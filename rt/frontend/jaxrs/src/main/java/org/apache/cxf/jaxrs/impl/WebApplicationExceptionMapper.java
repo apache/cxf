@@ -19,16 +19,15 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.util.ResourceBundle;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
-import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Message;
@@ -38,30 +37,15 @@ public class WebApplicationExceptionMapper
     implements ExceptionMapper<WebApplicationException> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WebApplicationExceptionMapper.class);
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WebApplicationExceptionMapper.class);
-    
+    private static final String ERROR_MESSAGE_START = "WebApplicationException has been caught, status: ";
     private boolean printStackTrace;
     
     public Response toResponse(WebApplicationException ex) {
         
-        String message = ex.getCause() == null ? ex.getMessage() : ex.getCause().getMessage();
-        if (message == null) {
-            if (ex.getCause() != null) {
-                message = "cause is " + ex.getCause().getClass().getName();
-            } else {
-                message = "no cause is available";
-            }
-        }
-        org.apache.cxf.common.i18n.Message errorMsg = 
-            new org.apache.cxf.common.i18n.Message("WEB_APP_EXCEPTION", BUNDLE, message);
-        if (LOG.isLoggable(Level.WARNING)) {
-            LOG.warning(errorMsg.toString());
-        }
-        Response r = ex.getResponse(); 
+        Response r = ex.getResponse();
         if (r == null) {
-            r = Response.status(500).type(MediaType.TEXT_PLAIN).entity(errorMsg.toString()).build();
+            r = Response.serverError().build();
         }
-        
         
         Message msg = PhaseInterceptorChain.getCurrentMessage();
         FaultListener flogger = null;
@@ -69,21 +53,43 @@ public class WebApplicationExceptionMapper
             flogger = (FaultListener)PhaseInterceptorChain.getCurrentMessage()
                 .getContextualProperty(FaultListener.class.getName());
         }
-        boolean doDefault = true;
-        if (flogger != null) {
-            doDefault = flogger.faultOccurred(ex, message, msg);
+        if (flogger != null || LOG.isLoggable(Level.FINE)) {
+            String errorMessage = buildErrorMessage(r, ex);
+            
+            boolean doDefault = 
+                flogger != null ? flogger.faultOccurred(ex, errorMessage, msg) : true;
+            if (doDefault && LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, errorMessage, ex);
+            }
         }
-        if (LOG.isLoggable(Level.FINE) && doDefault) {
-            LOG.log(Level.FINE, message, ex);
-        }
-        
         if (printStackTrace) {
-            ex.printStackTrace();
+            LOG.warning(getStackTrace(ex));
         }
         
         return r;
     }
 
+    private String buildErrorMessage(Response r, WebApplicationException ex) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ERROR_MESSAGE_START).append(r.getStatus());
+        
+        Throwable cause = ex.getCause();
+        String message = cause == null ? ex.getMessage() : cause.getMessage();
+        if (message == null && cause != null) {
+            message = "exception cause class: " + cause.getClass().getName();
+        }
+        if (message != null) {
+            sb.append(", message: ").append(message);
+        }
+        return sb.toString();
+    }
+    
+    private static String getStackTrace(Exception ex) { 
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
+    
     public void setPrintStackTrace(boolean printStackTrace) {
         this.printStackTrace = printStackTrace;
     }
