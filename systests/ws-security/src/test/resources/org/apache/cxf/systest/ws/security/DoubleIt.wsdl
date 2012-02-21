@@ -859,7 +859,6 @@
                 <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
                     <wsp:Policy>
                         <sp:MustSupportRefIssuerSerial />
-                        <sp:EnableRevocation/>
                     </wsp:Policy>
                 </sp:Wss10>
             </wsp:All>

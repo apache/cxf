@@ -61,6 +61,8 @@ public final class SecurityConstants {
     
     public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
     
+    public static final String ENABLE_REVOCATION = "ws-security.enableRevocation";
+    
     //WebLogic and WCF always encrypt UsernameTokens whenever possible
     //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
     //Be default, we will encrypt as well for interop reasons.  However, this
