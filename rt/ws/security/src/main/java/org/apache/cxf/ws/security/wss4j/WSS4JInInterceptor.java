@@ -195,6 +195,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         reqData.setWssConfig(config);
         
+                
         SOAPMessage doc = getSOAPMessage(msg);
         
         boolean doDebug = LOG.isLoggable(Level.FINE);
@@ -240,6 +241,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
              * they may be used for encryption too.
              */
             doReceiverAction(doAction, reqData);
+            
+            /*get chance to check msg context enableRevocation setting
+             *when use policy based ws-security where the WSHandler configuration
+             *isn't available
+             */
+            boolean enableRevocation = reqData.isRevocationEnabled() 
+                || MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
+            reqData.setEnableRevocation(enableRevocation);
             
             if (doTimeLog) {
                 t1 = System.currentTimeMillis();
