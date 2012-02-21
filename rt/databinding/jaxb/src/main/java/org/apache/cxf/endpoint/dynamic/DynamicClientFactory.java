@@ -506,6 +506,19 @@ public class DynamicClientFactory {
             if (key.startsWith("file:") || key.startsWith("jar:")) {
                 InputStream in = null;
                 try {
+                    if (key.contains("#")) {
+                        for (ServiceInfo si : serviceList) {
+                            for (SchemaInfo sci : si.getSchemas()) {
+                                if (key.equals(sci.getSystemId())) {
+                                    key = null;
+                                }
+                            }
+                        }
+                       
+                    }
+                    if (key == null) {
+                        continue;
+                    }
                     if (key.startsWith("file:")) {
                         in = new FileInputStream(new File(new URI(key)));
                     } else {
