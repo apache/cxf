@@ -56,10 +56,13 @@ public final class HttpUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(HttpUtils.class);
     private static final Logger LOG = LogUtils.getL7dLogger(HttpUtils.class);
     
+    private static final String REQUEST_PATH_TO_MATCH = "path_to_match";
+    private static final String REQUEST_PATH_TO_MATCH_SLASH = "path_to_match_slash";
+    
     private static final String ANY_IP_ADDRESS = "0.0.0.0";
     private static final String ANY_IP_ADDRESS_START = "://0.0.0.0";
     private static final int DEFAULT_HTTP_PORT = 80;
-    
+        
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
     
@@ -204,9 +207,16 @@ public final class HttpUtils {
     }
     
     public static String getPathToMatch(Message m, boolean addSlash) {
+        String var = addSlash ? REQUEST_PATH_TO_MATCH_SLASH : REQUEST_PATH_TO_MATCH;
+        String pathToMatch = (String)m.get(var);
+        if (pathToMatch != null) {
+            return pathToMatch; 
+        }
         String requestAddress = getProtocolHeader(m, Message.REQUEST_URI, "/");
         String baseAddress = getBaseAddress(m);
-        return getPathToMatch(requestAddress, baseAddress, addSlash);
+        pathToMatch = getPathToMatch(requestAddress, baseAddress, addSlash);
+        m.put(var, pathToMatch);
+        return pathToMatch;
     }
     
     public static String getProtocolHeader(Message m, String name, String defaultValue) {
@@ -260,6 +270,8 @@ public final class HttpUtils {
             path = "/" + path;
         }
         m.put(Message.REQUEST_URI, baseAddress + path);
+        m.remove(REQUEST_PATH_TO_MATCH);
+        m.remove(REQUEST_PATH_TO_MATCH_SLASH);
     }
 
     
