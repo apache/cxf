@@ -31,7 +31,6 @@ public class Wss10 extends AbstractSecurityAssertion {
     private boolean mustSupportRefIssuerSerial;
     private boolean mustSupportRefExternalURI;
     private boolean mustSupportRefEmbeddedToken;
-    private boolean enableRevocation;
 
     public Wss10(SPConstants version) {
         super(version);
@@ -93,20 +92,7 @@ public class Wss10 extends AbstractSecurityAssertion {
         this.mustSupportRefKeyIdentifier = mustSupportRefKeyIdentifier;
     }
     
-    /**
-     * @return Returns the enableRevocation.
-     */
-    public boolean isEnableRevocation() {
-        return enableRevocation;
-    }
-
-    /**
-     * @param enableRevocation The enableRevocation to set.
-     */
-    public void setEnableRevocation(boolean enableRevocation) {
-        this.enableRevocation = enableRevocation;
-    }
-
+        
     public QName getRealName() {
         return constants.getWSS10();
     }
@@ -166,13 +152,7 @@ public class Wss10 extends AbstractSecurityAssertion {
 
         }
         
-        if (isEnableRevocation()) {
-            // <sp:EnableRevocation />
-            writer.writeStartElement(prefix, SPConstants.ENABLE_REVOCATION, namespaceURI);
-            writer.writeEndElement();
-
-        }
-
+        
         // </wsp:Policy>
         writer.writeEndElement();
 

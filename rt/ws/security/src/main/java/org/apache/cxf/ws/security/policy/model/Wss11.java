@@ -152,13 +152,7 @@ public class Wss11 extends Wss10 {
             writer.writeEndElement();
         }
         
-        if (isEnableRevocation()) {
-            // <sp:EnableRevocation />
-            writer.writeStartElement(prefix, SPConstants.ENABLE_REVOCATION, namespaceURI);
-            writer.writeEndElement();
-
-        }
-
+        
         // </wsp:Policy>
         writer.writeEndElement();
 

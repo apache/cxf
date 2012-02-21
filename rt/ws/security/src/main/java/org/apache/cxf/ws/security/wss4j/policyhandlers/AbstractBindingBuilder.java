@@ -1397,11 +1397,8 @@ public abstract class AbstractBindingBuilder {
     public Crypto getEncryptionCrypto(TokenWrapper wrapper) throws WSSecurityException {
         Crypto crypto = getCrypto(wrapper, SecurityConstants.ENCRYPT_CRYPTO,
                                   SecurityConstants.ENCRYPT_PROPERTIES);
-        Wss10 wss10 = getWss10();
-        if (wss10 == null) {
-            return crypto;
-        }
-        boolean enableRevocation = wss10.isEnableRevocation();
+        boolean enableRevocation = MessageUtils.isTrue(
+                                       message.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             String encrUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);

@@ -513,6 +513,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("alice.properties"));
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("revocation.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENABLE_REVOCATION, 
+                                                      "true");
         
         DoubleIt di = new DoubleIt();
         di.setNumberToDouble(5);
