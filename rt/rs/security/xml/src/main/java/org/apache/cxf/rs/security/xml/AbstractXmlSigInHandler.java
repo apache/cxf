@@ -88,9 +88,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         boolean valid = false;
         Reference ref = null;
         try {
-            XMLSignature signature = new XMLSignature(signatureElement, "");
-            // TODO re-enable this line once we pick up xmlsec 1.5.0
-            // XMLSignature signature = new XMLSignature(signatureElement, "", true);  
+            XMLSignature signature = new XMLSignature(signatureElement, "", true);  
             ref = getReference(signature);
             Element signedElement = validateReference(root, ref);
             if (signedElement.hasAttributeNS(null, "ID")) {
