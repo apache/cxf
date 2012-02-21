@@ -91,7 +91,8 @@ public class Wss10 extends AbstractSecurityAssertion {
     public void setMustSupportRefKeyIdentifier(boolean mustSupportRefKeyIdentifier) {
         this.mustSupportRefKeyIdentifier = mustSupportRefKeyIdentifier;
     }
-
+    
+        
     public QName getRealName() {
         return constants.getWSS10();
     }
@@ -150,7 +151,8 @@ public class Wss10 extends AbstractSecurityAssertion {
             writer.writeEndElement();
 
         }
-
+        
+        
         // </wsp:Policy>
         writer.writeEndElement();
 

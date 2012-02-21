@@ -151,7 +151,8 @@ public class Wss11 extends Wss10 {
             writer.writeStartElement(prefix, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION, namespaceURI);
             writer.writeEndElement();
         }
-
+        
+        
         // </wsp:Policy>
         writer.writeEndElement();
 

@@ -75,7 +75,7 @@ public class WSS11Builder implements AssertionBuilder<Element> {
     
                 } else if (SPConstants.REQUIRE_SIGNATURE_CONFIRMATION.equals(name)) {
                     parent.setRequireSignatureConfirmation(true);
-                }
+                } 
                 child = DOMUtils.getNextElement(child);
             }
         }

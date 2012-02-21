@@ -489,4 +489,44 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         di.setNumberToDouble(5);
         assertEquals(10, pt.doubleIt(di, 1).getDoubledNumber());
     }
+    
+    @Test
+    public void testCXF4119() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+
+        Bus bus = bf.createBus();
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        
+        DoubleItPortTypeHeader pt;
+
+        QName portQName = new QName(NAMESPACE, "DoubleItPortCXF4119");
+        pt = service.getPort(portQName, DoubleItPortTypeHeader.class);
+        
+        updateAddressPort(pt, PORT);
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("alice.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                                      getClass().getResource("revocation.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENABLE_REVOCATION, 
+                                                      "true");
+        
+        DoubleIt di = new DoubleIt();
+        di.setNumberToDouble(5);
+        try {
+            pt.doubleIt(di, 1);
+            fail("Failure expected on a revoked certificate");
+        } catch (Exception ex) {
+            String errorMessage = ex.getMessage();
+            // Different errors using different JDKs...
+            assertTrue(errorMessage.contains("Certificate has been revoked")
+                       || errorMessage.contains("Certificate revocation")
+                       || errorMessage.contains("Error during certificate path validation"));
+        }
+    }
 }
