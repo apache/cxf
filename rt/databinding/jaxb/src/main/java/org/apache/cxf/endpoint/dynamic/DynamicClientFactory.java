@@ -66,10 +66,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
-import com.sun.tools.xjc.ErrorReceiver;
 import com.sun.tools.xjc.reader.internalizer.AbstractReferenceFinderImpl;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
-import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
+import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
+//import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
@@ -80,6 +80,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -793,20 +794,44 @@ public class DynamicClientFactory {
         try {
             Object o = ((ReflectionInvokationHandler)Proxy.getInvocationHandler(schemaCompiler)).getTarget();
             Field f = o.getClass().getDeclaredField("forest");
-            f.setAccessible(true);
-            DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic() {
+            Object forest = ReflectionUtil.setAccessible(f).get(o);
+            // Set the error handler
+            for (Method m : forest.getClass().getMethods()) {
+                if ("setErrorHandler".equals(m.getName())) {
+                    m.invoke(forest, o);
+                }
+            }
+            
+            f = forest.getClass().getDeclaredField("logic");
+            Object xil = ReflectionUtil.setAccessible(f).get(forest);
+            if (xil.getClass().getName().contains(".internal.")) {
+                xil = createWrapperLogic(xil, catalog);
+                ReflectionUtil.setAccessible(f).set(forest, xil);
+            }
+        } catch (Throwable ex)  {
+            //ignore
+            ex.printStackTrace();
+        }
+    }
+    private Object createWrapperLogic(final Object xil, final OASISCatalogManager catalog) {
+        try {
+            return new InternalizationLogic() {
                 public XMLFilterImpl createExternalReferenceFinder(DOMForest parent) {
                     return new ReferenceFinder(parent, catalog);
                 }
-
-            });
-            forest.setErrorHandler((ErrorReceiver)o);
-            f.set(o, forest);
-        } catch (Throwable ex)  {
+                public boolean checkIfValidTargetNode(DOMForest parent, Element bindings, Element target) {
+                    return ((InternalizationLogic)xil).checkIfValidTargetNode(parent, bindings, target);
+                }
+                public Element refineTarget(Element target) {
+                    return ((InternalizationLogic)xil).refineTarget(target);
+                }
+            };
+        } catch (Throwable ex) {
             //ignore
+            return xil;
         }
     }
-    
+
     private static final class ReferenceFinder extends AbstractReferenceFinderImpl {
         private Locator locator;
         private OASISCatalogManager catalog;
