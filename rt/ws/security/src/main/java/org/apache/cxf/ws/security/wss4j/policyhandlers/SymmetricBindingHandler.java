@@ -45,6 +45,7 @@ import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
+import org.apache.cxf.ws.security.policy.model.SpnegoContextToken;
 import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
@@ -159,10 +160,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 //SecureConversationToken
                 String tokenId = null;
                 SecurityToken tok = null;
-                if (encryptionToken instanceof IssuedToken || encryptionToken instanceof KerberosToken) {
-                    tok = getSecurityToken();
-                } else if (encryptionToken instanceof SecureConversationToken
-                    || encryptionToken instanceof SecurityContextToken) {
+                if (encryptionToken instanceof IssuedToken 
+                    || encryptionToken instanceof KerberosToken
+                    || encryptionToken instanceof SecureConversationToken
+                    || encryptionToken instanceof SecurityContextToken
+                    || encryptionToken instanceof SpnegoContextToken) {
                     tok = getSecurityToken();
                 } else if (encryptionToken instanceof X509Token) {
                     if (isRequestor()) {
@@ -284,9 +286,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             SecurityToken sigTok = null;
             if (sigToken != null) {
                 if (sigToken instanceof SecureConversationToken
-                    || sigToken instanceof SecurityContextToken) {
-                    sigTok = getSecurityToken();
-                } else if (sigToken instanceof IssuedToken || sigToken instanceof KerberosToken) {
+                    || sigToken instanceof SecurityContextToken
+                    || sigToken instanceof IssuedToken 
+                    || sigToken instanceof KerberosToken
+                    || sigToken instanceof SpnegoContextToken) {
                     sigTok = getSecurityToken();
                 } else if (sigToken instanceof X509Token) {
                     if (isRequestor()) {
@@ -546,7 +549,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setEncryptSymmKey(false);
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
                     
-                    if (encrToken instanceof IssuedToken) {
+                    if (encrToken instanceof IssuedToken || encrToken instanceof SpnegoContextToken) {
                         //Setting the AttachedReference or the UnattachedReference according to the flag
                         Element ref;
                         if (attached) {

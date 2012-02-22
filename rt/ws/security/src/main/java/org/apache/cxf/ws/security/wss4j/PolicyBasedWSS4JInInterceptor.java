@@ -542,15 +542,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
         
-        /*
-        WSSecurityEngineResult tsResult = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);
-        Element timestamp = null;
-        if (tsResult != null) {
-            Timestamp ts = (Timestamp)tsResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-            timestamp = ts.getElement();
-        }
-        */
-        
         //
         // Check policies
         //

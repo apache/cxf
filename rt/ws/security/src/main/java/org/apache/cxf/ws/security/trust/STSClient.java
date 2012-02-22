@@ -112,8 +112,10 @@ import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
 import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
+import org.apache.ws.security.processor.X509Util;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
@@ -150,6 +152,7 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     protected boolean useCertificateForConfirmationKeyInfo;
     protected boolean isSecureConv;
+    protected boolean isSpnego;
     protected boolean enableLifetime;
     protected int ttl = 300;
     
@@ -271,6 +274,14 @@ public class STSClient implements Configurable, InterceptorProvider {
         this.isSecureConv = secureConv;
     }
     
+    public boolean isSpnego() {
+        return isSpnego;
+    }
+
+    public void setSpnego(boolean spnego) {
+        this.isSpnego = spnego;
+    }
+    
     public boolean isEnableAppliesTo() {
         return enableAppliesTo;
     }
@@ -346,6 +357,10 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
+    }
+    
+    public String getTokenType() {
+        return tokenType;
     }
     
     public void setSendKeyType(boolean sendKeyType) {
@@ -474,15 +489,24 @@ public class STSClient implements Configurable, InterceptorProvider {
     }
 
     public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
+        return requestSecurityToken(appliesTo, null);
+    }
+    
+    public SecurityToken requestSecurityToken(String appliesTo, String binaryExchange) throws Exception {
         String action = null;
         if (isSecureConv) {
             action = namespace + "/RST/SCT";
         }
-        return requestSecurityToken(appliesTo, action, "/Issue", null);
+        return requestSecurityToken(appliesTo, action, "/Issue", null, binaryExchange);
+    }
+    
+    public SecurityToken requestSecurityToken(String appliesTo, String action, String requestType,
+            SecurityToken target) throws Exception {
+        return requestSecurityToken(appliesTo, action, requestType, target, null);
     }
 
     public SecurityToken requestSecurityToken(String appliesTo, String action, String requestType,
-                                              SecurityToken target) throws Exception {
+                                              SecurityToken target, String binaryExchange) throws Exception {
         createClient();
         BindingOperationInfo boi = findOperation("/RST/Issue");
 
@@ -528,6 +552,11 @@ public class STSClient implements Configurable, InterceptorProvider {
                 writer.writeEndElement();
             }
         }
+        
+        if (isSpnego) {
+            tokenType = STSUtils.getTokenTypeSCT(namespace);
+            sendKeyType = false;
+        }
 
         addRequestType(requestType, writer);
         if (enableAppliesTo) {
@@ -565,6 +594,8 @@ public class STSClient implements Configurable, InterceptorProvider {
             crypto = createCrypto(false);
             cert = getCert(crypto);
             writeElementsForRSTPublicKey(writer, cert);
+        } else if (isSpnego) {
+            addKeySize(keySize, writer);
         }
         
         if (target != null) {
@@ -575,6 +606,10 @@ public class STSClient implements Configurable, InterceptorProvider {
             }
             StaxUtils.copy(el, writer);
             writer.writeEndElement();
+        }
+        
+        if (binaryExchange != null) {
+            addBinaryExchange(binaryExchange, writer);
         }
 
         Element actAsSecurityToken = getActAsToken();
@@ -643,9 +678,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         byte[] requestorEntropy = null;
 
         if (!wroteKeySize && (!isSecureConv || keySize != 256)) {
-            writer.writeStartElement("wst", "KeySize", namespace);
-            writer.writeCharacters(Integer.toString(keySize));
-            writer.writeEndElement();
+            addKeySize(keySize, writer);
         }
 
         if (requiresEntropy) {
@@ -700,6 +733,23 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
 
         writer.writeEndElement();
+        writer.writeEndElement();
+    }
+    
+    protected void addBinaryExchange(
+        String binaryExchange, 
+        W3CDOMStreamWriter writer
+    ) throws XMLStreamException {
+        writer.writeStartElement("wst", "BinaryExchange", namespace);
+        writer.writeAttribute("EncodingType", BinarySecurity.BASE64_ENCODING);
+        writer.writeAttribute("ValueType", namespace + "/spnego");
+        writer.writeCharacters(binaryExchange);
+        writer.writeEndElement();
+    }
+    
+    protected void addKeySize(int keysize, W3CDOMStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement("wst", "KeySize", namespace);
+        writer.writeCharacters(Integer.toString(keysize));
         writer.writeEndElement();
     }
 
@@ -1128,21 +1178,42 @@ public class STSClient implements Configurable, InterceptorProvider {
     }
     
     protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
-        try {
-            EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-            WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
-            RequestData data = new RequestData();
-            data.setWssConfig(WSSConfig.getNewInstance());
-            data.setDecCrypto(createCrypto(true));
-            data.setCallbackHandler(createHandler());
-            List<WSSecurityEngineResult> result =
-                proc.handleToken(child, data, docInfo);
-            return 
-                (byte[])result.get(0).get(
-                    WSSecurityEngineResult.TAG_SECRET
-                );
-        } catch (IOException e) {
-            throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
+        String encryptionAlgorithm = X509Util.getEncAlgo(child);
+        // For the SPNEGO case just return the decoded cipher value and decrypt it later
+        if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
+            // Get the CipherValue
+            Element tmpE = 
+                WSSecurityUtil.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
+            byte[] cipherValue = null;
+            if (tmpE != null) {
+                tmpE = 
+                    WSSecurityUtil.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
+                if (tmpE != null) {
+                    String content = DOMUtils.getContent(tmpE);
+                    cipherValue = Base64.decode(content);
+                }
+            }
+            if (cipherValue == null) {
+                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY, "noCipher");
+            }
+            return cipherValue;
+        } else {
+            try {
+                EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
+                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+                RequestData data = new RequestData();
+                data.setWssConfig(WSSConfig.getNewInstance());
+                data.setDecCrypto(createCrypto(true));
+                data.setCallbackHandler(createHandler());
+                List<WSSecurityEngineResult> result =
+                    proc.handleToken(child, data, docInfo);
+                return 
+                    (byte[])result.get(0).get(
+                        WSSecurityEngineResult.TAG_SECRET
+                    );
+            } catch (IOException e) {
+                throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
+            }
         }
     }
 
@@ -1234,7 +1305,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (id == null && rur != null) {
             id = this.getIDFromSTR(rur);
         }
-        if (id == null) {
+        if (id == null && rst != null) {
             id = rst.getAttributeNS(WSConstants.WSU_NS, "Id");
         }
         return id;

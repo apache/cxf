@@ -114,6 +114,16 @@ public final class SecurityConstants {
     public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
     
     /**
+     * The JAAS Context name to use for Kerberos. This is currently only supported for SPNEGO.
+     */
+    public static final String KERBEROS_JAAS_CONTEXT_NAME = "ws-security.kerberos.jaas.context";
+    
+    /**
+     * The Kerberos Service Provider Name (spn) to use. This is currently only supported for SPNEGO.
+     */
+    public static final String KERBEROS_SPN = "ws-security.kerberos.spn";
+    
+    /**
      * Set this to "false" to not cache a SecurityToken per proxy object in the 
      * IssuedTokenInterceptorProvider. This should be done if a token is being retrieved
      * from an STS in an intermediary. The default value is "true".
@@ -134,7 +144,8 @@ public final class SecurityConstants {
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
             SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL,
             BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF,
-            KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT
+            KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
+            KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

@@ -46,12 +46,6 @@
         </cxf:features>
     </cxf:bus>
 
-    <bean id="kerberosValidator"
-        class="org.apache.ws.security.validate.KerberosTokenValidator">
-        <property name="contextName" value="bob"/>
-        <property name="serviceName" value="bob@service.ws.apache.org"/>
-    </bean> 
-    
     <jaxws:endpoint 
        id="SpnegoOverSymmetric"
        address="http://localhost:${testutil.ports.Server}/DoubleItSpnegoSymmetric" 
@@ -62,7 +56,7 @@
        wsdlLocation="org/apache/cxf/systest/ws/spnego/DoubleItSpnego.wsdl">
         
        <jaxws:properties>
-           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
+           <entry key="ws-security.kerberos.jaas.context" value="bob" />
        </jaxws:properties> 
      
     </jaxws:endpoint>  
@@ -77,7 +71,7 @@
        wsdlLocation="org/apache/cxf/systest/ws/spnego/DoubleItSpnego.wsdl">
         
        <jaxws:properties>
-           <entry key="ws-security.bst.validator" value-ref="kerberosValidator"/>
+           <entry key="ws-security.kerberos.jaas.context" value="bob" />
        </jaxws:properties> 
      
     </jaxws:endpoint>  
