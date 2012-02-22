@@ -39,6 +39,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.spnego.SpnegoClientAction;
 import org.apache.ws.security.spnego.SpnegoTokenContext;
 import org.apache.ws.security.util.Base64;
 
@@ -97,6 +98,12 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             );
         
         SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
+        Object spnegoClientAction = 
+            message.getContextualProperty(SecurityConstants.SPNEGO_CLIENT_ACTION);
+        if (spnegoClientAction instanceof SpnegoClientAction) {
+            spnegoToken.setSpnegoClientAction((SpnegoClientAction)spnegoClientAction);
+        }
+        
         try {
             spnegoToken.retrieveServiceTicket(jaasContext, callbackHandler, kerberosSpn);
         } catch (WSSecurityException e) {
