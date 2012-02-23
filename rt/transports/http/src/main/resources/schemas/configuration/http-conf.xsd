@@ -25,22 +25,23 @@
            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
            xmlns:sec="http://cxf.apache.org/configuration/security"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:beans="http://www.springframework.org/schema/beans" 
            xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
            elementFormDefault="qualified" 
            attributeFormDefault="unqualified"
            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
            jaxb:version="2.0">
 
-    <xs:include schemaLocation="http://cxf.apache.org/schemas/wsdl/http-conf.xsd"/> 
+    <xs:include schemaLocation="../wsdl/http-conf.xsd"/> 
     <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" 
                schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
     <xs:import namespace="http://cxf.apache.org/configuration/security" 
                schemaLocation="http://cxf.apache.org/schemas/configuration/security.xsd"/>
-    <xs:import namespace="http://www.springframework.org/schema/beans" 
-               schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
     <xs:import namespace="http://cxf.apache.org/configuration/beans" 
                schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
+
+    <xs:complexType name="identifiedType" abstract="true">
+      <xs:attribute name="id" type="xs:ID"/>
+    </xs:complexType>
 
     <!-- Conduit Specific Items -->
 
@@ -53,7 +54,7 @@
     <xs:element name="conduit">
       <xs:complexType>
         <xs:complexContent>
-          <xs:extension base="beans:identifiedType">
+          <xs:extension base="http-conf:identifiedType">
             <xs:all>
                 <xs:element ref="http-conf:client" minOccurs="0">
                    <xs:annotation>
@@ -127,7 +128,7 @@
     <xs:element name="destination">
       <xs:complexType>
         <xs:complexContent>
-          <xs:extension base="beans:identifiedType">
+          <xs:extension base="http-conf:identifiedType">
             <xs:all>
 	            <xs:element ref="http-conf:server" minOccurs="0">
 	               <xs:annotation>
