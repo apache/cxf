@@ -455,11 +455,17 @@ public class WadlGenerator implements RequestHandler {
             doWriteParam(sb, pm, type, getMethod(ori).getGenericParameterTypes()[pm.getIndex()],
                          pm.getName());
         } else {
-            doWriteBeanParam(sb, type, pm, null);
+            List<Class<?>> parentBeanClasses = new LinkedList<Class<?>>();
+            parentBeanClasses.add(type);
+            doWriteBeanParam(sb, type, pm, null, parentBeanClasses);
         }
     }
     
-    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName) {
+    private void doWriteBeanParam(StringBuilder sb, 
+                                  Class<?> type, 
+                                  Parameter pm, 
+                                  String parentName,
+                                  List<Class<?>> parentBeanClasses) {
         Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType(), true);
         for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
             String name = entry.getKey().getName();
@@ -470,8 +476,9 @@ public class WadlGenerator implements RequestHandler {
             boolean isPrimitive = InjectionUtils.isPrimitive(paramCls);
             if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
                 doWriteParam(sb, entry.getKey(), paramCls, paramCls, name);
-            } else {
-                doWriteBeanParam(sb, paramCls, entry.getKey(), name);
+            } else if (!parentBeanClasses.contains(paramCls)) {
+                parentBeanClasses.add(paramCls);
+                doWriteBeanParam(sb, paramCls, entry.getKey(), name, parentBeanClasses);
             }
         }
     }
