@@ -18,7 +18,14 @@
  */
 package org.apache.cxf.configuration.blueprint;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -33,8 +40,12 @@ import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableRefMetadata;
 import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.apache.cxf.bus.blueprint.BlueprintBus;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.osgi.framework.Bundle;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.CollectionMetadata;
@@ -48,6 +59,11 @@ public abstract class AbstractBPBeanDefinitionParser {
 
     private static final String XMLNS_BLUEPRINT = "http://www.osgi.org/xmlns/blueprint/v1.0.0";
     private static final String COMPONENT_ID = "component-id";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractBPBeanDefinitionParser.class);
+
+    private JAXBContext jaxbContext;
+    private Set<Class<?>> jaxbClasses;
 
     protected boolean hasBusProperty() {
         return false;
@@ -284,5 +300,61 @@ public abstract class AbstractBPBeanDefinitionParser {
             mapElement(ctx, bean, el, name);
             el = DOMUtils.getNextElement(el);
         }
+    }
+
+    protected void mapElementToJaxbProperty(ParserContext ctx,
+                                            MutableBeanMetadata bean, Element parent, 
+                                            QName name,
+                                            String propertyName, 
+                                            Class<?> c) {
+
+        Element data = DOMUtils.getFirstChildWithName(parent, name);
+        if (data == null) {
+            return;
+        }
+        
+        try {
+            Unmarshaller unmarshaller = getContext(c).createUnmarshaller();
+            MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
+            value.setObject(unmarshaller.unmarshal(data, c).getValue());
+            bean.addProperty(propertyName, value);
+        } catch (JAXBException e) {
+            LOG.warning("Unable to parse property " + propertyName + " due to " + e);
+        }
+    }
+
+    private synchronized JAXBContext getContext(Class<?> cls) {
+        if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
+            try {
+                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                if (jaxbClasses != null) {
+                    tmp.addAll(jaxbClasses);
+                }
+                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls), 
+                                            cls == null 
+                                            ? getClass().getClassLoader() 
+                                                : cls.getClassLoader());
+                if (cls != null) {
+                    boolean hasOf = false;
+                    for (Class<?> c : tmp) {
+                        if (c.getPackage() == cls.getPackage()
+                            && "ObjectFactory".equals(c.getSimpleName())) {
+                            hasOf = true;
+                        }
+                    }
+                    if (!hasOf) {
+                        tmp.add(cls);
+                    }
+                }
+                JAXBContextCache.scanPackages(tmp);
+                CachedContextAndSchemas ccs 
+                    = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
+                jaxbClasses = ccs.getClasses();
+                jaxbContext = ccs.getContext();
+            } catch (JAXBException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return jaxbContext;
     }
 }
