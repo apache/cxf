@@ -572,12 +572,18 @@ public class WadlGenerator implements RequestHandler {
                          pm.getName(), method.getParameterAnnotations()[pm.getIndex()],
                          isJson);
         } else {
-            doWriteBeanParam(sb, type, pm, null, isJson);
+            List<Class<?>> parentBeanClasses = new LinkedList<Class<?>>();
+            parentBeanClasses.add(type);
+            doWriteBeanParam(sb, type, pm, null, parentBeanClasses, isJson);
         }
     }
 
-    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName, 
-            boolean isJson) {
+    private void doWriteBeanParam(StringBuilder sb, 
+                                  Class<?> type, 
+                                  Parameter pm, 
+                                  String parentName,
+                                  List<Class<?>> parentBeanClasses,
+                                  boolean isJson) {
         Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType(), true);
         for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
             String name = entry.getKey().getName();
@@ -588,8 +594,9 @@ public class WadlGenerator implements RequestHandler {
             boolean isPrimitive = InjectionUtils.isPrimitive(paramCls) || paramCls.isEnum();
             if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
                 doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[]{}, isJson);
-            } else {
-                doWriteBeanParam(sb, paramCls, entry.getKey(), name, isJson);
+            } else if (!parentBeanClasses.contains(paramCls)) {
+                parentBeanClasses.add(paramCls);
+                doWriteBeanParam(sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
             }
         }
     }

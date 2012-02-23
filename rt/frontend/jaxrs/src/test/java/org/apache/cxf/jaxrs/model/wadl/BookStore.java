@@ -191,6 +191,9 @@ public class BookStore {
             return bean;
         }
         
+        public QueryBean2 getIt() {
+            return this;
+        }
     }
     
     public static class QueryBean3 {
