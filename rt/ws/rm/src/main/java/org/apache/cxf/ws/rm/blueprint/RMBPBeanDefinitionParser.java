@@ -19,25 +19,14 @@
 
 package org.apache.cxf.ws.rm.blueprint;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
-import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
@@ -51,10 +40,6 @@ import org.osgi.service.blueprint.reflect.Metadata;
  */
 public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
     protected static final String RM_NS = "http://cxf.apache.org/ws/rm/manager";
-
-    private static final Logger LOG = LogUtils.getL7dLogger(RMBPBeanDefinitionParser.class);
-
-    private Map<Class<?>, JAXBContext> jaxbContexts = new HashMap<Class<?>, JAXBContext>();
 
     private Class<?> beanClass;
     
@@ -100,8 +85,6 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         return bean;
     }
 
-
-
     @Override
     protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
         if ("store".equals(name)) {
@@ -109,33 +92,5 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         } else if ("addressingNamespace".equals(name)) {
             bean.addProperty("addressingNamespace", createValue(ctx, el.getTextContent()));
         }
-    }
-
-    protected void mapElementToJaxbProperty(ParserContext ctx,
-                                            MutableBeanMetadata bean, Element parent, 
-                                            QName name,
-                                            String propertyName, 
-                                            Class<?> c) {
-
-        Element data = DOMUtils.getFirstElement(parent);
-        
-        try {
-            Unmarshaller unmarshaller = getJAXBContext(c).createUnmarshaller();
-            MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
-            value.setObject(unmarshaller.unmarshal(data, c).getValue());
-            bean.addProperty(propertyName, value);
-        } catch (JAXBException e) {
-            LOG.warning("Unable to parse property " + propertyName + " due to " + e);
-        }
-    }
-
-    private synchronized JAXBContext getJAXBContext(Class<?> c) throws JAXBException {
-        JAXBContext jaxbContext = jaxbContexts.get(c);
-        if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(PackageUtils.getPackageName(c), 
-                                                  c.getClassLoader());
-            jaxbContexts.put(c, jaxbContext);
-        }
-        return jaxbContext;
     }
 }
