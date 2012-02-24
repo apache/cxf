@@ -31,6 +31,7 @@ import org.apache.cxf.rs.security.oauth.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth.utils.MD5SequenceGenerator;
+import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
 
 
@@ -54,6 +55,10 @@ public class AuthorizationCodeGrantHandler implements AccessTokenGrantHandler {
         if (grant == null) {
             return null;
         }
+        if (OAuthUtils.isExpired(grant.getIssuedAt(), grant.getLifetime())) {
+            throw new OAuthServiceException("invalid_grant");
+        }
+        
         String expectedRedirectUri = grant.getRedirectUri();
         if (expectedRedirectUri != null) {
             String providedRedirectUri = params.getFirst(REDIRECT_URI);

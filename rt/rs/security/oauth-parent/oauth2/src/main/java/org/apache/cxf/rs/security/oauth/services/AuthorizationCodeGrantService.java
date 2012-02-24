@@ -195,6 +195,11 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         if (!requestedScope.containsAll(approvedScope)) {
             return createErrorResponse(params, actualRedirectUri, INVALID_SCOPE);
         }
+        // the decision was allow but the approved scopes end up being empty
+        // in this case we default to the requestedScope
+        if (approvedScope.isEmpty()) {
+            approvedScope = requestedScope;
+        }
         codeReg.setApprovedScope(approvedScope);
         
         SecurityContext sc = getMessageContext().getSecurityContext();

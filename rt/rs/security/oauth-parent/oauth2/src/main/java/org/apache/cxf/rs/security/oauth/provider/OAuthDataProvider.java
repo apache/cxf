@@ -19,7 +19,6 @@
 
 package org.apache.cxf.rs.security.oauth.provider;
 
-import org.apache.cxf.rs.security.oauth.common.AccessToken;
 import org.apache.cxf.rs.security.oauth.common.Client;
 import org.apache.cxf.rs.security.oauth.common.ServerAccessToken;
 
@@ -60,13 +59,13 @@ public interface OAuthDataProvider {
      * @return AccessToken
      * @throws OAuthServiceException
      */
-    AccessToken refreshAccessToken(String clientId, String refreshToken) throws OAuthServiceException;
+    ServerAccessToken refreshAccessToken(String clientId, String refreshToken) throws OAuthServiceException;
 
     /**
      * Removes the token
      * @param token the token
      * @throws OAuthServiceException
      */
-    void removeAccessToken(String accessToken) throws OAuthServiceException;
+    void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;
     
 }

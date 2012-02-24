@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth.grants.code;
 
+import java.net.URI;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -35,6 +37,11 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     
     public AuthorizationCodeGrant(String code) {
         this.code = code;
+    }
+    
+    public AuthorizationCodeGrant(String code, URI uri) {
+        this.code = code;
+        redirectUri = uri.toString();
     }
 
     public void setRedirectUri(String redirectUri) {

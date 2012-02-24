@@ -32,6 +32,11 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static boolean isExpired(Long issuedAt, Long lifetime) {
+        return lifetime != -1
+            && issuedAt + lifetime < System.currentTimeMillis() / 1000;
+    }
+    
     public static boolean checkRequestURI(String servletPath, String uri) {
         boolean wildcard = uri.endsWith("*");
         String theURI = wildcard ? uri.substring(0, uri.length() - 1) : uri;

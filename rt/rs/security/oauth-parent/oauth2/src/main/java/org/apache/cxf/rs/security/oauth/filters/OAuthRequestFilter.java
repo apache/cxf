@@ -183,6 +183,10 @@ public class OAuthRequestFilter implements RequestHandler {
         if (accessToken == null) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);
         }
+        if (OAuthUtils.isExpired(accessToken.getIssuedAt(), accessToken.getLifetime())) {
+            dataProvider.removeAccessToken(accessToken);
+            AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);
+        }
         return accessToken;
     }
     
