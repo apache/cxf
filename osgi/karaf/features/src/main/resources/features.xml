@@ -83,7 +83,7 @@
     </feature>
     <feature name="wss4j" version="${cxf.wss4j.version}" resolver='(obr)'>
         <feature version='[2.4,3)'>opensaml</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlsec/${cxf.xmlsec.bundle.version}</bundle>
+        <bundle dependency="true">mvn:org.apache.santuario/xmlsec/${cxf.xmlsec.bundle.version}</bundle>
         <bundle>mvn:org.apache.ws.security/wss4j/${cxf.wss4j.version}</bundle>
     </feature>
 
