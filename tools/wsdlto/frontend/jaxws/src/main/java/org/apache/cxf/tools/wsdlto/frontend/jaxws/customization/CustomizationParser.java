@@ -572,8 +572,8 @@ public final class CustomizationParser {
     }
 
     private boolean isValidJaxbBindingFile(XMLStreamReader reader) {
-        if (ToolConstants.JAXB_BINDINGS.equals(reader.getName())) {
-
+        if (ToolConstants.JAXB_BINDINGS.equals(reader.getName())
+            || ToolConstants.SCHEMA.equals(reader.getName())) {
             return true;
         }
         return false;
