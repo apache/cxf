@@ -87,12 +87,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-security-oauth-test</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>  
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-http</artifactId>
             <version>${project.version}</version>
         </dependency>
