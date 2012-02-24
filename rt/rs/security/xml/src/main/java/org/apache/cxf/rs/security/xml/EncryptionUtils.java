@@ -18,11 +18,15 @@
  */
 package org.apache.cxf.rs.security.xml;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.cert.X509Certificate;
+import java.security.spec.MGF1ParameterSpec;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -38,8 +42,22 @@ public final class EncryptionUtils {
         throws WSSecurityException {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            cipher.init(mode, cert);
+            OAEPParameterSpec oaepParameterSpec = null;
+            if (XMLCipher.RSA_OAEP.equals(keyEncAlgo)) {
+                oaepParameterSpec = new OAEPParameterSpec(
+                    "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                );
+            }
+            if (oaepParameterSpec == null) {
+                cipher.init(mode, cert);
+            } else {
+                cipher.init(mode, cert.getPublicKey(), oaepParameterSpec);
+            }
         } catch (InvalidKeyException e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+            );
+        } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, e
             );
@@ -51,8 +69,22 @@ public final class EncryptionUtils {
         throws WSSecurityException {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            cipher.init(mode, key);
+            OAEPParameterSpec oaepParameterSpec = null;
+            if (XMLCipher.RSA_OAEP.equals(keyEncAlgo)) {
+                oaepParameterSpec = new OAEPParameterSpec(
+                    "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+                );
+            }
+            if (oaepParameterSpec == null) {
+                cipher.init(mode, key);
+            } else {
+                cipher.init(mode, key, oaepParameterSpec);
+            }
         } catch (InvalidKeyException e) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILED_ENCRYPTION, null, null, e
+            );
+        } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
                 WSSecurityException.FAILED_ENCRYPTION, null, null, e
             );
