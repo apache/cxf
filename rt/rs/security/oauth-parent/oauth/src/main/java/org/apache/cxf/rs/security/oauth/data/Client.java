@@ -28,7 +28,7 @@ public class Client {
     private String applicationName;
     private String applicationDescription;
     private String logoUri;
-    
+    private String callbackURI;
     private String loginName;
         
     private AccessToken preAuthorizedToken;
@@ -177,5 +177,13 @@ public class Client {
 
     public AccessToken getPreAuthorizedToken() {
         return preAuthorizedToken;
+    }
+
+    public void setCallbackURI(String callbackURI) {
+        this.callbackURI = callbackURI;
+    }
+
+    public String getCallbackURI() {
+        return callbackURI;
     }
 }
