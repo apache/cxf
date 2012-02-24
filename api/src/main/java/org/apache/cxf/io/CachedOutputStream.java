@@ -300,7 +300,7 @@ public class CachedOutputStream extends OutputStream {
         flush();
         if (totalLength < limit
             || limit == -1) {
-            writeCacheTo(out);
+            writeCacheTo(out, charsetName);
             return;
         }
 
