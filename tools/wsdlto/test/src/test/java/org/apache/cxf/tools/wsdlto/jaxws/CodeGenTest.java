@@ -1625,4 +1625,18 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
     }
 
+    
+    @Test
+    // CXF-4135
+    public void testPassShemaFileAsJAXBBinding() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_BINDING, getLocation("/wsdl2java_wsdl/Invoice.xsd"));
+        processor.setContext(env);
+        processor.execute();
+        File generateFromBindingFile = new File(output, "org/apache/invoice/Invoice.java");
+        assertTrue(generateFromBindingFile.exists());
+        File seiFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
+        assertTrue(seiFile.exists());
+    }
+    
 }
