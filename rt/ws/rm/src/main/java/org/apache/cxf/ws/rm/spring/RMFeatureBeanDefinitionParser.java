@@ -41,6 +41,8 @@ public class RMFeatureBeanDefinitionParser extends AbstractBeanDefinitionParser 
         mapElementToJaxbProperty(element, bean, 
                 new QName(RM_NS, "destinationPolicy"), "destinationPolicy");
         mapElementToJaxbProperty(element, bean, 
+                new QName(RM_NS, "RM10AddressingNamespace"), "RM10AddressingNamespace");
+        mapElementToJaxbProperty(element, bean, 
                 new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
                 "RMAssertion",
                 org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
@@ -57,8 +59,6 @@ public class RMFeatureBeanDefinitionParser extends AbstractBeanDefinitionParser 
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
         if ("store".equals(name)) {            
             setFirstChildAsProperty(e, ctx, bean, name);
-        } else if ("addressingNamespace".equals(name)) {
-            bean.addPropertyValue("addressingNamespace", e.getTextContent());
         }
     }
 

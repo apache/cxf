@@ -44,7 +44,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
       <wsrm-mgr:destinationPolicy>
           <wsrm-mgr:acksPolicy ImmediaAcksTimeout="2000" intraMessageThreshold="0"/>                    
       </wsrm-mgr:destinationPolicy>
-<!--       <wsrm-mgr:rm10AddressingNamespace>http://www.w3.org/2005/08/addressing</wsrm-mgr:rm10AddressingNamespace> -->
+      <wsrm-mgr:RM10AddressingNamespace uri="http://www.w3.org/2005/08/addressing"/>
       <wsrm-mgr:store>
           <bean class="org.apache.cxf.ws.rm.RMManagerConfigurationTest$TestStore">
               <property name="location" value="here"/>

@@ -278,7 +278,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                             String wsauri = null;
                             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
                             if (maps == null) {
-                                wsauri = getManager(message).getRMAddressingNamespace();
+                                wsauri = getManager(message).getAddressingNamespace(message);
                             } else {
                                 wsauri = maps.getNamespaceURI();
                             }

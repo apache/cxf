@@ -59,9 +59,9 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
+import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -112,7 +112,7 @@ public class RMManager {
     private InstrumentationManager instrumentationManager;
     private ManagedRMManager managedManager;
     private String rmNamespace = RM10Constants.NAMESPACE_URI;
-    private String rmAddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
+    private RM10AddressingNamespaceType rm10AddressingNamespace;
     
     public RMManager() {
         setEndpointMaps(new HashMap<ProtocolVariation, Map<Endpoint, RMEndpoint>>());
@@ -137,15 +137,18 @@ public class RMManager {
             return;
         }        
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
-        
-        ProtocolVariation protocol = ProtocolVariation.findVariant(getRMNamespace(),
-            getRMAddressingNamespace());
+        ProtocolVariation protocol = getConfiguredProtocol();
         Collection<SourceSequence> sss = store.getSourceSequences(id, protocol);
         if (null == sss || 0 == sss.size()) {                        
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
         recoverReliableEndpoint(client.getEndpoint(), client.getConduit(), protocol);
+    }
+
+    private ProtocolVariation getConfiguredProtocol() {
+        String addrns = rm10AddressingNamespace == null ? null : rm10AddressingNamespace.getUri();
+        return ProtocolVariation.findVariant(getRMNamespace(), addrns);
     }
     
     public void clientDestroyed(Client client) {
@@ -162,12 +165,12 @@ public class RMManager {
         rmNamespace = uri;
     }
 
-    public String getRMAddressingNamespace() {
-        return rmAddressingNamespace;
+    public RM10AddressingNamespaceType getRMAddressingNamespace() {
+        return rm10AddressingNamespace;
     }
 
-    public void setRMAddressingNamespace(String uri) {
-        rmAddressingNamespace = uri;
+    public void setRM10AddressingNamespace(RM10AddressingNamespaceType addrns) {
+        rm10AddressingNamespace = addrns;
     }
     
     public Bus getBus() {
@@ -350,7 +353,7 @@ public class RMManager {
      * @param message
      * @return namespace URI
      */
-    String getAddressingNamespace(Message message) {
+    public String getAddressingNamespace(Message message) {
         String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
         if (addrUri == null) {
             AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
@@ -358,7 +361,7 @@ public class RMManager {
                 addrUri = maps.getNamespaceURI();
             }
             if (addrUri == null) {
-                addrUri = getRMAddressingNamespace();
+                addrUri = getConfiguredProtocol().getWSANamespace();
             }
         }
         return addrUri;
@@ -415,7 +418,7 @@ public class RMManager {
             if (isServer) {
 
                 AddressingPropertiesImpl inMaps = RMContextUtils.retrieveMAPs(message, false, false);
-                inMaps.exposeAs(getRMAddressingNamespace());
+                inMaps.exposeAs(getConfiguredProtocol().getWSANamespace());
                 acksTo = RMUtils.createReference(inMaps.getTo().getValue());
                 to = inMaps.getReplyTo();
                 source.getReliableEndpoint().getServant().setUnattachedIdentifier(inSeqId);

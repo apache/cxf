@@ -23,6 +23,8 @@ package org.apache.cxf.ws.rm;
  * Supported protocol variations.
  */
 public enum ProtocolVariation {
+    
+    // these must be ordered so the default WS-A namespace is first for a particular WS-RM namespace
     RM10WSA200408(EncoderDecoder10Impl.INSTANCE, RM10Constants.INSTANCE),
     RM10WSA200508(EncoderDecoder10AImpl.INSTANCE, RM10Constants.INSTANCE),
     RM11WSA200508(EncoderDecoder11Impl.INSTANCE, RM11Constants.INSTANCE);
@@ -52,15 +54,18 @@ public enum ProtocolVariation {
     }
     
     /**
-     * Get the information for a supported version of WS-ReliableMessaging and WS-Addressing.
+     * Get the information for a supported version of WS-ReliableMessaging and WS-Addressing. If the WS-A
+     * namespace is not specified this just returns the first match on the WS-RM namespace, which should
+     * always be the default.
      * 
      * @param wsrm WS-RM namespace URI
-     * @param wsa WS-A namespace URI
+     * @param wsa WS-A namespace URI (<code>null</code> if not specified)
      * @return variant (<code>null</code> if not a supported version)
      */
     public static ProtocolVariation findVariant(String wsrm, String wsa) {
         for (ProtocolVariation variant : ProtocolVariation.values()) {
-            if (variant.getWSRMNamespace().equals(wsrm) && variant.getWSANamespace().equals(wsa)) {
+            if (variant.getWSRMNamespace().equals(wsrm)
+                && (wsa == null || variant.getWSANamespace().equals(wsa))) {
                 return variant;
             }
         }
