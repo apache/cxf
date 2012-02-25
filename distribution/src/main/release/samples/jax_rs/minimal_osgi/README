@@ -68,7 +68,7 @@ Running the sample
 
 You can run it directly from maven using the following command
 	
-	mvn integration-test
+	mvn exec:exec
 
 Note that when you run the sample this way, your input to the OSGI console will not echo. No worries, it'll still be processed!
 
