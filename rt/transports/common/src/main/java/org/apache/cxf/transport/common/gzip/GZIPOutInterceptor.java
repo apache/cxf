@@ -76,6 +76,11 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final Pattern ZERO_Q = Pattern.compile(";\\s*q=0(?:\\.0+)?$");
 
     /**
+     * regular expression which can split encodings
+     */
+    public static final Pattern ENCODINGS = Pattern.compile("[,\\s]*,\\s*");
+
+    /**
      * Key under which we store the original output stream on the message, for
      * use by the ending interceptor.
      */
@@ -195,7 +200,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     List<String> nonZeros = new ArrayList<String>(3);
 
                     for (String headerLine : acceptEncodingHeader) {
-                        String[] encodings = headerLine.trim().split("[,\\s]*,\\s*");
+                        String[] encodings = ENCODINGS.split(headerLine.trim());
 
                         for (String enc : encodings) {
                             Matcher m = ZERO_Q.matcher(enc);
