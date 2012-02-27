@@ -24,16 +24,10 @@
            attributeFormDefault="unqualified"
            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
            xmlns:tns="http://cxf.apache.org/configuration/security"
-           xmlns:beans="http://www.springframework.org/schema/beans"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:pt="http://cxf.apache.org/configuration/parameterized-types" 
-           xsi:schemaLocation="
-               http://www.springframework.org/schema/beans
-               http://www.springframework.org/schema/beans/spring-beans.xsd"
            jaxb:version="2.0">
 
-    <xs:import namespace="http://www.springframework.org/schema/beans"/>
-    
     <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
                schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
     
