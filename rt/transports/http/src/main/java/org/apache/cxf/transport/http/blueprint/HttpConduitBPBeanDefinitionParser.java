@@ -19,17 +19,25 @@
 
 package org.apache.cxf.transport.http.blueprint;
 
+import java.io.StringWriter;
+
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.configuration.jsse.spring.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.MessageTrustDecider;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -50,11 +58,6 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
         mapElementToJaxbProperty(context, bean, element,
                 new QName(HTTP_NS, "authorization"), "authorization", AuthorizationPolicy.class);
         
-        mapElementToJaxbProperty(context, bean, element,
-                new QName(HTTP_NS, "tlsClientParameters"), "tlsClientParameters", TLSClientParameters.class);
-        
-        //TODO handle those bean/ref dual entries (basicAuthSupplier and trustDecider)
-
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
 
@@ -67,5 +70,44 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
     protected void processNameAttribute(Element element, ParserContext context, MutableBeanMetadata bean,
                                         String val) {
         bean.setId(val);
+    }
+
+    @Override
+    protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
+        if ("tlsClientParameters".equals(name)) {
+            mapTLSClientParameters(ctx, bean, el);
+        } else if ("trustDecider".equals(name)) {
+            mapBeanOrClassElement(ctx, bean, el, MessageTrustDecider.class);
+        } else if ("authSupplier".equals(name)) {
+            mapBeanOrClassElement(ctx, bean, el, HttpAuthSupplier.class);
+        }
+    }
+
+    private void mapTLSClientParameters(ParserContext ctx, MutableBeanMetadata bean, Element el) {
+        StringWriter writer = new StringWriter();
+        XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
+        try {
+            StaxUtils.copy(el, xmlWriter);
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        Object v = TLSClientParametersConfig.createTLSClientParameters(writer.toString());
+        MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
+        value.setObject(v);
+        bean.addProperty("tlsClientParameters", value);
+    }
+
+    
+    private void mapBeanOrClassElement(ParserContext ctx, MutableBeanMetadata bean, Element el, 
+                                       Class<?> cls) {
+        String elementName = el.getLocalName();
+        String classProperty = el.getAttribute("class");
+        String beanref = el.getAttribute("bean");
+        if (classProperty != null && !classProperty.equals("")) {
+            bean.addProperty(elementName, createObjectOfClass(ctx, classProperty));
+        } else if (beanref != null && !beanref.equals("")) {
+            bean.addProperty(elementName, createRef(ctx, beanref));
+        }
     }
 }
