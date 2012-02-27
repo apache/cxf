@@ -38,6 +38,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String state;
     private String proposedScope;
     private String authenticityToken;
+    private String replyTo;
     
     private String applicationName;
     private String applicationWebUri;
@@ -126,6 +127,14 @@ public class OAuthAuthorizationData implements Serializable {
 
     public String getProposedScope() {
         return proposedScope;
+    }
+
+    public void setReplyTo(String replyTo) {
+        this.replyTo = replyTo;
+    }
+
+    public String getReplyTo() {
+        return replyTo;
     }
 
 }

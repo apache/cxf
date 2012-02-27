@@ -48,6 +48,7 @@ import org.apache.cxf.rs.security.oauth.grants.code.AuthorizationCodeDataProvide
 import org.apache.cxf.rs.security.oauth.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth.grants.code.ServerAuthorizationCodeGrant;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.security.LoginSecurityContext;
 
 
@@ -61,22 +62,8 @@ import org.apache.cxf.security.LoginSecurityContext;
 @Path("/authorize")
 public class AuthorizationCodeGrantService extends AbstractOAuthService {
 
-    private static final String SUPPORTED_RESPONSE_TYPE = "code";
-    private static final String REDIRECT_URI = "redirect_uri";
-    private static final String SCOPE = "scope";
-    private static final String STATE = "state";
-    
-    private static final String UNSUPPORTED_RESPONSE_TYPE = "unsupported_response_type";
-    private static final String UNAUTHORIZED_CLIENT = "unauthorized_client";
-    private static final String INVALID_SCOPE = "invalid_scope";
-    private static final String ACCESS_DENIED = "access_denied";
-    
     private static final long DEFAULT_CODE_GRANT_LIFETIME = 3600L;
     
-    private static final String SESSION_AUTHENTICITY_TOKEN = "session_authenticity_token";
-    private static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
-    private static final String AUTHORIZATION_DECISION_ALLOW = "allow";
-       
     private long grantLifetime = DEFAULT_CODE_GRANT_LIFETIME;
     
     @GET
@@ -102,21 +89,22 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
     
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
         Client client = getClient(params); 
-        String redirectUri = validateRedirectUri(client, params.getFirst(REDIRECT_URI)); 
+        String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
         if (!client.isConfidential()) {
-            return createErrorResponse(params, redirectUri, UNAUTHORIZED_CLIENT);
+            return createErrorResponse(params, redirectUri, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
-        if (params.getFirst(SUPPORTED_RESPONSE_TYPE) == null) {
-            return createErrorResponse(params, redirectUri, UNSUPPORTED_RESPONSE_TYPE);
+        String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
+        if (responseType == null || !responseType.equals(OAuthConstants.CODE_RESPONSE_TYPE)) {
+            return createErrorResponse(params, redirectUri, OAuthConstants.UNSUPPORTED_RESPONSE_TYPE);
         }
         
         List<OAuthPermission> permissions = null;
         try {
-            List<String> list = parseScope(params.getFirst(SCOPE));
+            List<String> list = parseScope(params.getFirst(OAuthConstants.SCOPE));
             permissions = ((AuthorizationCodeDataProvider)getDataProvider())
                 .convertScopeToPermissions(list);
         } catch (OAuthServiceException ex) {
-            return createErrorResponse(params, redirectUri, INVALID_SCOPE);
+            return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         OAuthAuthorizationData data = 
             createAuthorizationData(client, params, permissions);
@@ -147,32 +135,36 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         secData.setProposedScope(sb.toString());
         
         secData.setClientId(client.getClientId());
-        secData.setRedirectUri(params.getFirst(REDIRECT_URI));
-        secData.setState(params.getFirst(STATE));
+        secData.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
+        secData.setState(params.getFirst(OAuthConstants.STATE));
         
         secData.setApplicationName(client.getApplicationName()); 
         secData.setApplicationWebUri(client.getApplicationWebUri());
         secData.setApplicationDescription(client.getApplicationDescription());
         secData.setApplicationLogoUri(client.getApplicationLogoUri());
         
+        String replyTo = getMessageContext().getUriInfo()
+            .getAbsolutePathBuilder().path("decision").build().toString();
+        secData.setReplyTo(replyTo);
+        
         return secData;
     }
     
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
         
-        if (!compareRequestAndSessionTokens(params.getFirst(SESSION_AUTHENTICITY_TOKEN))) {
+        if (!compareRequestAndSessionTokens(params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN))) {
             throw new WebApplicationException(400);     
         }
         
         Client client = getClient(params);
-        String originalRedirectUri = params.getFirst(REDIRECT_URI);
+        String originalRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);
         String actualRedirectUri = validateRedirectUri(client, originalRedirectUri);
         
-        String decision = params.getFirst(AUTHORIZATION_DECISION_KEY);
-        boolean allow = AUTHORIZATION_DECISION_ALLOW.equals(decision);
+        String decision = params.getFirst(OAuthConstants.AUTHORIZATION_DECISION_KEY);
+        boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
 
         if (!allow) {
-            return createErrorResponse(params, actualRedirectUri, ACCESS_DENIED);
+            return createErrorResponse(params, actualRedirectUri, OAuthConstants.ACCESS_DENIED);
         }
         
         AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration(); 
@@ -182,18 +174,18 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         codeReg.setLifetime(grantLifetime);
         codeReg.setIssuedAt(System.currentTimeMillis() / 1000);
         
-        List<String> requestedScope = parseScope(params.getFirst(SCOPE));
+        List<String> requestedScope = parseScope(params.getFirst(OAuthConstants.SCOPE));
         codeReg.setRequestedScope(requestedScope);
 
         List<String> approvedScope = new LinkedList<String>(); 
         for (String rScope : requestedScope) {
             String param = params.getFirst(rScope + "_status");
-            if (param != null && AUTHORIZATION_DECISION_ALLOW.equals(param)) {
+            if (param != null && OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(param)) {
                 approvedScope.add(rScope);
             }
         }
         if (!requestedScope.containsAll(approvedScope)) {
-            return createErrorResponse(params, actualRedirectUri, INVALID_SCOPE);
+            return createErrorResponse(params, actualRedirectUri, OAuthConstants.INVALID_SCOPE);
         }
         // the decision was allow but the approved scopes end up being empty
         // in this case we default to the requestedScope
@@ -218,10 +210,10 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         try {
             grant = ((AuthorizationCodeDataProvider)getDataProvider()).createCodeGrant(codeReg);
         } catch (OAuthServiceException ex) {
-            return createErrorResponse(params, actualRedirectUri, ACCESS_DENIED);
+            return createErrorResponse(params, actualRedirectUri, OAuthConstants.ACCESS_DENIED);
         }
         
-        UriBuilder ub = getRedirectUriBuilder(params.getFirst(STATE), actualRedirectUri);
+        UriBuilder ub = getRedirectUriBuilder(params.getFirst(OAuthConstants.STATE), actualRedirectUri);
         ub.queryParam("code", grant.getCode());
         return Response.seeOther(ub.build()).build();    
     }
@@ -229,7 +221,7 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String redirectUri,
                                            String error) {
-        UriBuilder ub = getRedirectUriBuilder(params.getFirst(STATE), redirectUri);
+        UriBuilder ub = getRedirectUriBuilder(params.getFirst(OAuthConstants.STATE), redirectUri);
         ub.queryParam("error", error);
         return Response.seeOther(ub.build()).build();
     }
@@ -250,7 +242,7 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
     private UriBuilder getRedirectUriBuilder(String state, String redirectUri) {
         UriBuilder ub = UriBuilder.fromUri(redirectUri);
         if (state != null) { 
-            ub.queryParam(STATE, state);
+            ub.queryParam(OAuthConstants.STATE, state);
         }
         return ub;
     }
@@ -261,7 +253,7 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         if (redirectUri != null) {
             String webUri = client.getApplicationWebUri();
             if (uris.size() > 0 && !uris.contains(redirectUri)
-                || webUri != null && !webUri.startsWith(redirectUri)) {
+                || webUri != null && !redirectUri.startsWith(webUri)) {
                 redirectUri = null;
             } 
         } else if (uris.size() == 1) {
@@ -277,18 +269,18 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         HttpSession session = getMessageContext().getHttpServletRequest().getSession();
         String value = UUID.randomUUID().toString();
         secData.setAuthenticityToken(value);
-        session.setAttribute(SESSION_AUTHENTICITY_TOKEN, value);
+        session.setAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN, value);
     }
     
     private boolean compareRequestAndSessionTokens(String requestToken) {
         HttpSession session = getMessageContext().getHttpServletRequest().getSession();
-        String sessionToken = (String)session.getAttribute(SESSION_AUTHENTICITY_TOKEN);
+        String sessionToken = (String)session.getAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
         
         if (StringUtils.isEmpty(sessionToken)) {
             return false;
         }
         
-        session.removeAttribute(SESSION_AUTHENTICITY_TOKEN);
+        session.removeAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
         return requestToken.equals(sessionToken);
     }
 }

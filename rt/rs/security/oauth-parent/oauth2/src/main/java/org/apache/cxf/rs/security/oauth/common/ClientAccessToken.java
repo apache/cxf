@@ -18,39 +18,38 @@
  */
 package org.apache.cxf.rs.security.oauth.common;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
  * Base Token representation
  */
-@XmlRootElement
 public class ClientAccessToken extends AccessToken {
 
-    @XmlElement(name = "scope")
-    private String approvedScope;
-    @XmlElement(name = "refresh_token")
-    private String refreshToken;
-       
+    private String scope;
+    private String rToken;
+    
+    public ClientAccessToken(String type, String tokenKey) {
+        this(AccessTokenType.valueOf(type), tokenKey);
+    }
+    
     public ClientAccessToken(AccessTokenType type, String tokenKey) {
         super(type, tokenKey);
     }
 
     public void setApprovedScope(String approvedScope) {
-        this.approvedScope = approvedScope;
+        this.scope = approvedScope;
     }
 
     public String getApprovedScope() {
-        return approvedScope;
+        return scope;
     }
 
     public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+        this.rToken = refreshToken;
     }
 
     public String getRefreshToken() {
-        return refreshToken;
+        return rToken;
     }
 
 }

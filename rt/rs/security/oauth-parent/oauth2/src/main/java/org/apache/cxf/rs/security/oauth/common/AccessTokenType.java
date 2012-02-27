@@ -28,6 +28,14 @@ public enum AccessTokenType {
         this.type = type;
     }
 
+    public static AccessTokenType fromString(String str) {
+        if ("bearer".equals(str)) {
+            return BEARER;
+        } else {
+            throw new IllegalArgumentException(str);
+        }
+    }
+    
     public String getTokenType() {
         return type;
     }
@@ -35,4 +43,5 @@ public enum AccessTokenType {
     public String toString() {
         return type;
     }
+    
 }

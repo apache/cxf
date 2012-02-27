@@ -20,16 +20,12 @@ package org.apache.cxf.rs.security.oauth.common;
 
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElement;
-
 /**
  * Base Token representation
  */
 public abstract class AccessToken {
 
-    @XmlElement(name = "access_token")
     private String tokenKey;
-    @XmlElement(name = "token_type")
     private AccessTokenType tokenType;
     private Map<String, String> parameters;
     

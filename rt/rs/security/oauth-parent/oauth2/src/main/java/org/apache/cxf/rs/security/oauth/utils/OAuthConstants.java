@@ -23,6 +23,41 @@ package org.apache.cxf.rs.security.oauth.utils;
  * Miscellaneous constants 
  */
 public final class OAuthConstants {
+    // Common OAuth2 constants
+    public static final String CLIENT_ID = "client_id";
+    public static final String CLIENT_SECRET = "client_secret";
+    public static final String REDIRECT_URI = "redirect_uri";
+    public static final String SCOPE = "scope";
+    public static final String STATE = "state";
+    public static final String ACCESS_TOKEN = "access_token";
+    public static final String ACCESS_TOKEN_TYPE = "token_type";
+    public static final String GRANT_TYPE = "grant_type";
+    public static final String RESPONSE_TYPE = "response_type";
+    public static final String TOKEN_RESPONSE_TYPE = "token";
+    
+    // Authorization Code Grant
+    public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
+    public static final String AUTHORIZATION_CODE_VALUE = "code";
+    public static final String CODE_RESPONSE_TYPE = "code";
+    public static final String SESSION_AUTHENTICITY_TOKEN = "session_authenticity_token";
+    public static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
+    public static final String AUTHORIZATION_DECISION_ALLOW = "allow";
+    public static final String AUTHORIZATION_DECISION_DENY = "deny";
+    
+    // Error constants
+    public static final String ERROR_KEY = "error";
+    public static final String ERROR_DESCRIPTION_KEY = "error_description";
+    
+    public static final String SERVER_ERROR = "server_error";
+    public static final String INVALID_REQUEST = "invalid_request";
+    public static final String INVALID_GRANT = "invalid_grant";
+    public static final String UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
+    public static final String UNSUPPORTED_RESPONSE_TYPE = "unsupported_response_type";
+    public static final String UNAUTHORIZED_CLIENT = "unauthorized_client";
+    public static final String INVALID_SCOPE = "invalid_scope";
+    public static final String ACCESS_DENIED = "access_denied";
+    
     private OAuthConstants() {
     }
+    
 }

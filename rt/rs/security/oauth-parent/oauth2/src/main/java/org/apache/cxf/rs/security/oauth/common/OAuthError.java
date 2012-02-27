@@ -18,21 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth.common;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
 public class OAuthError {
     
-    public static final String INVALID_REQUEST = "invalid_request";
-    
-    @XmlElement(name = "error")
     private String error;
-    @XmlElement(name = "error_description")
     private String errorDescription;
-    @XmlElement(name = "error_uri")
     private String errorUri;
-    @XmlElement(name = "state")
     private String state;
     
     public OAuthError() {

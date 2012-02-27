@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth.services;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -35,20 +36,17 @@ import org.apache.cxf.rs.security.oauth.common.Client;
 import org.apache.cxf.rs.security.oauth.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth.common.OAuthError;
 import org.apache.cxf.rs.security.oauth.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth.grants.code.AuthorizationCodeGrantHandler;
 import org.apache.cxf.rs.security.oauth.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth.utils.AuthorizationUtils;
+import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 
 
 @Path("/token")
 public class AccessTokenService extends AbstractOAuthService {
-    private static final String CLIENT_SECRET = "client_secret";
-    private static final String GRANT_TYPE = "grant_type";
-    private static final String INVALID_GRANT = "invalid_grant";
-    private static final String UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
-    
-    private List<AccessTokenGrantHandler> grantHandlers;
+    private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
     
     public void setGrantHandlers(List<AccessTokenGrantHandler> handlers) {
         grantHandlers = handlers;
@@ -62,7 +60,7 @@ public class AccessTokenService extends AbstractOAuthService {
         
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
-            return createErrorResponse(params, UNSUPPORTED_GRANT_TYPE);
+            return createErrorResponse(params, OAuthConstants.UNSUPPORTED_GRANT_TYPE);
         }
         
         ServerAccessToken serverToken = null;
@@ -72,7 +70,7 @@ public class AccessTokenService extends AbstractOAuthService {
             // the error response is to be returned next
         }
         if (serverToken == null) {
-            return createErrorResponse(params, INVALID_GRANT);
+            return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
         }
         getDataProvider().persistAccessToken(serverToken);
         
@@ -86,10 +84,10 @@ public class AccessTokenService extends AbstractOAuthService {
         Client client = null;
         SecurityContext sc = getMessageContext().getSecurityContext();
         
-        if (params.containsKey(CLIENT_ID)) {
+        if (params.containsKey(OAuthConstants.CLIENT_ID)) {
             // both client_id and client_secret are expected in the form payload
-            client = getAndValidateClient(params.getFirst(CLIENT_ID),
-                                          params.getFirst(CLIENT_SECRET));
+            client = getAndValidateClient(params.getFirst(OAuthConstants.CLIENT_ID),
+                                          params.getFirst(OAuthConstants.CLIENT_SECRET));
         } else if (sc.getUserPrincipal() != null) {
             // client has already authenticated
             Principal p = sc.getUserPrincipal();
@@ -103,7 +101,7 @@ public class AccessTokenService extends AbstractOAuthService {
                 // in which case the mapping between the scheme and the client_id
                 // should've been done, in which case the client_id is expected
                 // on the current message
-                Object clientIdProp = getMessageContext().get(CLIENT_ID);
+                Object clientIdProp = getMessageContext().get(OAuthConstants.CLIENT_ID);
                 if (clientIdProp != null) {
                     client = getClient(clientIdProp.toString());
                 }
@@ -133,7 +131,7 @@ public class AccessTokenService extends AbstractOAuthService {
     }
     
     protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {
-        String grantType = params.getFirst(GRANT_TYPE);        
+        String grantType = params.getFirst(OAuthConstants.GRANT_TYPE);        
         if (grantType != null) {
             for (AccessTokenGrantHandler handler : grantHandlers) {
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
@@ -143,6 +141,8 @@ public class AccessTokenService extends AbstractOAuthService {
             if (grantHandlers.size() == 0) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
+                    handler.setCodeProvider(
+                            (AuthorizationCodeDataProvider)super.getDataProvider());
                     return handler;
                 }
             }

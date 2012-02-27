@@ -29,13 +29,12 @@ import org.apache.cxf.rs.security.oauth.common.Client;
 import org.apache.cxf.rs.security.oauth.common.OAuthError;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 
 /**
  * Abstract utility class which OAuth services extend
  */
 public abstract class AbstractOAuthService {
-    protected static final String CLIENT_ID = "client_id";
-    
     private MessageContext mc;
     private OAuthDataProvider dataProvider;
     
@@ -61,7 +60,7 @@ public abstract class AbstractOAuthService {
     }
     
     protected Client getClient(MultivaluedMap<String, String> params) {
-        return getClient(params.getFirst(CLIENT_ID));
+        return getClient(params.getFirst(OAuthConstants.CLIENT_ID));
     }
     protected Client getClient(String clientId) {
         Client client = null;
@@ -81,7 +80,8 @@ public abstract class AbstractOAuthService {
     }
     
     protected void reportInvalidRequestError(String errorDescription) {
-        OAuthError error = new OAuthError(OAuthError.INVALID_REQUEST, errorDescription);
+        OAuthError error = 
+            new OAuthError(OAuthConstants.INVALID_REQUEST, errorDescription);
         throw new WebApplicationException(
                   Response.status(400).type(MediaType.APPLICATION_JSON).entity(error).build());
     }
