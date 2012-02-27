@@ -112,7 +112,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
 
     public Map<String, String> readJSONResponse(InputStream is) throws IOException  {
         String str = IOUtils.readStringFromStream(is).trim();
-        if (str.isEmpty()) {
+        if (str.length() == 0) {
             return Collections.emptyMap();
         }
         if (!str.startsWith("{") || !str.endsWith("}")) {
