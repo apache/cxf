@@ -77,7 +77,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     }
     
     public void setSymmetricEncAlgorithm(String algo) {
-        if (!algo.startsWith(EncryptionConstants.EncryptionSpecNS)) {
+        if (!(algo.startsWith(EncryptionConstants.EncryptionSpecNS)
+            || algo.startsWith(EncryptionConstants.EncryptionSpec11NS))) {
             algo = EncryptionConstants.EncryptionSpecNS + algo;
         }
         symEncAlgo = algo;
@@ -156,11 +157,14 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             //
             String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
             KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)) {
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
                 keyGen.init(128);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)) {
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
                 keyGen.init(192);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)) {
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
                 keyGen.init(256);
             }
             return keyGen;
