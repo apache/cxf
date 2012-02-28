@@ -19,8 +19,11 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,6 +40,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
@@ -101,6 +107,15 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     }
     
     @Test
+    public void testGetBook123Fail() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
+        wc.accept("text/xml");
+        wc.header("fail-write", "");
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
+    
+    @Test
     public void testGetBookUsingStaxWriter() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/books/123",
                       "text/xml", 200);
@@ -137,6 +152,17 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
                 return new CachingXmlEventWriter();
             } else {
                 throw new RuntimeException();
+            }
+        }
+        @Override
+        public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
+            MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
+            List<String> failHeaders = getContext().getHttpHeaders().getRequestHeader("fail-write");
+            if (failHeaders.size() > 0) {
+                os.write("fail".getBytes());
+                throw new IOException();
+            } else {
+                super.writeTo(obj, cls, genericType, anns, m, headers, os);
             }
         }
     }
