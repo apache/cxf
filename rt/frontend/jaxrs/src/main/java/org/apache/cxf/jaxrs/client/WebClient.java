@@ -297,7 +297,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response form(Map<String, List<Object>> values) {
-        type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        type(MediaType.APPLICATION_FORM_URLENCODED);
         return doInvoke("POST", values, InputStream.class, InputStream.class);
     }
     
@@ -307,7 +307,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response form(Form form) {
-        type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+        type(MediaType.APPLICATION_FORM_URLENCODED);
         return doInvoke("POST", form.getData(), InputStream.class, InputStream.class);
     }
     
@@ -621,7 +621,11 @@ public class WebClient extends AbstractClient {
         MultivaluedMap<String, String> headers = getHeaders();
         boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
         if (contentTypeNotSet) {
-            String ct = body != null ? MediaType.APPLICATION_XML_TYPE.toString() : "*/*";
+            String ct = "*/*";
+            if (body != null) { 
+                ct = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
+                                          : MediaType.APPLICATION_XML;
+            }
             headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
         }
         if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {

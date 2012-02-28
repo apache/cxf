@@ -166,8 +166,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             status = isResponseNull(responseObj) ? 204 : 200;
         }
         
-        boolean responseHeadersCopied = isResponseHeadersCopied(message);
-        setResponseStatus(message, status, responseHeadersCopied);
+        setResponseStatus(message, status);
         
         Map<String, List<Object>> theHeaders = 
             (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
@@ -358,7 +357,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 ex.printStackTrace();
             }
         }
-        message.put(Message.RESPONSE_CODE, 500);
+        setResponseStatus(message, 500);
         writeResponseErrorMessage(out, "SERIALIZE_ERROR", 
                                   responseObj.getClass().getSimpleName()); 
             
@@ -470,8 +469,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
    
-    private void setResponseStatus(Message message, int status, boolean responseHeadersCopied) {
+    private void setResponseStatus(Message message, int status) {
         message.put(Message.RESPONSE_CODE, status);   
+        boolean responseHeadersCopied = isResponseHeadersCopied(message);
         if (responseHeadersCopied) {
             HttpServletResponse response = 
                 (HttpServletResponse)message.get(AbstractHTTPDestination.HTTP_RESPONSE);
