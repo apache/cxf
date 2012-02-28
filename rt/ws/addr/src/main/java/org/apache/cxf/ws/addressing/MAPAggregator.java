@@ -623,7 +623,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                                           Names.HEADER_REQUIRED_NAME));
                 }
             }
-            if (MessageUtils.isPartialResponse(message)) {
+            if (MessageUtils.isPartialResponse(message) 
+                && message.getExchange().getOutMessage() != null) {
                 // marked as a partial response, let's see if it really is
                 MessageInfo min = message.get(MessageInfo.class);
                 MessageInfo mout = message.getExchange().getOutMessage().get(MessageInfo.class);
