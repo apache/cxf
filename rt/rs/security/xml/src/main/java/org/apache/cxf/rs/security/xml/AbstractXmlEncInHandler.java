@@ -112,6 +112,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         
         // now start decrypting
         String algorithm = getEncodingMethodAlgorithm(encKeyElement);
+        String digestAlgorithm = getDigestMethodAlgorithm(encKeyElement);
         Element cipherValue = getNode(encKeyElement, WSConstants.ENC_NS, 
                                                "CipherValue", 0);
         if (cipherValue == null) {
@@ -122,6 +123,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
                                        cert,
                                        crypto,
                                        algorithm,
+                                       digestAlgorithm,
                                        message);
         } catch (Exception ex) {
             throwFault(ex.getMessage(), ex);
@@ -166,12 +168,33 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         }
         return encMethod.getAttribute("Algorithm");
     }
+    
+    private String getDigestMethodAlgorithm(Element parent) {
+        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        if (encMethod != null) {
+            Element digestMethod = getNode(encMethod, WSConstants.SIG_NS, "DigestMethod", 0);
+            if (digestMethod != null) {
+                return digestMethod.getAttributeNS(null, "Algorithm");
+            }
+        }
+        return null;
+    }
 
     //TODO: Support symmetric keys if requested
     protected byte[] decryptSymmetricKey(String base64EncodedKey, 
                                          X509Certificate cert,
                                          Crypto crypto,
                                          String keyEncAlgo,
+                                         Message message) throws WSSecurityException {
+        return decryptSymmetricKey(base64EncodedKey, cert, crypto, keyEncAlgo, null, message);
+    }
+    
+    //TODO: Support symmetric keys if requested
+    protected byte[] decryptSymmetricKey(String base64EncodedKey, 
+                                         X509Certificate cert,
+                                         Crypto crypto,
+                                         String keyEncAlgo,
+                                         String digestAlgo,
                                          Message message) throws WSSecurityException {
         CallbackHandler callback = SecurityUtils.getCallbackHandler(message, this.getClass());
         PrivateKey key = null;
@@ -181,7 +204,7 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
             throwFault("Encrypted key can not be decrypted", ex);
         }
         Cipher cipher = 
-            EncryptionUtils.initCipherWithKey(keyEncAlgo, Cipher.DECRYPT_MODE, key);
+            EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
         try {
             byte[] encryptedBytes = Base64Utility.decode(base64EncodedKey);
             return cipher.doFinal(encryptedBytes);

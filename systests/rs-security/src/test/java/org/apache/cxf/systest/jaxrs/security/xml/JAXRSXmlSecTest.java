@@ -167,7 +167,21 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         String aes128GCM = "http://www.w3.org/2009/xmlenc11#aes128-gcm";
-        doTestPostEncryptedBook(address, properties, SecurityUtils.X509_KEY, aes128GCM);
+        doTestPostEncryptedBook(address, properties, SecurityUtils.X509_KEY, aes128GCM, null);
+    }
+    
+    @Test
+    public void testPostEncryptedBookSHA256() throws Exception {
+        String address = "https://localhost:" + PORT + "/xmlenc/bookstore/books";
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("ws-security.callback-handler", 
+                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put("ws-security.encryption.username", "bob");
+        properties.put("ws-security.encryption.properties", 
+                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
+        doTestPostEncryptedBook(
+            address, properties, SecurityUtils.X509_KEY, XMLCipher.AES_128, XMLCipher.SHA256
+        );
     }
     
     @Test
@@ -179,7 +193,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.username", "bob");
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        doTestPostEncryptedBook(address, properties, SecurityUtils.X509_ISSUER_SERIAL, XMLCipher.AES_128);
+        doTestPostEncryptedBook(
+            address, properties, SecurityUtils.X509_ISSUER_SERIAL, XMLCipher.AES_128, null
+        );
     }
     
     @Test
@@ -214,12 +230,16 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     
     public void doTestPostEncryptedBook(String address, Map<String, Object> properties) 
         throws Exception {
-        doTestPostEncryptedBook(address, properties, SecurityUtils.X509_KEY, XMLCipher.AES_128);
+        doTestPostEncryptedBook(
+            address, properties, SecurityUtils.X509_KEY, XMLCipher.AES_128, null
+        );
     }
     
-    public void doTestPostEncryptedBook(String address, Map<String, Object> properties,
-                                        String keyIdentifierType, String symmetricAlgorithm) 
-        throws Exception {
+    public void doTestPostEncryptedBook(
+        String address, Map<String, Object> properties,
+        String keyIdentifierType, String symmetricAlgorithm,
+        String digestAlgorithm
+    ) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         
@@ -233,6 +253,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         XmlEncOutInterceptor encInterceptor = new XmlEncOutInterceptor();
         encInterceptor.setKeyIdentifierType(keyIdentifierType);
         encInterceptor.setSymmetricEncAlgorithm(symmetricAlgorithm);
+        encInterceptor.setDigestAlgorithm(digestAlgorithm);
         bean.getOutInterceptors().add(encInterceptor);
         
         bean.getInInterceptors().add(new XmlEncInInterceptor());
