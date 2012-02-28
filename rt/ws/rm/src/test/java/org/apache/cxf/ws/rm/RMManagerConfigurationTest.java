@@ -83,6 +83,7 @@ public class RMManagerConfigurationTest extends Assert {
                      .getMilliseconds().longValue());
         assertEquals(10000L, manager.getRMAssertion().getAcknowledgementInterval()
                      .getMilliseconds().longValue());        
+        assertEquals("http://www.w3.org/2005/08/addressing", manager.getRMAddressingNamespace().getUri());
         TestStore store = (TestStore)manager.getStore();
         assertEquals("here", store.getLocation());     
         assertNotNull(manager.getDeliveryAssurance().getInOrder());

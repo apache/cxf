@@ -102,7 +102,7 @@
           </xs:documentation>          
         </xs:annotation>
       </xs:element>
-<!--      <xs:element name="rm10AddressingNamespace" minOccurs="0" type="tns:rm10AddressingNamespace">
+      <xs:element ref="tns:RM10AddressingNamespace" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
               The WS-Addressing namespace to be used for WS-ReliableMessaging 1.0.
@@ -111,7 +111,7 @@
               in incoming messages.
           </xs:documentation>          
         </xs:annotation>
-      </xs:element> -->
+      </xs:element>
       <xs:element name="store" type="xs:anyType" minOccurs="0">
         <xs:annotation>
           <xs:documentation>

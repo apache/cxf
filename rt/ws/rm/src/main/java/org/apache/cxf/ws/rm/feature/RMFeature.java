@@ -23,8 +23,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
-import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMCaptureInInterceptor;
 import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
@@ -32,6 +30,7 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
+import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
@@ -47,6 +46,8 @@ public class RMFeature extends AbstractFeature {
     private DeliveryAssuranceType deliveryAssurance;
     private SourcePolicyType sourcePolicy;
     private DestinationPolicyType destinationPolicy;
+    private String rmNamespace;
+    private RM10AddressingNamespaceType rm10AddressingNamespace;
     private RMStore store;
 
     private RMInInterceptor rmLogicalIn = new RMInInterceptor();
@@ -54,8 +55,6 @@ public class RMFeature extends AbstractFeature {
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
     private RMSoapInterceptor rmCodec = new RMSoapInterceptor();
     private RMCaptureInInterceptor rmCaptureIn = new RMCaptureInInterceptor();
-    private String rmNamespace = RM10Constants.NAMESPACE_URI;
-    private String rm10AddressingNamespace = Names200408.WSA_NAMESPACE_NAME;
 
     public void setDeliveryAssurance(DeliveryAssuranceType da) {
         deliveryAssurance = da;
@@ -77,20 +76,12 @@ public class RMFeature extends AbstractFeature {
         this.store = store;
     }
 
-    public String getRMNamespace() {
-        return rmNamespace;
-    }
-
     public void setRMNamespace(String uri) {
         rmNamespace = uri;
     }
 
-    public String getRM10AddressingNamespace() {
-        return rm10AddressingNamespace;
-    }
-
-    public void setRM10AddressingNamespace(String uri) {
-        rm10AddressingNamespace = uri;
+    public void setRM10AddressingNamespace(RM10AddressingNamespaceType addrns) {
+        rm10AddressingNamespace = addrns;
     }
 
     @Override
@@ -111,6 +102,12 @@ public class RMFeature extends AbstractFeature {
         }
         if (null != store) {
             manager.setStore(store);
+        }
+        if (null != rmNamespace) {
+            manager.setRMNamespace(rmNamespace);
+        }
+        if (null != rm10AddressingNamespace) {
+            manager.setRM10AddressingNamespace(rm10AddressingNamespace);
         }
 
         rmLogicalIn.setBus(bus);

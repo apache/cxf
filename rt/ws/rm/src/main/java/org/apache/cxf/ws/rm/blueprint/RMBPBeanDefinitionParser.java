@@ -30,6 +30,7 @@ import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
+import org.apache.cxf.ws.rm.manager.RM10AddressingNamespaceType;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -63,6 +64,8 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
                 new QName(RM_NS, "sourcePolicy"), "sourcePolicy", SourcePolicyType.class);
         mapElementToJaxbProperty(context, bean, element, 
                 new QName(RM_NS, "destinationPolicy"), "destinationPolicy", DestinationPolicyType.class);
+        mapElementToJaxbProperty(context, bean, element, new QName(RM_NS, "RM10AddressingNamespace"),
+                "RM10AddressingNamespace", RM10AddressingNamespaceType.class);
         mapElementToJaxbProperty(context, bean, element, 
                 new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
                 "RMAssertion",
@@ -70,7 +73,7 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         mapElementToJaxbProperty(context, bean, element,
                 new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
                 "RMAssertion",
-                org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
+                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
 
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
@@ -89,8 +92,6 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
     protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
         if ("store".equals(name)) {
             setFirstChildAsProperty(el, ctx, bean, name);
-        } else if ("addressingNamespace".equals(name)) {
-            bean.addProperty("addressingNamespace", createValue(ctx, el.getTextContent()));
         }
     }
 }
