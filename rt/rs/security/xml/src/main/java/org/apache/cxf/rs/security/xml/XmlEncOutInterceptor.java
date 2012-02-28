@@ -67,6 +67,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     private String keyEncAlgo = XMLCipher.RSA_OAEP; 
     private String symEncAlgo = XMLCipher.AES_256;
     private String keyIdentifierType = SecurityUtils.X509_KEY;
+    private String digestAlgo;
     
     public XmlEncOutInterceptor() {
         addAfter(XmlSigOutInterceptor.class.getName());
@@ -86,6 +87,10 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     public void setKeyEncAlgorithm(String algo) {
         keyEncAlgo = algo;
+    }
+    
+    public void setDigestAlgorithm(String algo) {
+        digestAlgo = algo;
     }
     
     protected Document processDocument(Message message, Document payloadDoc) 
@@ -181,7 +186,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                                          X509Certificate remoteCert,
                                          Crypto crypto) throws WSSecurityException {
         Cipher cipher = 
-            EncryptionUtils.initCipherWithCert(keyEncAlgo, Cipher.ENCRYPT_MODE, remoteCert);
+            EncryptionUtils.initCipherWithCert(
+                keyEncAlgo, digestAlgo, Cipher.ENCRYPT_MODE, remoteCert
+            );
         int blockSize = cipher.getBlockSize();
         if (blockSize > 0 && blockSize < keyBytes.length) {
             String message = "Public key algorithm too weak to encrypt symmetric key";
@@ -308,6 +315,13 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX 
                                              + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyEncAlgo);
+        if (digestAlgo != null) {
+            Element digestMethod = 
+                encryptedDataDoc.createElementNS(WSConstants.SIG_NS, WSConstants.SIG_PREFIX 
+                                                 + ":DigestMethod");
+            digestMethod.setAttributeNS(null, "Algorithm", digestAlgo);
+            encryptionMethod.appendChild(digestMethod);
+        }
         encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }

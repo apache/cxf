@@ -30,8 +30,10 @@ import javax.crypto.spec.PSource;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.EncryptionConstants;
 
 public final class EncryptionUtils {
     private EncryptionUtils() {
@@ -40,18 +42,25 @@ public final class EncryptionUtils {
     
     public static Cipher initCipherWithCert(String keyEncAlgo, int mode, X509Certificate cert)
         throws WSSecurityException {
+        return initCipherWithCert(keyEncAlgo, null, mode, cert);
+    }
+    
+    public static Cipher initCipherWithCert(
+        String keyEncAlgo, 
+        String digestAlg,
+        int mode, 
+        X509Certificate cert
+    ) throws WSSecurityException {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            OAEPParameterSpec oaepParameterSpec = null;
-            if (XMLCipher.RSA_OAEP.equals(keyEncAlgo)) {
-                oaepParameterSpec = new OAEPParameterSpec(
-                    "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+            OAEPParameterSpec oaepParameters = 
+                constructOAEPParameters(
+                    keyEncAlgo, digestAlg, null, null
                 );
-            }
-            if (oaepParameterSpec == null) {
+            if (oaepParameters == null) {
                 cipher.init(mode, cert);
             } else {
-                cipher.init(mode, cert.getPublicKey(), oaepParameterSpec);
+                cipher.init(mode, cert.getPublicKey(), oaepParameters);
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
@@ -67,18 +76,21 @@ public final class EncryptionUtils {
     
     public static Cipher initCipherWithKey(String keyEncAlgo, int mode, Key key)
         throws WSSecurityException {
+        return initCipherWithKey(keyEncAlgo, null, mode, key);
+    }
+    
+    public static Cipher initCipherWithKey(String keyEncAlgo, String digestAlgo, int mode, Key key)
+        throws WSSecurityException {
         Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
-            OAEPParameterSpec oaepParameterSpec = null;
-            if (XMLCipher.RSA_OAEP.equals(keyEncAlgo)) {
-                oaepParameterSpec = new OAEPParameterSpec(
-                    "SHA-1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT
+            OAEPParameterSpec oaepParameters = 
+                constructOAEPParameters(
+                    keyEncAlgo, digestAlgo, null, null
                 );
-            }
-            if (oaepParameterSpec == null) {
+            if (oaepParameters == null) {
                 cipher.init(mode, key);
             } else {
-                cipher.init(mode, key, oaepParameterSpec);
+                cipher.init(mode, key, oaepParameters);
             }
         } catch (InvalidKeyException e) {
             throw new WSSecurityException(
@@ -90,6 +102,44 @@ public final class EncryptionUtils {
             );
         }
         return cipher;
+    }
+    
+    /**
+     * Construct an OAEPParameterSpec object from the given parameters
+     */
+    public static OAEPParameterSpec constructOAEPParameters(
+        String encryptionAlgorithm,
+        String digestAlgorithm,
+        String mgfAlgorithm,
+        byte[] oaepParams
+    ) {
+        if (XMLCipher.RSA_OAEP.equals(encryptionAlgorithm)
+            || XMLCipher.RSA_OAEP_11.equals(encryptionAlgorithm)) {
+            
+            String jceDigestAlgorithm = "SHA-1";
+            if (digestAlgorithm != null) {
+                jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
+            }
+            
+            PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
+            if (oaepParams != null) {
+                pSource = new PSource.PSpecified(oaepParams);
+            }
+            
+            MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
+            if (XMLCipher.RSA_OAEP_11.equals(encryptionAlgorithm)) {
+                if (EncryptionConstants.MGF1_SHA256.equals(mgfAlgorithm)) {
+                    mgfParameterSpec = new MGF1ParameterSpec("SHA-256");
+                } else if (EncryptionConstants.MGF1_SHA384.equals(mgfAlgorithm)) {
+                    mgfParameterSpec = new MGF1ParameterSpec("SHA-384");
+                } else if (EncryptionConstants.MGF1_SHA512.equals(mgfAlgorithm)) {
+                    mgfParameterSpec = new MGF1ParameterSpec("SHA-512");
+                }
+            }
+            return new OAEPParameterSpec(jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource);
+        }
+        
+        return null;
     }
     
     public static XMLCipher initXMLCipher(String symEncAlgo, int mode, Key key) 
