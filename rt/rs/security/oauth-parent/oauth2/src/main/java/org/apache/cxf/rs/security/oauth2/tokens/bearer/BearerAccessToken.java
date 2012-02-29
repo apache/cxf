@@ -18,15 +18,15 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.bearer;
 
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenType;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class BearerAccessToken extends ServerAccessToken {
     public BearerAccessToken(Client client, 
                              String tokenKey,
                              long lifetime, 
                              long issuedAt) {
-        super(client, AccessTokenType.BEARER, tokenKey, lifetime, issuedAt);
+        super(client, OAuthConstants.BEARER_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
     }
 }

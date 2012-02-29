@@ -33,11 +33,11 @@ public abstract class ServerAccessToken extends AccessToken {
     private UserSubject subject;
     
     protected ServerAccessToken(Client client, 
-                                        AccessTokenType type,
+                                        String tokenType,
                                         String tokenKey,
                                         long lifetime, 
                                         long issuedAt) {
-        super(type, tokenKey);
+        super(tokenType, tokenKey);
         this.client = client;
         this.lifetime = lifetime;
         this.issuedAt = issuedAt;

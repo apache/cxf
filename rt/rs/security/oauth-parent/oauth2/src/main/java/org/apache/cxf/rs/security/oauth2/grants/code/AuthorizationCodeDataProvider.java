@@ -19,9 +19,6 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.util.List;
-
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
@@ -31,13 +28,6 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
  */
 public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
 
-    /**
-     * Converts the requested scope to the list of permissions  
-     * @param requestedScope
-     * @return list of permissions
-     */
-    List<OAuthPermission> convertScopeToPermissions(List<String> requestedScope);
-    
     /**
      * Creates a temporarily code grant which will capture the
      * information about the {@link Client} attempting to access or

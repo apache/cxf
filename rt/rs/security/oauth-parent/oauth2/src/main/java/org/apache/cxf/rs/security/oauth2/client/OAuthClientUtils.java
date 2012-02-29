@@ -32,7 +32,6 @@ import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenType;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
@@ -137,10 +136,10 @@ public final class OAuthClientUtils {
         if (200 == response.getStatus()) {
             if (map.containsKey(OAuthConstants.ACCESS_TOKEN)
                 && map.containsKey(OAuthConstants.ACCESS_TOKEN_TYPE)) {
-                String type = map.get(OAuthConstants.ACCESS_TOKEN_TYPE);
+                String tokenType = map.get(OAuthConstants.ACCESS_TOKEN_TYPE);
                 
                 ClientAccessToken token = new ClientAccessToken(
-                                              AccessTokenType.fromString(type),
+                                              tokenType,
                                               map.get(OAuthConstants.ACCESS_TOKEN));
                 return token;
             } else {
@@ -170,9 +169,8 @@ public final class OAuthClientUtils {
     private static void appendTokenData(StringBuilder sb, ClientAccessToken token) 
         throws OAuthServiceException {
         // this should all be handled by token specific serializers
-        AccessTokenType type = token.getTokenType();
-        if (type == AccessTokenType.BEARER) {
-            sb.append("Bearer");
+        if (OAuthConstants.BEARER_TOKEN_TYPE.equals(token.getTokenType())) {
+            sb.append(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
             sb.append(" ");
             sb.append(token.getTokenKey());
         } else {

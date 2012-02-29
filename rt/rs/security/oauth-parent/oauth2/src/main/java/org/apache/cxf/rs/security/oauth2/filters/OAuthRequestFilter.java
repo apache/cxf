@@ -46,6 +46,7 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
@@ -56,7 +57,7 @@ import org.apache.cxf.security.SecurityContext;
 public class OAuthRequestFilter implements RequestHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthRequestFilter.class);
     
-    private static final String DEFAULT_AUTH_SCHEME = "Bearer"; 
+    private static final String DEFAULT_AUTH_SCHEME = OAuthConstants.BEARER_AUTHORIZATION_SCHEME; 
     
     private MessageContext mc;
 
@@ -192,11 +193,6 @@ public class OAuthRequestFilter implements RequestHandler {
     
     protected SecurityContext createSecurityContext(HttpServletRequest request, 
                                                     final OAuthInfo info) {
-        // TODO: 
-        // This custom parameter is only needed by the "oauth" 
-        // demo shipped in the distribution; needs to be removed.
-        request.setAttribute("oauth_authorities", info.getRoles());
-        
         UserSubject subject = info.getToken().getSubject();
 
         final UserSubject theSubject = subject;

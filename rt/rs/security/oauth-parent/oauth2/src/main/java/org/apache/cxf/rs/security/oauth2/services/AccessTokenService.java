@@ -28,6 +28,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -77,7 +78,10 @@ public class AccessTokenService extends AbstractOAuthService {
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
                                                               serverToken.getTokenKey());
         clientToken.setParameters(serverToken.getParameters());
-        return Response.ok(clientToken).build();
+        return Response.ok(clientToken)
+                       .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                       .header("Pragma", "no-cache")
+                        .build();
     }
     
     private Client authenticateClientIfNeeded(MultivaluedMap<String, String> params) {

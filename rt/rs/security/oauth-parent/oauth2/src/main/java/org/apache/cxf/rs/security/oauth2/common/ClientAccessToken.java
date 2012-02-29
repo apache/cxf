@@ -28,14 +28,10 @@ public class ClientAccessToken extends AccessToken {
     private String scope;
     private String rToken;
     
-    public ClientAccessToken(String type, String tokenKey) {
-        this(AccessTokenType.valueOf(type), tokenKey);
+    public ClientAccessToken(String tokenType, String tokenKey) {
+        super(tokenType, tokenKey);
     }
     
-    public ClientAccessToken(AccessTokenType type, String tokenKey) {
-        super(type, tokenKey);
-    }
-
     public void setApprovedScope(String approvedScope) {
         this.scope = approvedScope;
     }

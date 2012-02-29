@@ -19,7 +19,10 @@
 
 package org.apache.cxf.rs.security.oauth2.provider;
 
+import java.util.List;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 
 /**
@@ -27,6 +30,7 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
  * OAuth consumers, request and access tokens.
  */
 public interface OAuthDataProvider {
+
 
     /**
      * Returns the previously registered third-party {@link Client} 
@@ -67,5 +71,12 @@ public interface OAuthDataProvider {
      * @throws OAuthServiceException
      */
     void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;
-    
+
+    /**
+     * Converts the requested scope to the list of permissions  
+     * @param requestedScope
+     * @return list of permissions
+     */
+    List<OAuthPermission> convertScopeToPermissions(Client client,
+                                                    List<String> requestedScope);
 }

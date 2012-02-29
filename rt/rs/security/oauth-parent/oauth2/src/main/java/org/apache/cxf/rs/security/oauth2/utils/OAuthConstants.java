@@ -35,8 +35,19 @@ public final class OAuthConstants {
     public static final String RESPONSE_TYPE = "response_type";
     public static final String TOKEN_RESPONSE_TYPE = "token";
     
-    // Authorization Code Grant
+    // Well-known grant types
     public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
+    // etc
+    
+    // Well-known token types
+    public static final String BEARER_TOKEN_TYPE = "bearer";
+    public static final String MAC_TOKEN_TYPE = "mac";
+    
+    // Token Authorization schemes
+    public static final String BEARER_AUTHORIZATION_SCHEME = "Bearer";
+    public static final String MAC_AUTHORIZATION_SCHEME = "Mac";
+    
+    // Authorization Code grant constants
     public static final String AUTHORIZATION_CODE_VALUE = "code";
     public static final String CODE_RESPONSE_TYPE = "code";
     public static final String SESSION_AUTHENTICITY_TOKEN = "session_authenticity_token";

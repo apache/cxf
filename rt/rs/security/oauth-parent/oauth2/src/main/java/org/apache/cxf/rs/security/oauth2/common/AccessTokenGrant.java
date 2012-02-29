@@ -21,6 +21,6 @@ package org.apache.cxf.rs.security.oauth2.common;
 import javax.ws.rs.core.MultivaluedMap;
 
 public interface AccessTokenGrant {
-    AccessTokenGrantType getType(); 
+    String getType(); 
     MultivaluedMap<String, String> toMap();
 }

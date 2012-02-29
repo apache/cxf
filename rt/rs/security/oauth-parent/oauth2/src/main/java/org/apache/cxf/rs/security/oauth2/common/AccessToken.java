@@ -26,15 +26,15 @@ import java.util.Map;
 public abstract class AccessToken {
 
     private String tokenKey;
-    private AccessTokenType tokenType;
+    private String tokenType;
     private Map<String, String> parameters;
     
-    protected AccessToken(AccessTokenType type, String tokenKey) {
-        this.tokenType = type;
+    protected AccessToken(String tokenType, String tokenKey) {
+        this.tokenType = tokenType;
         this.tokenKey = tokenKey;
     }
 
-    public AccessTokenType getTokenType() {
+    public String getTokenType() {
         return tokenType;
     }
     

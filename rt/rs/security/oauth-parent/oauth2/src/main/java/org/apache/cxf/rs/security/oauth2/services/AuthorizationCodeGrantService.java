@@ -100,9 +100,7 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         
         List<OAuthPermission> permissions = null;
         try {
-            List<String> list = parseScope(params.getFirst(OAuthConstants.SCOPE));
-            permissions = ((AuthorizationCodeDataProvider)getDataProvider())
-                .convertScopeToPermissions(list);
+            permissions = convertScopeToPermissions(client, params.getFirst(OAuthConstants.SCOPE));
         } catch (OAuthServiceException ex) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
@@ -114,6 +112,16 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
     
     public void setGrantLifetime(long lifetime) {
         this.grantLifetime = lifetime;
+    }
+    
+    protected List<OAuthPermission> convertScopeToPermissions(Client client, String scope) 
+        throws OAuthServiceException {
+        List<String> list = parseScope(scope);
+        
+        List<OAuthPermission> permissions = getDataProvider()
+            .convertScopeToPermissions(client, list);
+        
+        return permissions;
     }
     
     protected OAuthAuthorizationData createAuthorizationData(
@@ -283,4 +291,5 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         session.removeAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
         return requestToken.equals(sessionToken);
     }
+    
 }

@@ -24,7 +24,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrantType;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 
@@ -56,13 +56,13 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
         return code;
     }
 
-    public AccessTokenGrantType getType() {
-        return AccessTokenGrantType.AUTHORIZATION_CODE;
+    public String getType() {
+        return OAuthConstants.AUTHORIZATION_CODE_GRANT;
     }
 
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putSingle("grant_type", AccessTokenGrantType.AUTHORIZATION_CODE.getGrantType());
+        map.putSingle("grant_type", OAuthConstants.AUTHORIZATION_CODE_GRANT);
         map.putSingle("code", code);
         if (redirectUri != null) {
             map.putSingle("redirect_uri", redirectUri);
