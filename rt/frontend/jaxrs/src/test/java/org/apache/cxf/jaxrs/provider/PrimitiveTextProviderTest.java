@@ -39,18 +39,18 @@ public class PrimitiveTextProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider();
-        assertTrue(p.isWriteable(byte.class, null, null, null)
+        assertTrue(p.isWriteable(Byte.TYPE, null, null, null)
                    && p.isWriteable(Byte.class, null, null, null)
-                   && p.isWriteable(boolean.class, null, null, null)
+                   && p.isWriteable(Boolean.TYPE, null, null, null)
                    && p.isWriteable(Boolean.class, null, null, null));
     }
     
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new PrimitiveTextProvider();
-        assertTrue(p.isReadable(byte.class, null, null, null)
+        assertTrue(p.isReadable(Byte.TYPE, null, null, null)
                    && p.isReadable(Byte.class, null, null, null)
-                   && p.isReadable(boolean.class, null, null, null)
+                   && p.isReadable(Boolean.TYPE, null, null, null)
                    && p.isReadable(Boolean.class, null, null, null));
     }
     
@@ -59,7 +59,7 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testReadByte() throws Exception {
         MessageBodyReader p = new PrimitiveTextProvider();
         
-        Byte valueRead = (Byte)p.readFrom(byte.class, 
+        Byte valueRead = (Byte)p.readFrom((Class)Byte.TYPE, 
                                           null, 
                                           null, 
                                           null, 
@@ -74,7 +74,7 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testReadBoolean() throws Exception {
         MessageBodyReader p = new PrimitiveTextProvider();
         
-        boolean valueRead = (Boolean)p.readFrom(boolean.class, 
+        boolean valueRead = (Boolean)p.readFrom(Boolean.TYPE, 
                                           null, 
                                           null, 
                                           null, 
