@@ -480,7 +480,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         for (OperationInfo opInfo : serviceInfo.getInterface().getOperations()) {
             Method m = (Method)opInfo.getProperty(METHOD);
-
             if (!isWrapped(m) && !isRPC(m) && opInfo.getInput() != null) {
                 createBareMessage(serviceInfo, opInfo, false);
             }
@@ -1487,8 +1486,15 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 continue;
             }
             if (isInParam(method, j)) {
-                final QName q = getInParameterName(op, method, j);
-                MessagePartInfo part = inMsg.addMessagePart(getInPartName(op, method, j));
+                QName q = getInParameterName(op, method, j);
+                QName partName = getInPartName(op, method, j);
+                if (!isRPC(method) && !isWrapped(method) 
+                    && inMsg.getMessagePartsMap().containsKey(partName)) {
+                    LOG.log(Level.WARNING, "INVALID_BARE_METHOD", getServiceClass() + "." + method.getName());
+                    partName = new QName(partName.getNamespaceURI(), partName.getLocalPart() + j);
+                    q = new QName(q.getNamespaceURI(), q.getLocalPart() + j);
+                }
+                MessagePartInfo part = inMsg.addMessagePart(partName);
 
 
 
