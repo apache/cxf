@@ -257,7 +257,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         } else {
             handler = null;
         }
-        ClientCallback callback = new JaxwsClientCallback<Object>(handler);
+        ClientCallback callback = new JaxwsClientCallback<Object>(handler, this);
              
         Response<Object> ret = new JaxwsResponseCallback<Object>(callback);
         client.invoke(callback, oi, params);

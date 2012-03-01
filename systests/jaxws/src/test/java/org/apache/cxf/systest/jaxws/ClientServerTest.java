@@ -383,6 +383,29 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
     } 
+    
+    @Test
+    public void testAsyncDiscardProxy() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+        
+        SOAPService service = new SOAPService(wsdl, serviceName);
+        
+        assertNotNull(service);
+        
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        
+        assertNotNull(service);
+        updateAddressPort(greeter, PORT);
+
+        Response<GreetMeLaterResponse> r1 = greeter.greetMeLaterAsync(3000);
+        greeter = null;
+        service = null;
+        System.gc();
+        System.gc();
+        System.gc();
+        assertEquals("Hello, finally!", r1.get().getResponseType());
+    }
 
     @Test
     public void testAsyncPollingCall() throws Exception {
