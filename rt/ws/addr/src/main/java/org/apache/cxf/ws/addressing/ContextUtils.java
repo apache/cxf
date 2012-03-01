@@ -396,7 +396,6 @@ public final class ContextUtils {
                 if (reference == null) {
                     reference = ContextUtils.getNoneEndpointReference();
                 }
-                exchange.setOutMessage(partialResponse);
                 Conduit backChannel = target.getBackChannel(inMessage,
                                                             partialResponse,
                                                             reference);
@@ -427,6 +426,7 @@ public final class ContextUtils {
                         fullResponse != null
                         ? fullResponse.getInterceptorChain()
                         : OutgoingChainInterceptor.getOutInterceptorChain(exchange);
+                    exchange.setOutMessage(partialResponse);                    
                     partialResponse.setInterceptorChain(chain);
                     exchange.put(ConduitSelector.class,
                                  new PreexistingConduitSelector(backChannel,
