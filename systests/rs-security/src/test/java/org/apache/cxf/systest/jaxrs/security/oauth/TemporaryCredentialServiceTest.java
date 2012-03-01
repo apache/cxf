@@ -40,7 +40,6 @@ import org.eclipse.jetty.http.HttpHeaders;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestBase {
@@ -56,7 +55,7 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
                    launchServer(OAuthServer.class, true));
     }
     
-    @Ignore
+    
     @Test
     public void testGetTemporaryCredentialsURIQuery() throws Exception {
         Map<String, String> parameters = new HashMap<String, String>();
