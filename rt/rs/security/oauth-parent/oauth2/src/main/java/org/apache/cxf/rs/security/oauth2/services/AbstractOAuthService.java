@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.util.logging.Logger;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -35,8 +38,10 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * Abstract utility class which OAuth services extend
  */
 public abstract class AbstractOAuthService {
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractOAuthService.class);
     private MessageContext mc;
     private OAuthDataProvider dataProvider;
+    private boolean blockUnsecureRequests;
     
     @Context 
     public void setMessageContext(MessageContext context) {
@@ -79,10 +84,23 @@ public abstract class AbstractOAuthService {
         
     }
     
+    protected void checkTransportSecurity() {  
+        if (!mc.getSecurityContext().isSecure()) {
+            LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
+            if (blockUnsecureRequests) {
+                throw new WebApplicationException(400);    
+            }
+        }
+    }
+    
     protected void reportInvalidRequestError(String errorDescription) {
         OAuthError error = 
             new OAuthError(OAuthConstants.INVALID_REQUEST, errorDescription);
         throw new WebApplicationException(
                   Response.status(400).type(MediaType.APPLICATION_JSON).entity(error).build());
+    }
+
+    public void setBlockUnsecureRequests(boolean blockUnsecureRequests) {
+        this.blockUnsecureRequests = blockUnsecureRequests;
     }
 }

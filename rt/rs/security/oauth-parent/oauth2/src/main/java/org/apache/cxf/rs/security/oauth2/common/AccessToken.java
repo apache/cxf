@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ public abstract class AccessToken {
 
     private String tokenKey;
     private String tokenType;
-    private Map<String, String> parameters;
+    private Map<String, String> parameters = Collections.emptyMap();
     
     protected AccessToken(String tokenType, String tokenKey) {
         this.tokenType = tokenType;

@@ -25,7 +25,7 @@ import java.util.List;
  * Base Token representation
  */
 public abstract class ServerAccessToken extends AccessToken {
-
+    private String grantType;
     private long issuedAt;
     private long lifetime;
     private Client client;
@@ -101,6 +101,14 @@ public abstract class ServerAccessToken extends AccessToken {
      */
     public UserSubject getSubject() {
         return subject;
+    }
+
+    public void setGrantType(String grantType) {
+        this.grantType = grantType;
+    }
+
+    public String getGrantType() {
+        return grantType;
     }
 
 }

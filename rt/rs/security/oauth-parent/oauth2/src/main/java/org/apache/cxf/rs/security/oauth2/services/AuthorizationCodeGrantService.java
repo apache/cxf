@@ -36,7 +36,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -50,6 +49,7 @@ import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGran
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.security.LoginSecurityContext;
+import org.apache.cxf.security.SecurityContext;
 
 
 /**
@@ -61,7 +61,6 @@ import org.apache.cxf.security.LoginSecurityContext;
  */
 @Path("/authorize")
 public class AuthorizationCodeGrantService extends AbstractOAuthService {
-
     private static final long DEFAULT_CODE_GRANT_LIFETIME = 3600L;
     
     private long grantLifetime = DEFAULT_CODE_GRANT_LIFETIME;
@@ -88,6 +87,8 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
     }
     
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
+        getAndValidateSecurityContext();
+        
         Client client = getClient(params); 
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
         if (!client.isConfidential()) {
@@ -159,10 +160,13 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
     }
     
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
+        SecurityContext securityContext = getAndValidateSecurityContext();
         
         if (!compareRequestAndSessionTokens(params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN))) {
             throw new WebApplicationException(400);     
         }
+        //TODO: additionally we can check that the Principal that got authenticated
+        // in startAuthorization is the same that got authenticated in completeAuthorization
         
         Client client = getClient(params);
         String originalRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);
@@ -202,17 +206,15 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         }
         codeReg.setApprovedScope(approvedScope);
         
-        SecurityContext sc = getMessageContext().getSecurityContext();
         List<String> roleNames = Collections.emptyList();
-        if (sc instanceof LoginSecurityContext) {
+        if (securityContext instanceof LoginSecurityContext) {
             roleNames = new ArrayList<String>();
-            Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
+            Set<Principal> roles = ((LoginSecurityContext)securityContext).getUserRoles();
             for (Principal p : roles) {
                 roleNames.add(p.getName());
             }
         }
-        codeReg.setSubject(new UserSubject(sc.getUserPrincipal() == null 
-            ? null : sc.getUserPrincipal().getName(), roleNames));
+        codeReg.setSubject(new UserSubject(securityContext.getUserPrincipal().getName(), roleNames));
         
         ServerAuthorizationCodeGrant grant = null;
         try {
@@ -222,15 +224,25 @@ public class AuthorizationCodeGrantService extends AbstractOAuthService {
         }
         
         UriBuilder ub = getRedirectUriBuilder(params.getFirst(OAuthConstants.STATE), actualRedirectUri);
-        ub.queryParam("code", grant.getCode());
+        ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_VALUE, grant.getCode());
         return Response.seeOther(ub.build()).build();    
+    }
+    
+    private SecurityContext getAndValidateSecurityContext() {
+        SecurityContext securityContext =  
+            (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
+        if (securityContext == null || securityContext.getUserPrincipal() == null) {
+            throw new WebApplicationException(401);
+        }
+        checkTransportSecurity();
+        return securityContext;
     }
     
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String redirectUri,
                                            String error) {
         UriBuilder ub = getRedirectUriBuilder(params.getFirst(OAuthConstants.STATE), redirectUri);
-        ub.queryParam("error", error);
+        ub.queryParam(OAuthConstants.ERROR_KEY, error);
         return Response.seeOther(ub.build()).build();
     }
     

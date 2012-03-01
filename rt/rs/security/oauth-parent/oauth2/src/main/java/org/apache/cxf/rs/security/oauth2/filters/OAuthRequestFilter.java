@@ -96,7 +96,7 @@ public class OAuthRequestFilter implements RequestHandler {
       
         OAuthInfo info = new OAuthInfo(accessToken, matchingPermissions);
         SecurityContext sc = createSecurityContext(req, info);
-        m.setContent(SecurityContext.class, sc);
+        m.put(SecurityContext.class, sc);
         m.setContent(OAuthContext.class, createOAuthContext(info));
         
         return null;
@@ -196,16 +196,20 @@ public class OAuthRequestFilter implements RequestHandler {
         UserSubject subject = info.getToken().getSubject();
 
         final UserSubject theSubject = subject;
+        final String login = OAuthRequestFilter.this.useUserSubject 
+                    ? (theSubject != null ? theSubject.getLogin() : null)
+                        : info.getToken().getClient().getLoginName();
+                    
         return new SecurityContext() {
 
             public Principal getUserPrincipal() {
-                String login = OAuthRequestFilter.this.useUserSubject 
-                    ? (theSubject != null ? theSubject.getLogin() : null)
-                    : info.getToken().getClient().getLoginName();  
-                return new SimplePrincipal(login);
+                return login != null ? new SimplePrincipal(login) : null;
             }
 
             public boolean isUserInRole(String role) {
+                if (login == null) {
+                    return false;
+                }
                 List<String> roles = null;
                 if (OAuthRequestFilter.this.useUserSubject && theSubject != null) {
                     roles = theSubject.getRoles();    
@@ -218,12 +222,10 @@ public class OAuthRequestFilter implements RequestHandler {
         };
     }
     
-    protected OAuthContext createOAuthContext(OAuthInfo info) {
-        UserSubject subject = null;
-        if (info.getToken() != null) {
-            subject = info.getToken().getSubject();
-        }
-        return new OAuthContext(subject, info.getMatchedPermissions());
+    private OAuthContext createOAuthContext(OAuthInfo info) {
+        return new OAuthContext(info.getToken().getSubject(),
+                                info.getMatchedPermissions(),
+                                info.getToken().getGrantType());
     }
     
     private static class OAuthInfo {

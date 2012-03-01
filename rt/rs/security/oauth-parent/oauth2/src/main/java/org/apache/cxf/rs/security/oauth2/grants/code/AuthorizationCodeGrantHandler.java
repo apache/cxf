@@ -19,38 +19,29 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
-import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
+import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
-import org.apache.cxf.rs.security.oauth2.utils.MD5SequenceGenerator;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
 
-public class AuthorizationCodeGrantHandler implements AccessTokenGrantHandler {
+public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
-    private static final long DEFAULT_TOKEN_LIFETIME = 3600L;
-    
-    private AuthorizationCodeDataProvider codeProvider;
-    private long tokenLifetime = DEFAULT_TOKEN_LIFETIME;
-    
-    public List<String> getSupportedGrantTypes() {
-        return Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+    public AuthorizationCodeGrantHandler() {
+        super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
+    
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
         throws OAuthServiceException {
-        
+        String codeValue = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         ServerAuthorizationCodeGrant grant = 
-            codeProvider.removeCodeGrant(params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE));
+            ((AuthorizationCodeDataProvider)getDataProvider()).removeCodeGrant(codeValue);
         if (grant == null) {
             return null;
         }
@@ -66,27 +57,13 @@ public class AuthorizationCodeGrantHandler implements AccessTokenGrantHandler {
             }
         }
         BearerAccessToken token = new BearerAccessToken(client, 
-                                                        generateTokenKey(),
-                                                        tokenLifetime, 
+                                                        generateRandomTokenKey(),
+                                                        getTokenLifetime(), 
                                                         System.currentTimeMillis() / 1000);
         token.setScopes(grant.getApprovedScopes());
         token.setSubject(grant.getSubject());
+        token.setGrantType(OAuthConstants.AUTHORIZATION_CODE_GRANT);
         return token;
-    }
-    public void setCodeProvider(AuthorizationCodeDataProvider codeProvider) {
-        this.codeProvider = codeProvider;
-    }
-    
-    protected String generateTokenKey() throws OAuthServiceException {
-        try {
-            byte[] bytes = UUID.randomUUID().toString().getBytes("UTF-8");
-            return new MD5SequenceGenerator().generate(bytes);
-        } catch (Exception ex) {
-            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, ex);
-        }
-    }
-    public void setTokenLifetime(long tokenLifetime) {
-        this.tokenLifetime = tokenLifetime;
     }
     
 }

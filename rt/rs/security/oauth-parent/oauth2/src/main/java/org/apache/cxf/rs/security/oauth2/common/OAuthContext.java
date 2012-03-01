@@ -29,10 +29,14 @@ public class OAuthContext {
 
     private UserSubject subject;
     private List<OAuthPermission> permissions;
+    private String tokenGrantType;
     
-    public OAuthContext(UserSubject subject, List<OAuthPermission> perms) {
+    public OAuthContext(UserSubject subject, 
+                        List<OAuthPermission> perms,
+                        String tokenGrantType) {
         this.subject = subject;
         this.permissions = perms;
+        this.tokenGrantType = tokenGrantType;
     }
     
     public UserSubject getSubject() {
@@ -41,6 +45,11 @@ public class OAuthContext {
     
     public List<OAuthPermission> getPermissions() {
         return Collections.unmodifiableList(permissions);
+    }
+
+    
+    public String getTokenGrantType() {
+        return tokenGrantType;
     }
     
 

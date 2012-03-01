@@ -108,6 +108,8 @@ public class AccessTokenService extends AbstractOAuthService {
                 Object clientIdProp = getMessageContext().get(OAuthConstants.CLIENT_ID);
                 if (clientIdProp != null) {
                     client = getClient(clientIdProp.toString());
+                    //TODO: 
+                    // consider matching client.getLoginName() against principal.getName() ?
                 }
             }
         } else {
@@ -145,7 +147,7 @@ public class AccessTokenService extends AbstractOAuthService {
             if (grantHandlers.size() == 0) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
-                    handler.setCodeProvider(
+                    handler.setDataProvider(
                             (AuthorizationCodeDataProvider)super.getDataProvider());
                     return handler;
                 }
