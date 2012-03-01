@@ -396,4 +396,14 @@ public class OutTransformWriterTest extends Assert {
         
     }
     
+    @Test
+    public void testOldSTSTransform() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("{http://docs.oasis-open.org/ws-sx/ws-trust/200512}*",
+                              "{http://schemas.xmlsoap.org/ws/2005/02/trust}*");
+
+        TransformTestUtils.transformOutStreamAndCompare("../resources/wstrustReqSTRCIn1.xml", 
+                                                     "../resources/wstrustReqSTRC.xml",
+                                  transformElements, null, null, null, null);
+    }
 }

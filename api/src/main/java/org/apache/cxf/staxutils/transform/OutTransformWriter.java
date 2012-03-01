@@ -20,8 +20,6 @@ package org.apache.cxf.staxutils.transform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +41,6 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private QNamesMap attributesMap;
     private Map<QName, ElementProperty> appendMap = new HashMap<QName, ElementProperty>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
-    private List<Set<String>> writtenUris = new LinkedList<Set<String>>();
     
     private Set<QName> dropElements;
     private Stack<List<ParsingEvent>> pushedAheadEvents = new Stack<List<ParsingEvent>>();
@@ -96,7 +93,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         
         uri = value != null ? value : uri;
         
-        if (writtenUris.get(0).contains(uri)) {
+        if (prefix.equals(getPrefix(uri))) {
             return;
         }
         
@@ -108,7 +105,6 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             }
             super.writeNamespace(prefix, uri);
         }
-        writtenUris.get(0).add(uri);
     }
     
     @Override
@@ -117,13 +113,6 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         if (matchesDropped(false)) {
             return;
         }
-        Set<String> s;
-        if (writtenUris.isEmpty()) {
-            s = new HashSet<String>();
-        } else {
-            s = new HashSet<String>(writtenUris.get(0));
-        }
-        writtenUris.add(0, s);
         
         final QName theName = new QName(uri, local, prefix);
         final ElementProperty appendProp = appendMap.remove(theName);
@@ -243,9 +232,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         } else if (dropDepth > 0) {
             dropDepth = 0;
         }
-        if (!writtenUris.isEmpty()) {
-            writtenUris.remove(0);
-        }
+
         QName theName = elementsStack.pop();
         final boolean dropped = dropElements.contains(theName);
         if (!dropped) {
