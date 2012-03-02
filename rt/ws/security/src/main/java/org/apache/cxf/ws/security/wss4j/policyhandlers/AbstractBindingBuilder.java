@@ -532,9 +532,6 @@ public abstract class AbstractBindingBuilder {
                     }
 
                     String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
-                    if (password == null) {
-                        password = "";
-                    }
                     sig.setUserInfo(uname, password);
                     try {
                         sig.prepare(saaj.getSOAPPart(), secToken.getCrypto(), secHeader);
@@ -936,9 +933,6 @@ public abstract class AbstractBindingBuilder {
             }
     
             String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
-            if (password == null) {
-                password = "";
-            }
          
             // TODO configure using a KeyValue here
             assertion.signAssertion(user, password, crypto, false);
@@ -1744,9 +1738,6 @@ public abstract class AbstractBindingBuilder {
         }
 
         String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
-        if (password == null) {
-            password = "";
-        }
         sig.setUserInfo(user, password);
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         sig.setDigestAlgo(binding.getAlgorithmSuite().getDigest());
