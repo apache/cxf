@@ -491,6 +491,7 @@ public class HTTPConduit
                                           getClient().getDecoupledEndpoint());
         }
         if (clientSidePolicy != null) {
+            clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
             clientSidePolicy.addPropertyChangeListener(this);
         }
     }
@@ -866,7 +867,10 @@ public class HTTPConduit
             }
             //defaultEndpointURL = null;
         }
-    
+        
+        if (clientSidePolicy != null) {
+            clientSidePolicy.removePropertyChangeListener(this);
+        }
     }
 
     /**
@@ -1391,8 +1395,12 @@ public class HTTPConduit
      * method will override any HTTPClientPolicy set in configuration.
      */
     public void setClient(HTTPClientPolicy client) {
+        if (this.clientSidePolicy != null) {
+            this.clientSidePolicy.removePropertyChangeListener(this);
+        }
         this.clientSidePolicy = client;
-        client.addPropertyChangeListener(this);
+        clientSidePolicy.removePropertyChangeListener(this); //make sure we aren't added twice
+        clientSidePolicy.addPropertyChangeListener(this);
         endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto", client.getDecoupledEndpoint());
     }
 
