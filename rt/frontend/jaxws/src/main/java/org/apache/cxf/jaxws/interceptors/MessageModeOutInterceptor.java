@@ -54,6 +54,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -187,7 +188,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         
         public void handleMessage(SoapMessage message) throws Fault {
             MessageContentsList list = (MessageContentsList)message.getContent(List.class);
-            Object o = list.get(0);
+            Object o = list.remove(0);
             SOAPMessage soapMessage = null;
             
             if (o instanceof SOAPMessage) {
@@ -221,7 +222,9 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             // Replace stax writer with DomStreamWriter
             message.setContent(XMLStreamWriter.class, writer);
             message.setContent(SOAPMessage.class, soapMessage);
-            
+
+            BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+
             DocumentFragment frag = soapMessage.getSOAPPart().createDocumentFragment();
             try {
                 Node body = soapMessage.getSOAPBody();
@@ -231,7 +234,25 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     frag.appendChild(nd);
                     nd = soapMessage.getSOAPBody().getFirstChild();
                 }
-                list.set(0, frag);
+                
+                int index = 0;
+
+                boolean client = isRequestor(message);
+                BindingMessageInfo bmsg = null; 
+
+                if (client) {
+                    bmsg = bop.getInput();
+                } else if (bop.getOutput() != null) {
+                    bmsg = bop.getOutput();  
+                }
+                if (bmsg != null && bmsg.getMessageParts() != null 
+                    && bmsg.getMessageParts().size() > 0) {
+                    index = bmsg.getMessageParts().get(0).getIndex(); 
+                }
+
+                list.set(index, frag);
+                
+                
                 //No need to buffer this as we're already a DOM, 
                 //but only do so if someone hasn't actually configured this
                 Object buffer = message
@@ -242,7 +263,6 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
-            BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
             if (bop != null && bop.isUnwrapped()) {
                 bop = bop.getWrappedOperation();
                 message.getExchange().put(BindingOperationInfo.class, bop);

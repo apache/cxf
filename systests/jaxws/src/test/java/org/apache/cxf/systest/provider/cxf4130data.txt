@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:inb="http://cxf.apache.org/soapheader/inband">
+   <soapenv:Header>
+      <inb:FooRequestHeader>?</inb:FooRequestHeader>
+   </soapenv:Header>
+   <soapenv:Body>
+      <inb:FooRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>
