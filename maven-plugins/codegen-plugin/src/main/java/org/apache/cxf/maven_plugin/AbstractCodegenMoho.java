@@ -34,17 +34,23 @@ import java.util.Set;
 
 import org.apache.commons.lang.SystemUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectUtils;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
@@ -142,7 +148,14 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @since 2.4
      */
     private String additionalJvmArgs;
-    
+    /**
+     * The local repository taken from Maven's runtime. Typically $HOME/.m2/repository.
+     * 
+     * @parameter expression="${localRepository}"
+     * @readonly
+     * @required
+     */
+    private ArtifactRepository localRepository;
     /**
      * Artifact factory, needed to create artifacts.
      * 
@@ -160,6 +173,22 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     private String javaExecutable;
     /**
+     * The remote repositories used as specified in your POM.
+     * 
+     * @parameter expression="${project.repositories}"
+     * @readonly
+     * @required
+     */
+    private List<Repository> repositories;
+    /**
+     * Artifact repository factory component.
+     * 
+     * @component
+     * @readonly
+     * @required
+     */
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
+    /**
      * The Maven session.
      * 
      * @parameter expression="${session}"
@@ -173,6 +202,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @required
      */
     private ProjectDependenciesResolver projectDependencyResolver;
+     /**
+      * @component
+      * @readonly
+      * @required
+      */
+    private ArtifactResolver artifactResolver;
 
     public AbstractCodegenMoho() {
         super();
@@ -572,9 +607,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (wsdlA == null) {
                 return;
             }
-            Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA.getArtifactId(),
-                                                                   wsdlA.getVersion(),
-                                                                   Artifact.SCOPE_COMPILE, wsdlA.getType());
+            Artifact wsdlArtifact = artifactFactory.createBuildArtifact(wsdlA.getGroupId(),
+                                                                        wsdlA.getArtifactId(),
+                                                                        wsdlA.getVersion(), wsdlA.getType());
             wsdlArtifact = resolveRemoteWsdlArtifact(wsdlArtifact);
             if (wsdlArtifact != null) {
                 File supposedFile = wsdlArtifact.getFile();
@@ -606,29 +641,73 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
     
     private Artifact resolveRemoteWsdlArtifact(Artifact artifact) throws MojoExecutionException {
-
-        Collection<String> scopes = new ArrayList<String>();
-        scopes.add(artifact.getScope());
-        Set<Artifact> resolvedArtifacts = null;
-        try {
-            resolvedArtifacts = projectDependencyResolver.resolve(project, scopes, mavenSession);
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Error downloading wsdl artifact.", e);
-        } catch (ArtifactNotFoundException e) {
-            throw new MojoExecutionException("Resource can not be found.", e);
+        Artifact remoteWsdl = resolveDependentWsdl(artifact);
+        if (remoteWsdl == null) {
+            remoteWsdl = resolveAttachedWsdl(artifact);
         }
+        if (remoteWsdl == null) {
+            remoteWsdl = resolveArbitraryWsdl(artifact);
+        }
+        if (remoteWsdl != null && remoteWsdl.isResolved()) {
+            return remoteWsdl;
+        }
+        throw new MojoExecutionException(String.format("Failed to resolve WSDL artifact %s",
+                                                       artifact.toString()));
+    }
 
-        if (resolvedArtifacts != null && resolvedArtifacts.size() != 0) {
-            for (Artifact pArtifact : resolvedArtifacts) {
-                if ("wsdl".equals(pArtifact.getType())) {
+    private Artifact resolveDependentWsdl(Artifact artifact) {
+        Collection<String> scopes = new ArrayList<String>();
+        scopes.add(Artifact.SCOPE_RUNTIME);
+        Set<Artifact> artifactSet = null;
+        try {
+            artifactSet = projectDependencyResolver.resolve(project, scopes, mavenSession);
+        } catch (AbstractArtifactResolutionException e) {
+            getLog().info("Error resolving dependent wsdl artifact.", e);
+        }
+        return findWsdlArtifact(artifact, artifactSet);
+    }
+
+    private Artifact resolveAttachedWsdl(Artifact artifact) {
+        List<MavenProject> rProjects = mavenSession.getSortedProjects();
+        List<Artifact> artifactList = new ArrayList<Artifact>();
+        for (MavenProject rProject : rProjects) {
+            List<Artifact> list = CastUtils.cast(rProject.getAttachedArtifacts());
+            if (list != null) {
+                artifactList.addAll(list);
+            }
+        }
+        return findWsdlArtifact(artifact, artifactList);
+    }
+
+    private Artifact resolveArbitraryWsdl(Artifact artifact) {
+        try {
+            @SuppressWarnings("rawtypes")
+            List remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, 
+                                                                      artifactRepositoryFactory,
+                                                                 mavenSession.getContainer());
+            artifactResolver.resolve(artifact, remoteRepos, localRepository);
+        } catch (InvalidRepositoryException e) {
+            getLog().info("Error build repositories for remote wsdls.", e);
+        } catch (AbstractArtifactResolutionException e) {
+            getLog().info("Error resolving arbitrary wsdl artifact.", e);
+        }
+        return artifact;
+    }
+
+    private Artifact findWsdlArtifact(Artifact targetArtifact, Collection<Artifact> artifactSet) {
+        if (artifactSet != null && !artifactSet.isEmpty()) {
+            for (Artifact pArtifact : artifactSet) {
+                if (targetArtifact.getGroupId().equals(pArtifact.getGroupId())
+                    && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
+                    && targetArtifact.getVersion().equals(pArtifact.getVersion())
+                    && "wsdl".equals(pArtifact.getType())) {
                     getLog().info(String.format("%s resolved to %s", pArtifact.toString(), pArtifact
                                       .getFile().getAbsolutePath()));
                     return pArtifact;
                 }
             }
         }
-        throw new MojoExecutionException(String.format("Failed to resolve WSDL artifact %s",
-                                                       artifact.toString()));
+        return null;
     }
 
 }
