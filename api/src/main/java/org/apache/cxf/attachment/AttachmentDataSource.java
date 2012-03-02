@@ -27,6 +27,7 @@ import javax.activation.DataSource;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.Message;
 
 public class AttachmentDataSource implements DataSource {
 
@@ -43,9 +44,10 @@ public class AttachmentDataSource implements DataSource {
     public boolean isCached() {
         return cache != null;
     }
-    public void cache() throws IOException {
+    public void cache(Message message) throws IOException {
         if (cache == null) {
             cache = new CachedOutputStream();
+            AttachmentUtil.setStreamedAttachmentProperties(message, cache);
             IOUtils.copy(ins, cache);
             cache.lockOutputStream();  
             ins.close();
@@ -55,8 +57,8 @@ public class AttachmentDataSource implements DataSource {
             }
         }
     }
-    public void hold() throws IOException {
-        cache();
+    public void hold(Message message) throws IOException {
+        cache(message);
         cache.holdTempFile();
     }
     public void release() {

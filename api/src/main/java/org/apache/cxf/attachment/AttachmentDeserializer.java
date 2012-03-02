@@ -19,7 +19,6 @@
 
 package org.apache.cxf.attachment;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -168,37 +167,6 @@ public class AttachmentDeserializer {
         return m.find() ? "--" + m.group(1) : null;
     }
     
-    private void setStreamedAttachmentProperties(CachedOutputStream bos) throws IOException {
-        Object directory = message.getContextualProperty(ATTACHMENT_DIRECTORY);
-        if (directory != null) {
-            if (directory instanceof File) {
-                bos.setOutputDir((File)directory);
-            } else {
-                bos.setOutputDir(new File((String)directory));
-            }
-        }
-        
-        Object threshold = message.getContextualProperty(ATTACHMENT_MEMORY_THRESHOLD);
-        if (threshold != null) {
-            if (threshold instanceof Long) {
-                bos.setThreshold((Long)threshold);
-            } else {
-                bos.setThreshold(Long.valueOf((String)threshold));
-            }
-        } else {
-            bos.setThreshold(THRESHOLD);
-        }
-
-        Object maxSize = message.getContextualProperty(ATTACHMENT_MAX_SIZE);
-        if (maxSize != null) {
-            if (maxSize instanceof Long) {
-                bos.setMaxSize((Long) maxSize);
-            } else {
-                bos.setMaxSize(Long.valueOf((String)maxSize));
-            }
-        }
-    }
-
     public AttachmentImpl readNext() throws IOException {
         // Cache any mime parts that are currently being streamed
         cacheStreamedAttachments();
@@ -237,7 +205,7 @@ public class AttachmentDeserializer {
             if (s instanceof AttachmentDataSource) {
                 AttachmentDataSource ads = (AttachmentDataSource)s;
                 if (!ads.isCached()) {
-                    ads.cache();
+                    ads.cache(message);
                 }
             } else if (s.getInputStream() instanceof DelegatingInputStream) {
                 cache((DelegatingInputStream) s.getInputStream(), false);
@@ -256,7 +224,7 @@ public class AttachmentDeserializer {
         InputStream origIn = input.getInputStream();
         try {
             out = new CachedOutputStream();
-            setStreamedAttachmentProperties(out);
+            AttachmentUtil.setStreamedAttachmentProperties(message, out);
             IOUtils.copy(input, out);
             input.setInputStream(out.getInputStream());
             origIn.close();

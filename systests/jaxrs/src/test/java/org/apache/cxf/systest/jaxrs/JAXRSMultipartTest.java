@@ -562,7 +562,31 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         post.setRequestHeader("Content-Type", ct);
         Part[] parts = new Part[1];
         parts[0] = new FilePart("image",
-                new ByteArrayPartSource("testfile.png", new byte[1024 * 1024 * 15]),
+                new ByteArrayPartSource("testfile.png", new byte[1024 * 11]),
+                "image/png", null);
+        post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+
+        HttpClient httpclient = new HttpClient();
+
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(413, result);
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }
+    }
+    @Test
+    public void testMultipartRequestTooLargeManyParts() throws Exception {
+        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books/image");
+        String ct = "multipart/mixed";
+        post.setRequestHeader("Content-Type", ct);
+        Part[] parts = new Part[2];
+        parts[0] = new FilePart("image",
+                new ByteArrayPartSource("testfile.png", new byte[1024 * 9]),
+                "image/png", null);
+        parts[1] = new FilePart("image",
+                new ByteArrayPartSource("testfile2.png", new byte[1024 * 11]),
                 "image/png", null);
         post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
 
