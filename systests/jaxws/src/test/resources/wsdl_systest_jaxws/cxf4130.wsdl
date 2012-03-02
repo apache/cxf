@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/soapheader/inband" targetNamespace="http://cxf.apache.org/soapheader/inband">
+	<types>
+		<schema elementFormDefault="qualified" targetNamespace="http://cxf.apache.org/soapheader/inband" xmlns="http://www.w3.org/2001/XMLSchema">
+>
+			<element name="FooRequest">
+				<complexType>
+					<sequence/>
+				</complexType>
+			</element>
+
+			<element name="FooResponse">
+				<complexType>
+					<sequence>
+						<element name="Return" type="string"/>
+					</sequence>
+				</complexType>
+			</element>
+
+			<element name="FooRequestHeader" type="string"/>
+			<element name="FooResponseHeader" type="string"/>
+		</schema>
+	</types>
+
+	<message name="FooRequest">
+		<part name="FooRequestHeader" element="tns:FooRequestHeader"/>
+		<part name="FooRequest" element="tns:FooRequest"/>
+	</message>
+	<message name="FooResponse">
+		<part name="FooResponseHeader" element="tns:FooResponseHeader"/>
+		<part name="FooResponse" element="tns:FooResponse"/>
+	</message>
+	<portType name="InBandSoapHeaderPortType">
+		<operation name="Foo">
+			<input name="FooRequest" message="tns:FooRequest"/>
+			<output name="FooResponse" message="tns:FooResponse"/>
+		</operation>
+	</portType>
+	<binding name="InBandSoapHeaderSoapHttpBinding" type="tns:InBandSoapHeaderPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="Foo">
+			<soap:operation/>
+			<input>
+				<soap:header message="tns:FooRequest" part="FooRequestHeader" use="literal"/>
+				<soap:body parts="FooRequest" use="literal"/>
+			</input>
+			<output>
+				<soap:header message="tns:FooResponse" part="FooResponseHeader" use="literal"/>
+				<!-- mmurphy - The follow line is from customer's original WSDL -->
+				<!-- <soap:body parts="FooCallbackPollResponse" use="literal"/>  -->
+				<!-- mmurphy - Replacing with suggestion from Seumas -->
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+
+	<service name="InBandSoapHeaderService">
+		<port name="InBandSoapHeaderSoapHttpPort" binding="tns:InBandSoapHeaderSoapHttpBinding">
+			<soap:address location="http://localhost:5640/InBand33MessageServiceProvider/InBandSoapHeaderSoapHttpPort"/>
+		</port>
+	</service>
+</definitions>
