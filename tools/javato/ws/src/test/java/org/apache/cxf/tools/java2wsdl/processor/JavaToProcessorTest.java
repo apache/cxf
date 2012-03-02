@@ -654,4 +654,25 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlContent.indexOf("<soap:fault name=\"Exception\" use=\"literal\"/>") != -1);
 
     }
+    
+    //CXF-4147
+    @Test
+    public void testBareWithoutWebParam() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/cxf4147.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.java2wsdl.processor.HelloBare");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File wsdlFile = new File(output, "cxf4147.wsdl");
+        assertTrue(wsdlFile.exists());
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        assertTrue(wsdlContent.indexOf("xsd:element name=\"add\" nillable=\"true\" type=\"xsd:int\"") != -1);
+        assertTrue(wsdlContent.indexOf("xsd:element name=\"add1\" nillable=\"true\" type=\"xsd:string\"") 
+                   != -1);
+        assertTrue(wsdlContent.indexOf("wsdl:part name=\"add1\" element=\"tns:add1\"") != -1);
+    }
 }
