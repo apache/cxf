@@ -163,6 +163,7 @@ public final class ToolConstants {
     public static final String NS_JAXB_BINDINGS = "http://java.sun.com/xml/ns/jaxb";
     public static final QName  JAXWS_BINDINGS = new QName(NS_JAXWS_BINDINGS, "bindings");
     public static final QName  JAXB_BINDINGS = new QName(NS_JAXB_BINDINGS, "bindings");
+    public static final QName SCHEMA = new QName(SCHEMA_URI, "schema");
     public static final String JAXWS_BINDINGS_WSDL_LOCATION = "wsdlLocation";
     public static final String JAXWS_BINDING_NODE = "node";
     public static final String JAXWS_BINDING_VERSION = "version";
