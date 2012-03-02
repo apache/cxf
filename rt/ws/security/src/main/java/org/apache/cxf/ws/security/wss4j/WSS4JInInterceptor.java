@@ -68,6 +68,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -376,7 +377,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * @param reqData
      */
     protected void computeAction(SoapMessage msg, RequestData reqData) {
-        
+        //
+        // Try to get Crypto Provider from message context properties. 
+        // It gives a possibility to use external Crypto Provider 
+        //
+        Crypto encCrypto = (Crypto)msg.getContextualProperty(SecurityConstants.ENCRYPT_CRYPTO);
+        if (encCrypto != null) {
+            reqData.setEncCrypto(encCrypto);
+            reqData.setDecCrypto(encCrypto);
+        }
+        Crypto sigCrypto = (Crypto)msg.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
+        if (sigCrypto != null) {
+            reqData.setSigCrypto(sigCrypto);
+        }
     }
 
     protected void doResults(
@@ -656,7 +669,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         return fault;
     }
-    
     
     static class CXFRequestData extends RequestData {
         public CXFRequestData() {
