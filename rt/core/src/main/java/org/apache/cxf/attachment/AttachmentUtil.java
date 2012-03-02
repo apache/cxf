@@ -47,7 +47,9 @@ import javax.mail.internet.InternetHeaders;
 
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
 
 public final class AttachmentUtil {
     
@@ -71,6 +73,38 @@ public final class AttachmentUtil {
 
     public static CommandMap getCommandMap() {
         return COMMAND_MAP;
+    }
+    
+    public static void setStreamedAttachmentProperties(Message message, CachedOutputStream bos) 
+        throws IOException {
+        Object directory = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_DIRECTORY);
+        if (directory != null) {
+            if (directory instanceof File) {
+                bos.setOutputDir((File)directory);
+            } else {
+                bos.setOutputDir(new File((String)directory));
+            }
+        }
+        
+        Object threshold = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD);
+        if (threshold != null) {
+            if (threshold instanceof Long) {
+                bos.setThreshold((Long)threshold);
+            } else {
+                bos.setThreshold(Long.valueOf((String)threshold));
+            }
+        } else {
+            bos.setThreshold(AttachmentDeserializer.THRESHOLD);
+        }
+
+        Object maxSize = message.getContextualProperty(AttachmentDeserializer.ATTACHMENT_MAX_SIZE);
+        if (maxSize != null) {
+            if (maxSize instanceof Long) {
+                bos.setMaxSize((Long) maxSize);
+            } else {
+                bos.setMaxSize(Long.valueOf((String)maxSize));
+            }
+        }
     }
     
     /**

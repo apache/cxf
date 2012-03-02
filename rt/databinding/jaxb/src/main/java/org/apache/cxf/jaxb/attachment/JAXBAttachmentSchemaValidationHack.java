@@ -53,7 +53,7 @@ public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInter
                 if (at.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                     AttachmentDataSource ds = (AttachmentDataSource)at.getDataHandler().getDataSource();
                     try {
-                        ds.hold();
+                        ds.hold(message);
                     } catch (IOException e) {
                         throw new Fault(e);
                     }

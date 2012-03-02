@@ -199,7 +199,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 for (Attachment a : atts) {
                     if (a.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                         try {
-                            ((AttachmentDataSource)a.getDataHandler().getDataSource()).cache();
+                            ((AttachmentDataSource)a.getDataHandler().getDataSource()).cache(message);
                         } catch (IOException e) {
                             throw new Fault(e);
                         }

@@ -453,7 +453,7 @@ public abstract class AbstractHTTPDestination
             for (Attachment a : atts) {
                 if (a.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                     try {
-                        ((AttachmentDataSource)a.getDataHandler().getDataSource()).cache();
+                        ((AttachmentDataSource)a.getDataHandler().getDataSource()).cache(inMessage);
                     } catch (IOException e) {
                         throw new Fault(e);
                     }

@@ -34,7 +34,7 @@ public class MultipartServer extends AbstractBusTestServerBase {
         sf.setResourceClasses(MultipartStore.class);
         sf.setProperties(Collections.<String, Object>singletonMap(
                 AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
-                String.valueOf(1024 * 1024 * 10)));
+                String.valueOf(1024 * 10)));
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(MultipartStore.class,
                                new SingletonResourceProvider(new MultipartStore()));
