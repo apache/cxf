@@ -26,7 +26,7 @@ import java.util.Map;
  * session state.
  *
  */
-class Cookie {
+public class Cookie {
     public static final String DISCARD_ATTRIBUTE = "discard";
     public static final String MAX_AGE_ATTRIBUTE = "max-age";
     public static final String PATH_ATTRIBUTE = "path";
