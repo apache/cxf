@@ -85,7 +85,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         return new PolicyBasedWSS4JOutInterceptorInternal();
     }
     
-    final class PolicyBasedWSS4JOutInterceptorInternal 
+    public final class PolicyBasedWSS4JOutInterceptorInternal 
         implements PhaseInterceptor<SoapMessage> {
         public PolicyBasedWSS4JOutInterceptorInternal() {
             super();
