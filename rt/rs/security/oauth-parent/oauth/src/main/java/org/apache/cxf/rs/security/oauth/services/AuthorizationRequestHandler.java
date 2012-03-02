@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
 import net.oauth.OAuth;
@@ -57,6 +56,7 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.LoginSecurityContext;
+import org.apache.cxf.security.SecurityContext;
 
 
 public class AuthorizationRequestHandler {
@@ -91,7 +91,7 @@ public class AuthorizationRequestHandler {
 
             Map<String, String> queryParams = new HashMap<String, String>();
             if (allow) {
-                SecurityContext sc = mc.getSecurityContext();
+                SecurityContext sc = (SecurityContext)mc.get(SecurityContext.class.getName());
                 List<String> roleNames = Collections.emptyList();
                 if (sc instanceof LoginSecurityContext) {
                     roleNames = new ArrayList<String>();
