@@ -359,7 +359,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         checkError();
         client.setExecutor(getClient().getEndpoint().getExecutor());
 
-        ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler);
+        ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this);
              
         Response<T> ret = new JaxwsResponseCallback<T>(callback);
         try {
