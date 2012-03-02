@@ -60,9 +60,9 @@ class Beanspector<T> {
         }
         for (Method m : tclass.getMethods()) {
             if (isGetter(m)) {
-                getters.put(getterName(m), m);
+                getters.put(getPropertyName(m), m);
             } else if (isSetter(m)) {
-                setters.put(setterName(m), m);
+                setters.put(getPropertyName(m), m);
             }
         }
         // check type equality for getter-setter pairs
@@ -171,8 +171,17 @@ class Beanspector<T> {
                && (m.getName().startsWith("get") || m.getName().startsWith("is"));
     }
 
-    private String getterName(Method m) {
-        return m.getName().replace("is", "").replace("get", "").toLowerCase();
+    private String getPropertyName(Method m) {
+        // at this point the method is either getter or setter
+        String result = m.getName().toLowerCase();
+
+        if (result.startsWith("is")) {
+            result = result.substring(2, result.length());
+        } else {
+            result = result.substring(3, result.length());
+        }
+        return result;
+
     }
 
     private boolean isSetter(Method m) {
@@ -180,8 +189,6 @@ class Beanspector<T> {
                && (m.getName().startsWith("set") || m.getName().startsWith("is"));
     }
 
-    private String setterName(Method m) {
-        return m.getName().replace("is", "").replace("set", "").toLowerCase();
-    }
+    
 
 }
