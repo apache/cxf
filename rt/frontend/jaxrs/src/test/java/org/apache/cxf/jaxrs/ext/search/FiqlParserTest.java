@@ -120,11 +120,6 @@ public class FiqlParserTest extends Assert {
         parser.parse("name==10");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testMismatchedAccessorTypes() throws FiqlParseException {
-        new FiqlParser<MismatchedTypes>(MismatchedTypes.class);
-    }
-
     @Test
     public void testParseName() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==king");
@@ -329,14 +324,4 @@ public class FiqlParserTest extends Assert {
 
     }
 
-    // TODO refactor to Beanspector unit tests
-    @Ignore
-    static class MismatchedTypes {
-        public Date getFoo() {
-            return null;
-        }
-
-        public void setFoo(String val) {
-        }
-    }
 }
