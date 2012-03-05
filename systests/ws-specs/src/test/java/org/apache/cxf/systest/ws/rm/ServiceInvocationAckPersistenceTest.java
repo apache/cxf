@@ -18,12 +18,36 @@
  */
 package org.apache.cxf.systest.ws.rm;
 
+import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
+
+import org.junit.BeforeClass;
+
 /**
  * Tests the acknowledgement delivery back to the non-decoupled port when there is some
  * error at the provider side and how its behavior is affected by the robust in-only mode setting.
  */
-public class ServiceInvocationAckTest extends ServiceInvocationAckBase {
+public class ServiceInvocationAckPersistenceTest extends ServiceInvocationAckBase {
+    @BeforeClass
+    public static void cleanUpDerby() throws Exception {
+        String derbyHome = System.getProperty("derby.system.home");
+        if (derbyHome == null) {
+            System.setProperty("derby.system.home", "target/derby");
+        }
+        RMTxStore.deleteDatabaseFiles();
+        derbyHome = System.getProperty("derby.system.home"); 
+        try {
+            System.setProperty("derby.system.home", derbyHome + "-server");
+            RMTxStore.deleteDatabaseFiles();
+        } finally {
+            if (derbyHome != null) {
+                System.setProperty("derby.system.home", derbyHome);
+            } else {
+                System.clearProperty("derby.system.home");
+            }
+        }
+    }
+
     protected void setupGreeter() throws Exception {
-        setupGreeter("org/apache/cxf/systest/ws/rm/sync-ack-server.xml");
+        setupGreeter("org/apache/cxf/systest/ws/rm/sync-ack-persistent-server.xml");
     }
 }
