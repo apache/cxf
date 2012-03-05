@@ -19,6 +19,8 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
@@ -27,6 +29,7 @@ import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
@@ -415,6 +418,46 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
         assertFalse(tokenString.contains(SAML1Constants.CONF_HOLDER_KEY));
+    }
+    
+    /**
+     * Create a default Saml2 Bearer Assertion using a specified C14n Algorithm
+     */
+    @org.junit.Test
+    public void testDefaultSaml2BearerDifferentC14nAssertion() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+        KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
+        
+        keyRequirements.setC14nAlgorithm(WSConstants.C14N_EXCL_WITH_COMMENTS);
+
+        // This will fail as the requested c14n algorithm is rejected
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertFalse(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
+        assertTrue(tokenString.contains(WSConstants.C14N_EXCL_OMIT_COMMENTS));
+        
+        STSPropertiesMBean stsProperties = providerParameters.getStsProperties();
+        SignatureProperties sigProperties = new SignatureProperties();
+        List<String> acceptedC14nAlgorithms = new ArrayList<String>();
+        acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_OMIT_COMMENTS);
+        acceptedC14nAlgorithms.add(WSConstants.C14N_EXCL_WITH_COMMENTS);
+        sigProperties.setAcceptedC14nAlgorithms(acceptedC14nAlgorithms);
+        stsProperties.setSignatureProperties(sigProperties);
+        
+        // This will succeed as the requested c14n algorithm is accepted
+        providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        token = providerResponse.getToken();
+        tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
     }
     
     private TokenProviderParameters createProviderParameters(

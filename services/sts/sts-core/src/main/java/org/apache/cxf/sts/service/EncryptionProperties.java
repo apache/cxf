@@ -42,6 +42,9 @@ public class EncryptionProperties {
         acceptedEncryptionAlgorithms.add(WSConstants.AES_128);
         acceptedEncryptionAlgorithms.add(WSConstants.AES_192);
         acceptedEncryptionAlgorithms.add(WSConstants.AES_256);
+        acceptedEncryptionAlgorithms.add(WSConstants.AES_128_GCM);
+        acceptedEncryptionAlgorithms.add(WSConstants.AES_192_GCM);
+        acceptedEncryptionAlgorithms.add(WSConstants.AES_256_GCM);
         
         // Default key wrap algorithms
         acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSA15);
@@ -107,7 +110,7 @@ public class EncryptionProperties {
     /**
      * Set the list of accepted encryption algorithms. A request can contain a wst:EncryptionAlgorithm
      * uri to use to encrypt an issued token. The algorithm specified must be contained in this list.
-     * The default algorithms are 3-DES, AES-128, AES-192 and AES-256.
+     * The default algorithms are 3-DES, AES-128, AES-128 GCM, AES-192, AES-192 GCM, AES-256 and AES-256 GCM.
      */
     public void setAcceptedEncryptionAlgorithms(List<String> acceptedEncryptionAlgorithms) {
         this.acceptedEncryptionAlgorithms = acceptedEncryptionAlgorithms;
@@ -116,7 +119,7 @@ public class EncryptionProperties {
     /**
      * Get the list of accepted encryption algorithms. A request can contain a wst:EncryptionAlgorithm
      * uri to use to encrypt an issued token. The algorithm specified must be contained in this list.
-     * The default algorithms are 3-DES, AES-128, AES-192 and AES-256.
+     * The default algorithms are 3-DES, AES-128, AES-128 GCM, AES-192, AES-192 GCM, AES-256 and AES-256 GCM.
      */
     public List<String> getAcceptedEncryptionAlgorithms() {
         return acceptedEncryptionAlgorithms;
