@@ -259,7 +259,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
 
         String keyType = keyRequirements.getKeyType();
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            if (keyRequirements.getCertificate() == null) {
+            if (keyRequirements.getReceivedKey() == null
+                || keyRequirements.getReceivedKey().getX509Cert() == null) {
                 LOG.log(Level.WARNING, "A PublicKey Keytype is requested, but no certificate is provided");
                 throw new STSException(
                     "No client certificate for PublicKey KeyType", STSException.INVALID_REQUEST

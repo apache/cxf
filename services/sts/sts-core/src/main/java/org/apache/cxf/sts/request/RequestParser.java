@@ -91,7 +91,7 @@ public class RequestParser {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
                 boolean found = parseTokenRequirements(jaxbElement, tokenRequirements, wsContext);
                 if (!found) {
-                    found = parseKeyRequirements(jaxbElement, keyRequirements);
+                    found = parseKeyRequirements(jaxbElement, keyRequirements, wsContext);
                 }
                 if (!found) {
                     LOG.log(Level.WARNING, "Found a JAXB object of unknown type: " + jaxbElement.getName());
@@ -143,7 +143,7 @@ public class RequestParser {
      * Parse the Key and Encryption requirements into the KeyRequirements argument.
      */
     private static boolean parseKeyRequirements(
-        JAXBElement<?> jaxbElement, KeyRequirements keyRequirements
+        JAXBElement<?> jaxbElement, KeyRequirements keyRequirements, WebServiceContext wsContext
     ) {
         if (QNameConstants.AUTHENTICATION_TYPE.equals(jaxbElement.getName())) {
             String authenticationType = (String)jaxbElement.getValue();
@@ -179,8 +179,8 @@ public class RequestParser {
             LOG.fine("Found KeyWrapAlgorithm: " + keywrapAlgorithm);
         } else if (QNameConstants.USE_KEY.equals(jaxbElement.getName())) {
             UseKeyType useKey = (UseKeyType)jaxbElement.getValue();
-            X509Certificate cert = parseUseKey(useKey);
-            keyRequirements.setCertificate(cert);
+            ReceivedKey receivedKey = parseUseKey(useKey, wsContext);
+            keyRequirements.setReceivedKey(receivedKey);
         } else if (QNameConstants.ENTROPY.equals(jaxbElement.getName())) {
             EntropyType entropyType = (EntropyType)jaxbElement.getValue();
             Entropy entropy = parseEntropy(entropyType);
@@ -229,16 +229,18 @@ public class RequestParser {
         } else if (QNameConstants.VALIDATE_TARGET.equals(jaxbElement.getName())) {
             ValidateTargetType validateTargetType = (ValidateTargetType)jaxbElement.getValue();
             ReceivedToken validateTarget = new ReceivedToken(validateTargetType.getAny());
-            if (isTokenReferenced(validateTarget)) {
-                validateTarget = fetchTokenFromReference(validateTarget, wsContext);
+            if (isTokenReferenced(validateTarget.getToken())) {
+                Element target = fetchTokenElementFromReference(validateTarget.getToken(), wsContext);
+                validateTarget = new ReceivedToken(target);
             }  
             tokenRequirements.setValidateTarget(validateTarget);
             LOG.fine("Found ValidateTarget token");
         } else if (QNameConstants.CANCEL_TARGET.equals(jaxbElement.getName())) {
             CancelTargetType cancelTargetType = (CancelTargetType)jaxbElement.getValue();
             ReceivedToken cancelTarget = new ReceivedToken(cancelTargetType.getAny());
-            if (isTokenReferenced(cancelTarget)) {
-                cancelTarget = fetchTokenFromReference(cancelTarget, wsContext);
+            if (isTokenReferenced(cancelTarget.getToken())) {
+                Element target = fetchTokenElementFromReference(cancelTarget.getToken(), wsContext);
+                cancelTarget = new ReceivedToken(target);
             }          
             tokenRequirements.setCancelTarget(cancelTarget);
             LOG.fine("Found CancelTarget token");
@@ -254,45 +256,79 @@ public class RequestParser {
     }
     
     /**
-     * Parse the UseKey structure to get a certificate
+     * Parse the UseKey structure to get a ReceivedKey containing a cert/public-key/secret-key.
      * @param useKey The UseKey object
-     * @return the X509 certificate that has been parsed
+     * @param wsContext The WebServiceContext object
+     * @return the ReceivedKey that has been parsed
      * @throws STSException
      */
-    private static X509Certificate parseUseKey(UseKeyType useKey) throws STSException {
+    private static ReceivedKey parseUseKey(
+        UseKeyType useKey, 
+        WebServiceContext wsContext
+    ) throws STSException {
         byte[] x509 = null;
-        KeyInfoType keyInfoType = extractType(useKey.getAny(), KeyInfoType.class);
-        if (null != keyInfoType) {
-            LOG.fine("Found KeyInfo UseKey type");
-            for (Object keyInfoContent : keyInfoType.getContent()) {
-                X509DataType x509DataType = extractType(keyInfoContent, X509DataType.class);
-                if (null != x509DataType) {
-                    LOG.fine("Found X509Data KeyInfo type");
-                    for (Object x509Object 
-                        : x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName()) {
-                        x509 = extractType(x509Object, byte[].class);
-                        if (null != x509) {
-                            LOG.fine("Found X509Certificate UseKey type");
-                            break;
+        if (useKey.getAny() instanceof JAXBElement<?>) {
+            JAXBElement<?> useKeyJaxb = (JAXBElement<?>)useKey.getAny();
+            if (KeyInfoType.class == useKeyJaxb.getDeclaredType()) {
+                KeyInfoType keyInfoType = KeyInfoType.class.cast(useKeyJaxb.getValue());
+                LOG.fine("Found KeyInfo UseKey type");
+                for (Object keyInfoContent : keyInfoType.getContent()) {
+                    X509DataType x509DataType = extractType(keyInfoContent, X509DataType.class);
+                    if (null != x509DataType) {
+                        LOG.fine("Found X509Data KeyInfo type");
+                        for (Object x509Object 
+                            : x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName()) {
+                            x509 = extractType(x509Object, byte[].class);
+                            if (null != x509) {
+                                LOG.fine("Found X509Certificate UseKey type");
+                                break;
+                            }
                         }
                     }
                 }
-            }
-        } else if (useKey.getAny() instanceof Element) {
-            Element elementNSImpl = (Element) useKey.getAny();
-            NodeList x509CertData = 
-                elementNSImpl.getElementsByTagNameNS(
-                    Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
-                );
-            if (x509CertData != null && x509CertData.getLength() > 0) {
+            } else if (SecurityTokenReferenceType.class == useKeyJaxb.getDeclaredType()) {
+                SecurityTokenReferenceType strType = 
+                    SecurityTokenReferenceType.class.cast(useKeyJaxb.getValue());
+                Element token = fetchTokenElementFromReference(strType, wsContext);
                 try {
-                    x509 = Base64Utility.decode(x509CertData.item(0).getTextContent());
-                    LOG.fine("Found X509Certificate UseKey type");
+                    x509 = Base64Utility.decode(token.getTextContent());
+                    LOG.fine("Found X509Certificate UseKey type via reference");
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "", e);
                     throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
                 }
             }
+        } else if (useKey.getAny() instanceof Element) {
+            if (isTokenReferenced(useKey.getAny())) {
+                Element token = fetchTokenElementFromReference(useKey.getAny(), wsContext);
+                try {
+                    x509 = Base64Utility.decode(token.getTextContent());
+                    LOG.fine("Found X509Certificate UseKey type via reference");
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "", e);
+                    throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
+                }
+            } else {
+                Element elementNSImpl = (Element) useKey.getAny();
+                NodeList x509CertData = 
+                    elementNSImpl.getElementsByTagNameNS(
+                        Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
+                    );
+                if (x509CertData != null && x509CertData.getLength() > 0) {
+                    try {
+                        x509 = Base64Utility.decode(x509CertData.item(0).getTextContent());
+                        LOG.fine("Found X509Certificate UseKey type");
+                    } catch (Exception e) {
+                        LOG.log(Level.WARNING, "", e);
+                        throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
+                    }
+                }
+            }
+        } else {
+            LOG.log(Level.WARNING, "An unknown element was received");
+            throw new STSException(
+                "An unknown element was received", STSException.BAD_REQUEST
+            );
         }
         
         if (x509 != null) {
@@ -301,7 +337,9 @@ public class RequestParser {
                 X509Certificate cert =
                     (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(x509));
                 LOG.fine("Successfully parsed X509 Certificate from UseKey");
-                return cert;
+                ReceivedKey receivedKey = new ReceivedKey();
+                receivedKey.setX509Cert(cert);
+                return receivedKey;
             } catch (CertificateException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException("Error in parsing certificate: ", ex, STSException.INVALID_REQUEST);
@@ -474,8 +512,7 @@ public class RequestParser {
     /**
      * Method to check if the passed token is a SecurityTokenReference
      */
-    private static boolean isTokenReferenced(ReceivedToken token) {
-        Object targetToken = token.getToken();
+    private static boolean isTokenReferenced(Object targetToken) {
         if (targetToken instanceof Element) {
             Element tokenElement = (Element)targetToken;
             String namespace = tokenElement.getNamespaceURI();
@@ -493,12 +530,11 @@ public class RequestParser {
     /**
      * Method to fetch token from the SecurityTokenReference
      */
-    private static ReceivedToken fetchTokenFromReference(
-        ReceivedToken tokenReference, WebServiceContext wsContext
+    private static Element fetchTokenElementFromReference(
+        Object targetToken, WebServiceContext wsContext
     ) {
         // Get the reference URI
         String referenceURI = null;
-        Object targetToken = tokenReference.getToken();
         if (targetToken instanceof Element) {
             Element tokenElement = (Element) targetToken;
             NodeList refList = 
@@ -519,7 +555,14 @@ public class RequestParser {
                 }
             }
         }
+        
         LOG.fine("Reference URI found " + referenceURI);
+        if (referenceURI == null) {
+            LOG.log(Level.WARNING, "No Reference URI was received");
+            throw new STSException(
+                "An unknown element was received", STSException.BAD_REQUEST
+            );
+        }
    
         // Find processed token corresponding to the URI
         if (referenceURI.charAt(0) == '#') {
@@ -544,14 +587,14 @@ public class RequestParser {
                             "Cannot retrieve token from reference", STSException.INVALID_REQUEST
                         );
                     }
-                    return new ReceivedToken(tokenElement);
+                    return tokenElement;
                 } else if (actInt == WSConstants.SCT) {
                     // Need to check special case of SecurityContextToken Identifier separately
                     SecurityContextToken sct = 
                         (SecurityContextToken)
                             engineResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                     if (referenceURI.equals(sct.getIdentifier())) {
-                        return new ReceivedToken(sct.getElement());
+                        return sct.getElement();
                     }
                 }
             }

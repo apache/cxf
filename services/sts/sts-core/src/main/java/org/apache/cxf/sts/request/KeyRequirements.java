@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.sts.request;
 
-import java.security.cert.X509Certificate;
-
 /**
  * This class contains values that have been extracted from a RequestSecurityToken corresponding to 
  * various key and encryption requirements.
@@ -34,7 +32,7 @@ public class KeyRequirements {
     private String c14nAlgorithm;
     private String computedKeyAlgorithm;
     private String keywrapAlgorithm;
-    private X509Certificate certificate;
+    private ReceivedKey receivedKey;
     private Entropy entropy;
     
     public String getAuthenticationType() {
@@ -113,12 +111,12 @@ public class KeyRequirements {
         this.keywrapAlgorithm = keywrapAlgorithm;
     }
 
-    public X509Certificate getCertificate() {
-        return certificate;
+    public ReceivedKey getReceivedKey() {
+        return receivedKey;
     }
 
-    public void setCertificate(X509Certificate certificate) {
-        this.certificate = certificate;
+    public void setReceivedKey(ReceivedKey receivedKey) {
+        this.receivedKey = receivedKey;
     }
     
     public Entropy getEntropy() {

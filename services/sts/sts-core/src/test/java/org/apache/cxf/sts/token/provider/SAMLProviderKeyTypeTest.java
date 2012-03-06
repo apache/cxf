@@ -35,6 +35,7 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.ReceivedKey;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -123,7 +124,9 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        providerParameters.getKeyRequirements().setCertificate(certs[0]);
+        ReceivedKey receivedKey = new ReceivedKey();
+        receivedKey.setX509Cert(certs[0]);
+        providerParameters.getKeyRequirements().setReceivedKey(receivedKey);
         
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -161,7 +164,9 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        providerParameters.getKeyRequirements().setCertificate(certs[0]);
+        ReceivedKey receivedKey = new ReceivedKey();
+        receivedKey.setX509Cert(certs[0]);
+        providerParameters.getKeyRequirements().setReceivedKey(receivedKey);
         
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);

@@ -30,6 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.ReceivedKey;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -132,7 +133,8 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 throw new STSException(ex.getMessage(), ex);
             }
         } else if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            KeyInfoBean keyInfo = createKeyInfo(keyRequirements.getCertificate());
+            ReceivedKey receivedKey = keyRequirements.getReceivedKey();
+            KeyInfoBean keyInfo = createKeyInfo(receivedKey.getX509Cert());
             subjectBean.setKeyInfo(keyInfo);
         }
         
