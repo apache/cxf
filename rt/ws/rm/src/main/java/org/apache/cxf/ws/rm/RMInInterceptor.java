@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
@@ -150,7 +151,11 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     
     void processSequence(Destination destination, Message message) 
         throws SequenceFault, RMException {
-        destination.acknowledge(message);
+        final boolean robust =
+            MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+        if (!robust) {
+            destination.acknowledge(message);
+        }
     }
     
     void processDeliveryAssurance(RMProperties rmps) {
