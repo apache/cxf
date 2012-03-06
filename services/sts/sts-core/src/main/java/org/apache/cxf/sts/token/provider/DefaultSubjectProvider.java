@@ -91,13 +91,20 @@ public class DefaultSubjectProvider implements SubjectProvider {
         String confirmationMethod = getSubjectConfirmationMethod(tokenType, keyType);
         
         Principal principal = null;
-        ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
+        ReceivedToken receivedToken = null;
         //[TODO] ActAs support
         //TokenValidator in IssueOperation has validated the ReceivedToken
         //if validation was successful, the principal was set in ReceivedToken 
-        if (receivedToken != null && receivedToken.getPrincipal() != null 
-                && receivedToken.getValidationState().equals(STATE.VALID)) {
-            principal = receivedToken.getPrincipal();
+        if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
+            receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();    
+            if (receivedToken.getValidationState().equals(STATE.VALID)) {
+                principal = receivedToken.getPrincipal();
+            }
+        } else if (providerParameters.getTokenRequirements().getValidateTarget() != null) {
+            receivedToken = providerParameters.getTokenRequirements().getValidateTarget();
+            if (receivedToken.getValidationState().equals(STATE.VALID)) {
+                principal = receivedToken.getPrincipal();
+            }
         } else {
             principal = providerParameters.getPrincipal();
         }

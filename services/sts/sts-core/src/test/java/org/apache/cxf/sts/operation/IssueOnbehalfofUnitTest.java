@@ -324,7 +324,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setIdentityMapper(new CustomIdentityMapper());
         issueOperation.setStsProperties(stsProperties);
         
-        Map<String, SAMLRealm> realms = getSamlRealms();
+        Map<String, SAMLRealm> realms = createSamlRealms();
         
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -391,7 +391,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("ALICE"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
-    }
+    }    
     
 
     /*
@@ -489,7 +489,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         return tokenType;
     }
     
-    private Map<String, SAMLRealm> getSamlRealms() {
+    private Map<String, SAMLRealm> createSamlRealms() {
         // Create Realms
         Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
         SAMLRealm samlRealm = new SAMLRealm();

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.operation;
 
-import java.security.Principal;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +27,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
@@ -104,20 +102,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             TokenProviderParameters providerParameters = 
                  createTokenProviderParameters(requestParser, context);
             
-            // Map the principal (if it exists)
-            Principal responsePrincipal = tokenResponse.getPrincipal();
-            if (responsePrincipal != null) {
-                String targetRealm = providerParameters.getRealm();
-                String sourceRealm = tokenResponse.getTokenRealm();
-                IdentityMapper identityMapper = stsProperties.getIdentityMapper();
-                if (sourceRealm != null && !sourceRealm.equals(targetRealm) && identityMapper != null) {
-                    Principal targetPrincipal = 
-                        identityMapper.mapPrincipal(sourceRealm, responsePrincipal, targetRealm);
-                    providerParameters.setPrincipal(targetPrincipal);
-                } else {
-                    providerParameters.setPrincipal(responsePrincipal);
-                }
-            }
+            processValidToken(providerParameters, validateTarget, tokenResponse);
             
             // Check if the requested claims can be handled by the configured claim handlers
             RequestClaimCollection requestedClaims = providerParameters.getRequestedClaims();

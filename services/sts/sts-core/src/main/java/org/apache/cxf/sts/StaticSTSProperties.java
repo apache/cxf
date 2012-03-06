@@ -21,6 +21,7 @@ package org.apache.cxf.sts;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -32,6 +33,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.realm.Relationship;
+import org.apache.cxf.sts.token.realm.RelationshipResolver;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -58,6 +61,8 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private EncryptionProperties encryptionProperties = new EncryptionProperties();
     private RealmParser realmParser;
     private IdentityMapper identityMapper;
+    private List<Relationship> relationships;
+    private RelationshipResolver relationshipResolver;
 
     /**
      * Load the CallbackHandler, Crypto objects, if necessary.
@@ -349,6 +354,18 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         }
         return handler;
     }
+
+    public void setRelationships(List<Relationship> relationships) {
+        this.relationships = relationships;
+        this.relationshipResolver = new RelationshipResolver(this.relationships);
+    }
+
+    public List<Relationship> getRelationships() {
+        return relationships;
+    }
     
+    public RelationshipResolver getRelationshipResolver() {
+        return relationshipResolver;      
+    }
     
 }

@@ -49,6 +49,7 @@
 
 	<bean id="x509IssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
 		<property name="tokenProviders" ref="x509SamlTokenProvider" />
+		<property name="tokenValidators" ref="x509TokenValidatorsOBO" />
 		<property name="services" ref="x509Service" />
 		<property name="stsProperties" ref="x509STSProperties" />
 	</bean>
@@ -63,6 +64,11 @@
 
 	<bean id="x509SamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
 	</bean>
+	
+	<util:list id="x509TokenValidatorsOBO">
+		<ref bean="x509SamlTokenValidator" />
+		<bean class="org.apache.cxf.systest.sts.username_onbehalfof.UsernameTokenValidator" />
+	</util:list>
 
 	<bean id="x509Service" class="org.apache.cxf.sts.service.StaticService">
 		<property name="endpoints" ref="x509Endpoints" />

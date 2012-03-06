@@ -36,6 +36,7 @@ import org.apache.cxf.sts.common.CustomAttributeProvider;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
@@ -72,6 +73,10 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
             createProviderParameters(
                 WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
+        //Principal must be set in ReceivedToken/OnBehalfOf
+        providerParameters.getTokenRequirements().getOnBehalfOf().setPrincipal(
+                new CustomTokenPrincipal(username.getValue()));
+        
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -92,12 +97,17 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
     public void testDefaultSaml2OnBehalfOfAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         
-        Element saml1Assertion = getSAMLAssertion();
+        String user = "alice";
+        Element saml1Assertion = getSAMLAssertion(user);
         
         TokenProviderParameters providerParameters = 
             createProviderParameters(
                 WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, saml1Assertion
             );
+        //Principal must be set in ReceivedToken/OnBehalfOf
+        providerParameters.getTokenRequirements().getOnBehalfOf().setPrincipal(
+                new CustomTokenPrincipal(user));
+        
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -107,6 +117,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains(user));
         assertTrue(tokenString.contains("OnBehalfOf"));
     }
     
@@ -131,6 +142,10 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
             createProviderParameters(
                 WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
+        //Principal must be set in ReceivedToken/OnBehalfOf
+        providerParameters.getTokenRequirements().getOnBehalfOf().setPrincipal(
+                new CustomTokenPrincipal(username.getValue()));
+        
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -163,10 +178,11 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
     }
     
     
-    private Element getSAMLAssertion() throws Exception {
+    private Element getSAMLAssertion(String user) throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters = 
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+        providerParameters.setPrincipal(new CustomTokenPrincipal(user));
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
@@ -186,7 +202,9 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         
         if (onBehalfOf != null) {
             ReceivedToken onBehalfOfToken = new ReceivedToken(onBehalfOf);
+            onBehalfOfToken.setValidationState(STATE.VALID);
             tokenRequirements.setOnBehalfOf(onBehalfOfToken);
+            
         }
         parameters.setTokenRequirements(tokenRequirements);
         

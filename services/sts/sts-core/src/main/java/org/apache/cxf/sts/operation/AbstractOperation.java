@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.operation;
 
 import java.net.URI;
+import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
@@ -56,6 +58,8 @@ import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenReference;
+import org.apache.cxf.sts.token.realm.Relationship;
+import org.apache.cxf.sts.token.realm.RelationshipResolver;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
@@ -523,15 +527,16 @@ public abstract class AbstractOperation {
             TokenRequirements tokenRequirements, ReceivedToken token) {
         token.setValidationState(STATE.NONE);
         
-        tokenRequirements.setValidateTarget(token);
-
+        TokenRequirements validateRequirements = new TokenRequirements();
+        validateRequirements.setValidateTarget(token);
+        
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         validatorParameters.setStsProperties(stsProperties);
         validatorParameters.setPrincipal(context.getUserPrincipal());
         validatorParameters.setWebServiceContext(context);
         validatorParameters.setTokenStore(getTokenStore());
         validatorParameters.setKeyRequirements(null);
-        validatorParameters.setTokenRequirements(tokenRequirements);
+        validatorParameters.setTokenRequirements(validateRequirements);
 
         TokenValidatorResponse tokenResponse = null;
         for (TokenValidator tokenValidator : tokenValidators) {
@@ -577,6 +582,56 @@ public abstract class AbstractOperation {
                         "The requested claim " + unhandledClaimTypes.toString() 
                         + " cannot be fulfilled by the STS."
                 );
+            }
+        }
+    }
+
+    protected void processValidToken(TokenProviderParameters providerParameters,
+            ReceivedToken validatedToken, TokenValidatorResponse tokenResponse) {
+        // Map the principal (if it exists)
+        Principal responsePrincipal = tokenResponse.getPrincipal();
+        if (responsePrincipal != null) {
+            String targetRealm = providerParameters.getRealm();
+            String sourceRealm = tokenResponse.getTokenRealm();
+    
+            if (sourceRealm != null && !sourceRealm.equals(targetRealm)) {
+                RelationshipResolver relRes = stsProperties.getRelationshipResolver();
+                Relationship relationship = null;
+                if (relRes != null) {
+                    relationship = relRes.resolveRelationship(sourceRealm, targetRealm);
+                    if (relationship != null) {
+                        tokenResponse.getAdditionalProperties().put(
+                                Relationship.class.getName(), relationship);
+                    }
+                }
+    
+                if (relationship == null || relationship.getType().equals(Relationship.FED_TYPE_IDENTITY)) {
+                    // federate identity
+                    IdentityMapper identityMapper = null;
+                    if (relationship == null) {
+                        identityMapper = stsProperties.getIdentityMapper();
+                    } else {
+                        identityMapper = relationship.getIdentityMapper();
+                    }
+                    if (identityMapper != null) {
+                        Principal targetPrincipal = 
+                            identityMapper.mapPrincipal(sourceRealm, responsePrincipal, targetRealm);
+                        validatedToken.setPrincipal(targetPrincipal);
+                    } else {
+                        LOG.log(Level.SEVERE,
+                                "No IdentityMapper configured in STSProperties or Relationship");
+                        throw new STSException("Error in providing a token", STSException.REQUEST_FAILED);
+                    }
+                } else if (relationship.getType().equals(Relationship.FED_TYPE_CLAIMS)) {
+                    // federate claims
+                    // Claims are transformed at the time when the claims are required to create a token
+                    // (ex. ClaimsAttributeStatementProvider)
+                    // principal remains unchanged                            
+    
+                } else  {
+                    LOG.log(Level.SEVERE, "Unkown federation type: " + relationship.getType());
+                    throw new STSException("Error in providing a token", STSException.BAD_REQUEST);
+                }
             }
         }
     }

@@ -16,34 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.operation;
 
-import java.security.Principal;
-
-import org.apache.cxf.sts.IdentityMapper;
-import org.apache.ws.security.CustomTokenPrincipal;
+package org.apache.cxf.sts.claims;
 
 /**
- * A test implementation of IdentityMapper.
+ * This interface defines a pluggable way of mapping claims from a source realm to a target
+ * realm.
  */
-public class CustomIdentityMapper implements IdentityMapper {
-
+public interface ClaimsMapper {
+    
     /**
-     * Map a principal in the source realm to the target realm
+     * Map a collection of claims in the source realm to the target realm
      * @param sourceRealm the source realm of the Principal
-     * @param sourcePrincipal the principal in the source realm
+     * @param sourceClaims the claims collection in the source realm
      * @param targetRealm the target realm of the Principal
-     * @return the principal in the target realm
+     * @return claims collection of the target realm
      */
-    public Principal mapPrincipal(String sourceRealm, Principal sourcePrincipal, String targetRealm) {
-        if ("A".equals(sourceRealm)) {
-            String name = sourcePrincipal.getName().toUpperCase();
-            return new CustomTokenPrincipal(name);
-        } else if ("B".equals(sourceRealm)) {
-            String name = sourcePrincipal.getName().toLowerCase();
-            return new CustomTokenPrincipal(name);
-        }
-        return null;
-    }
+    ClaimCollection mapClaims(String sourceRealm,
+            ClaimCollection sourceClaims, String targetRealm, ClaimsParameters parameters);
 
 }

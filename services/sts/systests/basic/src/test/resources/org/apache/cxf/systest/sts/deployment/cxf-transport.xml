@@ -55,6 +55,7 @@
 
 	<bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
 		<property name="tokenProviders" ref="transportTokenProviders" />
+		<property name="tokenValidators" ref="transportTokenValidators" />
 		<property name="services" ref="transportService" />
 		<property name="stsProperties" ref="transportSTSProperties" />
 	</bean>

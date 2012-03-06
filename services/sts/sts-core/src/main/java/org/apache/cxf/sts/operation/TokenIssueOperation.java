@@ -19,7 +19,6 @@
 
 package org.apache.cxf.sts.operation;
 
-import java.security.Principal;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +27,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -61,7 +59,7 @@ import org.apache.ws.security.WSSecurityException;
  */
 public class TokenIssueOperation extends AbstractOperation implements IssueOperation, IssueSingleOperation {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(TokenIssueOperation.class);
+    static final Logger LOG = LogUtils.getL7dLogger(TokenIssueOperation.class);
 
 
     public RequestSecurityTokenResponseCollectionType issue(
@@ -99,23 +97,12 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
             TokenValidatorResponse tokenResponse = validateReceivedToken(
                     context, realm, tokenRequirements, validateTarget);
-            
+
             if (tokenResponse == null) {
                 LOG.fine("No Token Validator has been found that can handle this token");
 
             } else if (validateTarget.getValidationState().equals(STATE.VALID)) {
-                // Map the principal (if it exists)
-                Principal responsePrincipal = tokenResponse.getPrincipal();
-                if (responsePrincipal != null) {
-                    String targetRealm = providerParameters.getRealm();
-                    String sourceRealm = tokenResponse.getTokenRealm();
-                    IdentityMapper identityMapper = stsProperties.getIdentityMapper();
-                    if (sourceRealm != null && !sourceRealm.equals(targetRealm) && identityMapper != null) {
-                        Principal targetPrincipal = 
-                            identityMapper.mapPrincipal(sourceRealm, responsePrincipal, targetRealm);
-                        validateTarget.setPrincipal(targetPrincipal);
-                    }
-                } 
+                processValidToken(providerParameters, validateTarget, tokenResponse); 
             } else {
                 //[TODO] Add plugin for validation out-of-band
                 // Example:

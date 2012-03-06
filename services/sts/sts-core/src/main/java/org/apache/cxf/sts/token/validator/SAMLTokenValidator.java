@@ -20,7 +20,9 @@ package org.apache.cxf.sts.token.validator;
 
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -222,6 +224,11 @@ public class SAMLTokenValidator implements TokenValidator {
                     }
                 }
             }
+            
+            // Add the AssertionWrapper to the properties, as the claims are required to be transformed
+            Map<String, Object> addProps = new HashMap<String, Object>();
+            addProps.put(AssertionWrapper.class.getName(), assertion);
+            response.setAdditionalProperties(addProps);
             
             response.setTokenRealm(tokenRealm);
             response.setValid(true);

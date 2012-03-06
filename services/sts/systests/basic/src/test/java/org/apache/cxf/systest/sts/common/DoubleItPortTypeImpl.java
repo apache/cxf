@@ -42,7 +42,6 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
         
         Assert.assertNotNull("Principal must not be null", pr);
         Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
-        
         return numberToDouble * 2;
     }
     

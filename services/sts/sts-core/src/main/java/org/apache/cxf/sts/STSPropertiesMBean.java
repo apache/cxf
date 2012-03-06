@@ -19,9 +19,13 @@
 
 package org.apache.cxf.sts;
 
+import java.util.List;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.realm.Relationship;
+import org.apache.cxf.sts.token.realm.RelationshipResolver;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.ws.security.components.crypto.Crypto;
 
@@ -158,5 +162,23 @@ public interface STSPropertiesMBean {
      * @return the IdentityMapper object to use.
      */
     IdentityMapper getIdentityMapper();
+    
+    /**
+     * Set the list of Relationship objects to use.
+     * @param relationships the List<Relationship> object to use.
+     */
+    void setRelationships(List<Relationship> relationships);
+
+    /**
+     * Get the list of Relationship objects to use.
+     * @return the List<Relationship> object to use.
+     */
+    List<Relationship> getRelationships();
+    
+    /**
+     * Get the RelationshipResolver objects to use.
+     * @return the RelationshipResolver object to use.
+     */    
+    RelationshipResolver getRelationshipResolver();
     
 }
