@@ -24,30 +24,26 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
-public class ClientCredentialsGrantHandler  extends AbstractGrantHandler {
+public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
+   
     
     public ClientCredentialsGrantHandler() {
-        super(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
+        super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, true);
     }
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        if (!client.isConfidential()) {
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
-        }
-        BearerAccessToken token = new BearerAccessToken(client, 
-                                                        generateRandomTokenKey(),
-                                                        getTokenLifetime(), 
-                                                        System.currentTimeMillis() / 1000);
-        token.setGrantType(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
+        checkIfGrantSupported(client);
+        
         // the OAuth filter will use Client.getLoginName() to initialize 
-        // the Principal when setting up the security context 
-        
-        return token;
-        
+        // the Principal when setting up the security context
+        // TODO: consider setting the UserSubject representing the authenticated Client instead
+        return doCreateAccessToken(client, 
+                                   null, 
+                                   OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));
     }
 
 

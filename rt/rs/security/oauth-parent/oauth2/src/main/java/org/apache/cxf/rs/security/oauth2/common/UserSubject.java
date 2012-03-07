@@ -28,7 +28,11 @@ import java.util.List;
 public class UserSubject {
     
     private String login;
-    private List<String> roles;
+    private List<String> roles = Collections.emptyList();
+    
+    public UserSubject(String login) {
+        this.login = login;
+    }
     
     public UserSubject(String login, List<String> roles) {
         this.login = login;

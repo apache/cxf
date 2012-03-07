@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
 /**
@@ -33,8 +33,14 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private long issuedAt;
     private long lifetime;
     private Client client;
-    private List<OAuthPermission> approvedScopes = Collections.emptyList();
+    private List<String> approvedScopes = Collections.emptyList();
     private UserSubject subject;
+    
+    public ServerAuthorizationCodeGrant(Client client, 
+                                        long lifetime) {
+        this(client, OAuthUtils.generateRandomTokenKey(), lifetime,
+             System.currentTimeMillis() / 1000);
+    }
     
     public ServerAuthorizationCodeGrant(Client client, 
                                   String code,
@@ -60,12 +66,12 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     }
 
 
-    public void setApprovedScopes(List<OAuthPermission> scopes) {
+    public void setApprovedScopes(List<String> scopes) {
         this.approvedScopes = scopes;
     }
 
 
-    public List<OAuthPermission> getApprovedScopes() {
+    public List<String> getApprovedScopes() {
         return approvedScopes;
     }
 

@@ -16,23 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.grants.code;
+package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-
 /**
  * Captures the information associated with the code grant registration request.
- * @see ServerAuthorizationCodeGrant  
  */
-public class AuthorizationCodeRegistration {
+public class AccessTokenRegistration {
     private Client client; 
     private List<String> requestedScope = Collections.emptyList();
     private List<String> approvedScope = Collections.emptyList();
-    private String redirectUri;
+    private String grantType;
     private UserSubject subject;
     
     public void setClient(Client client) {
@@ -42,28 +38,28 @@ public class AuthorizationCodeRegistration {
         return client;
     }
     
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
-    }
-    public String getRedirectUri() {
-        return redirectUri;
-    }
     public void setRequestedScope(List<String> requestedScope) {
         this.requestedScope = requestedScope;
     }
     public List<String> getRequestedScope() {
         return requestedScope;
     }
-    public void setApprovedScope(List<String> approvedScope) {
-        this.approvedScope = approvedScope;
-    }
-    public List<String> getApprovedScope() {
-        return approvedScope;
-    }
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
     public UserSubject getSubject() {
         return subject;
+    }
+    public void setGrantType(String grantType) {
+        this.grantType = grantType;
+    }
+    public String getGrantType() {
+        return grantType;
+    }
+    public void setApprovedScope(List<String> approvedScope) {
+        this.approvedScope = approvedScope;
+    }
+    public List<String> getApprovedScope() {
+        return approvedScope;
     }
 }

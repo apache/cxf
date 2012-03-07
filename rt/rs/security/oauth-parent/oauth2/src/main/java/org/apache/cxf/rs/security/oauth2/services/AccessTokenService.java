@@ -73,7 +73,6 @@ public class AccessTokenService extends AbstractOAuthService {
         if (serverToken == null) {
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
         }
-        getDataProvider().persistAccessToken(serverToken);
         
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
                                                               serverToken.getTokenKey());

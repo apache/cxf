@@ -35,11 +35,12 @@ public class Client {
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
-    
     private List<String> redirectUris = Collections.emptyList();
-    private boolean isConfidential;
     
-    private String loginName;
+    private boolean isConfidential;
+    private List<String> allowedGrantTypes = Collections.emptyList();
+    
+    private UserSubject subject;
         
     public Client(String clientId, String clientSecret, boolean isConfidential) {
         this.clientId = clientId;
@@ -137,24 +138,6 @@ public class Client {
         return applicationLogoUri;
     }
 
-    /**
-     * Gets the optional login name which does not necessarily matches
-     * the clientId; can be used for enforcing the existing RBAC rules.
-     *  
-     * @return the login name
-     */
-    public String getLoginName() {
-        return loginName;
-    }
-    
-    /**
-     * Sets the optional login name
-     * @param name the login name
-     */
-    public void setLoginName(String name) {
-        this.loginName = name;
-    }
-
     public void setConfidential(boolean isConf) {
         this.isConfidential = isConf;
     }
@@ -169,5 +152,21 @@ public class Client {
 
     public List<String> getRedirectUris() {
         return redirectUris;
+    }
+
+    public void setAllowedGrantTypes(List<String> allowedGrantTypes) {
+        this.allowedGrantTypes = allowedGrantTypes;
+    }
+
+    public List<String> getAllowedGrantTypes() {
+        return allowedGrantTypes;
+    }
+
+    public void setSubject(UserSubject subject) {
+        this.subject = subject;
+    }
+
+    public UserSubject getSubject() {
+        return subject;
     }
 }

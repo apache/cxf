@@ -47,7 +47,6 @@ public class OAuthContext {
         return Collections.unmodifiableList(permissions);
     }
 
-    
     public String getTokenGrantType() {
         return tokenGrantType;
     }

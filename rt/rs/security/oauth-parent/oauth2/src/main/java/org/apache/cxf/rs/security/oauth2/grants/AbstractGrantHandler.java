@@ -21,26 +21,27 @@ package org.apache.cxf.rs.security.oauth2.grants;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.utils.MD5SequenceGenerator;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
 
 public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     
-    private static final long DEFAULT_TOKEN_LIFETIME = 3600L;
-    
-    private long tokenLifetime = DEFAULT_TOKEN_LIFETIME;
-    private List<String> supportedGrants;
+    private String supportedGrant;
     private OAuthDataProvider dataProvider;
-        
-    protected AbstractGrantHandler(String grant) {
-        supportedGrants = Collections.singletonList(grant);
+    private boolean isClientConfidential;    
+    protected AbstractGrantHandler(String grant, boolean isClientConfidential) {
+        supportedGrant = grant;
+        this.isClientConfidential = isClientConfidential;
     }
     
     public void setDataProvider(OAuthDataProvider dataProvider) {
@@ -51,25 +52,30 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     }
     
     public List<String> getSupportedGrantTypes() {
-        return supportedGrants;
+        return Collections.singletonList(supportedGrant);
     }
     
-    protected static String generateRandomTokenKey() throws OAuthServiceException {
-        try {
-            byte[] bytes = UUID.randomUUID().toString().getBytes("UTF-8");
-            return new MD5SequenceGenerator().generate(bytes);
-        } catch (Exception ex) {
-            throw new OAuthServiceException(OAuthConstants.SERVER_ERROR, ex);
+    protected void checkIfGrantSupported(Client client) {
+        if (!OAuthUtils.isGrantSupportedForClient(client, isClientConfidential, supportedGrant)) {
+            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
     }
-
-    public void setTokenLifetime(long tokenLifetime) {
-        this.tokenLifetime = tokenLifetime;
-    }
-
-    public long getTokenLifetime() {
-        return tokenLifetime;
-    }
     
-    
+    protected ServerAccessToken doCreateAccessToken(Client client,
+                                                    UserSubject subject,
+                                                    List<String> requestedScope) {
+        ServerAccessToken token = dataProvider.getPreauthorizedToken(
+                                     client, subject, supportedGrant);
+        if (token != null) {
+            return token;
+        }
+        
+        AccessTokenRegistration reg = new AccessTokenRegistration();
+        reg.setClient(client);
+        reg.setGrantType(supportedGrant);
+        reg.setSubject(subject);
+        reg.setRequestedScope(requestedScope);        
+        
+        return dataProvider.createAccessToken(reg);
+    }
 }

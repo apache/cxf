@@ -38,6 +38,7 @@ public final class OAuthConstants {
     // Well-known grant types
     public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
     public static final String CLIENT_CREDENTIALS_GRANT = "client_credentials";
+    public static final String IMPLICIT_GRANT = "implicit";
     // etc
     
     // Well-known token types

@@ -94,10 +94,11 @@ public class OAuthRequestFilter implements RequestHandler {
             throw new WebApplicationException(403);
         }
       
-        OAuthInfo info = new OAuthInfo(accessToken, matchingPermissions);
-        SecurityContext sc = createSecurityContext(req, info);
+        SecurityContext sc = createSecurityContext(req, accessToken);
         m.put(SecurityContext.class, sc);
-        m.setContent(OAuthContext.class, createOAuthContext(info));
+        m.setContent(OAuthContext.class, new OAuthContext(accessToken.getSubject(),
+                                                          matchingPermissions,
+                                                          accessToken.getGrantType()));
         
         return null;
     }
@@ -192,66 +193,27 @@ public class OAuthRequestFilter implements RequestHandler {
     }
     
     protected SecurityContext createSecurityContext(HttpServletRequest request, 
-                                                    final OAuthInfo info) {
-        UserSubject subject = info.getToken().getSubject();
+                                                    ServerAccessToken token) {
+        UserSubject endUserSubject = token.getSubject();
+        UserSubject clientSubject = token.getClient().getSubject();
 
-        final UserSubject theSubject = subject;
-        final String login = OAuthRequestFilter.this.useUserSubject 
-                    ? (theSubject != null ? theSubject.getLogin() : null)
-                        : info.getToken().getClient().getLoginName();
+        final UserSubject theSubject = 
+            OAuthRequestFilter.this.useUserSubject ? endUserSubject : clientSubject;
                     
         return new SecurityContext() {
 
             public Principal getUserPrincipal() {
-                return login != null ? new SimplePrincipal(login) : null;
+                return theSubject != null ? new SimplePrincipal(theSubject.getLogin()) : null;
             }
 
             public boolean isUserInRole(String role) {
-                if (login == null) {
+                if (theSubject == null) {
                     return false;
                 }
-                List<String> roles = null;
-                if (OAuthRequestFilter.this.useUserSubject && theSubject != null) {
-                    roles = theSubject.getRoles();    
-                } else {
-                    roles = info.getRoles();
-                }
-                return roles == null ? false : roles.contains(role);
+                return theSubject.getRoles().contains(role);
             }
-             
         };
     }
     
-    private OAuthContext createOAuthContext(OAuthInfo info) {
-        return new OAuthContext(info.getToken().getSubject(),
-                                info.getMatchedPermissions(),
-                                info.getToken().getGrantType());
-    }
     
-    private static class OAuthInfo {
-        private ServerAccessToken token;
-        private List<OAuthPermission> permissions;
-        public OAuthInfo(ServerAccessToken token, 
-                         List<OAuthPermission> matchedPermissions) {
-            this.token = token;
-            this.permissions = matchedPermissions;
-        }
-        public ServerAccessToken getToken() {
-            return token;
-        }
-        
-        public List<String> getRoles() {
-            List<String> authorities = new ArrayList<String>();
-            for (OAuthPermission permission : permissions) {
-                authorities.addAll(permission.getRoles());
-            }
-            return authorities;
-        }
-        
-        public List<OAuthPermission> getMatchedPermissions() {
-            return permissions;
-        }
-        
-            
-    }
 }

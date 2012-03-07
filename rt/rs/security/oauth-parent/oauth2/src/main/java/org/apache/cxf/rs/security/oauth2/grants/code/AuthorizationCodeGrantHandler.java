@@ -25,7 +25,6 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
-import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
@@ -34,11 +33,13 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     public AuthorizationCodeGrantHandler() {
-        super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+        super(OAuthConstants.AUTHORIZATION_CODE_GRANT, true);
     }
     
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
         throws OAuthServiceException {
+        checkIfGrantSupported(client);
+        
         String codeValue = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         ServerAuthorizationCodeGrant grant = 
             ((AuthorizationCodeDataProvider)getDataProvider()).removeCodeGrant(codeValue);
@@ -48,22 +49,18 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         if (OAuthUtils.isExpired(grant.getIssuedAt(), grant.getLifetime())) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
-        
+        if (!grant.getClient().getClientId().equals(client.getClientId())) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
         String expectedRedirectUri = grant.getRedirectUri();
         if (expectedRedirectUri != null) {
             String providedRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);
-            if (providedRedirectUri == null || !providedRedirectUri.equals(expectedRedirectUri)) {
+            
+            if (providedRedirectUri != null && !providedRedirectUri.equals(expectedRedirectUri)) {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
         }
-        BearerAccessToken token = new BearerAccessToken(client, 
-                                                        generateRandomTokenKey(),
-                                                        getTokenLifetime(), 
-                                                        System.currentTimeMillis() / 1000);
-        token.setScopes(grant.getApprovedScopes());
-        token.setSubject(grant.getSubject());
-        token.setGrantType(OAuthConstants.AUTHORIZATION_CODE_GRANT);
-        return token;
+        return doCreateAccessToken(client, grant.getSubject(), grant.getApprovedScopes());
     }
     
 }

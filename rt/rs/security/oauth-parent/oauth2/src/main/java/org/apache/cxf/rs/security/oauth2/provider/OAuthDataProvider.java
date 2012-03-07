@@ -21,9 +21,11 @@ package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.util.List;
 
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
  * OAuth provider responsible for persisting the information about 
@@ -46,7 +48,7 @@ public interface OAuthDataProvider {
      * @return AccessToken
      * @throws OAuthServiceException
      */
-    void persistAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;
+    ServerAccessToken createAccessToken(AccessTokenRegistration accessToken) throws OAuthServiceException;
     
     /**
      * Get access token 
@@ -55,6 +57,16 @@ public interface OAuthDataProvider {
      * @throws OAuthServiceException
      */
     ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException;
+    
+    /**
+     * TODO: Consider introducing a dedicated entity representing a user pre authorization
+     * Get preauthorized access token 
+     * @param accessToken the token key 
+     * @return AccessToken
+     * @throws OAuthServiceException
+     */
+    ServerAccessToken getPreauthorizedToken(Client client, UserSubject subject, String grantType) 
+        throws OAuthServiceException;
     
     /**
      * Refresh access token 

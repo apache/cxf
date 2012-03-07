@@ -37,6 +37,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String redirectUri;
     private String state;
     private String proposedScope;
+    
     private String authenticityToken;
     private String replyTo;
     
