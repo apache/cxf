@@ -502,10 +502,17 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 dkSign.prepare(saaj.getSOAPPart(), secHeader);
 
                 if (abinding.isTokenProtection()) {
-                    WSEncryptionPart ekPart = 
-                        new WSEncryptionPart(encrKey.getId());
-                    ekPart.setElement(encrKey.getEncryptedKeyElement());
-                    sigParts.add(ekPart);
+                    if (bstElement != null) {
+                        WSEncryptionPart bstPart = 
+                            new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
+                        bstPart.setElement(bstElement);
+                        sigParts.add(bstPart);
+                    } else {
+                        WSEncryptionPart ekPart = 
+                            new WSEncryptionPart(encrKey.getId());
+                        ekPart.setElement(encrKey.getEncryptedKeyElement());
+                        sigParts.add(ekPart);
+                    }
                 }
 
                 dkSign.setParts(sigParts);
@@ -532,12 +539,18 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             WSSecSignature sig = getSignatureBuilder(wrapper, sigToken, attached, false);
                       
             // This action must occur before sig.prependBSTElementToHeader
-            if (abinding.isTokenProtection()
-                    && sig.getBSTTokenId() != null) {
-                WSEncryptionPart bstPart = 
-                    new WSEncryptionPart(sig.getBSTTokenId());
-                bstPart.setElement(sig.getBinarySecurityTokenElement());
-                sigParts.add(bstPart);
+            if (abinding.isTokenProtection()) {
+                if (sig.getBSTTokenId() != null) {
+                    WSEncryptionPart bstPart = 
+                        new WSEncryptionPart(sig.getBSTTokenId());
+                    bstPart.setElement(sig.getBinarySecurityTokenElement());
+                    sigParts.add(bstPart);
+                } else if (bstElement != null) {
+                    WSEncryptionPart bstPart = 
+                        new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
+                    bstPart.setElement(bstElement);
+                    sigParts.add(bstPart);
+                }
             }
 
             sig.prependBSTElementToHeader(secHeader);
