@@ -22,6 +22,8 @@ package org.apache.cxf.sts.request;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -31,6 +33,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
@@ -309,18 +317,22 @@ public class RequestParser {
                     throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
                 }
             } else {
-                Element elementNSImpl = (Element) useKey.getAny();
-                NodeList x509CertData = 
-                    elementNSImpl.getElementsByTagNameNS(
-                        Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
-                    );
-                if (x509CertData != null && x509CertData.getLength() > 0) {
-                    try {
-                        x509 = Base64Utility.decode(x509CertData.item(0).getTextContent());
-                        LOG.fine("Found X509Certificate UseKey type");
-                    } catch (Exception e) {
-                        LOG.log(Level.WARNING, "", e);
-                        throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
+                Element element = (Element)useKey.getAny();
+                if ("KeyInfo".equals(element.getLocalName())) {
+                    return parseKeyInfoElement((Element)useKey.getAny());
+                } else {
+                    NodeList x509CertData = 
+                        element.getElementsByTagNameNS(
+                            Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE   
+                        );
+                    if (x509CertData != null && x509CertData.getLength() > 0) {
+                        try {
+                            x509 = Base64Utility.decode(x509CertData.item(0).getTextContent());
+                            LOG.fine("Found X509Certificate UseKey type");
+                        } catch (Exception e) {
+                            LOG.log(Level.WARNING, "", e);
+                            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
+                        }
                     }
                 }
             }
@@ -354,6 +366,54 @@ public class RequestParser {
             if (clazz == jaxbElement.getDeclaredType()) {
                 return clazz.cast(jaxbElement.getValue());
             }
+        }
+        return null;
+    }
+    
+    /**
+     * Parse the KeyInfo Element to return a ReceivedKey object containing the found certificate or
+     * public key.
+     */
+    private static ReceivedKey parseKeyInfoElement(Element keyInfoElement) throws STSException {
+        KeyInfoFactory keyInfoFactory = null;
+        try {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
+        } catch (NoSuchProviderException ex) {
+            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
+        }
+
+        try {
+            KeyInfo keyInfo = 
+                keyInfoFactory.unmarshalKeyInfo(new DOMStructure(keyInfoElement));
+            List<?> list = keyInfo.getContent();
+
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) instanceof KeyValue) {
+                    KeyValue keyValue = (KeyValue)list.get(i);
+                    ReceivedKey receivedKey = new ReceivedKey();
+                    receivedKey.setPublicKey(keyValue.getPublicKey());
+                    return receivedKey;
+                } else if (list.get(i) instanceof X509Certificate) {
+                    ReceivedKey receivedKey = new ReceivedKey();
+                    receivedKey.setX509Cert((X509Certificate)list.get(i));
+                    return receivedKey;
+                } else if (list.get(i) instanceof X509Data) {
+                    X509Data x509Data = (X509Data)list.get(i);
+                    for (int j = 0; j < x509Data.getContent().size(); j++) {
+                        if (x509Data.getContent().get(j) instanceof X509Certificate) {
+                            ReceivedKey receivedKey = new ReceivedKey();
+                            receivedKey.setX509Cert((X509Certificate)x509Data.getContent().get(j));
+                            return receivedKey;
+                        }
+                    }
+                }
+            }
+        } catch (MarshalException e) {
+            LOG.log(Level.WARNING, "", e);
+            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
+        } catch (KeyException e) {
+            LOG.log(Level.WARNING, "", e);
+            throw new STSException(e.getMessage(), e, STSException.INVALID_REQUEST);
         }
         return null;
     }

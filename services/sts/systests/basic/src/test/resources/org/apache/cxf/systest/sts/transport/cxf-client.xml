@@ -79,7 +79,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
                                   value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
                            <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
-                           <entry key="ws-security.sts.token.usecert" value="true"/> 
+                           <entry key="ws-security.sts.token.usecert" value="false"/> 
                        </map>
                    </property>
                </bean>            

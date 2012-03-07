@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.security.Principal;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -141,7 +142,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
             }
         } else if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
             ReceivedKey receivedKey = keyRequirements.getReceivedKey();
-            KeyInfoBean keyInfo = createKeyInfo(receivedKey.getX509Cert());
+            KeyInfoBean keyInfo = createKeyInfo(receivedKey.getX509Cert(), receivedKey.getPublicKey());
             subjectBean.setKeyInfo(keyInfo);
         }
         
@@ -171,13 +172,18 @@ public class DefaultSubjectProvider implements SubjectProvider {
     }
 
     /**
-     * Create a KeyInfoBean that contains an X.509 certificate.
+     * Create a KeyInfoBean that contains an X.509 certificate or Public Key
      */
-    private static KeyInfoBean createKeyInfo(X509Certificate certificate) {
+    private static KeyInfoBean createKeyInfo(X509Certificate certificate, PublicKey publicKey) {
         KeyInfoBean keyInfo = new KeyInfoBean();
 
-        keyInfo.setCertificate(certificate);
-        keyInfo.setCertIdentifer(CERT_IDENTIFIER.X509_CERT);
+        if (certificate != null) {
+            keyInfo.setCertificate(certificate);
+            keyInfo.setCertIdentifer(CERT_IDENTIFIER.X509_CERT);
+        } else if (publicKey != null) {
+            keyInfo.setPublicKey(publicKey);
+            keyInfo.setCertIdentifer(CERT_IDENTIFIER.KEY_VALUE);
+        }
 
         return keyInfo;
     }
