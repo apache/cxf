@@ -64,7 +64,6 @@ public class InstrumentationManagerTest extends Assert {
         assertNull("MBeanServer should not be available.", mbs);
     }
     
-    @org.junit.Ignore
     @Test
     public void testInstrumentationEnabledSetBeforeBusSet() {
         SpringBusFactory factory = new SpringBusFactory();
