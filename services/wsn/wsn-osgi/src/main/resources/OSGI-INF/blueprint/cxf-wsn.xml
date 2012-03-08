@@ -33,11 +33,19 @@
     <bean id="activemq" class="org.apache.activemq.ActiveMQConnectionFactory">
         <argument value="${cxf.wsn.activemq}" />
     </bean>
+    
+    <bean id="JaxwsEndpointManager" 
+    	class="org.apache.cxf.wsn.services.OSGiJaxwsEndpointManager"
+    	destroy-method="destroy">
+        <property name="bundleContext" ref="blueprintBundleContext"/>
+        <property name="blueprintContainer" ref="blueprintContainer"/>
+    </bean>
 
     <!-- NotificationBroker -->
     <bean id="notificationBroker" class="org.apache.cxf.wsn.services.JaxwsNotificationBroker" init-method="init" destroy-method="destroy">
         <argument value="NotificationBroker" />
         <argument ref="activemq" />
+        <argument ref="JaxwsEndpointManager"/>
         <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/NotificationBroker" />
     </bean>
     <service ref="notificationBroker" interface="org.oasis_open.docs.wsn.brw_2.NotificationBroker">
@@ -50,6 +58,7 @@
     <bean id="createPullPoint" class="org.apache.cxf.wsn.services.JaxwsCreatePullPoint" init-method="init" destroy-method="destroy">
         <argument value="org.apache.cxf.wsn.client.CreatePullPoint" />
         <argument ref="activemq" />
+        <argument ref="JaxwsEndpointManager"/>
         <property name="address" value="${cxf.wsn.rootUrl}${cxf.wsn.context}/CreatePullPoint" />
     </bean>
     <service ref="createPullPoint" interface="org.oasis_open.docs.wsn.bw_2.CreatePullPoint">

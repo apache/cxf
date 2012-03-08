@@ -22,6 +22,7 @@ import javax.jms.ConnectionFactory;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
+import org.apache.cxf.wsn.EndpointManager;
 import org.apache.cxf.wsn.jms.JmsNotificationBroker;
 import org.apache.cxf.wsn.jms.JmsPublisher;
 import org.apache.cxf.wsn.jms.JmsSubscription;
@@ -35,13 +36,20 @@ public class JaxwsNotificationBroker extends JmsNotificationBroker
     implements JaxwsNotificationBrokerMBean {
 
     public JaxwsNotificationBroker(String name) {
-        super(name);
-        manager = new JaxwsEndpointManager();
+        this(name, null);
     }
-
     public JaxwsNotificationBroker(String name, ConnectionFactory connectionFactory) {
+        this(name, connectionFactory, null);
+    }
+    public JaxwsNotificationBroker(String name,
+                                   ConnectionFactory connectionFactory,
+                                   EndpointManager epManager) {
         super(name, connectionFactory);
-        manager = new JaxwsEndpointManager();
+        if (epManager == null) {
+            manager = new JaxwsEndpointManager();
+        } else {
+            manager = epManager;
+        }
     }
 
     @Override

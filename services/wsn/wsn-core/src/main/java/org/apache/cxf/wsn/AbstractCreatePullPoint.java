@@ -29,6 +29,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
+import javax.management.ObjectName;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.wsn.util.IdGenerator;
@@ -52,6 +53,14 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint
         super(name);
         idGenerator = new IdGenerator();
         pullPoints = new ConcurrentHashMap<String, AbstractPullPoint>();
+    }
+    @Override
+    public ObjectName getMBeanName() {
+        try {
+            return new ObjectName("org.apache.cxf.service.wsn:type=CreatePullPoint");
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void init() throws Exception {

@@ -59,7 +59,7 @@
                             org.apache.activemq.activemq-core
                         </Require-Bundle>
                         <Import-Package>
-                            !org.apache.cxf.*,
+                            org.apache.cxf.*;resolution:=optional,
                             !org.apache.activemq*,
                             !org.apache.log4j.*,
                             !org.slf4j.*,
@@ -70,7 +70,7 @@
                         </Import-Package>
                         <Export-Package>
                             org.oasis_open.docs.wsn.*;version=1.3;-noimport:=true,
-                            org.oasis_open.docs.wsrf.*;version=1.2,
+                            org.oasis_open.docs.wsrf.*;version=1.2;-noimport:=true,
                             org.apache.cxf.wsn.client;version=${project.version}
                         </Export-Package>
                         <Private-Package>
