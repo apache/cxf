@@ -195,12 +195,6 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         Entropy entropy = new Entropy();
         entropy.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
         providerParameters.getKeyRequirements().setEntropy(entropy);
-        try {
-            samlTokenProvider.createToken(providerParameters);
-            fail("Failure expected on no type");
-        } catch (STSException ex) {
-            // expected as no type is provided
-        }
         
         entropy.setBinarySecretType("bad-type");
         try {
@@ -251,6 +245,39 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
     }
     
     /**
+     * Create a default Saml1 SymmetricKey Assertion. Rather than using a Nonce as the Entropy,
+     * a secret key is supplied by the client instead.
+     */
+    @org.junit.Test
+    public void testDefaultSaml1SymmetricKeyAssertionSecretKey() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.SYMMETRIC_KEY_KEYTYPE);
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        
+        Entropy entropy = new Entropy();
+        entropy.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        providerParameters.getKeyRequirements().setEntropy(entropy);
+        
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertFalse(tokenString.contains("AuthenticationStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML1Constants.CONF_HOLDER_KEY));
+        assertFalse(tokenString.contains(SAML1Constants.CONF_BEARER));
+        
+        assertFalse(providerResponse.isComputedKey());
+        assertNull(providerResponse.getEntropy());
+    }
+    
+    
+    /**
      * Create a default Saml2 SymmetricKey Assertion.
      */
     @org.junit.Test
@@ -263,12 +290,6 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         Entropy entropy = new Entropy();
         entropy.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
         providerParameters.getKeyRequirements().setEntropy(entropy);
-        try {
-            samlTokenProvider.createToken(providerParameters);
-            fail("Failure expected on no type");
-        } catch (STSException ex) {
-            // expected as no type is provided
-        }
         
         entropy.setBinarySecretType("bad-type");
         try {

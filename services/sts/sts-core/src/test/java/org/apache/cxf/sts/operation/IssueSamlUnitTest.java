@@ -497,6 +497,99 @@ public class IssueSamlUnitTest extends org.junit.Assert {
     }
     
     /**
+     * Test to successfully issue a Saml2 SymmetricKey token. Rather than using a Nonce as the
+     * Entropy, a secret key is supplied by the client instead.
+     */
+    @org.junit.Test
+    public void testIssueSaml2SymmetricKeyTokenSecretKey() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new SAMLTokenProvider());
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        JAXBElement<String> keyType = 
+            new JAXBElement<String>(
+                QNameConstants.KEY_TYPE, String.class, STSConstants.SYMMETRIC_KEY_KEYTYPE
+            );
+        request.getAny().add(keyType);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Now add Entropy
+        BinarySecretType binarySecretType = new BinarySecretType();
+        binarySecretType.setType(STSConstants.SYMMETRIC_KEY_TYPE);
+        binarySecretType.setValue(WSSecurityUtil.generateNonce(256 / 8));
+        JAXBElement<BinarySecretType> binarySecretTypeJaxb = 
+            new JAXBElement<BinarySecretType>(
+                QNameConstants.BINARY_SECRET, BinarySecretType.class, binarySecretType
+            );
+        
+        EntropyType entropyType = new EntropyType();
+        entropyType.getAny().add(binarySecretTypeJaxb);
+        JAXBElement<EntropyType> entropyJaxbType = 
+            new JAXBElement<EntropyType>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
+        request.getAny().add(entropyJaxbType);
+        
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertFalse(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_HOLDER_KEY));
+    }
+    
+    
+    /**
      * Test to successfully issue a Saml 1.1 token with no References
      */
     @org.junit.Test

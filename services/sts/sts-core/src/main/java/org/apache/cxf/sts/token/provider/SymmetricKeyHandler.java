@@ -63,20 +63,13 @@ public class SymmetricKeyHandler {
                 + " not accepted so defaulting to " + signatureProperties.getKeySize()
             );
         }
-
+        
         // Test Entropy
         clientEntropy = keyRequirements.getEntropy();
         if (clientEntropy == null) {
             LOG.log(Level.WARNING, "A SymmetricKey KeyType is requested, but no client entropy is provided");
-        } else {
-            String binarySecurityType = clientEntropy.getBinarySecretType();
+        } else if (STSConstants.NONCE_TYPE.equals(clientEntropy.getBinarySecretType())) {
             byte[] nonce = clientEntropy.getBinarySecretValue();
-            if (!STSConstants.NONCE_TYPE.equals(binarySecurityType)) {
-                LOG.log(Level.WARNING, "The type " + binarySecurityType + " is not supported");
-                throw new STSException(
-                    "No user supplied entropy for SymmetricKey case", STSException.INVALID_REQUEST
-                );
-            }
             if (nonce == null || (nonce.length < (keySize / 8))) {
                 LOG.log(Level.WARNING, "User Entropy rejected");
                 clientEntropy = null;
@@ -91,6 +84,23 @@ public class SymmetricKeyHandler {
                     "Computed Key Algorithm not supported", STSException.INVALID_REQUEST
                 );
             }
+        } else if (STSConstants.SYMMETRIC_KEY_TYPE.equals(clientEntropy.getBinarySecretType())
+            || clientEntropy.getBinarySecretType() == null) {
+            byte[] secretValue = clientEntropy.getBinarySecretValue();
+            if ((secretValue.length * 8) < signatureProperties.getMinimumKeySize()
+                || (secretValue.length * 8) > signatureProperties.getMaximumKeySize()) {
+                LOG.log(
+                    Level.WARNING, "Received secret of length " + secret.length 
+                    + " bits is not accepted" 
+                );
+                LOG.log(Level.WARNING, "User Entropy rejected");
+                clientEntropy = null;
+            }
+        } else {
+            LOG.log(Level.WARNING, "The type " + clientEntropy.getBinarySecretType() + " is not supported");
+            throw new STSException(
+                "No user supplied entropy for SymmetricKey case", STSException.INVALID_REQUEST
+            );
         }
     }
 
@@ -98,23 +108,30 @@ public class SymmetricKeyHandler {
      * Create the Symmetric Key
      */
     public void createSymmetricKey() {
-        try {
-            entropyBytes = WSSecurityUtil.generateNonce(keySize / 8);
-            secret = entropyBytes;
+        if (clientEntropy != null 
+            && (STSConstants.SYMMETRIC_KEY_TYPE.equals(clientEntropy.getBinarySecretType())
+            || clientEntropy.getBinarySecretType() == null)) {
+            secret = clientEntropy.getBinarySecretValue();
             computedKey = false;
-        } catch (WSSecurityException ex) {
-            LOG.log(Level.WARNING, "", ex);
-            throw new STSException("Error in creating symmetric key", ex, STSException.INVALID_REQUEST);
-        } 
-        if (clientEntropy != null) {
-            byte[] nonce = clientEntropy.getBinarySecretValue();
+        } else {
             try {
-                P_SHA1 psha1 = new P_SHA1();
-                secret = psha1.createKey(nonce, entropyBytes, 0, keySize / 8);
-                computedKey = true;
-            } catch (ConversationException ex) {
+                entropyBytes = WSSecurityUtil.generateNonce(keySize / 8);
+                secret = entropyBytes;
+                computedKey = false;
+            } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
-                throw new STSException("Error in creating symmetric key", STSException.INVALID_REQUEST);
+                throw new STSException("Error in creating symmetric key", ex, STSException.INVALID_REQUEST);
+            } 
+            if (clientEntropy != null) {
+                byte[] nonce = clientEntropy.getBinarySecretValue();
+                try {
+                    P_SHA1 psha1 = new P_SHA1();
+                    secret = psha1.createKey(nonce, entropyBytes, 0, keySize / 8);
+                    computedKey = true;
+                } catch (ConversationException ex) {
+                    LOG.log(Level.WARNING, "", ex);
+                    throw new STSException("Error in creating symmetric key", STSException.INVALID_REQUEST);
+                }
             }
         }
     }
