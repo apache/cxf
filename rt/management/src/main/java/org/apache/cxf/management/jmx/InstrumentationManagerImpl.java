@@ -389,23 +389,28 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     
     private void readJMXProperties(Bus b) {
         if (b != null) {
-            persistentBusId = getBusProperty(b, "bus.jmx.persistentBusId", null);
+            persistentBusId = getBusProperty(b, "bus.jmx.persistentBusId", persistentBusId);
             mbeanServerName = 
-                getBusProperty(b, "bus.jmx.serverName", ManagementConstants.DEFAULT_DOMAIN_NAME);
+                getBusProperty(b, "bus.jmx.serverName", mbeanServerName);
             usePlatformMBeanServer = 
-                Boolean.valueOf(getBusProperty(b, "bus.jmx.usePlatformMBeanServer", null));
+                getBusProperty(b, "bus.jmx.usePlatformMBeanServer", usePlatformMBeanServer);
             createMBServerConnectorFactory = 
-                Boolean.valueOf(getBusProperty(b, "bus.jmx.createMBServerConnectorFactory", null));
-            daemon = Boolean.valueOf(getBusProperty(b, "bus.jmx.daemon", null));
-            threaded = Boolean.valueOf(getBusProperty(b, "bus.jmx.threaded", null));
-            enabled = Boolean.valueOf(getBusProperty(b, "bus.jmx.enabled", null));
-            jmxServiceURL = getBusProperty(b, "bus.jmx.JMXServiceURL", null);
+                getBusProperty(b, "bus.jmx.createMBServerConnectorFactory", createMBServerConnectorFactory);
+            daemon = getBusProperty(b, "bus.jmx.daemon", daemon);
+            threaded = getBusProperty(b, "bus.jmx.threaded", threaded);
+            enabled = getBusProperty(b, "bus.jmx.enabled", enabled);
+            jmxServiceURL = getBusProperty(b, "bus.jmx.JMXServiceURL", jmxServiceURL);
         }
     }
 
     private static String getBusProperty(Bus b, String key, String dflt) {
         String v = (String)b.getProperty(key);
         return v != null ? v : dflt;
+    }
+
+    private static boolean getBusProperty(Bus b, String key, boolean dflt) {
+        String v = (String)b.getProperty(key);
+        return v != null ? Boolean.valueOf(v) : dflt;
     }
 }
 
