@@ -82,6 +82,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 
 public final class StaxUtils {
+    public static final String TOTAL_ELEMENT_COUNT = "org.apache.cxf.staxutils.totalElementCountThreshold";
     public static final String INNER_ELEMENT_COUNT = "org.apache.cxf.staxutils.innerElementCountThreshold";
     public static final String INNER_ELEMENT_LEVEL = "org.apache.cxf.staxutils.innerElementLevelThreshold";
     

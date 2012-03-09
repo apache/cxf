@@ -40,14 +40,21 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
+import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.DocumentDepthProperties;
 import org.apache.cxf.staxutils.transform.IgnoreNamespacesWriter;
+import org.codehaus.jettison.AbstractXMLInputFactory;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLInputFactory;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
+import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.codehaus.jettison.mapped.TypeConverter;
 
@@ -134,11 +141,55 @@ public final class JSONUtils {
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap) throws Exception {
+        return createStreamReader(is, readXsiType, namespaceMap, null);
+    }
+    
+    public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
+        ConcurrentHashMap<String, String> namespaceMap, 
+        DocumentDepthProperties depthProps) throws Exception {
         if (readXsiType) {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
-        MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
+        XMLInputFactory factory = depthProps != null 
+            ? new JettisonMappedReaderFactory(namespaceMap, depthProps) 
+            : new MappedXMLInputFactory(namespaceMap);
         return new JettisonReader(namespaceMap, factory.createXMLStreamReader(is));
+    }
+    
+    private static class JettisonMappedReaderFactory extends AbstractXMLInputFactory {
+        private MappedNamespaceConvention convention;
+        private DocumentDepthProperties depthProps;
+        public JettisonMappedReaderFactory(Map<?, ?> nstojns, DocumentDepthProperties depthProps) {
+            convention = new MappedNamespaceConvention(new Configuration(nstojns));
+            this.depthProps = depthProps;
+        }
+        @Override
+        public XMLStreamReader createXMLStreamReader(JSONTokener tokener) throws XMLStreamException {
+            try {
+                JSONObject root = new JettisonJSONObject(tokener, depthProps);
+                return new MappedXMLStreamReader(root, convention);
+            } catch (JSONException e) {
+                throw new XMLStreamException(e);
+            }
+        }    
+    }
+    
+    private static class JettisonJSONObject extends JSONObject {
+        private static final long serialVersionUID = 9016458891093343731L;
+        private int threshold;
+        public JettisonJSONObject(JSONTokener tokener, DocumentDepthProperties depthProps) 
+            throws JSONException {
+            super(tokener);
+            this.threshold = depthProps.getElementCountThreshold() != -1 
+                ? depthProps.getElementCountThreshold() : depthProps.getInnerElementCountThreshold();
+        }
+        @Override
+        public JSONObject put(String key, Object value) throws JSONException {
+            if (threshold != -1 && super.length() >= threshold) {
+                throw new DepthExceededStaxException();
+            }
+            return super.put(key, value);    
+        }
     }
     
     private static class JettisonReader extends DepthXMLStreamReader {

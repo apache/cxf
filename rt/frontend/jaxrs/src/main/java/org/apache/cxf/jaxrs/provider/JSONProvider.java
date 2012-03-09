@@ -258,10 +258,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             reader = JSONUtils.createBadgerFishReader(is);
         } else {
-            reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
+            reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap, getDepthProperties());
         }
         reader = createTransformReaderIfNeeded(reader, is);
-        reader = createDepthReaderIfNeeded(reader, is);
         
         return reader;
     }
