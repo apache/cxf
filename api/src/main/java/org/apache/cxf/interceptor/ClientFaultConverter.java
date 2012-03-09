@@ -233,6 +233,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
     }
     
     private void setStackTrace(Fault fault, Message msg) {
+        Throwable cause = null;
         Map<String, String> ns = new HashMap<String, String>();
         XPathUtils xu = new XPathUtils(ns);
         ns.put("s", Fault.STACKTRACE_NAMESPACE);
@@ -244,22 +245,49 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             while (st.hasMoreTokens()) {
                 String oneLine = st.nextToken();
                 if (oneLine.startsWith("Caused by:")) {
-                    // need to skip this part of message,
-                    // as we can't create the cause exception instance directly. 
+                    cause = getCause(st, oneLine);
                     break;
                 }
-                StringTokenizer stInner = new StringTokenizer(oneLine, "!");
-                StackTraceElement ste = new StackTraceElement(stInner.nextToken(), stInner.nextToken(),
-                        stInner.nextToken(), Integer.parseInt(stInner.nextToken()));
-                stackTraceList.add(ste);
+                stackTraceList.add(parseStackTrackLine(oneLine));
             }
-            if (stackTraceList.size() > 0) {
-                StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
+            if (stackTraceList.size() > 0 || cause != null) {
                 Exception e = msg.getContent(Exception.class);
-                e.setStackTrace(stackTraceList.toArray(stackTraceElement));
+                if (!stackTraceList.isEmpty()) {
+                    StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
+                    e.setStackTrace(stackTraceList.toArray(stackTraceElement));
+                }
+                if (cause != null) {
+                    e.initCause(cause);
+                }
             }
         }
 
+    }
+
+    // recursively parse the causes and instantiate corresponding throwables
+    private Throwable getCause(StringTokenizer st, String firstLine) {
+        // The actual exception class of the cause might be unavailable at the
+        // client -> use a standard throwable to represent the cause.
+        Throwable res = new Throwable(firstLine.substring(firstLine.indexOf(":") + 2));
+        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        while (st.hasMoreTokens()) {
+            String oneLine = st.nextToken();
+            if (oneLine.startsWith("Caused by:")) {
+                Throwable nestedCause = getCause(st, oneLine);
+                res.initCause(nestedCause);
+                break;
+            }
+            stackTraceList.add(parseStackTrackLine(oneLine));
+        }
+        StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
+        res.setStackTrace(stackTraceList.toArray(stackTraceElement));
+        return res;
+    }
+    
+    private static StackTraceElement parseStackTrackLine(String oneLine) {
+        StringTokenizer stInner = new StringTokenizer(oneLine, "!");
+        return new StackTraceElement(stInner.nextToken(), stInner.nextToken(),
+                stInner.nextToken(), Integer.parseInt(stInner.nextToken()));
     }
     
     private Class<?> getPrimitiveClass(Class<?> cls) {
