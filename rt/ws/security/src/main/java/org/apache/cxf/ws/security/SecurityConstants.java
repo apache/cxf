@@ -139,9 +139,7 @@ public final class SecurityConstants {
         "ws-security.cache.issued.token.in.endpoint";
     
     /**
-     * Set this to "false" to not cache UsernameToken nonces. The default value is "true" for
-     * message recipients, and "false" for message initiators. Set it to true to cache for
-     * both cases.
+     * Set this to "true" to cache UsernameToken nonces. The default value is "false".
      */
     public static final String ENABLE_NONCE_CACHE = 
         "ws-security.enable.nonce.cache";
@@ -154,9 +152,8 @@ public final class SecurityConstants {
         "ws-security.nonce.cache.instance";
     
     /**
-     * Set this to "false" to not cache Timestamp Created Strings (these are only cached in 
-     * conjunction with a message Signature). The default value is "true" for message recipients, 
-     * and "false" for message initiators. Set it to true to cache for both cases.
+     * Set this to "true" to cache Timestamp Created Strings (these are only cached in 
+     * conjunction with a message Signature). The default value is "false".
      */
     public static final String ENABLE_TIMESTAMP_CACHE = 
         "ws-security.enable.timestamp.cache";

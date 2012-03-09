@@ -116,6 +116,7 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+           <entry key="ws-security.enable.nonce.cache" value="true"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 

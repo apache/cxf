@@ -191,6 +191,12 @@
              <artifactId>bcprov-jdk15</artifactId>
              <scope>test</scope>
         </dependency>
+        <dependency>
+             <groupId>net.sf.ehcache</groupId>
+             <artifactId>ehcache-core</artifactId>
+             <version>${cxf.ehcache.version}</version>
+             <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <properties>

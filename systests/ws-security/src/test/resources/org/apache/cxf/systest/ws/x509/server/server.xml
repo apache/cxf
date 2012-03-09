@@ -178,6 +178,7 @@
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.enable.timestamp.cache" value="true"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
