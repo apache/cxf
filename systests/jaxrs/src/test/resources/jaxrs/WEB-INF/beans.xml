@@ -221,7 +221,7 @@ http://cxf.apache.org/schemas/core.xsd">
       <ref bean="serviceBean" />
     </jaxrs:serviceBeans>		   
     <jaxrs:properties>
-       <entry key="org.apache.cxf.staxutils.innerElementLevelThreshold" value="2"/>
+       <entry key="org.apache.cxf.staxutils.innerElementCountThreshold" value="2"/>
     </jaxrs:properties>
         
   </jaxrs:server>
