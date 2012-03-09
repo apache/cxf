@@ -125,7 +125,7 @@
         <cxf.cglib.bundle.version>2.2_1</cxf.cglib.bundle.version>
         <cxf.fastinfoset.bundle.version>1.2.7_3</cxf.fastinfoset.bundle.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
-        <cxf.ehcache.version>2.4.4</cxf.ehcache.version>
+        <cxf.ehcache.version>2.5.1</cxf.ehcache.version>
         
         <!-- various OSGi related versions -->
         <cxf.aries.version>0.3.1</cxf.aries.version>
