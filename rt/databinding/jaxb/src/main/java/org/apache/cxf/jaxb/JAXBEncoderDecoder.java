@@ -852,7 +852,11 @@ public final class JAXBEncoderDecoder {
                 f.setAccessible(true);
                 String ns[] = (String[])f.get(c);
                 for (int x = 0; x < ns.length; x += 2) {
-                    nsMap.put(ns[x], ns[x + 1]);
+                    if (ns[x] == null) {
+                        nsMap.put(null, ns[x + 1]);
+                    } else {
+                        nsMap.put(ns[x], ns[x + 1]);
+                    }
                 }
             }
         } catch (Throwable t) {
