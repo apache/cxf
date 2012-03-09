@@ -661,10 +661,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     
     /**
      * Get a ReplayCache instance. It first checks to see whether caching has been explicitly 
-     * enabled or disabled via the booleanKey argument. If it has been set to false then no
-     * replay caching is done (for this booleanKey). If it has not been specified, then caching
-     * is enabled only if we are not the initiator of the exchange. If it has been specified, then
-     * caching is enabled.
+     * enabled or disabled via the booleanKey argument. If it has been set to false, or not
+     * specified, then no replay caching is done (for this booleanKey).
      * 
      * It tries to get an instance of ReplayCache via the instanceKey argument from a 
      * contextual property, and failing that the message exchange. If it can't find any, then it
@@ -673,18 +671,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     protected ReplayCache getReplayCache(
         SoapMessage message, String booleanKey, String instanceKey
     ) {
-        boolean specified = false;
         Object o = message.getContextualProperty(booleanKey);
-        if (o != null) {
-            if (!MessageUtils.isTrue(o)) {
-                return null;
-            }
-            specified = true;
-        }
-
-        if (!specified && MessageUtils.isRequestor(message)) {
+        if (o == null || !MessageUtils.isTrue(o)) {
             return null;
         }
+        
         Endpoint ep = message.getExchange().get(Endpoint.class);
         if (ep != null && ep.getEndpointInfo() != null) {
             EndpointInfo info = ep.getEndpointInfo();
