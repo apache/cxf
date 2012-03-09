@@ -590,7 +590,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                 continue;
             }
             String key = schema.getSourceURI();
-            if (ids.contains(key)) {
+            String tns = schema.getTargetNamespace();
+            if (ids.contains(key) || tns == null) {
                 continue;
             }
             if (key.startsWith("file:") || key.startsWith("jar:")) {
