@@ -29,6 +29,9 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.systest.ws.x509.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -342,6 +345,42 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+    }
+    
+    @org.junit.Test
+    public void testAsymmetricSignatureReplay() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509Signature.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignaturePort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT);
+        
+        Client cxfClient = ClientProxy.getClient(x509Port);
+        SecurityHeaderCacheInterceptor cacheInterceptor =
+            new SecurityHeaderCacheInterceptor();
+        cxfClient.getOutInterceptors().add(cacheInterceptor);
+        
+        // Make two invocations with the same security header
+        x509Port.doubleIt(25);
+        try {
+            x509Port.doubleIt(25);
+            fail("Failure expected on a replayed Timestamp");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "A replay attack has been detected";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     private boolean checkUnrestrictedPoliciesInstalled() {
