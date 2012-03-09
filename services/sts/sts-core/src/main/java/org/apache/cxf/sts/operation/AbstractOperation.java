@@ -173,7 +173,7 @@ public abstract class AbstractOperation {
         stsProperties.configureProperties();
         
         RequestParser requestParser = new RequestParser();
-        requestParser.parseRequest(request, context);
+        requestParser.parseRequest(request, context, stsProperties);
         
         return requestParser;
     }

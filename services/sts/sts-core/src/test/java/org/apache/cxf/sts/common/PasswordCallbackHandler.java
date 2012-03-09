@@ -40,6 +40,9 @@ public class PasswordCallbackHandler implements CallbackHandler {
                 } else if ("mystskey".equals(pc.getIdentifier())) {
                     pc.setPassword("stskpass");
                     break;
+                } else if ("myservicekey".equals(pc.getIdentifier())) {
+                    pc.setPassword("skpass");
+                    break;
                 }
             }
         }

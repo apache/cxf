@@ -21,6 +21,7 @@ package org.apache.cxf.sts.operation;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -59,9 +60,15 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDocInfo;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.ws.security.handler.RequestData;
+import org.apache.ws.security.message.WSSecEncryptedKey;
+import org.apache.ws.security.saml.SAMLKeyInfo;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.Base64;
@@ -586,6 +593,119 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("alice"));
         assertFalse(tokenString.contains(SAML2Constants.CONF_BEARER));
         assertTrue(tokenString.contains(SAML2Constants.CONF_HOLDER_KEY));
+    }
+    
+    /**
+     * Test to successfully issue a Saml2 SymmetricKey token. Rather than using a Nonce as the Entropy,
+     * a secret key is supplied by the client instead in an EncryptedKey structure.
+     */
+    @org.junit.Test
+    public void testIssueSaml2SymmetricKeyTokenEncryptedKey() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new SAMLTokenProvider());
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        JAXBElement<String> keyType = 
+            new JAXBElement<String>(
+                QNameConstants.KEY_TYPE, String.class, STSConstants.SYMMETRIC_KEY_KEYTYPE
+            );
+        request.getAny().add(keyType);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Now add Entropy
+        WSSecEncryptedKey builder = new WSSecEncryptedKey();
+        builder.setUserInfo("mystskey");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        
+        Document doc = DOMUtils.createDocument();
+        builder.prepare(doc, stsProperties.getSignatureCrypto());
+        Element encryptedKeyElement = builder.getEncryptedKeyElement();
+        byte[] secret = builder.getEphemeralKey();
+        
+        EntropyType entropyType = new EntropyType();
+        entropyType.getAny().add(encryptedKeyElement);
+        JAXBElement<EntropyType> entropyJaxbType = 
+            new JAXBElement<EntropyType>(QNameConstants.ENTROPY, EntropyType.class, entropyType);
+        request.getAny().add(entropyJaxbType);
+        
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertFalse(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_HOLDER_KEY));
+        
+        // Test that the (encrypted) secret sent in Entropy was used in the SAML Subject KeyInfo
+        AssertionWrapper assertionWrapper = new AssertionWrapper(assertion);
+        RequestData data = new RequestData();
+        
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+        );
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "sspass");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "servicestore.jks");
+        
+        data.setDecCrypto(CryptoFactory.getInstance(properties));
+        data.setCallbackHandler(new PasswordCallbackHandler());
+        data.setWssConfig(WSSConfig.getNewInstance());
+        
+        assertionWrapper.parseHOKSubject(data, new WSDocInfo(assertion.getOwnerDocument()));
+        SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
+        assertTrue(Arrays.equals(secret, samlKeyInfo.getSecret()));
     }
     
     

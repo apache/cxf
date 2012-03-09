@@ -19,26 +19,26 @@
 package org.apache.cxf.sts.request;
 
 /**
- * This class contains values that have been extracted from an Entropy structure.
+ * This class contains values that have been extracted from a BinarySecret structure.
  */
-public class Entropy {
-    private byte[] decryptedKey;
-    private BinarySecret binarySecret;
+public class BinarySecret {
+    private byte[] binarySecretValue;
+    private String binarySecretType;
 
-    public BinarySecret getBinarySecret() {
-        return binarySecret;
+    public byte[] getBinarySecretValue() {
+        return binarySecretValue;
     }
     
-    public void setBinarySecret(BinarySecret binarySecret) {
-        this.binarySecret = binarySecret;
+    public void setBinarySecretValue(byte[] binarySecretValue) {
+        this.binarySecretValue = binarySecretValue;
     }
     
-    public void setDecryptedKey(byte[] decryptedKey) {
-        this.decryptedKey = decryptedKey;
+    public String getBinarySecretType() {
+        return binarySecretType;
     }
     
-    public byte[] getDecryptedKey() {
-        return decryptedKey;
+    public void setBinarySecretType(String binarySecretType) {
+        this.binarySecretType = binarySecretType;
     }
     
 }

@@ -147,7 +147,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         resultsList.add(new WSHandlerResult("actor", engineResultList));
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
-        parser.parseRequest(request, wsContext);
+        parser.parseRequest(request, wsContext, null);
         
         SCTCanceller sctCanceller = new SCTCanceller();
         assertTrue(sctCanceller.canHandleToken(parser.getTokenRequirements().getCancelTarget()));
@@ -178,7 +178,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         resultsList.add(new WSHandlerResult("actor", engineResultList));
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
-        parser.parseRequest(request, wsContext);
+        parser.parseRequest(request, wsContext, null);
         
         SCTValidator sctValidator = new SCTValidator();
         assertTrue(sctValidator.canHandleToken(parser.getTokenRequirements().getValidateTarget()));
@@ -210,7 +210,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         resultsList.add(new WSHandlerResult("actor", engineResultList));
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
         
-        parser.parseRequest(request, wsContext);
+        parser.parseRequest(request, wsContext, null);
         
         assertNotNull(parser.getKeyRequirements().getReceivedKey().getX509Cert());
     }

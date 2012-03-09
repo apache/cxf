@@ -33,6 +33,7 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedKey;
@@ -193,10 +194,12 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         Entropy entropy = new Entropy();
-        entropy.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        BinarySecret binarySecret = new BinarySecret();
+        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
         
-        entropy.setBinarySecretType("bad-type");
+        binarySecret.setBinarySecretType("bad-type");
         try {
             samlTokenProvider.createToken(providerParameters);
             fail("Failure expected on a bad type");
@@ -204,7 +207,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
             // expected as no type is provided
         }
         
-        entropy.setBinarySecretType(STSConstants.NONCE_TYPE);
+        binarySecret.setBinarySecretType(STSConstants.NONCE_TYPE);
         try {
             samlTokenProvider.createToken(providerParameters);
             fail("Failure expected on no computed key algorithm");
@@ -256,7 +259,9 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         
         Entropy entropy = new Entropy();
-        entropy.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        BinarySecret binarySecret = new BinarySecret();
+        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
         
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
@@ -288,10 +293,12 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         
         Entropy entropy = new Entropy();
-        entropy.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        BinarySecret binarySecret = new BinarySecret();
+        binarySecret.setBinarySecretValue(WSSecurityUtil.generateNonce(256 / 8));
+        entropy.setBinarySecret(binarySecret);
         providerParameters.getKeyRequirements().setEntropy(entropy);
         
-        entropy.setBinarySecretType("bad-type");
+        binarySecret.setBinarySecretType("bad-type");
         try {
             samlTokenProvider.createToken(providerParameters);
             fail("Failure expected on a bad type");
@@ -299,7 +306,7 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
             // expected as no type is provided
         }
         
-        entropy.setBinarySecretType(STSConstants.NONCE_TYPE);
+        binarySecret.setBinarySecretType(STSConstants.NONCE_TYPE);
         try {
             samlTokenProvider.createToken(providerParameters);
             fail("Failure expected on no computed key algorithm");
