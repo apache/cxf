@@ -28,6 +28,7 @@ public class RequestClaim {
 
     private URI claimType;
     private boolean optional;
+    private String claimValue;
 
     public URI getClaimType() {
         return claimType;
@@ -45,4 +46,11 @@ public class RequestClaim {
         this.optional = optional;
     }
 
+    public String getClaimValue() {
+        return claimValue;
+    }
+
+    public void setClaimValue(String claimValue) {
+        this.claimValue = claimValue;
+    }
 }

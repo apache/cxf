@@ -43,6 +43,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -599,6 +600,37 @@ public class RequestParser {
                 );
             }
             requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
+            return requestClaim;
+        } else if ("ClaimValue".equals(claimLocalName)) {
+            String claimTypeUri = childClaimType.getAttribute("Uri");
+            String claimTypeOptional = childClaimType.getAttribute("Optional");
+            RequestClaim requestClaim = new RequestClaim();
+            try {
+                requestClaim.setClaimType(new URI(claimTypeUri));
+            } catch (URISyntaxException e) {
+                LOG.log(
+                    Level.WARNING, 
+                    "Cannot create URI from the given ClaimTye attribute value " + claimTypeUri,
+                    e
+                );
+            }
+            
+            Node valueNode = childClaimType.getFirstChild();
+            if (valueNode != null) {
+                if ("Value".equals(valueNode.getLocalName())) {
+                    requestClaim.setClaimValue(valueNode.getTextContent());
+                } else {
+                    LOG.warning("Unsupported child element of ClaimValue element "
+                            + valueNode.getLocalName());
+                    return null;
+                }
+            } else {
+                LOG.warning("No child element of ClaimValue element available");
+                return null;
+            }
+             
+            requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
+            
             return requestClaim;
         }
         
