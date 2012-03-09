@@ -179,7 +179,31 @@ public abstract class WsnBrokerTest extends TestCase {
         publisher.stop();
         consumer.stop();
     }
+    public void testNullPublisherReference() throws Exception {
+        TestConsumer consumerCallback = new TestConsumer();
+        Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
 
+        Subscription subscription = notificationBroker.subscribe(consumer, "myTopicNullEPR");
+
+        Publisher publisher = new Publisher(null, null);
+        Registration registration = notificationBroker.registerPublisher(publisher, "myTopicNullEPR", false);
+
+        synchronized (consumerCallback.notifications) {
+            notificationBroker.notify(publisher, "myTopicNullEPR",
+                                      new JAXBElement<String>(new QName("urn:test:org", "foo"),
+                                                      String.class, "bar"));
+            consumerCallback.notifications.wait(1000000);
+        }
+        assertEquals(1, consumerCallback.notifications.size());
+        NotificationMessageHolderType message = consumerCallback.notifications.get(0);
+        assertEquals(WSNHelper.getWSAAddress(subscription.getEpr()),
+                     WSNHelper.getWSAAddress(message.getSubscriptionReference()));
+
+        subscription.unsubscribe();
+        registration.destroy();
+        publisher.stop();
+        consumer.stop();
+    }
     public void testPublisherOnDemand() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");

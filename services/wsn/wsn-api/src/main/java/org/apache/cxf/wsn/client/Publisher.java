@@ -79,15 +79,24 @@ public class Publisher implements NotificationProducer, Referencable {
     public Publisher(Callback callback, String address) {
         this.callback = callback;
         this.address = address;
-        this.endpoint = Endpoint.create(this);
-        this.endpoint.publish(address);
+        if (callback == null || address == null) {
+            this.endpoint = null;
+        } else {
+            this.endpoint = Endpoint.create(this);
+            this.endpoint.publish(address);
+        }
     }
 
     public void stop() {
-        this.endpoint.stop();
+        if (endpoint != null) {
+            this.endpoint.stop();
+        }
     }
 
     public W3CEndpointReference getEpr() {
+        if (this.endpoint == null) {
+            return null;
+        }
         return this.endpoint.getEndpointReference(W3CEndpointReference.class);
     }
 

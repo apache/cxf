@@ -112,7 +112,7 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
             ? registerPublisherRequest.isDemand().booleanValue()
                 : false;
         // Check all parameters
-        if (publisherReference == null) {
+        if (publisherReference == null && demand) {
             PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
             throw new PublisherRegistrationFailedFault("Invalid PublisherReference: null", fault);
         }
