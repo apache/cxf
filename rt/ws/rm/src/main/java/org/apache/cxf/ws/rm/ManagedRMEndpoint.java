@@ -39,6 +39,7 @@ import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedOperationParameter;
 import org.apache.cxf.management.annotation.ManagedOperationParameters;
 import org.apache.cxf.management.annotation.ManagedResource;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.DestinationSequence.DeferredAcknowledgment;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
@@ -396,6 +397,13 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return destination.getSequence(identifier);
     }
 
+    private static String getAddressValue(EndpointReferenceType epr) {
+        if (null != epr && null != epr.getAddress()) {
+            return epr.getAddress().getValue();
+        }
+        return null;
+    }
+    
     private CompositeData getSourceSequenceProperties(SourceSequence ss) throws JMException {
         if (null == ss) {
             throw new IllegalArgumentException("no sequence");
@@ -404,7 +412,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         Object[] ssv = new Object[]{ss.getIdentifier().getValue(), ss.getCurrentMessageNr(), 
                                     ss.getExpires(), ss.isLastMessage(),
                                     manager.getRetransmissionQueue().countUnacknowledged(ss),
-                                    ss.getTarget().getAddress().getValue()};
+                                    getAddressValue(ss.getTarget())};
         
         CompositeData ssps = new CompositeDataSupport(sourceSequenceType, 
                                                       SOURCE_SEQUENCE_NAMES, ssv);
@@ -417,7 +425,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         }
         Object[] dsv = new Object[]{ds.getIdentifier().getValue(), ds.getLastMessageNumber(), 
                                     ds.getCorrelationID(),
-                                    ds.getAcksTo().getAddress().getValue()};
+                                    getAddressValue(ds.getAcksTo())};
         
         CompositeData dsps = new CompositeDataSupport(destinationSequenceType, 
                                                       DESTINATION_SEQUENCE_NAMES, dsv);
