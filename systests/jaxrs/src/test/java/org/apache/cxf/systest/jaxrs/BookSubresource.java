@@ -79,6 +79,13 @@ public interface BookSubresource {
                      @FormParam("") Book formBook) throws BookNotFoundFault;
     
     @POST
+    @Path("/subresource5/{id}/{name}")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    Book getTheBook5(@PathParam("name") String name,
+                     @PathParam("id") long id) throws BookNotFoundFault;
+    
+    @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/xml")
     OrderBean addOrder(@FormParam("") OrderBean order);
