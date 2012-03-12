@@ -353,9 +353,31 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/jaxbjsonconsumes")
+    @Consumes("multipart/related")
+    @Produces("text/xml")
+    public Book addBookJaxbJsonWithConsumes(
+        @Multipart(value = "rootPart", type = "text/xml") Book2 b1,
+        @Multipart(value = "book2", type = "application/json") Book b2) throws Exception {
+        return addBookJaxbJson(b1, b2);    
+    }
+    
+    @POST
+    @Path("/books/jaxbonly")
+    @Consumes("multipart/related")
+    @Produces("text/xml")
+    public Book2 addBookJaxbOnlyWithConsumes(
+        @Multipart(value = "rootPart", type = "text/xml") Book2 b1) throws Exception {
+        if (!"CXF in Action".equals(b1.getName())) {
+            throw new WebApplicationException();
+        }
+        return b1;    
+    }
+    
+    @POST
     @Path("/books/jaxbjson")
     @Produces("text/xml")
-    public Response addBookJaxbJson(
+    public Book addBookJaxbJson(
         @Multipart(value = "rootPart", type = "text/xml") Book2 b1,
         @Multipart(value = "book2", type = "application/json") Book b2) 
         throws Exception {
@@ -364,7 +386,7 @@ public class MultipartStore {
             throw new WebApplicationException();
         }
         b2.setId(124);
-        return Response.ok(b2).build();
+        return b2;
     }
     
     @POST
