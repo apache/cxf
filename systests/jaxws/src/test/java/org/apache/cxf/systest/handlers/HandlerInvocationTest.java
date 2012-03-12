@@ -59,7 +59,6 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -799,12 +798,11 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertNotNull(detail);
             
             QName nn = new QName("http://gizmos.com/orders/", "order");
-            Iterator<Element> it = CastUtils.cast(detail.getChildElements(nn));
-            assertTrue(it.hasNext());
-            Element el = it.next();
+            Element el = DOMUtils.getFirstChildWithName(detail, nn);
+            assertNotNull(el);
             el.normalize();
             assertEquals("Quantity element does not have a value", el.getFirstChild().getNodeValue());
-            el = it.next();
+            el = DOMUtils.getNextElement(el);
             el.normalize();
             assertEquals("Incomplete address: no zip code", el.getFirstChild().getNodeValue());
         }        

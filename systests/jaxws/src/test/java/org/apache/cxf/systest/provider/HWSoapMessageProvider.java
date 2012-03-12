@@ -34,6 +34,7 @@ import javax.xml.ws.WebServiceProvider;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.CastUtils;
 
 //The following wsdl file is used.
@@ -71,7 +72,7 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
     public SOAPMessage invoke(SOAPMessage request) {
         SOAPMessage response = null;        
         try {
-            SOAPBody body = request.getSOAPBody();
+            SOAPBody body = SAAJUtils.getBody(request);
             Node n = body.getFirstChild();
 
             while (n.getNodeType() != Node.ELEMENT_NODE) {

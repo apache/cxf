@@ -43,6 +43,8 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -202,7 +204,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     soapMessage = factory.createMessage();
                     SOAPPart part = soapMessage.getSOAPPart();
                     if (o instanceof Source) {
-                        StaxUtils.copy((Source)o, new W3CDOMStreamWriter(part));
+                        StaxUtils.copy((Source)o, new SAAJStreamWriter(part));
                     }
                 } catch (SOAPException e) {
                     throw new SoapFault("Error creating SOAPMessage", e, 
@@ -227,12 +229,12 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
 
             DocumentFragment frag = soapMessage.getSOAPPart().createDocumentFragment();
             try {
-                Node body = soapMessage.getSOAPBody();
+                Node body = SAAJUtils.getBody(soapMessage);
                 Node nd = body.getFirstChild();
                 while (nd != null) {
                     body.removeChild(nd);
                     frag.appendChild(nd);
-                    nd = soapMessage.getSOAPBody().getFirstChild();
+                    nd = SAAJUtils.getBody(soapMessage).getFirstChild();
                 }
                 
                 int index = 0;

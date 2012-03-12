@@ -231,7 +231,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             resp = port.greetMe(req);
             fail("did not get fault back");
         } catch (SOAPFaultException ex) {
-            assertFalse(ex.getFault().hasDetail());
+            assertNull(ex.getFault().getDetail());
         }
         
         GMonthTest gm = new GMonthTest();

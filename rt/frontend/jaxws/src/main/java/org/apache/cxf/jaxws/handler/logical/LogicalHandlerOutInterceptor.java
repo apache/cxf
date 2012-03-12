@@ -72,8 +72,21 @@ public class LogicalHandlerOutInterceptor
         try {
             
             XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
-            Document document = XMLUtils.newDocument();
-            message.setContent(Node.class, document);
+            
+            Node nd = message.getContent(Node.class);
+            SOAPMessage m = message.getContent(SOAPMessage.class);
+            Document document = null;
+            
+            if (m != null) {
+                document = m.getSOAPPart();
+            } else if (nd != null) {
+                document = nd.getOwnerDocument();
+            } else {
+                document = XMLUtils.newDocument();
+                message.setContent(Node.class, document);
+                nd = document;
+            }
+            
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document.createDocumentFragment());
         
             // Replace stax writer with DomStreamWriter

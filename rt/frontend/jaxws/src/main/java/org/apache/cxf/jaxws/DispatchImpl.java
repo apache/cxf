@@ -60,6 +60,7 @@ import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -460,7 +461,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     private String getPayloadElementName(SOAPMessage soapMessage) {
         try {            
             // we only care about the first element node, not text nodes
-            Element element = DOMUtils.getFirstElement(soapMessage.getSOAPBody());
+            Element element = DOMUtils.getFirstElement(SAAJUtils.getBody(soapMessage));
             if (element != null) {
                 return DOMUtils.getElementQName(element).toString();
             }

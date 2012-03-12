@@ -46,6 +46,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -288,7 +289,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 storeTimestamp(msg, reqData, wsResult);
                 checkActions(msg, reqData, wsResult, actions);
                 doResults(
-                    msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult, utWithCallbacks
+                    msg, actor, 
+                    SAAJUtils.getHeader(doc),
+                    SAAJUtils.getBody(doc),
+                    wsResult, utWithCallbacks
                 );
             } else { // no security header found
                 // Create an empty result list to pass into the required validation
@@ -307,13 +311,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     // the unasserted assertions will provide confirmation that
                     // security was not sufficient.
                     // checkActions(msg, reqData, wsResult, actions);
-                    doResults(msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult);
+                    doResults(msg, actor, 
+                              SAAJUtils.getHeader(doc),
+                              SAAJUtils.getBody(doc),
+                              wsResult);
                 } else {
                     checkActions(msg, reqData, wsResult, actions);
-                    doResults(msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult);
+                    doResults(msg, actor,
+                              SAAJUtils.getHeader(doc),
+                              SAAJUtils.getBody(doc),
+                              wsResult);
                 }
             }
-            advanceBody(msg, doc.getSOAPBody());
+            advanceBody(msg, SAAJUtils.getBody(doc));
             SAAJInInterceptor.replaceHeaders(doc, msg);
 
             if (doTimeLog) {

@@ -45,6 +45,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -102,6 +103,25 @@ public final class DOMUtils {
         return node.getValue();
     }
 
+    /**
+     * Get the text content of a node and all it's children or null if there is no text
+     */
+    public static String getAllContent(Node n) {
+        StringBuilder b = new StringBuilder();
+        getAllContent(n, b);
+        return b.toString();
+    }
+    private static void getAllContent(Node n, StringBuilder b) {
+        Node nd = n.getFirstChild();
+        while (nd != null) {
+            if (nd instanceof Text && !(nd instanceof Comment)) {
+                b.append(((Text)nd).getData());
+            } else {
+                getAllContent(nd, b);
+            }
+            nd = nd.getNextSibling();
+        }
+    }
     /**
      * Get the trimmed text content of a node or null if there is no text
      */

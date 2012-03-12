@@ -56,6 +56,7 @@ import org.xml.sax.InputSource;
 
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
@@ -283,8 +284,9 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         
         assertNotNull(soapResMsg);
         String expected = "Hello TestSOAPInputMessage";
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, soapResMsg.getSOAPBody()
-            .getTextContent().trim());
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, 
+                     DOMUtils.getContent(SAAJUtils.getBody(soapResMsg)
+                                             .getFirstChild().getFirstChild()).trim());
 
         // Test oneway
         InputStream is1 = getClass().getResourceAsStream("resources/GreetMe1WDocLiteralReq2.xml");
@@ -301,8 +303,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SOAPMessage soapResMsg2 = (SOAPMessage)response.get();
         assertNotNull(soapResMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2, soapResMsg2.getSOAPBody()
-            .getTextContent().trim());
+        assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2, 
+                     DOMUtils.getContent(SAAJUtils.getBody(soapResMsg2).getFirstChild().getFirstChild()));  
 
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
@@ -344,8 +346,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         
         assertNotNull(soapResMsg);
         String expected = "Hello TestSOAPInputMessage";
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, soapResMsg.getSOAPBody()
-            .getTextContent().trim());
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, 
+                     DOMUtils.getAllContent(SAAJUtils.getBody(soapResMsg)).trim());
     }
     
     @Test
@@ -374,11 +376,10 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(domResMsg);
         String expected = "Hello TestSOAPInputMessage";
 
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, domResMsg.getNode()
-            .getFirstChild().getTextContent().trim());
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, 
+                     DOMUtils.getAllContent(domResMsg.getNode().getFirstChild()).trim());
         
         Element el = (Element)domResMsg.getNode().getFirstChild();
-        System.out.println(DOMUtils.getElementQName(el));
         assertEquals("gmns", el.lookupPrefix("http://apache.org/hello_world_soap_http/types"));
         assertEquals("http://apache.org/hello_world_soap_http/types", 
                      el.lookupNamespaceURI("gmns"));
@@ -868,7 +869,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         public void handleResponse(Response<SOAPMessage> response) {
             try {
                 SOAPMessage reply = response.get();
-                replyBuffer = reply.getSOAPBody().getTextContent();
+                replyBuffer = DOMUtils.getContent(SAAJUtils.getBody(reply).getFirstChild().getFirstChild());
             } catch (Exception e) {
                 //e.printStackTrace();
             }

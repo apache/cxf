@@ -40,6 +40,7 @@ import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -164,7 +165,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                     StaxUtils.copy(obj, cos);
                     InputStream in = cos.getInputStream();
                     SOAPMessage msg = initSOAPMessage(in);
-                    source = new DOMSource(msg.getSOAPBody().getFirstChild());
+                    source = new DOMSource(SAAJUtils.getBody(msg).getFirstChild());
                     in.close();
                     cos.close();
                 } catch (Exception e) {
@@ -194,7 +195,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                         // REVISIT: should try to use the original SOAPMessage
                         // instead of creating a new empty one.
                         SOAPMessage msg = initSOAPMessage(null);
-                        write(s, msg.getSOAPBody());
+                        write(s, SAAJUtils.getBody(msg));
                         s = new DOMSource(msg.getSOAPPart());
                     } catch (Exception e) {
                         throw new Fault(e);
@@ -215,6 +216,22 @@ public class LogicalMessageImpl implements LogicalMessage {
 
     public Object getPayload(JAXBContext arg0) {
         try {
+            Source s = getPayload();
+            if (s instanceof DOMSource) {
+                DOMSource ds = (DOMSource)s;
+                Node parent = ds.getNode().getParentNode();
+                Node next = ds.getNode().getNextSibling();
+                if (parent instanceof DocumentFragment) {
+                    parent.removeChild(ds.getNode());
+                }
+                try {
+                    return arg0.createUnmarshaller().unmarshal(ds);
+                } finally {
+                    if (parent instanceof DocumentFragment) {
+                        parent.insertBefore(ds.getNode(), next);
+                    }
+                }
+            } 
             return arg0.createUnmarshaller().unmarshal(getPayload());
         } catch (JAXBException e) {
             throw new WebServiceException(e);

@@ -60,25 +60,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 reader.close();
             } else if (obj instanceof Node) {
                 Node nd = (Node)obj;
-                if (writer instanceof W3CDOMStreamWriter
-                    && ((W3CDOMStreamWriter)writer).getCurrentNode() != null) {
-                    W3CDOMStreamWriter dw = (W3CDOMStreamWriter)writer;
-                    
-                    if (nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {
-                        dw.getCurrentNode().appendChild(nd);
-                        return;
-                    } else if (nd instanceof DocumentFragment) {
-                        nd = dw.getDocument().importNode(nd, true);
-                        dw.getCurrentNode().appendChild(nd);
-                        return;
-                    }
-                }
-                if (nd instanceof Document) {
-                    StaxUtils.writeDocument((Document)nd,
-                                            writer, false, true);
-                } else {
-                    StaxUtils.writeNode(nd, writer, true);                    
-                }
+                writeNode(nd, writer);
             } else {
                 Source s = (Source) obj;
                 if (s instanceof DOMSource
@@ -93,6 +75,47 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         } catch (IOException e) {
             throw new Fault(new Message("COULD_NOT_WRITE_XML_STREAM", LOG), e);
         }
+    }
+
+    private void writeNode(Node nd, XMLStreamWriter writer) throws XMLStreamException {
+        if (writer instanceof W3CDOMStreamWriter) {
+            W3CDOMStreamWriter dw = (W3CDOMStreamWriter)writer;
+            
+            if (dw.getCurrentNode() != null) {
+                if (nd instanceof DocumentFragment
+                    && nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {
+                    Node ch = nd.getFirstChild();
+                    while (ch != null) {
+                        nd.removeChild(ch);
+                        dw.getCurrentNode().appendChild(ch);
+                        ch = nd.getFirstChild();
+                    }
+                } else if (nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {
+                    dw.getCurrentNode().appendChild(nd);
+                    return;
+                } else if (nd instanceof DocumentFragment) {
+                    nd = dw.getDocument().importNode(nd, true);
+                    dw.getCurrentNode().appendChild(nd);
+                    return;
+                }
+            } else if (dw.getCurrentFragment() != null) {
+                if (nd.getOwnerDocument() == dw.getCurrentFragment().getOwnerDocument()) {
+                    dw.getCurrentFragment().appendChild(nd);
+                    return;
+                } else if (nd instanceof DocumentFragment) {
+                    nd = dw.getDocument().importNode(nd, true);
+                    dw.getCurrentFragment().appendChild(nd);
+                    return;
+                }
+            }
+        }
+        if (nd instanceof Document) {
+            StaxUtils.writeDocument((Document)nd,
+                                    writer, false, true);
+        } else {
+            StaxUtils.writeNode(nd, writer, true);                    
+        }
+
     }
 
     public void setSchema(Schema s) {

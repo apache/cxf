@@ -158,6 +158,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         InputStream is = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is);
+        soapReq.saveChanges();
         DOMSource domReqMessage = new DOMSource(soapReq.getSOAPPart());
 
         DOMSource response = disp.invoke(domReqMessage);

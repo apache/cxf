@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -335,7 +336,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         if (signedParts != null) {
             if (signedParts.isBody()) {
-                WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
+                WSEncryptionPart bodyPart = convertToEncryptionPart(SAAJUtils.getBody(saaj));
                 sigParts.add(bodyPart);
             }
             for (Header header : signedParts.getHeaders()) {
@@ -422,7 +423,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         if (signdParts != null) {
             if (signdParts.isBody()) {
-                WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
+                WSEncryptionPart bodyPart = convertToEncryptionPart(SAAJUtils.getBody(saaj));
                 sigParts.add(bodyPart);
             }
             if (secTok.getX509Certificate() != null) {

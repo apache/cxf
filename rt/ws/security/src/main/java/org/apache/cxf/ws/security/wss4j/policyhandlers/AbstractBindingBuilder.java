@@ -55,6 +55,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -1041,12 +1042,25 @@ public abstract class AbstractBindingBuilder {
         } else {
             //Add an id
             id = "Id-" + elem.hashCode();
-            String pfx = elem.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
+            String pfx = null;
+            try {
+                pfx = elem.lookupPrefix(PolicyConstants.WSU_NAMESPACE_URI);
+            } catch (Throwable t) {
+                pfx = DOMUtils.getPrefixRecursive(elem, PolicyConstants.WSU_NAMESPACE_URI);
+            }
             boolean found = !StringUtils.isEmpty(pfx);
             int cnt = 0;
             while (StringUtils.isEmpty(pfx)) {
                 pfx = "wsu" + (cnt == 0 ? "" : cnt);
-                if (!StringUtils.isEmpty(elem.lookupNamespaceURI(pfx))) {
+                
+                String ns;
+                try { 
+                    ns = elem.lookupNamespaceURI(pfx);
+                } catch (Throwable t) {
+                    ns = DOMUtils.getNamespace(elem, pfx);
+                }
+                
+                if (!StringUtils.isEmpty(ns)) {
                     pfx = null;
                     cnt++;
                 }
@@ -1260,21 +1274,21 @@ public abstract class AbstractBindingBuilder {
         
         List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
         
-        if (includeBody && !found.contains(this.saaj.getSOAPBody())) {
-            found.add(saaj.getSOAPBody());
-            final String id = this.addWsuIdToElement(this.saaj.getSOAPBody());
+        if (includeBody && !found.contains(SAAJUtils.getBody(this.saaj))) {
+            found.add(SAAJUtils.getBody(saaj));
+            final String id = this.addWsuIdToElement(SAAJUtils.getBody(this.saaj));
             if (sign) {
                 WSEncryptionPart bodyPart = new WSEncryptionPart(id, "Element");
-                bodyPart.setElement(this.saaj.getSOAPBody());
+                bodyPart.setElement(SAAJUtils.getBody(this.saaj));
                 result.add(bodyPart);
             } else {
                 WSEncryptionPart bodyPart = new WSEncryptionPart(id, "Content");
-                bodyPart.setElement(this.saaj.getSOAPBody());
+                bodyPart.setElement(SAAJUtils.getBody(this.saaj));
                 result.add(bodyPart);
             }
         }
         
-        final SOAPHeader header = saaj.getSOAPHeader();
+        final SOAPHeader header = SAAJUtils.getHeader(saaj);
         
         // Handle sign/enc parts
         for (WSEncryptionPart part : parts) {

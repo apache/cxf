@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -142,8 +143,8 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     }
                     try {
                         //move to end
-                        saaj.getSOAPHeader().removeChild(el);
-                        saaj.getSOAPHeader().appendChild(el);
+                        SAAJUtils.getHeader(saaj).removeChild(el);
+                        SAAJUtils.getHeader(saaj).appendChild(el);
                     } catch (SOAPException e) {
                         //ignore
                     }

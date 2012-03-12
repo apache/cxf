@@ -32,6 +32,7 @@ import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -59,7 +60,7 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
         if (cachedSecurityHeader == null) {
             try {
                 Iterator<?> cachedHeadersIterator = 
-                    saaj.getSOAPHeader().getChildElements(SEC_HEADER);
+                    SAAJUtils.getHeader(saaj).getChildElements(SEC_HEADER);
                 if (cachedHeadersIterator.hasNext()) {
                     cachedSecurityHeader = (SOAPHeaderElement)cachedHeadersIterator.next();
                 }
@@ -71,7 +72,7 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
                 saaj.getSOAPHeader().removeContents();
                 
                 SOAPHeaderElement secHeaderElement = 
-                    saaj.getSOAPHeader().addHeaderElement(SEC_HEADER);
+                    SAAJUtils.getHeader(saaj).addHeaderElement(SEC_HEADER);
                 
                 Iterator<?> cachedHeadersIterator = 
                     cachedSecurityHeader.getChildElements();

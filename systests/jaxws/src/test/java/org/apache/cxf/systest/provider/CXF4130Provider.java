@@ -30,8 +30,10 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceProvider;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
+import org.apache.cxf.helpers.DOMUtils;
 
 @WebServiceProvider(serviceName = "InBandSoapHeaderService",
     targetNamespace = "http://cxf.apache.org/soapheader/inband", 
@@ -45,8 +47,7 @@ public class CXF4130Provider implements Provider<SOAPMessage> {
 
     public SOAPMessage invoke(SOAPMessage request) {
         try {
-            Document soapBodyDomDocument = request.getSOAPBody().extractContentAsDocument();
-            Node node = soapBodyDomDocument.getDocumentElement();
+            Node node = DOMUtils.getFirstElement(SAAJUtils.getBody(request));
             String requestMsgName = node.getLocalName();
             String responseText = null;
 

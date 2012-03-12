@@ -43,6 +43,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
 
 //The following wsdl file is used.
@@ -86,9 +87,8 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         SOAPMessage response = null;        
         SOAPBody body = null;
         try {
-            body = request.getSOAPBody();
+            body = SAAJUtils.getBody(request);
         } catch (SOAPException e) {
-            e.printStackTrace();
             return null;
         }
         Node n = body.getFirstChild();
@@ -101,7 +101,6 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
             Element el = DOMUtils.getFirstElement(n);
             String v = DOMUtils.getContent(el);
-            System.out.println(v);
             if (v.contains("Return sayHi")) {
                 response = sayHiResponse;
             } else if (v.contains("throwFault")) {
