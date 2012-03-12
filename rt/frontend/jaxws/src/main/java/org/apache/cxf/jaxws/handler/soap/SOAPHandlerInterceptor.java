@@ -50,6 +50,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -257,7 +258,7 @@ public class SOAPHandlerInterceptor extends
         try {            
             List<SOAPElement> params = new ArrayList<SOAPElement>();
             message.put(MessageContext.REFERENCE_PARAMETERS, params);
-            SOAPHeader head = msg.getSOAPHeader();
+            SOAPHeader head = SAAJUtils.getHeader(msg);
             if (head != null) {
                 Iterator<Node> it = CastUtils.cast(head.getChildElements());
                 while (it != null && it.hasNext()) {
@@ -314,6 +315,7 @@ public class SOAPHandlerInterceptor extends
             SAAJ_OUT.handleFault(message);
         }
     }    
+
     protected QName getOpQName(Exchange ex, Object data) {
         SOAPMessageContextImpl sm = (SOAPMessageContextImpl)data;
         try {
@@ -321,7 +323,7 @@ public class SOAPHandlerInterceptor extends
             if (msg == null) {
                 return null;
             }
-            SOAPBody body = msg.getSOAPBody();
+            SOAPBody body = SAAJUtils.getBody(msg);
             if (body == null) {
                 return null;
             }

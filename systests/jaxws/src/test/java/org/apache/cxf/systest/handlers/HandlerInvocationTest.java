@@ -84,6 +84,12 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        
+        //System.setProperty(SAAJFactoryResolver.MESSAGE_FACTORY_KEY, 
+        //                     "com.ibm.ws.webservices.engine.soap.MessageFactoryImpl");
+        //System.setProperty(SAAJFactoryResolver.SOAP_FACTORY_KEY, 
+        //    "com.ibm.ws.webservices.engine.xmlsoap.SOAPFactory");
+            
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
@@ -1183,7 +1189,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         String[] handlerNames = {"soapHandler4", "soapHandler3", "handler2", "handler1", "servant",
                                  "handler1", "handler2", "soapHandler3", "soapHandler4"};
 
-        List<String> resp = getHandlerNames(inMsg.getSOAPBody());
+        List<String> resp = getHandlerNames(inMsg.getSOAPPart().getEnvelope().getBody());
         assertEquals(handlerNames.length, resp.size());
 
         Iterator<String> iter = resp.iterator();

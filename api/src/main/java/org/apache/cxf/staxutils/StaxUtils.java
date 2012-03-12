@@ -531,7 +531,10 @@ public final class StaxUtils {
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
-                writer.writeCharacters(reader.getText());
+                String s = reader.getText();
+                if (s != null) {
+                    writer.writeCharacters(s);
+                }
                 break;
             case XMLStreamConstants.COMMENT:
                 writer.writeComment(reader.getText());

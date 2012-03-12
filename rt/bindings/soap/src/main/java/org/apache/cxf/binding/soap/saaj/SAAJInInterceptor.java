@@ -134,6 +134,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 
                 SOAPPart part = soapMessage.getSOAPPart();
                 message.setContent(Node.class, part);
+                message.put(W3CDOMStreamWriter.class, new SAAJStreamWriter(part));
                 message.put(BODY_FILLED_IN, Boolean.FALSE);
 
             } catch (RuntimeException ex) {
@@ -182,14 +183,15 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             if (xmlReader == null) {
                 return;
             }
-            SOAPPart part = soapMessage.getSOAPPart();
+            final SOAPPart part = soapMessage.getSOAPPart();
             Document node = (Document) message.getContent(Node.class);
             if (node != part) {
                 if (node == null) {
                     // replicate 2.1 behavior.
                     part.setContent(new DOMSource(null));
                 } else {
-                    StaxUtils.copy(node, new W3CDOMStreamWriter(part));
+                    //part.setContent(new DOMSource(node));
+                    StaxUtils.copy(node, new SAAJStreamWriter(part));
                 }
             }
             message.setContent(Node.class, soapMessage.getSOAPPart());
@@ -220,7 +222,8 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             if (message.hasHeaders()) {
                 replaceHeaders(soapMessage, message);
             }
-            if (soapMessage.getSOAPHeader() == null) {
+
+            if (soapMessage.getSOAPPart().getEnvelope().getHeader() == null) {
                 soapMessage.getSOAPPart().getEnvelope().addHeader();
             }
             
@@ -233,7 +236,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                     ? Soap11FaultInInterceptor.unmarshalFault(message, xmlReader)
                     : Soap12FaultInInterceptor.unmarshalFault(message, xmlReader);
                 if (fault.getFaultCode() != null) {
-                    soapFault.setFaultCode(fault.getFaultCode());
+                    SAAJUtils.setFaultCode(soapFault, fault.getFaultCode());
                 }
                 if (fault.getMessage() != null) {
                     soapFault.setFaultString(fault.getMessage());
@@ -261,7 +264,8 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 DOMSource bodySource = new DOMSource(soapFault);
                 xmlReader = StaxUtils.createXMLStreamReader(bodySource);
             } else { 
-                StaxUtils.readDocElements(soapMessage.getSOAPBody(), xmlReader, true, true);
+                StaxUtils.readDocElements(soapMessage.getSOAPPart().getEnvelope().getBody(),
+                                          xmlReader, true, true);
                 DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
                 xmlReader = StaxUtils.createXMLStreamReader(bodySource);
                 xmlReader.nextTag();
@@ -280,7 +284,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
     }
 
     public static void replaceHeaders(SOAPMessage soapMessage, SoapMessage message) throws SOAPException {
-        SOAPHeader header = soapMessage.getSOAPHeader();
+        SOAPHeader header = SAAJUtils.getHeader(soapMessage);
         if (header == null) {
             return;
         }

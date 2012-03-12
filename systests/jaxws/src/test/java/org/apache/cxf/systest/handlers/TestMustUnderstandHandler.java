@@ -58,7 +58,9 @@ public class TestMustUnderstandHandler<T extends SOAPMessageContext> extends Tes
                         header = envelope.addHeader();
                     }
 
-                    SOAPHeaderElement headerElement = header.addHeaderElement(qname);
+                    
+                    SOAPHeaderElement headerElement 
+                        = header.addHeaderElement(envelope.createName("MU", "ns1", qname.getNamespaceURI()));
 
                     // QName soapMustUnderstand = new QName("http://schemas.xmlsoap.org/soap/envelope/",
                     // "mustUnderstand");

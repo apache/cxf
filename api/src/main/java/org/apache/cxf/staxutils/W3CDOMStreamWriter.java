@@ -97,7 +97,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String local) throws XMLStreamException {
-        newChild(document.createElementNS(null, local));
+        createAndAddElement(null, local, null);
     }
 
     protected void newChild(Element element) {
@@ -122,18 +122,29 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String namespace, String local) throws XMLStreamException {
-        newChild(document.createElementNS(namespace, local));
+        createAndAddElement(null, local, namespace);
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
         if (prefix == null || prefix.equals("")) {
             writeStartElement(namespace, local);
         } else {
-            newChild(document.createElementNS(namespace, prefix + ":" + local));
+            createAndAddElement(prefix, local, namespace);
             if (nsRepairing
                 && !prefix.equals(getNamespaceContext().getPrefix(namespace))) {
                 writeNamespace(prefix, namespace);
             }
+        }
+    }
+    protected void createAndAddElement(String prefix, String local, String namespace) {
+        if (prefix == null) {
+            if (namespace == null) {
+                newChild(document.createElementNS(null, local));
+            } else {
+                newChild(document.createElementNS(namespace, local));
+            }
+        } else {
+            newChild(document.createElementNS(namespace, prefix + ":" + local));
         }
     }
 
@@ -307,4 +318,20 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     public void flush() throws XMLStreamException {
     }
     
+    public String toString() {
+        if (document == null) {
+            return "<null>";
+        }
+        if (document.getDocumentElement() == null) {
+            return "<null document element>";
+        }
+        try {
+            return StaxUtils.toString(document);
+        } catch (XMLStreamException e) {
+            return super.toString();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return super.toString();
+        }
+    }
 }

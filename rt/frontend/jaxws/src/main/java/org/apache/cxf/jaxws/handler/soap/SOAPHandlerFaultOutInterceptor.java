@@ -42,6 +42,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.handler.AbstractProtocolHandlerInterceptor;
@@ -134,7 +135,7 @@ public class SOAPHandlerFaultOutInterceptor extends
              */
             try {
                 SOAPMessage originalMsg = message.getContent(SOAPMessage.class);
-                SOAPBody body = originalMsg.getSOAPBody();
+                SOAPBody body = originalMsg.getSOAPPart().getEnvelope().getBody();
                 body.removeContents();
 
                 SOAPFault soapFault = body.addFault();
@@ -142,7 +143,7 @@ public class SOAPHandlerFaultOutInterceptor extends
                 if (exception instanceof SOAPFaultException) {
                     SOAPFaultException sf = (SOAPFaultException)exception;
                     soapFault.setFaultString(sf.getFault().getFaultString());
-                    soapFault.setFaultCode(sf.getFault().getFaultCodeAsQName());
+                    SAAJUtils.setFaultCode(soapFault, sf.getFault().getFaultCodeAsQName());
                     soapFault.setFaultActor(sf.getFault().getFaultActor());
                     if (sf.getFault().hasDetail()) {
                         Node nd = originalMsg.getSOAPPart().importNode(
@@ -154,7 +155,7 @@ public class SOAPHandlerFaultOutInterceptor extends
                     SoapFault sf = SoapFault.createFault((Fault)exception, message
                         .getVersion());
                     soapFault.setFaultString(sf.getReason());
-                    soapFault.setFaultCode(sf.getFaultCode());
+                    SAAJUtils.setFaultCode(soapFault, sf.getFaultCode());
                     if (sf.hasDetails()) {
                         soapFault.addDetail();
                         Node nd = originalMsg.getSOAPPart().importNode(sf.getDetail(), true);
@@ -166,7 +167,8 @@ public class SOAPHandlerFaultOutInterceptor extends
                     }
                 } else {
                     soapFault.setFaultString(exception.getMessage());
-                    soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandleFault"));
+                    SAAJUtils.setFaultCode(soapFault,
+                                           new QName("http://cxf.apache.org/faultcode", "HandleFault"));
                 }
             } catch (SOAPException e) {
                 // do nothing

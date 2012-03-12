@@ -41,6 +41,7 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.XPathUtils;
@@ -224,7 +225,7 @@ public class TestHandler<T extends LogicalMessageContext>
         try {
             SOAPFault fault = SOAPFactory.newInstance().createFault();
             fault.setFaultString(faultString);
-            fault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "Server"));
+            SAAJUtils.setFaultCode(fault, new QName("http://cxf.apache.org/faultcode", "Server"));
             return new SOAPFaultException(fault);
         } catch (SOAPException e) {
             // do nothing

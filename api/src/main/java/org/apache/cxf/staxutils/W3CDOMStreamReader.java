@@ -413,6 +413,23 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
         return super.getLocation();
     }
+    
+    public String toString() {
+        if (document == null) {
+            return "<null>";
+        }
+        if (document.getDocumentElement() == null) {
+            return "<null document element>";
+        }
+        try {
+            return StaxUtils.toString(document);
+        } catch (XMLStreamException e) {
+            return super.toString();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return super.toString();
+        }
+    }
 
     
 }

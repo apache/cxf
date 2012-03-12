@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
@@ -195,7 +196,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             //method to work.  Try the saaj 1.2 method of doing this.
             try {
                 soapFault = binding.getMessageFactory().createMessage()
-                    .getSOAPBody().addFault();
+                    .getSOAPPart().getEnvelope().getBody().addFault();
             } catch (Throwable t2) {
                 //still didn't work, we'll just throw what we have
                 return null;
@@ -214,7 +215,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 }
             }
             soapFault.setFaultString(((SoapFault)ex).getReason());
-            soapFault.setFaultCode(((SoapFault)ex).getFaultCode());
+            SAAJUtils.setFaultCode(soapFault, ((SoapFault)ex).getFaultCode());
             soapFault.setFaultActor(((SoapFault)ex).getRole());
             if (((SoapFault)ex).getSubCode() != null) {
                 soapFault.appendFaultSubcode(((SoapFault)ex).getSubCode());

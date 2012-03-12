@@ -55,6 +55,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 
 public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
@@ -151,8 +152,12 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                     .getBody());
 
                 Node nd = message.getContent(Node.class);
+                W3CDOMStreamWriter writer = message.get(W3CDOMStreamWriter.class);
                 Document doc = null;
-                if (nd instanceof Document) {
+                if (writer != null) {
+                    StaxUtils.copy(filteredReader, writer);
+                    doc = writer.getDocument();
+                } else if (nd instanceof Document) {
                     doc = (Document)nd;
                     StaxUtils.readDocElements(doc, doc, filteredReader, false, false);
                 } else {

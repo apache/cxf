@@ -34,6 +34,7 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.handler_test.HandlerTest;
 import org.apache.handler_test.PingException;
@@ -94,7 +95,7 @@ public class HandlerTestImpl implements HandlerTest {
         try {
             SOAPFault fault = SOAPFactory.newInstance().createFault();
             fault.setFaultString(faultString);
-            fault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "Server"));
+            SAAJUtils.setFaultCode(fault, new QName("http://cxf.apache.org/faultcode", "Server"));
             return new SOAPFaultException(fault);
         } catch (SOAPException e) {
             // do nothing

@@ -45,6 +45,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -80,7 +81,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                 XMLStreamReader reader = null;
                 if (msg != null) {
                     try {
-                        Node node = msg.getSOAPBody().getFirstChild();
+                        Node node = SAAJUtils.getBody(msg).getFirstChild();
                         while (node != null && !(node instanceof Element))  {
                             node = node.getNextSibling();
                         }

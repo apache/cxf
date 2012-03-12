@@ -45,6 +45,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJFactoryResolver;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
@@ -444,13 +445,13 @@ public class HandlerChainInvoker {
             soapMessage = SAAJFactoryResolver.createMessageFactory(version).createMessage();
             msg.setContent(SOAPMessage.class, soapMessage);
 
-            SOAPBody body = soapMessage.getSOAPBody();
+            SOAPBody body = SAAJUtils.getBody(soapMessage);
             SOAPFault soapFault = body.addFault();
 
             if (exception instanceof SOAPFaultException) {
                 SOAPFaultException sf = (SOAPFaultException)exception;
                 soapFault.setFaultString(sf.getFault().getFaultString());
-                soapFault.setFaultCode(sf.getFault().getFaultCode());
+                SAAJUtils.setFaultCode(soapFault, sf.getFault().getFaultCodeAsQName());
                 soapFault.setFaultActor(sf.getFault().getFaultActor());
                 if (sf.getFault().hasDetail()) {
                     Node nd = soapMessage.getSOAPPart().importNode(sf.getFault().getDetail(),
@@ -465,7 +466,7 @@ public class HandlerChainInvoker {
             } else if (exception instanceof Fault) {
                 SoapFault sf = SoapFault.createFault((Fault)exception, ((SoapMessage)msg).getVersion());
                 soapFault.setFaultString(sf.getReason());
-                soapFault.setFaultCode(sf.getFaultCode());
+                SAAJUtils.setFaultCode(soapFault, sf.getFaultCode());
                 if (sf.hasDetails()) {
                     soapFault.addDetail();
                     Node nd = soapMessage.getSOAPPart().importNode(sf.getDetail(), true);
@@ -476,7 +477,8 @@ public class HandlerChainInvoker {
                     }
                 }
             } else {
-                soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
+                SAAJUtils.setFaultCode(soapFault, 
+                                       new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
                 soapFault.setFaultString(exception.getMessage());
             }
         } catch (SOAPException e) {

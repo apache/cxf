@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.handlers;
 
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -45,6 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 
 //import org.apache.handler_test.PingException;
 
@@ -125,7 +127,7 @@ public class  TestSOAPHandler extends TestHandlerBase
                 if (outbound) {
                     try {
                         // append handler id to SOAP response message 
-                        SOAPBody body = msg.getSOAPBody(); 
+                        SOAPBody body = msg.getSOAPPart().getEnvelope().getBody(); 
                         Node resp = body.getFirstChild();
                         
                         if (resp.getNodeName().contains("pingResponse")) { 
@@ -162,11 +164,16 @@ public class  TestSOAPHandler extends TestHandlerBase
 
             try {
                 SOAPMessage msg = ctx.getMessage();
-                if ("soapHandler4HandleFaultThrowsRunException".equals(msg.getSOAPBody().getFault()
-                    .getFaultString())) {
+                try {
+                    msg.writeTo(System.out);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                String fs = msg.getSOAPPart().getEnvelope().getBody().getFault().getFaultString();
+                if ("soapHandler4HandleFaultThrowsRunException".equals(fs)) {
                     throw new RuntimeException("soapHandler4 HandleFault throws RuntimeException");
-                } else if ("soapHandler4HandleFaultThrowsSOAPFaultException".equals(msg.getSOAPBody()
-                    .getFault().getFaultString())) {
+                } else if ("soapHandler4HandleFaultThrowsSOAPFaultException".equals(fs)) {
                     throw createSOAPFaultException("soapHandler4 HandleFault throws SOAPFaultException");
                 }
             } catch (SOAPException e) {
@@ -189,7 +196,7 @@ public class  TestSOAPHandler extends TestHandlerBase
         boolean ret = true;
         try {
             SOAPMessage msg  = ctx.getMessage(); 
-            SOAPBody body = msg.getSOAPBody();
+            SOAPBody body = msg.getSOAPPart().getEnvelope().getBody();
 
             if (body.getFirstChild().getFirstChild() == null) {
                 return true;
@@ -282,7 +289,7 @@ public class  TestSOAPHandler extends TestHandlerBase
     private SOAPFaultException createSOAPFaultException(String faultString) throws SOAPException {
         SOAPFault fault = SOAPFactory.newInstance().createFault();
         fault.setFaultString(faultString);
-        fault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "Server"));
+        SAAJUtils.setFaultCode(fault, new QName("http://cxf.apache.org/faultcode", "Server"));
         return new SOAPFaultException(fault);
     }
     private SOAPFaultException createSOAPFaultExceptionWithDetail(String faultString) 
@@ -292,7 +299,7 @@ public class  TestSOAPHandler extends TestHandlerBase
 
         QName faultName = new QName(SOAPConstants.URI_NS_SOAP_ENVELOPE, 
                         "Server"); 
-        fault.setFaultCode(faultName); 
+        SAAJUtils.setFaultCode(fault, faultName); 
         fault.setFaultActor("http://gizmos.com/orders"); 
         fault.setFaultString(faultString); 
 
