@@ -385,14 +385,12 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     }
 
     private List<String> effectiveAllowOrigins(CrossOriginResourceSharing ann) {
-        if (ann != null) {
-            if (ann.allowOrigins() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.allowOrigins());
-        } else {
-            return allowOrigins;
-        }
+        List<String> actualOrigins = Collections.emptyList(); 
+        if (ann != null && ann.allowOrigins() != null) {
+            actualOrigins = Arrays.asList(ann.allowOrigins());
+        } 
+        
+        return actualOrigins.isEmpty() ? allowOrigins : actualOrigins;
     }
     
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
@@ -404,25 +402,21 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     }
     
     private List<String> effectiveAllowHeaders(CrossOriginResourceSharing ann) {
-        if (ann != null) {
-            if (ann.allowHeaders() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.allowHeaders());
-        } else {
-            return allowHeaders;
-        }
+        List<String> actualHeaders = Collections.emptyList(); 
+        if (ann != null && ann.allowHeaders() != null) {
+            actualHeaders = Arrays.asList(ann.allowHeaders());
+        } 
+        
+        return actualHeaders.isEmpty() ? allowHeaders : actualHeaders;
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {
-        if (ann != null) {
-            if (ann.exposeHeaders() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.exposeHeaders());
-        } else {
-            return exposeHeaders;
-        }
+        List<String> actualExposeHeaders = Collections.emptyList(); 
+        if (ann != null && ann.exposeHeaders() != null) {
+            actualExposeHeaders = Arrays.asList(ann.exposeHeaders());
+        } 
+        
+        return actualExposeHeaders.isEmpty() ? exposeHeaders : actualExposeHeaders;
     }
 
     private Integer effectiveMaxAge(CrossOriginResourceSharing ann) {
