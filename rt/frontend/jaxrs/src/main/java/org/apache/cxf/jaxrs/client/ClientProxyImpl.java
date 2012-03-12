@@ -50,12 +50,15 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Exchange;
@@ -137,7 +140,7 @@ public class ClientProxyImpl extends AbstractClient implements
             reportInvalidResourceMethod(m, "INVALID_RESOURCE_METHOD");
         }
         
-        MultivaluedMap<ParameterType, Parameter> types = getParametersInfo(ori);
+        MultivaluedMap<ParameterType, Parameter> types = getParametersInfo(params, ori);
         List<Object> pathParams = getPathParamValues(types, params, ori);
         
         int bodyIndex = getBodyIndex(types, ori);
@@ -183,10 +186,14 @@ public class ClientProxyImpl extends AbstractClient implements
         getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
         
         Object body = null;
-        boolean isForm = types.containsKey(ParameterType.FORM);
-        if (bodyIndex != -1 || isForm) {
-            body = isForm ? handleForm(types, params) : params[bodyIndex];
+        if (bodyIndex != -1) {
+            body = params[bodyIndex];
+        } else if (types.containsKey(ParameterType.FORM))  {
+            body = handleForm(types, params);
+        } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
+            body = handleMultipart(types, ori, params);
         }
+        
         return doChainedInvocation(uri, headers, ori, body, bodyIndex, null, null);
         
     }
@@ -197,7 +204,8 @@ public class ClientProxyImpl extends AbstractClient implements
         }
     }
     
-    private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(OperationResourceInfo ori) {
+    private static MultivaluedMap<ParameterType, Parameter> getParametersInfo(
+        Object[] params, OperationResourceInfo ori) {
         MultivaluedMap<ParameterType, Parameter> map = 
             new MetadataMap<ParameterType, Parameter>();
         
@@ -205,15 +213,24 @@ public class ClientProxyImpl extends AbstractClient implements
         if (parameters.size() == 0) {
             return map;
         }
+        int requestBodyParam = 0;
+        int multipartParam = 0;
         for (Parameter p : parameters) {
             if (p.getType() == ParameterType.CONTEXT) {
                 // ignore
                 continue;
             }
+            if (p.getType() == ParameterType.REQUEST_BODY) {
+                requestBodyParam++;
+                if (getMultipart(ori, p.getIndex()) != null) {
+                    multipartParam++;    
+                }
+            }
             map.add(p.getType(), p);
         }
+        
         if (map.containsKey(ParameterType.REQUEST_BODY)) {
-            if (map.get(ParameterType.REQUEST_BODY).size() > 1) {
+            if (requestBodyParam > 1 && requestBodyParam != multipartParam) {
                 reportInvalidResourceMethod(ori.getMethodToInvoke(), "SINGLE_BODY_ONLY");
             }
             if (map.containsKey(ParameterType.FORM)) {
@@ -226,7 +243,7 @@ public class ClientProxyImpl extends AbstractClient implements
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, 
                                     OperationResourceInfo ori) {
         List<Parameter> list = map.get(ParameterType.REQUEST_BODY);
-        int index  = list == null ? -1 : list.get(0).getIndex(); 
+        int index = list == null || list.size() > 1 ? -1 : list.get(0).getIndex();
         if (ori.isSubResourceLocator() && index != -1) {
             reportInvalidResourceMethod(ori.getMethodToInvoke(), "NO_BODY_IN_SUBRESOURCE");
         }
@@ -430,6 +447,21 @@ public class ClientProxyImpl extends AbstractClient implements
         return form;
     }
     
+    private List<Attachment> handleMultipart(MultivaluedMap<ParameterType, Parameter> map,
+                                             OperationResourceInfo ori,
+                                             Object[] params) {
+        
+        List<Attachment> atts = new LinkedList<Attachment>();
+        List<Parameter> fm = getParameters(map, ParameterType.REQUEST_BODY);
+        for (Parameter p : fm) {
+            Multipart part = getMultipart(ori, p.getIndex());
+            if (part != null) {
+                atts.add(new Attachment(part.value(), part.type(), params[p.getIndex()]));
+            }
+        }
+        return atts;        
+    }
+    
     private void handleHeaders(MultivaluedMap<String, String> headers,
                                MultivaluedMap<ParameterType, Parameter> map, Object[] params) {
         List<Parameter> hs = getParameters(map, ParameterType.HEADER);
@@ -438,6 +470,12 @@ public class ClientProxyImpl extends AbstractClient implements
                 headers.add(p.getName(), params[p.getIndex()].toString());
             }
         }
+    }
+    
+    private static Multipart getMultipart(OperationResourceInfo ori, int index) {
+        Method aMethod = ori.getAnnotatedMethod();
+        return aMethod != null ? AnnotationUtils.getAnnotation(
+            aMethod.getParameterAnnotations()[index], Multipart.class) : null;
     }
     
     private void handleCookies(MultivaluedMap<String, String> headers,

@@ -231,6 +231,27 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testAddBookAsJAXBJSONProxy() throws Exception {
+        MultipartStore store = 
+            JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+        
+        Book b = store.addBookJaxbJsonWithConsumes(new Book2("CXF in Action", 1L), 
+                                           new Book("CXF in Action - 2", 2L));
+        assertEquals(124L, b.getId());
+        assertEquals("CXF in Action - 2", b.getName());
+    }
+    
+    @Test
+    public void testAddBookAsJAXBOnlyProxy() throws Exception {
+        MultipartStore store = 
+            JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+        
+        Book2 b = store.addBookJaxbOnlyWithConsumes(new Book2("CXF in Action", 1L));
+        assertEquals(1L, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
     public void testAddBookAsJAXBJSONMixed() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjson";
         doAddBook("multipart/mixed", address, "attachmentData2", 200);               
