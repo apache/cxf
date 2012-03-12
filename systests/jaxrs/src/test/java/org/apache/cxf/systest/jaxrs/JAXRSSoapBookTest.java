@@ -85,7 +85,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class));
+                   launchServer(BookServerRestSoap.class, true));
     }
     
     @Test
@@ -438,6 +438,18 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         Book b = bs.getTheBook4(bean, bean, bean, bean);
         assertEquals(139, b.getId());
         assertEquals("CXF Rocks", b.getName());
+    }
+    
+    @Test
+    public void testGetBookSubresourceParamOrder() throws Exception {
+        
+        String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                              BookStoreJaxrsJaxws.class);
+        BookSubresource bs = proxy.getBookSubresource("139");
+        Book b = bs.getTheBook5("CXF", 555L);
+        assertEquals(555, b.getId());
+        assertEquals("CXF", b.getName());
     }
     
     @Test
