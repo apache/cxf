@@ -31,13 +31,22 @@ public class BookStoreSubresourcesOnly {
         return this;
     }
     
-    @Path("/sub2")
-    public BookStoreSubresourcesOnly getItself2(@PathParam("id") String id1, @PathParam("id3") String id3) { 
+    @Path("/sub2/{id4}")
+    public BookStoreSubresourcesOnly getItself2(@PathParam("id4") String id4,
+                                                @PathParam("id") String id1, @PathParam("id3") String id3) { 
         return this;
     }
     
     @Path("/{id4}/sub3")
     public BookStoreSubresourcesOnly getItself3(@PathParam("id4") String id4) { 
+        return this;
+    }
+    
+    @Path("/sub2/{id4}")
+    public BookStoreSubresourcesOnly getItself4(@PathParam("id4") String id4,
+                                                @PathParam("id") String id1,
+                                                @PathParam("id2") String id2,
+                                                @PathParam("id3") String id3) { 
         return this;
     }
 }

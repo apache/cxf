@@ -107,4 +107,8 @@ public class BookSubresourceImpl implements BookSubresource {
         return getTheBook();
     }
 
+    public Book getTheBook5(String name, long bookid) throws BookNotFoundFault {
+        return new Book(name, bookid);
+    }
+
 }

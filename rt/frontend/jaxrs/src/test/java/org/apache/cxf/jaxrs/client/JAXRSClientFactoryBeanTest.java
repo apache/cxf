@@ -118,8 +118,19 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
-        BookStoreSubresourcesOnly store2 = store.getItself2("11", "33");
-        assertEquals("http://bar/bookstore/11/2/33/sub2", 
+        BookStoreSubresourcesOnly store2 = store.getItself2("4", "11", "33");
+        assertEquals("http://bar/bookstore/11/2/33/sub2/4", 
+                     WebClient.client(store2).getCurrentURI().toString());
+    }
+    
+    @Test
+    public void testTemplateInRootReplaceEmpty() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookStoreSubresourcesOnly.class);
+        BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class);
+        BookStoreSubresourcesOnly store2 = store.getItself4("4", "11", "22", "33");
+        assertEquals("http://bar/bookstore/11/22/33/sub2/4", 
                      WebClient.client(store2).getCurrentURI().toString());
     }
     
