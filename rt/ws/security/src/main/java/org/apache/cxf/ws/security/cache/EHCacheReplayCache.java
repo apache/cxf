@@ -28,13 +28,16 @@ import net.sf.ehcache.Element;
 import org.apache.ws.security.cache.ReplayCache;
 
 /**
- * An in-memory EHCache implementation of the ReplayCache interface.
+ * An in-memory EHCache implementation of the ReplayCache interface. The default TTL is 60 minutes and the
+ * max TTL is 12 hours.
  */
 public class EHCacheReplayCache implements ReplayCache {
     
     public static final long DEFAULT_TTL = 3600L;
+    public static final long MAX_TTL = DEFAULT_TTL * 12L;
     private Cache cache;
     private CacheManager cacheManager;
+    private long ttl = DEFAULT_TTL;
     
     public EHCacheReplayCache(String key, URL configFileURL) {
         if (cacheManager == null) {
@@ -53,11 +56,27 @@ public class EHCacheReplayCache implements ReplayCache {
     }
     
     /**
+     * Set a new (default) TTL value in seconds
+     * @param newTtl a new (default) TTL value in seconds
+     */
+    public void setTTL(long newTtl) {
+        ttl = newTtl;
+    }
+    
+    /**
+     * Get the (default) TTL value in seconds
+     * @return the (default) TTL value in seconds
+     */
+    public long getTTL() {
+        return ttl;
+    }
+    
+    /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
      * @param identifier The identifier to be added
      */
     public void add(String identifier) {
-        add(identifier, DEFAULT_TTL);
+        add(identifier, ttl);
     }
     
     /**
@@ -70,13 +89,17 @@ public class EHCacheReplayCache implements ReplayCache {
             return;
         }
         
-        int ttl = (int)timeToLive;
-        if (timeToLive != (long)ttl) {
-            // Default to 60 minutes
-            ttl = 3600;
+        int parsedTTL = (int)timeToLive;
+        if (timeToLive != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+            // Default to configured value
+            parsedTTL = (int)ttl;
+            if (ttl != (long)parsedTTL) {
+                // Fall back to 60 minutes if the default TTL is set incorrectly
+                parsedTTL = 3600;
+            }
         }
         
-        cache.put(new Element(identifier, identifier, false, ttl, ttl));
+        cache.put(new Element(identifier, identifier, false, parsedTTL, parsedTTL));
     }
     
     /**
