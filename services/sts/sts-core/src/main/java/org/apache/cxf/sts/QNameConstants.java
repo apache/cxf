@@ -50,6 +50,8 @@ public final class QNameConstants {
         WS_TRUST_FACTORY.createValidateTarget(null).getName();
     public static final QName CANCEL_TARGET =
         WS_TRUST_FACTORY.createCancelTarget(null).getName();
+    public static final QName RENEW_TARGET =
+        WS_TRUST_FACTORY.createRenewTarget(null).getName();
     public static final QName LIFETIME = 
         WS_TRUST_FACTORY.createLifetime(null).getName();
     public static final QName REQUEST_TYPE = 

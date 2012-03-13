@@ -16,22 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.token.canceller;
+
+package org.apache.cxf.sts.token.renewer;
+
+import org.apache.cxf.sts.request.ReceivedToken;
 
 
 /**
- * This class encapsulates the response from a TokenCanceller instance after cancelling a token.
+ * An interface that can renew a security token.
  */
-public class TokenCancellerResponse {
 
-    private boolean tokenCancelled;
+public interface TokenRenewer {
+
+    /**
+     * boolean for enabling/disabling verification of proof of possession.
+     */
+    void setVerifyProofOfPossession(boolean verifyProofOfPossession);
     
-    public void setTokenCancelled(boolean tokenCancelled) {
-        this.tokenCancelled = tokenCancelled;
-    }
-    
-    public boolean isTokenCancelled() {
-        return tokenCancelled;
-    }
+    /**
+     * Return true if this TokenRenewer implementation is able to renew a token
+     * that corresponds to the given token.
+     */
+    boolean canHandleToken(ReceivedToken cancelTarget);
+
+    /**
+     * Renew a token given a TokenRenewerParameters
+     */
+    TokenRenewerResponse renewToken(TokenRenewerParameters tokenParameters);
     
 }

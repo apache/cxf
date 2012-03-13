@@ -62,6 +62,7 @@ import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
+import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
@@ -259,6 +260,15 @@ public class RequestParser {
                 cancelTarget = new ReceivedToken(target);
             }          
             tokenRequirements.setCancelTarget(cancelTarget);
+            LOG.fine("Found CancelTarget token");
+        } else if (QNameConstants.RENEW_TARGET.equals(jaxbElement.getName())) {
+            RenewTargetType renewTargetType = (RenewTargetType)jaxbElement.getValue();
+            ReceivedToken renewTarget = new ReceivedToken(renewTargetType.getAny());
+            if (isTokenReferenced(renewTarget.getToken())) {
+                Element target = fetchTokenElementFromReference(renewTarget.getToken(), wsContext);
+                renewTarget = new ReceivedToken(target);
+            }          
+            tokenRequirements.setRenewTarget(renewTarget);
             LOG.fine("Found CancelTarget token");
         } else if (QNameConstants.CLAIMS.equals(jaxbElement.getName())) {
             ClaimsType claimsType = (ClaimsType)jaxbElement.getValue();

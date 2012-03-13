@@ -34,11 +34,16 @@ public class TokenRequirements {
     private ReceivedToken onBehalfOf;
     private ReceivedToken actAs;
     private ReceivedToken cancelTarget;
+    private ReceivedToken renewTarget;
     private Lifetime lifetime;
     private RequestClaimCollection claims;
     
     public String getTokenType() {
         return tokenType;
+    }
+    
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
     }
     
     public ReceivedToken getCancelTarget() {
@@ -48,11 +53,15 @@ public class TokenRequirements {
     public void setCancelTarget(ReceivedToken cancelTarget) {
         this.cancelTarget = cancelTarget;
     }
-
-    public void setTokenType(String tokenType) {
-        this.tokenType = tokenType;
-    }
     
+    public ReceivedToken getRenewTarget() {
+        return renewTarget;
+    }
+
+    public void setRenewTarget(ReceivedToken renewTarget) {
+        this.renewTarget = renewTarget;
+    }
+
     public Element getAppliesTo() {
         return appliesTo;
     }

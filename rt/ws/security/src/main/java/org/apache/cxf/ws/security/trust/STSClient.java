@@ -684,6 +684,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         
         if (target != null) {
             writer.writeStartElement("wst", "RenewTarget", namespace);
+            client.getRequestContext().put(SecurityConstants.TOKEN, target);
             Element el = target.getUnattachedReference();
             if (el == null) {
                 el = target.getAttachedReference();

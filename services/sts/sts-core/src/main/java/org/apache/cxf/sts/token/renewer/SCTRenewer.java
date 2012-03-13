@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.token.canceller;
+package org.apache.cxf.sts.token.renewer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.token.provider.TokenReference;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -43,17 +44,34 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityContextToken;
 
 /**
- * This class cancels a SecurityContextToken.
+ * This class renews a SecurityContextToken.
  */
-public class SCTCanceller implements TokenCanceller {
+public class SCTRenewer implements TokenRenewer {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(SCTCanceller.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(SCTRenewer.class);
     
     // boolean to enable/disable the check of proof of possession
     private boolean verifyProofOfPossession = true;
+    private long lifetime = 300L;
     
     /**
-     * Return true if this TokenCanceller implementation is capable of cancelling the
+     * Return the lifetime of the generated SCT
+     * @return the lifetime of the generated SCT
+     */
+    public long getLifetime() {
+        return lifetime;
+    }
+
+    /**
+     * Set the lifetime of the generated SCT
+     * @param lifetime the lifetime of the generated SCT
+     */
+    public void setLifetime(long lifetime) {
+        this.lifetime = lifetime;
+    }
+    
+    /**
+     * Return true if this TokenRenewer implementation is capable of renewing the
      * ReceivedToken argument.
      */
     public boolean canHandleToken(ReceivedToken targetToken) {
@@ -72,25 +90,25 @@ public class SCTCanceller implements TokenCanceller {
     }
 
     /**
-     * Cancel a Token using the given TokenCancellerParameters.
+     * Renew a Token using the given TokenRenewerParameters.
      */
-    public TokenCancellerResponse cancelToken(TokenCancellerParameters tokenParameters) {
-        LOG.fine("Trying to cancel a SecurityContextToken");
+    public TokenRenewerResponse renewToken(TokenRenewerParameters tokenParameters) {
+        LOG.fine("Trying to renew a SecurityContextToken");
         TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken cancelTarget = tokenRequirements.getCancelTarget();
+        ReceivedToken renewTarget = tokenRequirements.getRenewTarget();
 
-        TokenCancellerResponse response = new TokenCancellerResponse();
-        response.setTokenCancelled(false);
+        TokenRenewerResponse response = new TokenRenewerResponse();
+        response.setTokenRenewed(false);
         
         if (tokenParameters.getTokenStore() == null) {
-            LOG.log(Level.FINE, "A cache must be configured to use the SCTCanceller");
+            LOG.log(Level.FINE, "A cache must be configured to use the SCTRenewer");
             return response;
         }
         
-        if (cancelTarget != null && cancelTarget.isDOMElement()) {
+        if (renewTarget != null && renewTarget.isDOMElement()) {
             try {
-                Element cancelTargetElement = (Element)cancelTarget.getToken();
-                SecurityContextToken sct = new SecurityContextToken(cancelTargetElement);
+                Element renewTargetElement = (Element)renewTarget.getToken();
+                SecurityContextToken sct = new SecurityContextToken(renewTargetElement);
                 String identifier = sct.getIdentifier();
                 SecurityToken token = tokenParameters.getTokenStore().getToken(identifier);
                 if (token == null) {
@@ -104,8 +122,46 @@ public class SCTCanceller implements TokenCanceller {
                         STSException.INVALID_REQUEST
                     );
                 }
+                // Remove old token from the cache
                 tokenParameters.getTokenStore().remove(token);
-                response.setTokenCancelled(true);
+                
+                // Create a new token corresponding to the old token
+                SecurityToken newToken = new SecurityToken(identifier);
+                newToken.setPrincipal(token.getPrincipal());
+                newToken.setSecret(token.getSecret());
+                if (token.getProperties() != null) {
+                    newToken.setProperties(token.getProperties());
+                }
+                
+                if (lifetime > 0) {
+                    Integer lifetimeInteger = new Integer(Long.valueOf(lifetime).intValue());
+                    tokenParameters.getTokenStore().add(newToken, lifetimeInteger);
+                } else {
+                    tokenParameters.getTokenStore().add(newToken);
+                }
+                
+                response.setTokenRenewed(true);
+                response.setRenewedToken(sct.getElement());
+                
+                // Create the references
+                TokenReference attachedReference = new TokenReference();
+                attachedReference.setIdentifier(sct.getID());
+                attachedReference.setUseDirectReference(true);
+                if (tokenRequirements.getTokenType() != null) {
+                    attachedReference.setWsseValueType(tokenRequirements.getTokenType());
+                }
+                response.setAttachedReference(attachedReference);
+                
+                TokenReference unAttachedReference = new TokenReference();
+                unAttachedReference.setIdentifier(sct.getIdentifier());
+                unAttachedReference.setUseDirectReference(true);
+                if (tokenRequirements.getTokenType() != null) {
+                    unAttachedReference.setWsseValueType(tokenRequirements.getTokenType());
+                }
+                response.setUnattachedReference(unAttachedReference);
+                
+                response.setLifetime(lifetime);
+                
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }
@@ -113,7 +169,7 @@ public class SCTCanceller implements TokenCanceller {
         return response;
     }
     
-    private boolean matchKey(TokenCancellerParameters tokenParameters, byte[] secretKey) {
+    private boolean matchKey(TokenRenewerParameters tokenParameters, byte[] secretKey) {
         boolean result = false;
         MessageContext messageContext = tokenParameters.getWebServiceContext().getMessageContext();
         final List<WSHandlerResult> handlerResults = 
