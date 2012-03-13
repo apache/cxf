@@ -23,11 +23,18 @@ import java.util.Stack;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+/**
+ * XMLStreamReader implementation which can be used to enforce a number of
+ * depth-restricting policies. The following properties are currently supported:
+ * - total number of elements in the document
+ * - the maximum depth of the given element; the root element will be checked by default
+ * - the maximum number of immediate child nodes for individual elements
+ * 
+ * More sophisticated policies can be supported in the future.      
+ */
 public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
-    private int elementCountThreshold = -1;
-    private int innerElementLevelThreshold = -1;
-    private int innerElementCountThreshold = -1;
     
+    private DocumentDepthProperties props;
     private int totalElementCount;
     private Stack<Integer> stack = new Stack<Integer>();
     
@@ -36,25 +43,33 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
                                         int innerElementLevelThreshold,
                                         int innerElementCountThreshold) {
         super(reader);
-        this.elementCountThreshold = elementCountThreshold;
-        this.innerElementLevelThreshold = innerElementLevelThreshold;
-        this.innerElementCountThreshold = innerElementCountThreshold;
+        this.props = new DocumentDepthProperties(elementCountThreshold, 
+                                            innerElementLevelThreshold,
+                                            innerElementCountThreshold);
+    }
+    
+    public DepthRestrictingStreamReader(XMLStreamReader reader,
+                                        DocumentDepthProperties props) {
+        super(reader);
+        this.props = props;
     }
     
     @Override
     public int next() throws XMLStreamException {
         int next = super.next();
         if (next == START_ELEMENT) {
-            if (innerElementLevelThreshold != -1 && getDepth() >= innerElementLevelThreshold) {
+            if (props.getInnerElementLevelThreshold() != -1 
+                && getDepth() >= props.getInnerElementLevelThreshold()) {
                 throw new DepthExceededStaxException();
             }
-            if (elementCountThreshold != -1 && ++totalElementCount >= elementCountThreshold) {
+            if (props.getElementCountThreshold() != -1 
+                && ++totalElementCount >= props.getElementCountThreshold()) {
                 throw new DepthExceededStaxException();
             }
-            if (innerElementCountThreshold != -1) {
+            if (props.getInnerElementCountThreshold() != -1) {
                 if (!stack.empty()) {
                     int currentCount = stack.pop();
-                    if (++currentCount >= innerElementCountThreshold) {
+                    if (++currentCount >= props.getInnerElementCountThreshold()) {
                         throw new DepthExceededStaxException();
                     } else {
                         stack.push(currentCount);
@@ -63,11 +78,9 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
                 stack.push(0);
             }
             
-        } else if (next == END_ELEMENT && innerElementCountThreshold != -1) {
+        } else if (next == END_ELEMENT && props.getInnerElementCountThreshold() != -1) {
             stack.pop();
         }
         return next;
     }
-
-    
 }
