@@ -34,6 +34,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.continuations.ContinuationProvider;
@@ -52,7 +53,9 @@ import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
-import org.eclipse.jetty.server.HttpConnection;
+import org.eclipse.jetty.io.AbstractConnection;
+import org.eclipse.jetty.server.AsyncHttpConnection;
+import org.eclipse.jetty.server.BlockingHttpConnection;
 import org.eclipse.jetty.server.Request;
 
 public class JettyHTTPDestination extends AbstractHTTPDestination {
@@ -211,6 +214,15 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                              HttpServletResponse resp) throws IOException {
         doService(servletContext, req, resp);
     }
+    
+    static AbstractConnection getConnectionForRequest(Request r) {
+        try {
+            return (AbstractConnection)r.getClass().getMethod("getConnection").invoke(r);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+    
     protected void doService(ServletContext context,
                              HttpServletRequest req,
                              HttpServletResponse resp) throws IOException {
@@ -218,14 +230,18 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             context = servletContext;
         }
         Request baseRequest = (req instanceof Request) 
-            ? (Request)req : HttpConnection.getCurrentConnection().getRequest();
+            ? (Request)req : getCurrentRequest();
             
         if (!"HEAD".equals(req.getMethod())) {
             //bug in Jetty with persistent connections that if a HEAD is
             //sent, a _head flag is never reset
-            HttpConnection c = baseRequest.getConnection();
+            AbstractConnection c = getConnectionForRequest(baseRequest);
             if (c != null) {
-                c.getGenerator().setHead(false);
+                if (c instanceof AsyncHttpConnection) {
+                    ((AsyncHttpConnection)c).getGenerator().setHead(false);
+                } else if (c instanceof BlockingHttpConnection) {
+                    ((BlockingHttpConnection)c).getGenerator().setHead(false);
+                }
             }
         }
         if (getServer().isSetRedirectURL()) {
@@ -300,7 +316,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
                                   final HttpServletResponse resp)
         throws IOException {
         Request baseRequest = (req instanceof Request) 
-            ? (Request)req : HttpConnection.getCurrentConnection().getRequest();
+            ? (Request)req : getCurrentRequest();
         
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Service http request on thread: " + Thread.currentThread());
@@ -362,5 +378,26 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             inMessage.put(ContinuationProvider.class.getName(), 
                       new JettyContinuationProvider(req, resp, inMessage));
         }
+    }
+    
+    private AbstractConnection getCurrentConnection() {
+        Class<?> cls = AsyncHttpConnection.class.getSuperclass();
+        // AbstractHttpConnection on Jetty 7.6, HttpConnection on Jetty <=7.5
+        try {
+            return (AbstractConnection)ReflectionUtil
+                .setAccessible(cls.getMethod("getCurrentConnection")).invoke(null);
+        } catch (Exception e) {
+            //ignore
+        }
+        return null;
+    }
+    private Request getCurrentRequest() {
+        AbstractConnection con = getCurrentConnection();
+        if (con instanceof AsyncHttpConnection) {
+            return ((AsyncHttpConnection)con).getRequest();
+        } else if (con instanceof BlockingHttpConnection) {
+            return ((BlockingHttpConnection)con).getRequest();
+        }
+        return null;
     }
 }
