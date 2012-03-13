@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -56,7 +55,6 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new FormatResponseHandler());
         providers.add(new GenericHandlerWriter());
         providers.add(new FaultyRequestHandler());
-        providers.add(new SearchContextProvider());
         sf.setProviders(providers);
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());

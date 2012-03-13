@@ -869,9 +869,9 @@ public final class InjectionUtils {
             proxy = createThreadLocalServletApiContext(type.getName());  
         }
         if (proxy == null) {
-            return (ThreadLocalProxy)Proxy.newProxyInstance(type.getClassLoader(),
+            return (ThreadLocalProxy<T>)Proxy.newProxyInstance(type.getClassLoader(),
                                    new Class[] {type, ThreadLocalProxy.class },
-                                   new ThreadLocalInvocationHandler());
+                                   new ThreadLocalInvocationHandler<T>());
         }
         
         return (ThreadLocalProxy<T>)proxy;
