@@ -53,10 +53,10 @@ import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
+import org.eclipse.jetty.http.Generator;
 import org.eclipse.jetty.io.AbstractConnection;
-import org.eclipse.jetty.server.AsyncHttpConnection;
-import org.eclipse.jetty.server.BlockingHttpConnection;
 import org.eclipse.jetty.server.Request;
+import org.springframework.util.ClassUtils;
 
 public class JettyHTTPDestination extends AbstractHTTPDestination {
     
@@ -223,6 +223,15 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
     }
     
+    private void setHeadFalse(AbstractConnection con) {
+        try {
+            Generator gen = (Generator)con.getClass().getMethod("getGenerator").invoke(con);
+            gen.setHead(true);
+        } catch (Exception ex) {
+            //ignore - can continue
+        }
+    }
+    
     protected void doService(ServletContext context,
                              HttpServletRequest req,
                              HttpServletResponse resp) throws IOException {
@@ -237,11 +246,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             //sent, a _head flag is never reset
             AbstractConnection c = getConnectionForRequest(baseRequest);
             if (c != null) {
-                if (c instanceof AsyncHttpConnection) {
-                    ((AsyncHttpConnection)c).getGenerator().setHead(false);
-                } else if (c instanceof BlockingHttpConnection) {
-                    ((BlockingHttpConnection)c).getGenerator().setHead(false);
-                }
+                setHeadFalse(c);
             }
         }
         if (getServer().isSetRedirectURL()) {
@@ -381,8 +386,23 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     }
     
     private AbstractConnection getCurrentConnection() {
-        Class<?> cls = AsyncHttpConnection.class.getSuperclass();
         // AbstractHttpConnection on Jetty 7.6, HttpConnection on Jetty <=7.5
+        Class<?> cls = null;
+        try {
+            cls = ClassUtils.forName("org.eclipse.jetty.server.AbstractHttpConnection",
+                                     AbstractConnection.class.getClassLoader());
+        } catch (Exception e) {
+            //ignore
+        }
+        if (cls == null) {
+            try {
+                cls = ClassUtils.forName("org.eclipse.jetty.server.HttpConnection",
+                                         AbstractConnection.class.getClassLoader());
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+
         try {
             return (AbstractConnection)ReflectionUtil
                 .setAccessible(cls.getMethod("getCurrentConnection")).invoke(null);
@@ -393,10 +413,11 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     }
     private Request getCurrentRequest() {
         AbstractConnection con = getCurrentConnection();
-        if (con instanceof AsyncHttpConnection) {
-            return ((AsyncHttpConnection)con).getRequest();
-        } else if (con instanceof BlockingHttpConnection) {
-            return ((BlockingHttpConnection)con).getRequest();
+        try {
+            return (Request)ReflectionUtil
+                .setAccessible(con.getClass().getMethod("getRequest")).invoke(con);
+        } catch (Exception e) {
+            //ignore
         }
         return null;
     }
