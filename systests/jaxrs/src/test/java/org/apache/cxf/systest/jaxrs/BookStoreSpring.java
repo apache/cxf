@@ -35,6 +35,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -135,7 +136,21 @@ public class BookStoreSpring {
     @GET
     public Book getDefaultBook() {
         return books.get(mainId);
-    }  
+    }
+    
+    @POST
+    @Path("depth")
+    @Produces({"application/xml", "application/json" })
+    @Consumes({"application/xml", "application/json" })
+    public Book echoBook(Book book) {
+        return book;
+    }
+    
+    @POST
+    @Path("depth-form")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void depthForm(MultivaluedMap<String, String> map) {
+    }
 
     @POST
     @Path("books/convert")

@@ -82,7 +82,9 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 
 public final class StaxUtils {
-
+    public static final String INNER_ELEMENT_COUNT = "org.apache.cxf.staxutils.innerElementCountThreshold";
+    public static final String INNER_ELEMENT_LEVEL = "org.apache.cxf.staxutils.innerElementLevelThreshold";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
     
     private static final BlockingQueue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
@@ -115,9 +117,7 @@ public final class StaxUtils {
         NS_AWARE_INPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLInputFactory>(i);
         OUTPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLOutputFactory>(i);
         try {
-            String s =  SystemPropertyAction
-                    .getProperty("org.apache.cxf.staxutils.innerElementLevelThreshold",
-                                 "-1");
+            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_LEVEL, "-1");
             innerElementLevelThreshold = Integer.parseInt(s);
         } catch (Throwable t) {
             innerElementLevelThreshold = -1;
@@ -126,9 +126,7 @@ public final class StaxUtils {
             innerElementLevelThreshold = -1;
         }
         try {
-            String s =  SystemPropertyAction
-                .getProperty("org.apache.cxf.staxutils.innerElementCountThreshold",
-                                    "-1");
+            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_COUNT, "-1");
             innerElementCountThreshold = Integer.parseInt(s);
         } catch (Throwable t) {
             innerElementCountThreshold = -1;
@@ -613,7 +611,7 @@ public final class StaxUtils {
         // We need this check because namespace writing works
         // different on Woodstox and the RI.
         if (writeElementNS) {
-            if (prefix == null || prefix.length() == 0) {
+            if (prefix.length() == 0) {
                 writer.writeDefaultNamespace(uri);
                 writer.setDefaultNamespace(uri);
             } else {
@@ -770,7 +768,7 @@ public final class StaxUtils {
                     String value = attr.getNodeValue();
                     if (attns == null || attns.length() == 0) {
                         writer.writeAttribute(name, value);
-                    } else if (attrPrefix == null || attrPrefix.length() == 0) {
+                    } else if (attrPrefix.length() == 0) {
                         writer.writeAttribute(attns, name, value);
                     } else {
                         writer.writeAttribute(attrPrefix, attns, name, value);
@@ -1025,12 +1023,12 @@ public final class StaxUtils {
                 stack.push(parent);
                 if (isThreshold && innerElementLevelThreshold != -1 
                     && stack.size() >= innerElementLevelThreshold) {
-                    throw new RuntimeException("reach the innerElementLevelThreshold:" 
+                    throw new DepthExceededStaxException("reach the innerElementLevelThreshold:" 
                                                + innerElementLevelThreshold);
                 }
                 if (isThreshold && innerElementCountThreshold != -1 
                     && elementCount >= innerElementCountThreshold) {
-                    throw new RuntimeException("reach the innerElementCountThreshold:" 
+                    throw new DepthExceededStaxException("reach the innerElementCountThreshold:" 
                                                + innerElementCountThreshold);
                 }
                 parent = e;
@@ -1398,14 +1396,14 @@ public final class StaxUtils {
         } else {
             writer.writeStartElement(localName);
         }
-        Iterator it = start.getNamespaces();
+        Iterator<XMLEvent> it = CastUtils.cast(start.getNamespaces());
         while (it != null && it.hasNext()) {
-            writeEvent((XMLEvent)it.next(), writer);
+            writeEvent(it.next(), writer);
         }
         
-        it = start.getAttributes();
+        it = CastUtils.cast(start.getAttributes());
         while (it != null && it.hasNext()) {
-            writeAttributeEvent((Attribute)it.next(), writer);            
+            writeAttributeEvent(it.next(), writer);            
         }
     }
     private static void writeAttributeEvent(XMLEvent event, XMLStreamWriter writer) 

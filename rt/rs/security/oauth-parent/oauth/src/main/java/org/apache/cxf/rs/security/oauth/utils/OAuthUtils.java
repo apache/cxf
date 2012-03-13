@@ -49,6 +49,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
 import org.apache.cxf.rs.security.oauth.data.Token;
@@ -127,7 +128,8 @@ public final class OAuthUtils {
                 ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
             String body = FormUtils.readBody(stream, enc);
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-            FormUtils.populateMapFromString(map, body, enc, true, request);
+            FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true, 
+                                            request);
             for (String key : map.keySet()) {
                 oAuthMessage.addParameter(key, map.getFirst(key));
             }

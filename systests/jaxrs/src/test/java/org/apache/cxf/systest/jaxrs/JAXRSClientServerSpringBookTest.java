@@ -48,6 +48,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
@@ -219,6 +220,36 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
         getBook(endpointAddress, "resources/expected_get_book123json.txt",
                 "application/vnd.example-com.foo+json");
+    }
+    
+    @Test
+    public void testBookDepthExceededXML() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks9/depth"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        Response r = wc.post(new Book("CXF", 123L));
+        assertEquals(413, r.getStatus());
+    }
+    
+    @Test
+    public void testBookDepthExceededJettison() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks10/depth"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/json").type("application/json");
+        Response r = wc.post(new Book("CXF", 123L));
+        assertEquals(413, r.getStatus());
+    }
+    
+    @Test
+    public void testTooManyFormParams() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks9/depth-form"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        Response r = wc.form(new Form().set("a", "b"));
+        assertEquals(204, r.getStatus());
+        r = wc.form(new Form().set("a", "b").set("c", "b"));
+        assertEquals(413, r.getStatus());
     }
     
     

@@ -72,7 +72,9 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.staxutils.DepthRestrictingStreamReader;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
 public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
@@ -605,6 +607,26 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                                             inElementsMap,
                                                             inAppendMap,
                                                             true);
+    }
+    
+    protected XMLStreamReader createDepthReaderIfNeeded(XMLStreamReader reader, InputStream is) {
+        if (getContext() != null) {
+            String elementCountStr = (String)getContext().getContextualProperty(
+                StaxUtils.INNER_ELEMENT_COUNT);
+            String elementLevelStr = (String)getContext().getContextualProperty(
+                StaxUtils.INNER_ELEMENT_LEVEL);
+            if (elementCountStr != null || elementLevelStr != null) {
+                try {
+                    int elementLevel = elementLevelStr != null ? Integer.valueOf(elementLevelStr) : -1;
+                    int elementCount = elementCountStr != null ? Integer.valueOf(elementCountStr) : -1;
+                    reader = TransformUtils.createNewReaderIfNeeded(reader, is);
+                    reader = new DepthRestrictingStreamReader(reader, -1, elementLevel, elementCount);
+                } catch (Exception ex) {
+                    throw new WebApplicationException(ex);
+                }
+            }
+        }
+        return reader;
     }
     
     public void setValidateBeforeWrite(boolean validateBeforeWrite) {

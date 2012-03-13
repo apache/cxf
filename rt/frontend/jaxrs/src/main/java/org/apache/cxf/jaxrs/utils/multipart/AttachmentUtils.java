@@ -41,6 +41,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class AttachmentUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
@@ -143,6 +144,7 @@ public final class AttachmentUtils {
         MultivaluedMap<String, T> data = new MetadataMap<String, T>();
         FormUtils.populateMapFromMultipart((MultivaluedMap)data,
                                            AttachmentUtils.getMultipartBody(mc), 
+                                           PhaseInterceptorChain.getCurrentMessage(),
                                            true);
         return data;
     }

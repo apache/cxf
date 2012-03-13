@@ -65,6 +65,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
@@ -232,6 +233,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             
         } catch (JAXBException e) {
             handleJAXBException(e, true);
+        } catch (DepthExceededStaxException e) {
+            throw new WebApplicationException(413);
         } catch (XMLStreamException e) {
             throw new WebApplicationException(e);
         } catch (WebApplicationException e) {
@@ -251,12 +254,16 @@ public class JSONProvider extends AbstractJAXBProvider  {
     
     protected XMLStreamReader createReader(Class<?> type, InputStream is) 
         throws Exception {
+        XMLStreamReader reader = null;
         if (BADGER_FISH_CONVENTION.equals(convention)) {
-            return JSONUtils.createBadgerFishReader(is);
+            reader = JSONUtils.createBadgerFishReader(is);
         } else {
-            XMLStreamReader reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
-            return createTransformReaderIfNeeded(reader, is);
+            reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
         }
+        reader = createTransformReaderIfNeeded(reader, is);
+        reader = createDepthReaderIfNeeded(reader, is);
+        
+        return reader;
     }
     
     protected InputStream getInputStream(Class<Object> cls, Type type, InputStream is) throws Exception {

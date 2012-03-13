@@ -157,10 +157,12 @@ public class FormEncodingProvider implements
         if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
             MultipartBody body = 
                 AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
-            FormUtils.populateMapFromMultipart(params, body, decode);
+            FormUtils.populateMapFromMultipart(params, body, PhaseInterceptorChain.getCurrentMessage(), 
+                                               decode);
         } else {
             String enc = HttpUtils.getEncoding(mt, "UTF-8");
-            FormUtils.populateMapFromString(params, 
+            FormUtils.populateMapFromString(params,
+                                            PhaseInterceptorChain.getCurrentMessage(),
                                             FormUtils.readBody(is, enc),
                                             enc,
                                             decode,

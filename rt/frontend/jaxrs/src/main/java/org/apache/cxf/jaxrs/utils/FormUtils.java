@@ -41,6 +41,7 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class FormUtils {
@@ -48,6 +49,7 @@ public final class FormUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";  
+    private static final String MAX_FORM_PARAM_COUNT = "org.apache.cxf.form.maxParameterCount";  
         
     private FormUtils() {
         
@@ -77,13 +79,15 @@ public final class FormUtils {
         }
     }
     
-    public static void populateMapFromString(MultivaluedMap<String, String> params, 
+    public static void populateMapFromString(MultivaluedMap<String, String> params,
+                                             Message m,
                                              String postBody, 
                                              String enc,
                                              boolean decode,
                                              HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             List<String> parts = Arrays.asList(postBody.split("&"));
+            checkNumberOfParts(m, parts.size());
             for (String part : parts) {
                 String[] keyValue = new String[2];
                 int index = part.indexOf("=");
@@ -145,9 +149,11 @@ public final class FormUtils {
     }
     
     public static void populateMapFromMultipart(MultivaluedMap<String, String> params,
-                                                MultipartBody body, 
+                                                MultipartBody body,
+                                                Message m,
                                                 boolean decode) {
         List<Attachment> atts = body.getAllAttachments();
+        checkNumberOfParts(m, atts.size());
         for (Attachment a : atts) {
             ContentDisposition cd = a.getContentDisposition();
             if (cd != null && !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())) {
@@ -166,6 +172,25 @@ public final class FormUtils {
             } catch (IOException ex) {
                 throw new WebApplicationException(415);
             }
+        }
+    }
+    
+    private static void checkNumberOfParts(Message m, int numberOfParts) {
+        if (m == null || m.getExchange() == null || m.getExchange().getInMessage() == null) {
+            return;
+        }
+        String maxPartsCountProp = (String)m.getExchange()
+            .getInMessage().getContextualProperty(MAX_FORM_PARAM_COUNT);
+        if (maxPartsCountProp == null) {
+            return;
+        }
+        try {
+            int maxPartsCount = Integer.valueOf(maxPartsCountProp);
+            if (maxPartsCount != -1 && numberOfParts >= maxPartsCount) {
+                throw new WebApplicationException(413);
+            }
+        } catch (NumberFormatException ex) {
+            throw new WebApplicationException(500);
         }
     }
 }
