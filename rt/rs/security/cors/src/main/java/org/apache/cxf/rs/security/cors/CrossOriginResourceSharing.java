@@ -44,27 +44,19 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface CrossOriginResourceSharing {
     /**
-     * If true, this resource will return
-     * <pre>Access-Control-Allow-Origin: *</pre>
-     * for a valid request.
-     */
-    boolean allowAllOrigins() default false;
-    /**
-     * A list of permitted origins. This is ignored 
-     * if {@link #allowAllOrigins()} is true.
+     * A list of permitted origins. This resource will 
+     * return * <pre>Access-Control-Allow-Origin: *</pre>
+     * for a valid request if the list is empty.
      */
     String[] allowOrigins() default { };
     /**
      * A list of headers that the client may include
-     * in an actual request.
+     * in an actual request. All the headers listed in 
+     * the Access-Control-Request-Headers will be allowed if
+     * the list is empty
      */
     String[] allowHeaders() default { };
     
-    /**
-     * Act as if whatever headers are listed in the Access-Control-Request-Headers are 
-     * listed in allowHeaders. Convenient for dealing with Browser bugs. 
-     */
-    boolean allowAnyHeaders() default false;
     /**
      * If true, this resource will return 
      * <pre>Access-Control-Allow-Credentials: true</pre>

@@ -80,7 +80,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private List<String> allowHeaders = Collections.emptyList();
     private boolean allowAllOrigins;
     private boolean allowCredentials;
-    private List<String> exposeHeaders = Collections.emptyList();
+    private List<String> exposeHeaders;
     private Integer maxAge;
     private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
@@ -125,7 +125,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
         
         // 5.1.2 check all the origins
-        if (!effectiveAllowAllOrigins(ann) && !effectiveAllowOrigins(ann).containsAll(values)) {
+        if (!effectiveAllowOrigins(ann, values)) {
             return null;
         }
         
@@ -215,8 +215,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
          */
 
         // 5.2.2 must be on the list or we must be matching *.
-        boolean effectiveAllowAllOrigins = effectiveAllowAllOrigins(ann);
-        if (!effectiveAllowAllOrigins && !effectiveAllowOrigins(ann).contains(origin)) {
+        if (!effectiveAllowOrigins(ann, Collections.singletonList(origin))) {
             return createPreflightResponse(m, false);
         }
 
@@ -227,7 +226,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         // This was indirectly enforced by getCorsMethod()
 
         // 5.2.6 reject if the header is not listed.
-        if (!effectiveAllowAnyHeaders(ann) && !effectiveAllowHeaders(ann).containsAll(requestHeaders)) {
+        if (!effectiveAllowHeaders(ann, requestHeaders)) {
             return createPreflightResponse(m, false);
         }
 
@@ -370,7 +369,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
 
     private boolean effectiveAllowAllOrigins(CrossOriginResourceSharing ann) {
         if (ann != null) {
-            return ann.allowAllOrigins();
+            return ann.allowOrigins().length == 0;
         } else {
             return allowAllOrigins;
         }
@@ -384,39 +383,51 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
     }
 
-    private List<String> effectiveAllowOrigins(CrossOriginResourceSharing ann) {
-        List<String> actualOrigins = Collections.emptyList(); 
-        if (ann != null && ann.allowOrigins() != null) {
+    private boolean effectiveAllowOrigins(CrossOriginResourceSharing ann, List<String> origins) {
+        if (effectiveAllowAllOrigins(ann)) {
+            return true;
+        }
+        List<String> actualOrigins = null; 
+        if (ann != null) {
             actualOrigins = Arrays.asList(ann.allowOrigins());
-        } 
+        } else {
+            actualOrigins = allowOrigins;
+        }
         
-        return actualOrigins.isEmpty() ? allowOrigins : actualOrigins;
+        return actualOrigins != null ? actualOrigins.containsAll(origins) : true;
     }
     
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
-            return ann.allowAnyHeaders();
+            return ann.allowHeaders().length == 0;
         } else {
             return allowAnyHeaders;
         }
     }
     
-    private List<String> effectiveAllowHeaders(CrossOriginResourceSharing ann) {
-        List<String> actualHeaders = Collections.emptyList(); 
+    private boolean effectiveAllowHeaders(CrossOriginResourceSharing ann, List<String> aHeaders) {
+        if (effectiveAllowAnyHeaders(ann)) {
+            return true;
+        }
+        List<String> actualHeaders = null; 
         if (ann != null && ann.allowHeaders() != null) {
             actualHeaders = Arrays.asList(ann.allowHeaders());
-        } 
+        } else {
+            actualHeaders = allowHeaders;
+        }
         
-        return actualHeaders.isEmpty() ? allowHeaders : actualHeaders;
+        return actualHeaders != null ? actualHeaders.containsAll(aHeaders) : true;
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {
-        List<String> actualExposeHeaders = Collections.emptyList(); 
-        if (ann != null && ann.exposeHeaders() != null) {
+        List<String> actualExposeHeaders = null; 
+        if (ann != null) {
             actualExposeHeaders = Arrays.asList(ann.exposeHeaders());
-        } 
+        } else {
+            actualExposeHeaders = exposeHeaders;
+        }
         
-        return actualExposeHeaders.isEmpty() ? exposeHeaders : actualExposeHeaders;
+        return actualExposeHeaders;
     }
 
     private Integer effectiveMaxAge(CrossOriginResourceSharing ann) {
