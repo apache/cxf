@@ -49,6 +49,7 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
@@ -87,6 +88,8 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
     private List<ProviderInfo<ContextResolver<?>>> contextResolvers = 
         new ArrayList<ProviderInfo<ContextResolver<?>>>(1);
+    private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
+        new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
@@ -225,6 +228,32 @@ public final class ProviderFactory {
             return new ContextResolverProxy<T>(candidates);
         }
         
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> ContextProvider<T> createContextProvider(Type contextType, 
+                                                        Message m) {
+        Class<?> contextCls = InjectionUtils.getActualType(contextType);
+        if (contextCls == null) {
+            return null;
+        }
+        for (ProviderInfo<ContextProvider<?>> cr : contextProviders) {
+            Type[] types = cr.getProvider().getClass().getGenericInterfaces();
+            for (Type t : types) {
+                if (t instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)t;
+                    Type[] args = pt.getActualTypeArguments();
+                    if (args.length > 0) {
+                        Class<?> argCls = InjectionUtils.getActualType(args[0]);
+                        
+                        if (argCls != null && argCls.isAssignableFrom(contextCls)) {
+                            return (ContextProvider<T>)cr.getProvider();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     
@@ -460,6 +489,10 @@ public final class ProviderFactory {
             
             if (ContextResolver.class.isAssignableFrom(oClass)) {
                 contextResolvers.add(new ProviderInfo<ContextResolver<?>>((ContextResolver<?>)o)); 
+            }
+            
+            if (ContextProvider.class.isAssignableFrom(oClass)) {
+                contextProviders.add(new ProviderInfo<ContextProvider<?>>((ContextProvider<?>)o)); 
             }
             
             if (RequestHandler.class.isAssignableFrom(oClass)) {

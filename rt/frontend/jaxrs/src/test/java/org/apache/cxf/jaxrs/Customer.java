@@ -64,6 +64,10 @@ import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
 public class Customer extends AbstractCustomer implements CustomerInfo {
     
+    public interface CustomerContext {
+        String get();
+    }
+    
     public interface CustomerBeanInterface {
         
     }
@@ -114,6 +118,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     
     @Context private ContextResolver<JAXBContext> cr;
     private UriInfo uriInfo;
+    @Context private CustomerContext customerContext;
     @Context private HttpHeaders headers;
     @Context private Request request;
     @Context private SecurityContext sContext;
@@ -452,7 +457,10 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testContextResolvers(@Context ContextResolver<JAXBContext> resolver) {
         // complete
     }
-    
+    public CustomerContext getCustomerContext() {
+        return customerContext;
+    }
+
     public static class CustomerBeanAdapter extends XmlAdapter<String, CustomerBean> {
 
         @Override

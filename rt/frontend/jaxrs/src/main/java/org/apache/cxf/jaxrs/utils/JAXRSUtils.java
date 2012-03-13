@@ -72,13 +72,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
-import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.apache.cxf.jaxrs.ext.search.SearchContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -846,8 +845,6 @@ public final class JAXRSUtils {
             o = createContextResolver(genericType, contextMessage);
         } else if (MessageContext.class.isAssignableFrom(clazz)) {
             o = new MessageContextImpl(m);
-        } else if (SearchContext.class.isAssignableFrom(clazz)) {
-            o = new SearchContextImpl(m);
         } else if (Application.class.isAssignableFrom(clazz)) {
             ProviderInfo<?> providerInfo = 
                 (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
@@ -855,6 +852,13 @@ public final class JAXRSUtils {
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
             o = createServletResourceValue(contextMessage, clazz);
+            if (o == null) {
+                ContextProvider<?> provider = 
+                    ProviderFactory.getInstance(m).createContextProvider(clazz, contextMessage);
+                if (provider != null) {
+                    o = provider.createContext(contextMessage);
+                }
+            }
         }
         return clazz.cast(o);
     }

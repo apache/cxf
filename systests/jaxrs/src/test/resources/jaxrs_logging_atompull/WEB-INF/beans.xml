@@ -120,6 +120,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
 	
@@ -129,6 +130,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
 	
@@ -138,6 +140,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
 
@@ -148,6 +151,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		<jaxrs:providers>
 			<ref bean="feed" />
 			<ref bean="entry" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
 	
@@ -157,6 +161,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
 	
@@ -166,6 +171,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
 	
@@ -175,6 +181,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
     
@@ -184,12 +191,14 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:providers>
 	</jaxrs:server>
     
     <jaxrs:server id="atomReset" address="/reset">
 		<jaxrs:serviceBeans>
 			<ref bean="atomServerReset"/>
+			<bean class="org.apache.cxf.jaxrs.ext.search.SearchContextProvider"/>
 		</jaxrs:serviceBeans>
 	</jaxrs:server>
 

@@ -52,6 +52,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.Customer.CustomerContext;
 import org.apache.cxf.jaxrs.Customer2;
 import org.apache.cxf.jaxrs.CustomerApplication;
 import org.apache.cxf.jaxrs.CustomerGender;
@@ -63,6 +64,7 @@ import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
 import org.apache.cxf.jaxrs.Timezone;
+import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
@@ -155,6 +157,33 @@ public class JAXRSUtilsTest extends Assert {
         bStore = JAXRSUtils.selectResourceClass(resources, "/bookstore/bar", map, null);
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class);
+    }
+    
+    @Test
+    public void testInjectCustomContext() throws Exception {
+        final CustomerContext contextImpl = new CustomerContext() {
+
+            public String get() {
+                return "customerContext";
+            }
+            
+        };
+        JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        Customer customer = new Customer();
+        sf.setServiceBeanObjects(customer);
+        sf.setProvider(new ContextProvider<CustomerContext>() {
+            public CustomerContext createContext(Message message) {
+                // TODO Auto-generated method stub
+                return contextImpl;
+            }
+        });
+        sf.setStart(false);
+        Server s = sf.create();  
+        assertTrue(customer.getCustomerContext() instanceof ThreadLocalProxy<?>);
+        invokeCustomerMethod(sf.getServiceFactory().getClassResourceInfo().get(0),
+                             customer, s);
+        CustomerContext context = customer.getCustomerContext();
+        assertEquals("customerContext", context.get());
     }
     
     @Test
@@ -1590,7 +1619,7 @@ public class JAXRSUtilsTest extends Assert {
         
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri); 
-        Message message = new MessageImpl();
+        Message message = createMessage();
         InjectionUtils.injectContextMethods(c, ori.getClassResourceInfo(), message);
         assertNotNull(c.getUriInfo());
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo().getClass());

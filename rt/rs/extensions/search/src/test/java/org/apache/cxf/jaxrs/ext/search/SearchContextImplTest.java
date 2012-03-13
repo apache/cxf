@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 

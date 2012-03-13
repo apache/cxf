@@ -71,17 +71,16 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
-import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalInvocationHandler;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProtocolHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
-import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSearchContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -862,14 +861,17 @@ public final class InjectionUtils {
             proxy = new ThreadLocalRequest();
         }  else if (Providers.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalProviders();
-        } else if (SearchContext.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalSearchContext();
         } else if (MessageContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalMessageContext();
         }
         
         if (proxy == null && isServletApiContext(type.getName())) {
             proxy = createThreadLocalServletApiContext(type.getName());  
+        }
+        if (proxy == null) {
+            return (ThreadLocalProxy)Proxy.newProxyInstance(type.getClassLoader(),
+                                   new Class[] {type, ThreadLocalProxy.class },
+                                   new ThreadLocalInvocationHandler());
         }
         
         return (ThreadLocalProxy<T>)proxy;

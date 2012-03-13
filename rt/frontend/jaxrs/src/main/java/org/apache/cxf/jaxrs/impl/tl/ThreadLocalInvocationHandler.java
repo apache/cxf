@@ -17,21 +17,23 @@
  * under the License.
  */
 
-
 package org.apache.cxf.jaxrs.impl.tl;
 
-import org.apache.cxf.jaxrs.ext.search.SearchCondition;
-import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
-public class ThreadLocalSearchContext extends AbstractThreadLocalProxy<SearchContext> 
-    implements SearchContext {
 
-    public <T> SearchCondition<T> getCondition(Class<T> cls) {
-        return get().getCondition(cls);
+public class ThreadLocalInvocationHandler<T> extends AbstractThreadLocalProxy<T> 
+    implements InvocationHandler {
+
+    public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
+        Object target = null;
+        if (m.getDeclaringClass() == ThreadLocalProxy.class) {
+            target = this;    
+        } else {
+            target = get();
+        }
+        return m.invoke(target, args);
     }
 
-
-    public String getSearchExpression() {
-        return get().getSearchExpression();
-    }
 }

@@ -146,7 +146,7 @@ public class SelectMethodCandidatesTest extends Assert {
         e.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         e.get(ProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
+        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(3);
         e.get("org.apache.cxf.jaxrs.comparator");
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
@@ -193,7 +193,7 @@ public class SelectMethodCandidatesTest extends Assert {
         e.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         e.get(ProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
+        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(3);
         e.get("org.apache.cxf.jaxrs.comparator");
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);

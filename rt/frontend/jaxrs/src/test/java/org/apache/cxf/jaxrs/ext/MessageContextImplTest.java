@@ -23,6 +23,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
@@ -162,8 +163,31 @@ public class MessageContextImplTest extends Assert {
     
     @Test
     public void testNoContext() {
-        MessageContext mc = new MessageContextImpl(new MessageImpl());
+        MessageContext mc = new MessageContextImpl(createMessage());
         assertNull(mc.getContext(Message.class));
+    }
+    
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get(Application.class.getName());
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
     }
     
     public static class CustomContextResolver implements ContextResolver<JAXBContext> {

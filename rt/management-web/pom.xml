@@ -89,6 +89,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-search</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <scope>provided</scope>
