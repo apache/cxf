@@ -76,7 +76,7 @@ public class SourceProviderTest extends Assert {
     public void testReadFrom() throws Exception {
         SourceProvider p = new TestSourceProvider();
         assertSame(StreamSource.class, verifyRead(p, StreamSource.class).getClass());
-        assertSame(StreamSource.class, verifyRead(p, Source.class).getClass());
+        assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
         assertSame(StaxSource.class, verifyRead(p, SAXSource.class).getClass());
         assertSame(StaxSource.class, verifyRead(p, StaxSource.class).getClass());
         assertSame(DOMSource.class, verifyRead(p, DOMSource.class).getClass());
