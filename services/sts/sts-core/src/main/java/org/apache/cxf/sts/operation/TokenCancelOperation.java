@@ -38,6 +38,8 @@ import org.apache.cxf.sts.token.canceller.TokenCanceller;
 import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
 import org.apache.cxf.sts.token.canceller.TokenCancellerResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedTokenCancelledType;
@@ -59,6 +61,18 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
     
     public List<TokenCanceller> getTokenCancellers() {
         return tokencancellers;
+    }
+    
+    public RequestSecurityTokenResponseCollectionType cancel(
+        RequestSecurityTokenCollectionType requestCollection, WebServiceContext context
+    ) {
+        RequestSecurityTokenResponseCollectionType responseCollection = 
+            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
+        for (RequestSecurityTokenType request : requestCollection.getRequestSecurityToken()) {
+            RequestSecurityTokenResponseType response = cancel(request, context);
+            responseCollection.getRequestSecurityTokenResponse().add(response);
+        }
+        return responseCollection;
     }
     
     public RequestSecurityTokenResponseType cancel(

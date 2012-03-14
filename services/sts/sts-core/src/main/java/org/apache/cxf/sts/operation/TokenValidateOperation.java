@@ -41,6 +41,8 @@ import org.apache.cxf.sts.token.provider.TokenReference;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
@@ -57,6 +59,18 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
     private static final Logger LOG = LogUtils.getL7dLogger(TokenValidateOperation.class);
 
    
+    public RequestSecurityTokenResponseCollectionType validate(
+        RequestSecurityTokenCollectionType requestCollection, WebServiceContext context
+    ) {
+        RequestSecurityTokenResponseCollectionType responseCollection = 
+            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
+        for (RequestSecurityTokenType request : requestCollection.getRequestSecurityToken()) {
+            RequestSecurityTokenResponseType response = validate(request, context);
+            responseCollection.getRequestSecurityTokenResponse().add(response);
+        }
+        return responseCollection;
+    }
+
     public RequestSecurityTokenResponseType validate(
         RequestSecurityTokenType request, 
         WebServiceContext context

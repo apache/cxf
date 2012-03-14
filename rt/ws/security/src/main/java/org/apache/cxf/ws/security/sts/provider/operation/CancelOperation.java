@@ -21,12 +21,17 @@ package org.apache.cxf.ws.security.sts.provider.operation;
 
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 
 public interface CancelOperation {
 
     RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request,
+                                            WebServiceContext context);
+    
+    RequestSecurityTokenResponseCollectionType cancel(RequestSecurityTokenCollectionType request,
                                             WebServiceContext context);
 
 }

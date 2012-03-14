@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.sts.provider.operation;
 
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 
@@ -28,6 +29,10 @@ public interface IssueOperation {
 
     RequestSecurityTokenResponseCollectionType issue(
             RequestSecurityTokenType request,
+            WebServiceContext context);
+    
+    RequestSecurityTokenResponseCollectionType issue(
+            RequestSecurityTokenCollectionType requestCollection,
             WebServiceContext context);
 
 }

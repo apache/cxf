@@ -53,6 +53,7 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.BinarySecretType;
 import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -232,6 +233,108 @@ public class IssueSamlUnitTest extends org.junit.Assert {
         
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+    }
+    
+    /**
+     * Test to successfully issue multiple Saml tokens. It request a SAML 1.1 and SAML 2 token.
+     */
+    @org.junit.Test
+    public void testIssueMultipleSamlTokens() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new SAMLTokenProvider());
+        issueOperation.setTokenProviders(providerList);
+        
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenCollectionType requestCollection = 
+            new RequestSecurityTokenCollectionType();
+        // SAML 1.1 request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        requestCollection.getRequestSecurityToken().add(request);
+        
+        // SAML 2 request
+        request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType2 = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType2);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        requestCollection.getRequestSecurityToken().add(request);
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Issue a token
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(requestCollection, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertEquals(securityTokenResponse.size(), 2);
+        
+        // Test the generated tokens.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
+        
+        for (Object tokenObject : securityTokenResponse.get(1).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));

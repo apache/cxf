@@ -44,6 +44,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.BinarySecretType;
 import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -70,6 +71,19 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         RequestSecurityTokenResponseCollectionType responseCollection = 
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
         responseCollection.getRequestSecurityTokenResponse().add(response);
+        return responseCollection;
+    }
+    
+    public RequestSecurityTokenResponseCollectionType issue(
+            RequestSecurityTokenCollectionType requestCollection,
+            WebServiceContext context
+    ) {
+        RequestSecurityTokenResponseCollectionType responseCollection = 
+            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
+        for (RequestSecurityTokenType request : requestCollection.getRequestSecurityToken()) {
+            RequestSecurityTokenResponseType response = issueSingle(request, context);
+            responseCollection.getRequestSecurityTokenResponse().add(response);
+        }
         return responseCollection;
     }
 
