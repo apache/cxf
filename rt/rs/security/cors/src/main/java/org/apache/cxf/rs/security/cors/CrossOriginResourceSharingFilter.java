@@ -78,13 +78,11 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      */
     private List<String> allowOrigins = Collections.emptyList();
     private List<String> allowHeaders = Collections.emptyList();
-    private boolean allowAllOrigins;
     private boolean allowCredentials;
-    private List<String> exposeHeaders;
+    private List<String> exposeHeaders = Collections.emptyList();
     private Integer maxAge;
     private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
-    private boolean allowAnyHeaders;
     
     
     private CrossOriginResourceSharing getAnnotation(OperationResourceInfo ori) {
@@ -369,9 +367,9 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
 
     private boolean effectiveAllowAllOrigins(CrossOriginResourceSharing ann) {
         if (ann != null) {
-            return ann.allowOrigins().length == 0;
+            return ann.allowAllOrigins();
         } else {
-            return allowAllOrigins;
+            return allowOrigins.isEmpty();
         }
     }
 
@@ -387,21 +385,23 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         if (effectiveAllowAllOrigins(ann)) {
             return true;
         }
-        List<String> actualOrigins = null; 
+        List<String> actualOrigins = Collections.emptyList(); 
         if (ann != null) {
             actualOrigins = Arrays.asList(ann.allowOrigins());
-        } else {
+        } 
+        
+        if (actualOrigins.isEmpty()) {
             actualOrigins = allowOrigins;
         }
         
-        return actualOrigins != null ? actualOrigins.containsAll(origins) : true;
+        return actualOrigins.containsAll(origins);
     }
     
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowHeaders().length == 0;
         } else {
-            return allowAnyHeaders;
+            return allowHeaders.isEmpty();
         }
     }
     
@@ -410,13 +410,13 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return true;
         }
         List<String> actualHeaders = null; 
-        if (ann != null && ann.allowHeaders() != null) {
+        if (ann != null) {
             actualHeaders = Arrays.asList(ann.allowHeaders());
         } else {
             actualHeaders = allowHeaders;
         }
         
-        return actualHeaders != null ? actualHeaders.containsAll(aHeaders) : true;
+        return actualHeaders.containsAll(aHeaders);
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {
@@ -516,18 +516,6 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         return allowOrigins;
     }
 
-    /**
-     * Whether to implement Access-Control-Allow-Origin: *
-     * 
-     * @param allowAllOrigins if true, all origins are accepted and 
-     * "*" is returned in the header. Sections
-     * 5.1.1 and 5.1.2, and 5.2.1 and 5.2.2. If false, then the list of allowed origins must be
-     */
-    public void setAllowAllOrigins(boolean allowAllOrigins) {
-        this.allowAllOrigins = allowAllOrigins;
-    }
-
-    
     public List<String> getAllowHeaders() {
         return allowHeaders;
     }
@@ -607,19 +595,5 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         this.defaultOptionsMethodsHandlePreflight = defaultOptionsMethodsHandlePreflight;
     }
 
-    public boolean isAllowAnyHeaders() {
-        return allowAnyHeaders;
-    }
-
-    /**
-     * Completely relax the Access-Control-Request-Headers check. 
-     * Any headers in this header will be permitted. Handy for 
-     * dealing with Chrome / Firefox / Safari incompatibilities.
-     * @param allowAnyHeader whether to allow any header. If <tt>false</tt>,
-     * respect the allowHeaders property.
-     */
-    public void setAllowAnyHeaders(boolean allowAnyHeader) {
-        this.allowAnyHeaders = allowAnyHeader;
-    }
-
+    
 }

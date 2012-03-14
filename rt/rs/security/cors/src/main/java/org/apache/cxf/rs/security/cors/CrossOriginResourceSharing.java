@@ -44,9 +44,14 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface CrossOriginResourceSharing {
     /**
-     * A list of permitted origins. This resource will 
-     * return * <pre>Access-Control-Allow-Origin: *</pre>
-     * for a valid request if the list is empty.
+     * If true, this resource will return 
+     * <pre>Access-Control-Allow-Origin: *</pre>
+     * for a valid request 
+     */
+    boolean allowAllOrigins() default false;
+    /**
+     * A list of permitted origins. It is ignored if
+     * {@link #allowAllOrigins()} returns true
      */
     String[] allowOrigins() default { };
     /**
