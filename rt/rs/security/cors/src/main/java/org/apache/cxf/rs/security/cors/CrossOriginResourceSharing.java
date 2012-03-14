@@ -78,14 +78,4 @@ public @interface CrossOriginResourceSharing {
      * value is -1.
      */
     int maxAge() default -1;
-    /**
-     * Controls the implementation of preflight processing 
-     * on an OPTIONS method.
-     * If the current method is OPTIONS, and this method wants to 
-     * handle the preflight process for itself, set this value to 
-     * <tt>true</tt>. In the default, false, case, the filter
-     * performs preflight processing.
-     */
-    boolean localPreflight() default false;
-    
 }

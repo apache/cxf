@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.cors;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,31 +86,21 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private boolean defaultOptionsMethodsHandlePreflight;
     
     
-    private CrossOriginResourceSharing getAnnotation(OperationResourceInfo ori) {
+    private <T extends Annotation> T  getAnnotation(OperationResourceInfo ori,
+                                                    Class<T> annClass) {
         if (ori == null) {
             return null;
         }
-        return ReflectionUtil.getAnnotationForMethodOrContainingClass(ori.getAnnotatedMethod(),
-                                                                      CrossOriginResourceSharing.class);
+        return ReflectionUtil.getAnnotationForMethodOrContainingClass(
+             ori.getAnnotatedMethod(),  annClass);
     }
 
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         OperationResourceInfo opResInfo = m.getExchange().get(OperationResourceInfo.class);
-        /*
-         * If there is an actual method annotated with @OPTIONS, this is the annotation (if any) from it.
-         * The lookup falls back to it.
-         */
-        CrossOriginResourceSharing annotation = getAnnotation(opResInfo);
-        /*
-         * If we don't have an annotation on the target method or an @OPTION method, perhaps
-         * we've got one on the class?
-         */
-        if (annotation == null) {
-            annotation = resourceClass.getServiceClass().getAnnotation(CrossOriginResourceSharing.class);
-        }
-
+        CrossOriginResourceSharing annotation = 
+            getAnnotation(opResInfo, CrossOriginResourceSharing.class);
+        
         if ("OPTIONS".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
-          
             return preflightRequest(m, annotation, opResInfo, resourceClass);
         }
         return simpleRequest(m, annotation);
@@ -165,7 +156,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      * @return
      */
     //CHECKSTYLE:OFF
-    private Response preflightRequest(Message m, CrossOriginResourceSharing optionAnn,
+    private Response preflightRequest(Message m, CrossOriginResourceSharing corsAnn,
                                       OperationResourceInfo opResInfo, ClassResourceInfo resourceClass) {
 
         /*
@@ -174,8 +165,9 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
          * has one of our annotations on it (or its parent class) indicating 'localPreflight' --
          * or the defaultOptionsMethodsHandlePreflight flag is true.
          */
-        if (opResInfo != null && ((optionAnn == null && defaultOptionsMethodsHandlePreflight) 
-            || (optionAnn != null && optionAnn.localPreflight()))) {
+        LocalPreflight preflightAnnotation = 
+            getAnnotation(opResInfo, LocalPreflight.class);
+        if (preflightAnnotation != null || defaultOptionsMethodsHandlePreflight) { 
             return null; // let the resource method take all responsibility.
         }
         
@@ -206,7 +198,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return null;
         }
         CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
-        ann = ann == null ? optionAnn : ann;
+        ann = ann == null ? corsAnn : ann;
         
         /* We aren't required to have any annotation at all. If no annotation,
          * the properties of this filter make all the decisions.

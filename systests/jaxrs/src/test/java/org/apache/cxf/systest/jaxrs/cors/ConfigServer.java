@@ -40,10 +40,7 @@ public class ConfigServer {
     @Path("/setOriginList")
     @Produces("text/plain")
     public String setOriginList(String[] origins) {
-        if (origins == null || origins.length == 0) {
-            inputFilter.setAllowAllOrigins(true);
-        } else {
-            inputFilter.setAllowAllOrigins(false);
+        if (origins != null) {
             inputFilter.setAllowOrigins(Arrays.asList(origins));
         }
         return "ok";
