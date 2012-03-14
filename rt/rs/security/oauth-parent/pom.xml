@@ -35,6 +35,9 @@
     </parent>
     <properties>
         <oauth.version>20100527</oauth.version>
+        <cxf.osgi.import>
+            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+        </cxf.osgi.import>
     </properties> 
 
 

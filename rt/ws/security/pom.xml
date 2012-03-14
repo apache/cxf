@@ -31,7 +31,11 @@
         <version>2.6.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
+    <properties>
+        <cxf.osgi.import>
+            net.sf.ehcache*;resolution:=optional,
+        </cxf.osgi.import>
+    </properties>
 
     <dependencies>
         <dependency>
