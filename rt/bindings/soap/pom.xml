@@ -133,6 +133,11 @@
                     <version>${extra.saaj.dep.version}</version>
                     <optional>true</optional>
                 </dependency>
+                <dependency>
+                    <groupId>javax.xml.soap</groupId>
+                    <artifactId>saaj-api</artifactId>
+                    <optional>true</optional>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
