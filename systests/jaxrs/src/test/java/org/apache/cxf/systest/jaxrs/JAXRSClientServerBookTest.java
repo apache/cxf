@@ -249,6 +249,22 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testPostObjectGetCollection() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collectionBook"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        Book b1 = new Book("Book", 666L);
+        List<Book> books = new ArrayList<Book>(wc.postObjectGetCollection(b1, Book.class));
+        assertNotNull(books);
+        assertEquals(1, books.size());
+        Book b = books.get(0);
+        assertEquals(666L, b.getId());
+        assertEquals("Book", b.getName());
+    }
+    
+    @Test
     public void testGetBookResponseAndETag() throws Exception {
         
         String endpointAddress =
