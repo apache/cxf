@@ -389,6 +389,20 @@ public class WebClient extends AbstractClient {
                               Collection.class, new ParameterizedCollectionType<T2>(responseClass));
         return CastUtils.cast((Collection)r.getEntity(), responseClass);
     }
+    
+    /**
+     * Posts the object and returns a collection of typed objects
+     * @param body request body
+     * @param memberClass type of collection member class
+     * @param responseClass expected type of response object
+     * @return JAX-RS Response
+     */
+    public <T> Collection<? extends T> postObjectGetCollection(Object body, 
+                                                                  Class<T> responseClass) {
+        Response r = doInvoke("POST", body, null, Collection.class, 
+                              new ParameterizedCollectionType<T>(responseClass));
+        return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
+    }
         
     /**
      * Posts request body and returns a collection of typed objects 
