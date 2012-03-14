@@ -82,9 +82,10 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 
 public final class StaxUtils {
-    public static final String TOTAL_ELEMENT_COUNT = "org.apache.cxf.staxutils.totalElementCountThreshold";
-    public static final String INNER_ELEMENT_COUNT = "org.apache.cxf.staxutils.innerElementCountThreshold";
-    public static final String INNER_ELEMENT_LEVEL = "org.apache.cxf.staxutils.innerElementLevelThreshold";
+    private static final String INNER_ELEMENT_COUNT_SYSTEM_PROP = 
+        "org.apache.cxf.staxutils.innerElementCountThreshold";
+    private static final String INNER_ELEMENT_LEVEL_SYSTEM_PROP = 
+        "org.apache.cxf.staxutils.innerElementLevelThreshold";
     
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
     
@@ -118,7 +119,7 @@ public final class StaxUtils {
         NS_AWARE_INPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLInputFactory>(i);
         OUTPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLOutputFactory>(i);
         try {
-            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_LEVEL, "-1");
+            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_LEVEL_SYSTEM_PROP, "-1");
             innerElementLevelThreshold = Integer.parseInt(s);
         } catch (Throwable t) {
             innerElementLevelThreshold = -1;
@@ -127,7 +128,7 @@ public final class StaxUtils {
             innerElementLevelThreshold = -1;
         }
         try {
-            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_COUNT, "-1");
+            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_COUNT_SYSTEM_PROP, "-1");
             innerElementCountThreshold = Integer.parseInt(s);
         } catch (Throwable t) {
             innerElementCountThreshold = -1;

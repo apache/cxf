@@ -49,7 +49,7 @@ public final class FormUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";  
-    private static final String MAX_FORM_PARAM_COUNT = "org.apache.cxf.form.maxParameterCount";  
+    private static final String MAX_FORM_PARAM_COUNT = "maxFormParameterCount";  
         
     private FormUtils() {
         
