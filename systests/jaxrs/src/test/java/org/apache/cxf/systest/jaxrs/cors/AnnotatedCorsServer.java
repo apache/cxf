@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
+import org.apache.cxf.rs.security.cors.LocalPreflight;
 
 /**
  * Service bean with no class-level annotation for cross-script control.
@@ -73,7 +74,7 @@ public class AnnotatedCorsServer {
 
     @OPTIONS
     @Path("/delete")
-    @CrossOriginResourceSharing(localPreflight = true)
+    @LocalPreflight
     public Response deleteOptions() {
         String origin = headers.getRequestHeader("Origin").get(0);
         if ("http://area51.mil:3333".equals(origin)) {

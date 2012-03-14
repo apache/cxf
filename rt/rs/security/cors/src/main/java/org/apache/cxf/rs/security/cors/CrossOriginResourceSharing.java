@@ -44,27 +44,24 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface CrossOriginResourceSharing {
     /**
-     * If true, this resource will return
+     * If true, this resource will return 
      * <pre>Access-Control-Allow-Origin: *</pre>
-     * for a valid request.
+     * for a valid request 
      */
     boolean allowAllOrigins() default false;
     /**
-     * A list of permitted origins. This is ignored 
-     * if {@link #allowAllOrigins()} is true.
+     * A list of permitted origins. It is ignored if
+     * {@link #allowAllOrigins()} returns true
      */
     String[] allowOrigins() default { };
     /**
      * A list of headers that the client may include
-     * in an actual request.
+     * in an actual request. All the headers listed in 
+     * the Access-Control-Request-Headers will be allowed if
+     * the list is empty
      */
     String[] allowHeaders() default { };
     
-    /**
-     * Act as if whatever headers are listed in the Access-Control-Request-Headers are 
-     * listed in allowHeaders. Convenient for dealing with Browser bugs. 
-     */
-    boolean allowAnyHeaders() default false;
     /**
      * If true, this resource will return 
      * <pre>Access-Control-Allow-Credentials: true</pre>
@@ -81,14 +78,4 @@ public @interface CrossOriginResourceSharing {
      * value is -1.
      */
     int maxAge() default -1;
-    /**
-     * Controls the implementation of preflight processing 
-     * on an OPTIONS method.
-     * If the current method is OPTIONS, and this method wants to 
-     * handle the preflight process for itself, set this value to 
-     * <tt>true</tt>. In the default, false, case, the filter
-     * performs preflight processing.
-     */
-    boolean localPreflight() default false;
-    
 }

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.cors;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,40 +79,28 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      */
     private List<String> allowOrigins = Collections.emptyList();
     private List<String> allowHeaders = Collections.emptyList();
-    private boolean allowAllOrigins;
     private boolean allowCredentials;
     private List<String> exposeHeaders = Collections.emptyList();
     private Integer maxAge;
     private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
-    private boolean allowAnyHeaders;
     
     
-    private CrossOriginResourceSharing getAnnotation(OperationResourceInfo ori) {
+    private <T extends Annotation> T  getAnnotation(OperationResourceInfo ori,
+                                                    Class<T> annClass) {
         if (ori == null) {
             return null;
         }
-        return ReflectionUtil.getAnnotationForMethodOrContainingClass(ori.getAnnotatedMethod(),
-                                                                      CrossOriginResourceSharing.class);
+        return ReflectionUtil.getAnnotationForMethodOrContainingClass(
+             ori.getAnnotatedMethod(),  annClass);
     }
 
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         OperationResourceInfo opResInfo = m.getExchange().get(OperationResourceInfo.class);
-        /*
-         * If there is an actual method annotated with @OPTIONS, this is the annotation (if any) from it.
-         * The lookup falls back to it.
-         */
-        CrossOriginResourceSharing annotation = getAnnotation(opResInfo);
-        /*
-         * If we don't have an annotation on the target method or an @OPTION method, perhaps
-         * we've got one on the class?
-         */
-        if (annotation == null) {
-            annotation = resourceClass.getServiceClass().getAnnotation(CrossOriginResourceSharing.class);
-        }
-
+        CrossOriginResourceSharing annotation = 
+            getAnnotation(opResInfo, CrossOriginResourceSharing.class);
+        
         if ("OPTIONS".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
-          
             return preflightRequest(m, annotation, opResInfo, resourceClass);
         }
         return simpleRequest(m, annotation);
@@ -125,7 +114,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
         
         // 5.1.2 check all the origins
-        if (!effectiveAllowAllOrigins(ann) && !effectiveAllowOrigins(ann).containsAll(values)) {
+        if (!effectiveAllowOrigins(ann, values)) {
             return null;
         }
         
@@ -167,7 +156,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
      * @return
      */
     //CHECKSTYLE:OFF
-    private Response preflightRequest(Message m, CrossOriginResourceSharing optionAnn,
+    private Response preflightRequest(Message m, CrossOriginResourceSharing corsAnn,
                                       OperationResourceInfo opResInfo, ClassResourceInfo resourceClass) {
 
         /*
@@ -176,8 +165,9 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
          * has one of our annotations on it (or its parent class) indicating 'localPreflight' --
          * or the defaultOptionsMethodsHandlePreflight flag is true.
          */
-        if (opResInfo != null && ((optionAnn == null && defaultOptionsMethodsHandlePreflight) 
-            || (optionAnn != null && optionAnn.localPreflight()))) {
+        LocalPreflight preflightAnnotation = 
+            getAnnotation(opResInfo, LocalPreflight.class);
+        if (preflightAnnotation != null || defaultOptionsMethodsHandlePreflight) { 
             return null; // let the resource method take all responsibility.
         }
         
@@ -208,15 +198,14 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return null;
         }
         CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
-        ann = ann == null ? optionAnn : ann;
+        ann = ann == null ? corsAnn : ann;
         
         /* We aren't required to have any annotation at all. If no annotation,
          * the properties of this filter make all the decisions.
          */
 
         // 5.2.2 must be on the list or we must be matching *.
-        boolean effectiveAllowAllOrigins = effectiveAllowAllOrigins(ann);
-        if (!effectiveAllowAllOrigins && !effectiveAllowOrigins(ann).contains(origin)) {
+        if (!effectiveAllowOrigins(ann, Collections.singletonList(origin))) {
             return createPreflightResponse(m, false);
         }
 
@@ -227,7 +216,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         // This was indirectly enforced by getCorsMethod()
 
         // 5.2.6 reject if the header is not listed.
-        if (!effectiveAllowAnyHeaders(ann) && !effectiveAllowHeaders(ann).containsAll(requestHeaders)) {
+        if (!effectiveAllowHeaders(ann, requestHeaders)) {
             return createPreflightResponse(m, false);
         }
 
@@ -372,7 +361,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         if (ann != null) {
             return ann.allowAllOrigins();
         } else {
-            return allowAllOrigins;
+            return allowOrigins.isEmpty();
         }
     }
 
@@ -384,45 +373,53 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
     }
 
-    private List<String> effectiveAllowOrigins(CrossOriginResourceSharing ann) {
-        if (ann != null) {
-            if (ann.allowOrigins() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.allowOrigins());
-        } else {
-            return allowOrigins;
+    private boolean effectiveAllowOrigins(CrossOriginResourceSharing ann, List<String> origins) {
+        if (effectiveAllowAllOrigins(ann)) {
+            return true;
         }
+        List<String> actualOrigins = Collections.emptyList(); 
+        if (ann != null) {
+            actualOrigins = Arrays.asList(ann.allowOrigins());
+        } 
+        
+        if (actualOrigins.isEmpty()) {
+            actualOrigins = allowOrigins;
+        }
+        
+        return actualOrigins.containsAll(origins);
     }
     
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
-            return ann.allowAnyHeaders();
+            return ann.allowHeaders().length == 0;
         } else {
-            return allowAnyHeaders;
+            return allowHeaders.isEmpty();
         }
     }
     
-    private List<String> effectiveAllowHeaders(CrossOriginResourceSharing ann) {
-        if (ann != null) {
-            if (ann.allowHeaders() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.allowHeaders());
-        } else {
-            return allowHeaders;
+    private boolean effectiveAllowHeaders(CrossOriginResourceSharing ann, List<String> aHeaders) {
+        if (effectiveAllowAnyHeaders(ann)) {
+            return true;
         }
+        List<String> actualHeaders = null; 
+        if (ann != null) {
+            actualHeaders = Arrays.asList(ann.allowHeaders());
+        } else {
+            actualHeaders = allowHeaders;
+        }
+        
+        return actualHeaders.containsAll(aHeaders);
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {
+        List<String> actualExposeHeaders = null; 
         if (ann != null) {
-            if (ann.exposeHeaders() == null) {
-                return Collections.emptyList();
-            }
-            return Arrays.asList(ann.exposeHeaders());
+            actualExposeHeaders = Arrays.asList(ann.exposeHeaders());
         } else {
-            return exposeHeaders;
+            actualExposeHeaders = exposeHeaders;
         }
+        
+        return actualExposeHeaders;
     }
 
     private Integer effectiveMaxAge(CrossOriginResourceSharing ann) {
@@ -511,18 +508,6 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         return allowOrigins;
     }
 
-    /**
-     * Whether to implement Access-Control-Allow-Origin: *
-     * 
-     * @param allowAllOrigins if true, all origins are accepted and 
-     * "*" is returned in the header. Sections
-     * 5.1.1 and 5.1.2, and 5.2.1 and 5.2.2. If false, then the list of allowed origins must be
-     */
-    public void setAllowAllOrigins(boolean allowAllOrigins) {
-        this.allowAllOrigins = allowAllOrigins;
-    }
-
-    
     public List<String> getAllowHeaders() {
         return allowHeaders;
     }
@@ -602,19 +587,5 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         this.defaultOptionsMethodsHandlePreflight = defaultOptionsMethodsHandlePreflight;
     }
 
-    public boolean isAllowAnyHeaders() {
-        return allowAnyHeaders;
-    }
-
-    /**
-     * Completely relax the Access-Control-Request-Headers check. 
-     * Any headers in this header will be permitted. Handy for 
-     * dealing with Chrome / Firefox / Safari incompatibilities.
-     * @param allowAnyHeader whether to allow any header. If <tt>false</tt>,
-     * respect the allowHeaders property.
-     */
-    public void setAllowAnyHeaders(boolean allowAnyHeader) {
-        this.allowAnyHeaders = allowAnyHeader;
-    }
-
+    
 }
