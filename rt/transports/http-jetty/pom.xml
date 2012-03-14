@@ -35,6 +35,7 @@
     <properties>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.eclipse.jetty.jmx

@@ -146,7 +146,7 @@
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
                             org.junit*;resolution:=optional,
-                            org.eclipse.jetty*;resolution:=optional;resolution:=optional;version="[7.2,8)",
+                            org.eclipse.jetty*;resolution:=optional;version="${cxf.jetty.osgi.version}",
                             org.mozilla.javascript*;resolution:=optional,
                             org.objectweb.asm*;version="[2.0,4)";resolution:=optional,
                             org.osgi.service.blueprint*;resolution:=optional,
