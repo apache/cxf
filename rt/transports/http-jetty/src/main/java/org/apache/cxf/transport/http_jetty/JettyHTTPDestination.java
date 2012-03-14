@@ -226,7 +226,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     private void setHeadFalse(AbstractConnection con) {
         try {
             Generator gen = (Generator)con.getClass().getMethod("getGenerator").invoke(con);
-            gen.setHead(true);
+            gen.setHead(false);
         } catch (Exception ex) {
             //ignore - can continue
         }
