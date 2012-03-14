@@ -47,7 +47,7 @@
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
-        <cxf.saaj.impl.version>1.3.12</cxf.saaj.impl.version>
+        <cxf.saaj.impl.version>1.3.18</cxf.saaj.impl.version>
 
         <extra.saaj.dep.groupId>${cxf.saaj.impl.groupId}</extra.saaj.dep.groupId>
         <extra.saaj.dep.artifactId>${cxf.saaj.impl.artifactId}</extra.saaj.dep.artifactId>
@@ -83,9 +83,9 @@
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
         <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
-        <cxf.jaxb22.version>2.2.3</cxf.jaxb22.version>
-        <cxf.jaxb22.impl.version>2.2.4-1</cxf.jaxb22.impl.version>
-        <cxf.jaxb22.xjc.version>2.2.4-1</cxf.jaxb22.xjc.version>
+        <cxf.jaxb22.version>2.2.6</cxf.jaxb22.version>
+        <cxf.jaxb22.impl.version>2.2.5</cxf.jaxb22.impl.version>
+        <cxf.jaxb22.xjc.version>2.2.5</cxf.jaxb22.xjc.version>
 
         <!-- by default, we use jaxb 2.1, but java5 profile will override to 2.2 -->
         <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
@@ -100,19 +100,19 @@
 	    <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
         <cxf.msv.version>2011.1</cxf.msv.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
-        <cxf.saaj.version>1.3.4</cxf.saaj.version>
+        <cxf.saaj-api.version>1.3.4</cxf.saaj-api.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
-        <cxf.spring.version>3.0.6.RELEASE</cxf.spring.version>
+        <cxf.spring.version>3.0.7.RELEASE</cxf.spring.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>1.3.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.stax.impl.groupId>org.codehaus.woodstox</cxf.stax.impl.groupId>
         <cxf.stax.impl.artifactId>woodstox-core-asl</cxf.stax.impl.artifactId>
-        <cxf.woodstox.core.version>4.1.1</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>4.1.2</cxf.woodstox.core.version>
         <cxf.stax.impl.version>${cxf.woodstox.core.version}</cxf.stax.impl.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
@@ -125,7 +125,7 @@
         <cxf.joda.time.version>1.6.2</cxf.joda.time.version>
         <cxf.opensaml.version>2.5.1</cxf.opensaml.version>
         <cxf.opensamlws.version>1.4.2-1</cxf.opensamlws.version>
-        <cxf.opensaml.osgi.version>2.5.1_1</cxf.opensaml.osgi.version>
+        <cxf.opensaml.osgi.version>2.5.1_2</cxf.opensaml.osgi.version>
         <cxf.opensaml.xmltooling.version>1.3.2-1</cxf.opensaml.xmltooling.version>
         <cxf.neethi.version>3.0.1</cxf.neethi.version>
         <cxf.velocity.version>1.7</cxf.velocity.version>
@@ -142,35 +142,36 @@
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
         <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
 
-        <cxf.cglib.bundle.version>2.2_1</cxf.cglib.bundle.version>
-        <cxf.fastinfoset.bundle.version>1.2.7_3</cxf.fastinfoset.bundle.version>
+        <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
+        <cxf.fastinfoset.bundle.version>1.2.7_4</cxf.fastinfoset.bundle.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
+
         <cxf.ehcache.version>2.5.1</cxf.ehcache.version>
+        <cxf.ehcache.bundle.version>2.5.1_1-SNAPSHOT</cxf.ehcache.bundle.version>
         
         <!-- various OSGi related versions -->
         <cxf.aries.version>0.3.1</cxf.aries.version>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
         <cxf.karaf.version>2.2.5</cxf.karaf.version>
 
-        <cxf.ehcache.bundle.version>2.4.3_1</cxf.ehcache.bundle.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.xmlbeans.bundle.version>2.5.0_2</cxf.xmlbeans.bundle.version>
         <cxf.servicemix.specs.version>1.9.0</cxf.servicemix.specs.version>
         <cxf.javax.mail.version>1.4.4</cxf.javax.mail.version>
-        <cxf.jaxb.bundle.version>2.2.1.1_1</cxf.jaxb.bundle.version>
-        <cxf.saaj-impl.bundle.version>1.3.9_2</cxf.saaj-impl.bundle.version>
-        <cxf.asm.bundle.version>3.3_2</cxf.asm.bundle.version>
-        <cxf.wsdl4j.bundle.version>1.6.2_3</cxf.wsdl4j.bundle.version>
+        <cxf.jaxb.bundle.version>2.2.4_2</cxf.jaxb.bundle.version>
+        <cxf.saaj-impl.bundle.version>1.3.18_1</cxf.saaj-impl.bundle.version>
+        <cxf.asm.bundle.version>3.3.1_1</cxf.asm.bundle.version>
+        <cxf.wsdl4j.bundle.version>1.6.2_6</cxf.wsdl4j.bundle.version>
         <cxf.xmlsec.bundle.version>1.5.1</cxf.xmlsec.bundle.version>
-        <cxf.rhino.bundle.version>1.7R2_1</cxf.rhino.bundle.version>
+        <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
         <cxf.xmlresolver.bundle.version>1.2_3</cxf.xmlresolver.bundle.version>
-        <cxf.xerces.bundle.version>2.9.1_4</cxf.xerces.bundle.version>
-        <cxf.bcel.bundle.version>5.2_3</cxf.bcel.bundle.version>
-        <cxf.xalan.bundle.version>2.7.1_3</cxf.xalan.bundle.version>
-        <cxf.oro.bundle.version>2.0.8_4</cxf.oro.bundle.version>
-        <cxf.jdom.bundle.version>1.1_3</cxf.jdom.bundle.version>
+        <cxf.xerces.bundle.version>2.9.1_5</cxf.xerces.bundle.version>
+        <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
+        <cxf.xalan.bundle.version>2.7.1_5</cxf.xalan.bundle.version>
+        <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
+        <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
 
 
         <cxf.checkstyle.extension />
@@ -791,7 +792,7 @@
             <dependency>
                 <groupId>javax.xml.soap</groupId>
                 <artifactId>saaj-api</artifactId>
-                <version>${cxf.saaj.version}</version>
+                <version>${cxf.saaj-api.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.activation</groupId>
