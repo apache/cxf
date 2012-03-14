@@ -183,6 +183,33 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
+  <jaxrs:server id="bookservice9"
+		        address="/thebooks9">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		   
+    <jaxrs:inInterceptors>
+      <bean class="org.apache.cxf.interceptor.security.DepthRestrictingStreamInterceptor">
+          <property name="innerElementLevelThreshold" value="2"/>
+      </bean>
+    </jaxrs:inInterceptors>
+    <jaxrs:properties>
+       <entry key="maxFormParameterCount" value="2"/>
+    </jaxrs:properties>
+        
+  </jaxrs:server>
+  
+  <jaxrs:server id="bookservice10"
+		        address="/thebooks10">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		   
+    <jaxrs:properties>
+       <entry key="depthInnerElementCountThreshold" value="2"/>
+    </jaxrs:properties>
+        
+  </jaxrs:server>
+
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>
   </bean>

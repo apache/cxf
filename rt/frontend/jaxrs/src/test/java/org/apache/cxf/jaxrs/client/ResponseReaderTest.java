@@ -59,6 +59,10 @@ public class ResponseReaderTest extends Assert {
         ProviderFactory instance = ProviderFactory.getInstance();
         
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         endpoint.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(instance).anyTimes();
         EasyMock.replay(endpoint);

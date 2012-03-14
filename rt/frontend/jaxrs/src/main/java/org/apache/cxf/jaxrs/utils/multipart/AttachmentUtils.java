@@ -43,6 +43,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class AttachmentUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
@@ -135,8 +136,10 @@ public final class AttachmentUtils {
     @SuppressWarnings("unchecked")
     public static <T> MultivaluedMap<String, T> populateFormMap(MessageContext mc, Class<T> cls) {
         MultivaluedMap<String, T> data = new MetadataMap<String, T>();
-        FormUtils.populateMapFromMultipart((MultivaluedMap)data, 
-                                           AttachmentUtils.getMultipartBody(mc), true);
+        FormUtils.populateMapFromMultipart((MultivaluedMap)data,
+                                           AttachmentUtils.getMultipartBody(mc), 
+                                           PhaseInterceptorChain.getCurrentMessage(),
+                                           true);
         return data;
     }
     

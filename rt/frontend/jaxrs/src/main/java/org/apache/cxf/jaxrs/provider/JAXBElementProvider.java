@@ -62,6 +62,7 @@ import org.apache.cxf.jaxrs.utils.JAXBUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Produces({"application/xml", "application/*+xml", "text/xml" })
@@ -158,6 +159,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             
         } catch (JAXBException e) {
             handleJAXBException(e, true);
+        } catch (DepthExceededStaxException e) {
+            throw new WebApplicationException(413);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -197,6 +200,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         
         reader = createTransformReaderIfNeeded(reader, is);
+        reader = createDepthReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return new JAXBCollectionWrapperReader(createNewReaderIfNeeded(reader, is));
         } else {

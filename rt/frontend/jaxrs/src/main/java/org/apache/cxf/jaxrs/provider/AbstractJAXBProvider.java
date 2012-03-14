@@ -79,7 +79,9 @@ import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
+import org.apache.cxf.staxutils.DepthRestrictingStreamReader;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.DocumentDepthProperties;
 import org.apache.cxf.staxutils.StaxStreamFilter;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -126,6 +128,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private boolean validateOutput;
     private boolean validateBeforeWrite;
     private ValidationEventHandler eventHandler;
+    private DocumentDepthProperties depthProperties;
     
     public void setValidationHandler(ValidationEventHandler handler) {
         eventHandler = handler;
@@ -609,7 +612,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         return reader;
     }
-    
+
     protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
                                                             OutputStream os) {
         if (outElementsMap != null || outDropElements != null 
@@ -668,12 +671,52 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return skipJaxbChecks;
     }
 
+    protected XMLStreamReader createDepthReaderIfNeeded(XMLStreamReader reader, InputStream is) {
+        DocumentDepthProperties props = getDepthProperties();
+        if (props != null && props.isEffective()) {
+            reader = createNewReaderIfNeeded(reader, is);
+            return new DepthRestrictingStreamReader(reader, props);
+        }
+        return reader;
+    }
+    
+    protected DocumentDepthProperties getDepthProperties() {
+        if (depthProperties != null) {
+            return depthProperties;
+        }
+        if (getContext() != null) {
+            String totalElementCountStr = (String)getContext().getContextualProperty(
+                DocumentDepthProperties.TOTAL_ELEMENT_COUNT);
+            String innerElementCountStr = (String)getContext().getContextualProperty(
+                DocumentDepthProperties.INNER_ELEMENT_COUNT);
+            String elementLevelStr = (String)getContext().getContextualProperty(
+                DocumentDepthProperties.INNER_ELEMENT_LEVEL);
+            if (totalElementCountStr != null || innerElementCountStr != null || elementLevelStr != null) {
+                try {
+                    int totalElementCount = totalElementCountStr != null 
+                        ? Integer.valueOf(totalElementCountStr) : -1;
+                    int elementLevel = elementLevelStr != null ? Integer.valueOf(elementLevelStr) : -1;
+                    int innerElementCount = innerElementCountStr != null 
+                        ? Integer.valueOf(innerElementCountStr) : -1;
+                    return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
+                } catch (Exception ex) {
+                    throw new WebApplicationException(ex);
+                }
+            }
+        }
+        return null;
+    }
+    
     public void setValidateBeforeWrite(boolean validateBeforeWrite) {
         this.validateBeforeWrite = validateBeforeWrite;
     }
 
     public void setValidateOutput(boolean validateOutput) {
         this.validateOutput = validateOutput;
+    }
+
+    public void setDepthProperties(DocumentDepthProperties depthProperties) {
+        this.depthProperties = depthProperties;
     }
 
     @XmlRootElement

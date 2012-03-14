@@ -91,6 +91,10 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.setInMessage(m);
         m.setExchange(ex);
         Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        e.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         e.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
         e.get("org.apache.cxf.jaxrs.comparator");
@@ -137,6 +141,10 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.setInMessage(m);
         m.setExchange(ex);
         Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        e.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         e.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
         e.get("org.apache.cxf.jaxrs.comparator");
@@ -180,6 +188,10 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.setInMessage(m);
         m.setExchange(ex);
         Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        e.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         e.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
         e.get("org.apache.cxf.jaxrs.comparator");

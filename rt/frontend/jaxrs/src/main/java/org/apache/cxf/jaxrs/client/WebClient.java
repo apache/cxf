@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.client;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -298,7 +297,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Map<String, List<Object>> values) {
         type(MediaType.APPLICATION_FORM_URLENCODED);
-        return doInvoke("POST", values, InputStream.class, InputStream.class);
+        return doInvoke("POST", values, Response.class, Response.class);
     }
     
     /**
@@ -308,7 +307,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Form form) {
         type(MediaType.APPLICATION_FORM_URLENCODED);
-        return doInvoke("POST", form.getData(), InputStream.class, InputStream.class);
+        return doInvoke("POST", form.getData(), Response.class, Response.class);
     }
     
     /**
@@ -628,7 +627,8 @@ public class WebClient extends AbstractClient {
             }
             headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
         }
-        if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
+        if (responseClass != null && responseClass != Response.class 
+            && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
         resetResponse();
