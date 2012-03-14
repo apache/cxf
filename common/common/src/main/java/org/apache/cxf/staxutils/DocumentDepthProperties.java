@@ -19,6 +19,11 @@
 package org.apache.cxf.staxutils;
 
 public class DocumentDepthProperties {
+    
+    public static final String TOTAL_ELEMENT_COUNT = "depthTotalElementCountThreshold";
+    public static final String INNER_ELEMENT_COUNT = "depthInnerElementCountThreshold";
+    public static final String INNER_ELEMENT_LEVEL = "depthInnerElementLevelThreshold";
+    
     private int elementCountThreshold = -1;
     private int innerElementLevelThreshold = -1;
     private int innerElementCountThreshold = -1;

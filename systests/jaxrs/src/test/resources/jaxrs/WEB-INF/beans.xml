@@ -210,7 +210,7 @@ http://cxf.apache.org/schemas/core.xsd">
       </bean>
     </jaxrs:inInterceptors>
     <jaxrs:properties>
-       <entry key="org.apache.cxf.form.maxParameterCount" value="2"/>
+       <entry key="maxFormParameterCount" value="2"/>
     </jaxrs:properties>
         
   </jaxrs:server>
@@ -221,7 +221,7 @@ http://cxf.apache.org/schemas/core.xsd">
       <ref bean="serviceBean" />
     </jaxrs:serviceBeans>		   
     <jaxrs:properties>
-       <entry key="org.apache.cxf.staxutils.innerElementCountThreshold" value="2"/>
+       <entry key="depthInnerElementCountThreshold" value="2"/>
     </jaxrs:properties>
         
   </jaxrs:server>

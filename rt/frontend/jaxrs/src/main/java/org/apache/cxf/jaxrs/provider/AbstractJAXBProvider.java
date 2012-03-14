@@ -75,7 +75,6 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DepthRestrictingStreamReader;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.TransformUtils;
 
 public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
@@ -624,11 +623,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         if (getContext() != null) {
             String totalElementCountStr = (String)getContext().getContextualProperty(
-                StaxUtils.TOTAL_ELEMENT_COUNT);
+                DocumentDepthProperties.TOTAL_ELEMENT_COUNT);
             String innerElementCountStr = (String)getContext().getContextualProperty(
-                StaxUtils.INNER_ELEMENT_COUNT);
+                DocumentDepthProperties.INNER_ELEMENT_COUNT);
             String elementLevelStr = (String)getContext().getContextualProperty(
-                StaxUtils.INNER_ELEMENT_LEVEL);
+                DocumentDepthProperties.INNER_ELEMENT_LEVEL);
             if (totalElementCountStr != null || innerElementCountStr != null || elementLevelStr != null) {
                 try {
                     int totalElementCount = totalElementCountStr != null 
