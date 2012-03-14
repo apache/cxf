@@ -32,15 +32,6 @@
         <version>2.6.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-    <properties>
-        <cxf.bundle.activator>org.apache.cxf.transport.http.osgi.HTTPTransportActivator</cxf.bundle.activator>
-        <cxf.osgi.import>
-            *
-        </cxf.osgi.import>
-        <cxf.osgi.export>
-            *
-        </cxf.osgi.export>
-    </properties>
 
     <dependencies>
         <dependency>
