@@ -351,7 +351,7 @@
                             org.codehaus.jra*;resolution:=optional,
                             org.codehaus.jettison*;resolution:=optional,
                             org.eclipse.emf*;resolution:=optional,
-                            org.eclipse.jetty*;resolution:=optional;version="[7.2,8)",
+                            org.eclipse.jetty*;resolution:=optional;version="${cxf.jetty.osgi.version}",
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
                             org.jibx*;resolution:=optional;version="[1.2.3,2)",
