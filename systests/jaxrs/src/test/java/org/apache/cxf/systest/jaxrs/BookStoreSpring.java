@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +35,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.staxutils.DepthExceededStaxException;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @Path("/")
 @Produces("application/json")
@@ -135,7 +142,42 @@ public class BookStoreSpring {
     @GET
     public Book getDefaultBook() {
         return books.get(mainId);
-    }  
+    }
+    
+    @POST
+    @Path("depth")
+    @Produces({"application/xml", "application/json" })
+    @Consumes({"application/xml", "application/json" })
+    public Book echoBook(Book book) {
+        return book;
+    }
+    
+    @POST
+    @Path("depth-source")
+    @Consumes({"application/xml" })
+    public void postSourceBook(Source source) {
+        try {
+            StaxUtils.copy(source, new ByteArrayOutputStream());
+        } catch (DepthExceededStaxException ex) {
+            throw new WebApplicationException(413); 
+        } catch (Exception ex) {
+            // ignore for now
+        }
+        throw new WebApplicationException(500);
+    }
+    
+    @POST
+    @Path("depth-dom")
+    @Consumes({"application/xml" })
+    public void postDomBook(DOMSource source) {
+        // complete
+    }
+    
+    @POST
+    @Path("depth-form")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void depthForm(MultivaluedMap<String, String> map) {
+    }
 
     @POST
     @Path("books/convert")

@@ -739,12 +739,12 @@ public final class JAXRSUtils {
                 String enc = HttpUtils.getEncoding(mt, "UTF-8");
                 String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-                FormUtils.populateMapFromString(params, (String)body, enc, decode, request);
+                FormUtils.populateMapFromString(params, m, (String)body, enc, decode, request);
             } else {
                 if (mt != null && "multipart".equalsIgnoreCase(mt.getType()) 
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
                     MultipartBody body = AttachmentUtils.getMultipartBody(mc);
-                    FormUtils.populateMapFromMultipart(params, body, decode);
+                    FormUtils.populateMapFromMultipart(params, body, m, decode);
                 } else {
                     org.apache.cxf.common.i18n.Message errorMsg = 
                         new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE", 

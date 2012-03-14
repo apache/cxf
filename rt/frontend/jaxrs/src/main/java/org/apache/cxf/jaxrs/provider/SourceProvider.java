@@ -48,6 +48,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -92,6 +93,8 @@ public class SourceProvider extends AbstractConfigurableProvider implements
             try {
                 Document doc = StaxUtils.read(reader);
                 return docRequired ? doc : new DOMSource(doc);
+            } catch (DepthExceededStaxException e) {
+                throw new WebApplicationException(413);
             } catch (Exception e) {
                 IOException ioex = new IOException("Problem creating a Source object");
                 ioex.setStackTrace(e.getStackTrace());
@@ -184,11 +187,12 @@ public class SourceProvider extends AbstractConfigurableProvider implements
     
     protected String getPreferredSource() {
         MessageContext mc = getContext();
+        String source = null;
         if (mc != null) {
-            return (String)mc.getContextualProperty(PREFERRED_FORMAT);
-        } else {
-            return "sax";
-        }
+            source = (String)mc.getContextualProperty(PREFERRED_FORMAT);
+        } 
+        return source != null ? source : "sax";
+        
     }
     
     protected MessageContext getContext() {

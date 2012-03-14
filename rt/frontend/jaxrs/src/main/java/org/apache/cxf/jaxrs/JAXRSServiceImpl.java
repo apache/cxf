@@ -29,6 +29,7 @@ import java.util.concurrent.Executor;
 
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.Configurable;
@@ -150,7 +151,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
 
     private void createMessagePartInfo(OperationInfo oi, Class<?> type, QName qname, Method m,
                                        boolean input) {
-        if (type == void.class) {
+        if (type == void.class || Source.class.isAssignableFrom(type)) {
             return;
         }
         if (InjectionUtils.isPrimitive(type) || Response.class == type) {
