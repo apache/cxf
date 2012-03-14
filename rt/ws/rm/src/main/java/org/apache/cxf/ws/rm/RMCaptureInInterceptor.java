@@ -27,6 +27,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
 /**
@@ -41,23 +42,26 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
 
     protected void handle(Message message) throws SequenceFault, RMException {
         LOG.entering(getClass().getName(), "handleMessage");
-        
-        InputStream is = message.getContent(InputStream.class);
-        if (is != null) {
-            CachedOutputStream saved = new CachedOutputStream();
-            try {
-                IOUtils.copy(is, saved);
+        // This message capturing mechanism will need to be changed at some point.
+        // Until then, we keep this interceptor here and utilize the robust
+        // option to avoid the unnecessary message capturing/caching.
+        if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
+            InputStream is = message.getContent(InputStream.class);
+            if (is != null) {
+                CachedOutputStream saved = new CachedOutputStream();
+                try {
+                    IOUtils.copy(is, saved);
 
-                saved.flush();
-                is.close();
+                    saved.flush();
+                    is.close();
 
-                message.setContent(InputStream.class, saved.getInputStream());
-                LOG.fine("Capturing the original RM message");
-                message.put(RMMessageConstants.SAVED_CONTENT, saved);
-            } catch (Exception e) {
-                throw new Fault(e);
+                    message.setContent(InputStream.class, saved.getInputStream());
+                    LOG.fine("Capturing the original RM message");
+                    message.put(RMMessageConstants.SAVED_CONTENT, saved);
+                } catch (Exception e) {
+                    throw new Fault(e);
+                }
             }
         }
     }
-
 }
