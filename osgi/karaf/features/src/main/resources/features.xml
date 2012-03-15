@@ -312,7 +312,7 @@
         <bundle start-level='40' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
 
         <feature version="${project.version}">cxf-core</feature>
-        <feature version="${project.version}">cxf-rt-ws-security</feature>
+        <feature version="${project.version}">cxf-ws-security</feature>
 
         <bundle>mvn:org.apache.cxf.services.sts/cxf-services-sts-core/${project.version}</bundle>
     </feature>
