@@ -21,12 +21,12 @@ package org.apache.cxf.transport.http.osgi;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,12 +86,46 @@ public class HTTPTransportActivator
     public static final String FACTORY_PID = "org.apache.cxf.http.conduits"; 
     
     
+    private static class PidInfo implements Comparable<PidInfo> {
+        final Dictionary<String, String> props;
+        final Matcher matcher;
+        final int priority;
+        
+        public PidInfo(Dictionary<String, String> p, Matcher m, int i) {
+            matcher = m;
+            props = p;
+            priority = i;
+        }
+        public Dictionary<String, String> getProps() {
+            return props;
+        }
+        public Matcher getMatcher() {
+            return matcher;
+        }
+        @Override
+        public int compareTo(PidInfo o) {
+            if (priority < o.priority) {
+                return -1;
+            } else if (priority > o.priority) { 
+                return 1;
+            }
+            // priorities are equal
+            if (matcher != null) {
+                if (o.matcher == null) {
+                    return -1;
+                }
+                return matcher.pattern().toString().compareTo(o.matcher.pattern().toString());
+            }
+            return 0;
+        }
+    }
+    
     ServiceTracker configAdminTracker;
     ServiceRegistration reg;
     ServiceRegistration reg2;
-    Map<String, Dictionary<String, String>> props 
-        = new ConcurrentHashMap<String, Dictionary<String, String>>();
-    Map<Matcher, String> matchers = new IdentityHashMap<Matcher, String>();
+    Map<String, PidInfo> props 
+        = new ConcurrentHashMap<String, PidInfo>();
+    CopyOnWriteArrayList<PidInfo> sorted = new CopyOnWriteArrayList<PidInfo>();
     
     public void start(BundleContext context) throws Exception {
         Properties servProps = new Properties();
@@ -126,27 +160,50 @@ public class HTTPTransportActivator
         }
         String url = (String)properties.get("url");
         String name = (String)properties.get("name");
-
-        props.put(pid, properties);
+        Matcher matcher = url == null ? null : Pattern.compile(url).matcher("");
+        String p = (String)properties.get("priority");
+        int priority = 50; 
+        if (p != null) {
+            priority = Integer.valueOf(p);
+        }
+        
+        PidInfo info = new PidInfo(properties, matcher, priority);
+        
+        props.put(pid, info);
         if (url != null) {
-            props.put(url, properties);
-            Matcher matcher = Pattern.compile(url).matcher("");
-            synchronized (matchers) {
-                matchers.put(matcher, pid);
-            }
+            props.put(url, info);
         }
         if (name != null) {
-            props.put(name, properties);
+            props.put(name, info);
         }
+        addToSortedInfos(info);
+    }
 
+    private synchronized void addToSortedInfos(PidInfo pi) {
+        int size = sorted.size();
+        for (int x = 0; x < size; x++) {
+            PidInfo p = sorted.get(x);
+            if (pi.compareTo(p) < 0) {
+                sorted.add(x, pi);
+                return;
+            }
+        }
+        sorted.add(pi);
+    }
+    private synchronized void removeFromSortedInfos(PidInfo pi) {
+        sorted.remove(pi);
     }
 
     public void deleted(String pid) {
-        @SuppressWarnings("rawtypes")
-        Dictionary d = props.remove(pid);
+        PidInfo info = props.remove(pid);
+        if (info == null) {
+            return;
+        }
+        removeFromSortedInfos(info);
+        Dictionary<String, String> d = info.getProps();
         if (d != null) {
-            String url = (String)d.get("url");
-            String name = (String)d.get("name");
+            String url = d.get("url");
+            String name = d.get("name");
             if (url != null) {
                 props.remove(url);
             }
@@ -154,39 +211,40 @@ public class HTTPTransportActivator
                 props.remove(name);
             }
         }
-        synchronized (matchers) {
-            for (Map.Entry<Matcher, String> ent : matchers.entrySet()) {
-                if (ent.getValue().equals(pid)) {
-                    matchers.remove(ent.getValue());
-                    break;
-                }
-            }
-        }
     }
 
     public void configure(String name, String address, HTTPConduit c) {
-        String pid = null;
-        synchronized (matchers) {
-            for (Map.Entry<Matcher, String> ent : matchers.entrySet()) {
-                Matcher m = ent.getKey();
-                m.reset(address);
-                if (m.matches()) {
-                    pid = ent.getValue();
+        PidInfo byName = null;
+        PidInfo byAddress = null;
+        if (name != null) {
+            byName = props.get(name);
+        }
+        if (address != null) {
+            byAddress = props.get(address);
+            if (byAddress == byName) {
+                byAddress = null;
+            }
+        }
+        
+        for (PidInfo info : sorted) {
+            if (info.getMatcher() != null
+                && info != byName
+                && info != byAddress) {
+                Matcher m = info.getMatcher();
+                synchronized (m) {
+                    m.reset(address);
+                    if (m.matches()) {
+                        apply(info.getProps(), c);
+                    }
                 }
             }
         }
-        Dictionary<String, String> d = null;
-        if (name != null) {
-            d = props.get(name);
+        
+        if (byAddress != null) {
+            apply(byAddress.getProps(), c);
         }
-        if (d != null) {
-            apply(d, c);
-        }
-        if (address != null && props.get(address) != d) {
-            apply(props.get(address), c);
-        }
-        if (pid != null && props.get(pid) != d) {
-            apply(props.get(pid), c);
+        if (byName != null) {
+            apply(byName.getProps(), c);
         }
     }
 
@@ -248,10 +306,12 @@ public class HTTPTransportActivator
                         }
                         k = k.substring("IssuerDNConstraints.".length());
                     }
-                    if ("combinator".equals(k)) {
-                        dnct.setCombinator(CombinatorType.fromValue(v));
-                    } else if ("RegularExpression".equals(k)) {
-                        dnct.getRegularExpression().add(k);
+                    if (dnct != null) {
+                        if ("combinator".equals(k)) {
+                            dnct.setCombinator(CombinatorType.fromValue(v));
+                        } else if ("RegularExpression".equals(k)) {
+                            dnct.getRegularExpression().add(k);
+                        }
                     }
                 } else if (k.startsWith("secureRandomParameters.")) {
                     k = k.substring("secureRandomParameters.".length());
