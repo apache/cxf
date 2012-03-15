@@ -49,7 +49,7 @@
         <cxf.xjc-utils.version>2.4.0</cxf.xjc-utils.version>
         <cxf.jdk.version>1.6</cxf.jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
+        <site.deploy.url>scp://people.apache.org/www/cxf.apache.org/maven-site</site.deploy.url>
     </properties>
 
     <distributionManagement>
@@ -484,7 +484,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.3.6</version>
+                    <version>2.3.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -579,19 +579,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.4</version>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <Specification-Title>${project.name}</Specification-Title>
-                                <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                                <Specification-Version>${project.version}</Specification-Version>
-                                <Implementation-Title>${project.name}</Implementation-Title>
-                                <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                                <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                                <Implementation-Version>${project.version}</Implementation-Version>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

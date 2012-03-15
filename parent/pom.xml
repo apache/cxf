@@ -398,11 +398,9 @@
                             <manifestEntries>
                                 <Specification-Title>${project.name}</Specification-Title>
                                 <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                                <Specification-Version>${project.version}</Specification-Version>
                                 <Implementation-Title>${project.name}</Implementation-Title>
                                 <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
                                 <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                                <Implementation-Version>${project.version}</Implementation-Version>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -473,7 +471,7 @@
                         </goals>
                         <configuration>
                             <versions>
-                                <cxf.osgi.version.clean>$project.version</cxf.osgi.version.clean>
+                                <cxf.osgi.version.clean>${project.version}</cxf.osgi.version.clean>
                             </versions>
                         </configuration>
                     </execution>
