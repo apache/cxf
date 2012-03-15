@@ -872,7 +872,7 @@ public final class JAXBEncoderDecoder {
                 String ns[] = (String[])f.get(c);
                 for (int x = 0; x < ns.length; x += 2) {
                     if (ns[x] == null) {
-                        nsMap.put(null, ns[x + 1]);
+                        nsMap.put("", ns[x + 1]);
                     } else {
                         nsMap.put(ns[x], ns[x + 1]);
                     }
