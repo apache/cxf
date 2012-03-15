@@ -369,6 +369,23 @@ public class SecurityToken implements Serializable {
     public Date getExpires() {
         return expires;
     }
+    
+    /**
+     * Return whether this SecurityToken is expired or not
+     */
+    public boolean isExpired() {
+        if (state == State.EXPIRED) {
+            return true;
+        }
+        if (expires != null) {
+            Date rightNow = new Date();
+            if (expires.before(rightNow)) {
+                state = State.EXPIRED;
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * @param expires The expires to set.

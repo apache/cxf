@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.token.renewer;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,19 +127,17 @@ public class SCTRenewer implements TokenRenewer {
                 tokenParameters.getTokenStore().remove(token);
                 
                 // Create a new token corresponding to the old token
-                SecurityToken newToken = new SecurityToken(identifier);
+                Date expires = new Date();
+                long currentTime = expires.getTime();
+                expires.setTime(currentTime + (lifetime * 1000L));
+                
+                SecurityToken newToken = new SecurityToken(identifier, null, expires);
                 newToken.setPrincipal(token.getPrincipal());
                 newToken.setSecret(token.getSecret());
                 if (token.getProperties() != null) {
                     newToken.setProperties(token.getProperties());
                 }
-                
-                if (lifetime > 0) {
-                    Integer lifetimeInteger = new Integer(Long.valueOf(lifetime).intValue());
-                    tokenParameters.getTokenStore().add(newToken, lifetimeInteger);
-                } else {
-                    tokenParameters.getTokenStore().add(newToken);
-                }
+                tokenParameters.getTokenStore().add(newToken);
                 
                 response.setTokenRenewed(true);
                 response.setRenewedToken(sct.getElement());
