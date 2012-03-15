@@ -151,6 +151,11 @@ public class SAMLTokenValidator implements TokenValidator {
                     secToken = tokenParameters.getTokenStore().getTokenByAssociatedHash(hash);
                 }
             }
+            if (secToken != null && secToken.isExpired()) {
+                LOG.fine("Token: " + secToken.getId() + " is in the cache but expired - revalidating");
+                secToken = null;
+            }
+            
             if (secToken == null) {
                 if (!assertion.isSigned()) {
                     LOG.log(Level.WARNING, "The received assertion is not signed, and therefore not trusted");

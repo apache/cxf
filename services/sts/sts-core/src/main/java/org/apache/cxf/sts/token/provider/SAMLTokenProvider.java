@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.provider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,11 @@ public class SAMLTokenProvider implements TokenProvider {
             
             // set the token in cache
             if (tokenParameters.getTokenStore() != null) {
-                SecurityToken securityToken = new SecurityToken(assertion.getId());
+                Date expires = new Date();
+                long currentTime = expires.getTime();
+                expires.setTime(currentTime + (conditionsProvider.getLifetime() * 1000L));
+                
+                SecurityToken securityToken = new SecurityToken(assertion.getId(), null, expires);
                 securityToken.setToken(token);
                 securityToken.setPrincipal(tokenParameters.getPrincipal());
                 int hash = 0;
@@ -142,8 +147,8 @@ public class SAMLTokenProvider implements TokenProvider {
                     props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
                     securityToken.setProperties(props);
                 }
-                Integer timeToLive = (int)(conditionsProvider.getLifetime() * 1000);
-                tokenParameters.getTokenStore().add(securityToken, timeToLive);
+                int ttl = (int)conditionsProvider.getLifetime();
+                tokenParameters.getTokenStore().add(securityToken, ttl);
             }
             
             TokenProviderResponse response = new TokenProviderResponse();

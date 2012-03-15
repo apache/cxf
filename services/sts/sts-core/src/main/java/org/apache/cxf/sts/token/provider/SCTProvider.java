@@ -19,6 +19,7 @@
 
 package org.apache.cxf.sts.token.provider;
 
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -130,7 +131,14 @@ public class SCTProvider implements TokenProvider {
             response.setComputedKey(keyHandler.isComputedKey());
             
             // putting the secret key into the cache
-            SecurityToken token = new SecurityToken(sct.getIdentifier());
+            Date expires = null;
+            if (lifetime > 0) {
+                expires = new Date();
+                long currentTime = expires.getTime();
+                expires.setTime(currentTime + (lifetime * 1000L));
+            }
+            
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), null, expires);
             token.setSecret(keyHandler.getSecret());
             token.setPrincipal(tokenParameters.getPrincipal());
             if (tokenParameters.getRealm() != null) {
@@ -147,7 +155,7 @@ public class SCTProvider implements TokenProvider {
             } else {
                 tokenParameters.getTokenStore().add(token);
             }
-            
+
             // Create the references
             TokenReference attachedReference = new TokenReference();
             attachedReference.setIdentifier(sct.getID());
