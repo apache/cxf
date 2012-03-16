@@ -37,6 +37,7 @@ public class ClaimsManager {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClaimsManager.class);
 
+    private List<ClaimsParser> claimParsers;
     private List<ClaimsHandler> claimHandlers;
     private List<URI> supportedClaimTypes = new ArrayList<URI>();
 
@@ -44,10 +45,18 @@ public class ClaimsManager {
         return supportedClaimTypes;
     }
 
+    public List<ClaimsParser> getClaimParsers() {
+        return claimParsers;
+    }
+    
     public List<ClaimsHandler> getClaimHandlers() {
         return claimHandlers;
     }
 
+    public void setClaimParsers(List<ClaimsParser> claimParsers) {
+        this.claimParsers = claimParsers;
+    }
+    
     public void setClaimHandlers(List<ClaimsHandler> claimHandlers) {
         this.claimHandlers = claimHandlers;
         if (claimHandlers == null) {

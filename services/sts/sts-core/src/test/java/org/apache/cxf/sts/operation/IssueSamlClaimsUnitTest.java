@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.operation;
 
+import java.net.URI;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,9 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsManager;
+import org.apache.cxf.sts.claims.ClaimsParser;
 import org.apache.cxf.sts.common.CustomAttributeProvider;
+import org.apache.cxf.sts.common.CustomClaimParser;
 import org.apache.cxf.sts.common.CustomClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.service.ServiceMBean;
@@ -57,6 +60,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
@@ -71,6 +75,9 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     public static final QName REQUESTED_SECURITY_TOKEN = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
     
+    private static final URI ROLE_CLAIM = 
+            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+    
     /**
      * Test to successfully issue a Saml 1.1 token.
      */
@@ -78,32 +85,11 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     public void testIssueSaml1Token() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
-        // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        addTokenProvider(issueOperation);
         
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
-        samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        providerList.add(samlTokenProvider);
-        issueOperation.setTokenProviders(providerList);
+        addService(issueOperation);
         
-        // Add Service
-        ServiceMBean service = new StaticService();
-        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
-        issueOperation.setServices(Collections.singletonList(service));
-        
-        // Add STSProperties object
-        STSPropertiesMBean stsProperties = new StaticSTSProperties();
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        stsProperties.setEncryptionCrypto(crypto);
-        stsProperties.setSignatureCrypto(crypto);
-        stsProperties.setEncryptionUsername("myservicekey");
-        stsProperties.setSignatureUsername("mystskey");
-        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
-        stsProperties.setIssuer("STS");
-        issueOperation.setStsProperties(stsProperties);
+        addSTSProperties(issueOperation);
         
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
@@ -122,21 +108,10 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         request.getAny().add(secondaryParameters);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         
-        // Mock up message context
-        MessageImpl msg = new MessageImpl();
-        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
-        );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        WebServiceContextImpl webServiceContext = setupMessageContext();
         
-        // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
-            response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        List<RequestSecurityTokenResponseType> securityTokenResponse = issueToken(issueOperation, request,
+                webServiceContext);
         
         // Test the generated token.
         Element assertion = null;
@@ -155,7 +130,9 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
-        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
+        assertTrue(tokenString.contains(ROLE_CLAIM.toString()));
+        assertTrue(tokenString.contains("administrator"));
     }
     
     /**
@@ -166,31 +143,13 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
-        
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
-        samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        providerList.add(samlTokenProvider);
-        issueOperation.setTokenProviders(providerList);
+        addTokenProvider(issueOperation);
         
         // Add Service
-        ServiceMBean service = new StaticService();
-        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
-        issueOperation.setServices(Collections.singletonList(service));
+        addService(issueOperation);
         
         // Add STSProperties object
-        STSPropertiesMBean stsProperties = new StaticSTSProperties();
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        stsProperties.setEncryptionCrypto(crypto);
-        stsProperties.setSignatureCrypto(crypto);
-        stsProperties.setEncryptionUsername("myservicekey");
-        stsProperties.setSignatureUsername("mystskey");
-        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
-        stsProperties.setIssuer("STS");
-        issueOperation.setStsProperties(stsProperties);
+        addSTSProperties(issueOperation);
         
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
@@ -209,21 +168,10 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         request.getAny().add(secondaryParameters);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         
-        // Mock up message context
-        MessageImpl msg = new MessageImpl();
-        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
-        );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        WebServiceContextImpl webServiceContext = setupMessageContext();
         
-        // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
-            response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        List<RequestSecurityTokenResponseType> securityTokenResponse = issueToken(issueOperation, request,
+                webServiceContext);
         
         // Test the generated token.
         Element assertion = null;
@@ -242,7 +190,138 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
-        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
+        assertTrue(tokenString.contains(ROLE_CLAIM.toString()));
+        assertTrue(tokenString.contains("administrator"));
+    }
+    
+    /**
+     * Test custom claim parser and handler.
+     */
+    @org.junit.Test
+    public void testCustomClaimDialect() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+        
+        // Add Token Provider
+        addTokenProvider(issueOperation);
+        
+        // Add Service
+        addService(issueOperation);
+        
+        // Add STSProperties object
+        addSTSProperties(issueOperation);
+        
+        // Set the ClaimsManager
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        ClaimsParser claimsParser = new CustomClaimParser();
+        claimsManager.setClaimParsers(Collections.singletonList(claimsParser));
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        issueOperation.setClaimsManager(claimsManager);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+        Element secondaryParameters = createCustomSecondaryParameters();
+        request.getAny().add(secondaryParameters);
+        request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
+        
+        // Mock up message context
+        WebServiceContextImpl webServiceContext = setupMessageContext();
+        
+        // Issue a token
+        List<RequestSecurityTokenResponseType> securityTokenResponse = issueToken(issueOperation, 
+                request, webServiceContext);
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("bob@custom"));
+    }
+
+    /**
+     * @param issueOperation
+     * @param request
+     * @param webServiceContext
+     * @return
+     */
+    private List<RequestSecurityTokenResponseType> issueToken(TokenIssueOperation issueOperation,
+            RequestSecurityTokenType request, WebServiceContextImpl webServiceContext) {
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        return securityTokenResponse;
+    }
+
+    /**
+     * @return
+     */
+    private WebServiceContextImpl setupMessageContext() {
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        return new WebServiceContextImpl(msgCtx);
+    }
+
+    /**
+     * @param issueOperation
+     * @throws WSSecurityException
+     */
+    private void addSTSProperties(TokenIssueOperation issueOperation) throws WSSecurityException {
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+    }
+
+    /**
+     * @param issueOperation
+     */
+    private void addService(TokenIssueOperation issueOperation) {
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+    }
+
+    /**
+     * @param issueOperation
+     */
+    private void addTokenProvider(TokenIssueOperation issueOperation) {
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        
+        List<AttributeStatementProvider> customProviderList = 
+            new ArrayList<AttributeStatementProvider>();
+        customProviderList.add(new CustomAttributeProvider());
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        samlTokenProvider.setAttributeStatementProviders(customProviderList);
+        providerList.add(samlTokenProvider);
+        issueOperation.setTokenProviders(providerList);
     }
     
     /**
@@ -253,32 +332,11 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     public void testIssueJaxbSaml1Token() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         
-        // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        addTokenProvider(issueOperation);
         
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
-        customProviderList.add(new CustomAttributeProvider());
-        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
-        samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        providerList.add(samlTokenProvider);
-        issueOperation.setTokenProviders(providerList);
+        addService(issueOperation);
         
-        // Add Service
-        ServiceMBean service = new StaticService();
-        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
-        issueOperation.setServices(Collections.singletonList(service));
-        
-        // Add STSProperties object
-        STSPropertiesMBean stsProperties = new StaticSTSProperties();
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        stsProperties.setEncryptionCrypto(crypto);
-        stsProperties.setSignatureCrypto(crypto);
-        stsProperties.setEncryptionUsername("myservicekey");
-        stsProperties.setSignatureUsername("mystskey");
-        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
-        stsProperties.setIssuer("STS");
-        issueOperation.setStsProperties(stsProperties);
+        addSTSProperties(issueOperation);
         
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
@@ -309,21 +367,10 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         
-        // Mock up message context
-        MessageImpl msg = new MessageImpl();
-        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
-        );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        WebServiceContextImpl webServiceContext = setupMessageContext();
         
-        // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
-            response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        List<RequestSecurityTokenResponseType> securityTokenResponse = issueToken(issueOperation, request,
+                webServiceContext);
         
         // Test the generated token.
         Element assertion = null;
@@ -342,7 +389,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
-        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
     }
     
     /*
@@ -399,8 +446,31 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
         claims.setAttributeNS(null, "Dialect", STSConstants.IDT_NS_05_05);
         
         Element claimType = createClaimsType(doc);
-        
         claims.appendChild(claimType);
+        Element claimValue = createClaimValue(doc);
+        claims.appendChild(claimValue);
+        secondary.appendChild(claims);
+
+        return secondary;
+    }
+    
+    /*
+     * Mock up a SecondaryParameters DOM Element containing a custom claim dialect.
+     */
+    private Element createCustomSecondaryParameters() {
+        Document doc = DOMUtils.createDocument();
+        Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
+        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+        
+        Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
+        claims.setAttributeNS(null, "Dialect", CustomClaimParser.CLAIMS_DIALECT);
+        
+        Element claim = doc.createElementNS(CustomClaimParser.CLAIMS_DIALECT, "MyElement");
+        claim.setAttributeNS(null, "Uri", ClaimTypes.FIRSTNAME.toString());
+        claim.setAttributeNS(null, "value", "bob");
+        claim.setAttributeNS(null, "scope", "custom");
+        
+        claims.appendChild(claim);
         secondary.appendChild(claims);
 
         return secondary;
@@ -409,11 +479,21 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
     private Element createClaimsType(Document doc) {
         Element claimType = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
         claimType.setAttributeNS(
-            null, "Uri", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
+            null, "Uri", ClaimTypes.LASTNAME.toString()
         );
         claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
         
         return claimType;
+    }
+    
+    private Element createClaimValue(Document doc) {
+        Element claimValue = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimValue");
+        claimValue.setAttributeNS(null, "Uri", ROLE_CLAIM.toString());
+        claimValue.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+        Element value = doc.createElementNS(STSConstants.IDT_NS_05_05, "Value");
+        value.setTextContent("administrator");
+        claimValue.appendChild(value);
+        return claimValue;
     }
     
 }
