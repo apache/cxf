@@ -308,28 +308,33 @@ public class JettyHTTPServerEngineFactory {
         }
     }
     
+    public MBeanServer getMBeanServer() {
+        if (bus != null && bus.getExtension(InstrumentationManager.class) != null) {
+            return bus.getExtension(InstrumentationManager.class).getMBeanServer();
+        }
+        return null;
+    }
+    
     public synchronized Container.Listener getMBeanContainer() {
         if (this.mBeanContainer != null) {
             return mBeanContainer;
         }
         
-        if (bus != null && bus.getExtension(InstrumentationManager.class) != null) {
-            MBeanServer mbs =  bus.getExtension(InstrumentationManager.class).getMBeanServer();
-            if (mbs != null) {
-                try {
-                    Class<?> cls = ClassLoaderUtils.loadClass("org.eclipse.jetty.jmx.MBeanContainer", 
-                                                          getClass());
-                    
-                    mBeanContainer = (Container.Listener) cls.
-                        getConstructor(MBeanServer.class).newInstance(mbs);
-                    
-                    cls.getMethod("start", (Class<?>[]) null).invoke(mBeanContainer, (Object[]) null);
-                } catch (Throwable ex) {
-                    //ignore - just won't instrument jetty.  Probably don't have the
-                    //jetty-management jar available
-                    LOG.info("Could not load or start org.eclipse.management.MBeanContainer.  "
-                             + "Jetty JMX support will not be enabled: " + ex.getMessage());
-                }
+        MBeanServer mbs =  getMBeanServer();
+        if (mbs != null) {
+            try {
+                Class<?> cls = ClassLoaderUtils.loadClass("org.eclipse.jetty.jmx.MBeanContainer", 
+                                                      getClass());
+                
+                mBeanContainer = (Container.Listener) cls.
+                    getConstructor(MBeanServer.class).newInstance(mbs);
+                
+                cls.getMethod("start", (Class<?>[]) null).invoke(mBeanContainer, (Object[]) null);
+            } catch (Throwable ex) {
+                //ignore - just won't instrument jetty.  Probably don't have the
+                //jetty-management jar available
+                LOG.info("Could not load or start org.eclipse.management.MBeanContainer.  "
+                         + "Jetty JMX support will not be enabled: " + ex.getMessage());
             }
         }
         

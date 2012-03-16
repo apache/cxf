@@ -693,7 +693,7 @@ public class JettyHTTPServerEngine
      * This method may only be called by the factory.
      * @throws IOException 
      */
-    public void setTlsServerParameters(TLSServerParameters params) throws IOException {
+    public void setTlsServerParameters(TLSServerParameters params) {
         
         tlsServerParameters = params;
         if (this.configFinalized) {

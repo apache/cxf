@@ -33,6 +33,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.bundle.activator>org.apache.cxf.transport.http_jetty.osgi.HTTPJettyTransportActivator</cxf.bundle.activator>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
             org.eclipse.jetty*;version="${cxf.jetty.osgi.version}",
@@ -42,6 +43,16 @@
         </cxf.osgi.dynamic.import>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-api</artifactId>
