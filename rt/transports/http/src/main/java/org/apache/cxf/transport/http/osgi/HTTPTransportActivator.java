@@ -64,6 +64,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * that has a list of properties like:
  * 
  * url: Regex url to match the configuration
+ * order: Integer order in which to apply the regex's when multiple regex's match.
  * client.*
  * tlsClientParameters.*
  * proxyAuthorization.*
@@ -89,12 +90,12 @@ public class HTTPTransportActivator
     private static class PidInfo implements Comparable<PidInfo> {
         final Dictionary<String, String> props;
         final Matcher matcher;
-        final int priority;
+        final int order;
         
-        public PidInfo(Dictionary<String, String> p, Matcher m, int i) {
+        public PidInfo(Dictionary<String, String> p, Matcher m, int o) {
             matcher = m;
             props = p;
-            priority = i;
+            order = o;
         }
         public Dictionary<String, String> getProps() {
             return props;
@@ -104,9 +105,9 @@ public class HTTPTransportActivator
         }
 
         public int compareTo(PidInfo o) {
-            if (priority < o.priority) {
+            if (order < o.order) {
                 return -1;
-            } else if (priority > o.priority) { 
+            } else if (order > o.order) { 
                 return 1;
             }
             // priorities are equal
@@ -161,13 +162,13 @@ public class HTTPTransportActivator
         String url = (String)properties.get("url");
         String name = (String)properties.get("name");
         Matcher matcher = url == null ? null : Pattern.compile(url).matcher("");
-        String p = (String)properties.get("priority");
-        int priority = 50; 
+        String p = (String)properties.get("order");
+        int order = 50; 
         if (p != null) {
-            priority = Integer.valueOf(p);
+            order = Integer.valueOf(p);
         }
         
-        PidInfo info = new PidInfo(properties, matcher, priority);
+        PidInfo info = new PidInfo(properties, matcher, order);
         
         props.put(pid, info);
         if (url != null) {
