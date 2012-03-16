@@ -147,8 +147,7 @@ public class SAMLTokenProvider implements TokenProvider {
                     props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
                     securityToken.setProperties(props);
                 }
-                int ttl = (int)conditionsProvider.getLifetime();
-                tokenParameters.getTokenStore().add(securityToken, ttl);
+                tokenParameters.getTokenStore().add(securityToken);
             }
             
             TokenProviderResponse response = new TokenProviderResponse();

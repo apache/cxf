@@ -30,8 +30,9 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken.State;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
-public class HazelCastTokenStore implements STSTokenStore {
+public class HazelCastTokenStore implements TokenStore {
 
     IMap<Object, Object> cacheMap;
     boolean autoRemove = true;

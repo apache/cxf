@@ -34,7 +34,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -46,6 +45,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
@@ -59,7 +59,7 @@ import org.junit.BeforeClass;
  */
 public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
     
-    private static STSTokenStore tokenStore;
+    private static TokenStore tokenStore;
     
     @BeforeClass
     public static void init() {

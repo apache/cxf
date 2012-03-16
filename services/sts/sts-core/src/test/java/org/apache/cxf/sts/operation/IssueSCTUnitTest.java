@@ -40,7 +40,6 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.common.TestUtils;
 import org.apache.cxf.sts.service.EncryptionProperties;
@@ -52,6 +51,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
@@ -71,7 +71,7 @@ public class IssueSCTUnitTest extends org.junit.Assert {
     public static final QName UNATTACHED_REFERENCE = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
     
-    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     private static boolean unrestrictedPoliciesInstalled;
     

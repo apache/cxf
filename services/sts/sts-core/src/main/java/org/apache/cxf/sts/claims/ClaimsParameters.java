@@ -26,10 +26,10 @@ import java.util.Map;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
 /**
  * This class encapsulates the parameters that will be passed to a ClaimsHandler instance to
@@ -46,14 +46,14 @@ public class ClaimsParameters {
     private TokenRequirements tokenRequirements;
     private String appliesToAddress;
     private Map<String, Object> additionalProperties;
-    private STSTokenStore tokenStore;
+    private TokenStore tokenStore;
     private String realm;
     
-    public STSTokenStore getTokenStore() {
+    public TokenStore getTokenStore() {
         return tokenStore;
     }
 
-    public void setTokenStore(STSTokenStore tokenStore) {
+    public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
         

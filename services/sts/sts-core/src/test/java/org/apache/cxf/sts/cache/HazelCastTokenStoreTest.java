@@ -19,11 +19,12 @@
 package org.apache.cxf.sts.cache;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.junit.BeforeClass;
 
 public class HazelCastTokenStoreTest extends org.junit.Assert {
   
-    private static STSTokenStore store;
+    private static TokenStore store;
     
     @BeforeClass
     public static void init() throws Exception {
@@ -39,10 +40,6 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
         SecurityToken cachedToken = store.getToken(key);
         assertEquals(token.getId(), cachedToken.getId());
         store.remove(token);
-        assertNull(store.getToken(key));
-        store.add(token, new Integer(1));
-        assertNotNull(store.getToken(key));
-        Thread.sleep(2000);
         assertNull(store.getToken(key));
     }
     

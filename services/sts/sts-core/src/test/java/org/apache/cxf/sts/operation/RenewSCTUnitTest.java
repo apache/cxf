@@ -37,7 +37,6 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -51,6 +50,7 @@ import org.apache.cxf.sts.token.renewer.TokenRenewer;
 import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
@@ -67,7 +67,7 @@ public class RenewSCTUnitTest extends org.junit.Assert {
     private static final QName QNAME_REQ_SEC_TOKEN = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
     
-    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Test to successfully renew a SecurityContextToken

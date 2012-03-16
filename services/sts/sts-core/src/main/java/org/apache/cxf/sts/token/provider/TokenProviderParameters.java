@@ -25,12 +25,12 @@ import java.util.Map;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
 /**
  * This class encapsulates the parameters that will be passed to a TokenProvider instance to
@@ -49,14 +49,14 @@ public class TokenProviderParameters {
     private String appliesToAddress;
     private ClaimsManager claimsManager;
     private Map<String, Object> additionalProperties;
-    private STSTokenStore tokenStore;
+    private TokenStore tokenStore;
     private String realm;
     
-    public STSTokenStore getTokenStore() {
+    public TokenStore getTokenStore() {
         return tokenStore;
     }
 
-    public void setTokenStore(STSTokenStore tokenStore) {
+    public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
 

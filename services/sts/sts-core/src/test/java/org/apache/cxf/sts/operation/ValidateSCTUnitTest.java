@@ -38,7 +38,6 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -53,6 +52,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
@@ -69,7 +69,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
     private static final QName QNAME_WST_STATUS = 
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
     
-    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Test to successfully validate a SecurityContextToken

@@ -29,8 +29,9 @@ import net.sf.ehcache.Element;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken.State;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
-public class DefaultInMemoryTokenStore implements STSTokenStore {
+public class DefaultInMemoryTokenStore implements TokenStore {
 
     private Cache cache;
     private CacheManager cacheManager = CacheManager.create();

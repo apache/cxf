@@ -45,7 +45,7 @@ public class SCTProvider implements TokenProvider {
     
     private static final Logger LOG = LogUtils.getL7dLogger(SCTProvider.class);
     private boolean returnEntropy = true;
-    private long lifetime = 300L;
+    private long lifetime = 60L * 30L;
     
     /**
      * Return the lifetime of the generated SCT
@@ -149,12 +149,7 @@ public class SCTProvider implements TokenProvider {
                 props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
                 token.setProperties(props);
             }
-            if (lifetime > 0) {
-                Integer lifetimeInteger = new Integer(Long.valueOf(lifetime).intValue());
-                tokenParameters.getTokenStore().add(token, lifetimeInteger);
-            } else {
-                tokenParameters.getTokenStore().add(token);
-            }
+            tokenParameters.getTokenStore().add(token);
 
             // Create the references
             TokenReference attachedReference = new TokenReference();

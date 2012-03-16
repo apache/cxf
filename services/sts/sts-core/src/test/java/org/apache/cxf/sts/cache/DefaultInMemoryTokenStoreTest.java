@@ -19,11 +19,12 @@
 package org.apache.cxf.sts.cache;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.junit.BeforeClass;
 
 public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
   
-    private static STSTokenStore store;
+    private static TokenStore store;
     
     @BeforeClass
     public static void init() {
@@ -38,10 +39,6 @@ public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
         store.add(token);
         assertEquals(token, store.getToken(key));
         store.remove(token);
-        assertNull(store.getToken(key));
-        store.add(token, new Integer(1));
-        assertNotNull(store.getToken(key));
-        Thread.sleep(2000);
         assertNull(store.getToken(key));
     }
     

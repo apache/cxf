@@ -27,11 +27,11 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
@@ -46,7 +46,7 @@ import org.apache.ws.security.util.DOM2Writer;
  */
 public class SCTProviderTest extends org.junit.Assert {
     
-    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Create a SecurityContextToken

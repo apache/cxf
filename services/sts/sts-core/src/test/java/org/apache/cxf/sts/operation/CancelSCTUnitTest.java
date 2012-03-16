@@ -37,7 +37,6 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -52,6 +51,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.CancelTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
@@ -68,7 +68,7 @@ public class CancelSCTUnitTest extends org.junit.Assert {
     private static final QName QNAME_REQ_TOKEN_CANCELLED = 
         QNameConstants.WS_TRUST_FACTORY.createRequestedTokenCancelled(null).getName();
     
-    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Test to successfully cancel a SecurityContextToken

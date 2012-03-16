@@ -53,7 +53,7 @@ public class SCTRenewer implements TokenRenewer {
     
     // boolean to enable/disable the check of proof of possession
     private boolean verifyProofOfPossession = true;
-    private long lifetime = 300L;
+    private long lifetime = 60L * 30L;
     
     /**
      * Return the lifetime of the generated SCT

@@ -34,11 +34,11 @@ import org.joda.time.DateTime;
  */
 public class DefaultConditionsProvider implements ConditionsProvider {
     
-    public static final long DEFAULT_MAX_LIFETIME = 60L * 60L;
+    public static final long DEFAULT_MAX_LIFETIME = 60L * 60L * 12L;
     
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultConditionsProvider.class);
     
-    private long lifetime = 300L;
+    private long lifetime = 60L * 30L;
     private long maxLifetime = DEFAULT_MAX_LIFETIME;
     private boolean failLifetimeExceedance = true;
     private boolean acceptClientLifetime;

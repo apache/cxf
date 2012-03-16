@@ -29,7 +29,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.cache.STSTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -39,6 +38,7 @@ import org.apache.cxf.sts.token.provider.SCTProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSSecurityException;
@@ -52,7 +52,7 @@ import org.apache.ws.security.message.token.SecurityContextToken;
  */
 public class SCTValidatorTest extends org.junit.Assert {
     
-    private static STSTokenStore tokenStore = new DefaultInMemoryTokenStore();
+    private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
     
     /**
      * Test a valid SecurityContextToken
