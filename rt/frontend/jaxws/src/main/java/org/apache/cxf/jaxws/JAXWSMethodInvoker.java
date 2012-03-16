@@ -32,6 +32,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.SingletonFactory;
 
@@ -62,7 +63,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             }
             res = CastUtils.cast((List<?>)super.invoke(exchange, serviceObject, m, params));
             if ((serviceObject instanceof Provider) 
-                && Boolean.TRUE.equals(exchange.getInMessage().
+                && MessageUtils.isTrue(exchange.getInMessage().
                                        getContextualProperty("jaxws.provider.interpretNullAsOneway"))
                 && (res != null && !res.isEmpty() && res.get(0) == null)) {
                 // treat the non-oneway call as oneway when a provider returns null
