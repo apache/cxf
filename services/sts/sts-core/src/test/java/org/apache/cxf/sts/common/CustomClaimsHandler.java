@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.common;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.apache.cxf.sts.claims.ClaimsHandler;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.common.CustomClaimParser.CustomRequestClaim;
 
 /**
  * A custom ClaimsHandler implementation for use in the tests.
@@ -36,11 +38,14 @@ import org.apache.cxf.sts.claims.RequestClaimCollection;
 public class CustomClaimsHandler implements ClaimsHandler {
     
     private static List<URI> knownURIs = new ArrayList<URI>();
+    private static final URI ROLE_CLAIM = 
+            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
     
     static {
         knownURIs.add(ClaimTypes.FIRSTNAME);
         knownURIs.add(ClaimTypes.LASTNAME);
         knownURIs.add(ClaimTypes.EMAILADDRESS);
+        knownURIs.add(ROLE_CLAIM);
     }
 
     public List<URI> getSupportedClaimTypes() {
@@ -56,12 +61,25 @@ public class CustomClaimsHandler implements ClaimsHandler {
                 Claim claim = new Claim();
                 claim.setClaimType(requestClaim.getClaimType());
                 if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
-                    claim.setValue("alice");
+                    if (requestClaim instanceof CustomRequestClaim) {
+                        CustomRequestClaim customClaim = (CustomRequestClaim) requestClaim;
+                        String customName = customClaim.getClaimValue() + "@" + customClaim.getScope();
+                        claim.setValue(customName);
+                    } else {
+                        claim.setValue("alice");
+                    }
                 } else if (ClaimTypes.LASTNAME.equals(requestClaim.getClaimType())) {
                     claim.setValue("doe");
                 } else if (ClaimTypes.EMAILADDRESS.equals(requestClaim.getClaimType())) {
                     claim.setValue("alice@cxf.apache.org");
-                }
+                } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
+                    String requestedRole = requestClaim.getClaimValue();
+                    if (isUserInRole(parameters.getPrincipal(), requestedRole)) {
+                        claim.setValue(requestedRole);
+                    } else {
+                        continue;
+                    }
+                }                
                 claimCollection.add(claim);
             }
             return claimCollection;
@@ -70,5 +88,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
         return null;
     }
 
+    private boolean isUserInRole(Principal principal, String requestedRole) {
+        return true;
+    }
         
 }

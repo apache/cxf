@@ -43,7 +43,6 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -53,6 +52,8 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.claims.ClaimsParser;
+import org.apache.cxf.sts.claims.IdentityClaimsParser;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -95,9 +96,11 @@ public class RequestParser {
     private TokenRequirements tokenRequirements = new TokenRequirements();
 
     public void parseRequest(
-        RequestSecurityTokenType request, WebServiceContext wsContext, STSPropertiesMBean stsProperties
+        RequestSecurityTokenType request, WebServiceContext wsContext, STSPropertiesMBean stsProperties, 
+        List<ClaimsParser> claimsParsers
     ) throws STSException {
         LOG.fine("Parsing RequestSecurityToken");
+        
         keyRequirements = new KeyRequirements();
         tokenRequirements = new TokenRequirements();
         
@@ -105,7 +108,8 @@ public class RequestParser {
             // JAXB types
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
-                boolean found = parseTokenRequirements(jaxbElement, tokenRequirements, wsContext);
+                boolean found = 
+                    parseTokenRequirements(jaxbElement, tokenRequirements, wsContext, claimsParsers);
                 if (!found) {
                     found = parseKeyRequirements(jaxbElement, keyRequirements, wsContext, stsProperties);
                 }
@@ -120,7 +124,7 @@ public class RequestParser {
                 Element element = (Element)requestObject;
                 if (STSConstants.WST_NS_05_12.equals(element.getNamespaceURI())
                     && "SecondaryParameters".equals(element.getLocalName())) {
-                    parseSecondaryParameters(element);
+                    parseSecondaryParameters(element, claimsParsers);
                 } else if ("AppliesTo".equals(element.getLocalName())
                     && (STSConstants.WSP_NS.equals(element.getNamespaceURI())
                         || STSConstants.WSP_NS_04.equals(element.getNamespaceURI()))) {
@@ -216,7 +220,8 @@ public class RequestParser {
     private static boolean parseTokenRequirements(
         JAXBElement<?> jaxbElement, 
         TokenRequirements tokenRequirements,
-        WebServiceContext wsContext
+        WebServiceContext wsContext,
+        List<ClaimsParser> claimsParsers
     ) {
         if (QNameConstants.TOKEN_TYPE.equals(jaxbElement.getName())) {
             String tokenType = (String)jaxbElement.getValue();
@@ -272,7 +277,7 @@ public class RequestParser {
             LOG.fine("Found CancelTarget token");
         } else if (QNameConstants.CLAIMS.equals(jaxbElement.getName())) {
             ClaimsType claimsType = (ClaimsType)jaxbElement.getValue();
-            RequestClaimCollection requestedClaims = parseClaims(claimsType);
+            RequestClaimCollection requestedClaims = parseClaims(claimsType, claimsParsers);
             tokenRequirements.setClaims(requestedClaims);
             LOG.fine("Found Claims token");
         } else {
@@ -495,7 +500,7 @@ public class RequestParser {
      * direct children of the RequestSecurityToken element. 
      * @param secondaryParameters the secondaryParameters element to parse
      */
-    private void parseSecondaryParameters(Element secondaryParameters) {
+    private void parseSecondaryParameters(Element secondaryParameters, List<ClaimsParser> claimsParsers) {
         LOG.fine("Found SecondaryParameters element");
         Element child = DOMUtils.getFirstElement(secondaryParameters);
         while (child != null) {
@@ -519,7 +524,7 @@ public class RequestParser {
             } else if (tokenRequirements.getClaims() == null 
                 && "Claims".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
                 LOG.fine("Found Claims element");
-                RequestClaimCollection requestedClaims = parseClaims(child);
+                RequestClaimCollection requestedClaims = parseClaims(child, claimsParsers);
                 tokenRequirements.setClaims(requestedClaims);
             } else {
                 LOG.fine("Found unknown element: " + localName + " " + namespace);
@@ -531,7 +536,7 @@ public class RequestParser {
     /**
      * Create a RequestClaimCollection from a DOM Element
      */
-    private RequestClaimCollection parseClaims(Element claimsElement) {
+    private RequestClaimCollection parseClaims(Element claimsElement, List<ClaimsParser> claimsParsers) {
         String dialectAttr = null;
         RequestClaimCollection requestedClaims = new RequestClaimCollection();
         try {
@@ -549,7 +554,7 @@ public class RequestParser {
         
         Element childClaimType = DOMUtils.getFirstElement(claimsElement);
         while (childClaimType != null) {
-            RequestClaim requestClaim = parseChildClaimType(childClaimType);
+            RequestClaim requestClaim = parseChildClaimType(childClaimType, dialectAttr, claimsParsers);
             if (requestClaim != null) {
                 requestedClaims.add(requestClaim);
             }
@@ -562,7 +567,9 @@ public class RequestParser {
     /**
      * Create a RequestClaimCollection from a JAXB ClaimsType object
      */
-    private static RequestClaimCollection parseClaims(ClaimsType claimsType) {
+    private static RequestClaimCollection parseClaims(
+        ClaimsType claimsType, List<ClaimsParser> claimsParsers
+    ) {
         String dialectAttr = null;
         RequestClaimCollection requestedClaims = new RequestClaimCollection();
         try {
@@ -580,7 +587,7 @@ public class RequestParser {
         
         for (Object claim : claimsType.getAny()) {
             if (claim instanceof Element) {
-                RequestClaim requestClaim = parseChildClaimType((Element)claim);
+                RequestClaim requestClaim = parseChildClaimType((Element)claim, dialectAttr, claimsParsers);
                 if (requestClaim != null) {
                     requestedClaims.add(requestClaim);
                 }
@@ -593,59 +600,24 @@ public class RequestParser {
     /**
      * Parse a child ClaimType into a RequestClaim object.
      */
-    private static RequestClaim parseChildClaimType(Element childClaimType) {
-        String claimLocalName = childClaimType.getLocalName();
-        String claimNS = childClaimType.getNamespaceURI();
-        if ("ClaimType".equals(claimLocalName)) {
-            String claimTypeUri = childClaimType.getAttribute("Uri");
-            String claimTypeOptional = childClaimType.getAttribute("Optional");
-            RequestClaim requestClaim = new RequestClaim();
-            try {
-                requestClaim.setClaimType(new URI(claimTypeUri));
-            } catch (URISyntaxException e) {
-                LOG.log(
-                    Level.WARNING, 
-                    "Cannot create URI from the given ClaimType attribute value " + claimTypeUri,
-                    e
-                );
-            }
-            requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
-            return requestClaim;
-        } else if ("ClaimValue".equals(claimLocalName)) {
-            String claimTypeUri = childClaimType.getAttribute("Uri");
-            String claimTypeOptional = childClaimType.getAttribute("Optional");
-            RequestClaim requestClaim = new RequestClaim();
-            try {
-                requestClaim.setClaimType(new URI(claimTypeUri));
-            } catch (URISyntaxException e) {
-                LOG.log(
-                    Level.WARNING, 
-                    "Cannot create URI from the given ClaimTye attribute value " + claimTypeUri,
-                    e
-                );
-            }
-            
-            Node valueNode = childClaimType.getFirstChild();
-            if (valueNode != null) {
-                if ("Value".equals(valueNode.getLocalName())) {
-                    requestClaim.setClaimValue(valueNode.getTextContent());
-                } else {
-                    LOG.warning("Unsupported child element of ClaimValue element "
-                            + valueNode.getLocalName());
-                    return null;
+    private static RequestClaim parseChildClaimType(
+        Element childClaimType, String dialect, List<ClaimsParser> claimsParsers
+    ) {
+        if (claimsParsers != null) {
+            for (ClaimsParser parser : claimsParsers) {
+                if (parser != null && dialect.equals(parser.getSupportedDialect())) {
+                    return parser.parse(childClaimType);
                 }
-            } else {
-                LOG.warning("No child element of ClaimValue element available");
-                return null;
             }
-             
-            requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
-            
-            return requestClaim;
+        }
+        if (IdentityClaimsParser.IDENTITY_CLAIMS_DIALECT.equals(dialect)) {
+            return IdentityClaimsParser.parseClaimType(childClaimType);
         }
         
-        LOG.fine("Found unknown element: " + claimLocalName + " " + claimNS);
-        return null;
+        LOG.log(Level.WARNING, "No ClaimsParser is registered for dialect " + dialect);
+        throw new STSException(
+            "No ClaimsParser is registered for dialect " + dialect, STSException.BAD_REQUEST
+        );
     }
     
     

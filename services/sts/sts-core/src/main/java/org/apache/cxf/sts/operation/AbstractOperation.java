@@ -102,7 +102,7 @@ public abstract class AbstractOperation {
     protected List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
     protected boolean returnReferences = true;
     protected STSTokenStore tokenStore;
-    protected ClaimsManager claimsManager;
+    protected ClaimsManager claimsManager = new ClaimsManager();
     
     public boolean isReturnReferences() {
         return returnReferences;
@@ -173,7 +173,7 @@ public abstract class AbstractOperation {
         stsProperties.configureProperties();
         
         RequestParser requestParser = new RequestParser();
-        requestParser.parseRequest(request, context, stsProperties);
+        requestParser.parseRequest(request, context, stsProperties, claimsManager.getClaimParsers());
         
         return requestParser;
     }
