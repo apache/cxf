@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.log4j.spi.LoggerFactory;
 
 
 /**
