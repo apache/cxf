@@ -96,8 +96,17 @@ public final class LogUtils {
             }
             if (StringUtils.isEmpty(cname)) {
                 Class.forName("org.slf4j.impl.StaticLoggerBinder");
-                // using the Slf4jLogger directly
-                cname = "org.apache.cxf.common.logging.Slf4jLogger";
+                Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
+                Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
+                if (fcls.getName().contains("Log4j")) {
+                    cname = "org.apache.cxf.common.logging.Log4jLogger";
+                } else if (fcls.getName().contains("JCL")) {
+                    cls = Class.forName("org.apache.commons.logging.LogFactory");
+                    fcls = cls.getMethod("getFactory").invoke(null).getClass();
+                    if (fcls.getName().contains("Log4j")) {
+                        cname = "org.apache.cxf.common.logging.Log4jLogger";
+                    }
+                }
             }
             if (!StringUtils.isEmpty(cname)) {
                 try {
