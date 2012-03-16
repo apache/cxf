@@ -37,6 +37,7 @@
         <cxf.spi-dir>spi-2.1</cxf.spi-dir>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+            org.objectweb.asm*;resolution:=optional;version="${cxf.osgi.asm.version}",
         </cxf.osgi.import>
     </properties>
     <dependencies>
@@ -71,7 +72,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.ow2.asm</groupId>
+            <groupId>asm</groupId>
             <artifactId>asm</artifactId>
         </dependency>
         <dependency>

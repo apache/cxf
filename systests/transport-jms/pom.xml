@@ -251,7 +251,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.ow2.asm</groupId>
+            <groupId>asm</groupId>
             <artifactId>asm</artifactId>
         </dependency>
         <dependency>

@@ -34,6 +34,9 @@
 
     <properties>
         <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
+        <cxf.osgi.import>
+            org.objectweb.asm*;version="${cxf.osgi.asm.version}",
+        </cxf.osgi.import>
     </properties>
 
     <dependencies>
@@ -43,6 +46,10 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
