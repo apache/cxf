@@ -97,6 +97,7 @@
         <bundle start-level='30' dependency="true">mvn:org.apache.ws.xmlschema/xmlschema-core/${cxf.xmlschema.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.wsdl4j/${cxf.wsdl4j.bundle.version}</bundle>
         <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${cxf.xmlresolver.bundle.version}</bundle>
+        <bundle start-level='30' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.fastinfoset/${cxf.fastinfoset.bundle.version}</bundle>
 
         <bundle>mvn:org.apache.cxf/cxf-api/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-rt-core/${project.version}</bundle>
