@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.common.logging;
 
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -52,6 +53,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
 
     private final org.slf4j.Logger logger;
     private LocationAwareLogger locationAwareLogger;
+    
 
     public Slf4jLogger(String name, String resourceBundleName) {
         super(name, resourceBundleName);
@@ -59,6 +61,10 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
         if (logger instanceof LocationAwareLogger) {
             locationAwareLogger = (LocationAwareLogger) logger;
         }
+    }
+    @Override
+    protected boolean supportsHandlers() {
+        return true;
     }
 
     @Override
@@ -83,11 +89,39 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
     }
 
     @Override
+    public boolean isLoggable(Level level) {
+        final int i = level.intValue();
+        if (i == Level.OFF.intValue()) {
+            return false;
+        } else if (i >= Level.SEVERE.intValue()) {
+            return logger.isErrorEnabled();
+        } else if (i >= Level.WARNING.intValue()) {
+            return logger.isWarnEnabled();
+        } else if (i >= Level.INFO.intValue()) {
+            return logger.isInfoEnabled();
+        } else if (i >= Level.FINER.intValue()) {
+            return logger.isDebugEnabled();
+        }
+        return logger.isTraceEnabled();
+    }
+
+
+    @Override
     protected void internalLogFormatted(String msg, LogRecord record) {
 
         Level level = record.getLevel();
         Throwable t = record.getThrown();
-
+        
+        Handler targets[] = getHandlers();
+        if (targets != null) {
+            for (Handler h : targets) {
+                h.publish(record);
+            }
+        }
+        if (!getUseParentHandlers()) {
+            return;
+        }
+        
         /*
          * As we can not use a "switch ... case" block but only a "if ... else if ..." block, the order of the
          * comparisons is important. We first try log level FINE then INFO, WARN, FINER, etc

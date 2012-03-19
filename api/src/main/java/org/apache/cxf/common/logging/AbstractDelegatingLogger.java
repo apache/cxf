@@ -277,23 +277,45 @@ public abstract class AbstractDelegatingLogger extends Logger {
         return level.intValue() >= l.intValue() && l != Level.OFF;
     }
 
+    protected boolean supportsHandlers() {
+        return false;
+    }
+    
     public synchronized void addHandler(Handler handler) throws SecurityException {
+        if (supportsHandlers()) {
+            super.addHandler(handler);
+            return;
+        }
         throw new UnsupportedOperationException();
     }
 
     public synchronized void removeHandler(Handler handler) throws SecurityException {
+        if (supportsHandlers()) {
+            super.removeHandler(handler);
+            return;
+        }
         throw new UnsupportedOperationException();
     }
 
     public synchronized Handler[] getHandlers() {
+        if (supportsHandlers()) {
+            return super.getHandlers();
+        }
         throw new UnsupportedOperationException();
     }
 
     public synchronized void setUseParentHandlers(boolean useParentHandlers) {
+        if (supportsHandlers()) {
+            super.setUseParentHandlers(useParentHandlers);
+            return;
+        }
         throw new UnsupportedOperationException();
     }
 
     public synchronized boolean getUseParentHandlers() {
+        if (supportsHandlers()) {
+            return super.getUseParentHandlers();
+        }
         throw new UnsupportedOperationException();
     }
 
