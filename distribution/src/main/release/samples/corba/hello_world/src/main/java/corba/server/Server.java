@@ -30,6 +30,8 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManager;
 
+import corba.common.HelloWorldHelper;
+
 public final class Server {
 
     private Server() {
