@@ -22,6 +22,8 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -222,7 +224,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         if (reader == null && is == null) {
-            reader = getStaxHandlerFromCurrentMessage(XMLStreamReader.class);
+            reader = getStreamHandlerFromCurrentMessage(XMLStreamReader.class);
         }
         
         reader = createTransformReaderIfNeeded(reader, is);
@@ -238,7 +240,16 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
         // Try to create the read before unmarshalling the stream
-        return unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(is));
+        if (is == null) {
+            Reader reader = getStreamHandlerFromCurrentMessage(Reader.class);
+            if (reader == null) {
+                LOG.severe("No InputStream, Reader, or XMStreamReader is available");
+                throw new WebApplicationException(500);
+            }
+            return unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(reader));
+        } else {
+            return unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(is));
+        }
     }
 
     protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 
@@ -530,14 +541,24 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         } 
         
         if (writer == null && os == null) {
-            writer = getStaxHandlerFromCurrentMessage(XMLStreamWriter.class);
+            writer = getStreamHandlerFromCurrentMessage(XMLStreamWriter.class);
         }
         return createTransformWriterIfNeeded(writer, os);
     }
     
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
         throws Exception {
-        ms.marshal(obj, os);
+        if (os == null) {
+            Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
+            if (writer == null) {
+                LOG.severe("No OutputStream, Writer, or XMStreamWriter is available");
+                throw new WebApplicationException(500);
+            }
+            ms.marshal(obj, writer);
+            writer.flush();
+        } else {
+            ms.marshal(obj, os);
+        }
     }
     
     protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, MediaType mt) 

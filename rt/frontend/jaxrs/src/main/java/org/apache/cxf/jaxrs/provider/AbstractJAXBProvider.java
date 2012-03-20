@@ -187,7 +187,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
     }
     
-    protected <X> X getStaxHandlerFromCurrentMessage(Class<X> staxCls) {
+    protected <X> X getStreamHandlerFromCurrentMessage(Class<X> staxCls) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {
             return staxCls.cast(m.getContent(staxCls));
