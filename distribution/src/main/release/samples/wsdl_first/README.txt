@@ -77,7 +77,7 @@ Using either UNIX or Windows:
 If you're using Tomcat for the web service provider:
 ----------------------------------------------------
 1.) Update the soap:address value in the resources/CustomerService.wsdl value, switching the
-soap:address value to servlet-specific one (presently commented-out).  Make sure the version
+soap:address value to the servlet-specific one (presently commented-out).  Make sure the version
 number there is the same as the version of CXF being used.
 
 2.) You can manually copy the generated WAR file to the Tomcat webapps folder, or, if you
@@ -90,7 +90,7 @@ To remove the code generated from the WSDL file and the .class files, run "mvn c
 
 There is no special maven profile for the spring client and server but you can easily set it up yourself.
 
-Using eclipse to run and test the demo
+Using Eclipse to run and test the demo
 --------------------------------------
 
 run the following in the demo base directory

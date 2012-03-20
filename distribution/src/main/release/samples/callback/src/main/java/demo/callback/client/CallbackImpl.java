@@ -38,7 +38,7 @@ public class CallbackImpl implements CallbackPortType  {
      */
     public String serverSayHi(String message) {
         System.out.println("Callback object invoked");
-        System.out.println("Message recieved: " + message);
+        System.out.println("Message received: " + message);
         return new String("Hi " + message);
     }
     

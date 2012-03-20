@@ -11,6 +11,7 @@ located), the Maven pom.xml file can be used to build and run the demo.
 
 Using either Unix or Windows:
 
+  mvn clean install
   mvn -Pserver  (from one command line window)
   mvn -Pclient  (from a second command line window)
 

@@ -1,5 +1,5 @@
-Building and running the demo using Maven
------------------------------------------
+Building and running the logbrowser demo using Maven
+----------------------------------------------------
 
 From the base directory of this sample (i.e., where this README file is
 located), the pom.xml file is used to build and run the demo. 

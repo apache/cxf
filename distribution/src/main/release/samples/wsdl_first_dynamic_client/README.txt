@@ -1,5 +1,5 @@
 Hello World Demo using Document/Literal Style and a Dynamic Client
-=============================================
+==================================================================
 
 This demo illustrates the use of the CXF dynamic client 
 against a standalone server using SOAP 1.1 over HTTP.
@@ -8,10 +8,11 @@ Please review the README in the samples directory before continuing.
 
 
 Building and running the demo using Maven
----------------------------------------
+-----------------------------------------
 
-From the base directory of this sample (i.e., where this README file is
-located), the pom.xml file is used to build and run the demo. 
+From the base directory of this sample (i.e., where this README 
+file is located), the pom.xml file is used to build and run the 
+demo. 
 
 Using either UNIX or Windows:
 

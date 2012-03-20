@@ -26,7 +26,7 @@ Alternative: WAR deployment of service in a servlet container (e.g. Tomcat)
 value. The endpointAddress value will be installation-specific, but could be 
 "http://localhost:8080/java_first_jaxws-{CXF Version}/services/hello_world" 
 for a default local installation of Tomcat.  Replace {CXF Version} with the
-CXF version declared in the parent POM -- for example, "2.5.1", "2.5.1-SNAPSHOT", 
+CXF version declared in the parent POM -- for example, "2.6.1", "2.6.1-SNAPSHOT", 
 etc.
 
 2.) Manually copy the generated WAR file to the Tomcat webapps folder, or, if you

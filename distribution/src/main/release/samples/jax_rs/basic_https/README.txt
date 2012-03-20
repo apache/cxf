@@ -51,10 +51,7 @@ Using either UNIX or Windows:
   mvn -Pserver  (from one command line window)
   mvn -Pclient  (from a second command line window)
     
-
 To remove the target dir, run "mvn clean".
-
-
 
 
 Certificates

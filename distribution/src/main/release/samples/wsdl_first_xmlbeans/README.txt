@@ -1,5 +1,5 @@
 Hello World Demo using Document/Literal Style and XMLBeans
-=============================================
+==========================================================
 
 This demo illustrates the use of the JAX-WS APIs and with the XMLBeans data binding
 to run a simple client against a standalone server using SOAP 1.1 over HTTP.

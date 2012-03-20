@@ -41,7 +41,7 @@ public class ServerImpl implements ServerPortType  {
             WebServiceFeature[] wfs = new WebServiceFeature[] {};
             CallbackPortType port = (CallbackPortType)callback.getPort(CallbackPortType.class, wfs);
 
-            System.out.println("Invoking on callback object");
+            System.out.println("Invoking callback object");
             String resp = port.serverSayHi(System.getProperty("user.name"));
             System.out.println("Response from callback object: " + resp);
   

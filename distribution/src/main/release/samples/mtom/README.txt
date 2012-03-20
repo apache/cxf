@@ -16,7 +16,7 @@ located), the maven pom.xml file can be used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install
-  mvn -Perver  (from one command line window)
+  mvn -Pserver  (from one command line window)
   mvn -Pclient  (from a second command line window)
     
 To remove the code generated from the WSDL file and the .class

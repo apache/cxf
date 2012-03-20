@@ -1,5 +1,5 @@
 JMS Spring Config Demo
-==================
+======================
 
 This is basically the wsdl first demo adapted to the jms transport. It uses the jms config feature so the jms transport can be
 added to any existing service without changing the wsdl.

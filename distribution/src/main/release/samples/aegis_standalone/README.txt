@@ -1,21 +1,10 @@
-Aegis Demo
-====================
+Aegis Standalone Demo
+=====================
 
 This demo shows how you can use Aegis with no web service at all
 as a mapping between XML and Java.
 
-Prerequisite
-------------
-
-If your environment already includes cxf-manifest.jar on the
-CLASSPATH, and the JDK and ant bin directories on the PATH
-it is not necessary to set the environment as described in
-the samples directory README.  If your environment is not
-properly configured, or if you are planning on using wsdl2java,
-javac, and java to build and run the demos, you must set the
-environment.
-
-
+Please review the README in the samples directory before continuing.
 
 Building and running the demo using Maven
 ---------------------------------------
@@ -27,9 +16,8 @@ Using either UNIX or Windows:
 
   mvn install   (builds the demo)
   mvn -Pwrite  (from one command line window)
-  mvn -Pread  (from one command line window)
+  mvn -Pread  (from another command line window)
 
 
 To remove the generated code, run "mvn clean".
-
 
