@@ -45,7 +45,8 @@ public final class Client {
         // Endpoint Address
         String endpointAddress = "http://localhost:9000/helloWorld";
         // If doing Tomcat deployment, endpoint will be similar to:
-        // String endpointAddress = "http://localhost:8080/java_first_jaxws-2.6-0-SNAPSHOT/services/hello_world";
+        // String endpointAddress 
+        //    = "http://localhost:8080/java_first_jaxws-2.6-0-SNAPSHOT/services/hello_world";
 
         // Add a port to the Service
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
