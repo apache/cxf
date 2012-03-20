@@ -19,6 +19,7 @@
 
 package demo.jms_greeter.client;
 
+import java.io.Closeable;
 import java.io.File;
 
 import javax.xml.namespace.QName;
@@ -63,6 +64,9 @@ public final class Client {
         System.out.println("No response from server as method is OneWay");
         System.out.println();
 
+        if (greeter instanceof Closeable) {
+            ((Closeable)greeter).close();
+        }
         System.exit(0);
     }
 }
