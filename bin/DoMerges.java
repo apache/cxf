@@ -491,7 +491,7 @@ public class DoMerges {
                 merged.addRange(new Range(s.ver));
             }
             System.out.println("Recording " + ver);
-            File logF = getLogFile("Recording", ver.toString(), records);
+            File logF = getLogFile("Recording", ver.toString(), new ArrayList<VerLog>());
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "propset",
                                                                        "svnmerge-integrated",
                                                                        merged.toProperty(),
@@ -657,6 +657,12 @@ public class DoMerges {
     }
     
     public static void main (String args[]) throws Exception {
+        File file = new File("svnmerge-commit-message.txt");
+        if (file.exists()) {
+            //make sure we delete this to not cause confusion
+            file.delete();
+        }
+        
         int onlyVersion = -1;
         if (args.length > 0) {
             if ("-auto".equals(args[0])) { 
@@ -665,7 +671,7 @@ public class DoMerges {
                 onlyVersion = Integer.valueOf(args[0]);
             }
         }
-        File file = new File(".git");
+        file = new File(".git");
         if (file.exists() && file.isDirectory()) {
             isGit = true;
         }
