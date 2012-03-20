@@ -40,6 +40,7 @@ import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
 
     private DestinationRegistry destinationRegistry;
+    private boolean globalRegistry;
     private Bus bus;
     private ServletController controller;
     private ClassLoader loader;
@@ -54,6 +55,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public CXFNonSpringServlet(DestinationRegistry destinationRegistry,
                                boolean loadBus) {
         this.destinationRegistry = destinationRegistry;
+        this.globalRegistry = destinationRegistry != null;
         this.loadBus = loadBus;
     }
 
@@ -133,15 +135,18 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     }
 
     public void destroy() {
-        for (String path : destinationRegistry.getDestinationsPaths()) {
-            // clean up the destination in case the destination itself can no longer access the registry later
-            AbstractHTTPDestination dest = destinationRegistry.getDestinationForPath(path);
-            synchronized (dest) {
-                destinationRegistry.removeDestination(path);
-                dest.releaseRegistry();
+        if (!globalRegistry) {
+            for (String path : destinationRegistry.getDestinationsPaths()) {
+                // clean up the destination in case the destination itself can 
+                // no longer access the registry later
+                AbstractHTTPDestination dest = destinationRegistry.getDestinationForPath(path);
+                synchronized (dest) {
+                    destinationRegistry.removeDestination(path);
+                    dest.releaseRegistry();
+                }
             }
+            destinationRegistry = null;
         }
-        destinationRegistry = null;
         destroyBus();
     }
     
