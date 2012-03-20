@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.interceptor;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -152,6 +154,22 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 bos.close();
             } catch (Exception e) {
                 throw new Fault(e);
+            }
+        } else {
+            Reader reader = message.getContent(Reader.class);
+            if (reader != null) {
+                try {
+                    BufferedReader r = new BufferedReader(reader, limit);
+                    r.mark(limit);
+                    char b[] = new char[limit];
+                    int i = r.read(b);
+                    buffer.getPayload().append(b, 0, i);
+                    r.reset();
+                    message.setContent(Reader.class, r);
+                } catch (Exception e) {
+                    throw new Fault(e);
+                }
+                
             }
         }
         log(logger, buffer.toString());

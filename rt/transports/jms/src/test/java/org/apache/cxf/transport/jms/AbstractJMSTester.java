@@ -20,6 +20,7 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -107,9 +108,15 @@ public abstract class AbstractJMSTester extends Assert {
             ex.printStackTrace();
         }
         OutputStream os = message.getContent(OutputStream.class);
-        assertTrue("The OutputStream should not be null ", os != null);
-        os.write(MESSAGE_CONTENT.getBytes()); // TODO encoding
-        os.close();
+        Writer writer = message.getContent(Writer.class);
+        assertTrue("The OutputStream and Writer should not both be null ", os != null || writer != null);
+        if (os != null) {
+            os.write(MESSAGE_CONTENT.getBytes()); // TODO encoding
+            os.close();
+        } else {
+            writer.write(MESSAGE_CONTENT);
+            writer.close();
+        }
     }
 
     protected void adjustEndpointInfoURL() {

@@ -19,8 +19,12 @@
 
 package org.apache.cxf.interceptor;
 
+import java.io.FilterWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,7 +64,8 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
     public void handleMessage(Message message) throws Fault {
         final OutputStream os = message.getContent(OutputStream.class);
-        if (os == null) {
+        final Writer iowriter = message.getContent(Writer.class);
+        if (os == null && iowriter == null) {
             return;
         }
         Logger logger = getMessageLogger(message);
@@ -69,13 +74,111 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             boolean hasLogged = message.containsKey(LOG_SETUP);
             if (!hasLogged) {
                 message.put(LOG_SETUP, Boolean.TRUE);
-                final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
-                if (threshold > 0) {
-                    newOut.setThreshold(threshold);
+                if (os != null) {
+                    final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+                    if (threshold > 0) {
+                        newOut.setThreshold(threshold);
+                    }
+                    message.setContent(OutputStream.class, newOut);
+                    newOut.registerCallback(new LoggingCallback(logger, message, os));
+                } else {
+                    message.setContent(Writer.class, new LogWriter(logger, message, iowriter));
                 }
-                message.setContent(OutputStream.class, newOut);
-                newOut.registerCallback(new LoggingCallback(logger, message, os));
             }
+        }
+    }
+    
+    private LoggingMessage setupBuffer(Message message) {
+        String id = (String)message.getExchange().get(LoggingMessage.ID_KEY);
+        if (id == null) {
+            id = LoggingMessage.nextId();
+            message.getExchange().put(LoggingMessage.ID_KEY, id);
+        }
+        final LoggingMessage buffer 
+            = new LoggingMessage("Outbound Message\n---------------------------",
+                                 id);
+        
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (responseCode != null) {
+            buffer.getResponseCode().append(responseCode);
+        }
+        
+        String encoding = (String)message.get(Message.ENCODING);
+        if (encoding != null) {
+            buffer.getEncoding().append(encoding);
+        }            
+        String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        if (httpMethod != null) {
+            buffer.getHttpMethod().append(httpMethod);
+        }
+        String address = (String)message.get(Message.ENDPOINT_ADDRESS);
+        if (address != null) {
+            buffer.getAddress().append(address);
+        }
+        String ct = (String)message.get(Message.CONTENT_TYPE);
+        if (ct != null) {
+            buffer.getContentType().append(ct);
+        }
+        Object headers = message.get(Message.PROTOCOL_HEADERS);
+        if (headers != null) {
+            buffer.getHeader().append(headers);
+        }
+        return buffer;
+    }
+    
+    private class LogWriter extends FilterWriter {
+        StringWriter out2;
+        int count;
+        Logger logger; //NOPMD
+        Message message;
+        
+        public LogWriter(Logger logger, Message message, Writer writer) {
+            super(writer);
+            this.logger = logger;
+            this.message = message;
+            if (!(writer instanceof StringWriter)) {
+                out2 = new StringWriter();
+            }
+        }
+        public void write(int c) throws IOException {
+            super.write(c);
+            if (out2 != null && count < limit) {
+                out2.write(c);
+            }
+            count++;
+        }
+        public void write(char[] cbuf, int off, int len) throws IOException {
+            super.write(cbuf, off, len);
+            if (out2 != null && count < limit) {
+                out2.write(cbuf, off, len);
+            }
+            count += len;
+        }
+        public void write(String str, int off, int len) throws IOException {
+            super.write(str, off, len);
+            if (out2 != null && count < limit) {
+                out2.write(str, off, len);
+            }
+            count += len;
+        }
+        public void close() throws IOException {
+            LoggingMessage buffer = setupBuffer(message);
+            if (count >= limit) {
+                buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+            }
+            StringWriter w2 = out2;
+            if (w2 == null) {
+                w2 = (StringWriter)out;
+            }
+            String ct = (String)message.get(Message.CONTENT_TYPE);
+            try {
+                writePayload(buffer.getPayload(), w2, ct); 
+            } catch (Exception ex) {
+                //ignore
+            }
+            log(logger, buffer.toString());
+            message.setContent(Writer.class, out);
+            super.close();
         }
     }
     
@@ -96,42 +199,9 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
         
         public void onClose(CachedOutputStream cos) {
-            String id = (String)message.getExchange().get(LoggingMessage.ID_KEY);
-            if (id == null) {
-                id = LoggingMessage.nextId();
-                message.getExchange().put(LoggingMessage.ID_KEY, id);
-            }
-            final LoggingMessage buffer 
-                = new LoggingMessage("Outbound Message\n---------------------------",
-                                     id);
-            
-            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
-            if (responseCode != null) {
-                buffer.getResponseCode().append(responseCode);
-            }
-            
-            String encoding = (String)message.get(Message.ENCODING);
+            LoggingMessage buffer = setupBuffer(message);
 
-            if (encoding != null) {
-                buffer.getEncoding().append(encoding);
-            }            
-            String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
-            if (httpMethod != null) {
-                buffer.getHttpMethod().append(httpMethod);
-            }
-            String address = (String)message.get(Message.ENDPOINT_ADDRESS);
-            if (address != null) {
-                buffer.getAddress().append(address);
-            }
             String ct = (String)message.get(Message.CONTENT_TYPE);
-            if (ct != null) {
-                buffer.getContentType().append(ct);
-            }
-            Object headers = message.get(Message.PROTOCOL_HEADERS);
-            if (headers != null) {
-                buffer.getHeader().append(headers);
-            }
-
             if (!isShowBinaryContent() && isBinaryContent(ct)) {
                 buffer.getMessage().append(BINARY_CONTENT_MESSAGE).append('\n');
                 log(logger, buffer.toString());
@@ -151,6 +221,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 }
             }
             try {
+                String encoding = (String)message.get(Message.ENCODING);
                 writePayload(buffer.getPayload(), cos, encoding, ct); 
             } catch (Exception ex) {
                 //ignore

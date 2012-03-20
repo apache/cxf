@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
@@ -169,6 +170,39 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                 cos.writeCacheTo(builder, encoding, limit);
             }
 
+        }
+    }
+    protected void writePayload(StringBuilder builder, 
+                                StringWriter stringWriter,
+                                String contentType) 
+        throws Exception {
+        // Just transform the XML message when the cos has content
+        if (isPrettyLogging() 
+            && contentType != null 
+            && contentType.indexOf("xml") >= 0 
+            && stringWriter.getBuffer().length() > 0) {
+            Transformer serializer = XMLUtils.newTransformer(2);
+            // Setup indenting to "pretty print"
+            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+            StringWriter swriter = new StringWriter();
+            serializer.transform(new StreamSource(new StringReader(stringWriter.getBuffer().toString())),
+                                 new StreamResult(swriter));
+            String result = swriter.toString();
+            if (result.length() < limit || limit == -1) {
+                builder.append(swriter.toString());
+            } else {
+                builder.append(swriter.toString().substring(0, limit));
+            }
+
+        } else {
+            StringBuffer buffer = stringWriter.getBuffer();
+            if (buffer.length() > limit) {
+                builder.append(buffer.subSequence(0, limit));
+            } else {
+                builder.append(buffer);
+            }
         }
     }
 

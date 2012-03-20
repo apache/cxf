@@ -19,6 +19,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamException;
@@ -34,11 +35,16 @@ public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutEndingInterceptor.class);
     
     private String outStreamHolder;
+    private String writerHolder;
     
     public StaxOutEndingInterceptor(String outStreamHolder) {
+        this(outStreamHolder, null);
+    }
+    public StaxOutEndingInterceptor(String outStreamHolder, String writerHolder) {
         super(Phase.PRE_STREAM_ENDING);
         getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
         this.outStreamHolder = outStreamHolder;
+        this.writerHolder = writerHolder;
     }
 
     public void handleMessage(Message message) throws Fault {
@@ -53,6 +59,12 @@ public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> 
             OutputStream os = (OutputStream)message.get(outStreamHolder);
             if (os != null) {
                 message.setContent(OutputStream.class, os);
+            }
+            if (writerHolder != null) {
+                Writer w = (Writer)message.get(writerHolder);
+                if (w != null) {
+                    message.setContent(Writer.class, w);
+                }
             }
             message.removeContent(XMLStreamWriter.class);
         } catch (XMLStreamException e) {

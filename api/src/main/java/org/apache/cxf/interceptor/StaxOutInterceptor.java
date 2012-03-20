@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -43,8 +44,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  */
 public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String OUTPUT_STREAM_HOLDER = StaxOutInterceptor.class.getName() + ".outputstream";
+    public static final String WRITER_HOLDER = StaxOutInterceptor.class.getName() + ".writer";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
-    public static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER);
+    public static final StaxOutEndingInterceptor ENDING 
+        = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER, WRITER_HOLDER);
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
     private static Map<Object, XMLOutputFactory> factories = new HashMap<Object, XMLOutputFactory>();
@@ -57,8 +60,12 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleMessage(Message message) {
         OutputStream os = message.getContent(OutputStream.class);
-        XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
-        if (os == null || writer != null) {
+        XMLStreamWriter xwriter = message.getContent(XMLStreamWriter.class);
+        Writer writer = null;
+        if (os == null) {
+            writer = message.getContent(Writer.class);
+        }
+        if ((os == null && writer == null) || xwriter != null) {
             return;
         }
 
@@ -67,21 +74,31 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         try {
             XMLOutputFactory factory = getXMLOutputFactory(message);
             if (factory == null) {
-                writer = StaxUtils.createXMLStreamWriter(os, encoding);
+                if (writer == null) {
+                    xwriter = StaxUtils.createXMLStreamWriter(os, encoding);
+                } else {
+                    xwriter = StaxUtils.createXMLStreamWriter(writer);
+                }
             } else {
                 synchronized (factory) {
-                    writer = factory.createXMLStreamWriter(os, encoding);
+                    if (writer == null) {
+                        xwriter = factory.createXMLStreamWriter(os, encoding);
+                    } else {
+                        xwriter = factory.createXMLStreamWriter(writer);
+                    }
                 }
             }
             if (MessageUtils.getContextualBoolean(message, FORCE_START_DOCUMENT, false)) {
-                writer.writeStartDocument(encoding, "1.0");
+                xwriter.writeStartDocument(encoding, "1.0");
                 message.removeContent(OutputStream.class);
                 message.put(OUTPUT_STREAM_HOLDER, os);
+                message.removeContent(Writer.class);
+                message.put(WRITER_HOLDER, writer);
             }
         } catch (XMLStreamException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("STREAM_CREATE_EXC", BUNDLE), e);
         }
-        message.setContent(XMLStreamWriter.class, writer);
+        message.setContent(XMLStreamWriter.class, xwriter);
 
         // Add a final interceptor to write end elements
         message.getInterceptorChain().add(ENDING);
@@ -92,6 +109,10 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
         if (os != null) {
             message.setContent(OutputStream.class, os);
+        }
+        Writer writer = (Writer)message.get(WRITER_HOLDER);
+        if (writer != null) {
+            message.setContent(Writer.class, writer);
         }
     }
 

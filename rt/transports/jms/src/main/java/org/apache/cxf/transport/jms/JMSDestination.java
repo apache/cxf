@@ -21,7 +21,10 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -361,7 +364,18 @@ public class JMSDestination extends AbstractMultiplexDestination
             inMessage = message;
             this.sender = sender;
         }
-
+        @Override
+        public void close(Message msg) throws IOException {
+            Writer writer = msg.getContent(Writer.class);
+            if (writer != null) {
+                writer.close();
+            }
+            Reader reader = msg.getContent(Reader.class);
+            if (reader != null) {
+                reader.close();
+            }
+            super.close(msg);
+        }
         /**
          * Register a message observer for incoming messages.
          * 
@@ -377,7 +391,7 @@ public class JMSDestination extends AbstractMultiplexDestination
          * 
          * @param message the message to be sent.
          */
-        public void prepare(Message message) throws IOException {
+        public void prepare(final Message message) throws IOException {
             // setup the message to be send back
             javax.jms.Message jmsMessage = (javax.jms.Message)inMessage
                 .get(JMSConstants.JMS_REQUEST_MESSAGE);
@@ -391,8 +405,19 @@ public class JMSDestination extends AbstractMultiplexDestination
 
             Exchange exchange = inMessage.getExchange();
             exchange.setOutMessage(message);
-            message.setContent(OutputStream.class, new JMSOutputStream(sender, exchange,
-                                                                       jmsMessage instanceof TextMessage));
+            
+            if (jmsMessage instanceof TextMessage) {
+                message.setContent(Writer.class, new StringWriter() {
+                    @Override
+                    public void close() throws IOException {
+                        super.close();
+                        sender.sendExchange(message.getExchange(), toString());
+                    }
+                });
+
+            } else {
+                message.setContent(OutputStream.class, new JMSOutputStream(sender, exchange, false));
+            }
         }
 
         protected Logger getLogger() {

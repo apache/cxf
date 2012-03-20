@@ -190,7 +190,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         MessageProducer producer = session.createProducer(destination);
         
         Message message = JMSUtils.createAndSetPayload(
-            writeBook(new Book("JMS OneWay", 125L)), session, "text");
+            writeBook(new Book("JMS OneWay", 125L)), session, "byte");
         message.setStringProperty("Content-Type", "application/xml");
         message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
         message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
@@ -203,7 +203,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
         
-        Message message = JMSUtils.createAndSetPayload(writeBook(new Book("JMS", 3L)), session, "text");
+        Message message = JMSUtils.createAndSetPayload(writeBook(new Book("JMS", 3L)), session, "byte");
         message.setJMSReplyTo(replyTo);
         // or, if oneway,
         // message.setStringProperty("OnewayRequest", "true");
@@ -235,12 +235,12 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         return (Book)u.unmarshal(is);
     }
     
-    private String writeBook(Book b) throws Exception {
+    private byte[] writeBook(Book b) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Marshaller m = c.createMarshaller();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         m.marshal(b, bos);
-        return bos.toString();
+        return bos.toByteArray();
     }
     
     

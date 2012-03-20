@@ -66,6 +66,8 @@ import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDDynam
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDStaticPrefix;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
@@ -158,6 +160,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             
             Client client = ClientProxy.getClient(greeter);
             client.getEndpoint().getOutInterceptors().add(new TibcoSoapActionInterceptor());
+            client.getOutInterceptors().add(new LoggingOutInterceptor());
+            client.getInInterceptors().add(new LoggingInInterceptor());
             EndpointInfo ei = client.getEndpoint().getEndpointInfo();
             AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
             JMSNamingPropertyType name = new JMSNamingPropertyType();

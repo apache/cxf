@@ -21,6 +21,8 @@ package org.apache.cxf.transport.jms;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -134,13 +136,7 @@ public final class JMSUtils {
             throw JmsUtils.convertJmsAccessException(e);
         }
         if (converted instanceof String) {
-            if (encoding != null) {
-                result = ((String)converted).getBytes(encoding);
-            } else {
-                // Using the UTF-8 encoding as default
-                result = ((String)converted).getBytes("UTF-8");
-            }
-            inMessage.setContent(InputStream.class, new ByteArrayInputStream(result));
+            inMessage.setContent(Reader.class, new StringReader((String)converted));
             messageType = "text";
         } else if (converted instanceof byte[]) {
             result = (byte[])converted;

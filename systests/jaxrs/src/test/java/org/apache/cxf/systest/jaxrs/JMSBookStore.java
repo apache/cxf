@@ -146,18 +146,18 @@ public class JMSBookStore {
         MessageProducer producer = session.createProducer(destination);
         
         Message message = JMSUtils.createAndSetPayload(
-            writeBook(book), session, "text");
+            writeBook(book), session, "byte");
                     
         producer.send(message);
         producer.close();
     }
     
-    private String writeBook(Book b) throws Exception {
+    private byte[] writeBook(Book b) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Marshaller m = c.createMarshaller();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         m.marshal(b, bos);
-        return bos.toString();
+        return bos.toByteArray();
     }
 }
 

@@ -21,7 +21,10 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.UUID;
@@ -93,16 +96,37 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
      * the OutputStream of the message and called the stream's close method. In the JMS case the
      * JMSOutputStream will then call back the sendExchange method of this class. {@inheritDoc}
      */
-    public void prepare(Message message) throws IOException {
+    public void prepare(final Message message) throws IOException {
         String name =  endpointInfo.getName().toString() + ".jms-conduit";
         org.apache.cxf.common.i18n.Message msg = 
             new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_CONDUIT", LOG, name);
         jmsConfig.ensureProperlyConfigured(msg);
         boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
-        JMSOutputStream out = new JMSOutputStream(this, message.getExchange(), isTextPayload);
-        message.setContent(OutputStream.class, out);
+        if (isTextPayload) {
+            message.setContent(Writer.class, new StringWriter() {
+                @Override
+                public void close() throws IOException {
+                    super.close();
+                    sendExchange(message.getExchange(), toString());
+                }
+            });
+        } else {
+            JMSOutputStream out = new JMSOutputStream(this, message.getExchange(), isTextPayload);
+            message.setContent(OutputStream.class, out);
+        }
     }
-    
+    @Override
+    public void close(Message msg) throws IOException {
+        Writer writer = msg.getContent(Writer.class);
+        if (writer != null) {
+            writer.close();
+        }
+        Reader reader = msg.getContent(Reader.class);
+        if (reader != null) {
+            reader.close();
+        }
+        super.close(msg);
+    }
     private synchronized AbstractMessageListenerContainer getJMSListener() {
         if (jmsListener == null) {
             jmsListener = JMSFactory.createJmsListener(jmsConfig, 

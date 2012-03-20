@@ -22,6 +22,8 @@ package org.apache.cxf.transport.jms;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -348,14 +350,27 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
     private void verifyReceivedMessage(Message message) {
         ByteArrayInputStream bis = (ByteArrayInputStream)message.getContent(InputStream.class);
-        byte bytes[] = new byte[bis.available()];
-        try {
-            bis.read(bytes);
-        } catch (IOException ex) {
-            assertFalse("Read the Destination recieved Message error ", false);
-            ex.printStackTrace();
+        String response = "<not found>";
+        if (bis != null) {
+            byte bytes[] = new byte[bis.available()];
+            try {
+                bis.read(bytes);
+            } catch (IOException ex) {
+                assertFalse("Read the Destination recieved Message error ", false);
+                ex.printStackTrace();
+            }
+            response = IOUtils.newStringFromBytes(bytes);
+        } else {
+            StringReader reader = (StringReader)message.getContent(Reader.class);
+            char buffer[] = new char[5000];
+            try {
+                int i = reader.read(buffer);
+                response = new String(buffer, 0 , i);
+            } catch (IOException e) {
+                assertFalse("Read the Destination recieved Message error ", false);
+                e.printStackTrace();
+            }
         }
-        String response = IOUtils.newStringFromBytes(bytes);
         assertEquals("The response content should be equal", AbstractJMSTester.MESSAGE_CONTENT, response);
     }
 

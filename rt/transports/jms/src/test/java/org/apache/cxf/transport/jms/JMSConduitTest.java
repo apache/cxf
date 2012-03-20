@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
@@ -85,7 +86,8 @@ public class JMSConduitTest extends AbstractJMSTester {
 
     private void verifySentMessage(boolean send, Message message) {
         OutputStream os = message.getContent(OutputStream.class);
-        assertTrue("OutputStream should not be null", os != null);
+        Writer writer = message.getContent(Writer.class);
+        assertTrue("The OutputStream and Writer should not both be null ", os != null || writer != null);
     }
 
     /*

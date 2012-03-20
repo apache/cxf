@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +63,13 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         InputStream is = message.getContent(InputStream.class);
+        Reader reader = null;
         if (is == null) {
-            return;
+            reader = message.getContent(Reader.class);
+            if (reader == null) {
+                return;
+            }
         }
-
         String contentType = (String)message.get(Message.CONTENT_TYPE);
         
         if (contentType != null && contentType.contains("text/html")) {
@@ -97,14 +101,22 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         String encoding = (String)message.get(Message.ENCODING);
 
-        XMLStreamReader reader;
+        XMLStreamReader xreader;
         try {
             XMLInputFactory factory = getXMLInputFactory(message);
             if (factory == null) {
-                reader = StaxUtils.createXMLStreamReader(is, encoding);
+                if (reader != null) {
+                    xreader = StaxUtils.createXMLStreamReader(reader);
+                } else {
+                    xreader = StaxUtils.createXMLStreamReader(is, encoding);
+                }
             } else {
                 synchronized (factory) {
-                    reader = factory.createXMLStreamReader(is, encoding);
+                    if (reader != null) {
+                        xreader = factory.createXMLStreamReader(reader);
+                    } else {
+                        xreader = factory.createXMLStreamReader(is, encoding);
+                    }
                 }                
             }
         } catch (XMLStreamException e) {
@@ -113,7 +125,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                    encoding), e);
         }
 
-        message.setContent(XMLStreamReader.class, reader);
+        message.setContent(XMLStreamReader.class, xreader);
     }
 
     public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
