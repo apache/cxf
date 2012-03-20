@@ -95,17 +95,34 @@ public final class LogUtils {
                 }
             }
             if (StringUtils.isEmpty(cname)) {
-                Class.forName("org.slf4j.impl.StaticLoggerBinder");
-                Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
-                Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
-                if (fcls.getName().contains("Log4j")) {
-                    cname = "org.apache.cxf.common.logging.Log4jLogger";
-                } else if (fcls.getName().contains("JCL")) {
-                    cls = Class.forName("org.apache.commons.logging.LogFactory");
-                    fcls = cls.getMethod("getFactory").invoke(null).getClass();
-                    if (fcls.getName().contains("Log4j")) {
+                try {
+                    // This Class.forName likely will barf in OSGi, but it's OK
+                    // as we'll just use j.u.l and pax-logging will pick it up fine
+                    // If we don't call this and there isn't a slf4j impl avail,
+                    // you get warnings printed to stderr about NOPLoggers and such
+                    Class.forName("org.slf4j.impl.StaticLoggerBinder");  
+                    Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
+                    Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
+                    String clsName = fcls.getName();
+                    if (clsName.contains("NOPLogger")) {
+                        //no real slf4j implementation, use j.u.l 
+                        cname = null;
+                    } else if (clsName.contains("Log4j")) {
                         cname = "org.apache.cxf.common.logging.Log4jLogger";
+                    } else if (clsName.contains("JCL")) {
+                        cls = Class.forName("org.apache.commons.logging.LogFactory");
+                        fcls = cls.getMethod("getFactory").invoke(null).getClass();
+                        if (fcls.getName().contains("Log4j")) {
+                            cname = "org.apache.cxf.common.logging.Log4jLogger";
+                        }
+                    } else if (clsName.contains("JDK14")
+                        || clsName.contains("pax.logging")) {
+                        //both of these we can use the appropriate j.u.l API's 
+                        //directly and have it work properly
+                        cname = null;
                     }
+                } catch (Throwable t) {
+                    //ignore - Slf4j not available
                 }
             }
             if (!StringUtils.isEmpty(cname)) {
