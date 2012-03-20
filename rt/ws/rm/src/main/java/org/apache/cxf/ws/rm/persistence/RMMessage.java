@@ -55,7 +55,7 @@ public class RMMessage {
     public byte[] getContent() {
         byte[] bytes = null;
         try {
-            bytes = content.getBytes();
+            bytes = content != null ? content.getBytes() : null;
         } catch (IOException e) {
             // ignore and treat it as null
         }
@@ -120,7 +120,7 @@ public class RMMessage {
      * @throws IOException
      */
     public InputStream getInputStream() throws IOException {
-        return content.getInputStream();
+        return content != null ? content.getInputStream() : null;
     }
     
     /**
@@ -137,6 +137,6 @@ public class RMMessage {
      * @return
      */
     public int getSize() {
-        return content.size();
+        return content != null ? content.size() : -1;
     }
 }

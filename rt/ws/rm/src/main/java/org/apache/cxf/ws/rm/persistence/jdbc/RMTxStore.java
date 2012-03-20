@@ -472,7 +472,9 @@ public class RMTxStore implements RMStore {
             
             updateDestinationSequence(seq);
             
-            storeMessage(seq.getIdentifier(), msg, false);
+            if (msg.getCachedOutputStream() != null) {
+                storeMessage(seq.getIdentifier(), msg, false);
+            }
             
             commit();
             
@@ -490,7 +492,9 @@ public class RMTxStore implements RMStore {
             
             updateSourceSequence(seq);
             
-            storeMessage(seq.getIdentifier(), msg, true);
+            if (msg.getCachedOutputStream() != null) {
+                storeMessage(seq.getIdentifier(), msg, true);
+            }
             
             commit();
             

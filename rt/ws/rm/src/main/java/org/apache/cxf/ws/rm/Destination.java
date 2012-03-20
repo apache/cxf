@@ -33,6 +33,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.persistence.RMMessage;
@@ -136,8 +137,10 @@ public class Destination extends AbstractEndpoint {
 
         RMStore store = getReliableEndpoint().getManager().getStore();
         if (null != store) {
-            CachedOutputStream saved = 
-                (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            CachedOutputStream saved = null;
+            if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
+                saved = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            }
             RMMessage msg = new RMMessage();
             msg.setMessageNumber(sequenceType.getMessageNumber());
             msg.setContent(saved);
