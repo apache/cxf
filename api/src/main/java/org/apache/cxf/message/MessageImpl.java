@@ -19,65 +19,32 @@
 
 package org.apache.cxf.message;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.InterceptorChain;
-import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 
 public class MessageImpl extends StringMapImpl implements Message {
     private static final long serialVersionUID = -3020763696429459865L;
-    private static final Class<?> DEFAULT_CONTENTS[];
-    private static final int DEFAULT_CONTENTS_LENGTH;
-    
-    static {
-        Class<?> tmps[];
-        
-        try {
-            //if SAAJ is there, give it a slot
-            Class<?> cls = Class.forName("javax.xml.soap.SOAPMessage");
-            tmps = new Class<?>[] {
-                XMLStreamReader.class, XMLStreamWriter.class,
-                InputStream.class, OutputStream.class,
-                List.class, Exception.class, Node.class, DelegatingInputStream.class,
-                cls
-            };
-        } catch (Throwable e) {
-            tmps = new Class<?>[] {
-                XMLStreamReader.class, XMLStreamWriter.class,
-                InputStream.class, OutputStream.class,
-                List.class, Exception.class, Node.class, DelegatingInputStream.class
-            };
-        }
-        DEFAULT_CONTENTS = tmps;
-        DEFAULT_CONTENTS_LENGTH = tmps.length;
-    }
     
     
     private Exchange exchange;
     private String id;
     private InterceptorChain interceptorChain;
     
-    private Object[] defaultContents = new Object[DEFAULT_CONTENTS_LENGTH];
-    private Map<Class<?>, Object> contents;
+    // array of Class<T>/T pairs for contents 
+    private Object[] contents = new Object[20];
+    private int index;
+    
     private Map<String, Object> contextCache;
     
     
@@ -91,8 +58,8 @@ public class MessageImpl extends StringMapImpl implements Message {
             exchange = impl.getExchange();
             id = impl.id;
             interceptorChain = impl.interceptorChain;
-            defaultContents = impl.defaultContents;
             contents = impl.contents;
+            index = impl.index;
             contextCache = impl.contextCache;
         } else {
             throw new RuntimeException("Not a MessageImpl! " + m.getClass());
@@ -130,51 +97,53 @@ public class MessageImpl extends StringMapImpl implements Message {
 
     @SuppressWarnings("unchecked")
     public <T> T getContent(Class<T> format) {
-        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
-            if (DEFAULT_CONTENTS[x] == format) {
-                return (T)defaultContents[x];
+        for (int x = 0; x < index; x += 2) {
+            if (contents[x] == format) {
+                return (T)contents[x + 1];
             }
         }
-        return contents == null ? null : (T)contents.get(format);
+        return null;
     }
 
     public <T> void setContent(Class<T> format, Object content) {
-        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
-            if (DEFAULT_CONTENTS[x] == format) {
-                defaultContents[x] = content;
+        for (int x = 0; x < index; x += 2) {
+            if (contents[x] == format) {
+                contents[x + 1] = content;
                 return;
             }
         }
-        if (contents == null) {
-            contents = new IdentityHashMap<Class<?>, Object>(6);
+        if (index >= contents.length) {
+            //very unlikely to happen.   Haven't seen more than about 6, 
+            //but just in case we'll add a few more
+            Object tmp[] = new Object[contents.length + 10];
+            System.arraycopy(contents, 0, tmp, 0, contents.length);
+            contents = tmp;
         }
-        contents.put(format, content);
+        contents[index] = format;
+        contents[index + 1] = content;
+        index += 2;
     }
     
     public <T> void removeContent(Class<T> format) {
-        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
-            if (DEFAULT_CONTENTS[x] == format) {
-                defaultContents[x] = null;
+        for (int x = 0; x < index; x += 2) {
+            if (contents[x] == format) {
+                index -= 2;
+                if (x != index) {
+                    contents[x] = contents[index];
+                    contents[x + 1] = contents[index + 1];
+                }
+                contents[index] = null;
+                contents[index + 1] = null;
                 return;
             }
-        }
-        if (contents != null) {
-            contents.remove(format);
         }
     }
 
     public Set<Class<?>> getContentFormats() {
         
-        Set<Class<?>> c;
-        if (contents == null) {
-            c = new HashSet<Class<?>>();
-        } else {
-            c = new HashSet<Class<?>>(contents.keySet());
-        }
-        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
-            if (defaultContents[x] != null) {
-                c.add(DEFAULT_CONTENTS[x]);
-            }
+        Set<Class<?>> c = new HashSet<Class<?>>();
+        for (int x = 0; x < index; x += 2) {
+            c.add((Class<?>)contents[x]);
         }
         return c;
     }
