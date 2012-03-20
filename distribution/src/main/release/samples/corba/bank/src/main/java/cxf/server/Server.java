@@ -26,7 +26,7 @@ public class Server {
         System.out.println("Starting Server");
 
         Object implementor = new BankImpl();
-        String address = "file:./build/bank.ref";
+        String address = "file:target/bank.ref";
         Endpoint endpoint = Endpoint.create("http://cxf.apache.org/bindings/corba",
                                             implementor);
         endpoint.publish(address);
