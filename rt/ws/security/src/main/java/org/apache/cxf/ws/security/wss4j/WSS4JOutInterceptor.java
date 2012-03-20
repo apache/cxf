@@ -193,7 +193,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 }
     
                 int doAction = WSSecurityUtil.decodeAction(action, actions, config);
-                if (doAction == WSConstants.NO_SECURITY) {
+                if (doAction == WSConstants.NO_SECURITY && actions.isEmpty()) {
                     return;
                 }
     
