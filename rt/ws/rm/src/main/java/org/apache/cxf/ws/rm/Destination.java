@@ -213,6 +213,17 @@ public class Destination extends AbstractEndpoint {
         }
     }
     
+    void releaseDeliveringStatus(Message message) {
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
+        SequenceType sequenceType = rmps.getSequence();
+        if (null != sequenceType) {
+            DestinationSequence seq = getSequence(sequenceType.getIdentifier());
+            if (null != seq) {
+                seq.removeDeliveringMessageNumber(sequenceType.getMessageNumber());
+            }
+        }
+    }
+    
     private static Message createMessage(Exchange exchange) {
         Endpoint ep = exchange.get(Endpoint.class);
         Message msg = null;
