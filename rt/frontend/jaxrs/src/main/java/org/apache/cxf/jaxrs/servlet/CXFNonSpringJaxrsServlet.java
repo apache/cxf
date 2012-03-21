@@ -88,6 +88,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             address = "/";
         }
         bean.setAddress(address);
+        
+        bean.setStaticSubresourceResolution(getStaticSubResolutionValue(servletConfig));
+        
         String modelRef = servletConfig.getInitParameter(USER_MODEL_PARAM);
         if (modelRef != null) {
             bean.setModelRef(modelRef.trim());
@@ -109,15 +112,16 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
         setExtensions(bean, servletConfig);
-        setStaticSubResolution(bean, servletConfig);
-        
+                
         bean.create();
     }
 
-    protected void setStaticSubResolution(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
+    protected boolean getStaticSubResolutionValue(ServletConfig servletConfig) {
         String param = servletConfig.getInitParameter(STATIC_SUB_RESOLUTION_PARAM);
         if (param != null) {
-            bean.setStaticSubresourceResolution(Boolean.valueOf(param.trim()));
+            return Boolean.valueOf(param.trim());
+        } else {
+            return false;
         }
     }
     
@@ -355,11 +359,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         Application app = (Application)createSingletonInstance(appClass, props, servletConfig);
         
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, MessageUtils.isTrue(ignoreParam));
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, 
+                                            MessageUtils.isTrue(ignoreParam),
+                                            getStaticSubResolutionValue(servletConfig));
         setAllInterceptors(bean, servletConfig);
         setExtensions(bean, servletConfig);
         setSchemasLocations(bean, servletConfig);
-        setStaticSubResolution(bean, servletConfig);
+        
         bean.setBus(getBus());
         bean.create();
     }
