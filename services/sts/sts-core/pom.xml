@@ -31,7 +31,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
+        <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
     </properties>
 
     <dependencies>

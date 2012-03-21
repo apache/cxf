@@ -37,8 +37,13 @@ public class DefaultInMemoryTokenStore implements STSTokenStore {
     private boolean autoRemove = true;
     
     public DefaultInMemoryTokenStore() {
-        cache = new Cache("STS", 5000, false, false, 3600, 3600);
-        cacheManager.addCache(cache);
+        String key = "STS";
+        if (!cacheManager.cacheExists(key)) {
+            cache = new Cache(key, 5000, false, false, 3600, 3600);
+            cacheManager.addCache(cache);
+        } else {
+            cache = cacheManager.getCache(key);
+        }
     }
     
     public void add(SecurityToken token) {
