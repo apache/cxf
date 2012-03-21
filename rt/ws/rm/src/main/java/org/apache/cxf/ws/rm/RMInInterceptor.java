@@ -153,9 +153,11 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         throws SequenceFault, RMException {
         final boolean robust =
             MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
-        if (!robust) {
-            destination.acknowledge(message);
-        }
+        if (robust) {
+            // set this property to change the acknlowledging behavior
+            message.put(RMMessageConstants.DELIVERING_ROBUST_ONEWAY, Boolean.TRUE);
+        } 
+        destination.acknowledge(message);
     }
     
     void processDeliveryAssurance(RMProperties rmps) {

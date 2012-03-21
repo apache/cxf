@@ -113,6 +113,9 @@ public class Destination extends AbstractEndpoint {
 
         if (null != seq) {
             if (seq.applyDeliveryAssurance(sequenceType.getMessageNumber(), message)) {
+                if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
+                    return;
+                }
                 seq.acknowledge(message);
     
                 if (null != rmps.getCloseSequence()) {
