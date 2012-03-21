@@ -59,12 +59,11 @@ public final class Client {
             get.releaseConnection();
         }
 
-        // Sent HTTP GET request to query customer info, expect JSON.
         System.out.println("\n");
-        System.out.println("Sent HTTP GET request to query customer info, expect JSON");
+        System.out.println("Sent HTTP GET request to query customer info, expect XML");
         //The default behavior without setting Accept header explicitly is depending on your client.
         //In the case of  HTTP Client, the Accept header will be absent. The CXF server will treat this
-        //as "*/*", JSON format is returned
+        //as "*/*", XML format is returned
         get = new GetMethod("http://localhost:9000/customerservice/customers/123");
         httpclient = new HttpClient();
 
