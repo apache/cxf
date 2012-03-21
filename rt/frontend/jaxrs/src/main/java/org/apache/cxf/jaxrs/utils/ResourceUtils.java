@@ -540,8 +540,11 @@ public final class ResourceUtils {
         }
         return values;
     }
-    
     public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath) {
+        return createApplication(app, ignoreAppPath, false);
+    }
+    public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
+                                                           boolean staticSubresourceResolution) {
         
         Set<Object> singletons = app.getSingletons();
         verifySingletons(singletons);
@@ -587,6 +590,7 @@ public final class ResourceUtils {
             }
         }
         bean.setAddress(address);
+        bean.setStaticSubresourceResolution(staticSubresourceResolution);
         bean.setResourceClasses(resourceClasses);
         bean.setProviders(providers);
         for (Map.Entry<Class, ResourceProvider> entry : map.entrySet()) {
