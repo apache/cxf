@@ -33,6 +33,7 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 import org.apache.ws.security.CustomTokenPrincipal;
@@ -73,6 +74,7 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         // It can't handle the token as the value type is not set
         assertFalse(x509TokenValidator.canHandleToken(validateTarget));
@@ -84,13 +86,14 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         TokenValidatorResponse validatorResponse = null;
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
         
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
         
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
         
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
@@ -124,12 +127,14 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         assertTrue(x509TokenValidator.canHandleToken(validateTarget));
         
         TokenValidatorResponse validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
     }
     
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {

@@ -31,7 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 
@@ -94,9 +94,6 @@ public class X509TokenValidator implements TokenValidator {
      */
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating X.509 Token");
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
-
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         Crypto sigCrypto = stsProperties.getSignatureCrypto();
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
@@ -107,9 +104,11 @@ public class X509TokenValidator implements TokenValidator {
         requestData.setCallbackHandler(callbackHandler);
 
         TokenValidatorResponse response = new TokenValidatorResponse();
-        response.setValid(false);
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
         
-        if (validateTarget == null || !validateTarget.isBinarySecurityToken()) {
+        if (!validateTarget.isBinarySecurityToken()) {
             return response;
         }
 
@@ -145,7 +144,7 @@ public class X509TokenValidator implements TokenValidator {
 
             Credential returnedCredential = validator.validate(credential, requestData);
             response.setPrincipal(returnedCredential.getCertificates()[0].getSubjectX500Principal());
-            response.setValid(true);
+            validateTarget.setValidationState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

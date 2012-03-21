@@ -25,6 +25,7 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
@@ -42,7 +43,16 @@ public class TokenValidatorParameters {
     private TokenRequirements tokenRequirements;
     private TokenStore tokenStore;
     private String realm;
+    private ReceivedToken token;
     
+    public ReceivedToken getToken() {
+        return token;
+    }
+
+    public void setToken(ReceivedToken token) {
+        this.token = token;
+    }
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }

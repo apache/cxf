@@ -19,7 +19,7 @@
 package org.apache.cxf.systest.sts.username_onbehalfof;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
@@ -51,15 +51,16 @@ public class UsernameTokenValidator implements TokenValidator {
      * Validate a Token using the given TokenValidatorParameters.
      */
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
+        TokenValidatorResponse response = new TokenValidatorResponse();
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
         
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
         // Ignore the fact that no password is provided
         // Some other requirements must be met to issue a token onbehalfof a subject
-        // whose authentication is not proofen
-        TokenValidatorResponse response = new TokenValidatorResponse();
-        response.setValid(true);
+        // whose authentication is not proved
+        validateTarget.setValidationState(STATE.VALID);
         response.setPrincipal(new CustomTokenPrincipal(usernameTokenType.getUsername().getValue()));
         
         return response;

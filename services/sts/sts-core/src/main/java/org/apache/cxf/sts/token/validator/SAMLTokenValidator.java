@@ -35,7 +35,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -124,16 +124,16 @@ public class SAMLTokenValidator implements TokenValidator {
      */
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating SAML Token");
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         Crypto sigCrypto = stsProperties.getSignatureCrypto();
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
         
         TokenValidatorResponse response = new TokenValidatorResponse();
-        response.setValid(false);
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
         
-        if (validateTarget == null || !validateTarget.isDOMElement()) {
+        if (!validateTarget.isDOMElement()) {
             return response;
         }
         
@@ -236,7 +236,7 @@ public class SAMLTokenValidator implements TokenValidator {
             response.setAdditionalProperties(addProps);
             
             response.setTokenRealm(tokenRealm);
-            response.setValid(true);
+            validateTarget.setValidationState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

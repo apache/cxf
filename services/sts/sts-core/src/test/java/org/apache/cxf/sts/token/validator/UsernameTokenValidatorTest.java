@@ -36,6 +36,7 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.EncodedString;
@@ -75,6 +76,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         assertTrue(usernameTokenValidator.canHandleToken(validateTarget));
         
@@ -82,7 +84,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         TokenValidatorResponse validatorResponse = 
                 usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
 
         // Add a password
         PasswordString password = new PasswordString();
@@ -96,7 +99,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
         
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
@@ -133,6 +137,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         assertTrue(usernameTokenValidator.canHandleToken(validateTarget));
         
@@ -140,14 +145,16 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         TokenValidatorResponse validatorResponse = 
             usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
         
         // This will fail as the password is bad
         username.setValue("alice");
         password.setValue("badpassword");
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
     }
     
     /**
@@ -206,13 +213,15 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         assertTrue(usernameTokenValidator.canHandleToken(validateTarget));
         
         TokenValidatorResponse validatorResponse = 
                 usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
         
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
@@ -221,7 +230,8 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         password.setValue("badpassword");
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
     }
     
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {

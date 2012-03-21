@@ -32,6 +32,7 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.SCTProvider;
@@ -67,13 +68,15 @@ public class SCTValidatorTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = getSecurityContextToken();
         ReceivedToken validateTarget = new ReceivedToken(providerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         assertTrue(sctValidator.canHandleToken(validateTarget));
         
         TokenValidatorResponse validatorResponse = 
             sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
         assertTrue(
             validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
         );
@@ -84,7 +87,8 @@ public class SCTValidatorTest extends org.junit.Assert {
         assertNull(tokenStore.getToken(providerResponse.getTokenId()));
         validatorResponse = sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
     }
     
     /**
@@ -101,13 +105,15 @@ public class SCTValidatorTest extends org.junit.Assert {
         SecurityContextToken sct = new SecurityContextToken(doc);
         ReceivedToken validateTarget = new ReceivedToken(sct.getElement());
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         assertTrue(sctValidator.canHandleToken(validateTarget));
         
         TokenValidatorResponse validatorResponse = 
             sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
     }
     
     private TokenProviderResponse getSecurityContextToken() throws Exception {

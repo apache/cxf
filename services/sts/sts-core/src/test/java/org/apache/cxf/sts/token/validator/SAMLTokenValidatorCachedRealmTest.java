@@ -37,6 +37,7 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
@@ -85,6 +86,7 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         // Now set the SAMLRealmCodec implementation on the Validator
         SAMLRealmCodec samlRealmCodec = new IssuerSAMLRealmCodec();
@@ -92,7 +94,8 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         
         TokenValidatorResponse validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
         assertTrue(validatorResponse.getTokenRealm().equals("A"));
         
     }
@@ -116,6 +119,7 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
         
         // Now set the SAMLRealmCodec implementation on the Validator
         SAMLRealmCodec samlRealmCodec = new CacheSAMLRealmCodec();
@@ -123,7 +127,8 @@ public class SAMLTokenValidatorCachedRealmTest extends org.junit.Assert {
         
         TokenValidatorResponse validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
-        assertFalse(validatorResponse.isValid());
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
         assertNull(validatorResponse.getTokenRealm());
         
     }

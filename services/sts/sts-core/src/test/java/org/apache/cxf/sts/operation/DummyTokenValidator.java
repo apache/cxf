@@ -20,7 +20,7 @@
 package org.apache.cxf.sts.operation;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
@@ -49,17 +49,16 @@ public class DummyTokenValidator implements TokenValidator {
     }
 
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
-        
         TokenValidatorResponse response = new TokenValidatorResponse();
-        response.setValid(false);
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
         
         if (validateTarget != null && validateTarget.isBinarySecurityToken()) {
             BinarySecurityTokenType binarySecurity = 
                 (BinarySecurityTokenType)validateTarget.getToken();
             if ("12345678".equals(binarySecurity.getValue())) {
-                response.setValid(true);
+                validateTarget.setValidationState(STATE.VALID);
             }
         }
         

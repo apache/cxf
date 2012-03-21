@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -84,20 +84,17 @@ public class SCTValidator implements TokenValidator {
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating SecurityContextToken");
         
+        TokenValidatorResponse response = new TokenValidatorResponse();
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
+        
         if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTValidator");
-            TokenValidatorResponse response = new TokenValidatorResponse();
-            response.setValid(false);
             return response;
         }
         
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
-
-        TokenValidatorResponse response = new TokenValidatorResponse();
-        response.setValid(false);
-        
-        if (validateTarget != null && validateTarget.isDOMElement()) {
+        if (validateTarget.isDOMElement()) {
             try {
                 Element validateTargetElement = (Element)validateTarget.getToken();
                 SecurityContextToken sct = new SecurityContextToken(validateTargetElement);
@@ -122,7 +119,7 @@ public class SCTValidator implements TokenValidator {
                     String realm = props.getProperty(STSConstants.TOKEN_REALM);
                     response.setTokenRealm(realm);
                 }
-                response.setValid(true);
+                validateTarget.setValidationState(STATE.VALID);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }

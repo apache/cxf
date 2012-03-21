@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.sts.deployment;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
@@ -51,21 +51,21 @@ public class CustomBSTTokenValidator implements TokenValidator {
     }
     
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
-        if (validateTarget == null || !validateTarget.isBinarySecurityToken()) {
-            TokenValidatorResponse response = new TokenValidatorResponse();
-            response.setValid(false);
+        TokenValidatorResponse response = new TokenValidatorResponse();
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
+        
+        if (!validateTarget.isBinarySecurityToken()) {
             return response;
         }
         BinarySecurityTokenType binarySecurityToken = (BinarySecurityTokenType)validateTarget.getToken();
         
-        TokenValidatorResponse response = new TokenValidatorResponse();
         //
         // Do some validation of the token here
         //
         if (Base64.encode("12345678".getBytes()).equals(binarySecurityToken.getValue())) {
-            response.setValid(true);
+            validateTarget.setValidationState(STATE.VALID);
         }
         response.setPrincipal(new CustomTokenPrincipal("alice"));
         

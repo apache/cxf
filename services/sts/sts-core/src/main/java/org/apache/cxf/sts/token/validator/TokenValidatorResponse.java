@@ -21,22 +21,24 @@ package org.apache.cxf.sts.token.validator;
 import java.security.Principal;
 import java.util.Map;
 
+import org.apache.cxf.sts.request.ReceivedToken;
+
 /**
  * This class encapsulates the response from a TokenValidator instance after validating a token.
  */
 public class TokenValidatorResponse {
 
-    private boolean valid;
     private Principal principal;
     private Map<String, Object> additionalProperties;
     private String realm;
+    private ReceivedToken token;
     
-    public void setValid(boolean valid) {
-        this.valid = valid;
+    public ReceivedToken getToken() {
+        return token;
     }
-    
-    public boolean isValid() {
-        return valid;
+
+    public void setToken(ReceivedToken token) {
+        this.token = token;
     }
     
     public void setPrincipal(Principal principal) {

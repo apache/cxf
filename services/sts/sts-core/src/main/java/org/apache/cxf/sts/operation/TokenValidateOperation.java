@@ -32,6 +32,7 @@ import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.RequestParser;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.provider.TokenProvider;
@@ -104,7 +105,8 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         if (tokenResponse == null) {
             LOG.fine("No Token Validator has been found that can handle this token");
             tokenResponse = new TokenValidatorResponse();
-            tokenResponse.setValid(false);
+            validateTarget.setValidationState(STATE.INVALID);
+            tokenResponse.setToken(validateTarget);
         }
         
         //
@@ -112,7 +114,8 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         //
         TokenProviderResponse tokenProviderResponse = null;
         String tokenType = tokenRequirements.getTokenType();
-        if (tokenResponse.isValid() && !STSConstants.STATUS.equals(tokenType)) {
+        if (tokenResponse.getToken().getValidationState() == STATE.VALID 
+            && !STSConstants.STATUS.equals(tokenType)) {
             TokenProviderParameters providerParameters = 
                  createTokenProviderParameters(requestParser, context);
             
@@ -182,7 +185,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         }
         
         // TokenType
-        boolean valid = tokenResponse.isValid();
+        boolean valid = tokenResponse.getToken().getValidationState() == STATE.VALID;
         String tokenType = tokenRequirements.getTokenType();
         if (valid || STSConstants.STATUS.equals(tokenType)) {
             JAXBElement<String> jaxbTokenType = 

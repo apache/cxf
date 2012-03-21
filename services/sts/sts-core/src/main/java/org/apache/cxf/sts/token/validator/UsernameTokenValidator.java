@@ -38,7 +38,7 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.UsernameTokenRealmCodec;
 
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
@@ -107,8 +107,6 @@ public class UsernameTokenValidator implements TokenValidator {
      */
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating UsernameToken");
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         Crypto sigCrypto = stsProperties.getSignatureCrypto();
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
@@ -118,11 +116,13 @@ public class UsernameTokenValidator implements TokenValidator {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);
-
-        TokenValidatorResponse response = new TokenValidatorResponse();
-        response.setValid(false);
         
-        if (validateTarget == null || !validateTarget.isUsernameToken()) {
+        TokenValidatorResponse response = new TokenValidatorResponse();
+        ReceivedToken validateTarget = tokenParameters.getToken();
+        validateTarget.setValidationState(STATE.INVALID);
+        response.setToken(validateTarget);
+
+        if (!validateTarget.isUsernameToken()) {
             return response;
         }
         
@@ -197,7 +197,7 @@ public class UsernameTokenValidator implements TokenValidator {
             
             response.setPrincipal(principal);
             response.setTokenRealm(tokenRealm);
-            response.setValid(true);
+            validateTarget.setValidationState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }
