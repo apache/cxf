@@ -1,7 +1,7 @@
-SecurityTokenService (STS) Demo
-=================
+Security Token Service (STS) Demo
+=================================
 
-This demo shows how to use the SecurityTokenService (STS) implementation in
+This demo shows how to use the Security Token Service (STS) implementation in
 Apache CXF.
 
 The policy of the service provider, as defined in hello_world.wsdl, requires a
