@@ -21,8 +21,10 @@ package org.apache.cxf.ws.rm;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +34,7 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
@@ -57,6 +60,7 @@ public class DestinationSequence extends AbstractSequence {
     private long inProcessNumber;
     private long highNumberCompleted;
     private List<Continuation> continuations = new LinkedList<Continuation>();
+    private Set<Long> deliveringMessageNumbers = new HashSet<Long>();
     
     public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d) {
         this(i, a, 0, null);
@@ -226,16 +230,35 @@ public class DestinationSequence extends AbstractSequence {
     boolean applyDeliveryAssurance(long mn, Message message) throws RMException {
         Continuation cont = getContinuation(message);
         DeliveryAssuranceType da = destination.getManager().getDeliveryAssurance();
+        boolean robust = false;
+        boolean robustDelivering = false;
+        if (message != null) {
+            robust = MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            if (robust) {
+                robustDelivering = 
+                    MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY));
+            }
+        }
+        if (robust && !robustDelivering) {
+            // no check performed if in robust and not in delivering
+            deliveringMessageNumbers.remove(mn);
+            return true;
+        }
         if (cont != null && da.isSetInOrder() && !cont.isNew()) {
             return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
                                message, cont);
         }
-        if ((da.isSetExactlyOnce() || da.isSetAtMostOnce()) && isAcknowledged(mn)) {            
+        if ((da.isSetExactlyOnce() || da.isSetAtMostOnce()) 
+            && (isAcknowledged(mn) 
+                || (robustDelivering && deliveringMessageNumbers.contains(mn)))) {            
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "MESSAGE_ALREADY_DELIVERED_EXC", LOG, mn, getIdentifier().getValue());
             LOG.log(Level.INFO, msg.toString());
             throw new RMException(msg);
         } 
+        if (robustDelivering) {
+            deliveringMessageNumbers.add(mn);
+        }
         if (da.isSetInOrder()) {
             return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
                                message, cont);
