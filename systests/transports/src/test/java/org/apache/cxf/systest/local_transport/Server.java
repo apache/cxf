@@ -28,10 +28,18 @@ import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
 public class Server extends AbstractBusTestServerBase {
 
+    Endpoint ep;
     protected void run() {        
         Object implementor = new GreeterImpl();
         String address = "local://Greeter";
-        Endpoint.publish(address, implementor);
+        ep = Endpoint.publish(address, implementor);
+    }
+    @Override
+    public void tearDown() {
+        if (ep != null) {
+            ep.stop();
+        }
+        
     }
     
     

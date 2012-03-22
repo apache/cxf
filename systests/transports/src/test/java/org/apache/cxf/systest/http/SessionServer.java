@@ -27,15 +27,21 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class SessionServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(SessionServer.class);
-
+    Bus bus;
+    
     @Override
     protected void run() {
         String configurationFile = "resources/SessionServer.xml";
         URL configure =
             SessionServer.class.getResource(configurationFile);
-        System.out.println("the configure is " + configure);
-        Bus bus = new SpringBusFactory().createBus(configure, true);
+        bus = new SpringBusFactory().createBus(configure, true);
         SpringBusFactory.setDefaultBus(bus);
+    }
+    
+    @Override
+    public void tearDown() {
+        bus.shutdown(true);
+        bus = null;
     }
     
     public static void main(String[] args) {

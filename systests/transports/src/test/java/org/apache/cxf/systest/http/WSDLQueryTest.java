@@ -34,7 +34,7 @@ public class WSDLQueryTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BareServer.class));
+                   launchServer(BareServer.class, true));
     }
     
     @Test

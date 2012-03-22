@@ -50,7 +50,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServer() {
-        launchServer(DigestServer.class);
+        launchServer(DigestServer.class, true);
     }
 
     @Test    

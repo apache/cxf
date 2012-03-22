@@ -26,15 +26,22 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class BareServer extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(BareServer.class); 
+    public static final String PORT = allocatePort(BareServer.class);
+    
+    Endpoint ep;
+    
     @Override
     protected void run() {
         Bus bus = new SpringBusFactory().createBus();
         SpringBusFactory.setDefaultBus(bus);
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-        Endpoint.publish(address, implementor);
-        
+        ep = Endpoint.publish(address, implementor);
+    }
+    @Override
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
     
     public static void main(String[] args) {

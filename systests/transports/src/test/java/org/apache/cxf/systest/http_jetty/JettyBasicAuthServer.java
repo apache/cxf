@@ -35,6 +35,8 @@ public class JettyBasicAuthServer extends AbstractBusTestServerBase  {
     static final String PORT = allocatePort(JettyBasicAuthServer.class);
     static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
+    Endpoint ep;
+    
     protected void run()  {
         String configurationFile = "jettyBasicAuthServer.xml";
         URL configure =
@@ -46,9 +48,16 @@ public class JettyBasicAuthServer extends AbstractBusTestServerBase  {
         setBus(bus);
 
         GreeterImpl implementor = new GreeterImpl();
-        Endpoint.publish(ADDRESS, implementor);
+        ep = Endpoint.publish(ADDRESS, implementor);
     }
-        
+    
+    public void tearDown() throws Exception {
+        if (ep != null) {
+            ep.stop();
+            ep = null;
+        }
+    }
+    
     public static void main(String[] args) {
         try { 
             JettyBasicAuthServer s = new JettyBasicAuthServer(); 

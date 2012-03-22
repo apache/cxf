@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
 
 import org.w3c.dom.Document;
 
@@ -272,7 +273,7 @@ public class CXFServletTest extends AbstractServletTest {
     @Test
     public void testGetBinding() throws Exception {
         Endpoint ep = Endpoint.create("http://schemas.xmlsoap.org/wsdl/soap/http", new HelloImpl());
-        System.out.println(ep.getBinding().getClass());
+        assertTrue(ep.getBinding() instanceof SOAPBinding);
     }
 
     @WebService(name = "Hello", portName = "HelloPort",

@@ -77,7 +77,8 @@ public class EngineLifecycleTest extends Assert {
     @Before 
     public void setSystemProperties() {
         close = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");        
-        System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort", "false");
+        //System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort", "false");
+        System.clearProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
         
     }
     
@@ -85,6 +86,8 @@ public class EngineLifecycleTest extends Assert {
     public void resetSystemProperties() {
         if (close != null) {
             System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort", close);
+        } else {
+            System.clearProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
         }
     }
     
@@ -166,11 +169,8 @@ public class EngineLifecycleTest extends Assert {
     }
 
     public void shutdownService() throws Exception {   
-        Bus bus = (Bus)applicationContext.getBean("cxf");
-        bus.shutdown(true);
         applicationContext.destroy();
         applicationContext.close();
-                
     }
     
     
@@ -201,7 +201,6 @@ public class EngineLifecycleTest extends Assert {
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
     }
-    
         
     private void verifyNoServer(String port) {
         try {
@@ -229,12 +228,15 @@ public class EngineLifecycleTest extends Assert {
         invokeService();    
         invokeService8801();
         shutdownService();
+        System.gc(); //make sure the port is cleaned up a bit
+        Thread.sleep(100);
+        System.gc(); 
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
         
         
         setUpBus(true);
-       
+        Thread.sleep(100);       
         invokeService();            
         invokeService8801();
         getTestHtml();

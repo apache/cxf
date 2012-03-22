@@ -31,10 +31,18 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class WSDLAddressRewriteTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(WSDLAddressRewriteTest.class);
+    
+    @Before
+    public void setupBus() throws Exception {
+        createStaticBus();
+    }
+
+    
     @Test
     public void testWithSameAddress() throws Exception {
         Endpoint endpoint = null;

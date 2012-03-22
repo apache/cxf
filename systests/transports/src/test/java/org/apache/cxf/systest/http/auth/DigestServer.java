@@ -48,7 +48,7 @@ public class DigestServer extends AbstractBusTestServerBase {
     }
     
     protected void run() {
-        System.out.println("Starting Server");
+        //System.out.println("Starting Server");
 
         server = new org.eclipse.jetty.server.Server();
 

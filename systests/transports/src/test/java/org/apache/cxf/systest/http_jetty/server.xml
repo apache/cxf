@@ -23,10 +23,14 @@
        xsi:schemaLocation="
 http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+  	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
   
     <http-jetty:engine-factory bus="cxf">
-        <http-jetty:engine port="0">
-	       <http-jetty:threadingParameters minThreads="1" maxThreads="3"/>   
+        <http-jetty:engine port="${testutil.ports.org.apache.cxf.systest.http_jetty.Server}">
+	       <http-jetty:threadingParameters minThreads="3" maxThreads="${ThreadPoolTest.threads}"/>   
         </http-jetty:engine>
     </http-jetty:engine-factory>
 

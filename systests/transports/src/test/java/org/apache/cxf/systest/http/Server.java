@@ -33,6 +33,7 @@ public class Server extends AbstractBusTestServerBase {
     private String name;
     private String address;
     private URL configFileURL;
+    private EndpointImpl ep;
     
     public Server(String[] args) throws Exception {
         this(args[0], args[1], args[2]);
@@ -46,6 +47,12 @@ public class Server extends AbstractBusTestServerBase {
         //                     + " Server at " + address
         //                     + " with config " + configFileURL);
 
+    }
+    public void tearDown() throws Exception {
+        if (ep != null) {
+            ep.stop();
+            ep = null;
+        }
     }
 
     protected void run()  {
@@ -66,7 +73,7 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor = new GreeterImpl(name);
         
         // I don't know why this works.
-        EndpointImpl ep = 
+        ep = 
             new EndpointImpl(
                     getBus(), 
                     implementor,

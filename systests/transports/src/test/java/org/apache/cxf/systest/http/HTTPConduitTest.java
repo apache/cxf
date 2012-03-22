@@ -69,7 +69,6 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.context.ApplicationContext;
@@ -212,13 +211,6 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             servers.add(name);
         }
         return server;
-    }
-    
-    @BeforeClass
-    public static void setProps() {
-        // TODO: Do I need this?
-        System.setProperty("org.apache.cxf.bus.factory", 
-            "org.apache.cxf.bus.CXFBusFactory");
     }
 
     public static KeyStore getKeyStore(String ksType, String file, String ksPassword)

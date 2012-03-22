@@ -51,14 +51,24 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
 
     public static class MyServer extends AbstractBusTestServerBase {
         Definition def;
+        Endpoint ep1;
+        Endpoint ep2;
         protected void run() {
             Object implementor = new HTTPGreeterImpl();
             String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
-            Endpoint.publish(address, implementor);
+            ep1 = Endpoint.publish(address, implementor);
             EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(),
                                                           "testutils/hello_world_doc_lit.wsdl");
             implementor = new JMSGreeterImpl();
-            Endpoint.publish(null, implementor);
+            ep2 = Endpoint.publish(null, implementor);
+        }
+        public void tearDown() {
+            if (ep1 != null) {
+                ep1.stop();
+            }
+            if (ep2 != null) {
+                ep2.stop();
+            }
         }
 
         public static void main(String[] args) {
@@ -81,13 +91,13 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
             props.put("org.apache.activemq.default.directory.prefix", 
                       System.getProperty("org.apache.activemq.default.directory.prefix"));
         }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
+        //props.put("java.util.logging.config.file", 
+        //          System.getProperty("java.util.logging.config.file"));
         
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
 
-        assertTrue("server did not launch correctly", launchServer(MyServer.class));
+        assertTrue("server did not launch correctly", launchServer(MyServer.class, true));
         
     }
     

@@ -32,6 +32,9 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
 import junit.framework.Assert;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -43,13 +46,15 @@ import org.junit.Test;
 public class PublishedEndpointUrlTest extends Assert {
     public static final String PORT = TestUtil.getPortNumber(PublishedEndpointUrlTest.class);
 
+    
     @Test
     public void testPublishedEndpointUrl() throws Exception {
         
         Greeter implementor = new org.apache.hello_world_soap_http.GreeterImpl();
         String publishedEndpointUrl = "http://cxf.apache.org/publishedEndpointUrl";
-        
+        Bus bus = BusFactory.getDefaultBus();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        svrFactory.setBus(bus);
         svrFactory.setServiceClass(Greeter.class);
         svrFactory.setAddress("http://localhost:" + PORT + "/publishedEndpointUrl");
         svrFactory.setPublishedEndpointUrl(publishedEndpointUrl);
@@ -87,8 +92,9 @@ public class PublishedEndpointUrlTest extends Assert {
                 }
             }
         }
-        
+        server.stop();
         server.destroy();
+        bus.shutdown(true);
     }
 
 

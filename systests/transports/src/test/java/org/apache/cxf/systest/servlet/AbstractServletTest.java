@@ -32,6 +32,8 @@ import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
 import org.apache.cxf.test.AbstractCXFTest;
+
+import org.junit.After;
 import org.junit.Before;
 
 public abstract class AbstractServletTest extends AbstractCXFTest {
@@ -43,15 +45,20 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
     public void setUp() throws Exception {
         InputStream configurationStream = getResourceAsStream(getConfiguration());
         sr = new ServletRunner(configurationStream, CONTEXT);
-        
         try {
             sr.newClient().getResponse(CONTEXT_URL + "/services");
         } catch (HttpNotFoundException e) {
             // ignore, we just want to boot up the servlet
         }   
         
-        HttpUnitOptions.setExceptionsThrownOnErrorStatus(true);        
+        HttpUnitOptions.setExceptionsThrownOnErrorStatus(true);
     } 
+    @After
+    public void tearDown() throws Exception {
+        if (sr != null) {
+            sr.shutDown();
+        }
+    }
 
     /**
      * @return The web.xml to use for testing.
