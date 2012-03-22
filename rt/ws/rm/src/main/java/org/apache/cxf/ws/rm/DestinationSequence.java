@@ -241,7 +241,7 @@ public class DestinationSequence extends AbstractSequence {
         }
         if (robust && !robustDelivering) {
             // no check performed if in robust and not in delivering
-            deliveringMessageNumbers.remove(mn);
+            removeDeliveringMessageNumber(mn);
             return true;
         }
         if (cont != null && da.isSetInOrder() && !cont.isNew()) {
@@ -264,6 +264,10 @@ public class DestinationSequence extends AbstractSequence {
                                message, cont);
         }
         return true;
+    }
+    
+    void removeDeliveringMessageNumber(long mn) {
+        deliveringMessageNumbers.remove(mn);
     }
     
     private Continuation getContinuation(Message message) {

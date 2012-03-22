@@ -45,6 +45,11 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     @Override
     public void handleFault(Message message) {
         message.put(MAPAggregator.class.getName(), true);
+        if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
+            // revert the delivering entry from the destination sequence
+            Destination destination = getManager().getDestination(message);
+            destination.releaseDeliveringStatus(message);
+        }
     }
 
     protected void handle(Message message) throws SequenceFault, RMException {
