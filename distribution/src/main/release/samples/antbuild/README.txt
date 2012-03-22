@@ -14,7 +14,9 @@ Prerequisite
 
 The Ant build.xml for this sample requires the CXF_HOME
 environment variable to be set to the root of the Apache CXF
-installation.   
+installation, and you may wish to place the Ant /bin folder
+in your system PATH variable so the "ant" command will be 
+available from any directory.
 
 
 Building and running the demo using Ant
