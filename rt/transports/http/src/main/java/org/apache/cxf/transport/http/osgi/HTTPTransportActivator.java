@@ -85,7 +85,7 @@ import org.osgi.util.tracker.ServiceTracker;
 public class HTTPTransportActivator 
     implements BundleActivator, ManagedServiceFactory, HTTPConduitConfigurer {
     public static final String FACTORY_PID = "org.apache.cxf.http.conduits"; 
-    
+    private static final String SECURE_HTTP_PREFIX = "https";
     
     private static class PidInfo implements Comparable<PidInfo> {
         final Dictionary<String, String> props;
@@ -235,25 +235,27 @@ public class HTTPTransportActivator
                 synchronized (m) {
                     m.reset(address);
                     if (m.matches()) {
-                        apply(info.getProps(), c);
+                        apply(info.getProps(), c, address);
                     }
                 }
             }
         }
         
         if (byAddress != null) {
-            apply(byAddress.getProps(), c);
+            apply(byAddress.getProps(), c, address);
         }
         if (byName != null) {
-            apply(byName.getProps(), c);
+            apply(byName.getProps(), c, address);
         }
     }
 
-    private void apply(Dictionary<String, String> d, HTTPConduit c) {
+    private void apply(Dictionary<String, String> d, HTTPConduit c, String address) {
         applyClientPolicies(d, c);
         applyAuthorization(d, c);
         applyProxyAuthorization(d, c);
-        applyTlsClientParameters(d, c);
+        if (address != null && address.startsWith(SECURE_HTTP_PREFIX)) {
+            applyTlsClientParameters(d, c);
+        }
     }
 
     private void applyTlsClientParameters(Dictionary<String, String> d, HTTPConduit c) {
