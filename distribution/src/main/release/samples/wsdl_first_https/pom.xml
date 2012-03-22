@@ -75,7 +75,7 @@
                         <configuration>
                             <tasks>
                                 <copy file="${basedir}/src/main/java/demo/hw_https/server/CherryServer.xml" todir="${basedir}/target/classes/demo/hw_https/server" />
-                                <copy file="${basedir}/src/main/java/demo/hw_https/client/WibbleClient.xml" todir="${basedir}/target/classes/demo/hw_https/client" />
+                                <copy file="${basedir}/src/main/java/demo/hw_https/client/SecureClient.xml" todir="${basedir}/target/classes/demo/hw_https/client" />
                                 <copy file="${basedir}/src/main/java/demo/hw_https/client/InsecureClient.xml" todir="${basedir}/target/classes/demo/hw_https/client" />
                                 <copy todir="${basedir}/target/classes/certs">
                                     <fileset dir="${basedir}/certs" />

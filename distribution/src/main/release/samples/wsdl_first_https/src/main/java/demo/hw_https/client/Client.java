@@ -58,7 +58,7 @@ public final class Client {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = null;
         if ("secure".equals(args[1])) {
-            busFile = Client.class.getResource("WibbleClient.xml");
+            busFile = Client.class.getResource("SecureClient.xml");
         } else if ("insecure".equals(args[1])) {
             busFile = Client.class.getResource("InsecureClient.xml");
         } else {
