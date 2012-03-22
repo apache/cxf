@@ -44,8 +44,10 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        int threads = Math.max(1, (Runtime.getRuntime().availableProcessors() + 3) / 4) * 2 + 3;
+        System.setProperty("ThreadPoolTest.threads", Integer.toString(threads));
         assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, false));
+                   launchServer(Server.class, true));
     }
 
     @Before
@@ -56,34 +58,53 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    ADDRESS);
     }
+    
+    class TestRunnable implements Runnable {
+        int i;
+        long total;
+        
+        public TestRunnable(int i) {
+            this.i = i;
+        }
+        public void run() {
+            long start = System.currentTimeMillis();
+            try {
+                greeter.greetMeLater(2 * 1000);
+            } catch (Throwable t) {
+                //ignore
+                t.printStackTrace();
+            }
+            long end = System.currentTimeMillis();
+            total = end - start;
+        }
+        public long getTotal() {
+            return total;
+        }
+    }
 
     @Test
-    public void testFallbackThreadPoolConfig() throws Exception { 
-        Runnable r = new Runnable() {
-            public void run() {
-                try {
-                    greeter.greetMeLater(5 * 1000);
-                } catch (Throwable t) {
-                    //ignore
-                }
-            }
-        };
+    public void testFallbackThreadPoolConfig() throws Exception {
+        TestRunnable r[] = new TestRunnable[5];
         Thread[] invokers = new Thread[5];
-        long start = System.currentTimeMillis();
         for (int i = 0; i < invokers.length; i++) {
-            invokers[i] = new Thread(r);
+            r[i] = new TestRunnable(i);
+            invokers[i] = new Thread(r[i]);
             invokers[i].setDaemon(true);
             invokers[i].start();
         }
+        
+        int countLess = 0;
+        int countMore = 0;
         for (int i = 0; i < invokers.length; i++) {
-            invokers[i].join(15 * 1000);
-            long end = System.currentTimeMillis();
-            if ((end - start) > (10 * 1000L)) {
-                return;
+            invokers[i].join(6 * 1000);
+            if (r[i].getTotal() > 3000) {
+                countMore++;
+            } else {
+                countLess++;
             }
         }
-        long end = System.currentTimeMillis();
-        assertTrue("unexpected duration: " + (end - start),
-                   end - start > 10 * 1000L);
+        assertEquals(3, countLess);
+        assertEquals(2, countMore);
+        
     }
 }
