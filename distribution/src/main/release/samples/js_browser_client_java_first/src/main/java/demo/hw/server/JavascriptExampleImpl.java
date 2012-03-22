@@ -35,41 +35,44 @@ public class JavascriptExampleImpl implements JavascriptExample {
     
     public JavascriptExampleImpl() {
         beverages = new ArrayList<Beverage>();
-        Ingredient chalk = new Ingredient();
-        chalk.setName("chalk");
-        chalk.setCategory(Category.Mineral);
+        Ingredient calcium = new Ingredient();
+        calcium.setName("calcium");
+        calcium.setCategory(Category.Mineral);
+        Ingredient zinc = new Ingredient();
+        zinc.setName("zinc");
+        zinc.setCategory(Category.Mineral);
         Ingredient broccoli = new Ingredient();
         broccoli.setName("broccoli");
         broccoli.setCategory(Category.Vegetable);
-        Ingredient locust = new Ingredient();
-        locust.setName("locust");
-        locust.setCategory(Category.Animal);
+        Ingredient apple = new Ingredient();
+        apple.setName("apple");
+        apple.setCategory(Category.Fruit);
         
         Beverage b = new Beverage();
-        b.setName("broccoli shake");
+        b.setName("zinc-fortified broccoli shake");
         b.setProof(20);
         Ingredient[] ingredients;
         ingredients = new Ingredient[2];
-        ingredients[0] = chalk;
+        ingredients[0] = zinc;
         ingredients[1] = broccoli;
         b.setIngredients(ingredients);
         beverages.add(b);
         
         b = new Beverage();
-        b.setName("green locust");
+        b.setName("apple broccoli shake");
         b.setProof(50);
         ingredients = new Ingredient[2];
-        ingredients[0] = locust;
+        ingredients[0] = apple;
         ingredients[1] = broccoli;
         b.setIngredients(ingredients);
         beverages.add(b);
         
         b = new Beverage();
-        b.setName("bug shake");
+        b.setName("calcium-fortified apple juice");
         b.setProof(13);
         ingredients = new Ingredient[2];
-        ingredients[0] = locust;
-        ingredients[1] = chalk;
+        ingredients[0] = apple;
+        ingredients[1] = calcium;
         b.setIngredients(ingredients);
         beverages.add(b);
         

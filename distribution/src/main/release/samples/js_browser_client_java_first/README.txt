@@ -15,16 +15,17 @@ Using either UNIX or Windows:
   mvn install
   mvn -Pserver
 
-
 Running the client in a browser
 -------------------------------
 
-Once the server is running, browse to:
+Once the server is running, you can view its WSDL at:
+   http://localhost:9000/beverages?wsdl
 
-  http://HOSTNAME:9000/Beverages.html
+Also, browse to:
 
-(Substitute your hostname for HOSTNAME.)
+  http://localhost:9000/Beverages.html
 
-On the web page you see, click on the 'invoke' button to invoke the
-very simple sayHi service, which takes no input and returns a single
-string.
+On the web page you see, choose a beverage ingredient category
+and select the invoke button to see a list of beverages 
+containing that ingredients of that category.
+

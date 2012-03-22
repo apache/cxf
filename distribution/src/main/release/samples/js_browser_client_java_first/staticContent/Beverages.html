@@ -35,9 +35,13 @@ function beverageListResponse(response)
     responseSpan = document.getElementById('beverages');
     var beverages = response.getItem();
     var str = '';
+    var first = new Boolean(true);
     for(b in beverages) {
+        if (first == false) {
+           str = str + ', ';
+        }
     	str = str + beverages[b].getName();
-    	str = str + ' ';
+    	first=false;
     }
     responseSpan.firstChild.nodeValue = str;
 }
@@ -67,12 +71,12 @@ Hello World Sample
 <div>
 	<table>
 	<tr>
-	<td>Category
+	<td>Ingredient
 	</td>
 	<td>
 	<select id='category'>
-	<option value="">Choose a Category...</option>
-    <option value="Animal">Animal</option>
+	<option value="">Choose an Ingredient...</option>
+	<option value="Fruit">Fruit</option>
 	<option value="Vegetable">Vegetable</option>
 	<option value="Mineral">Mineral</option>
     </select>
@@ -93,3 +97,4 @@ Hello World Sample
 </form>
 </body>
 </html>
+

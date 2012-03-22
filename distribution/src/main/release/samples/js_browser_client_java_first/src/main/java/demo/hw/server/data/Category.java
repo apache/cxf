@@ -20,7 +20,7 @@
 package demo.hw.server.data;
 
 public enum Category {
-    Animal,
+    Fruit,
     Vegetable,
     Mineral;
 }
