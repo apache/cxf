@@ -166,17 +166,31 @@
         <bundle start-level="30" dependency="true">mvn:org.codehaus.jettison/jettison/${cxf.jettison.version}</bundle>
 
         <bundle>mvn:org.apache.cxf/cxf-rt-bindings-xml/${project.version}</bundle>
-
         <bundle>mvn:org.apache.cxf/cxf-rt-rs-extension-providers/${project.version}</bundle>
         <bundle>mvn:org.apache.cxf/cxf-rt-rs-extension-search/${project.version}</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-cors/${project.version}</bundle>
-        <!-- requires net.oauth.core
-        <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-rs-security-oauth/${project.version}</bundle>
-        -->
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-oauth2/${project.version}</bundle>
-        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
-
         <bundle>mvn:org.apache.cxf/cxf-rt-frontend-jaxrs/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-rs-security-xml" version="${project.version}" resolver='(obr)' start-level='40'>
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
+    </feature>
+
+    <feature name="cxf-rs-security-cors" version="${project.version}" resolver='(obr)' start-level='40'>
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-cors/${project.version}</bundle>
+    </feature>
+
+    <!-- requires net.oauth.core
+    <feature name="cxf-rs-security-oauth" version="${project.version}" resolver='(obr)' start-level='40'>
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-rs-security-oauth/${project.version}</bundle>
+    </feature>
+    -->
+
+    <feature name="cxf-rs-security-oauth2" version="${project.version}" resolver='(obr)' start-level='40'>
+        <feature version="${project.version}">cxf-jaxrs</feature>
+        <bundle>mvn:org.apache.cxf/cxf-rt-rs-security-oauth2/${project.version}</bundle>
     </feature>
 
     <feature name="cxf-databinding-aegis" version="${project.version}" resolver='(obr)' start-level='40'>
