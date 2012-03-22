@@ -28,9 +28,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.Random;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 
 public final class TestUtil {
+    private static final Logger LOG = LogUtils.getL7dLogger(TestUtil.class);
     private static int portNum = -1;
     private static Properties ports = new Properties();
     
@@ -107,18 +111,24 @@ public final class TestUtil {
     public static Properties getAllPorts() {
         return ports;
     }
+    
     public static String getPortNumber(Class<?> cls) {
-        return getPortNumber(cls.getSimpleName());
+        return getPortNumber(cls.getName(), cls.getSimpleName());
     }
     public static String getPortNumber(Class<?> cls, int count) {
-        return getPortNumber(cls.getSimpleName() + "." + count);
+        return getPortNumber(cls.getName() + "." + count,
+                             cls.getSimpleName() + "." + count);
     }
     public static String getPortNumber(String name) {
-        String p = ports.getProperty("testutil.ports." + name);
+        return getPortNumber(name, name);
+    }
+    public static String getPortNumber(String fullName, String simpleName) {
+        String p = ports.getProperty("testutil.ports." + fullName);
         if (p == null) {
-            p = System.getProperty("testutil.ports." + name);
+            p = System.getProperty("testutil.ports." + fullName);
             if (p != null) {
-                ports.setProperty("testutil.ports." + name, p);
+                ports.setProperty("testutil.ports." + fullName, p);
+                ports.setProperty("testutil.ports." + simpleName, p);
             }
         }
         while (p == null) {
@@ -128,12 +138,15 @@ public final class TestUtil {
                 ServerSocket sock = new ServerSocket(pn);
                 sock.close();
                 p = Integer.toString(pn);
+                LOG.fine("Setting port for " + fullName + " to " + p);
             } catch (IOException ex) {
                 //
             }
         }
-        ports.put("testutil.ports." + name, p);
-        System.setProperty("testutil.ports." + name, p);
+        ports.put("testutil.ports." + fullName, p);
+        ports.put("testutil.ports." + simpleName, p);
+        System.setProperty("testutil.ports." + fullName, p);
+        System.setProperty("testutil.ports." + simpleName, p);
         return p;
     }
 }
