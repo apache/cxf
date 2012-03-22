@@ -32,6 +32,7 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.RequestParser;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.canceller.TokenCanceller;
@@ -102,6 +103,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
         
         cancellerParameters.setKeyRequirements(keyRequirements);
         cancellerParameters.setTokenRequirements(tokenRequirements);   
+        cancellerParameters.setToken(cancelTarget);
         
         //
         // Cancel token
@@ -120,7 +122,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
                 break;
             }
         }
-        if (tokenResponse == null) {
+        if (tokenResponse == null || tokenResponse.getToken() == null) {
             LOG.fine("No Token Canceller has been found that can handle this token");
             throw new STSException(
                 "No token canceller found for requested token type: " 
@@ -129,7 +131,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
             );
         }
         
-        if (!tokenResponse.isTokenCancelled()) {
+        if (tokenResponse.getToken().getState() != STATE.CANCELLED) {
             LOG.log(Level.WARNING, "Token cancellation failed.");
             throw new STSException("Token cancellation failed.");
         }

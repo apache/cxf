@@ -202,7 +202,7 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         
         if (onBehalfOf != null) {
             ReceivedToken onBehalfOfToken = new ReceivedToken(onBehalfOf);
-            onBehalfOfToken.setValidationState(STATE.VALID);
+            onBehalfOfToken.setState(STATE.VALID);
             tokenRequirements.setOnBehalfOf(onBehalfOfToken);
             
         }

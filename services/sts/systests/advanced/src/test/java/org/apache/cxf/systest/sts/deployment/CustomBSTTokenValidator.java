@@ -53,7 +53,7 @@ public class CustomBSTTokenValidator implements TokenValidator {
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
-        validateTarget.setValidationState(STATE.INVALID);
+        validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
         
         if (!validateTarget.isBinarySecurityToken()) {
@@ -65,7 +65,7 @@ public class CustomBSTTokenValidator implements TokenValidator {
         // Do some validation of the token here
         //
         if (Base64.encode("12345678".getBytes()).equals(binarySecurityToken.getValue())) {
-            validateTarget.setValidationState(STATE.VALID);
+            validateTarget.setState(STATE.VALID);
         }
         response.setPrincipal(new CustomTokenPrincipal("alice"));
         

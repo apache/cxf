@@ -76,7 +76,7 @@ public class SCTValidatorTest extends org.junit.Assert {
             sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue(
             validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
         );
@@ -88,7 +88,7 @@ public class SCTValidatorTest extends org.junit.Assert {
         validatorResponse = sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
     
     /**
@@ -113,7 +113,7 @@ public class SCTValidatorTest extends org.junit.Assert {
             sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
     
     private TokenProviderResponse getSecurityContextToken() throws Exception {

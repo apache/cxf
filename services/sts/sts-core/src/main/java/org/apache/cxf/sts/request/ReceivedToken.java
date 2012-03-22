@@ -43,10 +43,10 @@ public class ReceivedToken {
     private boolean isUsernameToken;
     private boolean isDOMElement;
     private String tokenContext; // WS-Security, OnBehalfOf, ActAs
-    private STATE validationState;
+    private STATE state = STATE.NONE;
     private Principal principal;
     
-    public enum STATE { VALID, INVALID, NONE };
+    public enum STATE { VALID, INVALID, CANCELLED, NONE };
     
     public ReceivedToken(Object receivedToken) throws STSException {
         if (receivedToken instanceof JAXBElement<?>) {
@@ -118,12 +118,12 @@ public class ReceivedToken {
         this.tokenContext = tokenContext;
     }
 
-    public STATE getValidationState() {
-        return validationState;
+    public STATE getState() {
+        return state;
     }
 
-    public void setValidationState(STATE validationState) {
-        this.validationState = validationState;
+    public void setState(STATE state) {
+        this.state = state;
     }
 
     public Principal getPrincipal() {

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -76,11 +76,10 @@ public class SCTCanceller implements TokenCanceller {
      */
     public TokenCancellerResponse cancelToken(TokenCancellerParameters tokenParameters) {
         LOG.fine("Trying to cancel a SecurityContextToken");
-        TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
-        ReceivedToken cancelTarget = tokenRequirements.getCancelTarget();
-
         TokenCancellerResponse response = new TokenCancellerResponse();
-        response.setTokenCancelled(false);
+        ReceivedToken cancelTarget = tokenParameters.getToken();
+        cancelTarget.setState(STATE.NONE);
+        response.setToken(cancelTarget);
         
         if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTCanceller");
@@ -105,7 +104,7 @@ public class SCTCanceller implements TokenCanceller {
                     );
                 }
                 tokenParameters.getTokenStore().remove(token);
-                response.setTokenCancelled(true);
+                cancelTarget.setState(STATE.CANCELLED);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
             }

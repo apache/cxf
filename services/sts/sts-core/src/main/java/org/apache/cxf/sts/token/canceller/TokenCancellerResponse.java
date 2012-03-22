@@ -18,20 +18,21 @@
  */
 package org.apache.cxf.sts.token.canceller;
 
+import org.apache.cxf.sts.request.ReceivedToken;
+
 
 /**
  * This class encapsulates the response from a TokenCanceller instance after cancelling a token.
  */
 public class TokenCancellerResponse {
-
-    private boolean tokenCancelled;
+    private ReceivedToken token;
     
-    public void setTokenCancelled(boolean tokenCancelled) {
-        this.tokenCancelled = tokenCancelled;
+    public ReceivedToken getToken() {
+        return token;
     }
-    
-    public boolean isTokenCancelled() {
-        return tokenCancelled;
+
+    public void setToken(ReceivedToken token) {
+        this.token = token;
     }
     
 }

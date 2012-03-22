@@ -53,14 +53,14 @@ public class UsernameTokenValidator implements TokenValidator {
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
-        validateTarget.setValidationState(STATE.INVALID);
+        validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
         
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
         // Ignore the fact that no password is provided
         // Some other requirements must be met to issue a token onbehalfof a subject
         // whose authentication is not proved
-        validateTarget.setValidationState(STATE.VALID);
+        validateTarget.setState(STATE.VALID);
         response.setPrincipal(new CustomTokenPrincipal(usernameTokenType.getUsername().getValue()));
         
         return response;

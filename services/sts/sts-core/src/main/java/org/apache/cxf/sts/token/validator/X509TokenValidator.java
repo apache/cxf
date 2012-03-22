@@ -105,7 +105,7 @@ public class X509TokenValidator implements TokenValidator {
 
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
-        validateTarget.setValidationState(STATE.INVALID);
+        validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
         
         if (!validateTarget.isBinarySecurityToken()) {
@@ -144,7 +144,7 @@ public class X509TokenValidator implements TokenValidator {
 
             Credential returnedCredential = validator.validate(credential, requestData);
             response.setPrincipal(returnedCredential.getCertificates()[0].getSubjectX500Principal());
-            validateTarget.setValidationState(STATE.VALID);
+            validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

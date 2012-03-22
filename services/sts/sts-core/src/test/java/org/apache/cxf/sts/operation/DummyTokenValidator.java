@@ -51,14 +51,14 @@ public class DummyTokenValidator implements TokenValidator {
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
-        validateTarget.setValidationState(STATE.INVALID);
+        validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
         
         if (validateTarget != null && validateTarget.isBinarySecurityToken()) {
             BinarySecurityTokenType binarySecurity = 
                 (BinarySecurityTokenType)validateTarget.getToken();
             if ("12345678".equals(binarySecurity.getValue())) {
-                validateTarget.setValidationState(STATE.VALID);
+                validateTarget.setState(STATE.VALID);
             }
         }
         

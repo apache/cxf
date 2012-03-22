@@ -130,7 +130,7 @@ public class SAMLTokenValidator implements TokenValidator {
         
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
-        validateTarget.setValidationState(STATE.INVALID);
+        validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
         
         if (!validateTarget.isDOMElement()) {
@@ -236,7 +236,7 @@ public class SAMLTokenValidator implements TokenValidator {
             response.setAdditionalProperties(addProps);
             
             response.setTokenRealm(tokenRealm);
-            validateTarget.setValidationState(STATE.VALID);
+            validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

@@ -105,7 +105,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         if (tokenResponse == null) {
             LOG.fine("No Token Validator has been found that can handle this token");
             tokenResponse = new TokenValidatorResponse();
-            validateTarget.setValidationState(STATE.INVALID);
+            validateTarget.setState(STATE.INVALID);
             tokenResponse.setToken(validateTarget);
         }
         
@@ -114,7 +114,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         //
         TokenProviderResponse tokenProviderResponse = null;
         String tokenType = tokenRequirements.getTokenType();
-        if (tokenResponse.getToken().getValidationState() == STATE.VALID 
+        if (tokenResponse.getToken().getState() == STATE.VALID 
             && !STSConstants.STATUS.equals(tokenType)) {
             TokenProviderParameters providerParameters = 
                  createTokenProviderParameters(requestParser, context);
@@ -185,7 +185,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         }
         
         // TokenType
-        boolean valid = tokenResponse.getToken().getValidationState() == STATE.VALID;
+        boolean valid = tokenResponse.getToken().getState() == STATE.VALID;
         String tokenType = tokenRequirements.getTokenType();
         if (valid || STSConstants.STATUS.equals(tokenType)) {
             JAXBElement<String> jaxbTokenType = 

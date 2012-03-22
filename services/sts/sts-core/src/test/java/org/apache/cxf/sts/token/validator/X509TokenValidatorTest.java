@@ -87,13 +87,13 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
         
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
         
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
@@ -134,7 +134,7 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         TokenValidatorResponse validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.INVALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
     
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {

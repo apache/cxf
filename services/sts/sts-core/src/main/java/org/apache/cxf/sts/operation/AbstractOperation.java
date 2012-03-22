@@ -525,7 +525,7 @@ public abstract class AbstractOperation {
     protected TokenValidatorResponse validateReceivedToken(
             WebServiceContext context, String realm,
             TokenRequirements tokenRequirements, ReceivedToken token) {
-        token.setValidationState(STATE.NONE);
+        token.setState(STATE.NONE);
         
         TokenRequirements validateRequirements = new TokenRequirements();
         validateRequirements.setValidateTarget(token);
@@ -556,7 +556,7 @@ public abstract class AbstractOperation {
                     token.setPrincipal(tokenResponse.getPrincipal());
                 } catch (RuntimeException ex) {
                     LOG.log(Level.WARNING, "Failed to validate the token", ex);
-                    token.setValidationState(STATE.INVALID);
+                    token.setState(STATE.INVALID);
                 }
                 break;
             }

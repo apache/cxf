@@ -115,7 +115,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             if (tokenResponse == null) {
                 LOG.fine("No Token Validator has been found that can handle this token");
 
-            } else if (validateTarget.getValidationState().equals(STATE.VALID)) {
+            } else if (validateTarget.getState().equals(STATE.VALID)) {
                 processValidToken(providerParameters, validateTarget, tokenResponse); 
             } else {
                 //[TODO] Add plugin for validation out-of-band

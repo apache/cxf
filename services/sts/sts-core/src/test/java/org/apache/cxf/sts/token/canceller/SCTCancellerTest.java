@@ -32,6 +32,7 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.SCTProvider;
@@ -67,17 +68,18 @@ public class SCTCancellerTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = getSecurityContextToken();
         ReceivedToken cancelTarget = new ReceivedToken(providerResponse.getToken());
         tokenRequirements.setCancelTarget(cancelTarget);
+        cancellerParameters.setToken(cancelTarget);
         
         assertTrue(sctCanceller.canHandleToken(cancelTarget));
         
         TokenCancellerResponse cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
         assertTrue(cancellerResponse != null);
-        assertTrue(cancellerResponse.isTokenCancelled());
+        assertTrue(cancellerResponse.getToken().getState() == STATE.CANCELLED);
         
         // Try to cancel the token again - this should fail
         cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
         assertTrue(cancellerResponse != null);
-        assertFalse(cancellerResponse.isTokenCancelled());
+        assertFalse(cancellerResponse.getToken().getState() == STATE.CANCELLED);
     }
     
     /**
@@ -95,12 +97,13 @@ public class SCTCancellerTest extends org.junit.Assert {
         SecurityContextToken sct = new SecurityContextToken(doc);
         ReceivedToken cancelTarget = new ReceivedToken(sct.getElement());
         tokenRequirements.setCancelTarget(cancelTarget);
+        cancellerParameters.setToken(cancelTarget);
         
         assertTrue(sctCanceller.canHandleToken(cancelTarget));
         
         TokenCancellerResponse cancellerResponse = sctCanceller.cancelToken(cancellerParameters);
         assertTrue(cancellerResponse != null);
-        assertFalse(cancellerResponse.isTokenCancelled());
+        assertFalse(cancellerResponse.getToken().getState() == STATE.CANCELLED);
     }
     
     private TokenProviderResponse getSecurityContextToken() throws Exception {

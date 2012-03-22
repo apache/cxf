@@ -119,7 +119,7 @@ public class UsernameTokenValidator implements TokenValidator {
         
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
-        validateTarget.setValidationState(STATE.INVALID);
+        validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
 
         if (!validateTarget.isUsernameToken()) {
@@ -197,7 +197,7 @@ public class UsernameTokenValidator implements TokenValidator {
             
             response.setPrincipal(principal);
             response.setTokenRealm(tokenRealm);
-            validateTarget.setValidationState(STATE.VALID);
+            validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
         }

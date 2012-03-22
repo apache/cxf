@@ -82,7 +82,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertNull(validatorResponse.getTokenRealm());
 
         // Now set the SAMLRealmCodec implementation on the Validator
@@ -92,7 +92,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue(validatorResponse.getTokenRealm().equals("A"));
             
         Principal principal = validatorResponse.getPrincipal();
@@ -125,7 +125,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertNull(validatorResponse.getTokenRealm());
 
         // Now set the SAMLRealmCodec implementation on the Validator
@@ -135,7 +135,7 @@ public class SAMLTokenValidatorRealmTest extends org.junit.Assert {
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getValidationState() == STATE.VALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertTrue(validatorResponse.getTokenRealm().equals("B"));
             
         Principal principal = validatorResponse.getPrincipal();
