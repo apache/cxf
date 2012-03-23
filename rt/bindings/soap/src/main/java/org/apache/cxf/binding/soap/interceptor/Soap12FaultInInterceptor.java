@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPathConstants;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -71,9 +70,23 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
         XPathUtils xu = new XPathUtils(ns);        
-        
         try {
-            Document fault = StaxUtils.read(new FragmentStreamReader(reader));
+            Node mainNode = message.getContent(Node.class);
+            
+            Node fault = null;
+            if (mainNode != null) {
+                Node bodyNode = (Node) xu.getValue("//s:Body",
+                                                   mainNode,
+                                                   XPathConstants.NODE);
+
+                StaxUtils.readDocElements(bodyNode.getOwnerDocument(),
+                                          bodyNode,
+                                          new FragmentStreamReader(reader),
+                                          false, false);
+                fault = (Element)xu.getValue("//s:Fault", bodyNode, XPathConstants.NODE);
+            } else {
+                fault = StaxUtils.read(new FragmentStreamReader(reader));
+            }
             Element el = (Element)xu.getValue("//s:Fault/s:Code/s:Value", 
                                       fault, 
                                       XPathConstants.NODE);

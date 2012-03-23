@@ -178,4 +178,27 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         assertEquals(Soap12.getInstance().getReceiver(), fault2.getFaultCode());
     }
 
+    @Test
+    public void testCXF4181() throws Exception {
+
+        SoapMessage m = new SoapMessage(new MessageImpl());
+        m.setVersion(Soap12.getInstance());        
+
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
+                                                                 .getResourceAsStream("cxf4181.xml"));
+
+        m.setContent(XMLStreamReader.class, reader);
+
+        new ReadHeadersInterceptor(null).handleMessage(m);
+        Soap12FaultInInterceptor inInterceptor = new Soap12FaultInInterceptor();
+        inInterceptor.handleMessage(m);
+
+        SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
+        assertNotNull(fault2);
+        
+        assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
+        assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"), 
+                     fault2.getSubCode());
+    }
 }
