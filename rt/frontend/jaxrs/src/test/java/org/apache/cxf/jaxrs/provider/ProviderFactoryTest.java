@@ -575,18 +575,7 @@ public class ProviderFactoryTest extends Assert {
         }
         return index;
     }
-    
-    private int indexOf(List<? extends Object> providerInfos, Object provider) {
-        int index = 0;
-        for (Object pi : providerInfos) {
-            if (((ProviderInfo<?>)pi).getProvider() == provider) {
-                break;
-            }
-            index++;
-        }
-        return index;
-    }
-    
+
     @Consumes("text/html")
     @Produces("text/html")
     private final class TestStringProvider 
