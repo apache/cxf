@@ -19,6 +19,7 @@
 
 package demo.jms_greeter.client;
 
+import java.io.Closeable;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -66,7 +67,7 @@ public final class Client {
         greeter.greetMeOneWay(System.getProperty("user.name"));
         System.out.println("No response from server as method is OneWay");
         System.out.println();
-        
+
         // Demonstration of JMS Context usage
 
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
@@ -113,9 +114,11 @@ public final class Client {
             System.out.println("Failed to get the binding provider cannot access context info.");
             System.exit(3);
         }
-
-
         System.out.println();
+
+        if (greeter instanceof Closeable) {
+            ((Closeable)greeter).close();
+        }
 
         System.exit(0);
     }

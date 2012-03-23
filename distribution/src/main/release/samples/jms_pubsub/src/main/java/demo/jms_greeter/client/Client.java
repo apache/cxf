@@ -18,6 +18,7 @@
  */
 package demo.jms_greeter.client;
 
+import java.io.Closeable;
 import java.io.File;
 import javax.xml.namespace.QName;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
@@ -49,6 +50,10 @@ public final class Client {
         greeter.greetMeOneWay(System.getProperty("user.name"));
         System.out.println("No response from server as method is OneWay");
         System.out.println();
+
+        if (greeter instanceof Closeable) {
+            ((Closeable)greeter).close();
+        }
 
         System.exit(0);
     }
