@@ -34,6 +34,8 @@ public final class CustomerServiceSpringClient {
         CustomerServiceTester client = (CustomerServiceTester)context.getBean("tester");
         
         client.testCustomerService();
-        System.exit(0);
+        context.stop();
+        context.destroy();
+        //System.exit(0);
     }
 }
