@@ -102,7 +102,7 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public List<PathSegment> getPathSegments(boolean decode) {
-        return JAXRSUtils.getPathSegments(getPath(), decode);
+        return JAXRSUtils.getPathSegments(getPath(false), decode);
     }
 
     public MultivaluedMap<String, String> getQueryParameters() {
