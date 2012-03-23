@@ -41,6 +41,8 @@ public class App extends Application {
         classes.add(new BootstrapStorage(new SimpleXMLSettingsStorage()));
         classes.add(new BootstrapStorage.StaticFileProvider());
         classes.add(new BootstrapStorage.SettingsProvider());
+        // this provider will have to be discovered via the class-scanning
+        classes.add(new org.apache.cxf.jaxrs.ext.search.SearchContextProvider()); 
 
         // The pull server
         AtomPullServer aps = new AtomPullServer();

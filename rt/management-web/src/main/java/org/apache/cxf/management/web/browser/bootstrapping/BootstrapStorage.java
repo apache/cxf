@@ -200,7 +200,7 @@ public class BootstrapStorage {
     }
 
     @Provider
-    public static class SettingsProvider extends JSONProvider<String> {
+    public static class SettingsProvider extends JSONProvider<Object> {
         private static final String LOGGING_NAMESPACE = "http://cxf.apache.org/log";
         private static final String SUBSCRIPTIONS_ARRAY = "subscriptions";
 

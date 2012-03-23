@@ -20,6 +20,15 @@ package org.apache.cxf.jaxrs.ext;
 
 import org.apache.cxf.message.Message;
 
+/**
+ * Provider of custom contexts representing the current request
+ * @param <T> Context class
+ */
 public interface ContextProvider<T> {
+    /**
+     * Creates the context instance
+     * @param message the current message
+     * @return the context
+     */
     T createContext(Message message);
 }
