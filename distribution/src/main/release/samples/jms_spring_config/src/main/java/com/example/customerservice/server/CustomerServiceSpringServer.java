@@ -26,7 +26,9 @@ public class CustomerServiceSpringServer {
     }
 
     public static void main(String args[]) throws Exception {
-        new ClassPathXmlApplicationContext("server-applicationContext.xml");
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("server-applicationContext.xml");
         System.in.read();
+        ctx.stop();
+        ctx.destroy();
     }
 }
