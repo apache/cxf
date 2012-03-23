@@ -52,6 +52,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -247,6 +248,19 @@ public final class StaxUtils {
     }
     
     public static XMLStreamWriter createXMLStreamWriter(Result r) {
+        if (r instanceof DOMResult) {
+            //use our own DOM writer to avoid issues with Sun's 
+            //version that doesn't support getNamespaceContext
+            DOMResult dr = (DOMResult)r;
+            Node nd = dr.getNode();
+            if (nd instanceof Document) {
+                return new W3CDOMStreamWriter((Document)nd);
+            } else if (nd instanceof Element) {
+                return new W3CDOMStreamWriter((Element)nd);
+            } else if (nd instanceof DocumentFragment) {
+                return new W3CDOMStreamWriter((DocumentFragment)nd);
+            }
+        }
         XMLOutputFactory factory = getXMLOutputFactory();
         try {
             return factory.createXMLStreamWriter(r);
