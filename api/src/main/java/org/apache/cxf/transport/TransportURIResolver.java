@@ -26,6 +26,8 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -101,6 +103,8 @@ public class TransportURIResolver extends ExtendedURIResolver {
                 }
                 if (ci != null) {
                     EndpointInfo info = new EndpointInfo();
+                    // set the endpointInfo name which could be used for configuration
+                    info.setName(new QName("http://cxf.apache.org", "TransportURIResolver"));
                     info.setAddress(base.toString());
                     final Conduit c = ci.getConduit(info);
                     Message message = new MessageImpl();
