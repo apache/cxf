@@ -19,7 +19,10 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.List;
+
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -58,6 +61,30 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong absolute path", "http://localhost:8080/baz/bar", 
                      u.getAbsolutePath().toString());
         
+    }
+    
+    @Test
+    public void testGetPathSegments() {
+        
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080", "/bar/foo/x%2Fb"),
+                                        null);
+        List<PathSegment> segments = u.getPathSegments();
+        assertEquals(3, segments.size());
+        assertEquals("bar", segments.get(0).toString());
+        assertEquals("foo", segments.get(1).toString());
+        assertEquals("x/b", segments.get(2).toString());
+    }
+    
+    @Test
+    public void testGetEncodedPathSegments() {
+        
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080", "/bar/foo/x%2Fb"),
+                                        null);
+        List<PathSegment> segments = u.getPathSegments(false);
+        assertEquals(3, segments.size());
+        assertEquals("bar", segments.get(0).toString());
+        assertEquals("foo", segments.get(1).toString());
+        assertEquals("x%2Fb", segments.get(2).toString());
     }
     
     @Test
