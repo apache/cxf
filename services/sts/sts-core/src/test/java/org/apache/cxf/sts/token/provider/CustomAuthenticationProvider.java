@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.sts.token.provider;
 
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
 /**
  * A custom AuthenticationStatementProvider implementation for use in the tests.
@@ -35,9 +38,13 @@ public class CustomAuthenticationProvider implements AuthenticationStatementProv
         SubjectLocalityBean subjectLocality = new SubjectLocalityBean();
         subjectLocality.setIpAddress("127.0.0.1");
         authBean.setSubjectLocality(subjectLocality);
-
-        authBean.setAuthenticationMethod("Password");
         
+        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(
+                providerParameters.getTokenRequirements().getTokenType())) {
+            authBean.setAuthenticationMethod(SAML1Constants.AUTH_METHOD_X509);
+        } else {
+            authBean.setAuthenticationMethod(SAML2Constants.AUTH_CONTEXT_CLASS_REF_X509);
+        }
         return authBean;
     }
     

@@ -40,6 +40,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.DOM2Writer;
 
 /**
@@ -98,6 +99,35 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertFalse(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("AuthnStatement"));
+        assertTrue(tokenString.contains(SAML2Constants.AUTH_CONTEXT_CLASS_REF_X509));
+        assertTrue(tokenString.contains("alice"));
+    }
+    
+    /**
+     * Create a custom Saml1 Authentication Assertion.
+     */
+    @org.junit.Test
+    public void testCustomSaml1AuthenticationAssertion() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE);
+        
+        List<AuthenticationStatementProvider> customProviderList = 
+            new ArrayList<AuthenticationStatementProvider>();
+        customProviderList.add(new CustomAuthenticationProvider());
+        ((SAMLTokenProvider)samlTokenProvider).setAuthenticationStatementProviders(customProviderList);
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertFalse(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("AuthenticationStatement"));
+        assertTrue(tokenString.contains(SAML1Constants.AUTH_METHOD_X509));
         assertTrue(tokenString.contains("alice"));
     }
     
