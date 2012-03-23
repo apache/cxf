@@ -120,7 +120,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
         
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
-        updateAddressPort(greeter, DecoupledClientServerTest.PORT);
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
        
         ConnectionHelper.setKeepAliveConnection(greeter, true);
