@@ -24,6 +24,9 @@ import java.util.Properties;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.UserException;
 
+import corba.common.HelloWorld;
+import corba.common.HelloWorldHelper;
+
 public final class Client {
     private Client() {
         //not consructed

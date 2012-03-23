@@ -21,6 +21,8 @@ package corba.server;
 
 import org.omg.PortableServer.POA;
 
+import corba.common.HelloWorldPOA;
+
 public class HelloWorldImpl extends HelloWorldPOA {
     // The servants default POA
     private POA poa;
