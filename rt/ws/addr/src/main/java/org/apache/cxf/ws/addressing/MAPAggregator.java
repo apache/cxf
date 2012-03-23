@@ -518,10 +518,14 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             }
             AddressingPropertiesImpl theMaps = 
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
-            if (null != theMaps && ContextUtils.isRequestor(message)) {            
-                assertAddressing(message, 
-                                 theMaps.getReplyTo(),
-                                 theMaps.getFaultTo());
+            if (null != theMaps) {
+                if (ContextUtils.isRequestor(message)) {            
+                    assertAddressing(message, 
+                                     theMaps.getReplyTo(),
+                                     theMaps.getFaultTo());
+                } else {
+                    checkReplyTo(message, theMaps);
+                }
             }
         } else if (!ContextUtils.isRequestor(message)) {
             //responder validates incoming MAPs
@@ -552,10 +556,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                                 message);
                 } 
                 if (!isOneway) {
-                    // if ReplyTo address is none then 202 response status is expected
-                    // However returning a fault is more appropriate for request-response MEP
                     if (ContextUtils.isNoneAddress(maps.getReplyTo())) {
-                        continueProcessing = false;
+                        LOG.warning("Detected NONE value in ReplyTo WSA header for request-respone MEP");
                     } else {
                         // ensure the inbound MAPs are available in both the full & fault
                         // response messages (used to determine relatesTo etc.)
@@ -1264,6 +1266,25 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         
         return valid;
+    }
+
+    /**
+     * Check for NONE ReplyTo value in request-response MEP
+     * @param message the current message
+     * @param maps the incoming MAPs
+     */
+    private void checkReplyTo(Message message, AddressingProperties maps) {              
+        // if ReplyTo address is none then 202 response status is expected
+        // However returning a fault is more appropriate for request-response MEP
+        if (!message.getExchange().isOneWay() 
+            && !MessageUtils.isPartialResponse(message)
+            && ContextUtils.isNoneAddress(maps.getReplyTo())) {
+            String reason = MessageFormat.format(BUNDLE.getString("REPLYTO_NOT_SUPPORTED_MSG"),
+                                                 maps.getReplyTo().getAddress().getValue());
+            throw new SoapFault(reason,
+                                new QName(Names.WSA_NAMESPACE_NAME,
+                                          Names.WSA_NONE_ADDRESS));
+        }
     }
 }
 

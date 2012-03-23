@@ -56,12 +56,10 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -383,10 +381,11 @@ public class MAPAggregatorTest extends Assert {
         verifyMessage(message, true, false, false /*check*/);
     }
     
-    @Test
+    @Test(expected = SoapFault.class)
     public void testTwoWayRequestWithReplyToNone() throws Exception {
         Message message = new MessageImpl();  
         Exchange exchange = new ExchangeImpl();
+        exchange.setOutMessage(message);
         message.setExchange(exchange);
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
@@ -400,18 +399,13 @@ public class MAPAggregatorTest extends Assert {
         maps.setMessageID(id);
         maps.setAction(ContextUtils.getAttributedURI(""));
         setUpMessageProperty(message,
-                             SERVER_ADDRESSING_PROPERTIES_INBOUND,
+                             SERVER_ADDRESSING_PROPERTIES_OUTBOUND,
                              maps);
         setUpMessageProperty(message,
                              "org.apache.cxf.ws.addressing.map.fault.name",
                              "NoneAddress");
         
-        try {
-            aggregator.mediate(message, false);
-            fail("Two way request with ReplyTo address set to none must fail");
-        } catch (SoapFault ex) {
-            // expected
-        }
+        aggregator.mediate(message, false);
     }
     
     @Test
