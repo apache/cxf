@@ -90,6 +90,9 @@
         <module>logbrowser</module>
         <module>ws_notification</module>
         <module>sts</module>
+        <module>corba/bank</module>
+        <module>corba/bank_ws_addressing</module>
+        <module>corba/hello_world</module>
 
         <!--module>jax_rs/minimal_osgi</module>
         <module>oauth/server</module>
@@ -132,6 +135,7 @@
     </dependencyManagement>
 
     <build>
+        <defaultGoal>install</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
