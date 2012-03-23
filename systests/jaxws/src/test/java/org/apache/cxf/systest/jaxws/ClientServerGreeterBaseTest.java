@@ -34,7 +34,7 @@ public class ClientServerGreeterBaseTest extends AbstractBusClientServerTestBase
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(ServerGreeterBase.class));
+                   launchServer(ServerGreeterBase.class, true));
     }
     
     @Test

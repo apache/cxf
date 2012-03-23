@@ -58,7 +58,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(HandlerServer.class));
+        assertTrue("server did not launch correctly", launchServer(HandlerServer.class, true));
     }
 
     @Test

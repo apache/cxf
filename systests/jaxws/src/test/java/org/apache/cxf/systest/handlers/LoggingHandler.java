@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.handlers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Set;
 
@@ -36,7 +37,8 @@ public class LoggingHandler implements SOAPHandler<SOAPMessageContext> {
     private PrintStream out;
 
     public LoggingHandler() {
-        setLogStream(System.out);
+        //setLogStream(System.out);
+        setLogStream(new PrintStream(new ByteArrayOutputStream()));
     }
 
     protected final void setLogStream(PrintStream ps) {

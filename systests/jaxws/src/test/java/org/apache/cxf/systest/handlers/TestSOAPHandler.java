@@ -19,7 +19,6 @@
 package org.apache.cxf.systest.handlers;
 
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -164,12 +163,6 @@ public class  TestSOAPHandler extends TestHandlerBase
 
             try {
                 SOAPMessage msg = ctx.getMessage();
-                try {
-                    msg.writeTo(System.out);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
                 String fs = msg.getSOAPPart().getEnvelope().getBody().getFault().getFaultString();
                 if ("soapHandler4HandleFaultThrowsRunException".equals(fs)) {
                     throw new RuntimeException("soapHandler4 HandleFault throws RuntimeException");

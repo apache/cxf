@@ -68,7 +68,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(MyServer.class));
+        assertTrue("server did not launch correctly", launchServer(MyServer.class, true));
     }
 
     @Test

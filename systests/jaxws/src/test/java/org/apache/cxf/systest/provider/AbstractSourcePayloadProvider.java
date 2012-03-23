@@ -71,7 +71,6 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
         }
         
         try {
-            System.out.println(request.getClass().getName());
             if (request instanceof StaxSource) {
                 StaxSource ss = (StaxSource)request;
                 if (ss.getXMLStreamReader().getEventType() == -1) {
@@ -79,7 +78,6 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
                 }
             }
             String input = getSourceAsString(request);
-            System.out.println(input);  
             
             if (input.indexOf("ServerLogicalHandler") >= 0) {
                 return map(request.getClass());
