@@ -131,6 +131,7 @@ public class CorbaDestination implements MultiplexDestination {
     }
 
     public void shutdown() {
+        deactivate();
         if (orb != null) {
             try {
                 // Ask for the ORB to be destroyed.  If another destination is using it, we'll
