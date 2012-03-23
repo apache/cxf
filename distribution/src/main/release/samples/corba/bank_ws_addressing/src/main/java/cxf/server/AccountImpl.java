@@ -24,7 +24,7 @@ import cxf.common.Account;
 @javax.jws.WebService(portName = "AccountCORBAPort",
                       serviceName = "AccountCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/Bank",
-                      wsdlLocation = "file:./BankWS-corba.wsdl",
+                      wsdlLocation = "classpath:/wsdl/BankWS-corba.wsdl",
                       endpointInterface = "cxf.common.Account")
 
 public class AccountImpl implements Account {

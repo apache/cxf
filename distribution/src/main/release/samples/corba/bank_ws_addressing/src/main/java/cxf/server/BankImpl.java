@@ -30,7 +30,7 @@ import cxf.common.Bank;
 @javax.jws.WebService(portName = "BankCORBAPort", 
                       serviceName = "BankCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/Bank",
-                      wsdlLocation = "file:./BankWS-corba.wsdl",
+                      wsdlLocation = "classpath:/wsdl/BankWS-corba.wsdl",
                       endpointInterface = "cxf.common.Bank")
 
 public class BankImpl implements Bank {
@@ -81,8 +81,7 @@ public class BankImpl implements Bank {
     }
     
     // TODO: What is the correct implementation for this operation?
-    public Object findAccount(Object accountDetails) {
-        return null;
+    public void findAccount(javax.xml.ws.Holder<java.lang.Object> accountDetails) {
     }
 
     public void removeAccount(String accountName) {
