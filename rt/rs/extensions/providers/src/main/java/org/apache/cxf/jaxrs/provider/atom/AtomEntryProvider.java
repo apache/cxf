@@ -16,32 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs;
 
-import java.io.IOException;
-import java.io.OutputStream;
+package org.apache.cxf.jaxrs.provider.atom;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.abdera.model.Feed;
-import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
+import org.apache.abdera.model.Entry;
 
-@Produces({"application/atom+xml", "application/atom+xml;type=feed", "application/json" })
-@Consumes({"application/atom+xml", "application/atom+xml;type=feed" })
+@Produces({"application/atom+xml", "application/atom+xml;type=entry", "application/json" })
+@Consumes({"application/atom+xml", "application/atom+xml;type=entry" })
 @Provider
-public class CustomAtomFeedProvider extends AtomFeedProvider {
+public class AtomEntryProvider extends AbstractAtomProvider<Entry> {
     
-    @Override
-    public void writeTo(Feed element, Class<?> clazz, Type type, Annotation[] a, 
-                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
-        throws IOException {
-        os.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>".getBytes());
-        super.writeTo(element, clazz, type, a, mt, headers, os);
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+        return Entry.class.isAssignableFrom(type);
     }
+    
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+        return Entry.class.isAssignableFrom(type);
+    }
+    
 }

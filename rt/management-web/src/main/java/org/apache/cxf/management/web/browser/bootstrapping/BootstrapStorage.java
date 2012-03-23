@@ -51,7 +51,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.provider.json.JSONProvider;
+import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 
 @Path("/browser")
 public class BootstrapStorage {
