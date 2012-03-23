@@ -19,6 +19,7 @@
 
 package demo.ws_rm.client;
 
+import java.io.Closeable;
 import java.io.File;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
@@ -75,6 +76,9 @@ public final class Client {
             // allow aynchronous resends to occur
             Thread.sleep(30 * 1000);
 
+            if (port instanceof Closeable) {
+                ((Closeable)port).close();
+            }
             bus.shutdown(true);
 
         } catch (UndeclaredThrowableException ex) {

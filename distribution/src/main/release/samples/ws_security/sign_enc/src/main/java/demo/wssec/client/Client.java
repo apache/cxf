@@ -19,6 +19,8 @@
 
 package demo.wssec.client;
 
+import java.io.Closeable;
+
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.HashMap;
@@ -106,6 +108,10 @@ public final class Client {
 
             // allow aynchronous resends to occur
             Thread.sleep(30 * 1000);
+
+            if (port instanceof Closeable) {
+                ((Closeable)port).close();
+            }
 
             bus.shutdown(true);
 

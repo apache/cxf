@@ -19,6 +19,7 @@
 
 package demo.wssec.client;
 
+import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.HashMap;
@@ -76,6 +77,9 @@ public final class Client {
                 String response = port.greetMe(names[i]);
                 System.out.println("response: " + response + "\n");
 
+            }
+            if (port instanceof Closeable) {
+                ((Closeable)port).close();
             }
 
             bus.shutdown(true);
