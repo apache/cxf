@@ -22,20 +22,35 @@ package demo.jms_greeter.server;
 import javax.xml.ws.Endpoint;
 
 public class Server {
+    Endpoint ep;
 
     protected Server() throws Exception {
         System.out.println("Starting Server");
         Object implementor = new GreeterJMSImpl();
         String address = "http://cxf.apache.org/transports/jms";
-        Endpoint.publish(address, implementor);
+        ep = Endpoint.publish(address, implementor);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                shutdown();
+            }
+        });
+    }
+    public void shutdown() {
+        if (ep != null) {
+            ep.stop();
+            ep = null;
+        }
     }
 
     public static void main(String args[]) throws Exception {
-        new Server();
+        Server s = new Server();
         System.out.println("Server ready...");
-
-        Thread.sleep(125 * 60 * 1000);
-        System.out.println("Server exiting");
-        System.exit(0);
+        try {
+            Thread.sleep(5 * 60 * 1000);
+            System.out.println("Server exiting");
+        } finally {
+            s.shutdown();
+        }
     }
 }
