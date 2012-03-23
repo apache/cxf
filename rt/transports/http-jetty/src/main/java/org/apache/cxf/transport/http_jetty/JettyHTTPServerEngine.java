@@ -458,6 +458,17 @@ public class JettyHTTPServerEngine
                 aconn.getServer().setThreadPool(pool);
                 aconn.setThreadPool(pool);
             }
+            //threads for the acceptors and selectors are taken from 
+            //the pool so we need to have room for those
+            int acc = aconn.getAcceptors() * 2;
+            if (getThreadingParameters().isSetMaxThreads()
+                && getThreadingParameters().getMaxThreads() <= acc) {
+                throw new Fault(new Message("NOT_ENOUGH_THREADS", LOG,
+                                            port,
+                                            acc + 1,
+                                            getThreadingParameters().getMaxThreads(),
+                                            acc));
+            }
             if (pool instanceof QueuedThreadPool) {
                 QueuedThreadPool pl = (QueuedThreadPool)pool;
                 if (getThreadingParameters().isSetMinThreads()) {
@@ -472,7 +483,7 @@ public class JettyHTTPServerEngine
                         pool.getClass().getMethod("setMinThreads", Integer.TYPE)
                             .invoke(pool, getThreadingParameters().getMinThreads());
                     }
-                    if (getThreadingParameters().isSetMinThreads()) {
+                    if (getThreadingParameters().isSetMaxThreads()) {
                         pool.getClass().getMethod("setMaxThreads", Integer.TYPE)
                             .invoke(pool, getThreadingParameters().getMaxThreads());
                     }

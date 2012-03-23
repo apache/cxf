@@ -25,6 +25,6 @@ http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schema
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
     <http:conduit name="*.http-conduit">
-      <http:client AllowChunking="false"/>
+      <http:client AllowChunking="false" Connection="close"/>
     </http:conduit>
 </beans>
