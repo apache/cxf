@@ -58,6 +58,9 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
         public Server(String dir) {
             tmpDir = dir;
         }
+        public Server(String[] args) {
+            tmpDir = args[0];
+        }
         protected void run()  {
             
             System.setProperty("temp.location", tmpDir);
@@ -97,7 +100,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
         System.setProperty("temp.location", TEMPDIR);
 
         assertTrue("server did not launch correctly", launchServer(Server.class, null,
-                                                                   new String[] {TEMPDIR}));
+                                                                   new String[] {TEMPDIR}, true));
     }
          
     @Test
@@ -120,7 +123,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
 
         // oneway
 
-        greeter.greetMeOneWay("CXF");
+        //greeter.greetMeOneWay("CXF");
 
         // two-way
 
