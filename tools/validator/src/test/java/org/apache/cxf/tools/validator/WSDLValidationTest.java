@@ -143,7 +143,7 @@ public class WSDLValidationTest extends ToolTestBase {
     @Test
     public void testWSIBPR2726() throws Exception {
         String[] args = new String[] {"-verbose",
-                                      getLocation("/validator_wsdl/jms_test.wsdl")};
+                                      getLocation("/validator_wsdl/jms_test_R2726.wsdl")};     
         WSDLValidator.main(args);
         assertTrue(getStdErr().indexOf("WSI-BP-1.0 R2726") > -1);
     }
