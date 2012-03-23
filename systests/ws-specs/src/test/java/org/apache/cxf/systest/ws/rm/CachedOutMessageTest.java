@@ -97,7 +97,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
         System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "16");
 
         assertTrue("server did not launch correctly", 
-                   launchServer(Server.class));
+                   launchServer(Server.class, true));
     }
 
     @AfterClass
@@ -129,7 +129,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
         
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
-        updateAddressPort(greeter, DecoupledClientServerTest.PORT);
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
        
         ConnectionHelper.setKeepAliveConnection(greeter, true);
