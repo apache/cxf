@@ -36,7 +36,7 @@ public final class Client {
     }
 
     public static void main(String args[]) throws Exception {
-        URL wsdlUrl = new URL("file:./../resources/bank.wsdl");
+        URL wsdlUrl = Client.class.getResource("/wsdl/bank.wsdl");
     
         BankCORBAService ss = new BankCORBAService(wsdlUrl, SERVICE_NAME);
         Bank port = ss.getBankCORBAPort();  

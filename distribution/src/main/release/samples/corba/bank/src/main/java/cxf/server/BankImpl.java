@@ -30,7 +30,7 @@ import bank.common.Bank;
 
 @javax.jws.WebService(portName = "BankCORBAPort", serviceName = "BankCORBAService", 
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/bank", 
-                      wsdlLocation = "file:../resources/bank.wsdl",
+                      wsdlLocation = "classpath:/wsdl/bank.wsdl",
                       endpointInterface = "bank.common.Bank")
 
 public class BankImpl implements Bank {
