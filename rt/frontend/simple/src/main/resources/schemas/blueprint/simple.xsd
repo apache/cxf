@@ -17,12 +17,11 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<xsd:schema xmlns="http://cxf.apache.org/simple"
+<xsd:schema xmlns="http://cxf.apache.org/blueprint/simple"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:beans="http://www.osgi.org/xmlns/blueprint/v1.0.0"
   xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
   targetNamespace="http://cxf.apache.org/blueprint/simple" 
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
