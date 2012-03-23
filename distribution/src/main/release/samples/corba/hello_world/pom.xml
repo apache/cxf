@@ -59,10 +59,10 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <outputDir>target/generated-wsdl/wsdl</outputDir>
+                            <outputDir>${basedir}/target/generated-wsdl/wsdl</outputDir>
                             <wsdltoidlOptions>
                                 <option>
-                                    <wsdl>src/main/resources/wsdl/HelloWorld.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/HelloWorld.wsdl</wsdl>
                                     <extraargs>
                                         <arg>-a</arg>
                                         <arg>corbaname::localhost:1050#HelloWorld</arg>
@@ -88,7 +88,7 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>target/generated-wsdl/wsdl/HelloWorld-corba.wsdl</wsdl>
+                                    <wsdl>${basedir}/target/generated-wsdl/wsdl/HelloWorld-corba.wsdl</wsdl>
                                     <packagenames>
                                         <package>cxf.common</package>
                                     </packagenames>
@@ -116,7 +116,7 @@
                         <configuration>
                             <resources>
                                 <resource> 
-                                    <directory>target/generated-wsdl</directory>
+                                    <directory>${basedir}/target/generated-wsdl</directory>
                                 </resource>
                             </resources>
                         </configuration>
