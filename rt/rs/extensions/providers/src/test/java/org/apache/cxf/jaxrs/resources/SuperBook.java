@@ -16,42 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.cxf.jaxrs.resources;
 
-import java.util.List;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.xml.bind.annotation.XmlRootElement;
 
-public class CollectionsResource {
-    
-    @GET
-    public List<Book> getBooks() {
-        return null;
+
+@XmlRootElement(name = "SuperBook")
+public class SuperBook extends Book {
+    private long superId;
+    public SuperBook() {
     }
     
-    @GET
-    public List<AegisTestBean> getAegisBeans() {
-        return null;
+    public SuperBook(String name, long id, long superId) {
+        super(name, id);
+        this.superId = superId;
     }
     
-    @GET
-    public List<TagVO2> getTags() {
-        return null;
+    public void setSuperId(long i) {
+        superId = i;
     }
     
-    @POST
-    public void setBooks(List<Book> books) {
+    public long getSuperId() {
+        return superId;
     }
-    
-    @POST
-    public void setBooksArray(Book[] books) {
-    }
-    
-    @POST
-    public void setTags(List<TagVO2> tags) {
-    }
-    
-    @POST
-    public void setTagsArray(TagVO2[] tags) {
-    }
+
 }

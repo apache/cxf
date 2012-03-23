@@ -232,41 +232,6 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    public void testCustomJsonProvider() {
-        ProviderFactory pf = ProviderFactory.getInstance();
-        JSONProvider<Book> provider = new JSONProvider<Book>();
-        pf.registerUserProvider(provider);
-        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
-                                               MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertSame(customJsonReader, provider);
-        
-        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null, 
-                                               MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertSame(customJsonWriter, provider);
-    }
-    
-    @Test
-    public void testDefaultJsonProviderCloned() {
-        ProviderFactory pf = ProviderFactory.getInstance();
-        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
-                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertTrue(customJsonReader instanceof JSONProvider);
-        
-        MessageBodyReader<?> customJsonReader2 = pf.createMessageBodyReader(Book.class, null, null, 
-                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertSame(customJsonReader, customJsonReader2);
-        
-        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null, 
-                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertSame(customJsonReader, customJsonWriter);
-        
-        MessageBodyReader<?> jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertTrue(jsonReader instanceof JSONProvider);
-        assertNotSame(jsonReader, customJsonReader);
-    }
-    
-    @Test
     public void testDataSourceReader() {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new DataSourceProvider<Object>());
@@ -319,16 +284,6 @@ public class ProviderFactoryTest extends Assert {
         
         assertNull(((JAXBElementProvider<Book>)jaxbReader).getSchema());
         assertNotNull(((JAXBElementProvider<Book>)customJaxbReader).getSchema());
-        
-        MessageBodyReader<Book> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
-                                                 MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertTrue(customJsonReader instanceof JSONProvider);
-        MessageBodyReader<Book> jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertTrue(jsonReader instanceof JSONProvider);
-        assertNotSame(jsonReader, customJsonReader);
-        assertNull(((JSONProvider<Book>)jsonReader).getSchema());
-        assertNotNull(((JSONProvider<Book>)customJsonReader).getSchema());
     }
     
     @Test
@@ -464,29 +419,6 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    public void testSortEntityProvidersWithConfig() throws Exception {
-        ProviderFactory pf = ProviderFactory.getInstance();
-        JSONProvider<?> json1 = new JSONProvider<Object>();
-        json1.setConsumeMediaTypes(Collections.singletonList("application/json;q=0.9"));
-        pf.registerUserProvider(json1);
-        JSONProvider<?> json2 = new JSONProvider<Object>();
-        json2.setConsumeMediaTypes(Collections.singletonList("application/json"));
-        json2.setProduceMediaTypes(Collections.singletonList("application/sbc;q=0.9"));
-        pf.registerUserProvider(json2);
-        
-        List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
-
-        assertTrue(indexOf(readers, json2) 
-                   < indexOf(readers, json1));
-        
-        List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
-
-        assertTrue(indexOf(writers, json1) 
-                   < indexOf(writers, json2));
-        
-    }
-    
-    @Test
     public void testGetStringProvider() throws Exception {
         verifyProvider(String.class, PrimitiveTextProvider.class, "text/plain");
     }
@@ -536,12 +468,6 @@ public class ProviderFactoryTest extends Assert {
         pf.registerUserProvider(new TestStringProvider());
         verifyProvider(pf, String.class, TestStringProvider.class, "text/html");
     }    
-    
-    @Test
-    public void testGetJSONProviderConsumeMime() throws Exception {
-        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, JSONProvider.class, 
-                       "application/json");
-    }
     
     @Test
     public void testRegisterCustomJSONEntityProvider() throws Exception {

@@ -21,9 +21,11 @@ package org.apache.cxf.jaxrs.resources;
 
 import javax.ws.rs.GET;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 
 @XmlRootElement(name = "Book")
+@XmlSeeAlso({SuperBook.class })
 public class Book implements Comparable<Book> {
     private String name;
     private long id;
@@ -57,8 +59,8 @@ public class Book implements Comparable<Book> {
         return "";
     }
     
-    
     public void setState(String s) {
+        
     }
     
     public int hashCode() { 

@@ -69,7 +69,7 @@ public final class ProviderFactory {
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     
     private static final String JAXB_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JAXBElementProvider";
-    private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JSONProvider";
+    private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.ext.provider.json.JSONProvider";
     
     static {
         SHARED_FACTORY.setProviders(new BinaryDataProvider<Object>(),
@@ -802,7 +802,7 @@ public final class ProviderFactory {
         }
     }
     
-    void clearProviders() {
+    public void clearProviders() {
         messageReaders.clear();
         messageWriters.clear();
         contextResolvers.clear();

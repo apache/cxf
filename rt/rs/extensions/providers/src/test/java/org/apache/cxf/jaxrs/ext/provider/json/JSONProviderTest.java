@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.provider;
+package org.apache.cxf.jaxrs.ext.provider.json;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +44,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlMixed;
@@ -56,9 +57,8 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.provider.JAXBElementProviderTest.TagVO2Holder;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
@@ -66,6 +66,7 @@ import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
+import org.apache.cxf.jaxrs.resources.jaxb.Book2;
 import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Assert;
@@ -135,23 +136,25 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteCollectionWithoutXmlRootElement() 
         throws Exception {
-        JSONProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>> provider 
-            = new JSONProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>>();
+        JSONProvider<List<SuperBook>> provider 
+            = new JSONProvider<List<SuperBook>>();
         provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
         provider.setJaxbElementClassMap(Collections.singletonMap(
-                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
+                SuperBook.class.getName(), 
                 "{http://superbooks}SuperBook"));
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
-            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
-        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> books = 
+        SuperBook b = 
+            new SuperBook("CXF in Action", 123L, 124L);
+        List<SuperBook> books = 
             Collections.singletonList(b);
         
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(books, List.class, 
-                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
+                         SuperBook.class,
                          new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
                          new MetadataMap<String, Object>(), bos);
-        String expected = "{\"ns1.SuperBooks\":[{\"id\":123,\"name\":\"CXF in Action\",\"superId\":124}]}";
+        String expected = "{\"ns1.SuperBooks\":[{\"id\":123,\"name\":\"CXF in Action\","
+            + "\"state\":\"\",\"superId\":124}]}";
+        System.out.println(bos.toString());
         assertEquals(expected, bos.toString());
     }
     
@@ -895,7 +898,7 @@ public class JSONProviderTest extends Assert {
         TagVO2 tag = new TagVO2("A", "B");
         TagVO2Holder holder = new TagVO2Holder();
         holder.setTag(tag);
-        List<TagVO2Holder> list = new ArrayList<JAXBElementProviderTest.TagVO2Holder>();
+        List<TagVO2Holder> list = new ArrayList<TagVO2Holder>();
         list.add(holder);
     
         //ParameterizedType required for Lists of Objects
@@ -1191,5 +1194,26 @@ public class JSONProviderTest extends Assert {
         public List<Book2> getBooks() {
             return books;
         }
+    }
+    
+    @XmlRootElement(name = "tagholder", namespace = "http://tags")
+    public static class TagVO2Holder {
+        @XmlElement(name = "thetag", namespace = "http://tags")
+        private TagVO2 t;
+        @XmlAttribute
+        private String attr = "attribute"; 
+        
+        public void setTag(TagVO2 tag) {
+            this.t = tag;
+        }
+
+        public TagVO2 getTagValue() {
+            return t;
+        }
+
+        public String getAttribute() {
+            return attr;
+        }
+        
     }
 }

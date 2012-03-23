@@ -18,40 +18,42 @@
  */
 package org.apache.cxf.jaxrs.resources;
 
-import java.util.List;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-public class CollectionsResource {
-    
-    @GET
-    public List<Book> getBooks() {
-        return null;
+import org.apache.cxf.jaxrs.model.wadl.Description;
+import org.apache.cxf.jaxrs.model.wadl.XMLName;
+
+@XmlRootElement(name = "thechapter", namespace = "http://superbooks")
+@XmlType(name = "chapter", namespace = "http://superbooks")
+@Description("Chapter subresource")
+@XMLName(value = "{http://books}thesuperchapter")
+public class Chapter {
+
+    private int id;
+    public Chapter() {
+    }
+    public Chapter(int id) {
+        this.id = id;
     }
     
     @GET
-    public List<AegisTestBean> getAegisBeans() {
-        return null;
+    @Path("/id")
+    @Produces({"application/xml", "application/json" })
+    @Description("Get the chapter")
+    public Chapter getIt() {
+        return this;
     }
     
-    @GET
-    public List<TagVO2> getTags() {
-        return null;
+    public void setId(int ident) {
+        id = ident;
     }
     
-    @POST
-    public void setBooks(List<Book> books) {
+    public int getId() {
+        return id;
     }
-    
-    @POST
-    public void setBooksArray(Book[] books) {
-    }
-    
-    @POST
-    public void setTags(List<TagVO2> tags) {
-    }
-    
-    @POST
-    public void setTagsArray(TagVO2[] tags) {
-    }
+
 }

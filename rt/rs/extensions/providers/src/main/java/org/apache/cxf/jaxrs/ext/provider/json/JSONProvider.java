@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.provider;
+package org.apache.cxf.jaxrs.ext.provider.json;
 
 
 import java.io.ByteArrayInputStream;
@@ -60,6 +60,8 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.provider.JSONUtils;
+import org.apache.cxf.jaxrs.provider.AbstractJAXBProvider;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;

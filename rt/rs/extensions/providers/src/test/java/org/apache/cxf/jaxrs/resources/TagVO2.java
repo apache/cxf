@@ -16,42 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.cxf.jaxrs.resources;
 
-import java.util.List;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.xml.bind.annotation.XmlRootElement;
 
-public class CollectionsResource {
+@XmlRootElement(name = "thetag", namespace = "http://tags")
+public class TagVO2 extends TagVO {
     
-    @GET
-    public List<Book> getBooks() {
-        return null;
+    public TagVO2() {
+        
     }
     
-    @GET
-    public List<AegisTestBean> getAegisBeans() {
-        return null;
-    }
-    
-    @GET
-    public List<TagVO2> getTags() {
-        return null;
-    }
-    
-    @POST
-    public void setBooks(List<Book> books) {
-    }
-    
-    @POST
-    public void setBooksArray(Book[] books) {
-    }
-    
-    @POST
-    public void setTags(List<TagVO2> tags) {
-    }
-    
-    @POST
-    public void setTagsArray(TagVO2[] tags) {
+    public TagVO2(String name, String group) {
+        super(name, group);
     }
 }

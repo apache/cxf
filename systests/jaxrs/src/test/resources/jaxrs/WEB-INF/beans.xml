@@ -261,7 +261,7 @@ http://cxf.apache.org/schemas/core.xsd">
     <value>books</value>
   </util:list>
   
-  <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.JSONProvider">
+  <bean id="jsonProvider" class="org.apache.cxf.jaxrs.ext.provider.json.JSONProvider">
       <property name="namespaceMap" ref="jsonNamespaceMap"/> 
       <property name="schemaHandler" ref="schemaHolder"/>
 

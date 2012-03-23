@@ -35,7 +35,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.jaxrs.provider.DataBindingProvider;
-import org.apache.cxf.jaxrs.provider.JSONUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.codehaus.jettison.mapped.Configuration;
