@@ -48,14 +48,15 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(FailoverTargetSelector.class);
-    protected Map<InvocationKey, InvocationContext> inProgress;
+    protected Map<InvocationKey, InvocationContext> inProgress 
+        = new ConcurrentHashMap<InvocationKey, InvocationContext>();;
     protected FailoverStrategy failoverStrategy;
     
     /**
      * Normal constructor.
      */
     public FailoverTargetSelector() {
-        this(null);
+        super();
     }
     
     /**
@@ -65,7 +66,6 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      */
     public FailoverTargetSelector(Conduit c) {
         super(c);
-        inProgress = new ConcurrentHashMap<InvocationKey, InvocationContext>();
     }
     
     /**
@@ -99,6 +99,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @return the Conduit to use for mediation of the message
      */
     public Conduit selectConduit(Message message) {
+        Conduit c = message.get(Conduit.class);
+        if (c != null) {
+            return c;
+        }
         return getSelectedConduit(message);
     }
 
@@ -115,11 +119,15 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         }
         boolean failover = false;
         if (requiresFailover(exchange)) {
+            Conduit old = (Conduit)exchange.getOutMessage().remove(Conduit.class.getName());
+            
             Endpoint failoverTarget = getFailoverTarget(exchange, invocation);
             if (failoverTarget != null) {
                 setEndpoint(failoverTarget);
-                selectedConduit.close();
-                selectedConduit = null;
+                if (old != null) {
+                    old.close();
+                    conduits.remove(old);
+                }
                 Exception prevExchangeFault =
                     (Exception)exchange.remove(Exception.class.getName());
                 Message outMessage = exchange.getOutMessage();
@@ -155,7 +163,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             }
         }
         if (!failover) {
-            getLogger().info("FAILOVER_NOT_REQUIRED");
+            getLogger().fine("FAILOVER_NOT_REQUIRED");
             synchronized (this) {
                 inProgress.remove(key);
             }
@@ -281,14 +289,52 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param context the request context
      */
     protected void overrideAddressProperty(Map<String, Object> context) {
+        overrideAddressProperty(context, getEndpoint().getEndpointInfo().getAddress());
+    }
+    
+    protected void overrideAddressProperty(Map<String, Object> context,
+                                           String address) {
         Map<String, Object> requestContext =
             CastUtils.cast((Map<?, ?>)context.get(Client.REQUEST_CONTEXT));
         if (requestContext != null) {
-            requestContext.put(Message.ENDPOINT_ADDRESS,
-                               getEndpoint().getEndpointInfo().getAddress());
-            requestContext.put("javax.xml.ws.service.endpoint.address",
-                               getEndpoint().getEndpointInfo().getAddress());
+            requestContext.put(Message.ENDPOINT_ADDRESS, address);
+            requestContext.put("javax.xml.ws.service.endpoint.address", address);
         }
+    }
+    
+    // Some conduits may replace the endpoint address after it has already been prepared
+    // but before the invocation has been done (ex, org.apache.cxf.clustering.LoadDistributorTargetSelector)
+    // which may affect JAX-RS clients where actual endpoint address property may include additional path 
+    // segments.  
+    protected boolean replaceEndpointAddressPropertyIfNeeded(Message message, 
+                                                             String endpointAddress,
+                                                             Conduit cond) {
+        String requestURI = (String)message.get(Message.REQUEST_URI);
+        if (requestURI != null && endpointAddress != null && !requestURI.startsWith(endpointAddress)) {
+            String basePath = (String)message.get(Message.BASE_PATH);
+            if (basePath != null && requestURI.startsWith(basePath)) {
+                String pathInfo = requestURI.substring(basePath.length());
+                message.put(Message.BASE_PATH, endpointAddress);
+                final String slash = "/";
+                boolean startsWithSlash = pathInfo.startsWith(slash);
+                if (endpointAddress.endsWith(slash)) {
+                    endpointAddress = endpointAddress + (startsWithSlash ? pathInfo.substring(1) : pathInfo);
+                } else {
+                    endpointAddress = endpointAddress + (startsWithSlash ? pathInfo : (slash + pathInfo));
+                }
+                message.put(Message.ENDPOINT_ADDRESS, endpointAddress);
+
+                Exchange exchange = message.getExchange();
+                InvocationKey key = new InvocationKey(exchange);
+                InvocationContext invocation = inProgress.get(key);
+                if (invocation != null) {
+                    overrideAddressProperty(invocation.getContext(),
+                                            cond.getTarget().getAddress().getValue());
+                }
+                return true;
+            }
+        }
+        return false;
     }
             
     /**

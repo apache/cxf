@@ -40,7 +40,7 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
      * Normal constructor.
      */
     public UpfrontConduitSelector() {
-        this(null);
+        super();
     }
     
     /**
@@ -58,7 +58,11 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
      * @param message the current Message
      */
     public void prepare(Message message) {
-        getSelectedConduit(message);
+        Conduit c = message.get(Conduit.class);
+        if (c == null) {
+            getSelectedConduit(message);
+            message.put(Conduit.class, c);
+        }
     }
     
     /**
@@ -68,7 +72,12 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
      * @return the Conduit to use for mediation of the message
      */
     public Conduit selectConduit(Message message) {
-        return getSelectedConduit(message);
+        Conduit c = message.get(Conduit.class);
+        if (c == null) {
+            c = getSelectedConduit(message);
+            message.put(Conduit.class, c);
+        }
+        return c;
     }
     
     /**

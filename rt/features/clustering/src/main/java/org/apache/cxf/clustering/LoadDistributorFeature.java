@@ -30,7 +30,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 public class LoadDistributorFeature extends FailoverFeature {
 
     @Override
-    protected FailoverTargetSelector getTargetSelector() {
+    public FailoverTargetSelector getTargetSelector() {
         return new LoadDistributorTargetSelector();
     }
 }

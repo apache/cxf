@@ -63,7 +63,7 @@ public class FailoverFeature extends AbstractFeature {
         return selector;
     }
     
-    protected FailoverTargetSelector getTargetSelector() {
+    public FailoverTargetSelector getTargetSelector() {
         if (this.targetSelector == null) {
             this.targetSelector = new FailoverTargetSelector();
         }

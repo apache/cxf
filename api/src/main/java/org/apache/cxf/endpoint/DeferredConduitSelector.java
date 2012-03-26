@@ -38,7 +38,7 @@ public class DeferredConduitSelector extends AbstractConduitSelector {
      * Normal constructor.
      */
     public DeferredConduitSelector() {
-        this(null);
+        super();
     }
     
     /**
@@ -66,7 +66,12 @@ public class DeferredConduitSelector extends AbstractConduitSelector {
      * @return the Conduit to use for mediation of the message
      */
     public Conduit selectConduit(Message message) {
-        return getSelectedConduit(message);
+        Conduit c = message.get(Conduit.class);
+        if (c == null) {
+            c = getSelectedConduit(message);
+            message.put(Conduit.class, c);
+        }
+        return c;
     }
 
     /**

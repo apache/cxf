@@ -24,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -466,6 +467,14 @@ public abstract class AbstractClient implements Client, Retryable {
         // operating on InputStream don't have to close streams pro-actively
         exchange.put(KEEP_CONDUIT_ALIVE, true);    
         getConfiguration().getConduitSelector().complete(exchange);
+        try {
+            String s = (String)exchange.getOutMessage().get(Message.BASE_PATH);
+            if (s != null) {
+                state.setBaseURI(new URI(s));
+            }
+        } catch (URISyntaxException e) {
+            //ignore
+        }
     }
     
     protected Object[] preProcessResult(Message message) throws Exception {

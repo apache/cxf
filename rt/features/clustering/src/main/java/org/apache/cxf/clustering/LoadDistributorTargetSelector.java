@@ -67,7 +67,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
      * Normal constructor.
      */
     public LoadDistributorTargetSelector() {
-        this(null);
+        super();
     }
 
     /**
@@ -98,7 +98,11 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
      * @param message
      * @return the Conduit to use for mediation of the message
      */
-    public Conduit selectConduit(Message message) {
+    public synchronized Conduit selectConduit(Message message) {
+        Conduit c = message.get(Conduit.class);
+        if (c != null) {
+            return c;
+        }
         Exchange exchange = message.getExchange();
         InvocationKey key = new InvocationKey(exchange);
         InvocationContext invocation = inProgress.get(key);
@@ -106,11 +110,8 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
             Endpoint target = getDistributionTarget(exchange, invocation);
             if (target != null) {
                 setEndpoint(target);
-                if (selectedConduit != null) {
-                    selectedConduit.close();
-                    selectedConduit = null;
-                }
                 message.put(Message.ENDPOINT_ADDRESS, target.getEndpointInfo().getAddress());
+                message.put(CONDUIT_COMPARE_FULL_URL, Boolean.TRUE);
                 overrideAddressProperty(invocation.getContext());
                 invocation.getContext().put(IS_DISTRIBUTED, null);
             }

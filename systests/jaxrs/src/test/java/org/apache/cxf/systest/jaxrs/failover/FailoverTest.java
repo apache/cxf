@@ -248,6 +248,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         } 
         
         for (int i = 0; i < 20; i++) {
+            feature.getTargetSelector().close();
             if (!singleProxy) {
                 bookStore = getBookStore(inactiveReplica, feature);
             }
@@ -273,7 +274,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             if (expectRandom) {
                 assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
             } else {
-                assertTrue(currEndpoint.equals(activeReplica1));
+                assertEquals(activeReplica1 , currEndpoint);
             }
             if (expectServerException) {
                 assertNotNull(ex);
@@ -301,6 +302,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         boolean randomized = false;
         String prevEndpoint = null;
         for (int i = 0; i < 20; i++) {
+            feature.getTargetSelector().close();
             WebClient bookStore = getWebClient(inactiveReplica, feature);
             verifyStrategy(bookStore, expectRandom 
                               ? RandomStrategy.class
