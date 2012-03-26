@@ -122,6 +122,10 @@
                             org.apache.commons.logging.*,
                             org.slf4j.*,
                             org.slf4j.impl.*,
+                            org.eclipse.jetty.plus.jaas,
+                            org.eclipse.jetty.plus.jaas.*,
+                            org.apache.karaf.jaas.modules,
+                            org.apache.karaf.jaas.modules.*,
                             org.eclipse.jetty.jmx,
                             org.eclipse.jetty.jmx.*
                         </DynamicImport-Package>
