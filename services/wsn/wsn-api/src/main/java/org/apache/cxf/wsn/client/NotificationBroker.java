@@ -75,14 +75,14 @@ public class NotificationBroker implements Referencable {
     private Class<?> extraClasses[];
     private JAXBContext context;
 
-    public NotificationBroker(String address) {
-        this(WSNHelper.getInstance().createWSA(address));
+    public NotificationBroker(String address, Class<?> ... cls) {
+        this(WSNHelper.getInstance().createWSA(address), cls);
     }
 
-    public NotificationBroker(W3CEndpointReference epr) {
+    public NotificationBroker(W3CEndpointReference epr, Class<?> ... cls) {
         this.epr = epr;
+        this.extraClasses = cls;
     }
-
     public void setExtraClasses(Class<?> ... c) {
         extraClasses = c;
     }
