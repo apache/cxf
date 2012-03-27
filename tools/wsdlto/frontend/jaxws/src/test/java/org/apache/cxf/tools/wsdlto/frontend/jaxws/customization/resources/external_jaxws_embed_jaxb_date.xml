@@ -24,8 +24,8 @@ under the License.
   <jaxws:bindings  node="wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='http://apache.org/hello_world_soap_http/types']">
       <jaxb:globalBindings>
         <jaxb:javaType name="java.util.Date" xmlType="xs:dateTime"
-                      parseMethod="org.apache.cxf.tools.common.DataTypeAdapter.parseDateTime"
-                      printMethod="org.apache.cxf.tools.common.DataTypeAdapter.printDateTime"/>
+                      parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime"
+                      printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
       </jaxb:globalBindings>
   </jaxws:bindings>
 </jaxws:bindings>

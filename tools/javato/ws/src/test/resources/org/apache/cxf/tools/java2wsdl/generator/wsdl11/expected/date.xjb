@@ -21,12 +21,12 @@
               xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <jxb:bindings schemaLocation="hello_schema1.xsd" node="/xs:schema">
     <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.tools.common.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.tools.common.DataTypeAdapter.printDateTime"/>
+      <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
     </jxb:globalBindings>
   </jxb:bindings>
   <jxb:bindings schemaLocation="hello_schema2.xsd" node="/xs:schema">
     <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-      <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.tools.common.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.tools.common.DataTypeAdapter.printDateTime"/>
+      <jxb:javaType name="java.util.Date" xmlType="xs:dateTime" parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime" printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
     </jxb:globalBindings>
   </jxb:bindings>
 </jxb:bindings>

@@ -38,7 +38,7 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
     private static final String TEMPLATE_EXT = TEMPLATE_BASE + "date_type_cust.vm";
     private static final String TEMPLATE_EMB = TEMPLATE_BASE + "date_type_cust_embed.vm";
 
-    private static final String DATE_ADAPTER = "org.apache.cxf.tools.common.DataTypeAdapter";
+    private static final String DATE_ADAPTER = "org.apache.cxf.xjc.runtime.DataTypeAdapter";
     private static final String CALENDAR_ADAPTER = "javax.xml.bind.DatatypeConverter";
 
     private String wsdlName;

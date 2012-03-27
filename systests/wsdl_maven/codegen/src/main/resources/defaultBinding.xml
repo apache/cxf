@@ -24,11 +24,11 @@
   <jaxws:bindings  node="wsdl:definitions/wsdl:types/xs:schema">
       <jxb:globalBindings>
         <jxb:javaType name="java.util.Date" xmlType="xs:dateTime"
-                      parseMethod="org.apache.cxf.tools.common.DataTypeAdapter.parseDateTime"
-                      printMethod="org.apache.cxf.tools.common.DataTypeAdapter.printDateTime"/>
+                      parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDateTime"
+                      printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDateTime"/>
         <jxb:javaType name="java.util.Date" xmlType="xs:date"
-                      parseMethod="org.apache.cxf.tools.common.DataTypeAdapter.parseDate"
-                      printMethod="org.apache.cxf.tools.common.DataTypeAdapter.printDate"/>
+                      parseMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.parseDate"
+                      printMethod="org.apache.cxf.xjc.runtime.DataTypeAdapter.printDate"/>
       </jxb:globalBindings>
   </jaxws:bindings>
 </jaxws:bindings>
