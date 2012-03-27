@@ -32,12 +32,15 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
+
 
 /**
  * This HttpsURLConnectionFactory implements the HttpURLConnectionFactory
@@ -147,7 +150,11 @@ public class HttpsURLConnectionFactory {
             SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
                 .getInstance(protocol, provider);
             ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
-            ctx.init(tlsClientParameters.getKeyManagers(), tlsClientParameters.getTrustManagers(),
+            KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
+            if (tlsClientParameters.getCertAlias() != null) {
+                getKeyManagersWithCertAlias(tlsClientParameters, keyManagers);
+            }
+            ctx.init(keyManagers, tlsClientParameters.getTrustManagers(),
                      tlsClientParameters.getSecureRandom());
 
             // The "false" argument means opposite of exclude.
@@ -238,6 +245,22 @@ public class HttpsURLConnectionFactory {
      */
     protected void addLogHandler(Handler handler) {
         LOG.addHandler(handler);
+    }
+    
+    protected void getKeyManagersWithCertAlias(TLSClientParameters tlsClientParameters,
+                                               KeyManager[] keyManagers) throws GeneralSecurityException {
+        if (tlsClientParameters.getCertAlias() != null) {
+            for (int idx = 0; idx < keyManagers.length; idx++) {
+                if (keyManagers[idx] instanceof X509KeyManager) {
+                    try {
+                        keyManagers[idx] = new AliasedX509ExtendedKeyManager(
+                            tlsClientParameters.getCertAlias(), (X509KeyManager)keyManagers[idx]);
+                    } catch (Exception e) {
+                        throw new GeneralSecurityException(e);
+                    }
+                }
+            }
+        }
     }
 
 }

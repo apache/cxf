@@ -41,7 +41,7 @@ public class TLSParameterBase {
     private CertificateConstraintsType certConstraints;
     private SecureRandom    secureRandom;
     private String          protocol;
-    
+    private String          certAlias;
     /**
      * Set the JSSE provider. If not set,
      * it uses system default.
@@ -163,5 +163,20 @@ public class TLSParameterBase {
      */
     public String getSecureSocketProtocol() {
         return protocol;
+    }
+    
+    /**
+     * This parameter configures the cert alias used on server side
+     * this is useful when keystore has multiple certs
+     */
+    public final void setCertAlias(String ctAlias) {
+        certAlias = ctAlias;
+    }
+    
+    /**
+     * This parameter retrieves the cert alias specified on server side
+     */
+    public String getCertAlias() {
+        return certAlias;
     }
 }

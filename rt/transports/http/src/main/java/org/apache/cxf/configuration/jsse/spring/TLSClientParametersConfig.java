@@ -116,6 +116,9 @@ public final class TLSClientParametersConfig {
         if (params.isSetSslCacheTimeout()) {
             ret.setSslCacheTimeout(params.getSslCacheTimeout());
         }
+        if (params.isSetCertAlias()) {
+            ret.setCertAlias(params.getCertAlias());
+        }
         return ret;
     }
     

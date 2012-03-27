@@ -26,11 +26,13 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 
@@ -47,7 +49,7 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     protected SecureRandom   secureRandom;
     protected List<String>   cipherSuites;
     protected FiltersType    cipherSuitesFilter;
-    
+       
     /**
      * Set the cipherSuites
      */
@@ -83,6 +85,7 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
         secureRandom = random;
     }
     
+    
     /**
      * Set the ClientAuthentication (from the JAXB type) that
      * configures an HTTP Destination.
@@ -114,6 +117,9 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
             ? SSLContext.getInstance(proto)
                 : SSLContext.getInstance(proto, getCxfSslContextFactory().getProvider());
             
+        if (getCxfSslContextFactory().getCertAlias() != null) {
+            getKeyManagersWithCertAlias();
+        }
         context.init(keyManagers, trustManagers, secureRandom);
 
         String[] cs = 
@@ -126,6 +132,17 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
         getCxfSslContextFactory().setExcludeCipherSuites(cs);
         
         return context;
+    }
+    
+    protected void getKeyManagersWithCertAlias() throws Exception {
+        if (getCxfSslContextFactory().getCertAlias() != null) {
+            for (int idx = 0; idx < keyManagers.length; idx++) {
+                if (keyManagers[idx] instanceof X509KeyManager) {
+                    keyManagers[idx] = new AliasedX509ExtendedKeyManager(
+                        getCxfSslContextFactory().getCertAlias(), (X509KeyManager)keyManagers[idx]);
+                }
+            }
+        }
     }
     
     public CxfSslContextFactory getCxfSslContextFactory() {
@@ -155,6 +172,10 @@ public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
         void setProtocol(String secureSocketProtocol);
 
         void setProvider(String jsseProvider);
+        
+        void setCertAlias(String certAlias);
+        
+        String getCertAlias();
     }
     
 }
