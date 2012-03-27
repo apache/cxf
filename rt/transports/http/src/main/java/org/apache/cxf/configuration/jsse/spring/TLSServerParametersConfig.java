@@ -69,5 +69,8 @@ public class TLSServerParametersConfig
         if (params.isSetCertConstraints()) {
             this.setCertConstraints(params.getCertConstraints());
         }
+        if (params.isSetCertAlias()) {
+            this.setCertAlias(params.getCertAlias());
+        }
     }
 }

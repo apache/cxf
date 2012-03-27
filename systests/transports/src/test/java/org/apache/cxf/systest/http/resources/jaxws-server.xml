@@ -86,6 +86,8 @@ under the License.
 	          	<sec:keyStore type="JKS" password="password"
 	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
 	     		</sec:trustManagers>
+                <sec:clientAuthentication want="true" required="true"/>
+                <sec:certAlias>bethal</sec:certAlias>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
@@ -103,6 +105,7 @@ under the License.
 	           <sec:keyStore type="JKS" password="password"
 	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
 	        </sec:trustManagers>
+            <sec:certAlias>morpit</sec:certAlias>
         </http:tlsClientParameters>
     </http:conduit>
 

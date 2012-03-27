@@ -432,6 +432,13 @@
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
+           <xs:element name="certAlias" type="xs:string" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the Certificate Alias.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
         </xs:all>
            <xs:attribute name="useHttpsURLConnectionDefaultSslSocketFactory" type="pt:ParameterizedBoolean" default="false">
              <xs:annotation>
@@ -539,6 +546,13 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains the Certificate Constraints specification.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="certAlias" type="xs:string" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the Certificate Alias.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
