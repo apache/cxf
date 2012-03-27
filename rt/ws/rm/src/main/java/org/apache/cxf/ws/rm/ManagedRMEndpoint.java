@@ -69,18 +69,18 @@ public class ManagedRMEndpoint implements ManagedComponent {
     {SimpleType.STRING, SimpleType.LONG, SimpleType.STRING, 
      SimpleType.STRING};
 
-    private static final String[] RETRANSMISSION_STATUS_NAMES = 
-    {"messageNumber", "resends", "previous", "next", "nextInterval", "backOff", "pending", "suspended"};
-    private static final String[] RETRANSMISSION_STATUS_DESCRIPTIONS = RETRANSMISSION_STATUS_NAMES;
+    private static final String[] RETRY_STATUS_NAMES = 
+    {"messageNumber", "retries", "previous", "next", "nextInterval", "backOff", "pending", "suspended"};
+    private static final String[] RETRY_STATUS_DESCRIPTIONS = RETRY_STATUS_NAMES;
     @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
-    private static final OpenType[] RETRANSMISSION_STATUS_TYPES =  
+    private static final OpenType[] RETRY_STATUS_TYPES =  
     {SimpleType.LONG, SimpleType.INTEGER, SimpleType.DATE, SimpleType.DATE, SimpleType.LONG, SimpleType.LONG, 
      SimpleType.BOOLEAN, SimpleType.BOOLEAN};
 
     private static CompositeType sourceSequenceType;
     private static CompositeType destinationSequenceType;
 
-    private static CompositeType retransmissionStatusType;
+    private static CompositeType retryStatusType;
 
     private RMEndpoint endpoint;
     
@@ -99,11 +99,11 @@ public class ManagedRMEndpoint implements ManagedComponent {
                                                         DESTINATION_SEQUENCE_DESCRIPTIONS,
                                                         DESTINATION_SEQUENCE_TYPES);
 
-            retransmissionStatusType = new CompositeType("retransmissionStatus",
-                                                         "retransmissionStatus",
-                                                         RETRANSMISSION_STATUS_NAMES,
-                                                         RETRANSMISSION_STATUS_DESCRIPTIONS,
-                                                         RETRANSMISSION_STATUS_TYPES);
+            retryStatusType = new CompositeType("retryStatus",
+                                                "retryStatus",
+                                                RETRY_STATUS_NAMES,
+                                                RETRY_STATUS_DESCRIPTIONS,
+                                                RETRY_STATUS_TYPES);
             
         } catch (OpenDataException e) {
             // ignore and handle it later
@@ -122,12 +122,23 @@ public class ManagedRMEndpoint implements ManagedComponent {
     }
 
     @ManagedOperation(description = "Total Number of Queued Messages")
-    public int getQueuedMessageTotalCount() {
-        Source source = endpoint.getSource();
-        RetransmissionQueue queue = endpoint.getManager().getRetransmissionQueue();
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "outbound", description = "The outbound direction") 
+    })
+    public int getQueuedMessageTotalCount(boolean outbound) {
         int count = 0;
-        for (SourceSequence ss : source.getAllSequences()) {
-            count += queue.countUnacknowledged(ss);
+        if (outbound) {
+            Source source = endpoint.getSource();
+            RetransmissionQueue queue = endpoint.getManager().getRetransmissionQueue();
+            for (SourceSequence ss : source.getAllSequences()) {
+                count += queue.countUnacknowledged(ss);
+            }
+        } else {
+//            Destination destination = endpoint.getDestination();
+//            RedeliveryQueue queue = endpoint.getManager().getRedeliveryQueue();
+//            for (DestinationSequence ds : destination.getAllSequences()) {
+//                count += queue.countUndelivered(ds);
+//            }
         }
 
         return count;
@@ -135,16 +146,26 @@ public class ManagedRMEndpoint implements ManagedComponent {
 
     @ManagedOperation(description = "Number of Queued Messages")
     @ManagedOperationParameters({
-        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier"), 
+        @ManagedOperationParameter(name = "outbound", description = "The outbound direction") 
     })
-    public int getQueuedMessageCount(String sid) {
+    public int getQueuedMessageCount(String sid, boolean outbound) {
         RMManager manager = endpoint.getManager();
-        SourceSequence ss = getSourceSeq(sid);
-        if (null == ss) {
-            throw new IllegalArgumentException("no sequence");
+        int count = 0;
+        if (outbound) {
+            SourceSequence ss = getSourceSeq(sid);
+            if (null == ss) {
+                throw new IllegalArgumentException("no sequence");
+            }
+            count = manager.getRetransmissionQueue().countUnacknowledged(ss);
+        } else {
+//            DestinationSequence ds = getDestinationSeq(sid);
+//            if (null == ds) {
+//                throw new IllegalArgumentException("no sequence");
+//            }
+//            count = manager.getRedeliveryQueue().countUndelivered(ds);
         }
-
-        return manager.getRetransmissionQueue().countUnacknowledged(ss);
+        return count;
     }
 
     @ManagedOperation(description = "List of UnAcknowledged Message Numbers")
@@ -239,8 +260,8 @@ public class ManagedRMEndpoint implements ManagedComponent {
             throw new IllegalArgumentException("no sequence");
         }
         RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
-        RetransmissionStatus rs = rq.getRetransmissionStatus(ss, num);
-        return getRetransmissionStatusProperties(num, rs);
+        RetryStatus rs = rq.getRetransmissionStatus(ss, num);
+        return getRetryStatusProperties(num, rs);
     }
 
     @ManagedOperation(description = "Retransmission Statuses")
@@ -253,15 +274,65 @@ public class ManagedRMEndpoint implements ManagedComponent {
             throw new IllegalArgumentException("no sequence");
         }
         RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
-        Map<Long, RetransmissionStatus> rsmap = rq.getRetransmissionStatuses(ss);
+        Map<Long, RetryStatus> rsmap = rq.getRetransmissionStatuses(ss);
 
         CompositeData[] rsps = new CompositeData[rsmap.size()];
         int i = 0;
-        for (Map.Entry<Long, RetransmissionStatus> rs : rsmap.entrySet()) {
-            rsps[i++] = getRetransmissionStatusProperties(rs.getKey(), rs.getValue());
+        for (Map.Entry<Long, RetryStatus> rs : rsmap.entrySet()) {
+            rsps[i++] = getRetryStatusProperties(rs.getKey(), rs.getValue());
         }
         return rsps;
     }
+
+//     @ManagedOperation(description = "Redelivery Status")
+//     @ManagedOperationParameters({
+//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier"),
+//         @ManagedOperationParameter(name = "messageNumber", description = "The message number")
+//     })
+//     public CompositeData getRedeliveryStatus(String sid, long num) throws JMException {
+//         DestinationSequence ds = getDestinationSeq(sid);
+//         if (null == ds) {
+//             throw new IllegalArgumentException("no sequence");
+//         }
+//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+//         RetryStatus rs = rq.getRedeliveryStatus(ds, num);
+//         return getRetryStatusProperties(num, rs);
+//     }
+
+//    @ManagedOperation(description = "Redelivery Statuses")
+//     @ManagedOperationParameters({
+//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier")
+//     })
+//     public CompositeData[] getRedeliveryStatuses(String sid) throws JMException {
+//         DestinationSequence ds = getDestinationSeq(sid);
+//         if (null == ds) {
+//             throw new IllegalArgumentException("no sequence");
+//         }
+//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+//         Map<Long, RetryStatus> rsmap = rq.getRedeliveryStatuses(ds);
+//
+//         CompositeData[] rsps = new CompositeData[rsmap.size()];
+//         int i = 0;
+//         for (Map.Entry<Long, RetryStatus> rs : rsmap.entrySet()) {
+//             rsps[i++] = getRetryStatusProperties(rs.getKey(), rs.getValue());
+//         }
+//         return rsps;
+//     }
+
+//     @ManagedOperation(description = "List of UnDelivered Message Numbers")
+//     @ManagedOperationParameters({
+//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+//     })
+//     public Long[] getUnDeliveredMessageIdentifiers(String sid) {
+//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+//         DestinationSequence ds = getDestinationSeq(sid);
+//         if (null == ds) {
+//             throw new IllegalArgumentException("no sequence");
+//         }
+//        
+//         List<Long> numbers = rq.getUndeliveredMessageNumbers(ds);
+//         return numbers.toArray(new Long[numbers.size()]);
+//     }
 
     @ManagedOperation(description = "List of Source Sequence IDs")
     @ManagedOperationParameters({
@@ -316,6 +387,32 @@ public class ManagedRMEndpoint implements ManagedComponent {
         rq.resume(ss);
     }
     
+//     @ManagedOperation(description = "Suspend Redelivery Queue")
+//     @ManagedOperationParameters({
+//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+//     })
+//     public void suspendDestinationQueue(String sid) throws JMException {
+//         DestinationSequence ds = getDestinationSeq(sid);
+//         if (null == ds) {
+//             throw new IllegalArgumentException("no sequence");
+//         }
+//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+//         rq.suspend(ds);
+//     }
+    
+//     @ManagedOperation(description = "Resume Redelivery Queue")
+//     @ManagedOperationParameters({
+//         @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+//     })
+//     public void resumeDestinationQueue(String sid) throws JMException {
+//         DestinationSequence ds = getDestinationSeq(sid);
+//         if (null == ds) {
+//             throw new JMException("no source sequence");
+//         }
+//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+//         rq.resume(ds);
+//     }
+    
     @ManagedOperation(description = "Current Source Sequence Properties")
     public CompositeData getCurrentSourceSequence() throws JMException {
         Source source = endpoint.getSource();
@@ -363,7 +460,6 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return sps.toArray(new CompositeData[sps.size()]);
     }
     
-    
     @ManagedOperation(description = "Destination Sequence Properties")
     @ManagedOperationParameters({
         @ManagedOperationParameter(name = "sequenceId", description = "The destination identifier") 
@@ -400,6 +496,36 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return destination.getSequence(identifier);
     }
 
+    @ManagedOperation(description = "Remove Source Sequence")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The destination identifier") 
+    })
+    public void removeSourceSequence(String sid) throws JMException {
+        SourceSequence ss = getSourceSeq(sid);
+        if (null == ss) {
+            throw new JMException("no source sequence");
+        }
+        //TODO use cancel insted of suspend
+        RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
+        rq.suspend(ss);
+        ss.getSource().removeSequence(ss);
+    }
+
+    @ManagedOperation(description = "Remove Destination Sequence")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The destination identifier") 
+    })
+    public void removeDestinationSequence(String sid) throws JMException {
+        DestinationSequence ds = getDestinationSeq(sid);
+        if (null == ds) {
+            throw new JMException("no source sequence");
+        }
+        //TODO use cancel insted of suspend
+//         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
+//         rq.suspend(ds);
+        ds.getDestination().removeSequence(ds);
+    }
+    
     private static String getAddressValue(EndpointReferenceType epr) {
         if (null != epr && null != epr.getAddress()) {
             return epr.getAddress().getValue();
@@ -435,15 +561,13 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return dsps;
     }
     
-    private CompositeData getRetransmissionStatusProperties(long num, 
-                                                            RetransmissionStatus rs) throws JMException {
+    private CompositeData getRetryStatusProperties(long num, RetryStatus rs) throws JMException {
         CompositeData rsps = null;
         if (null != rs) {
-            Object[] rsv = new Object[] {num, rs.getResends(), rs.getPrevious(), 
+            Object[] rsv = new Object[] {num, rs.getRetries(), rs.getPrevious(), 
                                          rs.getNext(), rs.getNextInterval(),
                                          rs.getBackoff(), rs.isPending(), rs.isSuspended()};
-            rsps = new CompositeDataSupport(retransmissionStatusType,
-                                            RETRANSMISSION_STATUS_NAMES, rsv);
+            rsps = new CompositeDataSupport(retryStatusType, RETRY_STATUS_NAMES, rsv);
         }
         return rsps;
     }

@@ -67,14 +67,14 @@ public interface RetransmissionQueue {
      * @param num
      * @return
      */
-    RetransmissionStatus getRetransmissionStatus(SourceSequence seq, long num);
+    RetryStatus getRetransmissionStatus(SourceSequence seq, long num);
     
     /**
      * Return the retransmission status of all the messages assigned to the sequence.
      * @param seq
      * @return
      */
-    Map<Long, RetransmissionStatus> getRetransmissionStatuses(SourceSequence seq);
+    Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq);
         
     /**
      * Initiate resends.

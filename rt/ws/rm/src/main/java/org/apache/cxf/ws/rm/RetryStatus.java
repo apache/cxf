@@ -22,23 +22,29 @@ package org.apache.cxf.ws.rm;
 import java.util.Date;
 
 /**
- * 
+ * A generic interface to represent the retrying status of a repeating activity
+ * at some WS-RM component.
  */
-public interface RetransmissionStatus {
+public interface RetryStatus {
     /**
-     * @return the next transmission time
+     * @return the next retry time
      */
     Date getNext();
 
     /**
-     * @return the previous transmission time
+     * @return the previous retry time
      */
     Date getPrevious();
     
     /**
-     * @return the resends
+     * @return the number of retries
      */
-    int getResends();
+    int getRetries();
+    
+    /**
+     * @return the max number of retries permitted
+     */
+    int getMaxRetries();
     
     /**
      * @return the nextInterval

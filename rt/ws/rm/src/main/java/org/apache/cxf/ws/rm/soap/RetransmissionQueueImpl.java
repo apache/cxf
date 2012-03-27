@@ -62,7 +62,7 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.RetransmissionCallback;
 import org.apache.cxf.ws.rm.RetransmissionQueue;
-import org.apache.cxf.ws.rm.RetransmissionStatus;
+import org.apache.cxf.ws.rm.RetryStatus;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
@@ -168,7 +168,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         return unacknowledged;
     }
     
-    public RetransmissionStatus getRetransmissionStatus(SourceSequence seq, long num) {
+    public RetryStatus getRetransmissionStatus(SourceSequence seq, long num) {
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -184,8 +184,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         return null;
     }
     
-    public Map<Long, RetransmissionStatus> getRetransmissionStatuses(SourceSequence seq) {
-        Map<Long, RetransmissionStatus> cp = new HashMap<Long, RetransmissionStatus>();
+    public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
+        Map<Long, RetryStatus> cp = new HashMap<Long, RetryStatus>();
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -469,12 +469,12 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     /**
      * Represents a candidate for resend, i.e. an unacked outgoing message.
      */
-    protected class ResendCandidate implements Runnable, RetransmissionStatus {
+    protected class ResendCandidate implements Runnable, RetryStatus {
         private Message message;
         private OutputStream out;
         private Date next;
         private TimerTask nextTask;
-        private int resends;
+        private int retries;
         private long nextInterval;
         private long backoff;
         private boolean pending;
@@ -486,7 +486,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
          */
         protected ResendCandidate(Message m) {
             message = m;
-            resends = 0;
+            retries = 0;
             out = m.getContent(OutputStream.class);
             org.apache.cxf.ws.rmp.v200502.RMAssertion rma = 
                 RM10PolicyUtils.getRMAssertion(manager.getRMAssertion(), message);
@@ -555,10 +555,17 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         /**
          * @return number of resend attempts
          */
-        public int getResends() {
-            return resends;
+        public int getRetries() {
+            return retries;
         }
 
+        /**
+         * @return number of max resend attempts
+         */
+        public int getMaxRetries() {
+            return 0;
+        }
+        
         /**
          * @return date of next resend
          */
@@ -570,7 +577,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
          * @return date of previous resend or null if no attempt is yet taken 
          */
         public Date getPrevious() {
-            if (resends > 0) {
+            if (retries > 0) {
                 return new Date(next.getTime() - nextInterval / backoff);
             }
             return null;
@@ -652,7 +659,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
          */
         protected synchronized void attempted() {
             pending = false;
-            resends++;
+            retries++;
             if (null != next) {
                 next = new Date(next.getTime() + nextInterval);
                 nextInterval *= backoff;

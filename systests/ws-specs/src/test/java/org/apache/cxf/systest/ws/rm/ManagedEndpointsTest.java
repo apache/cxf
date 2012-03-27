@@ -154,11 +154,12 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
                        new Object[]{true}, new String[]{"boolean"});
         verifyArray("Expected sequence identifier", o, new String[]{dseqId}); 
         
-        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getQueuedMessageCount",
-                       new Object[]{sseqId}, new String[]{"java.lang.String"});
+                       new Object[]{sseqId, true}, new String[]{"java.lang.String", "boolean"});
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getCurrentSourceSequence", null, null);
@@ -180,7 +181,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         greeter.greetMeOneWay("two"); // getting lost
         greeter.greetMeOneWay("three"); // sent
         
-        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
@@ -203,7 +205,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         LOG.info("waiting for 12 secs for the retry to complete ...");
         Thread.sleep(12000);
 
-        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
@@ -260,7 +263,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         greeter.greetMeOneWay("two"); // sent but suspended
         greeter.greetMeOneWay("three"); // sent but suspended
 
-        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
 
         mbs.invoke(clientEndpointName, "suspendSourceQueue", 
@@ -272,7 +276,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         LOG.info("waiting for 10 secs for the retry (suspended)...");
         Thread.sleep(10000);
 
-        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue("One queued message", o instanceof Integer && 1 == ((Integer)o).intValue());
 
         mbs.invoke(clientEndpointName, "resumeSourceQueue", 
@@ -282,7 +287,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         LOG.info("waiting for 15 secs for the retry (resumed)...");
         Thread.sleep(10000);
 
-        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue("No queued messages", o instanceof Integer && 0 == ((Integer)o).intValue());
     }
 
@@ -323,7 +329,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         assertTrue(value instanceof CompositeData);
         CompositeData cd = (CompositeData)value;
         verifyValue(cd, "messageNumber", num);
-        verifyValue(cd, "resends", count);
+        verifyValue(cd, "retries", count);
         Date now = new Date();
         if (count > 0) {
             assertTrue(now.after((Date)getValue(cd, "previous")));

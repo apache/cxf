@@ -147,7 +147,8 @@ public class ManagedRMManagerTest extends Assert {
         assertTrue(o instanceof Integer);
         assertEquals("No deferred acks", 0, o);
         
-        o = mbs.invoke(endpointName, "getQueuedMessageTotalCount", null, null);
+        o = mbs.invoke(endpointName, "getQueuedMessageTotalCount", 
+                       new Object[]{true}, new String[]{"boolean"});
         assertTrue(o instanceof Integer);
         assertEquals("No queued messages", 0, o);
     }
@@ -156,10 +157,10 @@ public class ManagedRMManagerTest extends Assert {
     public void testManagedRMEndpointGetQueuedCount() throws Exception {
         ManagedRMEndpoint managedEndpoint = createTestManagedRMEndpoint();
 
-        int n = managedEndpoint.getQueuedMessageTotalCount();
+        int n = managedEndpoint.getQueuedMessageTotalCount(true);
         assertEquals(3, n);
         
-        n = managedEndpoint.getQueuedMessageCount("seq1");
+        n = managedEndpoint.getQueuedMessageCount("seq1", true);
         assertEquals(2, n);
     }
     
@@ -263,9 +264,9 @@ public class ManagedRMManagerTest extends Assert {
         assertTrue("seq3".equals(key) || "seq4".equals(key)); 
     }
 
-    private void verifyRetransmissionStatus(CompositeData cd, long num, RetransmissionStatus status) {
+    private void verifyRetransmissionStatus(CompositeData cd, long num, RetryStatus status) {
         assertEquals(num, cd.get("messageNumber"));
-        assertEquals(status.getResends(), cd.get("resends"));
+        assertEquals(status.getRetries(), cd.get("retries"));
         assertEquals(status.getNext(), cd.get("next"));
         assertEquals(status.getPrevious(), cd.get("previous"));
         assertEquals(status.getNextInterval(), cd.get("nextInterval"));
@@ -394,7 +395,7 @@ public class ManagedRMManagerTest extends Assert {
     
     private class TestRetransmissionQueue implements RetransmissionQueue {
         private Set<String> suspended = new HashSet<String>();
-        private RetransmissionStatus status = new TestRetransmissionStatus();
+        private RetryStatus status = new TestRetransmissionStatus();
         
         public int countUnacknowledged(SourceSequence seq) {
             final String key = seq.getIdentifier().getValue(); 
@@ -430,7 +431,7 @@ public class ManagedRMManagerTest extends Assert {
             return list;
         }
 
-        public RetransmissionStatus getRetransmissionStatus(SourceSequence seq, long num) {
+        public RetryStatus getRetransmissionStatus(SourceSequence seq, long num) {
             final String key = seq.getIdentifier().getValue();
             if (("seq1".equals(key) && (2L == num || 4L == num)) 
                 || ("seq2".equals(key) && (2L == num))) {
@@ -439,7 +440,7 @@ public class ManagedRMManagerTest extends Assert {
             return null;
         }
 
-        public Map<Long, RetransmissionStatus> getRetransmissionStatuses(SourceSequence seq) {
+        public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -464,12 +465,12 @@ public class ManagedRMManagerTest extends Assert {
             return suspended.contains(sid);
         }
         
-        RetransmissionStatus getRetransmissionStatus() {
+        RetryStatus getRetransmissionStatus() {
             return status;
         }
     }
     
-    private static class TestRetransmissionStatus implements RetransmissionStatus {
+    private static class TestRetransmissionStatus implements RetryStatus {
         private long interval = 300000L;
         private Date next = new Date(System.currentTimeMillis() + interval / 2);
         private Date previous = new Date(next.getTime() - interval);
@@ -482,8 +483,12 @@ public class ManagedRMManagerTest extends Assert {
             return previous;
         }
 
-        public int getResends() {
+        public int getRetries() {
             return 2;
+        }
+
+        public int getMaxRetries() {
+            return -1;
         }
 
         public long getNextInterval() {

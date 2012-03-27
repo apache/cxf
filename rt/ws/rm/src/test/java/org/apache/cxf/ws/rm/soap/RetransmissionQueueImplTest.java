@@ -106,7 +106,7 @@ public class RetransmissionQueueImplTest extends Assert {
         long now = System.currentTimeMillis();
         RetransmissionQueueImpl.ResendCandidate candidate = queue.createResendCandidate(message);
         assertSame(message, candidate.getMessage());
-        assertEquals(0, candidate.getResends());
+        assertEquals(0, candidate.getRetries());
         Date refDate = new Date(now + 5000);
         assertTrue(!candidate.getNext().before(refDate));
         refDate = new Date(now + 7000);
@@ -122,7 +122,7 @@ public class RetransmissionQueueImplTest extends Assert {
         long now = System.currentTimeMillis();
         RetransmissionQueueImpl.ResendCandidate candidate = queue.createResendCandidate(message);
         candidate.attempted();
-        assertEquals(1, candidate.getResends());
+        assertEquals(1, candidate.getRetries());
         Date refDate = new Date(now + 15000);
         assertTrue(!candidate.getNext().before(refDate));
         refDate = new Date(now + 17000);
