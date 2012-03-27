@@ -40,6 +40,7 @@
         <cxf.surefire.parallel.mode />
         <cxf.surefire.fork.vmargs>-ea</cxf.surefire.fork.vmargs>
         <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
+        <cxf.surefire.enable.assertions>true</cxf.surefire.enable.assertions>
         <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
@@ -371,6 +372,7 @@
                         <forkMode>${cxf.surefire.fork.mode}</forkMode>
                         <childDelegation>false</childDelegation>
                         <argLine>${cxf.surefire.fork.vmargs}</argLine>
+                        <enableAssertions>${cxf.surefire.enable.assertions}</enableAssertions>
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
                             <cxf.useRandomFirstPort>true</cxf.useRandomFirstPort>

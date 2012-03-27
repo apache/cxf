@@ -38,11 +38,11 @@ public class Subscription implements Referencable {
     private final W3CEndpointReference epr;
 
     public Subscription(String address) {
-        this(WSNHelper.createWSA(address));
+        this(WSNHelper.getInstance().createWSA(address));
     }
 
     public Subscription(W3CEndpointReference epr) {
-        this.subscription = WSNHelper.getPort(epr, PausableSubscriptionManager.class);
+        this.subscription = WSNHelper.getInstance().getPort(epr, PausableSubscriptionManager.class);
         this.epr = epr;
     }
 

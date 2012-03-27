@@ -43,7 +43,7 @@ public class JaxwsEndpointManager implements EndpointManager {
     public Endpoint register(String address, Object service) throws EndpointRegistrationException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
-            if (WSNHelper.setClassLoader()) {
+            if (WSNHelper.getInstance().setClassLoader()) {
                 Thread.currentThread().setContextClassLoader(JaxwsEndpointManager.class.getClassLoader());
             }
             String bindingId = SOAPBinding.SOAP11HTTP_BINDING;

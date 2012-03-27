@@ -20,8 +20,10 @@ package org.apache.cxf.wsn.util;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Service;
+import javax.xml.ws.spi.Provider;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
@@ -31,26 +33,72 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.wsn.wsdl.WSNWSDLLocator;
 
-public abstract class WSNHelper {
-    private static boolean setClassLoader = true;
-    public static boolean setClassLoader() {
+public class WSNHelper {
+    private static volatile WSNHelper instance;
+    protected boolean setClassLoader = true;
+
+    
+    public static WSNHelper getInstance() {
+        if (instance == null) {
+            createInstance();
+        }
+        return instance;
+    }
+    public static void clearInstance() {
+        instance = null;
+    }
+    
+    private static synchronized void createInstance() {
+        if (instance != null) {
+            return;
+        }
+        Provider p = Provider.provider();
+        if (p.getClass().getName().contains("apache.cxf")) {
+            instance = new CXFWSNHelper();
+        } else {
+            instance = new WSNHelper();
+        }
+    }
+    
+    public boolean setClassLoader() {
         return setClassLoader;
     }
-    public static void setClassLoader(boolean cl) {
+    public void setClassLoader(boolean cl) {
         setClassLoader = cl;
     }
     
-    public static <T> T getPort(EndpointReference ref, Class<T> serviceInterface) {
+    public boolean supportsExtraClasses() {
+        return false;
+    }
+    
+    public Endpoint publish(String address, Object o, Class<?> ... extraClasses) {
+        if (extraClasses != null && extraClasses.length > 0) {
+            throw new UnsupportedOperationException("Pure JAX-WS does not support the extraClasses");
+        }
+        Endpoint endpoint = Endpoint.create(o);
+        endpoint.publish(address);
+        return endpoint;
+    }
+    
+    public <T> T getPort(EndpointReference ref, 
+                         Class<T> serviceInterface,
+                         Class<?> ... extraClasses) {
         if (!(ref instanceof W3CEndpointReference)) {
             throw new IllegalArgumentException("Unsupported endpoint reference: " 
                 + (ref != null ? ref.toString() : "null"));
         }
         W3CEndpointReference w3cEpr = (W3CEndpointReference) ref;
         String address = getWSAAddress(w3cEpr);
-        return getPort(address, serviceInterface);
+        return getPort(address, serviceInterface, extraClasses);
     }
 
-    public static <T> T getPort(String address, Class<T> serviceInterface) {
+    public <T> T getPort(String address, 
+                         Class<T> serviceInterface,
+                         Class<?> ... extraClasses) {
+        if (extraClasses != null && extraClasses.length > 0) {
+            throw new UnsupportedOperationException("Pure JAX-WS does not support the extraClasses");
+        }
+        
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             if (setClassLoader) {
@@ -66,7 +114,7 @@ public abstract class WSNHelper {
         }
     }
 
-    public static W3CEndpointReference createWSA(String address) {
+    public W3CEndpointReference createWSA(String address) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             if (setClassLoader) {
@@ -79,7 +127,7 @@ public abstract class WSNHelper {
         }
     }
 
-    public static String getWSAAddress(W3CEndpointReference ref) {
+    public String getWSAAddress(W3CEndpointReference ref) {
         Element element = DOMUtils.createDocument().createElement("elem");
         ref.writeTo(new DOMResult(element));
         NodeList nl = element.getElementsByTagNameNS("http://www.w3.org/2005/08/addressing", "Address");
@@ -89,6 +137,4 @@ public abstract class WSNHelper {
         }
         return null;
     }
-
-
 }

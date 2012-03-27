@@ -30,11 +30,13 @@ public class CreatePullPoint implements Referencable {
     private final W3CEndpointReference epr;
 
     public CreatePullPoint(String address) {
-        this(WSNHelper.createWSA(address));
+        this(WSNHelper.getInstance().createWSA(address));
     }
 
     public CreatePullPoint(W3CEndpointReference epr) {
-        this.createPullPoint = WSNHelper.getPort(epr, org.oasis_open.docs.wsn.bw_2.CreatePullPoint.class);
+        this.createPullPoint 
+            = WSNHelper.getInstance().getPort(epr, 
+                                              org.oasis_open.docs.wsn.bw_2.CreatePullPoint.class);
         this.epr = epr;
     }
 

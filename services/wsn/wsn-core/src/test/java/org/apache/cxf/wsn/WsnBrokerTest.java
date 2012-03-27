@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.wsn.client.Consumer;
 import org.apache.cxf.wsn.client.CreatePullPoint;
@@ -45,11 +44,19 @@ import org.apache.cxf.wsn.client.Registration;
 import org.apache.cxf.wsn.client.Subscription;
 import org.apache.cxf.wsn.services.JaxwsCreatePullPoint;
 import org.apache.cxf.wsn.services.JaxwsNotificationBroker;
+import org.apache.cxf.wsn.types.CustomType;
 import org.apache.cxf.wsn.util.WSNHelper;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
-public abstract class WsnBrokerTest extends TestCase {
+
+public abstract class WsnBrokerTest extends Assert {
     private boolean useExternal;
     
     
@@ -66,21 +73,22 @@ public abstract class WsnBrokerTest extends TestCase {
     protected abstract String getProviderImpl();
     
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         loader = Thread.currentThread().getContextClassLoader();
         String impl = getProviderImpl();
         Thread.currentThread()
             .setContextClassLoader(new FakeClassLoader(impl));
-        WSNHelper.setClassLoader(false);
+        WSNHelper.getInstance().setClassLoader(false);
     
         System.setProperty("javax.xml.ws.spi.Provider", impl);
 
         port2 = getFreePort();
         if (!useExternal) {
             port1 = getFreePort();
-            
-            activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:6000)?persistent=false)");
+            int brokerPort = getFreePort();
+            activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:" + brokerPort 
+                                                     + ")?persistent=false)");
 
             notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
             notificationBrokerServer.setAddress("http://localhost:" + port1 + "/wsn/NotificationBroker");
@@ -103,7 +111,7 @@ public abstract class WsnBrokerTest extends TestCase {
         return port;
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         if (!useExternal) {
             notificationBrokerServer.destroy();
@@ -112,8 +120,10 @@ public abstract class WsnBrokerTest extends TestCase {
         System.clearProperty("javax.xml.ws.spi.Provider");
         Thread.currentThread()
             .setContextClassLoader(loader);
+        WSNHelper.clearInstance();
     }
 
+    @Test
     public void testBroker() throws Exception {
         TestConsumer callback = new TestConsumer();
         Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
@@ -128,13 +138,14 @@ public abstract class WsnBrokerTest extends TestCase {
         }
         assertEquals(1, callback.notifications.size());
         NotificationMessageHolderType message = callback.notifications.get(0);
-        assertEquals(WSNHelper.getWSAAddress(subscription.getEpr()), 
-                     WSNHelper.getWSAAddress(message.getSubscriptionReference()));
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()), 
+                     WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
 
         subscription.unsubscribe();
         consumer.stop();
     }
 
+    @Test
     public void testPullPoint() throws Exception {
         PullPoint pullPoint = createPullPoint.create();
         Subscription subscription = notificationBroker.subscribe(pullPoint, "myTopic");
@@ -157,6 +168,7 @@ public abstract class WsnBrokerTest extends TestCase {
         pullPoint.destroy();
     }
 
+    @Test
     public void testPublisher() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
@@ -176,16 +188,17 @@ public abstract class WsnBrokerTest extends TestCase {
         }
         assertEquals(1, consumerCallback.notifications.size());
         NotificationMessageHolderType message = consumerCallback.notifications.get(0);
-        assertEquals(WSNHelper.getWSAAddress(subscription.getEpr()),
-                     WSNHelper.getWSAAddress(message.getSubscriptionReference()));
-        assertEquals(WSNHelper.getWSAAddress(publisher.getEpr()),
-                     WSNHelper.getWSAAddress(message.getProducerReference()));
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()),
+                     WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
+        assertEquals(WSNHelper.getInstance().getWSAAddress(publisher.getEpr()),
+                     WSNHelper.getInstance().getWSAAddress(message.getProducerReference()));
 
         subscription.unsubscribe();
         registration.destroy();
         publisher.stop();
         consumer.stop();
     }
+    @Test
     public void testNullPublisherReference() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
@@ -203,14 +216,15 @@ public abstract class WsnBrokerTest extends TestCase {
         }
         assertEquals(1, consumerCallback.notifications.size());
         NotificationMessageHolderType message = consumerCallback.notifications.get(0);
-        assertEquals(WSNHelper.getWSAAddress(subscription.getEpr()),
-                     WSNHelper.getWSAAddress(message.getSubscriptionReference()));
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()),
+                     WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
 
         subscription.unsubscribe();
         registration.destroy();
         publisher.stop();
         consumer.stop();
     }
+    @Test
     public void testPublisherOnDemand() throws Exception {
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
@@ -236,6 +250,40 @@ public abstract class WsnBrokerTest extends TestCase {
 
         assertTrue(publisherCallback.unsubscribed.await(5, TimeUnit.SECONDS));
 
+        registration.destroy();
+        publisher.stop();
+        consumer.stop();
+    }
+    
+    @Test
+    public void testPublisherCustomType() throws Exception {
+        notificationBroker.setExtraClasses(CustomType.class);
+        
+        TestConsumer consumerCallback = new TestConsumer();
+        Consumer consumer = new Consumer(consumerCallback,
+                                         "http://localhost:" + port2 + "/test/consumer",
+                                         CustomType.class);
+        
+        Subscription subscription = notificationBroker.subscribe(consumer, "myTopic");
+
+        PublisherCallback publisherCallback = new PublisherCallback();
+        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2 
+                                            + "/test/publisher");
+        Registration registration = notificationBroker.registerPublisher(publisher, "myTopic");
+
+        synchronized (consumerCallback.notifications) {
+            notificationBroker.notify(publisher, "myTopic", new CustomType(1, 2));
+            consumerCallback.notifications.wait(1000000);
+        }
+        assertEquals(1, consumerCallback.notifications.size());
+        NotificationMessageHolderType message = consumerCallback.notifications.get(0);
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()),
+                     WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
+        assertEquals(WSNHelper.getInstance().getWSAAddress(publisher.getEpr()),
+                     WSNHelper.getInstance().getWSAAddress(message.getProducerReference()));
+        assertTrue(message.getMessage().getAny() instanceof CustomType);
+
+        subscription.unsubscribe();
         registration.destroy();
         publisher.stop();
         consumer.stop();

@@ -59,7 +59,8 @@ public class JaxwsPublisher extends JmsPublisher {
     protected void start() throws PublisherRegistrationFailedFault {
         super.start();
         if (demand) {
-            notificationProducer = WSNHelper.getPort(publisherReference, NotificationProducer.class);
+            notificationProducer = WSNHelper.getInstance()
+                .getPort(publisherReference, NotificationProducer.class);
         }
     }
 
@@ -73,7 +74,8 @@ public class JaxwsPublisher extends JmsPublisher {
                     new JAXBElement<TopicExpressionType>(AbstractSubscription.QNAME_TOPIC_EXPRESSION,
                             TopicExpressionType.class, topic));
             SubscribeResponse response = notificationProducer.subscribe(subscribeRequest);
-            return WSNHelper.getPort(response.getSubscriptionReference(), SubscriptionManager.class);
+            return WSNHelper.getInstance()
+                .getPort(response.getSubscriptionReference(), SubscriptionManager.class);
         } catch (Exception e) {
             LOGGER.log(Level.INFO, "Error while subscribing on-demand publisher", e);
             return null;

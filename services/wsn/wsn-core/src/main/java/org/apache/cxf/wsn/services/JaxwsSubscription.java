@@ -62,7 +62,8 @@ public class JaxwsSubscription extends JmsSubscription {
             throw new SubscribeCreationFailedFault("Raw notifications are not supported", fault);
         }
         try {
-            consumer = WSNHelper.getPort(subscribeRequest.getConsumerReference(), NotificationConsumer.class);
+            consumer = WSNHelper.getInstance().getPort(subscribeRequest.getConsumerReference(), 
+                                                       NotificationConsumer.class);
         } catch (Exception e) {
             SubscribeCreationFailedFaultType fault = new SubscribeCreationFailedFaultType();
             throw new SubscribeCreationFailedFault("Unable to resolve consumer reference endpoint", fault, e);

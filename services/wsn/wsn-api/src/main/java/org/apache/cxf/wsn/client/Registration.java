@@ -32,11 +32,11 @@ public class Registration implements Referencable {
     private final W3CEndpointReference epr;
 
     public Registration(String address) {
-        this(WSNHelper.createWSA(address));
+        this(WSNHelper.getInstance().createWSA(address));
     }
 
     public Registration(W3CEndpointReference epr) {
-        this.registration = WSNHelper.getPort(epr, PublisherRegistrationManager.class);
+        this.registration = WSNHelper.getInstance().getPort(epr, PublisherRegistrationManager.class);
         this.epr = epr;
     }
 

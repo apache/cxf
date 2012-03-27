@@ -20,9 +20,15 @@ package org.apache.cxf.wsn.client;
 
 import java.util.Collections;
 import java.util.List;
+
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
+
+import org.w3c.dom.Document;
 
 import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.FilterType;
@@ -64,19 +70,44 @@ public class NotificationBroker implements Referencable {
     public static final QName QNAME_MESSAGE_CONTENT = new QName(WSN_URI, "MessageContent");
 
     
-    private final org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
+    private org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
     private final W3CEndpointReference epr;
+    private Class<?> extraClasses[];
+    private JAXBContext context;
 
     public NotificationBroker(String address) {
-        this(WSNHelper.createWSA(address));
+        this(WSNHelper.getInstance().createWSA(address));
     }
 
     public NotificationBroker(W3CEndpointReference epr) {
-        this.broker = WSNHelper.getPort(epr, org.oasis_open.docs.wsn.brw_2.NotificationBroker.class);
         this.epr = epr;
     }
 
-    public org.oasis_open.docs.wsn.brw_2.NotificationBroker getBroker() {
+    public void setExtraClasses(Class<?> ... c) {
+        extraClasses = c;
+    }
+    
+    public synchronized org.oasis_open.docs.wsn.brw_2.NotificationBroker getBroker() {
+        if (broker == null) {
+            WSNHelper helper = WSNHelper.getInstance();
+            if (helper.supportsExtraClasses()) {
+                this.broker = WSNHelper.getInstance()
+                    .getPort(epr, 
+                         org.oasis_open.docs.wsn.brw_2.NotificationBroker.class,
+                         extraClasses);
+            } else {
+                this.broker = WSNHelper.getInstance()
+                    .getPort(epr, 
+                         org.oasis_open.docs.wsn.brw_2.NotificationBroker.class);
+                if (extraClasses != null && extraClasses.length > 0) {
+                    try {
+                        this.context = JAXBContext.newInstance(extraClasses);
+                    } catch (JAXBException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
         return broker;
     }
 
@@ -89,6 +120,20 @@ public class NotificationBroker implements Referencable {
     }
 
     public void notify(Referencable publisher, String topic, Object msg) {
+        getBroker();
+        if (this.context != null) {
+            try {
+                DOMResult result = new DOMResult();
+                context.createMarshaller().marshal(msg, result);
+                msg = result.getNode();
+                if (msg instanceof Document) {
+                    msg = ((Document)msg).getDocumentElement();
+                } 
+            } catch (JAXBException e) {
+                //ignore, we'll try and let the runtime handle it as is
+            }
+        }
+        
         Notify notify = new Notify();
         NotificationMessageHolderType holder = new NotificationMessageHolderType();
         if (publisher != null) {
@@ -102,7 +147,7 @@ public class NotificationBroker implements Referencable {
         holder.setMessage(new NotificationMessageHolderType.Message());
         holder.getMessage().setAny(msg);
         notify.getNotificationMessage().add(holder);
-        broker.notify(notify);
+        getBroker().notify(notify);
     }
 
     public Subscription subscribe(Referencable consumer, String topic) 
@@ -160,7 +205,7 @@ public class NotificationBroker implements Referencable {
             subscribeRequest.setSubscriptionPolicy(new Subscribe.SubscriptionPolicy());
             subscribeRequest.getSubscriptionPolicy().getAny().add(new UseRaw());
         }
-        SubscribeResponse response = broker.subscribe(subscribeRequest);
+        SubscribeResponse response = getBroker().subscribe(subscribeRequest);
         return new Subscription(response.getSubscriptionReference());
     }
 
@@ -175,7 +220,7 @@ public class NotificationBroker implements Referencable {
             topicExp.getContent().add(topic);
             getCurrentMessageRequest.setTopic(topicExp);
         }
-        GetCurrentMessageResponse response = broker.getCurrentMessage(getCurrentMessageRequest);
+        GetCurrentMessageResponse response = getBroker().getCurrentMessage(getCurrentMessageRequest);
         return response.getAny();
     }
 
@@ -214,7 +259,7 @@ public class NotificationBroker implements Referencable {
             }
         }
         registerPublisherRequest.setDemand(demand);
-        RegisterPublisherResponse response = broker.registerPublisher(registerPublisherRequest);
+        RegisterPublisherResponse response = getBroker().registerPublisher(registerPublisherRequest);
         return new Registration(response.getPublisherRegistrationReference());
     }
 

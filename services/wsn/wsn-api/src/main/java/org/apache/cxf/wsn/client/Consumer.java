@@ -18,11 +18,17 @@
  */
 package org.apache.cxf.wsn.client;
 
+
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.wsn.util.WSNHelper;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 import org.oasis_open.docs.wsn.b_2.Notify;
 import org.oasis_open.docs.wsn.bw_2.NotificationConsumer;
@@ -36,11 +42,26 @@ public class Consumer implements NotificationConsumer, Referencable {
 
     private final Callback callback;
     private final Endpoint endpoint;
+    private final JAXBContext context;
 
-    public Consumer(Callback callback, String address) {
+    public Consumer(Callback callback, String address, Class<?> ... extraClasses) {
         this.callback = callback;
-        this.endpoint = Endpoint.create(this);
-        this.endpoint.publish(address);
+        WSNHelper helper = WSNHelper.getInstance();
+        if (helper.supportsExtraClasses()) {
+            this.endpoint = helper.publish(address, this, extraClasses);
+            this.context = null;
+        } else {
+            this.endpoint = helper.publish(address, this);
+            if (extraClasses != null && extraClasses.length > 0) {
+                try {
+                    this.context = JAXBContext.newInstance(extraClasses);
+                } catch (JAXBException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                this.context = null;
+            }
+        }
     }
 
     public void stop() {
@@ -56,6 +77,17 @@ public class Consumer implements NotificationConsumer, Referencable {
                   name = "Notify", 
                   targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Notify notify) {
         for (NotificationMessageHolderType message : notify.getNotificationMessage()) {
+            if (context != null) {
+                Object o = message.getMessage().getAny();
+                if (o instanceof Element) {
+                    try {
+                        o = context.createUnmarshaller().unmarshal((Element)o);
+                        message.getMessage().setAny(o);
+                    } catch (JAXBException e) {
+                        //ignore, leave as a DOM
+                    }
+                }
+            }
             this.callback.notify(message);
         }
     }

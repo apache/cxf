@@ -176,7 +176,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     protected AbstractPublisher getPublisher(W3CEndpointReference producerReference) {
         AbstractPublisher publisher = null;
         if (producerReference != null) {
-            String address = WSNHelper.getWSAAddress(producerReference);
+            String address = WSNHelper.getInstance().getWSAAddress(producerReference);
             publisher = publishers.get(address);
         }
         if (publisher == null) {
@@ -337,7 +337,9 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             RegisterPublisherResponse response = new RegisterPublisherResponse();
             response.setPublisherRegistrationReference(publisher.getEpr());
             if (publisher.getPublisherReference() != null) {
-                publishers.put(WSNHelper.getWSAAddress(publisher.getPublisherReference()), publisher);
+                publishers.put(WSNHelper.getInstance()
+                                   .getWSAAddress(publisher.getPublisherReference()),
+                               publisher);
             } else {
                 nonContactPublishers.add(publisher);
             }
