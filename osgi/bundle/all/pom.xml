@@ -33,8 +33,8 @@
         <version>2.6.0-SNAPSHOT</version>
     </parent>
     <properties>
-         <bundle.symbolic.name>${project.groupId}.bundle</bundle.symbolic.name>
-     </properties>
+        <bundle.symbolic.name>${project.groupId}.bundle</bundle.symbolic.name>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -143,6 +143,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-features-clustering</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -257,6 +262,26 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-cors</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-oauth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-oauth2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-xml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-ws-mex</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -286,11 +311,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-               <groupId>com.sun.xml.fastinfoset</groupId>
-               <artifactId>FastInfoset</artifactId>
-               <optional>true</optional>
-          </dependency>
-
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
@@ -341,10 +365,12 @@
                             javax.xml.soap,
                             junit.framework*;resolution:=optional,
                             net.sf.cglib*;resolution:=optional;version="[2.1.3, 3.0.0)",
+                            net.oauth*;resolution:=optional,
                             org.apache.abdera*;resolution:=optional;version="[1.0,2)",
                             org.apache.aries*;resolution:=optional;version="[0.2,2)",
                             org.apache.commons.lang*;resolution:=optional;version="[2.4,3)",
                             org.apache.commons.codec*;resolution:=optional,
+                            org.apache.commons.logging*;resolution:=optional,
                             org.apache.commons.pool*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,
                             org.apache.mina*;resolution:=optional,
@@ -357,9 +383,11 @@
                             org.codehaus.jettison*;resolution:=optional,
                             org.eclipse.emf*;resolution:=optional,
                             org.eclipse.jetty*;resolution:=optional;version="${cxf.jetty.osgi.version}",
+                            org.ietf.jgss*;resolution:=optional,
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
                             org.jibx*;resolution:=optional;version="[1.2.3,2)",
+                            org.joda.time;resolution:=optional,
                             org.junit*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
                             org.objectweb.asm*;version="[2.0,4)";resolution:=optional,

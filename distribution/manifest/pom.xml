@@ -75,6 +75,7 @@
             <version>${project.version}</version>
         </dependency>
         
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-wsdlto-frontend-jaxws</artifactId>
@@ -87,12 +88,14 @@
             <version>${project.version}</version>
         </dependency>
         
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-java2ws</artifactId>
             <version>${project.version}</version>
-        </dependency>       
+        </dependency>
         
+
         <dependency>
             <groupId>${project.groupId}.xjcplugins</groupId>
             <artifactId>cxf-xjc-dv</artifactId>
@@ -114,6 +117,11 @@
             <version>${cxf.xjc-utils.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}.xjc-utils</groupId>
+            <artifactId>cxf-xjc-runtime</artifactId>
+            <version>${cxf.xjc-utils.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
             <version>${project.version}</version>
@@ -122,6 +130,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-features-clustering</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -216,6 +229,36 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-extension-providers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-extension-search</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-cors</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-oauth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-oauth2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-rs-security-xml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -234,7 +277,7 @@
             <artifactId>cxf-rt-ws-mex</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${project.version}</version>
@@ -258,12 +301,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-javascript</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-bundle</artifactId>
@@ -300,8 +343,8 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
-             <groupId>com.sun.xml.fastinfoset</groupId>
-             <artifactId>FastInfoset</artifactId>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
         </dependency>
 
         <dependency>
@@ -341,13 +384,13 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                          <!-- Add an entry for the renamed bundle jar in the distro -->
-                          <!-- Add entries for the stuff that needs to be endorsed on Java6, but not on java5 -->
-                          <!-- Stick both versions of jaxb xjc/impl on classpath to make it easier to flip back and forth -->
-			              <Class-Path>
+                            <!-- Add an entry for the renamed bundle jar in the distro -->
+                            <!-- Add entries for the stuff that needs to be endorsed on Java6, but not on java5 -->
+                            <!-- Stick both versions of jaxb xjc/impl on classpath to make it easier to flip back and forth -->
+                            <Class-Path>
                           cxf-${project.version}.jar endorsed/jaxb-api-${cxf.jaxb22.version}.jar endorsed/geronimo-jaxws_2.2_spec-${cxf.specs.jaxws.api.version}.jar jaxb-impl-${cxf.jaxb22.impl.version}.jar jaxb-impl-${cxf.jaxb21.impl.version}.jar jaxb-xjc-${cxf.jaxb22.xjc.version}.jar jaxb-xjc-${cxf.jaxb21.xjc.version}.jar
-                          </Class-Path>
-			            </manifestEntries>
+                            </Class-Path>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
