@@ -186,6 +186,8 @@ public class HTTPJettyTransportActivator
                     p.setSecureSocketProtocol(v);
                 } else if ("jsseProvider".equals(k)) {
                     p.setJsseProvider(v);
+                } else if ("certAlias".equals(k)) {
+                    p.setCertAlias(v);
                 } else if ("clientAuthentication.want".equals(k)) {
                     if (p.getClientAuthentication() == null) {
                         p.setClientAuthentication(new ClientAuthentication());
