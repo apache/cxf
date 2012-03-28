@@ -328,6 +328,7 @@
                             antlr*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             com.ctc.wstx.msv*;resolution:=optional,
+                            net.sf.ehcache*;resolution:=optional,
                             org.codehaus.stax2*;resolution:=optional,
                             commonj.sdo*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
