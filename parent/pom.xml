@@ -123,6 +123,7 @@
 
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
         <cxf.ehcache.version>2.5.1</cxf.ehcache.version>
+        <cxf.ehcache.bundle.version>2.5.1_1-SNAPSHOT</cxf.ehcache.bundle.version>
         
         <!-- various OSGi related versions -->
         <cxf.aries.version>0.3.1</cxf.aries.version>
