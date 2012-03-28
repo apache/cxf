@@ -199,57 +199,11 @@ public class HTTPJettyTransportActivator
                     }
                     p.getClientAuthentication().setRequired(Boolean.parseBoolean(v));
                 } else if (k.startsWith("certConstraints.")) {
-                    k = k.substring("certConstraints.".length());
-                    CertificateConstraintsType cct = p.getCertConstraints();
-                    if (cct == null) {
-                        cct = new CertificateConstraintsType();
-                        p.setCertConstraints(cct);
-                    }
-                    DNConstraintsType dnct = null;
-                    if (k.startsWith("SubjectDNConstraints.")) {
-                        dnct = cct.getSubjectDNConstraints();
-                        if (dnct == null) {
-                            dnct = new DNConstraintsType();
-                            cct.setSubjectDNConstraints(dnct);
-                        }
-                        k = k.substring("SubjectDNConstraints.".length());
-                    } else if (k.startsWith("IssuerDNConstraints.")) {
-                        dnct = cct.getIssuerDNConstraints();
-                        if (dnct == null) {
-                            dnct = new DNConstraintsType();
-                            cct.setIssuerDNConstraints(dnct);
-                        }
-                        k = k.substring("IssuerDNConstraints.".length());
-                    }
-                    if (dnct != null) {
-                        if ("combinator".equals(k)) {
-                            dnct.setCombinator(CombinatorType.fromValue(v));
-                        } else if ("RegularExpression".equals(k)) {
-                            dnct.getRegularExpression().add(k);
-                        }
-                    }
+                    configureCertConstraints(p, k, v);
                 } else if (k.startsWith("secureRandomParameters.")) {
-                    k = k.substring("secureRandomParameters.".length());
-                    if (srp == null) {
-                        srp = new SecureRandomParameters();
-                    }
-                    if ("algorithm".equals(k)) {
-                        srp.setAlgorithm(v);
-                    } else if ("provider".equals(k)) {
-                        srp.setProvider(v);
-                    }
+                    srp = configureSecureRandom(srp, k, v);
                 } else if (k.startsWith("cipherSuitesFilter.")) {
-                    k = k.substring("cipherSuitesFilter.".length());
-                    StringTokenizer st = new StringTokenizer(v, ",");
-                    FiltersType ft = p.getCipherSuitesFilter();
-                    if (ft == null) {
-                        ft = new FiltersType();
-                        p.setCipherSuitesFilter(ft);
-                    }
-                    List<String> lst = "include".equals(k) ? ft.getInclude() : ft.getExclude();
-                    while (st.hasMoreTokens()) {
-                        lst.add(st.nextToken());
-                    }
+                    configureCipherSuitesFilter(p, k, v);
                 } else if (k.startsWith("cipherSuites")) {
                     StringTokenizer st = new StringTokenizer(v, ",");
                     while (st.hasMoreTokens()) {
@@ -283,6 +237,65 @@ public class HTTPJettyTransportActivator
             throw new RuntimeException(e);
         }
         return p;
+    }
+
+    private void configureCipherSuitesFilter(TLSServerParameters p, String k, String v) {
+        k = k.substring("cipherSuitesFilter.".length());
+        StringTokenizer st = new StringTokenizer(v, ",");
+        FiltersType ft = p.getCipherSuitesFilter();
+        if (ft == null) {
+            ft = new FiltersType();
+            p.setCipherSuitesFilter(ft);
+        }
+        List<String> lst = "include".equals(k) ? ft.getInclude() : ft.getExclude();
+        while (st.hasMoreTokens()) {
+            lst.add(st.nextToken());
+        }
+    }
+
+    private SecureRandomParameters configureSecureRandom(SecureRandomParameters srp, String k, String v) {
+        k = k.substring("secureRandomParameters.".length());
+        if (srp == null) {
+            srp = new SecureRandomParameters();
+        }
+        if ("algorithm".equals(k)) {
+            srp.setAlgorithm(v);
+        } else if ("provider".equals(k)) {
+            srp.setProvider(v);
+        }
+        return srp;
+    }
+
+    private void configureCertConstraints(TLSServerParameters p, String k, String v) {
+        k = k.substring("certConstraints.".length());
+        CertificateConstraintsType cct = p.getCertConstraints();
+        if (cct == null) {
+            cct = new CertificateConstraintsType();
+            p.setCertConstraints(cct);
+        }
+        DNConstraintsType dnct = null;
+        if (k.startsWith("SubjectDNConstraints.")) {
+            dnct = cct.getSubjectDNConstraints();
+            if (dnct == null) {
+                dnct = new DNConstraintsType();
+                cct.setSubjectDNConstraints(dnct);
+            }
+            k = k.substring("SubjectDNConstraints.".length());
+        } else if (k.startsWith("IssuerDNConstraints.")) {
+            dnct = cct.getIssuerDNConstraints();
+            if (dnct == null) {
+                dnct = new DNConstraintsType();
+                cct.setIssuerDNConstraints(dnct);
+            }
+            k = k.substring("IssuerDNConstraints.".length());
+        }
+        if (dnct != null) {
+            if ("combinator".equals(k)) {
+                dnct.setCombinator(CombinatorType.fromValue(v));
+            } else if ("RegularExpression".equals(k)) {
+                dnct.getRegularExpression().add(k);
+            }
+        }
     }
 
     private KeyManagersType getKeyManagers(KeyManagersType keyManagers, String k, String v) {
