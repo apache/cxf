@@ -39,6 +39,7 @@ import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.realm.CertConstraintsParser;
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.SAMLTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
@@ -197,23 +198,6 @@ public class SAMLTokenValidator implements TokenValidator {
                 }
             }
            
-            DateTime validFrom = null;
-            DateTime validTill = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                validFrom = assertion.getSaml2().getConditions().getNotBefore();
-                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-            } else {
-                validFrom = assertion.getSaml1().getConditions().getNotBefore();
-                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-            }
-            if (validFrom.isAfterNow() || validTill.isBeforeNow()) {
-                LOG.log(Level.WARNING, "SAML Token condition not met");
-                if (secToken != null) {
-                    tokenParameters.getTokenStore().remove(secToken);
-                }
-                return response;
-            }
-            
             // Get the realm of the SAML token
             String tokenRealm = null;
             if (samlRealmCodec != null) {
@@ -228,6 +212,10 @@ public class SAMLTokenValidator implements TokenValidator {
                         }
                     }
                 }
+            }
+            
+            if (!validateConditions(assertion, validateTarget, secToken, tokenParameters.getTokenStore())) {
+                return response;
             }
             
             // Add the AssertionWrapper to the properties, as the claims are required to be transformed
@@ -275,4 +263,35 @@ public class SAMLTokenValidator implements TokenValidator {
         }
     }
     
+    protected boolean validateConditions(
+        AssertionWrapper assertion,
+        ReceivedToken validateTarget,
+        SecurityToken secToken, 
+        TokenStore tokenStore
+    ) {
+        DateTime validFrom = null;
+        DateTime validTill = null;
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            validFrom = assertion.getSaml2().getConditions().getNotBefore();
+            validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+        } else {
+            validFrom = assertion.getSaml1().getConditions().getNotBefore();
+            validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+        }
+        if (validFrom.isAfterNow()) {
+            LOG.log(Level.WARNING, "SAML Token condition not met");
+            if (secToken != null) {
+                tokenStore.remove(secToken);
+            }
+            return false;
+        } else if (validTill.isBeforeNow()) {
+            LOG.log(Level.WARNING, "SAML Token condition not met");
+            if (secToken != null) {
+                tokenStore.remove(secToken);
+            }
+            validateTarget.setState(STATE.EXPIRED);
+            return false;
+        }
+        return true;
+    }
 }

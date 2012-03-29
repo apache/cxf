@@ -233,7 +233,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
     }
     
     /**
@@ -263,7 +263,7 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
             samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
+        assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
     }
     
     

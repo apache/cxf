@@ -46,7 +46,7 @@ public class ReceivedToken {
     private STATE state = STATE.NONE;
     private Principal principal;
     
-    public enum STATE { VALID, INVALID, CANCELLED, NONE };
+    public enum STATE { VALID, INVALID, CANCELLED, EXPIRED, NONE };
     
     public ReceivedToken(Object receivedToken) throws STSException {
         if (receivedToken instanceof JAXBElement<?>) {
