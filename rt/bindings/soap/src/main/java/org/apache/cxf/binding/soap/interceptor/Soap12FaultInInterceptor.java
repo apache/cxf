@@ -41,6 +41,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.FragmentStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
     
@@ -72,9 +73,13 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         XPathUtils xu = new XPathUtils(ns);        
         try {
             Node mainNode = message.getContent(Node.class);
-            
             Node fault = null;
-            if (mainNode != null) {
+            
+            if (reader instanceof W3CDOMStreamReader) {
+                W3CDOMStreamReader dr = (W3CDOMStreamReader)reader;
+                fault = dr.getCurrentElement();
+                dr.consumeFrame();
+            } else if (mainNode != null) {
                 Node bodyNode = (Node) xu.getValue("//s:Body",
                                                    mainNode,
                                                    XPathConstants.NODE);

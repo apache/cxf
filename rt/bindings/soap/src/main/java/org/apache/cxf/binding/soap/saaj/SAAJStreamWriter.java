@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.binding.soap.saaj;
 
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPPart;
@@ -35,25 +36,42 @@ public final class SAAJStreamWriter extends W3CDOMStreamWriter {
         this.part = part;
     }
 
+    private SOAPElement adjustPrefix(SOAPElement e, String prefix) {
+        if (prefix == null) {
+            prefix = "";
+        }
+        try {
+            String s = e.getPrefix();
+            if (!prefix.equals(s)) {
+                e.setPrefix(prefix);
+                e.removeNamespaceDeclaration(s);
+            }
+        } catch (Throwable t) {
+            //likely old old version of SAAJ, we'll just try our best
+        }
+        return e;
+    }
+    
     protected void createAndAddElement(String prefix, String local, String namespace) {
         try {
             if (namespace != null 
                 && namespace.equals(part.getEnvelope().getElementName().getURI())) {
                 if ("Envelope".equals(local)) {
-                    setChild(part.getEnvelope(), false);
+                    setChild(adjustPrefix(part.getEnvelope(), prefix), false);
+                    adjustPrefix(part.getEnvelope().getHeader(), prefix);
                     return;
                 } else if ("Body".equals(local)) {
-                    setChild(part.getEnvelope().getBody(), false);
+                    setChild(adjustPrefix(part.getEnvelope().getBody(), prefix), false);
                     return;
                 } else if ("Header".equals(local)) {
-                    setChild(part.getEnvelope().getHeader(), false);
+                    setChild(adjustPrefix(part.getEnvelope().getHeader(), prefix), false);
                     return;
                 } else if ("Fault".equals(local)) {
                     SOAPFault f = part.getEnvelope().getBody().getFault();
                     if (f == null) {
                         f = part.getEnvelope().getBody().addFault();
                     }
-                    setChild(f, false);
+                    setChild(adjustPrefix(f, prefix), false);
                     return;
                 }
             } else if (getCurrentNode() instanceof SOAPFault) {

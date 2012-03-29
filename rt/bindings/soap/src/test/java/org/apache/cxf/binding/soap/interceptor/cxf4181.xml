@@ -2,7 +2,10 @@
             xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" 
             xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
             xmlns:wst="http://schemas.xmlsoap.org/ws/2005/02/trust">
-  <S:Body>
+  <S2:Header xmlns:S2="http://www.w3.org/2003/05/soap-envelope">
+     <foo:blah xmlns:foo="http://cxf.apache.org/test">Snarf</foo:blah>
+  </S2:Header>
+  <S3:Body xmlns:S3="http://www.w3.org/2003/05/soap-envelope">
     <S:Fault>
       <S:Code>
         <S:Value>S:Sender</S:Value>
@@ -14,5 +17,5 @@
         <S:Text xml:lang="en-US">Authentication Failure</S:Text>
       </S:Reason>
     </S:Fault>
-  </S:Body>
+  </S3:Body>
 </S:Envelope>

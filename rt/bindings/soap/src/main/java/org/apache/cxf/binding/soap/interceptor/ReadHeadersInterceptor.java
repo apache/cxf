@@ -198,7 +198,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                             }
                         }
                         
-                        HeaderProcessor p = bus.getExtension(HeaderManager.class)
+                        HeaderProcessor p = bus == null ? null : bus.getExtension(HeaderManager.class)
                             .getHeaderProcessor(hel.getNamespaceURI());
 
                         Object obj;
