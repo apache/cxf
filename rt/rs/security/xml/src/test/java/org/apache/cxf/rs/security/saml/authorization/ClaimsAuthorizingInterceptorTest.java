@@ -34,6 +34,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.claims.authorization.Claim;
+import org.apache.cxf.security.claims.authorization.ClaimMode;
+import org.apache.cxf.security.claims.authorization.Claims;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

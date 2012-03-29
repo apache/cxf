@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.saml.authorization;
 
+import org.apache.cxf.security.claims.authorization.ClaimMode;
+
 
 public class ClaimBean {
     private org.apache.cxf.rs.security.saml.assertion.Claim claim;

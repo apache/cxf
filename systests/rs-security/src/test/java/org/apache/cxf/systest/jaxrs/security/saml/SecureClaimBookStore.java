@@ -25,8 +25,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.apache.cxf.rs.security.saml.authorization.Claim;
-import org.apache.cxf.rs.security.saml.authorization.Claims;
+import org.apache.cxf.security.claims.authorization.Claim;
+import org.apache.cxf.security.claims.authorization.Claims;
 import org.apache.cxf.systest.jaxrs.security.Book;
 
 @Path("/bookstore")

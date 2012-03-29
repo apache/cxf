@@ -16,9 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.authorization;
 
-public enum ClaimMode {
-    STRICT,
-    LAX
+package org.apache.cxf.security.claims.authorization;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+
+@Target({ElementType.TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Claims {
+    String realm() default "";
+    Claim[] value();
 }

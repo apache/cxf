@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.saml.authorization;
+package org.apache.cxf.security.claims.authorization;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
