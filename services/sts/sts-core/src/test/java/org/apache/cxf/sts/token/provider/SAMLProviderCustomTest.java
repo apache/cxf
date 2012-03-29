@@ -105,8 +105,10 @@ public class SAMLProviderCustomTest extends org.junit.Assert {
     
     /**
      * Create a custom Saml1 Authentication Assertion.
+     * TODO re-enable when we pick up WSS4J 1.6.5.
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testCustomSaml1AuthenticationAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         TokenProviderParameters providerParameters = 
