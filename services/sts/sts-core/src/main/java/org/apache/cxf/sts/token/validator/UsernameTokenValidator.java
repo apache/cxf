@@ -169,7 +169,8 @@ public class UsernameTokenValidator implements TokenValidator {
             if (ut.getPassword() == null) {
                 return response;
             }
-            if (secToken == null || (secToken.getAssociatedHash() != ut.hashCode())) {
+            if (secToken == null || secToken.isExpired()
+                || (secToken.getAssociatedHash() != ut.hashCode())) {
                 Credential credential = new Credential();
                 credential.setUsernametoken(ut);
                 validator.validate(credential, requestData);
