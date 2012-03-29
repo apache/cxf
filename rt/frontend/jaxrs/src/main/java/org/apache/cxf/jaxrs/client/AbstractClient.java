@@ -24,7 +24,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -460,21 +459,22 @@ public abstract class AbstractClient implements Client, Retryable {
         return null;                                                
     }
     
-    protected void completeExchange(Object response, Exchange exchange) {
+    protected void completeExchange(Object response, Exchange exchange, boolean proxy) {
         // higher level conduits such as FailoverTargetSelector need to
         // clear the request state but a fair number of response objects 
         // depend on InputStream being still open thus lower-level conduits
         // operating on InputStream don't have to close streams pro-actively
         exchange.put(KEEP_CONDUIT_ALIVE, true);    
         getConfiguration().getConduitSelector().complete(exchange);
-        try {
-            String s = (String)exchange.getOutMessage().get(Message.BASE_PATH);
-            if (s != null) {
-                state.setBaseURI(new URI(s));
-            }
-        } catch (URISyntaxException e) {
-            //ignore
+        String s = (String)exchange.getOutMessage().get(Message.BASE_PATH);
+        if (s != null && !state.getBaseURI().toString().equals(s)) {
+            // usually the (failover) conduit change will result in a retry call
+            // which in turn will reset the base and current request URI.
+            // In some cases, such as the "upfront" load-balancing, etc, the retries
+            // won't be executed so it is necessary to reset the base address 
+            calculateNewRequestURI(URI.create(s), getCurrentURI(), proxy);
         }
+        
     }
     
     protected Object[] preProcessResult(Message message) throws Exception {

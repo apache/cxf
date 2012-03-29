@@ -248,8 +248,8 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         } 
         
         for (int i = 0; i < 20; i++) {
-            feature.getTargetSelector().close();
             if (!singleProxy) {
+                feature.getTargetSelector().close();
                 bookStore = getBookStore(inactiveReplica, feature);
             }
             verifyStrategy(bookStore, expectRandom 
@@ -344,7 +344,10 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
 
     
     protected String getCurrentEndpointAddress(Object client) {
-        return WebClient.client(client).getBaseURI().toString();
+        String currentBaseURI = WebClient.client(client).getBaseURI().toString();
+        String currentURI = WebClient.client(client).getCurrentURI().toString();
+        assertTrue(currentURI.startsWith(currentBaseURI));
+        return currentBaseURI;
     }
     
         

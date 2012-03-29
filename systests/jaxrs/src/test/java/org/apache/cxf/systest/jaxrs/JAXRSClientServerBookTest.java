@@ -775,7 +775,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
         urlConnection.setReadTimeout(30000); // 30 seconds tops
         urlConnection.setConnectTimeout(30000); // 30 second tops
-        urlConnection.addRequestProperty("Content-Type", "MissingSeparator");
+        urlConnection.addRequestProperty("Content-Type", "xxx/xxx");
+        urlConnection.addRequestProperty("Accept", "*/*");
         urlConnection.setRequestMethod("POST");
         assertEquals(415, urlConnection.getResponseCode());
     }

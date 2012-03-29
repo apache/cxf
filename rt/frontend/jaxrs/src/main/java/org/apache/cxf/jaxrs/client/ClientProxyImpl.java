@@ -535,7 +535,7 @@ public class ClientProxyImpl extends AbstractClient implements
             response = ex;
             throw ex;
         } finally {
-            completeExchange(response, outMessage.getExchange());
+            completeExchange(response, outMessage.getExchange(), true);
         }
         
     }

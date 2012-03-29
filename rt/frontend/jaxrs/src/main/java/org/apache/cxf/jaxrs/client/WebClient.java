@@ -770,7 +770,7 @@ public class WebClient extends AbstractClient {
             entity = ex;
             throw ex;
         } finally {
-            completeExchange(entity, m.getExchange());
+            completeExchange(entity, m.getExchange(), false);
         }
     }
     
