@@ -23,10 +23,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
@@ -34,6 +38,8 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11FaultOutInterceptorInternal;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12FaultOutInterceptorInternal;
+import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor.SAAJPreInInterceptor;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.ExchangeImpl;
@@ -180,25 +186,69 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
 
     @Test
     public void testCXF4181() throws Exception {
-
+        //Try WITH SAAJ
         SoapMessage m = new SoapMessage(new MessageImpl());
         m.setVersion(Soap12.getInstance());        
-
-
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
                                                                  .getResourceAsStream("cxf4181.xml"));
 
         m.setContent(XMLStreamReader.class, reader);
 
+        new SAAJPreInInterceptor().handleMessage(m);
         new ReadHeadersInterceptor(null).handleMessage(m);
-        Soap12FaultInInterceptor inInterceptor = new Soap12FaultInInterceptor();
-        inInterceptor.handleMessage(m);
+        new StartBodyInterceptor().handleMessage(m);
+        new SAAJInInterceptor().handleMessage(m);
+        new Soap12FaultInInterceptor().handleMessage(m);
 
+        Node nd = m.getContent(Node.class);
+        
+        SOAPPart part = (SOAPPart)nd;
+        assertEquals("S", part.getEnvelope().getPrefix());
+        assertEquals("S2", part.getEnvelope().getHeader().getPrefix());
+        assertEquals("S3", part.getEnvelope().getBody().getPrefix());
+        SOAPFault fault = part.getEnvelope().getBody().getFault();
+        assertEquals("S", fault.getPrefix());
+        
+        assertEquals("Authentication Failure", fault.getFaultString());
+        
         SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
         assertNotNull(fault2);
         
         assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
         assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"), 
                      fault2.getSubCode());
+        
+        Element el = part.getEnvelope().getBody();
+        nd = el.getFirstChild();
+        int count = 0;
+        while (nd != null) {
+            if (nd instanceof Element) {
+                count++;
+            }
+            nd = nd.getNextSibling();
+        }
+        assertEquals(1, count);
+        
+        
+        //Try WITHOUT SAAJ
+        m = new SoapMessage(new MessageImpl());
+        m.setVersion(Soap12.getInstance());  
+        reader = StaxUtils.createXMLStreamReader(this.getClass()
+                                                 .getResourceAsStream("cxf4181.xml"));
+
+        m.setContent(XMLStreamReader.class, reader);
+
+        new ReadHeadersInterceptor(null).handleMessage(m);
+        new StartBodyInterceptor().handleMessage(m);
+        new Soap12FaultInInterceptor().handleMessage(m);
+
+        nd = m.getContent(Node.class);
+
+        fault2 = (SoapFault)m.getContent(Exception.class);
+        assertNotNull(fault2);
+
+        assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
+        assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"), 
+             fault2.getSubCode());
     }
 }
