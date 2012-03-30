@@ -45,6 +45,7 @@ import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -136,6 +137,32 @@ public class SAAJInInterceptorTest extends TestBase {
         detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorstring", detailEntry.getLocalName());
         assertEquals("This is a fault detail error string", detailEntry.getTextContent());
+        
+    }
+    
+    @Test
+    @Ignore
+    public void testFaultDetailSOAP12() throws Exception {
+        try {
+            prepareSoapMessage("../test-soap-12-fault-detail.xml");
+        } catch (IOException ioe) {
+            fail("Failed in creating soap message");
+        }
+
+        staxIntc.handleMessage(soapMessage);
+        rhi.handleMessage(soapMessage);
+        sbi.handleMessage(soapMessage);
+
+        // check the xmlReader should be placed on the first entry of the body
+        // element
+        XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
+        xmlReader.nextTag();
+        saajIntc.handleMessage(soapMessage);
+        
+        SOAPMessage parsedMessage = soapMessage.getContent(SOAPMessage.class);
+        SOAPFault fault = parsedMessage.getSOAPBody().getFault();
+        assertEquals("Simulated failure", fault.getFaultReasonTexts().next());
+        assertEquals("soap:Receiver", fault.getFaultCode());
         
     }
     
