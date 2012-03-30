@@ -104,6 +104,7 @@ public class SCTValidator implements TokenValidator {
                     LOG.fine("Identifier: " + identifier + " is not found in the cache");
                     return response;
                 }
+                response.setSecurityToken(token);
                 if (token.isExpired()) {
                     validateTarget.setState(STATE.EXPIRED);
                     LOG.fine("Token: " + identifier + " is in the cache but expired");

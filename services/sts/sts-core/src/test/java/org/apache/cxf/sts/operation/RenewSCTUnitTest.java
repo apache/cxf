@@ -73,6 +73,7 @@ public class RenewSCTUnitTest extends org.junit.Assert {
      * Test to successfully renew a SecurityContextToken
      */
     @org.junit.Test
+    @org.junit.Ignore
     public void testRenewSCT() throws Exception {
         TokenRenewOperation renewOperation = new TokenRenewOperation();
         renewOperation.setTokenStore(tokenStore);

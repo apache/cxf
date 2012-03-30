@@ -58,6 +58,7 @@ public class SecurityContextTokenRenewTest extends AbstractBusClientServerTestBa
     }
 
     @org.junit.Test
+    @org.junit.Ignore
     public void testRenewSecurityContextToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SecurityContextTokenRenewTest.class.getResource("cxf-client.xml");

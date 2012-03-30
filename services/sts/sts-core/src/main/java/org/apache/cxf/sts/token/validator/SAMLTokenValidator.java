@@ -152,6 +152,7 @@ public class SAMLTokenValidator implements TokenValidator {
                 if (signatureValue != null && signatureValue.length > 0) {
                     hash = Arrays.hashCode(signatureValue);
                     secToken = tokenParameters.getTokenStore().getTokenByAssociatedHash(hash);
+                    response.setSecurityToken(secToken);
                 }
             }
             if (secToken != null && secToken.isExpired()) {

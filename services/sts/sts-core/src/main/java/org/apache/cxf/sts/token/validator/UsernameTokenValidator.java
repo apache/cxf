@@ -134,6 +134,7 @@ public class UsernameTokenValidator implements TokenValidator {
         SecurityToken secToken = null;
         if (tokenParameters.getTokenStore() != null) {
             secToken = tokenParameters.getTokenStore().getToken(usernameTokenType.getId());
+            response.setSecurityToken(secToken);
         }
 
         // Marshall the received JAXB object into a DOM Element
