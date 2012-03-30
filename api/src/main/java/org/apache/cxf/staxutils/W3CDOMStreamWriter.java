@@ -68,6 +68,11 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         currentNode = e;
         ((W3CNamespaceContext)context).setElement(e);
     }
+    public W3CDOMStreamWriter(Document owner, Element e) {
+        this.document = owner;
+        currentNode = e;
+        ((W3CNamespaceContext)context).setElement(e);
+    }
     
     public Element getCurrentNode() {
         if (currentNode instanceof Element) {

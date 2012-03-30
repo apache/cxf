@@ -26,6 +26,7 @@ import javax.xml.soap.SOAPPart;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public final class SAAJStreamWriter extends W3CDOMStreamWriter {
@@ -33,6 +34,10 @@ public final class SAAJStreamWriter extends W3CDOMStreamWriter {
 
     public SAAJStreamWriter(SOAPPart part) {
         super(part);
+        this.part = part;
+    }
+    public SAAJStreamWriter(SOAPPart part, Element current) {
+        super(part, current);
         this.part = part;
     }
 
@@ -69,7 +74,13 @@ public final class SAAJStreamWriter extends W3CDOMStreamWriter {
                 } else if ("Fault".equals(local)) {
                     SOAPFault f = part.getEnvelope().getBody().getFault();
                     if (f == null) {
-                        f = part.getEnvelope().getBody().addFault();
+                        Element el = part.createElementNS(namespace, 
+                                             StringUtils.isEmpty(prefix) ? local : prefix + ":" + local);
+                        el = (Element)part.getEnvelope().getBody().appendChild(el);
+                        f = part.getEnvelope().getBody().getFault();
+                        if (f == null) {
+                            f = part.getEnvelope().getBody().addFault();
+                        }
                     }
                     setChild(adjustPrefix(f, prefix), false);
                     return;
