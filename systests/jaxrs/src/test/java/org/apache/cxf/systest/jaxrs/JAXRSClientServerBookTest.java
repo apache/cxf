@@ -1337,6 +1337,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testAddBookEmptyContent() throws Exception {
+        Response r = WebClient.create("http://localhost:" + PORT + "/bookstore/books").post(null);
+        assertEquals(400, r.getStatus());
+    }
+    
+    @Test
+    public void testAddBookEmptyContentWithNullable() throws Exception {
+        Book defaultBook = 
+            WebClient.create("http://localhost:" + PORT + "/bookstore/books/null").post(null, Book.class);
+        assertEquals("Default Book", defaultBook.getName());
+    }
+    
+    @Test
     public void testAddBook() throws Exception {
         doAddBook("http://localhost:" + PORT + "/bookstore/books");               
     }

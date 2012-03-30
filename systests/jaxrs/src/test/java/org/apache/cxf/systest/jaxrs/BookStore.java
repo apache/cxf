@@ -75,6 +75,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
@@ -752,6 +753,17 @@ public class BookStore {
         }
     }
 
+    @POST
+    @Path("/books/null")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book handleNullBook(@Nullable Book book) {
+        if (book != null) {
+            throw new WebApplicationException(400);
+        }
+        return new Book("Default Book", 222L);
+    }
+    
     @POST
     @Path("/books")
     @Produces("text/xml")
