@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.util.List;
 
+import javax.ws.rs.core.HttpHeaders;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -142,5 +144,20 @@ public abstract class AbstractConfigurableProvider {
      */
     public void init(List<ClassResourceInfo> resources) {
         // complete
+    }
+    
+    protected boolean isPayloadEmpty(HttpHeaders headers) {
+        if (headers != null) {
+            List<String> values = headers.getRequestHeader(HttpHeaders.CONTENT_LENGTH);
+            if (values.size() == 1) {
+                try {
+                    Long len = Long.valueOf(values.get(0));
+                    return len <= 0;
+                } catch (NumberFormatException ex) {
+                    // ignore
+                }
+            }
+        }
+        return false;
     }
 }

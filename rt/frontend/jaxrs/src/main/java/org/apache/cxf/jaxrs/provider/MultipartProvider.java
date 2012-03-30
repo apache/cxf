@@ -44,7 +44,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -122,13 +121,10 @@ public class MultipartProvider extends AbstractConfigurableProvider
     }
     
     protected void checkContentLength() {
-        if (mc != null) {
-            List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
-            if (values.size() == 1 && "0".equals(values.get(0))) {
-                String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
-                LOG.warning(message);
-                throw new WebApplicationException(400);
-            }
+        if (mc != null && isPayloadEmpty(mc.getHttpHeaders())) {
+            String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+            LOG.warning(message);
+            throw new WebApplicationException(400);
         }
     }
     
