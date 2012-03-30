@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -113,5 +114,20 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
             //ignore
         }
         return false;
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        if (tmpDir != null) {
+            File nonceFile = new File(tmpDir + File.separator + "ws-security.nonce.cache.instance.data");
+            if (nonceFile.exists()) {
+                nonceFile.delete();
+            }
+            File tsFile = new File(tmpDir + File.separator + "ws-security.timestamp.cache.instance.data");
+            if (tsFile.exists()) {
+                tsFile.delete();
+            }
+        }
     }
 }

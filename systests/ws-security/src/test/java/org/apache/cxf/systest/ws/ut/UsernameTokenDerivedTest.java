@@ -26,6 +26,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.server.ServerDerived;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -51,6 +52,11 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(ServerDerived.class, true)
         );
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
     }
 
     /**

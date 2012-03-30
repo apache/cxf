@@ -26,6 +26,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.systest.wssec.examples.secconv.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -53,6 +54,11 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         );
     }
 
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
+    }
+    
     /**
      * 2.4.1 (WSS 1.0) Secure Conversation bootstrapped by Mutual
      * Authentication with X.509 Certificates
