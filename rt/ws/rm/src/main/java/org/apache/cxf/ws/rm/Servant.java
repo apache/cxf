@@ -60,6 +60,7 @@ public class Servant implements Invoker {
     
     public Object invoke(Exchange exchange, Object o) {
         LOG.fine("Invoking on RM Endpoint");
+        final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(exchange.getInMessage());
         OperationInfo oi = exchange.get(OperationInfo.class);
         if (null == oi) {
             LOG.fine("No operation info."); 
@@ -77,10 +78,10 @@ public class Servant implements Invoker {
             }
         } else if (RM10Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())
             || RM11Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())) {
-            EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
+            EncoderDecoder codec = protocol.getCodec();
             CreateSequenceResponseType createResponse = 
                 codec.convertReceivedCreateSequenceResponse(getParameter(exchange.getInMessage()));
-            createSequenceResponse(createResponse);
+            createSequenceResponse(createResponse, protocol);
         } else if (RM10Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())
             || RM11Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())) {
             terminateSequence(exchange.getInMessage());
@@ -92,6 +93,7 @@ public class Servant implements Invoker {
 
     Object createSequence(Message message) {
         LOG.fine("Creating sequence");
+        final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
         
         AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
         Message outMessage = message.getExchange().getOutMessage();  
@@ -99,7 +101,7 @@ public class Servant implements Invoker {
             RMContextUtils.storeMAPs(maps, outMessage, false, false);
         }
         
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
+        EncoderDecoder codec = protocol.getCodec();
         CreateSequenceType create = codec.convertReceivedCreateSequence(getParameter(message));
         Destination destination = reliableEndpoint.getDestination();
         
@@ -135,7 +137,7 @@ public class Servant implements Invoker {
                 // AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
                 accept.setAcksTo(RMUtils.createReference(maps.getTo().getValue()));
                 SourceSequence seq = new SourceSequence(offer.getIdentifier(), null,
-                    createResponse.getIdentifier(), reliableEndpoint.getProtocol());
+                    createResponse.getIdentifier(), protocol);
                 seq.setExpires(offer.getExpires());
                 seq.setTarget(create.getAcksTo());
                 source.addSequence(seq);
@@ -154,18 +156,19 @@ public class Servant implements Invoker {
         }
         
         DestinationSequence seq = new DestinationSequence(createResponse.getIdentifier(),
-            create.getAcksTo(), destination, reliableEndpoint.getProtocol());
+            create.getAcksTo(), destination, protocol);
         seq.setCorrelationID(maps.getMessageID().getValue());
         destination.addSequence(seq);
         LOG.fine("returning " + createResponse);
         return codec.convertToSend(createResponse);
     }
 
-    public void createSequenceResponse(CreateSequenceResponseType createResponse) {
+    public void createSequenceResponse(CreateSequenceResponseType createResponse, 
+                                       ProtocolVariation protocol) {
         LOG.fine("Creating sequence response");
         
         SourceSequence seq = new SourceSequence(createResponse.getIdentifier(),
-            reliableEndpoint.getProtocol());
+            protocol);
         seq.setExpires(createResponse.getExpires());
         Source source  = reliableEndpoint.getSource();
         source.addSequence(seq);
@@ -187,7 +190,7 @@ public class Servant implements Invoker {
             String address = accept.getAcksTo().getAddress().getValue();
             if (!RMUtils.getAddressingConstants().getNoneURI().equals(address)) {
                 DestinationSequence ds =  new DestinationSequence(offeredId, accept.getAcksTo(), dest,
-                    reliableEndpoint.getProtocol());
+                    protocol);
                 dest.addSequence(ds);
             }
         }
@@ -195,8 +198,9 @@ public class Servant implements Invoker {
 
     public void terminateSequence(Message message) {
         LOG.fine("Terminating sequence");
+        final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
         
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
+        EncoderDecoder codec = protocol.getCodec();
         TerminateSequenceType terminate = codec.convertReceivedTerminateSequence(getParameter(message));
         
         // check if the terminated sequence was created in response to a a createSequence

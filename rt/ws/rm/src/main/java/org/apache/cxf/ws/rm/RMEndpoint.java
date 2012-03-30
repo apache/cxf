@@ -20,7 +20,9 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,17 +88,13 @@ public class RMEndpoint {
     private RMManager manager;
     private Endpoint applicationEndpoint;
     private Conduit conduit;
-    private ProtocolVariation protocol;
     private EndpointReferenceType replyTo;
     private Source source;
     private Destination destination;
-    private WrappedService service;
-    private Endpoint endpoint;
+    private Map<ProtocolVariation, WrappedService> services;
+    private Map<ProtocolVariation, Endpoint> endpoints;
     private Proxy proxy;
     private Servant servant;
-    private QName serviceQName;
-    private QName bindingQName;
-    private QName interfaceQName;
     private long lastApplicationMessage;
     private long lastControlMessage;
     private InstrumentationManager instrumentationManager;
@@ -109,14 +107,15 @@ public class RMEndpoint {
      * @param ae
      * @param pv
      */
-    public RMEndpoint(RMManager m, Endpoint ae, ProtocolVariation pv) {
+    public RMEndpoint(RMManager m, Endpoint ae) {
         manager = m;
         applicationEndpoint = ae;
         source = new Source(this);
         destination = new Destination(this);
         proxy = new Proxy(this);
         servant = new Servant(this);
-        protocol = pv;
+        services = new HashMap<ProtocolVariation, WrappedService>();
+        endpoints = new HashMap<ProtocolVariation, Endpoint>();
     }
 
     /**
@@ -136,36 +135,23 @@ public class RMEndpoint {
     /**
      * @return Returns the RM protocol endpoint.
      */
-    public Endpoint getEndpoint() {
-        return endpoint;
-    }
-
-    public ProtocolVariation getProtocol() {
-        return protocol;
-    }
-
-    /**
-     * Set the protocol used by this endpoint. This method is only intended for use in testing; all normal use
-     * uses the constructor to set the value.
-     * 
-     * @param protocol
-     */
-    public void setProtocol(ProtocolVariation protocol) {
-        this.protocol = protocol;
+    public Endpoint getEndpoint(ProtocolVariation protocol) {
+        return endpoints.get(protocol);
     }
 
     /**
      * @return Returns the RM protocol service.
      */
-    public Service getService() {
-        return service;
+    public Service getService(ProtocolVariation protocol) {
+        return services.get(protocol);
     }
 
     /**
      * @return Returns the RM protocol binding info.
      */
-    public BindingInfo getBindingInfo() {
-        return service.getServiceInfo().getBinding(bindingQName);
+    public BindingInfo getBindingInfo(ProtocolVariation protocol) {
+        final QName bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
+        return services.get(protocol).getServiceInfo().getBinding(bindingQName);
     }
 
     /**
@@ -261,8 +247,8 @@ public class RMEndpoint {
                     org.apache.cxf.transport.Destination d) {
         conduit = c;
         replyTo = r;
-        createService();
-        createEndpoint(d);
+        createServices();
+        createEndpoints(d);
         setPolicies();
         if (manager != null && manager.getBus() != null) {
             managedEndpoint = new ManagedRMEndpoint(this);
@@ -277,15 +263,24 @@ public class RMEndpoint {
         }
     }
 
-    void createService() {
+    // internally we keep three services and three endpoints to support three protocol variations
+    // using the specifically generated jaxb classes and operation names etc but this could probably 
+    // be simplified/unified.
+    void createServices() {
+        for (ProtocolVariation protocol : ProtocolVariation.values()) {
+            createService(protocol);
+        }
+    }
+    
+    void createService(ProtocolVariation protocol) {
         ServiceInfo si = new ServiceInfo();
         si.setProperty(Schema.class.getName(), getSchema());
-        serviceQName = new QName(protocol.getWSRMNamespace(), SERVICE_NAME);
+        QName serviceQName = new QName(protocol.getWSRMNamespace(), SERVICE_NAME);
         si.setName(serviceQName);
         
-        buildInterfaceInfo(si);
+        buildInterfaceInfo(si, protocol);
 
-        service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
+        WrappedService service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
 
         DataBinding dataBinding = null;
         Class<?> create = protocol.getCodec().getCreateSequenceType();
@@ -298,6 +293,7 @@ public class RMEndpoint {
         }
         service.setDataBinding(dataBinding);
         service.setInvoker(servant);
+        services.put(protocol, service);
     }
 
     private static synchronized Schema getSchema() {
@@ -320,10 +316,18 @@ public class RMEndpoint {
         }
         return rmSchema;
     }
-
-    void createEndpoint(org.apache.cxf.transport.Destination d) {
+    
+    void createEndpoints(org.apache.cxf.transport.Destination d) {
+        for (ProtocolVariation protocol : ProtocolVariation.values()) {
+            createEndpoint(d, protocol);
+        }
+    }
+    
+    void createEndpoint(org.apache.cxf.transport.Destination d, ProtocolVariation protocol) {
+        final QName bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
+        WrappedService service = services.get(protocol);
         ServiceInfo si = service.getServiceInfo();
-        buildBindingInfo(si);
+        buildBindingInfo(si, protocol);
         EndpointInfo aei = applicationEndpoint.getEndpointInfo();
         String transportId = aei.getTransportId();
         EndpointInfo ei = new EndpointInfo(si, transportId);
@@ -346,8 +350,9 @@ public class RMEndpoint {
         }
         si.addEndpoint(ei);
 
-        endpoint = new WrappedEndpoint(applicationEndpoint, ei, service);
+        Endpoint endpoint = new WrappedEndpoint(applicationEndpoint, ei, service);
         service.setEndpoint(endpoint);
+        endpoints.put(protocol, endpoint);
     }
 
     void setPolicies() {
@@ -357,7 +362,7 @@ public class RMEndpoint {
             return;
         }
 
-        EndpointInfo ei = getEndpoint().getEndpointInfo();
+        EndpointInfo ei = getEndpoint(ProtocolVariation.RM10WSA200408).getEndpointInfo();
 
         PolicyInterceptorProviderRegistry reg = manager.getBus()
             .getExtension(PolicyInterceptorProviderRegistry.class);
@@ -388,23 +393,23 @@ public class RMEndpoint {
         // TODO: FaultPolicy (SequenceFault)
     }
 
-    void buildInterfaceInfo(ServiceInfo si) {
-        interfaceQName = new QName(protocol.getWSRMNamespace(), INTERFACE_NAME);
+    void buildInterfaceInfo(ServiceInfo si, ProtocolVariation protocol) {
+        QName interfaceQName = new QName(protocol.getWSRMNamespace(), INTERFACE_NAME);
         InterfaceInfo ii = new InterfaceInfo(si, interfaceQName);
-        buildOperationInfo(ii);
+        buildOperationInfo(ii, protocol);
     }
 
-    void buildOperationInfo(InterfaceInfo ii) {
-        buildCreateSequenceOperationInfo(ii);
-        buildTerminateSequenceOperationInfo(ii);
-        buildSequenceAckOperationInfo(ii);
-        buildCloseSequenceOperationInfo(ii);
-        buildAckRequestedOperationInfo(ii);
+    void buildOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
+        buildCreateSequenceOperationInfo(ii, protocol);
+        buildTerminateSequenceOperationInfo(ii, protocol);
+        buildSequenceAckOperationInfo(ii, protocol);
+        buildCloseSequenceOperationInfo(ii, protocol);
+        buildAckRequestedOperationInfo(ii, protocol);
 
         // TODO: FaultInfo (SequenceFault)
     }
 
-    void buildCreateSequenceOperationInfo(InterfaceInfo ii) {
+    void buildCreateSequenceOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
 
         OperationInfo operationInfo = null;
         MessagePartInfo partInfo = null;
@@ -447,7 +452,7 @@ public class RMEndpoint {
         partInfo.setTypeClass(protocol.getCodec().getCreateSequenceResponseType());
     }
 
-    void buildTerminateSequenceOperationInfo(InterfaceInfo ii) {
+    void buildTerminateSequenceOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
 
         OperationInfo operationInfo = null;
         MessagePartInfo partInfo = null;
@@ -464,7 +469,7 @@ public class RMEndpoint {
         partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
     }
 
-    void buildSequenceAckOperationInfo(InterfaceInfo ii) {
+    void buildSequenceAckOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
 
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
@@ -476,7 +481,7 @@ public class RMEndpoint {
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
 
-    void buildCloseSequenceOperationInfo(InterfaceInfo ii) {
+    void buildCloseSequenceOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
 
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
@@ -488,7 +493,7 @@ public class RMEndpoint {
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
 
-    void buildAckRequestedOperationInfo(InterfaceInfo ii) {
+    void buildAckRequestedOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
 
         OperationInfo operationInfo = null;
         MessageInfo messageInfo = null;
@@ -500,17 +505,17 @@ public class RMEndpoint {
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
     }
 
-    void buildBindingInfo(ServiceInfo si) {
+    void buildBindingInfo(ServiceInfo si, ProtocolVariation protocol) {
         // use same binding id as for application endpoint
         // also, to workaround the problem that it may not be possible to determine
         // the soap version depending on the bindingId, speciffy the soap version
         // explicitly
         if (null != applicationEndpoint) {
+            final QName bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
             SoapBindingInfo sbi = (SoapBindingInfo)applicationEndpoint.getEndpointInfo().getBinding();
             SoapVersion sv = sbi.getSoapVersion();
             String bindingId = sbi.getBindingId();
             SoapBindingInfo bi = new SoapBindingInfo(si, bindingId, sv);
-            bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
             bi.setName(bindingQName);
             BindingOperationInfo boi = null;
 

@@ -110,11 +110,12 @@ public class DestinationTest extends Assert {
         Message message = setupMessage();
         RMProperties rmps = control.createMock(RMProperties.class);
         EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
+        EasyMock.expect(RMContextUtils.getProtocolVariation(message))
+            .andReturn(ProtocolVariation.RM10WSA200408);
         SequenceType st = control.createMock(SequenceType.class);
         EasyMock.expect(rmps.getSequence()).andReturn(st);
         Identifier id = control.createMock(Identifier.class);
         EasyMock.expect(st.getIdentifier()).andReturn(id).times(2);
-        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         String sid = "sid";
         EasyMock.expect(id.getValue()).andReturn(sid); 
         control.replay();

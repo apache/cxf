@@ -132,6 +132,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getExpires()).andReturn(null);
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.createSourceSequence(seq);   
@@ -142,6 +143,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getExpires()).andReturn(null);
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         try {
@@ -163,7 +165,7 @@ public class RMTxStoreTest extends Assert {
         sid3.setValue("offeringSequence3");
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(sid3);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
-        
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
          
         control.replay();
         store.createSourceSequence(seq);   
@@ -185,7 +187,8 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
-        
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
+
         control.replay();
         store.createDestinationSequence(seq);   
         control.verify();
@@ -194,6 +197,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         try {
@@ -213,6 +217,7 @@ public class RMTxStoreTest extends Assert {
         epr = RMUtils.createReference(NON_ANON_ACKS_TO);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.createDestinationSequence(seq);   
@@ -299,6 +304,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.createDestinationSequence(seq);   
@@ -308,6 +314,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getLastMessageNumber()).andReturn(Long.valueOf(0));
         EasyMock.expect(seq.getAcknowledgment()).andReturn(ack1);        
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.beginTransaction();
@@ -318,6 +325,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getLastMessageNumber()).andReturn(TEN);
         EasyMock.expect(seq.getAcknowledgment()).andReturn(ack1);        
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.beginTransaction();
@@ -336,6 +344,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getExpires()).andReturn(null);
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.createSourceSequence(seq);   
@@ -345,6 +354,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getCurrentMessageNr()).andReturn(ONE);
         EasyMock.expect(seq.isLastMessage()).andReturn(false);
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);   
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.beginTransaction();
@@ -355,6 +365,7 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getCurrentMessageNr()).andReturn(TEN);
         EasyMock.expect(seq.isLastMessage()).andReturn(true);  
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
+        EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
         
         control.replay();
         store.beginTransaction();
@@ -372,18 +383,18 @@ public class RMTxStoreTest extends Assert {
         Identifier sid2 = null;
         
         Collection<DestinationSequence> seqs =
-            store.getDestinationSequences("unknown", ProtocolVariation.RM10WSA200408);
+            store.getDestinationSequences("unknown");
         assertEquals(0, seqs.size());
         
         try {
             sid1 = setupDestinationSequence("sequence1");
 
-            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID);
             assertEquals(1, seqs.size());
             checkRecoveredDestinationSequences(seqs);
 
             sid2 = setupDestinationSequence("sequence2");
-            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID);
             assertEquals(2, seqs.size());
             checkRecoveredDestinationSequences(seqs);
         } finally {
@@ -403,18 +414,18 @@ public class RMTxStoreTest extends Assert {
         Identifier sid2 = null;
         
         Collection<SourceSequence> seqs =
-            store.getSourceSequences("unknown", ProtocolVariation.RM10WSA200408);
+            store.getSourceSequences("unknown");
         assertEquals(0, seqs.size());
         
         try {
             sid1 = setupSourceSequence("sequence1");
 
-            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID);
             assertEquals(1, seqs.size());
             checkRecoveredSourceSequences(seqs);
 
             sid2 = setupSourceSequence("sequence2");
-            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID);
             assertEquals(2, seqs.size());
             checkRecoveredSourceSequences(seqs);
         } finally {
@@ -434,18 +445,18 @@ public class RMTxStoreTest extends Assert {
         Identifier sid2 = null;
         
         DestinationSequence seq = 
-            store.getDestinationSequence(new Identifier(), ProtocolVariation.RM10WSA200408);
+            store.getDestinationSequence(new Identifier());
         assertNull(seq);
 
         try {
             sid1 = setupDestinationSequence("sequence1");
 
-            seq = store.getDestinationSequence(sid1, ProtocolVariation.RM10WSA200408);
+            seq = store.getDestinationSequence(sid1);
             assertNotNull(seq);
             verifyDestinationSequence("sequence1", seq);
 
             sid2 = setupDestinationSequence("sequence2");
-            seq = store.getDestinationSequence(sid2, ProtocolVariation.RM10WSA200408);
+            seq = store.getDestinationSequence(sid2);
             assertNotNull(seq);
             verifyDestinationSequence("sequence2", seq);
         } finally {
@@ -465,18 +476,18 @@ public class RMTxStoreTest extends Assert {
         Identifier sid2 = null;
         
         SourceSequence seq = 
-            store.getSourceSequence(new Identifier(), ProtocolVariation.RM10WSA200408);
+            store.getSourceSequence(new Identifier());
         assertNull(seq);
         
         try {
             sid1 = setupSourceSequence("sequence1");
 
-            seq = store.getSourceSequence(sid1, ProtocolVariation.RM10WSA200408);
+            seq = store.getSourceSequence(sid1);
             assertNotNull(seq);
             verifySourceSequence("sequence1", seq);
             
             sid2 = setupSourceSequence("sequence2");
-            seq = store.getSourceSequence(sid2, ProtocolVariation.RM10WSA200408);
+            seq = store.getSourceSequence(sid2);
             assertNotNull(seq);
             verifySourceSequence("sequence2", seq);
         } finally {
@@ -543,10 +554,12 @@ public class RMTxStoreTest extends Assert {
         
         SequenceAcknowledgement ack = ack1;
         Long lmn = ZERO;
+        ProtocolVariation pv = ProtocolVariation.RM10WSA200408;
          
         if ("sequence2".equals(s)) {
             ack = ack2;
             lmn = TEN;
+            pv = ProtocolVariation.RM11WSA200508;
         }
         
         EasyMock.expect(seq.getIdentifier()).andReturn(sid);
@@ -555,7 +568,8 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getLastMessageNumber()).andReturn(lmn);
         EasyMock.expect(seq.getAcknowledgment()).andReturn(ack);
         EasyMock.expect(seq.getIdentifier()).andReturn(sid);
-        
+        EasyMock.expect(seq.getProtocol()).andReturn(pv);
+
         control.replay();
         store.createDestinationSequence(seq);           
         store.beginTransaction();
@@ -575,6 +589,7 @@ public class RMTxStoreTest extends Assert {
         Identifier osid = null;
         Long cmn = ONE;
         boolean lm = false;
+        ProtocolVariation pv = ProtocolVariation.RM10WSA200408;
         
         if ("sequence2".equals(s)) {
             expiry = new Date(System.currentTimeMillis() + 3600 * 1000);
@@ -582,6 +597,7 @@ public class RMTxStoreTest extends Assert {
             osid.setValue("offeringSequence");
             cmn = TEN;
             lm = true;            
+            pv = ProtocolVariation.RM11WSA200508;
         } 
         
         EasyMock.expect(seq.getIdentifier()).andReturn(sid);
@@ -591,7 +607,8 @@ public class RMTxStoreTest extends Assert {
         EasyMock.expect(seq.getCurrentMessageNr()).andReturn(cmn);
         EasyMock.expect(seq.isLastMessage()).andReturn(lm);
         EasyMock.expect(seq.getIdentifier()).andReturn(sid);
-        
+        EasyMock.expect(seq.getProtocol()).andReturn(pv);
+
         control.replay();
         store.createSourceSequence(seq);           
         store.beginTransaction();
@@ -611,11 +628,13 @@ public class RMTxStoreTest extends Assert {
             SequenceAcknowledgement sa = seq.getAcknowledgment();
             assertNotNull(sa);
             verifyAcknowledgementRanges(sa.getAcknowledgementRange(), new long[]{1, 1});
+            assertEquals(ProtocolVariation.RM10WSA200408, seq.getProtocol());
         } else if ("sequence2".equals(s)) {
             assertEquals(10, seq.getLastMessageNumber());
             SequenceAcknowledgement sa = seq.getAcknowledgment();
             assertNotNull(sa);
             verifyAcknowledgementRanges(sa.getAcknowledgementRange(), new long[]{1, 1, 3, 10});
+            assertEquals(ProtocolVariation.RM11WSA200508, seq.getProtocol());
         }
     }
     
@@ -627,12 +646,14 @@ public class RMTxStoreTest extends Assert {
             assertNull(seq.getExpires());
             assertEquals(1, seq.getCurrentMessageNr());
             assertFalse(seq.isLastMessage());
+            assertEquals(ProtocolVariation.RM10WSA200408, seq.getProtocol());
         } else if ("sequence2".equals(s)) {
             Date expires = seq.getExpires();
             assertNotNull(expires);
             expires.after(new Date());
             assertEquals(10, seq.getCurrentMessageNr());
             assertTrue(seq.isLastMessage());
+            assertEquals(ProtocolVariation.RM11WSA200508, seq.getProtocol());
         }
     }
     
@@ -677,6 +698,7 @@ public class RMTxStoreTest extends Assert {
                     recovered.getAcknowledgment().getAcknowledgementRange().get(0);
                 assertEquals(ONE, r.getLower());
                 assertEquals(ONE, r.getUpper());
+                assertEquals(ProtocolVariation.RM10WSA200408, recovered.getProtocol());
             } else {
                 assertEquals(10, recovered.getLastMessageNumber());
                 assertEquals(2, recovered.getAcknowledgment().getAcknowledgementRange().size());
@@ -687,6 +709,7 @@ public class RMTxStoreTest extends Assert {
                 r = recovered.getAcknowledgment().getAcknowledgementRange().get(1);
                 assertEquals(new Long(3), r.getLower());
                 assertEquals(TEN, r.getUpper());                
+                assertEquals(ProtocolVariation.RM11WSA200508, recovered.getProtocol());
             }
         }
     }
@@ -701,11 +724,13 @@ public class RMTxStoreTest extends Assert {
                 assertEquals(1, recovered.getCurrentMessageNr());  
                 assertNull(recovered.getExpires());
                 assertNull(recovered.getOfferingSequenceIdentifier());
+                assertEquals(ProtocolVariation.RM10WSA200408, recovered.getProtocol());
             } else {
                 assertTrue(recovered.isLastMessage());
                 assertEquals(10, recovered.getCurrentMessageNr()); 
                 assertNotNull(recovered.getExpires());
                 assertEquals("offeringSequence", recovered.getOfferingSequenceIdentifier().getValue());
+                assertEquals(ProtocolVariation.RM11WSA200508, recovered.getProtocol());
             }
         }
     }

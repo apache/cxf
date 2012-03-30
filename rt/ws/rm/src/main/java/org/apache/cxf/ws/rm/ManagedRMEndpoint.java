@@ -54,20 +54,20 @@ public class ManagedRMEndpoint implements ManagedComponent {
 
     private static final String[] SOURCE_SEQUENCE_NAMES = 
     {"sequenceId", "currentMessageNumber", "expires", "lastMessage", "queuedMessageCount", 
-     "target"};
+     "target", "wsrm", "wsa"};
     private static final String[] SOURCE_SEQUENCE_DESCRIPTIONS = SOURCE_SEQUENCE_NAMES;
     @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
     private static final OpenType[] SOURCE_SEQUENCE_TYPES =  
     {SimpleType.STRING, SimpleType.LONG, SimpleType.DATE, SimpleType.BOOLEAN, SimpleType.INTEGER, 
-     SimpleType.STRING};
+     SimpleType.STRING, SimpleType.STRING, SimpleType.STRING};
     
     private static final String[] DESTINATION_SEQUENCE_NAMES = 
-    {"sequenceId", "lastMessageNumber", "correlationId", "ackTo"};
+    {"sequenceId", "lastMessageNumber", "correlationId", "ackTo", "wsrm", "wsa"};
     private static final String[] DESTINATION_SEQUENCE_DESCRIPTIONS = DESTINATION_SEQUENCE_NAMES;
     @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
     private static final OpenType[] DESTINATION_SEQUENCE_TYPES =  
     {SimpleType.STRING, SimpleType.LONG, SimpleType.STRING, 
-     SimpleType.STRING};
+     SimpleType.STRING, SimpleType.STRING, SimpleType.STRING};
 
     private static final String[] RETRY_STATUS_NAMES = 
     {"messageNumber", "retries", "previous", "next", "nextInterval", "backOff", "pending", "suspended"};
@@ -541,7 +541,9 @@ public class ManagedRMEndpoint implements ManagedComponent {
         Object[] ssv = new Object[]{ss.getIdentifier().getValue(), ss.getCurrentMessageNr(), 
                                     ss.getExpires(), ss.isLastMessage(),
                                     manager.getRetransmissionQueue().countUnacknowledged(ss),
-                                    getAddressValue(ss.getTarget())};
+                                    getAddressValue(ss.getTarget()),
+                                    ss.getProtocol().getWSRMNamespace(),
+                                    ss.getProtocol().getWSANamespace()};
         
         CompositeData ssps = new CompositeDataSupport(sourceSequenceType, 
                                                       SOURCE_SEQUENCE_NAMES, ssv);
@@ -554,7 +556,9 @@ public class ManagedRMEndpoint implements ManagedComponent {
         }
         Object[] dsv = new Object[]{ds.getIdentifier().getValue(), ds.getLastMessageNumber(), 
                                     ds.getCorrelationID(),
-                                    getAddressValue(ds.getAcksTo())};
+                                    getAddressValue(ds.getAcksTo()),
+                                    ds.getProtocol().getWSRMNamespace(),
+                                    ds.getProtocol().getWSANamespace()};
         
         CompositeData dsps = new CompositeDataSupport(destinationSequenceType, 
                                                       DESTINATION_SEQUENCE_NAMES, dsv);

@@ -72,7 +72,7 @@ public class RMEndpointTest extends Assert {
         control = EasyMock.createNiceControl();
         manager = control.createMock(RMManager.class);
         ae = control.createMock(Endpoint.class);
-        rme = new RMEndpoint(manager, ae, ProtocolVariation.RM10WSA200408);
+        rme = new RMEndpoint(manager, ae);
     }
 
     @After
@@ -84,8 +84,8 @@ public class RMEndpointTest extends Assert {
     public void testConstructor() {
         control.replay();
         assertNotNull(rme);
-        assertNull(rme.getEndpoint());
-        assertNull(rme.getService());
+        assertNull(rme.getEndpoint(ProtocolVariation.RM10WSA200408));
+        assertNull(rme.getService(ProtocolVariation.RM10WSA200408));
         assertNull(rme.getConduit());
         assertNull(rme.getReplyTo());
     }
@@ -134,16 +134,16 @@ public class RMEndpointTest extends Assert {
 
     @Test
     public void testInitialise() throws NoSuchMethodException {
-        Method m1 = RMEndpoint.class.getDeclaredMethod("createService", new Class[] {});
+        Method m1 = RMEndpoint.class.getDeclaredMethod("createServices", new Class[] {});
         Method m2 = RMEndpoint.class
-            .getDeclaredMethod("createEndpoint", new Class[] {org.apache.cxf.transport.Destination.class});
+            .getDeclaredMethod("createEndpoints", new Class[] {org.apache.cxf.transport.Destination.class});
         Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {});
 
         rme = EasyMock.createMockBuilder(RMEndpoint.class)
             .addMockedMethods(m1, m2 , m3).createMock(control);
-        rme.createService();
+        rme.createServices();
         EasyMock.expectLastCall();
-        rme.createEndpoint(null);
+        rme.createEndpoints(null);
         EasyMock.expectLastCall();
         rme.setPolicies();
         EasyMock.expectLastCall();
@@ -160,8 +160,8 @@ public class RMEndpointTest extends Assert {
         Service as = control.createMock(Service.class);
         EasyMock.expect(ae.getService()).andReturn(as);
         control.replay();
-        rme.createService();
-        Service s = rme.getService();
+        rme.createServices();
+        Service s = rme.getService(ProtocolVariation.RM10WSA200408);
         assertNotNull(s);
         WrappedService ws = (WrappedService)s;
         assertSame(as, ws.getWrappedService());
@@ -172,17 +172,16 @@ public class RMEndpointTest extends Assert {
     @Test
     public void testCreateEndpoint() throws NoSuchMethodException {
         Method m = RMEndpoint.class.getDeclaredMethod("getUsingAddressing", new Class[] {EndpointInfo.class});
-        rme = EasyMock.createMockBuilder(RMEndpoint.class)
+        rme = EasyMock.createMockBuilder(RMEndpoint.class).withConstructor(manager, ae)
             .addMockedMethod(m).createMock(control);
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
-        rme.setProtocol(ProtocolVariation.RM10WSA200408);
         Service as = control.createMock(Service.class);
         EasyMock.expect(ae.getService()).andReturn(as);
         EndpointInfo aei = control.createMock(EndpointInfo.class);
-        EasyMock.expect(ae.getEndpointInfo()).andReturn(aei).times(2);
+        EasyMock.expect(ae.getEndpointInfo()).andReturn(aei).anyTimes();
         SoapBindingInfo bi = control.createMock(SoapBindingInfo.class);
-        EasyMock.expect(aei.getBinding()).andReturn(bi); 
+        EasyMock.expect(aei.getBinding()).andReturn(bi).anyTimes(); 
         SoapVersion sv = Soap11.getInstance();
         EasyMock.expect(bi.getSoapVersion()).andReturn(sv);
         String ns = "http://schemas.xmlsoap.org/wsdl/soap/";
@@ -193,12 +192,12 @@ public class RMEndpointTest extends Assert {
         Object ua = new Object();
         EasyMock.expect(rme.getUsingAddressing(aei)).andReturn(ua);
         control.replay();
-        rme.createService();
-        rme.createEndpoint(null);
-        Endpoint e = rme.getEndpoint();
+        rme.createServices();
+        rme.createEndpoints(null);
+        Endpoint e = rme.getEndpoint(ProtocolVariation.RM10WSA200408);
         WrappedEndpoint we = (WrappedEndpoint)e;
         assertSame(ae, we.getWrappedEndpoint());
-        Service s = rme.getService();
+        Service s = rme.getService(ProtocolVariation.RM10WSA200408);
         assertEquals(1, s.getEndpoints().size());
         assertSame(e, s.getEndpoints().get(RM10Constants.PORT_NAME));
     }
@@ -273,13 +272,13 @@ public class RMEndpointTest extends Assert {
 
     @Test
     public void testSetPolicies() throws NoSuchMethodException {
-        Method m = RMEndpoint.class.getDeclaredMethod("getEndpoint", new Class[] {});
+        Method m = RMEndpoint.class.getDeclaredMethod("getEndpoint", new Class[] {ProtocolVariation.class});
         rme = EasyMock.createMockBuilder(RMEndpoint.class)
             .addMockedMethod(m).createMock(control);
         rme.setAplicationEndpoint(ae);
         rme.setManager(manager);
         Endpoint e = control.createMock(Endpoint.class);
-        EasyMock.expect(rme.getEndpoint()).andReturn(e);
+        EasyMock.expect(rme.getEndpoint(ProtocolVariation.RM10WSA200408)).andReturn(e);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(e.getEndpointInfo()).andReturn(ei);
         Bus bus = control.createMock(Bus.class);
@@ -363,7 +362,7 @@ public class RMEndpointTest extends Assert {
     }
 
     private void verifyService() {
-        Service service = rme.getService();
+        Service service = rme.getService(ProtocolVariation.RM10WSA200408);
         ServiceInfo si = service.getServiceInfos().get(0);
         assertNotNull("service info is null", si);
 

@@ -54,6 +54,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
+import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
@@ -372,8 +373,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         
         final String address = to.getValue();
         LOG.fine("Resending to address: " + address);
-        
-        final Endpoint reliableEndpoint = manager.getReliableEndpoint(message).getEndpoint();
+        final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
+        final Endpoint reliableEndpoint = manager.getReliableEndpoint(message).getEndpoint(protocol);
 
         ConduitSelector cs = new DeferredConduitSelector() {
             @Override

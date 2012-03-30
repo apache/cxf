@@ -62,7 +62,11 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         Source source = getManager().getSource(msg);
-        ProtocolVariation protocol = source.getReliableEndpoint().getProtocol();
+        String rmUri = getManager().getRMNamespace(msg);
+        String addrUri = getManager().getAddressingNamespace(msg);
+
+        ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
+        RMContextUtils.setProtocolVariation(msg, protocol);
         maps.exposeAs(protocol.getWSANamespace());
         Destination destination = getManager().getDestination(msg);
 

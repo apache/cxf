@@ -357,6 +357,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         }
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         rmps.exposeAs(consts.getWSRMNamespace());
+        ProtocolVariation protocol = 
+            ProtocolVariation.findVariant(consts.getWSRMNamespace(), maps.getNamespaceURI());
         
         LOG.info("Updating service model info in exchange");
         
@@ -372,16 +374,16 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         }
   
         Exchange exchange = message.getExchange();
-        
-        exchange.put(Endpoint.class, rme.getEndpoint());
-        exchange.put(Service.class, rme.getService());
-        exchange.put(Binding.class, rme.getEndpoint().getBinding());
+        Endpoint ep = rme.getEndpoint(protocol);
+        exchange.put(Endpoint.class, ep);
+        exchange.put(Service.class, ep.getService());
+        exchange.put(Binding.class, ep.getBinding());
         
         // Also set BindingOperationInfo as some operations (SequenceAcknowledgment) have
         // neither in nor out messages, and thus the WrappedInInterceptor cannot
         // determine the operation name.
         
-        BindingInfo bi = rme.getEndpoint().getEndpointInfo().getBinding();
+        BindingInfo bi = ep.getEndpointInfo().getBinding();
         BindingOperationInfo boi = null;
         boolean isOneway = true;
         if (consts.getCreateSequenceAction().equals(action)) {

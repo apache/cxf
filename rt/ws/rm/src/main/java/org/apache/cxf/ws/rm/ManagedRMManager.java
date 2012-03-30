@@ -19,9 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.JMException;
@@ -63,22 +61,12 @@ public class ManagedRMManager implements ManagedComponent {
     @ManagedOperation
     public String[] getEndpointIdentifiers() {
         Set<String> identifiers = new HashSet<String>();
-        //FIXME find this method for 2.5
-//        for (Endpoint ep : manager.getReliableEndpointsMap().keySet()) {
-        for (Endpoint ep : getReliableEndpointsMap().keySet()) {
+        for (Endpoint ep : manager.getReliableEndpointsMap().keySet()) {
             identifiers.add(RMUtils.getEndpointIdentifier(ep));
         }
         return identifiers.toArray(new String[identifiers.size()]);
     }
 
-    //TODO see the comment above
-    private Map<Endpoint, RMEndpoint> getReliableEndpointsMap() {
-        Map<Endpoint, RMEndpoint> epmap = new HashMap<Endpoint, RMEndpoint>();
-        for (ProtocolVariation pv : manager.getEndpointMaps().keySet()) {
-            epmap.putAll(manager.getEndpointMaps().get(pv));
-        }
-        return epmap;
-    }
     
     @ManagedAttribute(description = "Using Store")
     public boolean isUsingStore() {

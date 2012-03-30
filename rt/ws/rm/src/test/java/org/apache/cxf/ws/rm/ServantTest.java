@@ -83,7 +83,6 @@ public class ServantTest extends Assert {
 
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
         EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
-        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
 
         control.replay();
 
@@ -209,6 +208,8 @@ public class ServantTest extends Assert {
         MessageContentsList contents = new MessageContentsList();
         contents.add(cs);
         message.setContent(List.class, contents);
+
+        RMContextUtils.setProtocolVariation(message, ProtocolVariation.RM10WSA200408);
         
         return message;
     }

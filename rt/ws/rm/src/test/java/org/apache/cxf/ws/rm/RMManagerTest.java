@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimerTask;
 
 import javax.xml.namespace.QName;
@@ -136,12 +135,12 @@ public class RMManagerTest extends Assert {
     @Test
     public void testStartServer() throws NoSuchMethodException {
         Method m = RMManager.class.getDeclaredMethod("recoverReliableEndpoint",
-            new Class[] {Endpoint.class, Conduit.class, ProtocolVariation.class});
+            new Class[] {Endpoint.class, Conduit.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
         Server s = control.createMock(Server.class);
         Endpoint e = control.createMock(Endpoint.class);
         EasyMock.expect(s.getEndpoint()).andReturn(e);
-        manager.recoverReliableEndpoint(e, (Conduit)null, ProtocolVariation.RM10WSA200408);
+        manager.recoverReliableEndpoint(e, (Conduit)null);
         EasyMock.expectLastCall();
         control.replay();
         manager.startServer(s);
@@ -166,7 +165,7 @@ public class RMManagerTest extends Assert {
     @Test
     public void testClientCreated() throws NoSuchMethodException {
         Method m = RMManager.class.getDeclaredMethod("recoverReliableEndpoint",
-            new Class[] {Endpoint.class, Conduit.class, ProtocolVariation.class});
+            new Class[] {Endpoint.class, Conduit.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
         Client client = control.createMock(Client.class);
         
@@ -207,11 +206,11 @@ public class RMManagerTest extends Assert {
     @Test
     public void testGetReliableEndpointServerSideCreate() throws NoSuchMethodException, RMException {
         Method m1 = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
-            new Class[] {Endpoint.class, ProtocolVariation.class});
+            new Class[] {Endpoint.class});
         Method m2 = RMManager.class.getDeclaredMethod("getRMNamespace",  new Class[] {Message.class});
         Method m3 = RMManager.class.getDeclaredMethod("getAddressingNamespace",  new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m1, m2, m3});
-        manager.setEndpointMaps(new HashMap<ProtocolVariation, Map<Endpoint, RMEndpoint>>());
+        manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
@@ -227,7 +226,7 @@ public class RMManagerTest extends Assert {
         Endpoint e = control.createMock(Endpoint.class);
         EasyMock.expect(wre.getWrappedEndpoint()).andReturn(e).anyTimes();        
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(manager.createReliableEndpoint(e, ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(manager.createReliableEndpoint(e))
             .andReturn(rme).anyTimes();
         org.apache.cxf.transport.Destination destination = control
             .createMock(org.apache.cxf.transport.Destination.class);
@@ -264,11 +263,11 @@ public class RMManagerTest extends Assert {
     @Test
     public void testGetReliableEndpointClientSideCreate() throws NoSuchMethodException, RMException {
         Method m1 = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
-            new Class[] {Endpoint.class, ProtocolVariation.class});
+            new Class[] {Endpoint.class});
         Method m2 = RMManager.class.getDeclaredMethod("getRMNamespace",  new Class[] {Message.class});
         Method m3 = RMManager.class.getDeclaredMethod("getAddressingNamespace",  new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m1, m2, m3});
-        manager.setEndpointMaps(new HashMap<ProtocolVariation, Map<Endpoint, RMEndpoint>>());
+        manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
@@ -282,7 +281,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(manager.getAddressingNamespace(message)).andReturn(Names200408.WSA_NAMESPACE_NAME)
             .anyTimes();
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(manager.createReliableEndpoint(endpoint, ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(manager.createReliableEndpoint(endpoint))
             .andReturn(rme);
         EasyMock.expect(exchange.getDestination()).andReturn(null);
         Conduit conduit = control.createMock(Conduit.class);
@@ -311,10 +310,11 @@ public class RMManagerTest extends Assert {
     @Test
     public void testGetReliableEndpointExisting() throws NoSuchMethodException, RMException {
         Method m1 = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
-            new Class[] {Endpoint.class, ProtocolVariation.class});
+            new Class[] {Endpoint.class});
         Method m2 = RMManager.class.getDeclaredMethod("getRMNamespace",  new Class[] {Message.class});
         Method m3 = RMManager.class.getDeclaredMethod("getAddressingNamespace",  new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m1, m2, m3});
+        manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
         EasyMock.expect(manager.getRMNamespace(message)).andReturn(RM10Constants.NAMESPACE_URI).anyTimes();
         EasyMock.expect(manager.getAddressingNamespace(message)).andReturn(Names200408.WSA_NAMESPACE_NAME)
@@ -328,8 +328,7 @@ public class RMManagerTest extends Assert {
         QName name = new QName("http://x.y.z/a", "GreeterPort");
         EasyMock.expect(ei.getName()).andReturn(name);
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        manager.setEndpointMaps(new HashMap<ProtocolVariation, Map<Endpoint, RMEndpoint>>());
-        manager.getEndpointMaps().get(ProtocolVariation.RM10WSA200408).put(endpoint, rme);
+        manager.getReliableEndpointsMap().put(endpoint, rme);
 
         control.replay();
         assertSame(rme, manager.getReliableEndpoint(message));
@@ -402,6 +401,8 @@ public class RMManagerTest extends Assert {
         Method m = RMManager.class.getDeclaredMethod("getSource", new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
         Message message = control.createMock(Message.class);
+        EasyMock.expect(RMContextUtils.getProtocolVariation(message))
+            .andReturn(ProtocolVariation.RM10WSA200408);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message).anyTimes();
@@ -426,11 +427,12 @@ public class RMManagerTest extends Assert {
         CreateSequenceResponseType createResponse = control.createMock(CreateSequenceResponseType.class);
         proxy.createSequence(EasyMock.isA(EndpointReferenceType.class),
                              (RelatesToType)EasyMock.isNull(),
-                             EasyMock.eq(false));
+                             EasyMock.eq(false),
+                             EasyMock.isA(ProtocolVariation.class));
         EasyMock.expectLastCall().andReturn(createResponse);
         Servant servant = control.createMock(Servant.class);
         EasyMock.expect(rme.getServant()).andReturn(servant);
-        servant.createSequenceResponse(createResponse);
+        servant.createSequenceResponse(createResponse, ProtocolVariation.RM10WSA200408);
         EasyMock.expectLastCall();
         SourceSequence sseq = control.createMock(SourceSequence.class);
         EasyMock.expect(source.awaitCurrent(inSid)).andReturn(sseq);
@@ -448,7 +450,7 @@ public class RMManagerTest extends Assert {
         manager = bus.getExtension(RMManager.class);        
         Endpoint e = control.createMock(Endpoint.class);
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        manager.getEndpointMaps().get(ProtocolVariation.RM10WSA200408).put(e, rme);
+        manager.getReliableEndpointsMap().put(e, rme);
         manager.getTimer(); //start the timer
         rme.shutdown();
         EasyMock.expectLastCall();
@@ -478,12 +480,12 @@ public class RMManagerTest extends Assert {
         control.verify();
         
         control.reset();
-        manager.getEndpointMaps().get(ProtocolVariation.RM10WSA200408).put(e, rme);
+        manager.getReliableEndpointsMap().put(e, rme);
         rme.shutdown();
         EasyMock.expectLastCall();
         control.replay();
         manager.shutdownReliableEndpoint(e);
-        assertNull(manager.getEndpointMaps().get(ProtocolVariation.RM10WSA200408).get(e));  
+        assertNull(manager.getReliableEndpointsMap().get(e));  
         control.verify();
     }
     
@@ -494,7 +496,7 @@ public class RMManagerTest extends Assert {
         Conduit conduit = control.createMock(Conduit.class);
                 
         control.replay();
-        manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
+        manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();
         
         control.reset();
@@ -503,15 +505,16 @@ public class RMManagerTest extends Assert {
         manager.setStore(store);
        
         control.replay();
-        manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
+        manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();           
     }
     
     @Test
     public void testRecoverReliableClientEndpoint() throws NoSuchMethodException {
         Method method = RMManager.class.getDeclaredMethod("createReliableEndpoint", 
-            new Class[] {Endpoint.class, ProtocolVariation.class});
+            new Class[] {Endpoint.class});
         manager = control.createMock(RMManager.class, new Method[] {method});
+        manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Endpoint endpoint = control.createMock(Endpoint.class);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         ServiceInfo si = control.createMock(ServiceInfo.class);  
@@ -521,7 +524,7 @@ public class RMManagerTest extends Assert {
         Conduit conduit = control.createMock(Conduit.class);        
         setUpRecoverReliableEndpoint(endpoint, conduit, null, null, null);
         control.replay();
-        manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
+        manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();
         
         control.reset();
@@ -530,7 +533,7 @@ public class RMManagerTest extends Assert {
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, null);
         control.replay();
-        manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
+        manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();
         
         control.reset();
@@ -538,7 +541,7 @@ public class RMManagerTest extends Assert {
         RMMessage m = control.createMock(RMMessage.class);
         setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, m);        
         control.replay();
-        manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
+        manager.recoverReliableEndpoint(endpoint, conduit);
         control.verify();        
     }
     
@@ -568,7 +571,7 @@ public class RMManagerTest extends Assert {
         if (null != ss) {
             sss.add(ss);            
         }
-        EasyMock.expect(store.getSourceSequences("{S}s.{P}p", ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(store.getSourceSequences("{S}s.{P}p"))
             .andReturn(sss);
         if (null == ss) {
             return;
@@ -578,7 +581,7 @@ public class RMManagerTest extends Assert {
         if (null != ds) {
             dss.add(ds);            
         }
-        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p", ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p"))
             .andReturn(dss);
         if (null == ds) {
             return;
@@ -593,9 +596,8 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(store.getMessages(id, true)).andReturn(ms);
         
         
-        manager.setEndpointMaps(new HashMap<ProtocolVariation, Map<Endpoint, RMEndpoint>>());
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(manager.createReliableEndpoint(endpoint, ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(manager.createReliableEndpoint(endpoint))
             .andReturn(rme);
         Source source = control.createMock(Source.class);
         EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();

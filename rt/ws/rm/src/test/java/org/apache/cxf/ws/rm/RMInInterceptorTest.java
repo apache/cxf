@@ -35,6 +35,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
@@ -110,7 +111,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(servant.createSequence(message)).andReturn(csr);
         Proxy proxy = control.createMock(Proxy.class);
         EasyMock.expect(rme.getProxy()).andReturn(proxy);
-        proxy.createSequenceResponse(csr);
+        proxy.createSequenceResponse(csr, ProtocolVariation.RM10WSA200408);
         EasyMock.expectLastCall();
         
         control.replay();
@@ -130,14 +131,14 @@ public class RMInInterceptorTest extends Assert {
     private void testHandleSequenceAck(boolean onServer) throws SequenceFault, RMException, 
     NoSuchMethodException {
         Method m = RMInInterceptor.class.getDeclaredMethod("processAcknowledgments",
-            new Class[] {RMEndpoint.class, RMProperties.class});
+            new Class[] {RMEndpoint.class, RMProperties.class, ProtocolVariation.class});
         interceptor =
             EasyMock.createMockBuilder(RMInInterceptor.class)
                 .addMockedMethod(m).createMock(control);
         Message message = setupInboundMessage(RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION, onServer);
         rme.receivedControlMessage();
         EasyMock.expectLastCall();
-        interceptor.processAcknowledgments(rme, rmps);
+        interceptor.processAcknowledgments(rme, rmps, ProtocolVariation.RM10WSA200408);
         EasyMock.expectLastCall();
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
 
@@ -189,7 +190,7 @@ public class RMInInterceptorTest extends Assert {
     private void testAppMessage(boolean onServer, boolean deferredAbort) 
         throws SequenceFault, RMException, NoSuchMethodException {
         Method m1 = RMInInterceptor.class.getDeclaredMethod("processAcknowledgments",
-            new Class[] {RMEndpoint.class, RMProperties.class});
+            new Class[] {RMEndpoint.class, RMProperties.class, ProtocolVariation.class});
         Method m2 = RMInInterceptor.class.getDeclaredMethod("processAcknowledgmentRequests",
             new Class[] {Destination.class, Message.class});
         Method m3 = RMInInterceptor.class.getDeclaredMethod("processSequence",
@@ -202,7 +203,7 @@ public class RMInInterceptorTest extends Assert {
         Message message = setupInboundMessage("greetMe", true);
         Destination d = control.createMock(Destination.class);
         EasyMock.expect(manager.getDestination(message)).andReturn(d);
-        interceptor.processAcknowledgments(rme, rmps);
+        interceptor.processAcknowledgments(rme, rmps, ProtocolVariation.RM10WSA200408);
         EasyMock.expectLastCall();
         interceptor.processAcknowledgmentRequests(d, message);
         EasyMock.expectLastCall();
@@ -234,7 +235,6 @@ public class RMInInterceptorTest extends Assert {
         Source source = control.createMock(Source.class);
         rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         interceptor.setManager(manager);
         SequenceAcknowledgement ack1 = control.createMock(SequenceAcknowledgement.class);
         SequenceAcknowledgement ack2 = control.createMock(SequenceAcknowledgement.class);
@@ -253,7 +253,7 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(source.getSequence(id2)).andReturn(null);
         control.replay();
         try {
-            interceptor.processAcknowledgments(rme, rmps);
+            interceptor.processAcknowledgments(rme, rmps, ProtocolVariation.RM10WSA200408);
             fail("Expected SequenceFault not thrown");
         } catch (SequenceFault sf) {
             assertEquals(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME, sf.getFaultCode());
@@ -307,6 +307,10 @@ public class RMInInterceptorTest extends Assert {
         EasyMock.expect(exchange.getDestination()).andReturn(td);
         
         manager = control.createMock(RMManager.class);
+        EasyMock.expect(manager.getRMNamespace(EasyMock.same(message)))
+            .andReturn(RM10Constants.NAMESPACE_URI);
+        EasyMock.expect(manager.getAddressingNamespace(EasyMock.same(message)))
+            .andReturn(Names200408.WSA_NAMESPACE_NAME);
         interceptor.setManager(manager);
         rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(manager.getReliableEndpoint(message)).andReturn(rme);

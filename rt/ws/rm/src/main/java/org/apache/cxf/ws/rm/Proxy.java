@@ -73,45 +73,46 @@ public class Proxy {
     }
 
     void acknowledge(DestinationSequence ds) throws RMException {        
+        final ProtocolVariation protocol = ds.getProtocol(); 
         String address = ds.getAcksTo().getAddress().getValue();
         if (RMUtils.getAddressingConstants().getAnonymousURI().equals(address)) {
             LOG.log(Level.WARNING, "STANDALONE_ANON_ACKS_NOT_SUPPORTED");
             return;
         }
-        
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
-        OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getSequenceAckOperationName());
-        invoke(oi, new Object[] {ds}, null);
+        RMConstants constants = protocol.getConstants();
+        OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
+            .getService().getInterface().getOperation(constants.getSequenceAckOperationName());
+        invoke(oi, protocol, new Object[] {ds}, null);
     }
     
     void terminate(SourceSequence ss) throws RMException {
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
-        OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getTerminateSequenceOperationName());
+        final ProtocolVariation protocol = ss.getProtocol(); 
+        RMConstants constants = protocol.getConstants();
+        OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
+            .getService().getInterface().getOperation(constants.getTerminateSequenceOperationName());
         
         TerminateSequenceType ts = new TerminateSequenceType();
         ts.setIdentifier(ss.getIdentifier());
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
-        invoke(oi, new Object[] {codec.convertToSend(ts)}, null);
+        EncoderDecoder codec = protocol.getCodec();
+        invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, null);
     }
     
-    void createSequenceResponse(final Object createResponse) throws RMException {
+    void createSequenceResponse(final Object createResponse, ProtocolVariation protocol) throws RMException {
         LOG.fine("sending CreateSequenceResponse from client side");
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
-        final OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getCreateSequenceResponseOnewayOperationName());
+        RMConstants constants = protocol.getConstants();
+        final OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo().getService()
+            .getInterface().getOperation(constants.getCreateSequenceResponseOnewayOperationName());
         
         // TODO: need to set relatesTo
 
-        invoke(oi, new Object[] {createResponse}, null);
+        invoke(oi, protocol, new Object[] {createResponse}, null);
        
     }
 
     public CreateSequenceResponseType createSequence(
                         EndpointReferenceType defaultAcksTo,
                         RelatesToType relatesTo,
-                        boolean isServer) throws RMException {
+                        boolean isServer, final ProtocolVariation protocol) throws RMException {
         
         SourcePolicyType sp = reliableEndpoint.getManager().getSourcePolicy();
         CreateSequenceType create = new CreateSequenceType();        
@@ -145,9 +146,10 @@ public class Proxy {
             setOfferedIdentifier(offer);
         }
         
-        InterfaceInfo ii = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface();
+        InterfaceInfo ii = reliableEndpoint.getEndpoint(protocol).getEndpointInfo()
+            .getService().getInterface();
         
-        EncoderDecoder codec = reliableEndpoint.getProtocol().getCodec();
+        EncoderDecoder codec = protocol.getCodec();
         RMConstants constants = codec.getConstants();
         final OperationInfo oi = isServer 
             ? ii.getOperation(constants.getCreateSequenceOnewayOperationName())
@@ -161,7 +163,7 @@ public class Proxy {
             Runnable r = new Runnable() {
                 public void run() {
                     try {
-                        invoke(oi, new Object[] {send}, null);
+                        invoke(oi, protocol, new Object[] {send}, null);
                     } catch (RMException ex) {
                         // already logged
                     }
@@ -172,11 +174,12 @@ public class Proxy {
         }
         
         
-        Object resp = invoke(oi, new Object[] {send}, null);
+        Object resp = invoke(oi, protocol, new Object[] {send}, null);
         return codec.convertReceivedCreateSequenceResponse(resp);
     }
     
     void lastMessage(SourceSequence s) throws RMException {
+        final ProtocolVariation protocol = s.getProtocol();
         EndpointReferenceType target = s.getTarget();
         AttributedURIType uri = null;
         if (null != target) {
@@ -196,19 +199,19 @@ public class Proxy {
             LOG.log(Level.WARNING, "STANDALONE_CLOSE_SEQUENCE_ANON_TARGET_MSG");
             return; 
         }
-        
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
-        OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getCloseSequenceOperationName());
+        RMConstants constants = protocol.getConstants();
+        OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo().getService()
+            .getInterface().getOperation(constants.getCloseSequenceOperationName());
         // pass reference to source sequence in invocation context
         Map<String, Object> context = new HashMap<String, Object>(
                 Collections.singletonMap(SourceSequence.class.getName(), 
                                          (Object)s));
 
-        invoke(oi, new Object[] {}, context);
+        invoke(oi, protocol, new Object[] {}, context);
     }
     
     void ackRequested(SourceSequence s) throws RMException {
+        final ProtocolVariation protocol = s.getProtocol();
         EndpointReferenceType target = s.getTarget();
         AttributedURIType uri = null;
         if (null != target) {
@@ -229,10 +232,10 @@ public class Proxy {
             return; 
         }
         
-        RMConstants constants = reliableEndpoint.getProtocol().getConstants();
-        OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
-            .getOperation(constants.getAckRequestedOperationName());
-        invoke(oi, new Object[] {}, null);
+        RMConstants constants = protocol.getConstants();
+        OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo().getService()
+            .getInterface().getOperation(constants.getAckRequestedOperationName());
+        invoke(oi, protocol, new Object[] {}, null);
     }
         
     Identifier getOfferedIdentifier() {
@@ -245,7 +248,8 @@ public class Proxy {
         }
     }
        
-    Object invoke(OperationInfo oi, Object[] params, Map<String, Object> context) throws RMException {
+    Object invoke(OperationInfo oi, ProtocolVariation protocol, 
+                  Object[] params, Map<String, Object> context) throws RMException {
         
         if (LOG.isLoggable(Level.INFO)) {
             LOG.log(Level.INFO, "Sending out-of-band RM protocol message {0}.", 
@@ -254,8 +258,8 @@ public class Proxy {
         
         RMManager manager = reliableEndpoint.getManager();
         Bus bus = manager.getBus();
-        Endpoint endpoint = reliableEndpoint.getEndpoint();
-        BindingInfo bi = reliableEndpoint.getBindingInfo();
+        Endpoint endpoint = reliableEndpoint.getEndpoint(protocol);
+        BindingInfo bi = reliableEndpoint.getBindingInfo(protocol);
         Conduit c = reliableEndpoint.getConduit();
         Client client = null;
         if (params.length > 0 && params[0] instanceof DestinationSequence) {
@@ -265,11 +269,11 @@ public class Proxy {
             attrURIType.setValue(acksAddress);
             EndpointReferenceType acks =  new EndpointReferenceType();
             acks.setAddress(attrURIType);
-            client = createClient(bus, endpoint, c, acks);
+            client = createClient(bus, endpoint, protocol, c, acks);
             params = new Object[] {};
         } else {
             EndpointReferenceType replyTo = reliableEndpoint.getReplyTo();
-            client = createClient(bus, endpoint, c, replyTo);
+            client = createClient(bus, endpoint, protocol, c, replyTo);
         }
         
         BindingOperationInfo boi = bi.getOperation(oi);
@@ -289,8 +293,8 @@ public class Proxy {
         return null;
     }
     
-    protected Client createClient(Bus bus, Endpoint endpoint, Conduit conduit,
-                                  final EndpointReferenceType address) {
+    protected Client createClient(Bus bus, Endpoint endpoint, final ProtocolVariation protocol, 
+                                  Conduit conduit, final EndpointReferenceType address) {
         ConduitSelector cs = new DeferredConduitSelector(conduit) {
             @Override
             public synchronized Conduit selectConduit(Message message) {
@@ -311,7 +315,6 @@ public class Proxy {
         };  
         RMClient client = new RMClient(bus, endpoint, cs);
         Map<String, Object> context = client.getRequestContext();
-        ProtocolVariation protocol = reliableEndpoint.getProtocol();
         context.put(RMManager.WSRM_VERSION_PROPERTY, protocol.getWSRMNamespace());
         context.put(RMManager.WSRM_WSA_VERSION_PROPERTY, protocol.getWSANamespace());
         return client;

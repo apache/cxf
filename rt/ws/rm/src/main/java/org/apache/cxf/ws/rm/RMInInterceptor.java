@@ -84,6 +84,12 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             LOG.fine("Restoring original requestor role to: " + originalRequestor);
             message.put(Message.REQUESTOR_ROLE, originalRequestor);
         }
+
+        String rmUri = getManager().getRMNamespace(message);
+        String addrUri = getManager().getAddressingNamespace(message);
+
+        ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
+        RMContextUtils.setProtocolVariation(message, protocol);
         
         // Destination destination = getManager().getDestination(message);
         // RMEndpoint rme = getManager().getReliableEndpoint(message);
@@ -101,7 +107,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         if (isApplicationMessage) {                        
             if (null != rmps) {
-                processAcknowledgments(rme, rmps);
+                processAcknowledgments(rme, rmps, protocol);
                 processAcknowledgmentRequests(destination, message);
                 processSequence(destination, message);
                 processDeliveryAssurance(rmps);
@@ -116,7 +122,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             rme.receivedControlMessage();
             if (RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)
                 || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
-                processAcknowledgments(rme, rmps);
+                processAcknowledgments(rme, rmps, protocol);
             } else if (RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action)
                 || RM11Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION.equals(action)) {
                 processSequence(destination, message);
@@ -126,7 +132,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 Servant servant = rme.getServant();
                 Object csr = servant.createSequence(message);
                 Proxy proxy = rme.getProxy();
-                proxy.createSequenceResponse(csr);
+                proxy.createSequenceResponse(csr, protocol);
                 return;
             }
         }
@@ -134,7 +140,8 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         assertReliability(message);
     }
     
-    void processAcknowledgments(RMEndpoint rme, RMProperties rmps) throws SequenceFault, RMException {
+    void processAcknowledgments(RMEndpoint rme, RMProperties rmps, ProtocolVariation protocol) 
+        throws SequenceFault, RMException {
         
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();
         Source source = rme.getSource();
@@ -145,7 +152,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 if (null != ss) {
                     ss.setAcknowledged(ack);
                 } else {
-                    RMConstants consts = rme.getProtocol().getConstants();
+                    RMConstants consts = protocol.getConstants();
                     SequenceFaultFactory sff = new SequenceFaultFactory(consts);
                     throw sff.createUnknownSequenceFault(id);
                 }

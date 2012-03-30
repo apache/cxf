@@ -290,7 +290,6 @@ public class ManagedRMManagerTest extends Assert {
         EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
         EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
-        EasyMock.expect(rme.getProtocol()).andReturn(null).anyTimes();
 
         control.replay();
         setCurrentMessageNumber(sss.get(0), 5L);
@@ -314,8 +313,10 @@ public class ManagedRMManagerTest extends Assert {
     private List<SourceSequence> createTestSourceSequences(Source source, 
                                                            EndpointReferenceType to) {
         List<SourceSequence> sss = new ArrayList<SourceSequence>();
-        sss.add(createTestSourceSequence(source, "seq1", to, new long[]{1L, 1L, 3L, 3L}));
-        sss.add(createTestSourceSequence(source, "seq2", to, new long[]{1L, 1L, 3L, 3L}));
+        sss.add(createTestSourceSequence(source, "seq1", to, 
+                                         ProtocolVariation.RM10WSA200408, new long[]{1L, 1L, 3L, 3L}));
+        sss.add(createTestSourceSequence(source, "seq2", to, 
+                                         ProtocolVariation.RM11WSA200508, new long[]{1L, 1L, 3L, 3L}));
         
         return sss;
     }
@@ -323,17 +324,20 @@ public class ManagedRMManagerTest extends Assert {
     private List<DestinationSequence> createTestDestinationSequences(Destination destination, 
                                                                      EndpointReferenceType to) {
         List<DestinationSequence> dss = new ArrayList<DestinationSequence>();
-        dss.add(createTestDestinationSequence(destination, "seq3", to, new long[]{1L, 1L, 3L, 3L}));
-        dss.add(createTestDestinationSequence(destination, "seq4", to, new long[]{1L, 1L, 3L, 3L}));
+        dss.add(createTestDestinationSequence(destination, "seq3", to, 
+                                              ProtocolVariation.RM10WSA200408, new long[]{1L, 1L, 3L, 3L}));
+        dss.add(createTestDestinationSequence(destination, "seq4", to, 
+                                              ProtocolVariation.RM11WSA200508, new long[]{1L, 1L, 3L, 3L}));
         
         return dss;
     }
 
     private SourceSequence createTestSourceSequence(Source source, String sid, 
-                                                    EndpointReferenceType to, long[] acked) {
+                                                    EndpointReferenceType to, 
+                                                    ProtocolVariation protocol, long[] acked) {
         Identifier identifier = RMUtils.getWSRMFactory().createIdentifier();
         identifier.setValue(sid);
-        SourceSequence ss = new SourceSequence(identifier, null);
+        SourceSequence ss = new SourceSequence(identifier, protocol);
         ss.setSource(source);
         ss.setTarget(to);
         List<SequenceAcknowledgement.AcknowledgementRange> ranges = 
@@ -345,10 +349,11 @@ public class ManagedRMManagerTest extends Assert {
     }
 
     private DestinationSequence createTestDestinationSequence(Destination destination, String sid, 
-                                                              EndpointReferenceType to, long[] acked) {
+                                                              EndpointReferenceType to, 
+                                                              ProtocolVariation protocol, long[] acked) {
         Identifier identifier = RMUtils.getWSRMFactory().createIdentifier();
         identifier.setValue(sid);
-        DestinationSequence ds = new DestinationSequence(identifier, to, null, null);
+        DestinationSequence ds = new DestinationSequence(identifier, to, null, protocol);
         ds.setDestination(destination);
 
         List<SequenceAcknowledgement.AcknowledgementRange> ranges = 
@@ -387,7 +392,6 @@ public class ManagedRMManagerTest extends Assert {
         
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
-        EasyMock.expect(exchange.getOutMessage()).andReturn(message);
         
         control.replay();
         return manager.getReliableEndpoint(message);

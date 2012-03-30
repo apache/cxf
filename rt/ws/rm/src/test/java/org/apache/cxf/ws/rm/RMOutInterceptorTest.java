@@ -35,6 +35,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.MAPAggregator;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.easymock.EasyMock;
@@ -133,6 +134,10 @@ public class RMOutInterceptorTest extends Assert {
             andReturn(rmpsOut).anyTimes();
         InterceptorChain chain = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(chain).anyTimes();
+        EasyMock.expect(manager.getRMNamespace(EasyMock.same(message)))
+            .andReturn(RM10Constants.NAMESPACE_URI);
+        EasyMock.expect(manager.getAddressingNamespace(EasyMock.same(message)))
+            .andReturn(Names200408.WSA_NAMESPACE_NAME);
         chain.add(EasyMock.isA(RetransmissionInterceptor.class));
         EasyMock.expectLastCall();
         RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
@@ -141,13 +146,13 @@ public class RMOutInterceptorTest extends Assert {
         EasyMock.expectLastCall();
                 
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(rme.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         Source source = control.createMock(Source.class);
         EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
         EasyMock.expect(manager.getSource(message)).andReturn(source).anyTimes();
         Destination destination = control.createMock(Destination.class);
         EasyMock.expect(manager.getDestination(message)).andReturn(destination).anyTimes();
         SourceSequence sseq = control.createMock(SourceSequence.class);
+        EasyMock.expect(sseq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes(); 
         EasyMock.expect(manager.getSequence((Identifier)EasyMock.isNull(), EasyMock.same(message), 
                                         EasyMock.same(maps))).andReturn(sseq).anyTimes();
         EasyMock.expect(sseq.nextMessageNumber((Identifier)EasyMock.isNull(), 

@@ -117,8 +117,7 @@ public class RMManagerConfigurationTest extends Assert {
             
         }
 
-        public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier,
-            ProtocolVariation protocol) {
+        public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -128,8 +127,7 @@ public class RMManagerConfigurationTest extends Assert {
             return null;
         }
 
-        public Collection<SourceSequence> getSourceSequences(String endpointIdentifier,
-            ProtocolVariation protocol) {
+        public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -159,12 +157,12 @@ public class RMManagerConfigurationTest extends Assert {
             
         }
 
-        public SourceSequence getSourceSequence(Identifier seq, ProtocolVariation protocol) {
+        public SourceSequence getSourceSequence(Identifier seq) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public DestinationSequence getDestinationSequence(Identifier seq, ProtocolVariation protocol) {
+        public DestinationSequence getDestinationSequence(Identifier seq) {
             // TODO Auto-generated method stub
             return null;
         }
