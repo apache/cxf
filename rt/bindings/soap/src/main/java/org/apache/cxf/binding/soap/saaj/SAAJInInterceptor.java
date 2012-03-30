@@ -226,12 +226,11 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             
 
             if (hasFault(message, xmlReader)) {
-                SOAPFault soapFault = 
-                    soapMessage.getSOAPPart().getEnvelope().getBody().addFault();
                 SoapFault fault = 
                     message.getVersion() instanceof Soap11 
                     ? Soap11FaultInInterceptor.unmarshalFault(message, xmlReader)
                     : Soap12FaultInInterceptor.unmarshalFault(message, xmlReader);
+<<<<<<< HEAD
                 if (fault.getFaultCode() != null) {
                     soapFault.setFaultCode(fault.getFaultCode());
                 }
@@ -243,21 +242,40 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 }
                 if (fault.getDetail() != null
                     && fault.getDetail().getFirstChild() != null) {
+=======
+>>>>>>> 941b6cf... [CXF-4181] Fix for SAAJ + SOAP 1.2 fault...
                     
-                    Detail detail = null;
-                    Node child = fault.getDetail().getFirstChild();
-                    while (child != null) {
-                        if (Node.ELEMENT_NODE == child.getNodeType()) {
-                            if (detail == null) {
-                                detail = soapFault.addDetail();
-                            }
-                            Node importedChild = soapMessage.getSOAPPart().importNode(child, true);
-                            detail.appendChild(importedChild);
+                SOAPFault soapFault = 
+                    soapMessage.getSOAPPart().getEnvelope().getBody().getFault();
+                if (soapFault == null) {
+                    soapFault = 
+                        soapMessage.getSOAPPart().getEnvelope().getBody().addFault();
+                    if (fault.getFaultCode() != null) {
+                        SAAJUtils.setFaultCode(soapFault, fault.getFaultCode());
+                    }
+                    if (fault.getMessage() != null) {
+                        soapFault.setFaultString(fault.getMessage());
+                    }
+                    if (fault.getRole() != null) {
+                        soapFault.setFaultActor(fault.getRole());
+                    }
+                    if (fault.getDetail() != null
+                        && fault.getDetail().getFirstChild() != null) {
+                        
+                        Detail detail = null;
+                        Node child = fault.getDetail().getFirstChild();
+                        if (child != null) {
+                            detail = soapFault.addDetail();
                         }
-                        child = child.getNextSibling();
+                        while (child != null) {
+                            if (Node.ELEMENT_NODE == child.getNodeType()) {
+                                Node importedChild = soapMessage.getSOAPPart().importNode(child, true);
+                                detail.appendChild(importedChild);
+                            }
+                            child = child.getNextSibling();
+                        }
                     }
                 }
-
                 DOMSource bodySource = new DOMSource(soapFault);
                 xmlReader = StaxUtils.createXMLStreamReader(bodySource);
             } else { 

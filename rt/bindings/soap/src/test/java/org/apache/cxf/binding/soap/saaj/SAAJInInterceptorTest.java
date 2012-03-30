@@ -45,7 +45,6 @@ import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -141,7 +140,6 @@ public class SAAJInInterceptorTest extends TestBase {
     }
     
     @Test
-    @Ignore
     public void testFaultDetailSOAP12() throws Exception {
         try {
             prepareSoapMessage("../test-soap-12-fault-detail.xml");
