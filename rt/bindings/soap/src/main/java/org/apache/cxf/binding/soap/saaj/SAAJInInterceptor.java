@@ -29,10 +29,8 @@ import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.AttachmentPart;
-import javax.xml.soap.Detail;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
@@ -54,8 +52,6 @@ import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
-import org.apache.cxf.binding.soap.interceptor.Soap11FaultInInterceptor;
-import org.apache.cxf.binding.soap.interceptor.Soap12FaultInInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.databinding.DataBinding;
@@ -224,67 +220,12 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 soapMessage.getSOAPPart().getEnvelope().addHeader();
             }
             
-
-            if (hasFault(message, xmlReader)) {
-                SoapFault fault = 
-                    message.getVersion() instanceof Soap11 
-                    ? Soap11FaultInInterceptor.unmarshalFault(message, xmlReader)
-                    : Soap12FaultInInterceptor.unmarshalFault(message, xmlReader);
-<<<<<<< HEAD
-                if (fault.getFaultCode() != null) {
-                    soapFault.setFaultCode(fault.getFaultCode());
-                }
-                if (fault.getMessage() != null) {
-                    soapFault.setFaultString(fault.getMessage());
-                }
-                if (fault.getRole() != null) {
-                    soapFault.setFaultActor(fault.getRole());
-                }
-                if (fault.getDetail() != null
-                    && fault.getDetail().getFirstChild() != null) {
-=======
->>>>>>> 941b6cf... [CXF-4181] Fix for SAAJ + SOAP 1.2 fault...
-                    
-                SOAPFault soapFault = 
-                    soapMessage.getSOAPPart().getEnvelope().getBody().getFault();
-                if (soapFault == null) {
-                    soapFault = 
-                        soapMessage.getSOAPPart().getEnvelope().getBody().addFault();
-                    if (fault.getFaultCode() != null) {
-                        SAAJUtils.setFaultCode(soapFault, fault.getFaultCode());
-                    }
-                    if (fault.getMessage() != null) {
-                        soapFault.setFaultString(fault.getMessage());
-                    }
-                    if (fault.getRole() != null) {
-                        soapFault.setFaultActor(fault.getRole());
-                    }
-                    if (fault.getDetail() != null
-                        && fault.getDetail().getFirstChild() != null) {
-                        
-                        Detail detail = null;
-                        Node child = fault.getDetail().getFirstChild();
-                        if (child != null) {
-                            detail = soapFault.addDetail();
-                        }
-                        while (child != null) {
-                            if (Node.ELEMENT_NODE == child.getNodeType()) {
-                                Node importedChild = soapMessage.getSOAPPart().importNode(child, true);
-                                detail.appendChild(importedChild);
-                            }
-                            child = child.getNextSibling();
-                        }
-                    }
-                }
-                DOMSource bodySource = new DOMSource(soapFault);
-                xmlReader = StaxUtils.createXMLStreamReader(bodySource);
-            } else { 
-                StaxUtils.readDocElements(soapMessage.getSOAPBody(), xmlReader, true, true);
-                DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
-                xmlReader = StaxUtils.createXMLStreamReader(bodySource);
-                xmlReader.nextTag();
-                xmlReader.nextTag(); // move past body tag
-            }
+            StaxUtils.readDocElements(soapMessage.getSOAPPart().getEnvelope().getBody(),
+                                      xmlReader, true, true);
+            DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
+            xmlReader = StaxUtils.createXMLStreamReader(bodySource);
+            xmlReader.nextTag();
+            xmlReader.nextTag(); // move past body tag
             message.setContent(XMLStreamReader.class, xmlReader);           
         } catch (SOAPException soape) {
             throw new SoapFault(new org.apache.cxf.common.i18n.Message(
@@ -340,17 +281,6 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             message.getHeaders().add(shead);                        
             
             elem = DOMUtils.getNextElement(elem);
-        }
-    }
-
-
-    private static boolean hasFault(SoapMessage message, 
-                                    XMLStreamReader xmlReader) {
-        try {
-            QName name = xmlReader.getName();
-            return message.getVersion().getFault().equals(name);
-        } catch (Exception e) {
-            return false;
         }
     }
 }
