@@ -45,7 +45,6 @@ import org.apache.cxf.testutil.recorders.MessageRecorder;
 import org.apache.cxf.testutil.recorders.OutMessageRecorder;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.DestinationSequence;
-import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RM10Constants;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMUtils;
@@ -217,11 +216,11 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
         Collection<DestinationSequence> dss =
-            store.getDestinationSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getDestinationSequences(id);
         assertEquals(1, dss.size());
         
         Collection<SourceSequence> sss =
-            store.getSourceSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getSourceSequences(id);
         assertEquals(1, sss.size());
         
         Collection<RMMessage> msgs = 
@@ -293,11 +292,11 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
         
         Collection<DestinationSequence> dss =
-            store.getDestinationSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getDestinationSequences(id);
         assertEquals(1, dss.size());
         
         Collection<SourceSequence> sss =
-            store.getSourceSequences(id, ProtocolVariation.RM10WSA200408);
+            store.getSourceSequences(id);
         assertEquals(1, sss.size());
         
         int i = 0;
