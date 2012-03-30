@@ -44,6 +44,7 @@ import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
+import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,6 +60,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ResourceManagerWSDLLocator;
@@ -71,6 +73,7 @@ public class WSDLGetUtils {
     
     public static final String AUTO_REWRITE_ADDRESS = "autoRewriteSoapAddress";
     public static final String PUBLISHED_ENDPOINT_URL = "publishedEndpointUrl";
+    public static final String WSDL_CREATE_IMPORTS = "org.apache.cxf.wsdl.create.imports";
     
     private static final String WSDLS_KEY = WSDLGetUtils.class.getName() + ".WSDLs";
     private static final String SCHEMAS_KEY = WSDLGetUtils.class.getName() + ".Schemas";
@@ -171,8 +174,16 @@ public class WSDLGetUtils {
             }
             
             if (!mp.containsKey("")) {
-                Definition def = new ServiceWSDLBuilder(bus,
-                                                        endpointInfo.getService()).build();
+                ServiceWSDLBuilder builder = 
+                    new ServiceWSDLBuilder(bus, endpointInfo.getService());
+
+                builder.setUseSchemaImports(
+                     MessageUtils.getContextualBoolean(message, WSDL_CREATE_IMPORTS, false));
+                
+                // base file name is ignored if createSchemaImports == false!
+                builder.setBaseFileName(endpointInfo.getService().getName().getLocalPart());
+                
+                Definition def = builder.build(new HashMap<String, SchemaInfo>());
 
                 mp.put("", def);
                 updateDefinition(bus, def, mp, smp, base, endpointInfo);
@@ -236,7 +247,13 @@ public class WSDLGetUtils {
                                                                                 bus);
                 
                 InputSource src = rml.getBaseInputSource();
-                doc = StaxUtils.read(src);
+                if (src.getByteStream() != null || src.getCharacterStream() != null) {
+                    doc = StaxUtils.read(src);
+                } else { // last resort lets try for the referenced schema itself.
+                    // its not thread safe if we use the same document
+                    doc = StaxUtils.read(
+                            new DOMSource(si.getReferencedSchema().getElement().getOwnerDocument()));
+                }
             }
             
             updateDoc(doc, base, mp, smp, message);

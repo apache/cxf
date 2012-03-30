@@ -19,7 +19,11 @@
 
 package org.apache.cxf.wsdl11;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.wsdl.Binding;
@@ -35,17 +39,22 @@ import javax.wsdl.Service;
 import javax.wsdl.Types;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.schema.Schema;
+import javax.wsdl.extensions.schema.SchemaImport;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
@@ -53,6 +62,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -62,6 +72,7 @@ public class ServiceWSDLBuilderTest extends Assert {
     private static final Logger LOG = LogUtils.getLogger(ServiceWSDLBuilderTest.class);
     private static final String WSDL_PATH = "hello_world.wsdl";
     private static final String NO_BODY_PARTS_WSDL_PATH = "no_body_parts.wsdl";
+    private static final String WSDL_XSD_IMPORT_PATH = "hello_world_schema_import_test.wsdl";
 
     private Definition def;
     private Definition newDef;
@@ -77,6 +88,10 @@ public class ServiceWSDLBuilderTest extends Assert {
     private DestinationFactory destinationFactory;
     
     private void setupWSDL(String wsdlPath) throws Exception {
+        setupWSDL(wsdlPath, false);
+    }
+    
+    private void setupWSDL(String wsdlPath, boolean doXsdImports) throws Exception {
         String wsdlUrl = getClass().getResource(wsdlPath).toString();
         LOG.info("the path of wsdl file is " + wsdlUrl);
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
@@ -110,7 +125,10 @@ public class ServiceWSDLBuilderTest extends Assert {
         control.replay();
         
         serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
-        newDef = new ServiceWSDLBuilder(bus, serviceInfo).build();
+        ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus, serviceInfo);
+        builder.setUseSchemaImports(doXsdImports);
+        builder.setBaseFileName("HelloWorld");
+        newDef = builder.build(new HashMap<String, SchemaInfo>());
     }
     
     @After
@@ -305,6 +323,55 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals("http://apache.org/hello_world_soap_http/types",
                      newSchema.getTargetNamespace() 
                      );
+    }
+    
+    @Test
+    public void testXsdImportMultipleSchemas() throws Exception {
+        setupWSDL(WSDL_XSD_IMPORT_PATH, true);
+
+        Types types = newDef.getTypes();
+        assertNotNull(types);
+
+        Collection<ExtensibilityElement> schemas = CastUtils.cast(types.getExtensibilityElements(),
+                                                                  ExtensibilityElement.class);
+        assertEquals(1, schemas.size());
+
+        Schema schema = (Schema)schemas.iterator().next();
+
+        assertEquals(1, schema.getImports().values().size());
+
+        SchemaImport serviceTypesSchemaImport = getImport(schema.getImports(),
+                "http://apache.org/hello_world_soap_http/servicetypes");
+
+        Schema serviceTypesSchema = serviceTypesSchemaImport.getReferencedSchema();
+
+        assertEquals(1, serviceTypesSchema.getImports().values().size());
+        SchemaImport typesSchemaImport = getImport(serviceTypesSchema.getImports(),
+                "http://apache.org/hello_world_soap_http/types");
+
+        Schema typesSchema = typesSchemaImport.getReferencedSchema();
+        
+        Document doc = typesSchema.getElement().getOwnerDocument();
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(outputStream, "utf-8");
+        StaxUtils.writeNode(doc, writer, true);
+        writer.close();
+
+        // this is a test to make sure any embedded namespaces are properly included
+        String savedSchema = new String(outputStream.toByteArray(), "UTF-8");
+        assertTrue(savedSchema.contains("http://www.w3.org/2005/05/xmlmime"));
+        
+        SchemaImport types2SchemaImport = getImport(typesSchema.getImports(),
+                "http://apache.org/hello_world_soap_http/types2");
+        
+        Schema types2Schema = types2SchemaImport.getReferencedSchema();
+        assertNotNull(types2Schema);
+    }
+    
+    private SchemaImport getImport(Map<?, ?> imps, String key) {
+        List<SchemaImport> s1 = CastUtils.cast((List<?>)imps.get(key));
+        return s1.get(0);
     }
     
 }
