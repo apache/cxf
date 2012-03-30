@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.ws.util;
+package org.apache.cxf.testutil.recorders;
 
 import java.util.List;
 

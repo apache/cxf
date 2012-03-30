@@ -41,6 +41,7 @@
         <module>databinding</module>
         <module>jaxrs</module>
         <module>ws-specs</module>
+        <module>ws-rm</module>
         <module>ws-security</module>
         <module>ws-security-examples</module>
         <module>rs-security</module>
