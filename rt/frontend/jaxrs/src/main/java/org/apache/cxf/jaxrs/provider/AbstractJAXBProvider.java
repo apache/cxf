@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
@@ -171,20 +170,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         jaxbElementClassMap = map;
     }
     
-    protected void checkContentLength() {
-        if (mc != null) {
-            HttpHeaders headers = mc.getHttpHeaders();
-            if (headers != null) {
-                List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
-                if (values.size() == 1 && "0".equals(values.get(0))) {
-                    String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
-                    LOG.warning(message);
-                    throw new WebApplicationException(400);
-                }
-            }
-        }
+    protected boolean isPayloadEmpty() {
+        return mc != null ? isPayloadEmpty(mc.getHttpHeaders()) : false;     
     }
     
+    protected void reportEmptyContentLength() {
+        String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+        LOG.warning(message);
+        throw new WebApplicationException(400);
+    }
+
     protected <T> T getStaxHandlerFromCurrentMessage(Class<T> staxCls) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {

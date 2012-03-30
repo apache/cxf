@@ -58,6 +58,7 @@ import javax.xml.transform.Source;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
@@ -151,9 +152,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
+        if (isPayloadEmpty()) {
+            if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
+                return null;
+            } else {
+                reportEmptyContentLength();
+            }
+        }
+        
         try {
-            
-            checkContentLength();
             
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
