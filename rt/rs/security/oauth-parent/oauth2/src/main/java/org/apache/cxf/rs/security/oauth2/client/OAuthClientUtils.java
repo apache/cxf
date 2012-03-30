@@ -39,8 +39,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
- * The utility class for simplifying making OAuth request and access token
- * requests as well as for creating Authorization OAuth headers
+ * The utility class for simplifying working with OAuth servers
  */
 public final class OAuthClientUtils {
     private OAuthClientUtils() {
@@ -48,11 +47,15 @@ public final class OAuthClientUtils {
     }
     
     /**
-     * Returns URI of the authorization service with the query parameter containing 
-     * the request token key 
-     * @param authorizationServiceURI the service URI
-     * @param requestToken the request token key
-     * @return
+     * Builds a complete URI for redirecting to OAuth Authorization Service
+     * @param authorizationServiceURI the service endpoint address
+     * @param clientId client registration id
+     * @param redirectUri the uri the authorization code will be posted to
+     * @param state the client state, example the key or the encrypted token 
+     *              representing the info about the current end user's request
+     * @scope scope the optional scope; if not specified then the authorization
+     *              service will allocate the default scope               
+     * @return authorization service URI
      */
     public static URI getAuthorizationURI(String authorizationServiceURI, 
                                           String clientId,
@@ -71,6 +74,14 @@ public final class OAuthClientUtils {
         return ub.build();
     }
     
+    /**
+     * Creates the builder for building OAuth AuthorizationService URIs
+     * @param authorizationServiceURI the service endpoint address 
+     * @param clientId client registration id
+     * @param scope the optional scope; if not specified then the authorization
+     *              service will allocate the default scope
+     * @return the builder
+     */
     public static UriBuilder getAuthorizationURIBuilder(String authorizationServiceURI, 
                                                  String clientId,
                                                  String scope) {
@@ -85,6 +96,15 @@ public final class OAuthClientUtils {
         return ub;                                   
     }
     
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * using the initialized web client 
+     * @param accessTokenService the AccessToken client
+     * @param consumer {@link Consumer} representing the registered client 
+     * @param grant {@link AccessTokenGrant} grant
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
     public static ClientAccessToken getAccessToken(WebClient accessTokenService,
                                                    Consumer consumer,
                                                    AccessTokenGrant grant) throws OAuthServiceException {
@@ -92,6 +112,17 @@ public final class OAuthClientUtils {
         return getAccessToken(accessTokenService, consumer, grant, true);
     }
     
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * @param accessTokenServiceUri the AccessToken endpoint address
+     * @param consumer {@link Consumer} representing the registered client 
+     * @param grant {@link AccessTokenGrant} grant
+     * @param setAuthorizationHeader if set to true then HTTP Basic scheme
+     *           will be used to pass client id and secret, otherwise they will
+     *           be passed in the form payload
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
     public static ClientAccessToken getAccessToken(String accessTokenServiceUri,
                                                    Consumer consumer,
                                                    AccessTokenGrant grant,
@@ -104,6 +135,18 @@ public final class OAuthClientUtils {
         return getAccessToken(accessTokenService, consumer, grant, true);
     }
     
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * using the initialized web client 
+     * @param accessTokenService the AccessToken client
+     * @param consumer {@link Consumer} representing the registered client.
+     * @param grant {@link AccessTokenGrant} grant
+     * @param setAuthorizationHeader if set to true then HTTP Basic scheme
+     *           will be used to pass client id and secret, otherwise they will
+     *           be passed in the form payload  
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
     public static ClientAccessToken getAccessToken(WebClient accessTokenService,
                                                    Consumer consumer,
                                                    AccessTokenGrant grant,
@@ -111,20 +154,25 @@ public final class OAuthClientUtils {
         throws OAuthServiceException {
         
         Form form = new Form(grant.toMap());
-        
-        if (setAuthorizationHeader) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Basic ");
-            try {
-                String data = consumer.getKey() + ":" + consumer.getSecret();
-                sb.append(Base64Utility.encode(data.getBytes("UTF-8")));
-            } catch (Exception ex) {
-                throw new ClientWebApplicationException(ex);
+    
+        if (consumer != null) {
+            if (setAuthorizationHeader) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Basic ");
+                try {
+                    String data = consumer.getKey() + ":" + consumer.getSecret();
+                    sb.append(Base64Utility.encode(data.getBytes("UTF-8")));
+                } catch (Exception ex) {
+                    throw new ClientWebApplicationException(ex);
+                }
+                accessTokenService.header("Authorization", sb.toString());
+            } else {
+                form.set(OAuthConstants.CLIENT_ID, consumer.getKey());
+                form.set(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
             }
-            accessTokenService.header("Authorization", sb.toString());
         } else {
-            form.set(OAuthConstants.CLIENT_ID, consumer.getKey());
-            form.set(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
+            // in this case the AccessToken service is expected to find a mapping between
+            // the authenticated credentials and the client registration id
         }
         Response response = accessTokenService.form(form);
         Map<String, String> map = null;
@@ -154,7 +202,9 @@ public final class OAuthClientUtils {
     }
     
     /**
-     * Creates OAuth Authorization header
+     * Creates OAuth Authorization header for accessing the end user's resources
+     * @param consumer represents the registered client
+     * @param accessToken the access token  
      * @return the header value
      */
     public static String createAuthorizationHeader(Consumer consumer,

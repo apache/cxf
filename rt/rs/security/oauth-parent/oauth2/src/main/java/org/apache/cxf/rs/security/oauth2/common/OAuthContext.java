@@ -23,7 +23,8 @@ import java.util.List;
 
 
 /**
- * Captures the information which custom filters may use to further protect the endpoints
+ * Captures the information about the current client request
+ * which custom filters may use to further protect the endpoints
  */
 public class OAuthContext {
 
@@ -38,15 +39,29 @@ public class OAuthContext {
         this.permissions = perms;
         this.tokenGrantType = tokenGrantType;
     }
-    
+   
+    /**
+     * Gets the {@link UserSubject} representing the end user authorizing the client 
+     * at the authorization grant creation time 
+     * @return the subject
+     */
     public UserSubject getSubject() {
         return subject;
     }
     
+    /**
+     * Gets the list of the permissions assigned to the current access token
+     * @return the permissions
+     */
     public List<OAuthPermission> getPermissions() {
         return Collections.unmodifiableList(permissions);
     }
 
+    /**
+     * Returns the grant type which was used to obtain the access token
+     * the client is using now during the current request
+     * @return the grant type
+     */
     public String getTokenGrantType() {
         return tokenGrantType;
     }

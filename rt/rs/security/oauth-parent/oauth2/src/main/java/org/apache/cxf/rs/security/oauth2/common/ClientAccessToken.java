@@ -21,7 +21,10 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 
 /**
- * Base Token representation
+ * Represents the extended client view of {@link AccessToken}.
+ * It may contain the actual scope value assigned to the access token,
+ * the refresh token key, and other properties such as when this token 
+ * will expire, etc.
  */
 public class ClientAccessToken extends AccessToken {
 
@@ -32,18 +35,38 @@ public class ClientAccessToken extends AccessToken {
         super(tokenType, tokenKey);
     }
     
+    /**
+     * Sets the actual scope assigned to the access token.
+     * For example, it can be down-scoped in which case the client
+     * may need to adjust the way it works with the end user. 
+     * @param approvedScope the actual scope
+     */
     public void setApprovedScope(String approvedScope) {
         this.scope = approvedScope;
     }
 
+    /**
+     * Gets the actual scope assigned to the access token.
+     * @return the scope
+     */
     public String getApprovedScope() {
         return scope;
     }
 
+    /**
+     * Sets the refresh token key the client can use to obtain a new
+     * access token
+     * @param refreshToken the refresh token
+     */
     public void setRefreshToken(String refreshToken) {
         this.rToken = refreshToken;
     }
 
+    /**
+     * Gets the refresh token key the client can use to obtain a new
+     * access token
+     * @return the refresh token
+     */
     public String getRefreshToken() {
         return rToken;
     }

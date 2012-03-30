@@ -60,7 +60,7 @@ public class Client {
     }
     
     /**
-     * Gets the consumer registration id
+     * Gets the client registration id
      * @return the consumer key
      */
     public String getClientId() {
@@ -68,8 +68,8 @@ public class Client {
     }
 
     /**
-     * Gets the secret key
-     * @return the secret key
+     * Gets the client secret
+     * @return the secret
      */
     public String getClientSecret() {
         return clientSecret;
@@ -95,8 +95,6 @@ public class Client {
 
     /**
      * Gets the public URI of the third-party application.
-     * For example, this property can be used to validate 
-     * request token callbacks
      * @return the application URI
      */
     public String getApplicationWebUri() {
@@ -105,6 +103,7 @@ public class Client {
 
     /**
      * Sets the public URI of the third-party application.
+     * @param applicationWebUri the application URI
      */
     public void setApplicationWebUri(String applicationWebUri) {
         this.applicationWebUri = applicationWebUri;
@@ -112,6 +111,7 @@ public class Client {
 
     /**
      * Sets the description of the third-party application.
+     * @param applicationDescription the description
      */
     public void setApplicationDescription(String applicationDescription) {
         this.applicationDescription = applicationDescription;
@@ -126,46 +126,91 @@ public class Client {
     }
     
     /**
-     * Sets the uri pointing to a client logo image.
-     * At the moment it must be a relative URI
-     * @param logoPath
+     * Sets the URI pointing to a logo image of the client application
+     * @param logoPath the logo URI
      */
     public void setApplicationLogoUri(String logoPath) {
         this.applicationLogoUri = logoPath;
     }
 
+    /**
+     * Get the URI pointing to a logo image of the client application
+     * @return the logo URI
+     */
     public String getApplicationLogoUri() {
         return applicationLogoUri;
     }
 
+    /**
+     * Sets the confidentiality status of this client application.
+     * This can be used to restrict which OAuth2 flows this client
+     * can participate in.
+     * 
+     * @param isConf true if the client is confidential
+     */
     public void setConfidential(boolean isConf) {
         this.isConfidential = isConf;
     }
 
+    /**
+     * Gets the confidentiality status of this client application.
+     * @return the confidentiality status
+     */
     public boolean isConfidential() {
         return isConfidential;
     }
 
+    /**
+     * Sets a list of URIs the AuthorizationService
+     * may return the authorization code to.
+     * @param redirectUris the redirect uris
+     */
     public void setRedirectUris(List<String> redirectUris) {
         this.redirectUris = redirectUris;
     }
 
+    /**
+     * Gets a list of URIs the AuthorizationService
+     * may return the authorization code to
+     * @return the redirect uris
+     */
     public List<String> getRedirectUris() {
         return redirectUris;
     }
 
+    /**
+     * Sets the list of access token grant types this client
+     * can use to obtain the access tokens.
+     * @param allowedGrantTypes the list of grant types
+     */
     public void setAllowedGrantTypes(List<String> allowedGrantTypes) {
         this.allowedGrantTypes = allowedGrantTypes;
     }
 
+    /**
+     * Gets the list of access token grant types this client
+     * can use to obtain the access tokens.
+     * @return the list of grant types
+     */
     public List<String> getAllowedGrantTypes() {
         return allowedGrantTypes;
     }
 
+    /**
+     * Sets the {@link UserSubject} representing this Client 
+     * authentication, may be setup during the registration. 
+     *
+     * @param subject the user subject
+     */
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
 
+    /**
+     * Gets the {@link UserSubject} representing this Client 
+     * authentication
+     * @return the user subject
+     */
     public UserSubject getSubject() {
         return subject;
     }

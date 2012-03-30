@@ -20,7 +20,21 @@ package org.apache.cxf.rs.security.oauth2.common;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+/**
+ * Access Token Grant  
+ */
 public interface AccessTokenGrant {
+    /**
+     * Returns the token grant type, example, "authorization_code"
+     * @return
+     */
     String getType(); 
+    
+    /**
+     * Returns the map containing public grant parameters;
+     * can be used by clients requesting the access tokens.
+     *  
+     * @return the grant parameters
+     */
     MultivaluedMap<String, String> toMap();
 }

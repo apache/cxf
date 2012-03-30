@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Base Token representation
+ * Base Access Token representation
  */
 public abstract class AccessToken {
 
@@ -35,6 +35,10 @@ public abstract class AccessToken {
         this.tokenKey = tokenKey;
     }
 
+    /**
+     * Returns the token type such as bearer, mac, etc
+     * @return the type
+     */
     public String getTokenType() {
         return tokenType;
     }
@@ -47,10 +51,18 @@ public abstract class AccessToken {
         return tokenKey;
     }
 
+    /**
+     * Sets token parameters
+     * @param parameters the token parameters
+     */
     public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
     }
 
+    /**
+     * Gets token parameters 
+     * @return
+     */
     public Map<String, String> getParameters() {
         return parameters;
     }
