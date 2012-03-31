@@ -19,8 +19,12 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.frontend.WSDLGetUtils;
 import org.apache.cxf.greeter_control.GreeterImplNoWsdl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -30,7 +34,11 @@ public class ServerGreeterNoWsdl extends AbstractBusTestServerBase {
     protected void run() {
         Object implementor = new GreeterImplNoWsdl();
         String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-        Endpoint.publish(address, implementor);
+        Endpoint ep = Endpoint.create(implementor);
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(WSDLGetUtils.WSDL_CREATE_IMPORTS, Boolean.TRUE);
+        ep.setProperties(props);
+        ep.publish(address);
     }
 
     public static void main(String[] args) {

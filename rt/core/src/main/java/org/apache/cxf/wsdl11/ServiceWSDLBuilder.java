@@ -63,6 +63,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
@@ -96,7 +97,7 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerExcep
  * the top-level object.
  */
 public class ServiceWSDLBuilder {
-    
+
     private final Map<String, String> ns2prefix;
     private Definition definition;
     private final List<ServiceInfo> services;
@@ -195,7 +196,12 @@ public class ServiceWSDLBuilder {
                 portTypes.add(buildPortType(service.getInterface(), portTypeDef));
                 
                 if (service.getSchemas() != null && service.getSchemas().size() > 0) {
-                    buildTypes(service.getSchemas(), imports, portTypeDef);
+                    if (!useSchemaImports) {
+                        buildTypes(service.getSchemas(), imports, portTypeDef);
+                    } else {
+                        buildTypesWithSchemaImports(service.getSchemas(),
+                                imports, portTypeDef);
+                    }
                 }
             }
             
@@ -297,104 +303,177 @@ public class ServiceWSDLBuilder {
                               final Definition def) {
         Types types = def.createTypes();
         
+        for (SchemaInfo schemaInfo : schemas) {
+            Schema schemaImpl = getSchemaImplementation(def);
+            schemaImpl.setRequired(true);
+            schemaImpl.setElementType(WSDLConstants.QNAME_SCHEMA);
+            schemaImpl.setElement(schemaInfo.getElement());
+            for (XmlSchemaExternal ext : schemaInfo.getSchema().getExternals()) {
+                if (ext.getSchema() == null) {
+                    continue;
+                }
+                if (ext instanceof XmlSchemaImport) {
+                    SchemaImport imp = schemaImpl.createImport();
+                    imp.setNamespaceURI(((XmlSchemaImport)ext).getNamespace());
+                    imp.setSchemaLocationURI(((XmlSchemaImport)ext).getSchemaLocation());
+                    
+                    Schema schemaImpl2 = getSchemaImplementation(def);
+                    schemaImpl2.setRequired(true);
+                    schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
+                    schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
+                    try {
+                        schemaImpl2.setElement(ext.getSchema().getSchemaDocument().getDocumentElement());
+                    } catch (XmlSchemaSerializerException e) {
+                        //ignore
+                    }
+                    imp.setReferencedSchema(schemaImpl2);
+
+                    schemaImpl.addImport(imp);
+                } else if (ext instanceof XmlSchemaInclude) {
+                    SchemaReference imp = schemaImpl.createInclude();
+                    imp.setSchemaLocationURI(((XmlSchemaInclude)ext).getSchemaLocation());
+
+                    Schema schemaImpl2 = getSchemaImplementation(def);
+                    schemaImpl2.setRequired(true);
+                    schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
+                    schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
+                    try {
+                        schemaImpl2.setElement(ext.getSchema().getSchemaDocument().getDocumentElement());
+                    } catch (XmlSchemaSerializerException e) {
+                        //ignore
+                    }
+                    imp.setReferencedSchema(schemaImpl2);
+                    
+                    schemaImpl.addInclude(imp);
+                } else if (ext instanceof XmlSchemaRedefine) {
+                    SchemaReference imp = schemaImpl.createRedefine();
+                    imp.setSchemaLocationURI(((XmlSchemaRedefine)ext).getSchemaLocation());
+                    
+                    Schema schemaImpl2 = getSchemaImplementation(def);
+                    schemaImpl2.setRequired(true);
+                    schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
+                    schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
+                    try {
+                        schemaImpl2.setElement(ext.getSchema().getSchemaDocument().getDocumentElement());
+                    } catch (XmlSchemaSerializerException e) {
+                        //ignore
+                    }
+                    imp.setReferencedSchema(schemaImpl2);
+                    
+                    schemaImpl.addRedefine(imp);
+                }
+            }
+            types.addExtensibilityElement(schemaImpl);
+        }
+        def.setTypes(types);
+    }
+    
+    /**
+     * @param schemas
+     * @param imports
+     * @param def
+     */
+    protected void buildTypesWithSchemaImports(final Collection<SchemaInfo> schemas,
+                                               final Map<String, SchemaInfo> imports, final Definition def) {
+
+        Types types = def.createTypes();
+
+        Map<String, Schema> namespaceToSchemaMap = new HashMap<String, Schema>();
+        Map<String, SchemaInfo> namespaceToSchemaInfo = new HashMap<String, SchemaInfo>();
+        
+        for (SchemaInfo schemaInfo : schemas) {
+            Schema schema = getSchemaImplementation(def);
+            schema.setRequired(true);
+            schema.setElementType(WSDLConstants.QNAME_SCHEMA);
+
+            String name = baseFileName + "_schema" + (++xsdCount) + ".xsd";
+            schema.setDocumentBaseURI(name);
+               
+
+            try {
+                schema.setElement(schemaInfo.getSchema().getSchemaDocument().getDocumentElement());
+            } catch (XmlSchemaSerializerException e) {
+                //ignore
+            }
+
+            namespaceToSchemaMap.put(schemaInfo.getNamespaceURI(), schema);
+            namespaceToSchemaInfo.put(schemaInfo.getNamespaceURI(), schemaInfo);
+            
+            imports.put(name, schemaInfo);
+        }
+        
+        for (Schema schema : namespaceToSchemaMap.values()) {
+            Element docElement = schema.getElement();
+
+            List<Element> elementList = DOMUtils
+                .findAllElementsByTagNameNS(docElement, "http://www.w3.org/2001/XMLSchema", "import");
+
+            for (Element el : elementList) {
+                String sn = el.getAttribute("namespace");
+
+                Schema referencedSchema = namespaceToSchemaMap.get(sn);
+                if (referencedSchema != null) {
+                    SchemaInfo schemaInfo = namespaceToSchemaInfo.get(sn);
+                    
+                    el.setAttribute("schemaLocation", referencedSchema.getDocumentBaseURI());
+    
+                    addSchemaImport(schema, schemaInfo, referencedSchema);
+                }
+            }
+        }
+        
+        Document doc = createDocument();
+        Element nd = XMLUtils.createElementNS(doc, new QName(WSDLConstants.NS_SCHEMA_XSD, "schema"));
+        nd.setAttribute("xmlns", WSDLConstants.NS_SCHEMA_XSD);
+        doc.appendChild(nd);
+        
+        Schema schema = getSchemaImplementation(def);
+        schema.setRequired(true);
+        schema.setElementType(WSDLConstants.QNAME_SCHEMA);
+        
+        Collection<String> defNamespaces = CastUtils.cast(def.getNamespaces().values());
+        
+        for (SchemaInfo schemaInfo : schemas) {
+            Schema referencedSchema = namespaceToSchemaMap.get(schemaInfo.getNamespaceURI());
+            
+            // this ensures only the schemas directly referenced by the wsdl are included.
+            if (defNamespaces.contains(schemaInfo.getNamespaceURI())) {
+                Element impElement = XMLUtils.createElementNS(doc, new QName(WSDLConstants.NS_SCHEMA_XSD,
+                                                                             "import"));
+                
+                impElement.setAttribute("schemaLocation", referencedSchema.getDocumentBaseURI());
+                impElement.setAttribute("namespace", schemaInfo.getNamespaceURI());
+                nd.appendChild(impElement);
+                
+                addSchemaImport(schema, schemaInfo, referencedSchema);
+            }
+        }
+        
+        schema.setElement(nd);
+        types.addExtensibilityElement(schema);
+
+        def.setTypes(types);
+    }
+
+    private Document createDocument() {
         Document doc = null;
         try {
             doc = XMLUtils.newDocument();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException("DOM configuration problem", e);
         }
-        Element nd = XMLUtils.createElementNS(doc, new QName(WSDLConstants.NS_SCHEMA_XSD,
-                                                             "schema"));
-        nd.setAttribute("xmlns", WSDLConstants.NS_SCHEMA_XSD);
-        doc.appendChild(nd);
-        
-        for (SchemaInfo schemaInfo : schemas) {
-            
-            if (!useSchemaImports) {
-                Schema schemaImpl = getSchemaImplementation(def);
-                schemaImpl.setRequired(true);
-                schemaImpl.setElementType(WSDLConstants.QNAME_SCHEMA);
-                schemaImpl.setElement(schemaInfo.getElement());
-                for (XmlSchemaExternal ext : schemaInfo.getSchema().getExternals()) {
-                    if (ext.getSchema() == null) {
-                        continue;
-                    }
-                    if (ext instanceof XmlSchemaImport) {
-                        SchemaImport imp = schemaImpl.createImport();
-                        imp.setNamespaceURI(((XmlSchemaImport)ext).getNamespace());
-                        imp.setSchemaLocationURI(((XmlSchemaImport)ext).getSchemaLocation());
-                        
-                        Schema schemaImpl2 = getSchemaImplementation(def);
-                        schemaImpl2.setRequired(true);
-                        schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
-                        schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
-                        try {
-                            schemaImpl2.setElement(ext.getSchema().getSchemaDocument().getDocumentElement());
-                        } catch (XmlSchemaSerializerException e) {
-                            //ignore
-                        }
-                        imp.setReferencedSchema(schemaImpl2);
-
-                        schemaImpl.addImport(imp);
-                    } else if (ext instanceof XmlSchemaInclude) {
-                        SchemaReference imp = schemaImpl.createInclude();
-                        imp.setSchemaLocationURI(((XmlSchemaInclude)ext).getSchemaLocation());
-
-                        Schema schemaImpl2 = getSchemaImplementation(def);
-                        schemaImpl2.setRequired(true);
-                        schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
-                        schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
-                        try {
-                            schemaImpl2.setElement(ext.getSchema().getSchemaDocument().getDocumentElement());
-                        } catch (XmlSchemaSerializerException e) {
-                            //ignore
-                        }
-                        imp.setReferencedSchema(schemaImpl2);
-                        
-                        schemaImpl.addInclude(imp);
-                    } else if (ext instanceof XmlSchemaRedefine) {
-                        SchemaReference imp = schemaImpl.createRedefine();
-                        imp.setSchemaLocationURI(((XmlSchemaRedefine)ext).getSchemaLocation());
-                        
-                        Schema schemaImpl2 = getSchemaImplementation(def);
-                        schemaImpl2.setRequired(true);
-                        schemaImpl2.setElementType(WSDLConstants.QNAME_SCHEMA);
-                        schemaImpl2.setDocumentBaseURI(ext.getSchema().getSourceURI());
-                        try {
-                            schemaImpl2.setElement(ext.getSchema().getSchemaDocument().getDocumentElement());
-                        } catch (XmlSchemaSerializerException e) {
-                            //ignore
-                        }
-                        imp.setReferencedSchema(schemaImpl2);
-                        
-                        schemaImpl.addRedefine(imp);
-                    }
-                }
-                types.addExtensibilityElement(schemaImpl);
-            } else {
-                //imports
-                String name = baseFileName + "_schema" + (++xsdCount) + ".xsd";
-                Element imp = XMLUtils.createElementNS(doc, 
-                                                       new QName(WSDLConstants.NS_SCHEMA_XSD,
-                                                                  "import"));
-                imp.setAttribute("schemaLocation", name);
-                imp.setAttribute("namespace", schemaInfo.getNamespaceURI());
-                nd.appendChild(imp);
-                               
-                imports.put(name, schemaInfo);
-            }
-
-        }
-        if (useSchemaImports) {
-            Schema schemaImpl = getSchemaImplementation(def);
-            schemaImpl.setRequired(true);
-            schemaImpl.setElementType(WSDLConstants.QNAME_SCHEMA);
-            schemaImpl.setElement(nd);
-            types.addExtensibilityElement(schemaImpl);
-        }
-        def.setTypes(types);
+        return doc;
     }
 
+    private void addSchemaImport(Schema schema, SchemaInfo schemaInfo, Schema referencedSchema) {
+        SchemaImport imp = schema.createImport();
+        imp.setId(schemaInfo.getSystemId());
+        imp.setNamespaceURI(schemaInfo.getNamespaceURI());
+        imp.setSchemaLocationURI(referencedSchema.getDocumentBaseURI());
+        imp.setReferencedSchema(referencedSchema);
+        schema.addImport(imp);
+    }
+    
     protected void buildBinding(Collection<BindingInfo> bindingInfos, Collection<PortType> portTypes) {
         Binding binding = null;
         for (BindingInfo bindingInfo : bindingInfos) {
