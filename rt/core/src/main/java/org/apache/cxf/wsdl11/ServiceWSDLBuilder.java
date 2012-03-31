@@ -388,13 +388,8 @@ public class ServiceWSDLBuilder {
 
             String name = baseFileName + "_schema" + (++xsdCount) + ".xsd";
             schema.setDocumentBaseURI(name);
-               
 
-            try {
-                schema.setElement(schemaInfo.getSchema().getSchemaDocument().getDocumentElement());
-            } catch (XmlSchemaSerializerException e) {
-                //ignore
-            }
+            schema.setElement(schemaInfo.getElement());
 
             namespaceToSchemaMap.put(schemaInfo.getNamespaceURI(), schema);
             namespaceToSchemaInfo.put(schemaInfo.getNamespaceURI(), schemaInfo);
