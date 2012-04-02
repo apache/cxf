@@ -264,6 +264,13 @@ public class RMEndpoint {
         createService();
         createEndpoint(d);
         setPolicies();
+        // CXF-4218 requires a change in the DB schema, which is not practical
+        // for the released 2.5.x. Thus, this is a workaround for 2.5.x to avoid getting 
+        // the duplicate jmx registration error.
+        if (!ProtocolVariation.RM10WSA200408.equals(protocol)) {
+            LOG.log(Level.INFO, "Skip monitoring for protocol: " + protocol);
+            return;
+        }
         if (manager != null && manager.getBus() != null) {
             managedEndpoint = new ManagedRMEndpoint(this);
             instrumentationManager = manager.getBus().getExtension(InstrumentationManager.class);        
