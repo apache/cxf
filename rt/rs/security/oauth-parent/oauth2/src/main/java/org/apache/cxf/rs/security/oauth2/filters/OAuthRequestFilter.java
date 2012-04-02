@@ -51,7 +51,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
 /**
- * JAX-RS OAuth filter which can be used to protect end user endpoints
+ * JAX-RS OAuth2 filter which can be used to protect the end-user endpoints
  */
 @Provider
 public class OAuthRequestFilter implements RequestHandler {
@@ -74,7 +74,10 @@ public class OAuthRequestFilter implements RequestHandler {
     }
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+        // Get the access token
         ServerAccessToken accessToken = getAccessToken(); 
+        
+        // Find the scopes which match the current request
         
         List<OAuthPermission> permissions = accessToken.getScopes();
         List<OAuthPermission> matchingPermissions = new ArrayList<OAuthPermission>();
@@ -94,8 +97,11 @@ public class OAuthRequestFilter implements RequestHandler {
             throw new WebApplicationException(403);
         }
       
+        // Create the security context and make it available on the message
         SecurityContext sc = createSecurityContext(req, accessToken);
         m.put(SecurityContext.class, sc);
+        
+        // Also set the OAuthContext
         m.setContent(OAuthContext.class, new OAuthContext(accessToken.getSubject(),
                                                           matchingPermissions,
                                                           accessToken.getGrantType()));
@@ -155,25 +161,34 @@ public class OAuthRequestFilter implements RequestHandler {
         return null;        
     }
     
+    /**
+     * Get the access token
+     */
     protected ServerAccessToken getAccessToken() {
         ServerAccessToken accessToken = null;
         if (dataProvider == null && tokenHandlers.isEmpty()) {
             throw new WebApplicationException(500);
         }
         
+        // Get the scheme and its data, Bearer only is supported by default
+        // WWW-Authenticate with the list of supported schemes will be sent back 
+        // if the scheme is not accepted
         String[] authParts = AuthorizationUtils.getAuthorizationParts(mc, supportedSchemes);
         String authScheme = authParts[0];
         String authSchemeData = authParts[1];
         
+        // Get the registered handler capable of processing the token
         AccessTokenValidator handler = findTokenHandler(authScheme);
         if (handler != null) {
             try {
+                // Convert the HTTP Authorization scheme data into a token
                 accessToken = handler.getAccessToken(authSchemeData);
             } catch (OAuthServiceException ex) {
                 AuthorizationUtils.throwAuthorizationFailure(
                     Collections.singleton(authScheme));
             }
         }
+        // Default processing if no registered providers available
         if (accessToken == null && authScheme.equals(DEFAULT_AUTH_SCHEME)) {
             try {
                 accessToken = dataProvider.getAccessToken(authSchemeData);
@@ -185,6 +200,7 @@ public class OAuthRequestFilter implements RequestHandler {
         if (accessToken == null) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);
         }
+        // Check if token is still valid
         if (OAuthUtils.isExpired(accessToken.getIssuedAt(), accessToken.getLifetime())) {
             dataProvider.removeAccessToken(accessToken);
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);

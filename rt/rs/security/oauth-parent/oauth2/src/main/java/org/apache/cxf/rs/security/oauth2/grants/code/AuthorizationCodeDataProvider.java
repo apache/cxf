@@ -23,18 +23,19 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 /**
- * OAuth provider responsible for persisting the information about 
- * OAuth consumers, request and access tokens.
+ * AuthorizationCodeDataProvider is the {@link OAuthDataProvider} which
+ * can additionally persist the authorization code grant information 
  */
 public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
 
     /**
      * Creates a temporarily code grant which will capture the
-     * information about the {@link Client} attempting to access or
-     * modify the resource owner's resource 
-     * @param reg AuthorizationCodeRegistration
+     * information about the {@link Client} requesting the access to
+     * the resource owner's resources 
+     * @param reg information about the client code grant request
      * @return new code grant
      * @see AuthorizationCodeRegistration
+     * @see ServerAuthorizationCodeGrant
      * @throws OAuthServiceException
      */
     ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg) 
@@ -43,8 +44,9 @@ public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
     /**
      * Returns the previously registered {@link ServerAuthorizationCodeGrant}
      * @param code the code grant
-     * @return AuthorizationCodeGrant
-     * @throws OAuthServiceException
+     * @return the grant
+     * @throws OAuthServiceException if no grant with this code is available
+     * @see ServerAuthorizationCodeGrant
      */
     ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException;
 }

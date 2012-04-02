@@ -26,7 +26,7 @@ import javax.ws.rs.core.MultivaluedMap;
 public interface AccessTokenGrant {
     /**
      * Returns the token grant type, example, "authorization_code"
-     * @return
+     * @return the grant type
      */
     String getType(); 
     

@@ -33,7 +33,9 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
-
+/**
+ * Abstract access token grant handler
+ */
 public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     
     private String supportedGrant;
@@ -64,12 +66,14 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     List<String> requestedScope) {
+        // Check if a pre-authorized  token available
         ServerAccessToken token = dataProvider.getPreauthorizedToken(
                                      client, subject, supportedGrant);
         if (token != null) {
             return token;
         }
         
+        // Delegate to the data provider to create the one
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
         reg.setGrantType(supportedGrant);

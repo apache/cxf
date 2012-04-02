@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents a user alias or login name which AuthorizationService
+ * Represents a login name which AuthorizationService
  * may capture after the end user approved a given third party request
  */
 public class UserSubject {
@@ -39,10 +39,19 @@ public class UserSubject {
         this.roles = roles;
     }
     
+    /**
+     * Returns the user login name
+     * @return the login name
+     */
     public String getLogin() {
         return login;
     }
 
+    /**
+     * Returns the optional list of user roles which may have 
+     * been captured during the authentication process 
+     * @return the list of roles
+     */
     public List<String> getRoles() {
         return Collections.unmodifiableList(roles);
     }

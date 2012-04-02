@@ -29,7 +29,9 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
-
+/**
+ * Authorization Code Grant Handler
+ */
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     public AuthorizationCodeGrantHandler() {
@@ -38,20 +40,24 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
     
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
         throws OAuthServiceException {
+        // Only confidential clients can use it
         checkIfGrantSupported(client);
         
+        // Get the grant representation from the provider 
         String codeValue = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
         ServerAuthorizationCodeGrant grant = 
             ((AuthorizationCodeDataProvider)getDataProvider()).removeCodeGrant(codeValue);
         if (grant == null) {
             return null;
         }
+        // check it has not expired, the client ids are the same
         if (OAuthUtils.isExpired(grant.getIssuedAt(), grant.getLifetime())) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         if (!grant.getClient().getClientId().equals(client.getClientId())) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
+        // redirect URIs must match too
         String expectedRedirectUri = grant.getRedirectUri();
         if (expectedRedirectUri != null) {
             String providedRedirectUri = params.getFirst(OAuthConstants.REDIRECT_URI);

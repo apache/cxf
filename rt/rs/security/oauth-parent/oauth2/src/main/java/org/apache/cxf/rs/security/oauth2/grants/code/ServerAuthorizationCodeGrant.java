@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
 /**
- * Authorization Code Token representation
+ * The Authorization Code Grant representation visible to the server
  */
 public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
     private long issuedAt;
@@ -52,35 +52,62 @@ public class ServerAuthorizationCodeGrant extends AuthorizationCodeGrant {
         this.issuedAt = issuedAt;
     }
 
-    
+    /**
+     * Returns the time (in seconds) this grant was issued at
+     * @return the seconds
+     */
     public long getIssuedAt() {
         return issuedAt;
     }
 
+    /**
+     * Returns the number of seconds this grant can be valid after it was issued
+     * @return the seconds this grant will be valid for
+     */
     public long getLifetime() {
         return lifetime;
     }
 
+    /**
+     * Returns the reference to {@link Client}
+     * @return the client
+     */
     public Client getClient() {
         return client;
     }
 
-
+    /**
+     * Sets the scopes explicitly approved by the end user.
+     * If this list is empty then the end user had no way to down-scope. 
+     * @param approvedScope the approved scopes
+     */
+    
     public void setApprovedScopes(List<String> scopes) {
         this.approvedScopes = scopes;
     }
 
-
+    /**
+     * Gets the scopes explicitly approved by the end user
+     * @return the approved scopes
+     */
+    
     public List<String> getApprovedScopes() {
         return approvedScopes;
     }
 
 
+    /**
+     * Sets the user subject representing the end user
+     * @param subject the subject
+     */
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
-
-
+    
+    /**
+     * Gets the user subject representing the end user
+     * @return the subject
+     */
     public UserSubject getSubject() {
         return subject;
     }

@@ -27,6 +27,9 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
+/**
+ * The "client_credentials" grant handler
+ */
 public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
    
     
@@ -38,9 +41,8 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
         throws OAuthServiceException {
         checkIfGrantSupported(client);
         
-        // the OAuth filter will use Client.getLoginName() to initialize 
-        // the Principal when setting up the security context
-        // TODO: consider setting the UserSubject representing the authenticated Client instead
+        // the OAuth filter will use Client.getUserSubject() 
+        // to initialize the request security context
         return doCreateAccessToken(client, 
                                    null, 
                                    OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));

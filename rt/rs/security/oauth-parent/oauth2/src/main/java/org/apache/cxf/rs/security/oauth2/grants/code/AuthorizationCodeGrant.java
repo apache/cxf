@@ -29,7 +29,8 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 /**
- * Authorization Code Token representation
+ * Base Authorization Code Grant representation, captures the code 
+ * and the redirect URI this code has been returned to, visible to the client
  */
 public class AuthorizationCodeGrant implements AccessTokenGrant {
     private String code;
@@ -44,22 +45,41 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
         redirectUri = uri.toString();
     }
 
+    /**
+     * Sets the redirect URI, if set then the client is expected to 
+     * include the same URI during the access token request
+     * @param redirectUri redirect URI
+     */
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
     }
 
+    /**
+     * Gets the redirect URI
+     * @return the redirect URI
+     */
     public String getRedirectUri() {
         return redirectUri;
     }
 
+    /**
+     * Gets the authorization code
+     * @return the code
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getType() {
         return OAuthConstants.AUTHORIZATION_CODE_GRANT;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle("grant_type", OAuthConstants.AUTHORIZATION_CODE_GRANT);

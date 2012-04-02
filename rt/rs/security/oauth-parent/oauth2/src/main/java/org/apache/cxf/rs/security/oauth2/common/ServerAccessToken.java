@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Base Token representation
+ * Server Access Token representation
  */
 public abstract class ServerAccessToken extends AccessToken {
     private String grantType;
@@ -103,10 +103,18 @@ public abstract class ServerAccessToken extends AccessToken {
         return subject;
     }
 
+    /**
+     * Sets the grant type which was used to obtain the access token
+     * @param grantType the grant type
+     */
     public void setGrantType(String grantType) {
         this.grantType = grantType;
     }
 
+    /**
+     * Returns the grant type which was used to obtain the access token
+     * @return the grant type
+     */
     public String getGrantType() {
         return grantType;
     }

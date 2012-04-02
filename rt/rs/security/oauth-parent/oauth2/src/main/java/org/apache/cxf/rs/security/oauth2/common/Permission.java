@@ -19,8 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 /**
- * Base permission description which is visible to 
- * authorization handlers
+ * Base permission description
  * @see OAuthAuthorizationData
  */
 public class Permission {
@@ -36,28 +35,46 @@ public class Permission {
         this.description = description;
         this.permission = permission;
     }
-    
+   
+    /**
+     * Gets the permission description
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Sets the permission description
+     * @param description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Get the permission value such as "read_calendar"
+     * @return the value
+     */
     public String getPermission() {
         return permission;
     }
 
+    /**
+     * Sets the permission value such as "read_calendar"
+     * @param permission the permission value
+     */
     public void setPermission(String permission) {
         this.permission = permission;
     }
 
     /**
-     * Indicates that this permission has been allocated by default.
+     * Indicates if this permission has been allocated by default or not.
      * Authorization View handlers may use this property in order to restrict
-     * the list of scopes which may be refused to non-default scopes only
-     * @param isDefault
+     * the list of scopes which may be refused to non-default scopes only.
+     * For example, the read-only check-box controls can be used to represent
+     * the default scopes 
+     * @param isDefault true if the permission has been allocated by default
      */
     public void setDefault(boolean value) {
         this.isDefault = value;

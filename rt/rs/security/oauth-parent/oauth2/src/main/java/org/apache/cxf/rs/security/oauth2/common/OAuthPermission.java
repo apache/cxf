@@ -23,6 +23,10 @@ import java.util.List;
 
 /**
  * Provides the complete information about a given opaque permission.
+ * For example, a scope parameter such as "read_calendar" will be
+ * translated into the instance of this class in order to provide
+ * the human readable description and optionally restrict it to
+ * a limited set of HTTP verbs and request URIs
  */
 public class OAuthPermission extends Permission {
     private List<String> httpVerbs = Collections.emptyList();
@@ -32,18 +36,35 @@ public class OAuthPermission extends Permission {
         super(permission, description);
     }
     
+    /**
+     * Sets the optional list of HTTP verbs, example,
+     * "GET" and "POST", etc
+     * @param httpVerbs the list of HTTP verbs
+     */
     public void setHttpVerbs(List<String> httpVerbs) {
         this.httpVerbs = httpVerbs;
     }
 
+    /**
+     * Gets the optional list of HTTP verbs
+     * @return the list of HTTP verbs
+     */
     public List<String> getHttpVerbs() {
         return httpVerbs;
     }
 
+    /**
+     * Sets the optional list of relative request URIs
+     * @param uri the list of URIs
+     */
     public void setUris(List<String> uri) {
         this.uris = uri;
     }
 
+    /**
+     * Gets the optional list of relative request URIs
+     * @return the list of URIs
+     */
     public List<String> getUris() {
         return uris;
     }

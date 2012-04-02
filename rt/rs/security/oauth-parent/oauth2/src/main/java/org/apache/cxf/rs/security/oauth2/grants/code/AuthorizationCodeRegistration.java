@@ -35,34 +35,80 @@ public class AuthorizationCodeRegistration {
     private String redirectUri;
     private UserSubject subject;
     
+    /**
+     * Sets the {@link Client} reference
+     * @param client the client
+     */
     public void setClient(Client client) {
         this.client = client;
     }
+    /**
+     * Gets {@link Client} reference
+     * @return the client
+     */
     public Client getClient() {
         return client;
     }
-    
+    /**
+     * Sets the redirect URI
+     * @param redirectUri the redirect URI
+     */
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
     }
+    /**
+     * Gets the redirect URI
+     * @return the redirect URI
+     */
     public String getRedirectUri() {
         return redirectUri;
     }
+    
+    /**
+     * Sets the scopes request by the client
+     * @param requestedScope the requested scopes
+     */
     public void setRequestedScope(List<String> requestedScope) {
         this.requestedScope = requestedScope;
     }
+    
+    /**
+     * Gets the scopes request by the client
+     * @return the requested scopes
+     */
     public List<String> getRequestedScope() {
         return requestedScope;
     }
+    
+    /**
+     * Sets the scopes explicitly approved by the end user.
+     * If this list is empty then the end user had no way to down-scope. 
+     * @param approvedScope the approved scopes
+     */
     public void setApprovedScope(List<String> approvedScope) {
         this.approvedScope = approvedScope;
     }
+    
+    /**
+     * Gets the scopes explicitly approved by the end user
+     * @return the approved scopes
+     */
     public List<String> getApprovedScope() {
         return approvedScope;
     }
+    
+    /**
+     * Sets the user subject representing the end user
+     * @param subject the subject
+     */
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
+    
+    /**
+     * Gets the user subject representing the end user
+     * @return the subject
+     */
     public UserSubject getSubject() {
         return subject;
     }
