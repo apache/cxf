@@ -17,15 +17,18 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.ws.security.tokenstore;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
+import org.apache.cxf.message.Message;
 
-public class DefaultInMemoryTokenStore extends EHCacheTokenStore {
 
-    public DefaultInMemoryTokenStore() {
-        super("STS", ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
+/**
+ * A factory to return a MemoryTokenStore instance.
+ */
+public class MemoryTokenStoreFactory extends TokenStoreFactory {
+    
+    public TokenStore newTokenStore(String key, Message message) {
+        return new MemoryTokenStore();
     }
     
 }

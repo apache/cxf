@@ -27,9 +27,10 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -123,13 +124,18 @@ public class STSTokenValidator implements Validator {
     static final TokenStore getTokenStore(Message message) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             }
             if (tokenStore == null) {
-                tokenStore = new MemoryTokenStore();
-                info.setProperty(TokenStore.class.getName(), tokenStore);
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                tokenStore = 
+                    tokenStoreFactory.newTokenStore(
+                        SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message
+                    );
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
             }
             return tokenStore;
         }

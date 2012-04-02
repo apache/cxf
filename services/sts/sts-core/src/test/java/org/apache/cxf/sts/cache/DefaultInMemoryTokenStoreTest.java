@@ -51,11 +51,11 @@ public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
         store.add(token1);
         store.add(token2);
         store.add(token3);
-        assertTrue(store.getValidTokens().size() == 3);
+        assertTrue(store.getTokenIdentifiers().size() == 3);
         store.remove(token3);
         assertNull(store.getToken("test3"));
         store.remove(token1);
         store.remove(token2);
-        assertTrue(store.getValidTokens().size() == 0);
+        assertTrue(store.getTokenIdentifiers().size() == 0);
     }
 }

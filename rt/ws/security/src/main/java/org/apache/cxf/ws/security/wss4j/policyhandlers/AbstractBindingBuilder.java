@@ -97,9 +97,9 @@ import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.Wss10;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.policy.model.X509Token;
-import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -362,13 +362,18 @@ public abstract class AbstractBindingBuilder {
     protected final TokenStore getTokenStore() {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             }
             if (tokenStore == null) {
-                tokenStore = new MemoryTokenStore();
-                info.setProperty(TokenStore.class.getName(), tokenStore);
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                tokenStore = 
+                    tokenStoreFactory.newTokenStore(
+                        SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message
+                    );
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
             }
             return tokenStore;
         }

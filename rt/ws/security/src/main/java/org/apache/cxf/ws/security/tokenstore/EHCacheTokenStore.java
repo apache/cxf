@@ -17,31 +17,50 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.ws.security.tokenstore;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IMap;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
-public class HazelCastTokenStore implements TokenStore {
-    
+/**
+ * An in-memory EHCache implementation of the TokenStore interface. The default TTL is 60 minutes
+ * and the max TTL is 12 hours.
+ */
+public class EHCacheTokenStore implements TokenStore {
+
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-
-    private IMap<Object, Object> cacheMap;
+    
+    private Cache cache;
+    private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
-    public HazelCastTokenStore(String mapName) {
-        cacheMap = Hazelcast.getDefaultInstance().getMap(mapName);
+    public EHCacheTokenStore(String key, URL configFileURL) {
+        if (cacheManager == null) {
+            if (configFileURL == null) {
+                cacheManager = CacheManager.create();
+            } else {
+                cacheManager = CacheManager.create(configFileURL);
+            }
+        }
+        
+        if (!cacheManager.cacheExists(key)) {
+            // Cannot overflow to disk as SecurityToken Elements can't be serialized
+            cache = new Cache(key, 0, false, false, DEFAULT_TTL, DEFAULT_TTL);
+            cacheManager.addCache(cache);
+        } else {
+            cache = cacheManager.getCache(key);
+        }
     }
     
     /**
@@ -62,6 +81,7 @@ public class HazelCastTokenStore implements TokenStore {
     
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
+            
             int parsedTTL = 0;
             if (token.getExpires() != null) {
                 Date expires = token.getExpires();
@@ -86,39 +106,53 @@ public class HazelCastTokenStore implements TokenStore {
                 }
             }
             
-            cacheMap.put(token.getId(), token, parsedTTL, TimeUnit.SECONDS);
+            cache.put(new Element(token.getId(), token, false, parsedTTL, parsedTTL));
         }
     }
     
     public void remove(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            cacheMap.remove(token.getId());
+            cache.remove(token.getId());
         }
     }
-    
-    public Collection<String> getTokenIdentifiers() {
-        return CastUtils.cast((Collection<?>)cacheMap.keySet());
-    }
 
+    @SuppressWarnings("unchecked")
+    public Collection<String> getTokenIdentifiers() {
+        return cache.getKeysWithExpiryCheck();
+    }
+    
     public Collection<SecurityToken> getExpiredTokens() {
-        // TODO Auto-generated method stub
+        List<SecurityToken> expiredTokens = new ArrayList<SecurityToken>();
+        @SuppressWarnings("unchecked")
+        Iterator<String> ids = cache.getKeys().iterator();
+        while (ids.hasNext()) {
+            Element element = cache.get(ids.next());
+            if (cache.isExpired(element)) {
+                expiredTokens.add((SecurityToken)element.getObjectValue());
+            }
+        }
+        return expiredTokens;
+    }
+    
+    public SecurityToken getToken(String id) {
+        Element element = cache.get(id);
+        if (element != null && !cache.isExpired(element)) {
+            return (SecurityToken)element.getObjectValue();
+        }
         return null;
     }
 
-    public SecurityToken getToken(String id) {
-        return (SecurityToken)cacheMap.get(id);
-    }
-
     public SecurityToken getTokenByAssociatedHash(int hashCode) {
-        Iterator<Object> ids = cacheMap.keySet().iterator();
+        @SuppressWarnings("unchecked")
+        Iterator<String> ids = cache.getKeysWithExpiryCheck().iterator();
         while (ids.hasNext()) {
-            SecurityToken securityToken = getToken((String)ids.next());
+            Element element = cache.get(ids.next());
+            SecurityToken securityToken = (SecurityToken)element.getObjectValue();
             if (hashCode == securityToken.getAssociatedHash()) {
                 return securityToken;
             }
         }
         return null;
     }
-    
     
 }

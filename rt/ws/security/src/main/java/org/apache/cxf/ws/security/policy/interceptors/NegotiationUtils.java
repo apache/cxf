@@ -52,9 +52,9 @@ import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 import org.apache.cxf.ws.security.policy.model.Trust13;
-import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
@@ -98,13 +98,18 @@ final class NegotiationUtils {
     static TokenStore getTokenStore(Message message) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             }
             if (tokenStore == null) {
-                tokenStore = new MemoryTokenStore();
-                info.setProperty(TokenStore.class.getName(), tokenStore);
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                tokenStore = 
+                    tokenStoreFactory.newTokenStore(
+                        SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message
+                    );
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
             }
             return tokenStore;
         }
@@ -196,11 +201,7 @@ final class NegotiationUtils {
         try {
             Endpoint endpoint = message.getExchange().getEndpoint();
 
-            TokenStore store = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
-            if (store == null) {
-                store = new MemoryTokenStore();
-                endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
-            }
+            TokenStore store = getTokenStore(message);
             endpoint = STSUtils.createSTSEndpoint(bus, 
                     namespace,
                     endpoint.getEndpointInfo().getTransportId(),

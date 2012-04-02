@@ -45,14 +45,6 @@ public class SecurityToken implements Serializable {
     
     private static final long serialVersionUID = -8023092932997444513L;
 
-    public enum State {
-        UNKNOWN,
-        ISSUED, 
-        EXPIRED, 
-        CANCELLED, 
-        RENEWED
-    };
-    
     /**
      * Token identifier
      */
@@ -62,11 +54,6 @@ public class SecurityToken implements Serializable {
      * WSU Identifier of the token
      */
     private String wsuId;
-    
-    /**
-     * Current state of the token
-     */
-    private State state = State.UNKNOWN;
     
     /**
      * The actual token in its current state
@@ -160,16 +147,12 @@ public class SecurityToken implements Serializable {
     
     public SecurityToken(String id) {
         this.id = id;
-        createDefaultExpires();
     }
 
     public SecurityToken(String id, Date created, Date expires) {
         this.id = id;
         this.created = created;
         this.expires = expires;
-        if (expires == null) {
-            createDefaultExpires();
-        }
     }
     
     public SecurityToken(String id,
@@ -180,9 +163,6 @@ public class SecurityToken implements Serializable {
         this.token = cloneElement(tokenElem);
         this.created = created;
         this.expires = expires;
-        if (expires == null) {
-            createDefaultExpires();
-        }
     }
 
     public SecurityToken(String id,
@@ -192,9 +172,6 @@ public class SecurityToken implements Serializable {
         this.token = cloneElement(tokenElem);
         if (lifetimeElem != null) {
             processLifeTime(lifetimeElem);
-        }
-        if (expires == null) {
-            createDefaultExpires();
         }
     }
     
@@ -259,20 +236,6 @@ public class SecurityToken implements Serializable {
      */
     public void setProperties(Properties properties) {
         this.properties = properties;
-    }
-
-    /**
-     * @return Returns the state.
-     */
-    public State getState() {
-        return state;
-    }
-
-    /**
-     * @param state The state to set.
-     */
-    public void setState(State state) {
-        this.state = state;
     }
 
     /**
@@ -374,13 +337,9 @@ public class SecurityToken implements Serializable {
      * Return whether this SecurityToken is expired or not
      */
     public boolean isExpired() {
-        if (state == State.EXPIRED) {
-            return true;
-        }
         if (expires != null) {
             Date rightNow = new Date();
             if (expires.before(rightNow)) {
-                state = State.EXPIRED;
                 return true;
             }
         }
@@ -511,13 +470,4 @@ public class SecurityToken implements Serializable {
         return principal;
     }
     
-    /**
-     * Create a default Expires date 5 minutes in the future
-     */
-    private void createDefaultExpires() {
-        expires = new Date();
-        long currentTime = expires.getTime();
-        expires.setTime(currentTime + 300L * 1000L);
-    }
-
 } 

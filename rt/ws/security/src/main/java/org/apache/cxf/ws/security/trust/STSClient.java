@@ -1061,7 +1061,6 @@ public class STSClient implements Configurable, InterceptorProvider {
 
         try {
             client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
-            token.setState(SecurityToken.State.CANCELLED);
             return true;
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "Problem cancelling token", ex);

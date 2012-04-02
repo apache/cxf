@@ -26,139 +26,127 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken.State;
 
 /**
- * 
+ * A simple HashMap-based TokenStore. The default TTL is 5 minutes and the max TTL is 1 hour.
  */
 public class MemoryTokenStore implements TokenStore {
-    boolean autoRemove = true;
+    public static final long DEFAULT_TTL = 60L * 5L;
+    public static final long MAX_TTL = DEFAULT_TTL * 12L;
     
-    Map<String, SecurityToken> tokens = new ConcurrentHashMap<String, SecurityToken>();
+    private Map<String, CacheEntry> tokens = new ConcurrentHashMap<String, CacheEntry>();
     
-    /** {@inheritDoc}*/
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            tokens.put(token.getId(), token);
+            CacheEntry cacheEntry = null;
+            if (token.getExpires() == null) {
+                Date expires = new Date();
+                long currentTime = expires.getTime();
+                expires.setTime(currentTime + (DEFAULT_TTL * 1000L));
+                cacheEntry = new CacheEntry(token, expires);
+            } else {
+                Date expires = token.getExpires();
+                Date current = new Date();
+                long expiryTime = expires.getTime() - current.getTime();
+                if (expiryTime < 0 || expiryTime > (MAX_TTL * 1000L)) {
+                    expires.setTime(current.getTime() + (DEFAULT_TTL * 1000L));
+                }
+                cacheEntry = new CacheEntry(token, expires);
+            }
+            
+            tokens.put(token.getId(), cacheEntry);
         }
     }
-
-    /** {@inheritDoc}*/
-    public void update(SecurityToken token) {
-        if (autoRemove 
-            && (token.getState() == State.EXPIRED
-                || token.getState() == State.CANCELLED)) {
-            remove(token);
-        } else {
-            add(token);
-        }
-    }
+    
     public void remove(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             tokens.remove(token.getId());
         }
     }
 
-    public Collection<SecurityToken> getCancelledTokens() {
-        return getTokens(SecurityToken.State.CANCELLED);
-    }
-    public Collection<SecurityToken> getExpiredTokens() {
-        return getTokens(SecurityToken.State.EXPIRED);
-    }
-    public Collection<SecurityToken> getRenewedTokens() {
-        return getTokens(SecurityToken.State.RENEWED);
-    }
     public Collection<String> getTokenIdentifiers() {
-        processTokenExpiry();        
+        processTokenExpiry();
         return tokens.keySet();
     }
-
-    public Collection<SecurityToken> getValidTokens() {
-        Collection<SecurityToken> toks = getTokens(SecurityToken.State.ISSUED);
-        toks.addAll(getTokens(SecurityToken.State.RENEWED));
-        toks.addAll(getTokens(SecurityToken.State.UNKNOWN));
-        return toks;
-    }
-
-    public SecurityToken getToken(String id) {
-        processTokenExpiry();
-        
-        SecurityToken token = tokens.get(id);
-        if (token == null) {
-            for (SecurityToken t : tokens.values()) {
-                if (id.equals(t.getWsuId())) {
-                    return t;
+    
+    public Collection<SecurityToken> getExpiredTokens() {
+        List<SecurityToken> expiredTokens = new ArrayList<SecurityToken>();
+        Date current = new Date();
+        synchronized (tokens) {
+            for (String id : tokens.keySet()) {
+                CacheEntry cacheEntry = tokens.get(id);
+                if (cacheEntry.getExpiry().before(current)) {
+                    expiredTokens.add(cacheEntry.getSecurityToken());
                 }
             }
         }
-        return token;
+        return expiredTokens;
+    }
+    
+    public SecurityToken getToken(String id) {
+        processTokenExpiry();
+        
+        CacheEntry cacheEntry = tokens.get(id);
+        if (cacheEntry != null) {
+            return cacheEntry.getSecurityToken();
+        }
+        return null;
     }
     
     public SecurityToken getTokenByAssociatedHash(int hashCode) {
         processTokenExpiry();
         
-        for (String id : tokens.keySet()) {
-            SecurityToken securityToken = tokens.get(id);
-            if (hashCode == securityToken.getAssociatedHash()) {
-                return securityToken;
+        synchronized (tokens) {
+            for (String id : tokens.keySet()) {
+                CacheEntry cacheEntry = tokens.get(id);
+                SecurityToken securityToken = cacheEntry.getSecurityToken();
+                if (hashCode == securityToken.getAssociatedHash()) {
+                    return securityToken;
+                }
             }
         }
         return null;
     }
 
-    
-    protected Collection<SecurityToken> getTokens(SecurityToken.State state) {
-        processTokenExpiry();
-        List<SecurityToken> t = new ArrayList<SecurityToken>();
-        for (SecurityToken token : tokens.values()) {
-            if (token.getState() == state) {
-                t.add(token);
-            }
-        }
-        return t;
-    }
-
     protected void processTokenExpiry() {
-        for (SecurityToken token : tokens.values()) {
-            if (token.getState() == State.EXPIRED
-                || token.getState() == State.CANCELLED) {
-                if (autoRemove) {
-                    remove(token);
+        Date current = new Date();
+        synchronized (tokens) {
+            for (String id : tokens.keySet()) {
+                CacheEntry cacheEntry = tokens.get(id);
+                if (cacheEntry.getExpiry().before(current)) {
+                    tokens.remove(id);
                 }
-            } else if (token.getExpires() != null) {
-                Date current = new Date();
-                if (token.getExpires().before(current)) {
-                    token.setState(SecurityToken.State.EXPIRED);
-                    if (autoRemove) {
-                        remove(token);
-                    }
-                }
-            }            
-        }
-    }
-
-
-    public void removeCancelledTokens() {
-        for (SecurityToken token : tokens.values()) {
-            if (token.getState() == State.CANCELLED) {
-                remove(token);
             }
         }
-    }
-
-    public void removeExpiredTokens() {
-        processTokenExpiry();
-        for (SecurityToken token : tokens.values()) {
-            if (token.getState() == State.EXPIRED) {
-                remove(token);
-            }
-        }
-    }
-
-    public void setAutoRemoveTokens(boolean auto) {
-        autoRemove = auto;
     }
     
+    private static class CacheEntry {
+        
+        private final SecurityToken securityToken;
+        private final Date expires;
+        
+        public CacheEntry(SecurityToken securityToken, Date expires) {
+            this.securityToken = securityToken;
+            this.expires = expires;
+        }
+        
+        /**
+         * Get the SecurityToken
+         * @return the SecurityToken
+         */
+        public SecurityToken getSecurityToken() {
+            return securityToken;
+        }
+        
+        /**
+         * Get when this CacheEntry is to be removed from the cache
+         * @return when this CacheEntry is to be removed from the cache
+         */
+        public Date getExpiry() {
+            return expires;
+        }
+        
+    }
+ 
 }

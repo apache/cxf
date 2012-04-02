@@ -39,9 +39,9 @@ import org.apache.cxf.ws.security.kerberos.KerberosClient;
 import org.apache.cxf.ws.security.kerberos.KerberosUtils;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -78,13 +78,18 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
     static final TokenStore getTokenStore(Message message) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
+            TokenStore tokenStore = 
+                (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
-                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+                tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             }
             if (tokenStore == null) {
-                tokenStore = new MemoryTokenStore();
-                info.setProperty(TokenStore.class.getName(), tokenStore);
+                TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
+                tokenStore = 
+                    tokenStoreFactory.newTokenStore(
+                        SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message
+                    );
+                info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
             }
             return tokenStore;
         }

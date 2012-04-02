@@ -22,21 +22,16 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.util.Collection;
 
 /**
- * 
+ * This interface defines a caching mechanism for security tokens. It is up to the underlying implementation
+ * to handle token expiration (e.g. by querying the SecurityToken's expires date).
  */
 public interface TokenStore {
-    /**
-     * Add the given token to the list.
-     * @param token The token to be added
-     * @throws TokenStoreException
-     */
-    void add(SecurityToken token);
     
     /**
-     * Update an existing token.
-     * @param token
+     * Add the given token to the cache.
+     * @param token The token to be added
      */
-    void update(SecurityToken token);
+    void add(SecurityToken token);
     
     /**
      * Remove an existing token.
@@ -44,41 +39,21 @@ public interface TokenStore {
     void remove(SecurityToken token);
     
     /**
-     * Return the list of all token identifiers.
-     * @return As array of token identifiers
+     * Return the list of all valid token identifiers.
+     * @return As array of (valid) token identifiers
      */
     Collection<String> getTokenIdentifiers();
     
     /**
-     * Return the list of <code>EXPIRED</code> tokens.
-     * If there are no <code>EXPIRED</code> tokens <code>null</code> will be 
-     * returned
+     * Return the list of expired tokens.
      * @return An array of expired <code>Tokens</code>
      */
     Collection<SecurityToken> getExpiredTokens();
     
     /**
-     * Return the list of ISSUED and RENEWED tokens.
-     * @return An array of ISSUED and RENEWED <code>Tokens</code>.
-     */
-    Collection<SecurityToken> getValidTokens();
-    
-    /**
-     * Return the list of RENEWED tokens.
-     * @return An array of RENEWED <code>Tokens</code>
-     */
-    Collection<SecurityToken> getRenewedTokens();
-    
-    /**
-     * Return the list of CANCELLED tokens
-     * @return An array of CANCELLED <code>Tokens</code>
-     */
-    Collection<SecurityToken> getCancelledTokens();
-    
-    /**
      * Returns the <code>Token</code> of the given id
      * @param id
-     * @return The requested <code>Token</code> identified by the give id
+     * @return The requested <code>Token</code> identified by the given id
      */
     SecurityToken getToken(String id);
     
@@ -88,23 +63,5 @@ public interface TokenStore {
      * @return the <code>Token</code> by the associated hash. 
      */
     SecurityToken getTokenByAssociatedHash(int hashCode);
-    
-    /**
-     * Removes all expired tokens.  
-     */
-    void removeExpiredTokens();
-    
-    /**
-     * Removes all cancelled tokens.
-     */
-    void removeCancelledTokens();
-    
-    /**
-     * Controls whether the store will automatically remove cancelled and expired 
-     * tokens.  If true, calls to getCancelledTokens() and getExpiredTokens() 
-     * will never return value;
-     * @param auto
-     */
-    void setAutoRemoveTokens(boolean auto);
     
 }

@@ -175,6 +175,14 @@ public final class SecurityConstants {
     public static final String CACHE_CONFIG_FILE = 
         "ws-security.cache.config.file";
     
+    /**
+     * The TokenStore instance to use to cache security tokens. By default this uses the
+     * EHCacheTokenStore if EhCache is available. Otherwise it uses the MemoryTokenStore.
+     */
+    public static final String TOKEN_STORE_CACHE_INSTANCE = 
+        "org.apache.cxf.ws.security.tokenstore.TokenStore";
+
+    
     public static final Set<String> ALL_PROPERTIES;
     
     static {
@@ -191,7 +199,7 @@ public final class SecurityConstants {
             KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
             ENABLE_NONCE_CACHE, NONCE_CACHE_INSTANCE, ENABLE_TIMESTAMP_CACHE,
-            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE
+            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, TOKEN_STORE_CACHE_INSTANCE
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

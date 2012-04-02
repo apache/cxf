@@ -95,7 +95,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                             AssertionInfoMap aim, 
                             SecurityToken tok,
                             SecureConversationToken itok) {
-        if (tok.getState() != SecurityToken.State.EXPIRED) {
+        if (!tok.isExpired()) {
             return;
         }
         
