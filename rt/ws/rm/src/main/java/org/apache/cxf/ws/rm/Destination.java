@@ -140,13 +140,12 @@ public class Destination extends AbstractEndpoint {
 
         RMStore store = getReliableEndpoint().getManager().getStore();
         if (null != store) {
-            CachedOutputStream saved = null;
+            RMMessage msg = null;
             if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
-                saved = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+                msg = new RMMessage();
+                msg.setContent((CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT));
+                msg.setMessageNumber(sequenceType.getMessageNumber());
             }
-            RMMessage msg = new RMMessage();
-            msg.setMessageNumber(sequenceType.getMessageNumber());
-            msg.setContent(saved);
             store.persistIncoming(seq, msg);
         }
 
