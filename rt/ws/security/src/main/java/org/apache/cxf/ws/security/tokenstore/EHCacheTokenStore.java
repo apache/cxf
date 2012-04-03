@@ -40,6 +40,7 @@ public class EHCacheTokenStore implements TokenStore {
 
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
+    public static final int MAX_ELEMENTS = 1000000;
     
     private Cache cache;
     private CacheManager cacheManager;
@@ -56,7 +57,7 @@ public class EHCacheTokenStore implements TokenStore {
         
         if (!cacheManager.cacheExists(key)) {
             // Cannot overflow to disk as SecurityToken Elements can't be serialized
-            cache = new Cache(key, 0, false, false, DEFAULT_TTL, DEFAULT_TTL);
+            cache = new Cache(key, MAX_ELEMENTS, false, false, DEFAULT_TTL, DEFAULT_TTL);
             cacheManager.addCache(cache);
         } else {
             cache = cacheManager.getCache(key);

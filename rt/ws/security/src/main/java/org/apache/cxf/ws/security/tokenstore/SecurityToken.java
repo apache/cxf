@@ -43,7 +43,7 @@ import org.apache.ws.security.util.XmlSchemaDateFormat;
  */
 public class SecurityToken implements Serializable {
     
-    private static final long serialVersionUID = -8023092932997444513L;
+    private static final long serialVersionUID = 3820740387121650613L;
 
     /**
      * Token identifier
@@ -90,11 +90,6 @@ public class SecurityToken implements Serializable {
      */
     private Properties properties;
 
-    /**
-     * A flag to assist the TokenStorage
-     */
-    private boolean changed;
-    
     /**
      * The secret associated with the Token
      */
@@ -210,20 +205,6 @@ public class SecurityToken implements Serializable {
         }
     }
 
-    /**
-     * @return Returns the changed.
-     */
-    public boolean isChanged() {
-        return changed;
-    }
-
-    /**
-     * @param chnaged The changed to set.
-     */
-    public void setChanged(boolean chnaged) {
-        this.changed = chnaged;
-    }
-    
     /**
      * @return Returns the properties.
      */
