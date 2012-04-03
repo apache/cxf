@@ -65,7 +65,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
     }
     
     @Test
@@ -113,6 +113,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
         checkSchemas(address, "/book.xsd", "/bookid.xsd", "import");
         checkSchemas(address, "/bookid.xsd", null, null);
+        checkWadlResourcesInfo(address, address, "/book.xsd", 1);
     }
     
     private void checkSchemas(String address, String schemaSegment, 

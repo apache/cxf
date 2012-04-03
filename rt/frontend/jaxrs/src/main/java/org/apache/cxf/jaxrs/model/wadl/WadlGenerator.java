@@ -882,9 +882,12 @@ public class WadlGenerator implements RequestHandler {
         
         for (Element schemaRefEl : schemaRefEls) {
             String href = schemaRefEl.getAttribute(attrName);
-            String actualRef = parentRef + href;
-            schemaLocationMap.put(actualRef, parentDocLoc + href);    
-            DOMUtils.setAttribute(schemaRefEl, attrName, getBaseURI(ui) + "/" + actualRef);
+            if (!StringUtils.isEmpty(href)) {
+                String actualRef = parentRef + href;
+                schemaLocationMap.put(actualRef, parentDocLoc + href);   
+                URI schemaURI = ui.getBaseUriBuilder().path(actualRef).build();
+                DOMUtils.setAttribute(schemaRefEl, attrName, schemaURI.toString());
+            }
         }
     }
 

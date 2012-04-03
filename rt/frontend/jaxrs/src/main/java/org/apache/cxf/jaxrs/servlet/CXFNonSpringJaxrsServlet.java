@@ -64,6 +64,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String LANGUAGES_PARAM = "jaxrs.languages";
     private static final String PROPERTIES_PARAM = "jaxrs.properties";
     private static final String SCHEMAS_PARAM = "jaxrs.schemaLocations";
+    private static final String DOC_LOCATION_PARAM = "jaxrs.documentLocation";
     private static final String STATIC_SUB_RESOLUTION_PARAM = "jaxrs.static.subresources";
     private static final String SERVICE_SCOPE_SINGLETON = "singleton";
     private static final String SERVICE_SCOPE_REQUEST = "prototype";
@@ -95,7 +96,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (modelRef != null) {
             bean.setModelRef(modelRef.trim());
         }
-        
+        setDocLocation(bean, servletConfig);
         setSchemasLocations(bean, servletConfig);
         setAllInterceptors(bean, servletConfig);
         
@@ -170,6 +171,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         if (list.size() > 0) {
             bean.setSchemaLocations(list);
+        }
+    }
+    
+    protected void setDocLocation(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
+        String wadlLoc = servletConfig.getInitParameter(DOC_LOCATION_PARAM);
+        if (wadlLoc != null) {
+            bean.setDocLocation(wadlLoc);
         }
     }
     
@@ -364,6 +372,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                                             getStaticSubResolutionValue(servletConfig));
         setAllInterceptors(bean, servletConfig);
         setExtensions(bean, servletConfig);
+        setDocLocation(bean, servletConfig);
         setSchemasLocations(bean, servletConfig);
         
         bean.setBus(getBus());
