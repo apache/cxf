@@ -132,7 +132,7 @@ public class ValidateSCTUnitTest extends org.junit.Assert {
         assertTrue(validateResponse(response));
         
         // Now remove the token from the cache before validating again
-        tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()));
+        tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()).getId());
         assertNull(tokenStore.getToken(providerResponse.getTokenId()));
         response = validateOperation.validate(request, webServiceContext);
         assertFalse(validateResponse(response));

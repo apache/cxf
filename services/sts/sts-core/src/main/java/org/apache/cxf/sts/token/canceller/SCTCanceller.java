@@ -103,7 +103,7 @@ public class SCTCanceller implements TokenCanceller {
                         STSException.INVALID_REQUEST
                     );
                 }
-                tokenParameters.getTokenStore().remove(token);
+                tokenParameters.getTokenStore().remove(token.getId());
                 cancelTarget.setState(STATE.CANCELLED);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);

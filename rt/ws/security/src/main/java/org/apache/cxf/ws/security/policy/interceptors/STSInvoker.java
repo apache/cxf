@@ -160,7 +160,7 @@ abstract class STSInvoker implements Invoker {
         
         TokenStore store = (TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                 .getProperty(TokenStore.class.getName());
-        store.remove(cancelToken);
+        store.remove(cancelToken.getId());
         writer.writeEmptyElement(prefix, "RequestedTokenCancelled", namespace);
         exchange.put(SecurityConstants.TOKEN, cancelToken);
         

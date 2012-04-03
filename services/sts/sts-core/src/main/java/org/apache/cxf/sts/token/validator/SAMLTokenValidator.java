@@ -146,14 +146,15 @@ public class SAMLTokenValidator implements TokenValidator {
             response.setPrincipal(samlPrincipal);
             
             SecurityToken secToken = null;
-            if (tokenParameters.getTokenStore() != null) {
-                int hash = 0;
-                byte[] signatureValue = assertion.getSignatureValue();
-                if (signatureValue != null && signatureValue.length > 0) {
-                    hash = Arrays.hashCode(signatureValue);
-                    secToken = tokenParameters.getTokenStore().getTokenByAssociatedHash(hash);
-                    response.setSecurityToken(secToken);
+            byte[] signatureValue = assertion.getSignatureValue();
+            if (tokenParameters.getTokenStore() != null && signatureValue != null
+                && signatureValue.length > 0) {
+                int hash = Arrays.hashCode(signatureValue);
+                secToken = tokenParameters.getTokenStore().getToken(Integer.toString(hash));
+                if (secToken != null && secToken.getTokenHash() != hash) {
+                    secToken = null;
                 }
+                response.setSecurityToken(secToken);
             }
             if (secToken != null && secToken.isExpired()) {
                 LOG.fine("Token: " + secToken.getId() + " is in the cache but expired - revalidating");
@@ -282,13 +283,13 @@ public class SAMLTokenValidator implements TokenValidator {
         if (validFrom.isAfterNow()) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
             if (secToken != null) {
-                tokenStore.remove(secToken);
+                tokenStore.remove(secToken.getId());
             }
             return false;
         } else if (validTill.isBeforeNow()) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
             if (secToken != null) {
-                tokenStore.remove(secToken);
+                tokenStore.remove(secToken.getId());
             }
             validateTarget.setState(STATE.EXPIRED);
             return false;

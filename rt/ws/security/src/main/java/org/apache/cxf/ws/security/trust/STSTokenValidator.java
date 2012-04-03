@@ -91,13 +91,14 @@ public class STSTokenValidator implements Validator {
             
             TokenStore tokenStore = getTokenStore(message);
             if (tokenStore != null && hash != 0) {
-                SecurityToken recoveredToken = tokenStore.getTokenByAssociatedHash(hash);
-                if (recoveredToken != null) {
-                    AssertionWrapper assertion = new AssertionWrapper(recoveredToken.getToken());
+                SecurityToken transformedToken = getTransformedToken(tokenStore, hash);
+                if (transformedToken != null) {
+                    AssertionWrapper assertion = new AssertionWrapper(transformedToken.getToken());
                     credential.setTransformedToken(assertion);
                     return credential;
                 }
             }
+            token.setTokenHash(hash);
             
             STSClient c = STSUtils.getClient(message, "sts");
             synchronized (c) {
@@ -108,8 +109,9 @@ public class STSTokenValidator implements Validator {
                     AssertionWrapper assertion = new AssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
                     if (hash != 0) {
-                        returnedToken.setAssociatedHash(hash);
                         tokenStore.add(returnedToken);
+                        token.setTransformedTokenIdentifier(returnedToken.getId());
+                        tokenStore.add(Integer.toString(hash), token);
                     }
                 }
                 return credential;
@@ -157,4 +159,14 @@ public class STSTokenValidator implements Validator {
         return false;
     }
 
+    private SecurityToken getTransformedToken(TokenStore tokenStore, int hash) {
+        SecurityToken recoveredToken = tokenStore.getToken(Integer.toString(hash));
+        if (recoveredToken != null && recoveredToken.getTokenHash() == hash) {
+            String transformedTokenId = recoveredToken.getTransformedTokenIdentifier();
+            if (transformedTokenId != null) {
+                return tokenStore.getToken(transformedTokenId);
+            }
+        }
+        return null;
+    }
 }

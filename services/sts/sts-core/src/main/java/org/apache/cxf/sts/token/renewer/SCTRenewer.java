@@ -124,7 +124,7 @@ public class SCTRenewer implements TokenRenewer {
                     );
                 }
                 // Remove old token from the cache
-                tokenParameters.getTokenStore().remove(token);
+                tokenParameters.getTokenStore().remove(token.getId());
                 
                 // Create a new token corresponding to the old token
                 Date expires = new Date();

@@ -82,38 +82,21 @@ public class EHCacheTokenStore implements TokenStore {
     
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            
-            int parsedTTL = 0;
-            if (token.getExpires() != null) {
-                Date expires = token.getExpires();
-                Date current = new Date();
-                long expiryTime = (expires.getTime() - current.getTime()) / 1000L;
-                
-                parsedTTL = (int)expiryTime;
-                if (expiryTime != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
-                    // Default to configured value
-                    parsedTTL = (int)ttl;
-                    if (ttl != (long)parsedTTL) {
-                        // Fall back to 60 minutes if the default TTL is set incorrectly
-                        parsedTTL = 3600;
-                    }
-                }
-            } else {
-                // Default to configured value
-                parsedTTL = (int)ttl;
-                if (ttl != (long)parsedTTL) {
-                    // Fall back to 60 minutes if the default TTL is set incorrectly
-                    parsedTTL = 3600;
-                }
-            }
-            
+            int parsedTTL = getTTL(token);
             cache.put(new Element(token.getId(), token, false, parsedTTL, parsedTTL));
         }
     }
     
-    public void remove(SecurityToken token) {
-        if (token != null && !StringUtils.isEmpty(token.getId())) {
-            cache.remove(token.getId());
+    public void add(String identifier, SecurityToken token) {
+        if (token != null && !StringUtils.isEmpty(identifier)) {
+            int parsedTTL = getTTL(token);
+            cache.put(new Element(identifier, token, false, parsedTTL, parsedTTL));
+        }
+    }
+    
+    public void remove(String identifier) {
+        if (!StringUtils.isEmpty(identifier) && cache.isKeyInCache(identifier)) {
+            cache.remove(identifier);
         }
     }
 
@@ -135,25 +118,39 @@ public class EHCacheTokenStore implements TokenStore {
         return expiredTokens;
     }
     
-    public SecurityToken getToken(String id) {
-        Element element = cache.get(id);
+    public SecurityToken getToken(String identifier) {
+        Element element = cache.get(identifier);
         if (element != null && !cache.isExpired(element)) {
             return (SecurityToken)element.getObjectValue();
         }
         return null;
     }
-
-    public SecurityToken getTokenByAssociatedHash(int hashCode) {
-        @SuppressWarnings("unchecked")
-        Iterator<String> ids = cache.getKeysWithExpiryCheck().iterator();
-        while (ids.hasNext()) {
-            Element element = cache.get(ids.next());
-            SecurityToken securityToken = (SecurityToken)element.getObjectValue();
-            if (hashCode == securityToken.getAssociatedHash()) {
-                return securityToken;
+    
+    private int getTTL(SecurityToken token) {
+        int parsedTTL = 0;
+        if (token.getExpires() != null) {
+            Date expires = token.getExpires();
+            Date current = new Date();
+            long expiryTime = (expires.getTime() - current.getTime()) / 1000L;
+            
+            parsedTTL = (int)expiryTime;
+            if (expiryTime != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+                // Default to configured value
+                parsedTTL = (int)ttl;
+                if (ttl != (long)parsedTTL) {
+                    // Fall back to 60 minutes if the default TTL is set incorrectly
+                    parsedTTL = 3600;
+                }
+            }
+        } else {
+            // Default to configured value
+            parsedTTL = (int)ttl;
+            if (ttl != (long)parsedTTL) {
+                // Fall back to 60 minutes if the default TTL is set incorrectly
+                parsedTTL = 3600;
             }
         }
-        return null;
+        return parsedTTL;
     }
     
 }

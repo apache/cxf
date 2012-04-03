@@ -68,10 +68,12 @@ public class CustomUsernameTokenProvider implements TokenProvider {
             
             // Store the token in the cache
             if (tokenParameters.getTokenStore() != null) {
-                SecurityToken secrutiyToken = new SecurityToken(usernameToken.getID());
-                secrutiyToken.setToken(usernameToken.getElement());
-                secrutiyToken.setAssociatedHash(usernameToken.hashCode());
-                tokenParameters.getTokenStore().add(secrutiyToken);
+                SecurityToken securityToken = new SecurityToken(usernameToken.getID());
+                securityToken.setToken(usernameToken.getElement());
+                int hashCode = usernameToken.hashCode();
+                String identifier = Integer.toString(hashCode);
+                securityToken.setTokenHash(hashCode);
+                tokenParameters.getTokenStore().add(identifier, securityToken);
             }
             
             return response;

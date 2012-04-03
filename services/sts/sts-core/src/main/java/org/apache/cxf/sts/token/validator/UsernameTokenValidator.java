@@ -131,12 +131,6 @@ public class UsernameTokenValidator implements TokenValidator {
         //
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
         
-        SecurityToken secToken = null;
-        if (tokenParameters.getTokenStore() != null) {
-            secToken = tokenParameters.getTokenStore().getToken(usernameTokenType.getId());
-            response.setSecurityToken(secToken);
-        }
-
         // Marshall the received JAXB object into a DOM Element
         Element usernameTokenElement = null;
         try {
@@ -170,12 +164,23 @@ public class UsernameTokenValidator implements TokenValidator {
             if (ut.getPassword() == null) {
                 return response;
             }
-            if (secToken == null || secToken.isExpired() 
-                || (secToken.getAssociatedHash() != ut.hashCode())) {
+            
+            // See if the UsernameToken is stored in the cache
+            int hash = ut.hashCode();
+            SecurityToken secToken = null;
+            if (tokenParameters.getTokenStore() != null) {
+                secToken = tokenParameters.getTokenStore().getToken(Integer.toString(hash));
+                if (secToken != null && secToken.getTokenHash() != hash) {
+                    secToken = null;
+                }
+            }
+            
+            if (secToken == null) {
                 Credential credential = new Credential();
                 credential.setUsernametoken(ut);
                 validator.validate(credential, requestData);
             }
+            
             Principal principal = 
                 createPrincipal(
                     ut.getName(), ut.getPassword(), ut.getPasswordType(), ut.getNonce(), ut.getCreated()

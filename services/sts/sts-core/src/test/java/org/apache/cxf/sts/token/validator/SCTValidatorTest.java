@@ -83,7 +83,7 @@ public class SCTValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse.getPrincipal().getName().equals("alice"));
         
         // Now remove the SCT from the cache
-        tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()));
+        tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()).getId());
         assertNull(tokenStore.getToken(providerResponse.getTokenId()));
         validatorResponse = sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);

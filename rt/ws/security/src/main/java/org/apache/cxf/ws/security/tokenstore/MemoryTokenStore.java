@@ -39,29 +39,21 @@ public class MemoryTokenStore implements TokenStore {
     
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
-            CacheEntry cacheEntry = null;
-            if (token.getExpires() == null) {
-                Date expires = new Date();
-                long currentTime = expires.getTime();
-                expires.setTime(currentTime + (DEFAULT_TTL * 1000L));
-                cacheEntry = new CacheEntry(token, expires);
-            } else {
-                Date expires = token.getExpires();
-                Date current = new Date();
-                long expiryTime = expires.getTime() - current.getTime();
-                if (expiryTime < 0 || expiryTime > (MAX_TTL * 1000L)) {
-                    expires.setTime(current.getTime() + (DEFAULT_TTL * 1000L));
-                }
-                cacheEntry = new CacheEntry(token, expires);
-            }
-            
+            CacheEntry cacheEntry = createCacheEntry(token);
             tokens.put(token.getId(), cacheEntry);
         }
     }
     
-    public void remove(SecurityToken token) {
-        if (token != null && !StringUtils.isEmpty(token.getId())) {
-            tokens.remove(token.getId());
+    public void add(String identifier, SecurityToken token) {
+        if (token != null && !StringUtils.isEmpty(identifier)) {
+            CacheEntry cacheEntry = createCacheEntry(token);
+            tokens.put(identifier, cacheEntry);
+        }
+    }
+    
+    public void remove(String identifier) {
+        if (!StringUtils.isEmpty(identifier) && tokens.containsKey(identifier)) {
+            tokens.remove(identifier);
         }
     }
 
@@ -94,21 +86,6 @@ public class MemoryTokenStore implements TokenStore {
         return null;
     }
     
-    public SecurityToken getTokenByAssociatedHash(int hashCode) {
-        processTokenExpiry();
-        
-        synchronized (tokens) {
-            for (String id : tokens.keySet()) {
-                CacheEntry cacheEntry = tokens.get(id);
-                SecurityToken securityToken = cacheEntry.getSecurityToken();
-                if (hashCode == securityToken.getAssociatedHash()) {
-                    return securityToken;
-                }
-            }
-        }
-        return null;
-    }
-
     protected void processTokenExpiry() {
         Date current = new Date();
         synchronized (tokens) {
@@ -119,6 +96,25 @@ public class MemoryTokenStore implements TokenStore {
                 }
             }
         }
+    }
+    
+    private CacheEntry createCacheEntry(SecurityToken token) {
+        CacheEntry cacheEntry = null;
+        if (token.getExpires() == null) {
+            Date expires = new Date();
+            long currentTime = expires.getTime();
+            expires.setTime(currentTime + (DEFAULT_TTL * 1000L));
+            cacheEntry = new CacheEntry(token, expires);
+        } else {
+            Date expires = token.getExpires();
+            Date current = new Date();
+            long expiryTime = expires.getTime() - current.getTime();
+            if (expiryTime < 0 || expiryTime > (MAX_TTL * 1000L)) {
+                expires.setTime(current.getTime() + (DEFAULT_TTL * 1000L));
+            }
+            cacheEntry = new CacheEntry(token, expires);
+        }
+        return cacheEntry;
     }
     
     private static class CacheEntry {

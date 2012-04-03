@@ -28,15 +28,23 @@ import java.util.Collection;
 public interface TokenStore {
     
     /**
-     * Add the given token to the cache.
+     * Add the given token to the cache. The SecurityTokens getId() identifier will be used to
+     * key it in the cache.
      * @param token The token to be added
      */
     void add(SecurityToken token);
     
     /**
-     * Remove an existing token.
+     * Add the given token to the cache under the given identifier
+     * @param identifier The identifier to use to key the SecurityToken in the cache
+     * @param token The token to be added
      */
-    void remove(SecurityToken token);
+    void add(String identifier, SecurityToken token);
+    
+    /**
+     * Remove an existing token by its identifier
+     */
+    void remove(String identifier);
     
     /**
      * Return the list of all valid token identifiers.
@@ -51,17 +59,10 @@ public interface TokenStore {
     Collection<SecurityToken> getExpiredTokens();
     
     /**
-     * Returns the <code>Token</code> of the given id
-     * @param id
-     * @return The requested <code>Token</code> identified by the given id
+     * Returns the <code>Token</code> of the given identifier
+     * @param identifier
+     * @return The requested <code>Token</code> identified by the given identifier
      */
-    SecurityToken getToken(String id);
-    
-    /**
-     * Returns the <code>Token</code> by the associated hash. 
-     * @param hashCode
-     * @return the <code>Token</code> by the associated hash. 
-     */
-    SecurityToken getTokenByAssociatedHash(int hashCode);
+    SecurityToken getToken(String identifier);
     
 }

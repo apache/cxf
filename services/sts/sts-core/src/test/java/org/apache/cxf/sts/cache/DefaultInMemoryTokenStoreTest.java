@@ -38,7 +38,7 @@ public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
         SecurityToken token = new SecurityToken(key);
         store.add(token);
         assertEquals(token, store.getToken(key));
-        store.remove(token);
+        store.remove(token.getId());
         assertNull(store.getToken(key));
     }
     
@@ -52,10 +52,10 @@ public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
         store.add(token2);
         store.add(token3);
         assertTrue(store.getTokenIdentifiers().size() == 3);
-        store.remove(token3);
+        store.remove(token3.getId());
         assertNull(store.getToken("test3"));
-        store.remove(token1);
-        store.remove(token2);
+        store.remove(token1.getId());
+        store.remove(token2.getId());
         assertTrue(store.getTokenIdentifiers().size() == 0);
     }
 }

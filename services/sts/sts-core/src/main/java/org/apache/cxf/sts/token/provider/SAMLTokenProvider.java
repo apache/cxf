@@ -124,8 +124,10 @@ public class SAMLTokenProvider implements TokenProvider {
             AssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
             Element token = assertion.toDOM(doc);
             
-            // set the token in cache
-            if (tokenParameters.getTokenStore() != null) {
+            // set the token in cache (only if the token is signed)
+            byte[] signatureValue = assertion.getSignatureValue();
+            if (tokenParameters.getTokenStore() != null && signatureValue != null
+                && signatureValue.length > 0) {
                 Date expires = new Date();
                 long currentTime = expires.getTime();
                 expires.setTime(currentTime + (conditionsProvider.getLifetime() * 1000L));
@@ -133,12 +135,6 @@ public class SAMLTokenProvider implements TokenProvider {
                 SecurityToken securityToken = new SecurityToken(assertion.getId(), null, expires);
                 securityToken.setToken(token);
                 securityToken.setPrincipal(tokenParameters.getPrincipal());
-                int hash = 0;
-                byte[] signatureValue = assertion.getSignatureValue();
-                if (signatureValue != null && signatureValue.length > 0) {
-                    hash = Arrays.hashCode(signatureValue);
-                    securityToken.setAssociatedHash(hash);
-                }
                 if (tokenParameters.getRealm() != null) {
                     Properties props = securityToken.getProperties();
                     if (props == null) {
@@ -147,7 +143,10 @@ public class SAMLTokenProvider implements TokenProvider {
                     props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
                     securityToken.setProperties(props);
                 }
-                tokenParameters.getTokenStore().add(securityToken);
+                int hash = Arrays.hashCode(signatureValue);
+                securityToken.setTokenHash(hash);
+                String identifier = Integer.toString(hash);
+                tokenParameters.getTokenStore().add(identifier, securityToken);
             }
             
             TokenProviderResponse response = new TokenProviderResponse();
