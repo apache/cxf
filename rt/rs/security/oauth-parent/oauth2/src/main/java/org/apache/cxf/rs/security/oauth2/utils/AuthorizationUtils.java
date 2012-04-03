@@ -29,7 +29,9 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
-
+/**
+ * Authorization helpers
+ */
 public final class AuthorizationUtils {
     private AuthorizationUtils() {
     }

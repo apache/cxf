@@ -51,11 +51,7 @@ import org.apache.cxf.security.SecurityContext;
 
 
 /**
- * This resource handles the End User authorising
- * or denying the Client to access its resources.
- * If End User approves the access this resource will
- * redirect End User back to the Client, supplying 
- * a request token verifier (aka authorization code)
+ * The Base Redirection-Based Grant Service
  */
 public abstract class RedirectionBasedGrantService extends AbstractOAuthService {
     private String supportedResponseType;
@@ -69,6 +65,12 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         this.isClientConfidential = isConfidential;
     }
     
+    /**
+     * Handles the initial authorization request by preparing 
+     * the authorization challenge data and returning it to the user.
+     * Typically the data are expected to be presented in the HTML form 
+     * @return the authorization data
+     */
     @GET
     @Produces({"application/xhtml+xml", "text/html", "application/xml", "application/json" })
     public Response authorize() {
@@ -76,6 +78,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return startAuthorization(params);
     }
     
+    /**
+     * Processes the end user decision
+     * @return The grant value, authorization code or the token
+     */
     @GET
     @Path("/decision")
     public Response authorizeDecision() {
@@ -83,6 +89,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return completeAuthorization(params);
     }
     
+    /**
+     * Processes the end user decision
+     * @return The grant value, authorization code or the token
+     */
     @POST
     @Path("/decision")
     @Consumes("application/x-www-form-urlencoded")
@@ -90,22 +100,37 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return completeAuthorization(params);
     }
     
+    /**
+     * Starts the authorization process
+     */
     protected Response startAuthorization(MultivaluedMap<String, String> params) {
+        // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext sc = getAndValidateSecurityContext();
         
-        Client client = getClient(params); 
+        Client client = getClient(params);
+        
+        // Validate the provided request URI, if any, against the ones Client provided
+        // during the registration
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI)); 
         
+        // Enforce the client confidentiality requirements
         if (!OAuthUtils.isGrantSupportedForClient(client, isClientConfidential, supportedGrantType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
+        
+        // Check response_type
         String responseType = params.getFirst(OAuthConstants.RESPONSE_TYPE);
         if (responseType == null || !responseType.equals(supportedResponseType)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.UNSUPPORTED_RESPONSE_TYPE);
         }
+        
+        // Get the requested scopes
         List<String> requestedScope = OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE));
         
+        // Create a UserSubject representing the end user 
         UserSubject userSubject = createUserSubject(sc);
+        
+        // Request a new grant only if no pre-authorized token is available
         ServerAccessToken preauthorizedToken = getDataProvider().getPreauthorizedToken(
             client, userSubject, supportedGrantType);
         if (preauthorizedToken != null) {
@@ -118,6 +143,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                preauthorizedToken);
         }
         
+        // Convert the requested scopes to OAuthPermission instances
         List<OAuthPermission> permissions = null;
         try {
             permissions = getDataProvider().convertScopeToPermissions(client, requestedScope);
@@ -125,13 +151,16 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
     
+        // Return the authorization challenge data to the end user 
         OAuthAuthorizationData data = 
             createAuthorizationData(client, params, permissions);
         return Response.ok(data).build();
         
     }
     
-    
+    /**
+     * Create the authorization challenge data 
+     */
     protected OAuthAuthorizationData createAuthorizationData(
         Client client, MultivaluedMap<String, String> params, List<OAuthPermission> perms) {
         
@@ -166,9 +195,14 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         return secData;
     }
     
+    /**
+     * Completes the authorization process
+     */
     protected Response completeAuthorization(MultivaluedMap<String, String> params) {
+        // Make sure the end user has authenticated, check if HTTPS is used
         SecurityContext securityContext = getAndValidateSecurityContext();
         
+        // Make sure the session is valid
         if (!compareRequestAndSessionTokens(params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN))) {
             throw new WebApplicationException(400);     
         }
@@ -178,13 +212,16 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         Client client = getClient(params);
         String redirectUri = validateRedirectUri(client, params.getFirst(OAuthConstants.REDIRECT_URI));
         
+        // Get the end user decision value
         String decision = params.getFirst(OAuthConstants.AUTHORIZATION_DECISION_KEY);
         boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
-
+        
+        // Return the error if denied
         if (!allow) {
             return createErrorResponse(params, redirectUri, OAuthConstants.ACCESS_DENIED);
         }
         
+        // Check if the end user may have had a chance to down-scope the requested scopes
         List<String> requestedScope = OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE));
         List<String> approvedScope = new LinkedList<String>(); 
         for (String rScope : requestedScope) {
@@ -199,6 +236,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         UserSubject userSubject = createUserSubject(securityContext);
         
+        // Request a new grant
         return createGrant(params,
                            client, 
                            redirectUri,

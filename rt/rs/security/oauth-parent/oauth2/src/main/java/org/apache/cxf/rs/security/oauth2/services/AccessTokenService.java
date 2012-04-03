@@ -44,26 +44,41 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-
+/**
+ * OAuth2 Access Token Service implementation
+ */
 @Path("/token")
 public class AccessTokenService extends AbstractOAuthService {
     private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
     
+    /**
+     * Sets the list of optional grant handlers
+     * @param handlers the grant handlers
+     */
     public void setGrantHandlers(List<AccessTokenGrantHandler> handlers) {
         grantHandlers = handlers;
     }
     
+    /**
+     * Processes an access token request
+     * @param params the form parameters representing the access token grant 
+     * @return Access Token or the error 
+     */
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json")
     public Response handleTokenRequest(MultivaluedMap<String, String> params) {
+        
+        // Make sure the client is authenticated
         Client client = authenticateClientIfNeeded(params);
         
+        // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
             return createErrorResponse(params, OAuthConstants.UNSUPPORTED_GRANT_TYPE);
         }
         
+        // Create the access token
         ServerAccessToken serverToken = null;
         try {
             serverToken = handler.createAccessToken(client, params);
@@ -74,15 +89,22 @@ public class AccessTokenService extends AbstractOAuthService {
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
         }
         
+        // Extract the information to be of use for the client
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
                                                               serverToken.getTokenKey());
         clientToken.setParameters(serverToken.getParameters());
+        
+        
+        // Return it to the client
         return Response.ok(clientToken)
                        .header(HttpHeaders.CACHE_CONTROL, "no-store")
                        .header("Pragma", "no-cache")
                         .build();
     }
     
+    /**
+     * Make sure the client is authenticated
+     */
     private Client authenticateClientIfNeeded(MultivaluedMap<String, String> params) {
         Client client = null;
         SecurityContext sc = getMessageContext().getSecurityContext();
@@ -107,11 +129,12 @@ public class AccessTokenService extends AbstractOAuthService {
                 Object clientIdProp = getMessageContext().get(OAuthConstants.CLIENT_ID);
                 if (clientIdProp != null) {
                     client = getClient(clientIdProp.toString());
-                    //TODO: 
-                    // consider matching client.getLoginName() against principal.getName() ?
+                    // TODO: consider matching client.getUserSubject().getLoginName() 
+                    // against principal.getName() ?
                 }
             }
         } else {
+            // the client id and secret are expected to be in the Basic scheme data
             String[] parts = 
                 AuthorizationUtils.getAuthorizationParts(getMessageContext());
             if ("Basic".equals(parts[0])) {
@@ -126,6 +149,7 @@ public class AccessTokenService extends AbstractOAuthService {
         return client;
     }
     
+    // Get the Client and check the id and secret
     private Client getAndValidateClient(String clientId, String clientSecret) {
         Client client = getClient(clientId);
         if (clientSecret == null || !client.getClientId().equals(clientId) 
@@ -135,6 +159,9 @@ public class AccessTokenService extends AbstractOAuthService {
         return client;
     }
     
+    /**
+     * Find the mathcing grant handler
+     */
     protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {
         String grantType = params.getFirst(OAuthConstants.GRANT_TYPE);        
         if (grantType != null) {
@@ -143,6 +170,7 @@ public class AccessTokenService extends AbstractOAuthService {
                     return handler;
                 }
             }
+            // Lets try the default grant handler
             if (grantHandlers.size() == 0) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {

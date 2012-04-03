@@ -41,7 +41,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * or denying the Client to access its resources.
  * If End User approves the access this resource will
  * redirect End User back to the Client, supplying 
- * a request token verifier (aka authorization code)
+ * the authorization code.
  */
 @Path("/authorize")
 public class AuthorizationCodeGrantService extends RedirectionBasedGrantService {
@@ -73,6 +73,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return createErrorResponse(params, redirectUri, OAuthConstants.ACCESS_DENIED);
         }
         
+        // return the code by appending it as a query parameter to the redirect URI
         UriBuilder ub = getRedirectUriBuilder(params.getFirst(OAuthConstants.STATE), redirectUri);
         ub.queryParam(OAuthConstants.AUTHORIZATION_CODE_VALUE, grant.getCode());
         return Response.seeOther(ub.build()).build();

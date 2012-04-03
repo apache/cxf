@@ -23,6 +23,9 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
+/**
+ * Simple Bearer Access Token implementations
+ */
 public class BearerAccessToken extends ServerAccessToken {
     public BearerAccessToken(Client client, 
                              long lifetime) {

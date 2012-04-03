@@ -35,7 +35,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
- * Abstract utility class which OAuth services extend
+ * Abstract OAuth service
  */
 public abstract class AbstractOAuthService {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractOAuthService.class);
@@ -67,6 +67,14 @@ public abstract class AbstractOAuthService {
     protected Client getClient(MultivaluedMap<String, String> params) {
         return getClient(params.getFirst(OAuthConstants.CLIENT_ID));
     }
+    /**
+     * Get the {@link Client} reference
+     * @param clientId the provided client id
+     * @return Client the client reference 
+     * @throws WebApplicationException if no matching Client is found, 
+     *         the error is returned directly to the end user without 
+     *         following the redirect URI if any
+     */
     protected Client getClient(String clientId) {
         Client client = null;
         
@@ -84,6 +92,11 @@ public abstract class AbstractOAuthService {
         
     }
     
+    /**
+     * HTTPS is the default transport for OAuth 2.0 services.
+     * By default this method will issue a warning for open 
+     * endpoints
+     */
     protected void checkTransportSecurity() {  
         if (!mc.getSecurityContext().isSecure()) {
             LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
@@ -100,6 +113,12 @@ public abstract class AbstractOAuthService {
                   Response.status(400).type(MediaType.APPLICATION_JSON).entity(error).build());
     }
 
+    /**
+     * HTTPS is the default transport for OAuth 2.0 services, this property 
+     * can be used to block all the requests issued over HTTP
+     * 
+     * @param blockUnsecureRequests if set to true then HTTP requests will be blocked
+     */
     public void setBlockUnsecureRequests(boolean blockUnsecureRequests) {
         this.blockUnsecureRequests = blockUnsecureRequests;
     }

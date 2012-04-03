@@ -34,10 +34,10 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 /**
+ * Redirection-based Implicit Grant Service
+ * 
  * This resource handles the End User authorising
- * or denying the Client to access its resources.
- * If End User approves the access this resource will
- * return the token directly.
+ * or denying the Client embedded in the Web agent.
  * 
  * We can consider having a single authorization service dealing with either
  * authorization code or implicit grant.
@@ -68,6 +68,8 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
             token = preAuthorizedToken;
         }
 
+   
+       // return the code by appending it as a fragment parameter to the redirect URI
         
         StringBuilder sb = getUriWithFragment(params.getFirst(OAuthConstants.STATE), redirectUri);
         sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
