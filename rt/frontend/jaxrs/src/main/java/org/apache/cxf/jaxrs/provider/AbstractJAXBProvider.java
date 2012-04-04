@@ -119,6 +119,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     private boolean validateOutput;
     private boolean validateBeforeWrite;
     private ValidationEventHandler eventHandler;
+    private Unmarshaller.Listener unmarshallerListener;
+    private Marshaller.Listener marshallerListener;
     private DocumentDepthProperties depthProperties;
     
     public void setValidationHandler(ValidationEventHandler handler) {
@@ -467,6 +469,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         if (eventHandler != null) {
             unmarshaller.setEventHandler(eventHandler);
         }
+        if (unmarshallerListener != null) {
+            unmarshaller.setListener(unmarshallerListener);
+        }
         if (uProperties != null) {
             for (Map.Entry<String, Object> entry : uProperties.entrySet()) {
                 unmarshaller.setProperty(entry.getKey(), entry.getValue());
@@ -485,6 +490,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         Marshaller marshaller = context.createMarshaller();
         if (enc != null) {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, enc);
+        }
+        if (marshallerListener != null) {
+            marshaller.setListener(marshallerListener);
         }
         validateObjectIfNeeded(marshaller, obj);
         return marshaller;
@@ -659,6 +667,14 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
 
     public void setDepthProperties(DocumentDepthProperties depthProperties) {
         this.depthProperties = depthProperties;
+    }
+
+    public void setUnmarshallerListener(Unmarshaller.Listener unmarshallerListener) {
+        this.unmarshallerListener = unmarshallerListener;
+    }
+
+    public void setMarshallerListener(Marshaller.Listener marshallerListener) {
+        this.marshallerListener = marshallerListener;
     }
 
     @XmlRootElement
