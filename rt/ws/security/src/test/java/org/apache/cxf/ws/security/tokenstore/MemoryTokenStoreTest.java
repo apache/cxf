@@ -16,22 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.ws.security.tokenstore;
 
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import java.util.Date;
+
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.junit.BeforeClass;
 
-public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
+public class MemoryTokenStoreTest extends org.junit.Assert {
   
     private static TokenStore store;
     
     @BeforeClass
     public static void init() {
-        store = new DefaultInMemoryTokenStore();
+        TokenStoreFactory tokenStoreFactory = new MemoryTokenStoreFactory();
+        Message message = new MessageImpl();
+        store = tokenStoreFactory.newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);
     }
     
-    // tests STSCache apis for storing in the cache.
+    // tests TokenStore apis for storing in the cache.
     @org.junit.Test
     public void testTokenAdd() throws Exception {
         String key = "key";
@@ -40,9 +45,39 @@ public class DefaultInMemoryTokenStoreTest extends org.junit.Assert {
         assertEquals(token, store.getToken(key));
         store.remove(token.getId());
         assertNull(store.getToken(key));
+        
+        String newKey = "xyz";
+        store.add(newKey, token);
+        assertNull(store.getToken(key));
+        assertEquals(token, store.getToken(newKey));
+        store.remove(newKey);
+        assertNull(store.getToken(newKey));
     }
     
-    // tests STSCache apis for removing from the cache.
+    // tests TokenStore apis for storing in the cache with various expiration times
+    @org.junit.Test
+    public void testTokenAddExpiration() throws Exception {
+        SecurityToken expiredToken = new SecurityToken("expiredToken");
+        Date currentDate = new Date();
+        long currentTime = currentDate.getTime();
+        Date expiry = new Date();
+        expiry.setTime(currentTime - 5000L);
+        expiredToken.setExpires(expiry);
+        store.add(expiredToken);
+        assertTrue(store.getTokenIdentifiers().isEmpty());
+        
+        SecurityToken farFutureToken = new SecurityToken("farFuture");
+        expiry = new Date();
+        expiry.setTime(Long.MAX_VALUE);
+        farFutureToken.setExpires(expiry);
+        store.add(farFutureToken);
+        
+        assertTrue(store.getTokenIdentifiers().size() == 1);
+        store.remove(farFutureToken.getId());
+        assertTrue(store.getTokenIdentifiers().isEmpty());
+    }
+    
+    // tests TokenStore apis for removing from the cache.
     @org.junit.Test
     public void testTokenRemove() {
         SecurityToken token1 = new SecurityToken("token1");

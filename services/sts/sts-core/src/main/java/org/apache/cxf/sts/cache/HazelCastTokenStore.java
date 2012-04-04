@@ -62,14 +62,18 @@ public class HazelCastTokenStore implements TokenStore {
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             int parsedTTL = getTTL(token);
-            cacheMap.put(token.getId(), token, parsedTTL, TimeUnit.SECONDS);
+            if (parsedTTL > 0) {
+                cacheMap.put(token.getId(), token, parsedTTL, TimeUnit.SECONDS);
+            }
         }
     }
     
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
             int parsedTTL = getTTL(token);
-            cacheMap.put(identifier, token, parsedTTL, TimeUnit.SECONDS);
+            if (parsedTTL > 0) {
+                cacheMap.put(identifier, token, parsedTTL, TimeUnit.SECONDS);
+            }
         }
     }
     
@@ -98,9 +102,12 @@ public class HazelCastTokenStore implements TokenStore {
             Date expires = token.getExpires();
             Date current = new Date();
             long expiryTime = (expires.getTime() - current.getTime()) / 1000L;
+            if (expiryTime < 0) {
+                return 0;
+            }
             
             parsedTTL = (int)expiryTime;
-            if (expiryTime != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+            if (expiryTime != (long)parsedTTL || parsedTTL > MAX_TTL) {
                 // Default to configured value
                 parsedTTL = (int)ttl;
                 if (ttl != (long)parsedTTL) {

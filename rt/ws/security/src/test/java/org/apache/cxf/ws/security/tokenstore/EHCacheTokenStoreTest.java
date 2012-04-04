@@ -16,21 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.sts.cache;
+package org.apache.cxf.ws.security.tokenstore;
 
 import java.util.Date;
 
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.junit.BeforeClass;
 
-public class HazelCastTokenStoreTest extends org.junit.Assert {
+public class EHCacheTokenStoreTest extends org.junit.Assert {
   
     private static TokenStore store;
     
     @BeforeClass
-    public static void init() throws Exception {
-        store = new HazelCastTokenStore("default");
+    public static void init() {
+        TokenStoreFactory tokenStoreFactory = new EHCacheTokenStoreFactory();
+        Message message = new MessageImpl();
+        message.put(
+            SecurityConstants.CACHE_CONFIG_FILE, 
+            ClassLoaderUtils.getResource("cxf-ehcache.xml", EHCacheTokenStoreTest.class)
+        );
+        store = tokenStoreFactory.newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);
     }
     
     // tests TokenStore apis for storing in the cache.

@@ -40,14 +40,18 @@ public class MemoryTokenStore implements TokenStore {
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             CacheEntry cacheEntry = createCacheEntry(token);
-            tokens.put(token.getId(), cacheEntry);
+            if (cacheEntry != null) {
+                tokens.put(token.getId(), cacheEntry);
+            }
         }
     }
     
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
             CacheEntry cacheEntry = createCacheEntry(token);
-            tokens.put(identifier, cacheEntry);
+            if (cacheEntry != null) {
+                tokens.put(identifier, cacheEntry);
+            }
         }
     }
     
@@ -109,7 +113,10 @@ public class MemoryTokenStore implements TokenStore {
             Date expires = token.getExpires();
             Date current = new Date();
             long expiryTime = expires.getTime() - current.getTime();
-            if (expiryTime < 0 || expiryTime > (MAX_TTL * 1000L)) {
+            if (expiryTime < 0) {
+                return null;
+            }
+            if (expiryTime > (MAX_TTL * 1000L)) {
                 expires.setTime(current.getTime() + (DEFAULT_TTL * 1000L));
             }
             cacheEntry = new CacheEntry(token, expires);
