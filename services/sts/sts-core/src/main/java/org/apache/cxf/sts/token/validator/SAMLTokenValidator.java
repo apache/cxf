@@ -216,6 +216,7 @@ public class SAMLTokenValidator implements TokenValidator {
                     }
                 }
             }
+            response.setTokenRealm(tokenRealm);
             
             if (!validateConditions(assertion, validateTarget, secToken, tokenParameters.getTokenStore())) {
                 return response;
@@ -233,7 +234,6 @@ public class SAMLTokenValidator implements TokenValidator {
             addProps.put(AssertionWrapper.class.getName(), assertion);
             response.setAdditionalProperties(addProps);
             
-            response.setTokenRealm(tokenRealm);
             validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);

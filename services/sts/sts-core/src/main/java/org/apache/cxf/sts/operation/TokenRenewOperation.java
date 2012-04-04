@@ -31,7 +31,6 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
-import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -66,7 +65,16 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
     private static final Logger LOG = LogUtils.getL7dLogger(TokenRenewOperation.class);
 
     private List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
+    private boolean allowRenewalBeforeExpiry;
     
+    public boolean isAllowRenewalBeforeExpiry() {
+        return allowRenewalBeforeExpiry;
+    }
+
+    public void setAllowRenewalBeforeExpiry(boolean allowRenewalBeforeExpiry) {
+        this.allowRenewalBeforeExpiry = allowRenewalBeforeExpiry;
+    }
+
     public void setTokenRenewers(List<TokenRenewer> tokenRenewerList) {
         this.tokenRenewers = tokenRenewerList;
     }
@@ -124,8 +132,9 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             );
         }
         
-        // Reject an valid token (not expired) by default
-        if (tokenResponse.getToken().getState() != STATE.EXPIRED) {
+        // Reject a non-expired token (valid or invalid) by default
+        if (tokenResponse.getToken().getState() != STATE.EXPIRED
+            && !(allowRenewalBeforeExpiry && tokenResponse.getToken().getState() == STATE.VALID)) {
             LOG.fine("The token is not expired, and so it cannot be renewed");
             throw new STSException(
                 "No Token Validator has been found that can handle this token" 
@@ -141,11 +150,6 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         String tokenType = tokenRequirements.getTokenType();
         TokenProviderParameters providerParameters = 
                 createTokenProviderParameters(requestParser, context);
-
-        // Check if the requested claims can be handled by the configured claim handlers
-        RequestClaimCollection requestedClaims = providerParameters.getRequestedClaims();
-        checkClaimsSupport(requestedClaims);
-        providerParameters.setClaimsManager(claimsManager);
 
         Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
         if (additionalProperties != null) {
