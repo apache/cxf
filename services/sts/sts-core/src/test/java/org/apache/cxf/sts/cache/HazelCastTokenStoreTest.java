@@ -39,14 +39,16 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
         String key = "key";
         SecurityToken token = new SecurityToken(key);
         store.add(token);
-        assertEquals(token, store.getToken(key));
+        SecurityToken cachedToken = store.getToken(key);
+        assertEquals(token.getId(), cachedToken.getId());
         store.remove(token.getId());
         assertNull(store.getToken(key));
         
         String newKey = "xyz";
         store.add(newKey, token);
         assertNull(store.getToken(key));
-        assertEquals(token, store.getToken(newKey));
+        cachedToken = store.getToken(newKey);
+        assertEquals(key, cachedToken.getId());
         store.remove(newKey);
         assertNull(store.getToken(newKey));
     }

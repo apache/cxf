@@ -202,6 +202,16 @@ public class UsernameTokenValidator implements TokenValidator {
                 }
             }
             
+            // Store the successfully validated token in the cache
+            if (tokenParameters.getTokenStore() != null && secToken == null) {
+                secToken = new SecurityToken(ut.getID());
+                secToken.setToken(ut.getElement());
+                int hashCode = ut.hashCode();
+                String identifier = Integer.toString(hashCode);
+                secToken.setTokenHash(hashCode);
+                tokenParameters.getTokenStore().add(identifier, secToken);
+            }
+            
             response.setPrincipal(principal);
             response.setTokenRealm(tokenRealm);
             validateTarget.setState(STATE.VALID);
