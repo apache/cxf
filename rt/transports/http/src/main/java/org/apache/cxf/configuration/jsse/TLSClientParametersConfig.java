@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.configuration.jsse.spring;
+package org.apache.cxf.configuration.jsse;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -35,7 +35,6 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.util.PackageUtils;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
 import org.apache.cxf.staxutils.StaxUtils;
 

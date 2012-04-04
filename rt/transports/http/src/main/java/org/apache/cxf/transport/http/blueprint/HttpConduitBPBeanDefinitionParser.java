@@ -31,7 +31,7 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
-import org.apache.cxf.configuration.jsse.spring.TLSClientParametersConfig;
+import org.apache.cxf.configuration.jsse.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.staxutils.StaxUtils;

@@ -16,13 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.configuration.jsse.spring;
+package org.apache.cxf.configuration.jsse;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 
 /**

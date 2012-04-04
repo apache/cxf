@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
+import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;

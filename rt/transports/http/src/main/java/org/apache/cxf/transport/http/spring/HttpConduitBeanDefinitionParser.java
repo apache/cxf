@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.configuration.jsse.spring.TLSClientParametersConfig;
+import org.apache.cxf.configuration.jsse.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;

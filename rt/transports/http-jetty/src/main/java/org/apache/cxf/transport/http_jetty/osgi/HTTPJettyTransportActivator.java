@@ -29,8 +29,8 @@ import java.util.StringTokenizer;
 
 import javax.management.MBeanServer;
 
+import org.apache.cxf.configuration.jsse.TLSParameterJaxBUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
-import org.apache.cxf.configuration.jsse.spring.TLSParameterJaxBUtils;
 import org.apache.cxf.configuration.security.CertStoreType;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ClientAuthentication;

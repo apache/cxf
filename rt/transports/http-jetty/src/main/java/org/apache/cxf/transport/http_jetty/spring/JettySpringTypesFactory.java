@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
-import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
+import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http_jetty.ThreadingParameters;
 import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIdentifiedType;
