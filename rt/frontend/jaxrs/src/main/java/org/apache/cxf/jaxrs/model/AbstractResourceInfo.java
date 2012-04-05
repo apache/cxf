@@ -125,8 +125,7 @@ public abstract class AbstractResourceInfo {
     
     private void checkContextMethod(Method m) {
         Class<?> type = m.getParameterTypes()[0];
-        if (AnnotationUtils.isContextClass(type)
-            && m.getName().equals("set" + type.getSimpleName())) {        
+        if (m.getName().equals("set" + type.getSimpleName())) {        
             addContextMethod(type, m);
         }
     }

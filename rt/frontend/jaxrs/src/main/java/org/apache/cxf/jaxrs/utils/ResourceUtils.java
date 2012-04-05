@@ -246,8 +246,7 @@ public final class ResourceUtils {
             boolean match = true;
             for (int i = 0; i < params.length; i++) {
                 if (!perRequest) { 
-                    if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null
-                        || !AnnotationUtils.isContextClass(params[i])) {
+                    if (AnnotationUtils.getAnnotation(anns[i], Context.class) == null) {
                         match = false;
                         break;
                     }
@@ -562,7 +561,7 @@ public final class ResourceUtils {
             : (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         Object[] values = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
-            if (AnnotationUtils.isContextClass(params[i])) {
+            if (AnnotationUtils.getAnnotation(anns[i], Context.class) != null) {
                 values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
             } else {
                 Parameter p = ResourceUtils.getParameter(i, anns[i], params[i]);
