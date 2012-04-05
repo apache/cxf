@@ -1025,5 +1025,15 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         InputStream ins = url.openStream();
         ins.close();
     }
-    
+
+    @Test
+    public void testServerAsync() throws Exception {
+        Service service = Service.create(serviceName);
+        service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING, 
+            "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort");
+        Greeter greeter = service.getPort(fakePortName, Greeter.class);
+        String resp = greeter.greetMe("World");
+        assertEquals("Hello World", resp);
+    }
+
 }

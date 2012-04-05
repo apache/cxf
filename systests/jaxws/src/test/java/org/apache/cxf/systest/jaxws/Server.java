@@ -20,15 +20,20 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.net.URL;
+import java.util.concurrent.Future;
 
 import javax.jws.WebService;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.BaseGreeterImpl;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.GreeterImpl;
+import org.apache.hello_world_soap_http.types.GreetMeResponse;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
@@ -42,6 +47,11 @@ public class Server extends AbstractBusTestServerBase {
         }
         Object implementor;
         String address;
+
+        implementor = new AsyncGreeter();
+        address = "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort";
+        Endpoint.publish(address, implementor);
+        
         implementor = new GreeterImplMultiPort();
         address = "http://localhost:" + PORT + "/MultiPort/GreeterPort";
         Endpoint.publish(address, implementor);
@@ -53,7 +63,7 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new GreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
-        
+
         implementor = new RefGreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort2";
         Endpoint.publish(address, implementor);
@@ -79,9 +89,38 @@ public class Server extends AbstractBusTestServerBase {
     @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http")
     public class Greeter12Impl extends BaseGreeterImpl {
+
     }
     
-    
+    @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
+        targetNamespace = "http://apache.org/hello_world_soap_http")
+    public class AsyncGreeter extends BaseGreeterImpl {
+
+        @UseAsyncMethod
+        public String greetMe(String me) {
+            throw new RuntimeException("Should be async");
+        }
+
+        public Future<?> greetMeAsync(final String requestType,
+                                      final AsyncHandler<GreetMeResponse> asyncHandler) {
+            final ServerAsyncResponse<GreetMeResponse> r = new ServerAsyncResponse<GreetMeResponse>();
+            new Thread() {
+                public void run() {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        //ignore
+                    }
+                    GreetMeResponse resp = new GreetMeResponse();
+                    resp.setResponseType("Hello " + requestType);
+                    r.set(resp);
+                    asyncHandler.handleResponse(r);                    
+                }
+            } .start();
+            return r;
+        }
+    }
+
     public static void main(String[] args) {
         try {
             Server s = new Server();

@@ -59,11 +59,6 @@ public abstract class AbstractInvoker implements Invoker {
                 throw new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG, 
                                              "No binding operation info", "unknown method", "unknown"));
             }
-            
-            
-            //Method m = (Method)bop.getOperationInfo().getProperty(Method.class.getName());
-            m = matchMethod(m, serviceObject);
-            
             List<Object> params = null;
             if (o instanceof List) {
                 params = CastUtils.cast((List<?>)o);
@@ -71,10 +66,23 @@ public abstract class AbstractInvoker implements Invoker {
                 params = new MessageContentsList(o);
             }
             
+            m = adjustMethodAndParams(m, exchange, params);
+            
+            //Method m = (Method)bop.getOperationInfo().getProperty(Method.class.getName());
+            m = matchMethod(m, serviceObject);
+            
+            
             return invoke(exchange, serviceObject, m, params);
         } finally {
             releaseServiceObject(exchange, serviceObject);
         }
+    }
+
+    protected Method adjustMethodAndParams(Method m,
+                                           Exchange ex,
+                                           List<Object> params) {
+        //nothing to do
+        return m;
     }
 
     protected Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {

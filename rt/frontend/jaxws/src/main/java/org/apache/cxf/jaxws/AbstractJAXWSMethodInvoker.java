@@ -28,13 +28,18 @@ import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
+import javax.xml.ws.AsyncHandler;
+import javax.xml.ws.Response;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.continuations.Continuation;
+import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
@@ -43,12 +48,15 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
+import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
+    private static final String ASYNC_METHOD = "org.apache.cxf.jaxws.async.method";
 
     public AbstractJAXWSMethodInvoker(final Object bean) {
         super(new SingletonFactory(bean));
@@ -66,6 +74,111 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             return findSoapFaultException(ex.getCause());
         }
         return null;
+    }
+    protected Method adjustMethodAndParams(Method m, Exchange ex, List<Object> params) {
+        
+        UseAsyncMethod uam = m.getAnnotation(UseAsyncMethod.class);
+        if (uam != null) {
+            BindingOperationInfo bop = ex.getBindingOperationInfo();
+            Method ret = bop.getProperty(ASYNC_METHOD, Method.class);
+            if (ret == null) {
+                Class<?> ptypes[] = new Class<?>[m.getParameterTypes().length + 1];
+                System.arraycopy(m.getParameterTypes(), 0, ptypes, 0, m.getParameterTypes().length);
+                ptypes[m.getParameterTypes().length] = AsyncHandler.class;
+                try {
+                    ret = m.getDeclaringClass().getMethod(m.getName() + "Async", ptypes);
+                    bop.setProperty(ASYNC_METHOD, ret);
+                } catch (Throwable t) {
+                    //ignore
+                }
+            }
+            if (ret != null) {
+                JaxwsServerHandler h = ex.get(JaxwsServerHandler.class);
+                if (h != null) {
+                    return ret; 
+                }
+                ContinuationProvider cp = ex.getInMessage().get(ContinuationProvider.class);
+                if (cp == null && uam.always()) {
+                    JaxwsServerHandler handler = new JaxwsServerHandler(null);
+                    ex.put(JaxwsServerHandler.class, handler);
+                    params.add(handler);
+                    return ret;
+                } else if (cp != null && cp.getContinuation() != null) {
+                    final Continuation c = cp.getContinuation();
+                    c.suspend(0);
+                    JaxwsServerHandler handler = new JaxwsServerHandler(c);
+                    ex.put(JaxwsServerHandler.class, handler);
+                    params.add(handler);
+                    return ret;
+                }
+            }
+        }
+        return m;
+    }
+    
+    class JaxwsServerHandler implements AsyncHandler<Object> {
+        Response<Object> r;
+        Continuation continuation;
+        boolean done;
+        
+        public JaxwsServerHandler(Continuation c) {
+            continuation = c;
+        }
+        
+        public synchronized void handleResponse(Response<Object> res) {
+            r = res;
+            done = true;
+            if (continuation != null) {
+                continuation.resume();
+            }
+            notifyAll();
+        }
+        public boolean hasContinuation() {
+            return continuation != null;
+        }
+        public synchronized void waitForDone() {
+            while (!done) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    //ignore
+                }
+            }
+        }
+        public boolean isDone() {
+            return done;
+        }
+        public Object getObject() {
+            try {
+                return r.get();
+            } catch (Exception ex) {
+                throw new Fault(ex);
+            }
+        }
+    }
+    
+    @Override
+    protected Object invoke(Exchange exchange, 
+                            final Object serviceObject, Method m,
+                            List<Object> params) {
+        JaxwsServerHandler h = exchange.get(JaxwsServerHandler.class);
+        if (h != null && h.isDone()) {
+            BindingOperationInfo bop = exchange.getBindingOperationInfo();
+            if (bop.isUnwrapped()) {
+                exchange.put(BindingOperationInfo.class, bop.getWrappedOperation());
+            }
+            return new MessageContentsList(h.getObject());
+        }
+        Object o = super.invoke(exchange, serviceObject, m, params);
+        if (h != null && !h.hasContinuation()) {
+            h.waitForDone();
+            BindingOperationInfo bop = exchange.getBindingOperationInfo();
+            if (bop.isUnwrapped()) {
+                exchange.put(BindingOperationInfo.class, bop.getWrappedOperation());
+            }
+            return new MessageContentsList(h.getObject());
+        }
+        return o;
     }
     
     @Override
