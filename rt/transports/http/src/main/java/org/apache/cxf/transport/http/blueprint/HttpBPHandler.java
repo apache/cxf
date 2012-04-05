@@ -56,7 +56,10 @@ public class HttpBPHandler implements NamespaceHandler {
 
         if ("conduit".equals(s)) {
             return new HttpConduitBPBeanDefinitionParser().parse(element, context);
+        } else if ("destination".equals(s)) {
+            return new HttpDestinationBPBeanDefinitionParser().parse(element, context);
         }
+        
         return null;
     }
 
