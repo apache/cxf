@@ -30,6 +30,7 @@ import java.util.concurrent.TimeoutException;
 public class ServerAsyncResponse<T> implements javax.xml.ws.Response<T> {
     T value;
     boolean done;
+    Throwable throwable;
     
     /**
      * Currently unused
@@ -51,17 +52,24 @@ public class ServerAsyncResponse<T> implements javax.xml.ws.Response<T> {
         done = true;
     }
     public T get() throws InterruptedException, ExecutionException {
+        if (throwable != null) {
+            throw new ExecutionException(throwable);
+        }
         return value;
     }
     public T get(long timeout, TimeUnit unit) 
         throws InterruptedException, ExecutionException, TimeoutException {
         return value;
     }
-    
+    public void exception(Throwable ex) {
+        throwable = ex;
+        done = true;
+    }
     /**
      * Currently unused
      */
     public Map<String, Object> getContext() {
         return null;
     }
+    
 }

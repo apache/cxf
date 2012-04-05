@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.activation.DataHandler;
 import javax.xml.ws.AsyncHandler;
@@ -47,6 +48,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
@@ -148,12 +150,8 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         public boolean isDone() {
             return done;
         }
-        public Object getObject() {
-            try {
-                return r.get();
-            } catch (Exception ex) {
-                throw new Fault(ex);
-            }
+        public Object getObject() throws Exception {
+            return r.get();
         }
     }
     
@@ -167,7 +165,15 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             if (bop.isUnwrapped()) {
                 exchange.put(BindingOperationInfo.class, bop.getWrappedOperation());
             }
-            return new MessageContentsList(h.getObject());
+            try {
+                return new MessageContentsList(h.getObject());
+            } catch (ExecutionException ex) {
+                exchange.getInMessage().put(FaultMode.class, 
+                                            FaultMode.CHECKED_APPLICATION_FAULT);                    
+                throw createFault(ex.getCause(), m, params, true);
+            } catch (Exception ex) {
+                throw createFault(ex.getCause(), m, params, false);
+            }
         }
         Object o = super.invoke(exchange, serviceObject, m, params);
         if (h != null && !h.hasContinuation()) {
@@ -176,7 +182,15 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             if (bop.isUnwrapped()) {
                 exchange.put(BindingOperationInfo.class, bop.getWrappedOperation());
             }
-            return new MessageContentsList(h.getObject());
+            try {
+                return new MessageContentsList(h.getObject());
+            } catch (ExecutionException ex) {
+                exchange.getInMessage().put(FaultMode.class, 
+                                            FaultMode.CHECKED_APPLICATION_FAULT);                    
+                throw createFault(ex.getCause(), m, params, true);
+            } catch (Exception ex) {
+                throw createFault(ex.getCause(), m, params, false);
+            }
         }
         return o;
     }
