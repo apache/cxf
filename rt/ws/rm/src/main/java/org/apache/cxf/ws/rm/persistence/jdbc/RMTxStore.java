@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,6 +34,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -58,36 +62,47 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 public class RMTxStore implements RMStore {
     
     public static final String DEFAULT_DATABASE_NAME = "rmdb";
+    private static final String[][] DEST_SEQUENCES_TABLE_COLS 
+        = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
+           {"ACKS_TO", "VARCHAR(1024) NOT NULL"},
+           {"LAST_MSG_NO", "DECIMAL(19, 0)"},
+           {"ENDPOINT_ID", "VARCHAR(1024)"},
+           {"ACKNOWLEDGED", "BLOB"},
+           {"PROTOCOL_VERSION", "VARCHAR(256)"}};
+    private static final String[] DEST_SEQUENCES_TABLE_KEYS = {"SEQ_ID"};
+    private static final String[][] SRC_SEQUENCES_TABLE_COLS
+        = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
+           {"CUR_MSG_NO", "DECIMAL(19, 0) DEFAULT 1 NOT NULL"},
+           {"LAST_MSG", "CHAR(1)"},
+           {"EXPIRY", "DECIMAL(19, 0)"},
+           {"OFFERING_SEQ_ID", "VARCHAR(256)"},
+           {"ENDPOINT_ID", "VARCHAR(1024)"},
+           {"PROTOCOL_VERSION", "VARCHAR(256)"}};
+    private static final String[] SRC_SEQUENCES_TABLE_KEYS = {"SEQ_ID"};
+    private static final String[][] MESSAGES_TABLE_COLS
+        = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
+           {"MSG_NO", "DECIMAL(19, 0) NOT NULL"},
+           {"SEND_TO", "VARCHAR(256)"},
+           {"CONTENT", "BLOB"}};
+    private static final String[] MESSAGES_TABLE_KEYS = {"SEQ_ID", "MSG_NO"};
     
-    private static final String CREATE_DEST_SEQUENCES_TABLE_STMT =
-        "CREATE TABLE CXF_RM_DEST_SEQUENCES " 
-        + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "ACKS_TO VARCHAR(1024) NOT NULL, "
-        + "LAST_MSG_NO DECIMAL(19, 0), "
-        + "ENDPOINT_ID VARCHAR(1024), "
-        + "ACKNOWLEDGED BLOB, "
-        + "PROTOCOL_VERSION VARCHAR(256), "
-        + "PRIMARY KEY (SEQ_ID))";
-    private static final String CREATE_SRC_SEQUENCES_TABLE_STMT =
-        "CREATE TABLE CXF_RM_SRC_SEQUENCES " 
-        + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "CUR_MSG_NO DECIMAL(19, 0) DEFAULT 1 NOT NULL, "
-        + "LAST_MSG CHAR(1), "
-        + "EXPIRY DECIMAL(19, 0), "
-        + "OFFERING_SEQ_ID VARCHAR(256), "
-        + "ENDPOINT_ID VARCHAR(1024), "
-        + "PROTOCOL_VERSION VARCHAR(256), "
-        + "PRIMARY KEY (SEQ_ID))";
-    private static final String CREATE_MESSAGES_TABLE_STMT =
-        "CREATE TABLE {0} " 
-        + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "MSG_NO DECIMAL(19, 0) NOT NULL, "
-        + "SEND_TO VARCHAR(256), "
-        + "CONTENT BLOB, "
-        + "PRIMARY KEY (SEQ_ID, MSG_NO))";
+
+    private static final String DEST_SEQUENCES_TABLE_NAME = "CXF_RM_DEST_SEQUENCES"; 
+    private static final String SRC_SEQUENCES_TABLE_NAME = "CXF_RM_SRC_SEQUENCES";
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
     private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
     
+    private static final String CREATE_DEST_SEQUENCES_TABLE_STMT = 
+        buildCreateTableStatement(DEST_SEQUENCES_TABLE_NAME, 
+                                  DEST_SEQUENCES_TABLE_COLS, DEST_SEQUENCES_TABLE_KEYS);
+
+    private static final String CREATE_SRC_SEQUENCES_TABLE_STMT =
+        buildCreateTableStatement(SRC_SEQUENCES_TABLE_NAME, 
+                                  SRC_SEQUENCES_TABLE_COLS, SRC_SEQUENCES_TABLE_KEYS);
+    private static final String CREATE_MESSAGES_TABLE_STMT =
+        buildCreateTableStatement("{0}", 
+                                  MESSAGES_TABLE_COLS, MESSAGES_TABLE_KEYS);
+
     private static final String CREATE_DEST_SEQUENCE_STMT_STR 
         = "INSERT INTO CXF_RM_DEST_SEQUENCES (SEQ_ID, ACKS_TO, ENDPOINT_ID, PROTOCOL_VERSION) " 
             + "VALUES(?, ?, ?, ?)";
@@ -119,7 +134,8 @@ public class RMTxStore implements RMStore {
         + "FROM CXF_RM_SRC_SEQUENCES WHERE ENDPOINT_ID = ?";
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
-    
+    private static final String ALTER_TABLE_STMT_STR =
+        "ALTER TABLE {0} ADD {1} {2}";
     private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
     private static final int ORACLE_TABLE_EXISTS_CODE = 955;
     
@@ -640,10 +656,11 @@ public class RMTxStore implements RMStore {
                 throw ex;
             } else {
                 LOG.fine("Table CXF_RM_SRC_SEQUENCES already exists.");
+                verifyTable(SRC_SEQUENCES_TABLE_NAME, SRC_SEQUENCES_TABLE_COLS);
             }
         }
         stmt.close();
-        
+
         stmt = connection.createStatement();
         try {
             stmt.executeUpdate(CREATE_DEST_SEQUENCES_TABLE_STMT);
@@ -652,6 +669,7 @@ public class RMTxStore implements RMStore {
                 throw ex;
             } else {
                 LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
+                verifyTable(DEST_SEQUENCES_TABLE_NAME, DEST_SEQUENCES_TABLE_COLS);        
             }
         }
         stmt.close();
@@ -667,12 +685,58 @@ public class RMTxStore implements RMStore {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Table " + tableName + " already exists.");
                     }
+                    verifyTable(tableName, MESSAGES_TABLE_COLS);
                 }
             }
             stmt.close();
         }
     }
     
+    protected void verifyTable(String tableName, String[][] tableCols) {
+        try {
+            DatabaseMetaData metadata = connection.getMetaData();
+            ResultSet rs = metadata.getColumns(null, null, tableName, "%");
+            Set<String> dbCols = new HashSet<String>();
+            List<String[]> newCols = new ArrayList<String[]>(); 
+            while (rs.next()) {
+                dbCols.add(rs.getString(4));
+            }
+            for (String[] col : tableCols) {
+                if (!dbCols.contains(col[0])) {
+                    newCols.add(col);
+                }
+            }
+            if (newCols.size() > 0) {
+                // need to add the new columns
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");
+                }
+                
+                for (String[] newCol : newCols) {
+                    Statement st = null;
+                    try {
+                        st = connection.createStatement();
+                        st.executeUpdate(MessageFormat.format(ALTER_TABLE_STMT_STR, 
+                                                              tableName, newCol[0], newCol[1]));
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.log(Level.FINE, "Successfully added column {0} to table {1}",
+                                    new Object[] {tableName, newCol[0]});
+                        }
+                    } finally {
+                        if (st != null) {
+                            st.close();
+                        }
+                    }
+                }
+            }
+            
+        } catch (SQLException ex) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Table " + tableName + " cannot be verified.");
+            }
+        }
+    }
+
     @PostConstruct     
     public synchronized void init() {
         
@@ -787,7 +851,24 @@ public class RMTxStore implements RMStore {
             dir.deleteOnExit();
         }
     }
-    
+     
+    private static String buildCreateTableStatement(String name, String[][] cols, String[] keys) {
+        StringBuffer buf = new StringBuffer();
+        buf.append("CREATE TABLE ").append(name).append(" (");
+        for (String[] col : cols) {
+            buf.append(col[0]).append(" ").append(col[1]).append(", ");
+        }
+        buf.append("PRIMARY KEY (");
+        for (int i = 0; i < keys.length; i++) {
+            if (i > 0) {
+                buf.append(", ");
+            }
+            buf.append(keys[i]);
+        }
+        buf.append("))");
+        return buf.toString();
+    }
+
     protected boolean isTableExistsError(SQLException ex) {
         // we could be deriving the state/code from the driver url to avoid explicit setting of them
         return (null != tableExistsState && tableExistsState.equals(ex.getSQLState()))
