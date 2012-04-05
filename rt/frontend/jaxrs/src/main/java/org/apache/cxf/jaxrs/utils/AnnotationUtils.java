@@ -53,6 +53,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 
 public final class AnnotationUtils {
     
@@ -82,6 +83,7 @@ public final class AnnotationUtils {
         classes.add(Providers.class);
         classes.add(Request.class);
         classes.add(Application.class);
+        classes.add(SearchContext.class);
         // Servlet API
         try {
             classes.add(HttpServletRequest.class);
