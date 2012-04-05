@@ -453,6 +453,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testRetrieveGetBookAegis() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve/get"; 
+        getBookAegis(endpointAddress, "application/xml"); 
+    }
+    
+    @Test
     public void testRetrieveBookAegis3() throws Exception {
         
         Socket s = new Socket("localhost", Integer.parseInt(PORT));
