@@ -23,6 +23,7 @@
     <name>JAX-WS Asynchronous Demo using Document/Literal Style</name>
     <description>JAX-WS Asynchronous Demo using Document/Literal Style</description>
     <version>2.6.0-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
@@ -32,6 +33,7 @@
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
+        <wsdl.location>${basedir}/wsdl/hello_world_async.wsdl</wsdl.location>
     </properties>
     <build>
         <plugins>
@@ -95,6 +97,14 @@
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <!-- Jetty is needed if you're using the CXFServlet -->
+                <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                    <version>2.6.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>client</id>
@@ -113,7 +123,7 @@
                                 <configuration>
                                     <mainClass>demo.hw.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world_async.wsdl</argument>
+                                        <argument>${wsdl.location}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -134,11 +144,10 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>2.6.0-SNAPSHOT</version>
         </dependency>
-        <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>2.6.0-SNAPSHOT</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>3.0.7.RELEASE</version>
         </dependency>
     </dependencies>
 </project>

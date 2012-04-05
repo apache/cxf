@@ -21,6 +21,7 @@
 package demo.hw.client;
 
 import java.io.File;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -47,10 +48,15 @@ public final class Client {
             System.out.println("please specify wsdl");
             System.exit(1); 
         }
-
+        URL url = null;
         File wsdl = new File(args[0]);
+        if (wsdl.exists() && wsdl.isFile()) {
+            url = wsdl.toURI().toURL();
+        } else {
+            url = new URL(args[0]);
+        }
         
-        SOAPService ss = new SOAPService(wsdl.toURL(), SERVICE_NAME);
+        SOAPService ss = new SOAPService(url, SERVICE_NAME);
         ExecutorService executor = Executors.newFixedThreadPool(5);
         ss.setExecutor(executor);
         GreeterAsync port = ss.getSoapPort();

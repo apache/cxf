@@ -27,6 +27,8 @@ import javax.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 
+import org.apache.cxf.annotations.UseAsyncMethod;
+import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.hello_world_async_soap_http.GreeterAsync;
 import org.apache.hello_world_async_soap_http.types.GreetMeSometimeResponse;
 
@@ -42,16 +44,29 @@ public class GreeterImpl implements GreeterAsync {
      /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMeSometime(java.lang.String)
      */
+    @UseAsyncMethod
     public String greetMeSometime(String me) {
-        LOG.info("Executing operation greetMeSometime");
-        System.out.println("Executing operation greetMeSometime\n");
+        LOG.info("Executing operation greetMeSometime synchronously");
+        System.out.println("Executing operation greetMeSometime synchronously\n");
         return "How are you " + me;
     }
     
-    public Future<?>  greetMeSometimeAsync(String requestType, 
-                                           AsyncHandler<GreetMeSometimeResponse> asyncHandler) {
-        return null; 
-        /*not called */
+    public Future<?>  greetMeSometimeAsync(final String me, 
+                                           final AsyncHandler<GreetMeSometimeResponse> asyncHandler) {
+        LOG.info("Executing operation greetMeSometimeAsync asynchronously");
+        System.out.println("Executing operation greetMeSometimeAsync asynchronously\n");
+        final ServerAsyncResponse<GreetMeSometimeResponse> r = new ServerAsyncResponse<GreetMeSometimeResponse>();
+        new Thread() {
+            public void run() {
+                GreetMeSometimeResponse resp = new GreetMeSometimeResponse();
+                resp.setResponseType("How are you " + me);
+                r.set(resp);
+                System.out.println("Responding on background thread\n");
+                asyncHandler.handleResponse(r);
+            }
+        } .start();
+        
+        return r; 
     }
     
     public Response<GreetMeSometimeResponse> greetMeSometimeAsync(String requestType) { 
