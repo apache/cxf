@@ -114,9 +114,18 @@ public class DefaultConditionsProvider implements ConditionsProvider {
      * Get a ConditionsBean object.
      */
     public ConditionsBean getConditions(TokenProviderParameters providerParameters) {
+        return getConditions(
+            providerParameters.getAppliesToAddress(),
+            providerParameters.getTokenRequirements().getLifetime()
+        );
+    }
+    
+    /**
+     * Get a ConditionsBean object.
+     */
+    public ConditionsBean getConditions(String appliesToAddress, Lifetime tokenLifetime) {
         ConditionsBean conditions = new ConditionsBean();
         if (lifetime > 0) {
-            Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
             if (acceptClientLifetime && tokenLifetime != null) {
                 try {
                     XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
@@ -154,7 +163,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         } else {
             conditions.setTokenPeriodMinutes(5);
         }
-        conditions.setAudienceURI(providerParameters.getAppliesToAddress());
+        conditions.setAudienceURI(appliesToAddress);
         
         return conditions;
     }

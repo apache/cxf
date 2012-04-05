@@ -22,7 +22,6 @@ import java.security.Principal;
 import java.util.Map;
 
 import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 
 /**
  * This class encapsulates the response from a TokenValidator instance after validating a token.
@@ -33,19 +32,7 @@ public class TokenValidatorResponse {
     private Map<String, Object> additionalProperties;
     private String realm;
     private ReceivedToken token;
-    /**
-     * The SecurityToken corresponding to the ReceivedToken that was stored in the cache 
-     */
-    private SecurityToken securityToken;
     
-    public SecurityToken getSecurityToken() {
-        return securityToken;
-    }
-
-    public void setSecurityToken(SecurityToken securityToken) {
-        this.securityToken = securityToken;
-    }
-
     public ReceivedToken getToken() {
         return token;
     }

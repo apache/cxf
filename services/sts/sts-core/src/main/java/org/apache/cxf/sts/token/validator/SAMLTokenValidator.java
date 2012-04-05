@@ -155,7 +155,6 @@ public class SAMLTokenValidator implements TokenValidator {
                 if (secToken != null && secToken.getTokenHash() != hash) {
                     secToken = null;
                 }
-                response.setSecurityToken(secToken);
             }
             if (secToken != null && secToken.isExpired()) {
                 LOG.fine("Token: " + secToken.getId() + " is in the cache but expired - revalidating");
@@ -218,14 +217,14 @@ public class SAMLTokenValidator implements TokenValidator {
             }
             response.setTokenRealm(tokenRealm);
             
-            if (!validateConditions(assertion, validateTarget, secToken, tokenParameters.getTokenStore())) {
+            if (!validateConditions(assertion, validateTarget)) {
                 return response;
             }
             
             // Store the successfully validated token in the cache
             if (secToken == null) {
                 storeTokenInCache(
-                    tokenParameters.getTokenStore(), assertion, tokenParameters.getPrincipal()
+                    tokenParameters.getTokenStore(), assertion, tokenParameters.getPrincipal(), tokenRealm
                 );
             }
             
@@ -274,10 +273,7 @@ public class SAMLTokenValidator implements TokenValidator {
     }
     
     protected boolean validateConditions(
-        AssertionWrapper assertion,
-        ReceivedToken validateTarget,
-        SecurityToken secToken, 
-        TokenStore tokenStore
+        AssertionWrapper assertion, ReceivedToken validateTarget
     ) {
         DateTime validFrom = null;
         DateTime validTill = null;
@@ -290,25 +286,20 @@ public class SAMLTokenValidator implements TokenValidator {
         }
         if (validFrom.isAfterNow()) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
-            if (secToken != null) {
-                tokenStore.remove(secToken.getId());
-            }
             return false;
         } else if (validTill.isBeforeNow()) {
             LOG.log(Level.WARNING, "SAML Token condition not met");
-            if (secToken != null) {
-                tokenStore.remove(secToken.getId());
-            }
             validateTarget.setState(STATE.EXPIRED);
             return false;
         }
         return true;
     }
     
-    protected void storeTokenInCache(
+    private void storeTokenInCache(
         TokenStore tokenStore, 
         AssertionWrapper assertion, 
-        Principal principal
+        Principal principal,
+        String tokenRealm
     ) throws WSSecurityException {
         // Store the successfully validated token in the cache
         byte[] signatureValue = assertion.getSignatureValue();
@@ -323,6 +314,12 @@ public class SAMLTokenValidator implements TokenValidator {
             SecurityToken securityToken = new SecurityToken(assertion.getId(), null, validTill.toDate());
             securityToken.setToken(assertion.getElement());
             securityToken.setPrincipal(principal);
+            
+            if (tokenRealm != null) {
+                Properties props = new Properties();
+                props.setProperty(STSConstants.TOKEN_REALM, tokenRealm);
+                securityToken.setProperties(props);
+            }
 
             int hash = Arrays.hashCode(signatureValue);
             securityToken.setTokenHash(hash);

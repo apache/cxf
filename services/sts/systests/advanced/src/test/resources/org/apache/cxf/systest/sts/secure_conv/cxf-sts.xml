@@ -53,7 +53,6 @@
 	    <property name="issueOperation" ref="transportIssueDelegate" />
 	    <property name="validateOperation" ref="transportValidateDelegate" />
 	    <property name="cancelOperation" ref="transportCancelDelegate" />
-	    <property name="renewOperation" ref="transportRenewDelegate" />
     </bean>
 
 	<bean id="transportSTSEncryptedProviderBean"
@@ -90,12 +89,6 @@
 		<property name="tokenStore" ref="defaultTokenStore" />
 	</bean>
 	
-	<bean id="transportRenewDelegate" class="org.apache.cxf.sts.operation.TokenRenewOperation">
-        <property name="tokenRenewers" ref="transportTokenRenewers" />
-        <property name="stsProperties" ref="transportSTSProperties" />
-        <property name="tokenStore" ref="defaultTokenStore" />
-    </bean>
-
 	<bean id="defaultTokenStore" class="org.apache.cxf.sts.cache.DefaultInMemoryTokenStore">
 	</bean>
 
@@ -111,10 +104,6 @@
 	<util:list id="transportTokenCancellers">
 		<ref bean="transportSCTCanceller" />
 	</util:list>
-	
-	<util:list id="transportTokenRenewers">
-        <ref bean="transportSCTRenewer" />
-    </util:list>
 
 	<bean id="transportSCTProvider" class="org.apache.cxf.sts.token.provider.SCTProvider">
 	</bean>
@@ -129,9 +118,6 @@
 	<bean id="transportSCTCanceller" class="org.apache.cxf.sts.token.canceller.SCTCanceller">
 	</bean>
 	
-	<bean id="transportSCTRenewer" class="org.apache.cxf.sts.token.renewer.SCTRenewer">
-    </bean>
-
 	<bean id="transportService" class="org.apache.cxf.sts.service.StaticService">
 		<property name="endpoints" ref="transportEndpoints" />
 	</bean>

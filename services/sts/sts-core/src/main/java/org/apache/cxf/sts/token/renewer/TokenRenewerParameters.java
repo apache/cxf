@@ -20,12 +20,15 @@
 package org.apache.cxf.sts.token.renewer;
 
 import java.security.Principal;
+import java.util.Map;
 
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
 /**
@@ -36,11 +39,25 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 public class TokenRenewerParameters {
 
     private STSPropertiesMBean stsProperties;
+    private EncryptionProperties encryptionProperties;
     private Principal principal;
     private WebServiceContext webServiceContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
+    private String appliesToAddress;
+    private Map<String, Object> additionalProperties;
     private TokenStore tokenStore;
+    private String realm;
+    private ReceivedToken token;
+    
+    public ReceivedToken getToken() {
+        return token;
+    }
+
+    public void setToken(ReceivedToken token) {
+        this.token = token;
+    }
+
     
     public TokenStore getTokenStore() {
         return tokenStore;
@@ -49,7 +66,15 @@ public class TokenRenewerParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-    
+
+    public String getAppliesToAddress() {
+        return appliesToAddress;
+    }
+
+    public void setAppliesToAddress(String appliesToAddress) {
+        this.appliesToAddress = appliesToAddress;
+    }
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
@@ -57,7 +82,7 @@ public class TokenRenewerParameters {
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-
+    
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
@@ -65,13 +90,21 @@ public class TokenRenewerParameters {
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }
 
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
+    }
+    
+    public EncryptionProperties getEncryptionProperties() {
+        return encryptionProperties;
+    }
+
+    public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
+        this.encryptionProperties = encryptionProperties;
     }
     
     public WebServiceContext getWebServiceContext() {
@@ -88,6 +121,22 @@ public class TokenRenewerParameters {
     
     public Principal getPrincipal() {
         return principal;
+    }
+    
+    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
+    
+    public Map<String, Object> getAdditionalProperties() {
+        return additionalProperties;
+    }
+    
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
+    
+    public String getRealm() {
+        return realm;
     }
     
 }
