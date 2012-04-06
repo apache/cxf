@@ -469,16 +469,19 @@ public class PolicyInterceptorsTest extends Assert {
         PolicyInterceptorProviderRegistry reg = control
             .createMock(PolicyInterceptorProviderRegistry.class);
         EasyMock.expect(bus.getExtension(PolicyInterceptorProviderRegistry.class)).andReturn(reg);
+        PolicyInterceptorProvider pp = control.createMock(PolicyInterceptorProvider.class);
+        EasyMock.expect(reg.get(ASSERTION_QNAME)).andReturn(pp);
+
         
         List<Interceptor<? extends Message>> li = createMockInterceptorList();
         if (in && fault) {
-            EasyMock.expect(reg.getInFaultInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+            EasyMock.expect(pp.getInFaultInterceptors()).andReturn(li);
         } else if (!in && fault) {
-            EasyMock.expect(reg.getOutFaultInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+            EasyMock.expect(pp.getOutFaultInterceptors()).andReturn(li);
         } else if (in && !fault) {
-            EasyMock.expect(reg.getInInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+            EasyMock.expect(pp.getInInterceptors()).andReturn(li);
         } else if (!in && !fault) {
-            EasyMock.expect(reg.getOutInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+            EasyMock.expect(pp.getOutInterceptors()).andReturn(li);
         }
         InterceptorChain ic = control.createMock(InterceptorChain.class);
         EasyMock.expect(message.getInterceptorChain()).andReturn(ic).anyTimes();
