@@ -70,12 +70,16 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     }
     
     public void initialise(EndpointPolicyImpl epi, PolicyEngineImpl engine, boolean inbound) {
+        initialise(epi, engine, inbound, false);
+    }
+
+    public void initialise(EndpointPolicyImpl epi, PolicyEngineImpl engine, boolean inbound, boolean fault) {
         policy = epi.getPolicy();
         chosenAlternative = epi.getChosenAlternative();
         if (chosenAlternative == null) {
             chooseAlternative(engine, null);
         }
-        initialiseInterceptors(engine, inbound);  
+        initialiseInterceptors(engine, inbound, fault);  
     }
     
     public void initialise(EndpointInfo ei, 
@@ -188,14 +192,19 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     void initialiseInterceptors(PolicyEngineImpl engine) {
         initialiseInterceptors(engine, false);
     }
+    
     void initialiseInterceptors(PolicyEngineImpl engine, boolean useIn) {
+        initialiseInterceptors(engine, useIn, false);
+    }
+
+    void initialiseInterceptors(PolicyEngineImpl engine, boolean useIn, boolean fault) {
         if (engine.getBus() != null) {
             PolicyInterceptorProviderRegistry reg 
                 = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
             Set<Interceptor<? extends org.apache.cxf.message.Message>> out 
                 = new LinkedHashSet<Interceptor<? extends org.apache.cxf.message.Message>>();
             for (Assertion a : getChosenAlternative()) {
-                initialiseInterceptors(reg, engine, out, a, useIn);
+                initialiseInterceptors(reg, engine, out, a, useIn, fault);
             }        
             setInterceptors(new ArrayList<Interceptor<? extends  org.apache.cxf.message.Message>>(out));
         }
@@ -217,18 +226,26 @@ public class EffectivePolicyImpl implements EffectivePolicy {
 
     void initialiseInterceptors(PolicyInterceptorProviderRegistry reg, PolicyEngineImpl engine,
                                 Set<Interceptor<? extends org.apache.cxf.message.Message>> out, Assertion a,
-                                boolean usIn) {
+                                boolean useIn, boolean fault) {
         QName qn = a.getName();
-        List<Interceptor<? extends org.apache.cxf.message.Message>> i = 
-            usIn ? reg.getInInterceptorsForAssertion(qn) 
-                : reg.getOutInterceptorsForAssertion(qn);
+        
+        List<Interceptor<? extends org.apache.cxf.message.Message>> i = null;
+        if (useIn & !fault) {
+            i = reg.getInInterceptorsForAssertion(qn);
+        } else if (!useIn && !fault) {
+            i = reg.getOutInterceptorsForAssertion(qn);
+        } else if (useIn && fault) {
+            i = reg.getInFaultInterceptorsForAssertion(qn);
+        } else if (!useIn && fault) {
+            i = reg.getOutFaultInterceptorsForAssertion(qn);
+        }
         out.addAll(i);
 
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {
                 for (Assertion a2 : getSupportedAlternatives(engine, p)) {
-                    initialiseInterceptors(reg, engine, out, a2, usIn);
+                    initialiseInterceptors(reg, engine, out, a2, useIn, fault);
                 }
             }
         }

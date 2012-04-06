@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -50,6 +52,7 @@ import org.junit.Test;
  * 
  */
 public class PolicyInterceptorsTest extends Assert {
+    private static final QName ASSERTION_QNAME = new QName("http://apache.cxf", "test");
     
     private IMocksControl control;
     private Message message;
@@ -58,7 +61,7 @@ public class PolicyInterceptorsTest extends Assert {
     private Endpoint endpoint;
     private EndpointInfo ei;
     private Bus bus;
-    private PolicyEngine pe;
+    private PolicyEngineImpl pe;
     private Conduit conduit;
     private Destination destination;
     
@@ -277,6 +280,96 @@ public class PolicyInterceptorsTest extends Assert {
         control.verify();        
     }
    
+    @Test
+    public void testClientPolicyInInterceptorPolicyOverride() {
+        PolicyInInterceptor interceptor = new PolicyInInterceptor();
+       
+        doTestBasics(interceptor, true, false);
+        
+        control.reset();
+        setupMessage(true, true, true, true, true, true);
+        coachPolicyOverride(true, false);
+        
+        control.replay();
+        interceptor.handleMessage(message);
+        control.verify();        
+    }
+
+    @Test
+    public void testClientPolicyOutInterceptorPolicyOverride() {
+        PolicyOutInterceptor interceptor = new PolicyOutInterceptor();
+       
+        doTestBasics(interceptor, true, true);
+        
+        control.reset();
+        setupMessage(true, true, true, true, true, true);
+        coachPolicyOverride(false, false);
+        
+        control.replay();
+        interceptor.handleMessage(message);
+        control.verify();        
+    }
+
+    @Test
+    public void testServerPolicyInInterceptorPolicyOverride() {
+        PolicyInInterceptor interceptor = new PolicyInInterceptor();
+       
+        doTestBasics(interceptor, false, false);
+
+        control.reset();
+        setupMessage(false, false, false, false, true, true);
+        coachPolicyOverride(true, false);
+        
+        control.replay();
+        interceptor.handleMessage(message);
+        control.verify();        
+    }
+
+    @Test
+    public void testServerPolicyOutInterceptorPolicyOverride() {
+        PolicyOutInterceptor interceptor = new PolicyOutInterceptor();
+       
+        doTestBasics(interceptor, false, true);
+        
+        control.reset();
+        setupMessage(false, false, true, true, true, true);
+        coachPolicyOverride(false, false);
+        
+        control.replay();
+        interceptor.handleMessage(message);
+        control.verify();        
+    }
+
+
+    @Test
+    public void testClientPolicyInFaultInterceptorPolicyOverride() {
+        ClientPolicyInFaultInterceptor interceptor = new ClientPolicyInFaultInterceptor();
+       
+        doTestBasics(interceptor, true, false);
+        
+        control.reset();
+        setupMessage(true, true, false, false, true, true);
+        coachPolicyOverride(true, true);
+        
+        control.replay();
+        interceptor.handleMessage(message);
+        control.verify();        
+    }
+
+    @Test
+    public void testServerPolicyOutFaultInterceptorPolicyOverride() {
+        ServerPolicyOutFaultInterceptor interceptor = new ServerPolicyOutFaultInterceptor();
+        doTestBasics(interceptor, false, true);
+
+        control.reset();
+        setupMessage(false, false, true, true, true, true);
+        coachPolicyOverride(false, true);
+        control.replay();
+
+        interceptor.handleMessage(message);
+        control.verify();        
+    }
+
     private void doTestBasics(Interceptor<Message> interceptor, boolean isClient, boolean usesOperationInfo) {
         setupMessage(!isClient, isClient, usesOperationInfo, !usesOperationInfo, false, false);
         control.replay();
@@ -322,7 +415,8 @@ public class PolicyInterceptorsTest extends Assert {
             if (null == boi && setupOperation) {
                 boi = control.createMock(BindingOperationInfo.class);
             }
-            EasyMock.expect(exchange.get(BindingOperationInfo.class)).andReturn(setupOperation ? boi : null);
+            EasyMock.expect(exchange.get(BindingOperationInfo.class)).andReturn(setupOperation ? boi : null)
+                .anyTimes();
             if (!setupOperation) {
                 return;
             }
@@ -341,7 +435,7 @@ public class PolicyInterceptorsTest extends Assert {
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
 
         if (null == pe && setupEngine) {
-            pe = control.createMock(PolicyEngine.class);
+            pe = control.createMock(PolicyEngineImpl.class);
         }
         EasyMock.expect(bus.getExtension(PolicyEngine.class)).andReturn(setupEngine ? pe : null);
         if (!setupEngine) {
@@ -354,8 +448,42 @@ public class PolicyInterceptorsTest extends Assert {
             EasyMock.expect(exchange.getConduit(message)).andReturn(conduit).anyTimes();
         } else {
             destination = control.createMock(Destination.class);
-            EasyMock.expect(exchange.getDestination()).andReturn(destination);
+            EasyMock.expect(exchange.getDestination()).andReturn(destination).anyTimes();
         }
-      
     }
+    
+    private void coachPolicyOverride(boolean in, boolean fault) {
+        Assertion assertion = control.createMock(Assertion.class);
+        EasyMock.expect(assertion.getName()).andReturn(ASSERTION_QNAME);
+        Collection<Assertion> assertions = 
+            new ArrayList<Assertion>();
+        assertions.add(assertion);
+        
+        Policy policyOverride = control.createMock(Policy.class);
+        EasyMock.expect(message.getContextualProperty(PolicyConstants.POLICY_OVERRIDE))
+            .andReturn(policyOverride);
+        AlternativeSelector selector = control.createMock(AlternativeSelector.class);
+        EasyMock.expect(selector.selectAlternative(policyOverride, pe, null, null)).andReturn(assertions);
+        EasyMock.expect(pe.getAlternativeSelector()).andReturn(selector);
+        EasyMock.expect(pe.getBus()).andReturn(bus).anyTimes();
+        PolicyInterceptorProviderRegistry reg = control
+            .createMock(PolicyInterceptorProviderRegistry.class);
+        EasyMock.expect(bus.getExtension(PolicyInterceptorProviderRegistry.class)).andReturn(reg);
+        
+        List<Interceptor<? extends Message>> li = createMockInterceptorList();
+        if (in && fault) {
+            EasyMock.expect(reg.getInFaultInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+        } else if (!in && fault) {
+            EasyMock.expect(reg.getOutFaultInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+        } else if (in && !fault) {
+            EasyMock.expect(reg.getInInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+        } else if (!in && !fault) {
+            EasyMock.expect(reg.getOutInterceptorsForAssertion(ASSERTION_QNAME)).andReturn(li);
+        }
+        InterceptorChain ic = control.createMock(InterceptorChain.class);
+        EasyMock.expect(message.getInterceptorChain()).andReturn(ic).anyTimes();
+        ic.add(li.get(0));
+        EasyMock.expectLastCall();
+    }
+
 }

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,6 +39,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 
 /**
  * 
@@ -81,31 +83,46 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         Destination destination = exchange.getDestination();
         
         Exception ex = exchange.get(Exception.class);
-        assert null != ex;
         
-        BindingFaultInfo bfi = getBindingFaultInfo(msg, ex, boi);
+        List<Interceptor<? extends Message>> faultInterceptors = 
+            new ArrayList<Interceptor<? extends Message>>();
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
 
-        if (bfi == null 
-            && msg.get(FaultMode.class) != FaultMode.UNCHECKED_APPLICATION_FAULT
-            && msg.get(FaultMode.class) != FaultMode.CHECKED_APPLICATION_FAULT) {
-            return;
+        // 1. Check overridden policy
+        Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
+        if (p != null) {
+            EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
+            EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false, true);
+            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
+                                  effectivePolicy.getPolicy());
+            
+            faultInterceptors.addAll(effectivePolicy.getInterceptors());
+            assertions.addAll(effectivePolicy.getChosenAlternative());
+        } else {
+            // 2. Process effective server policy
+            BindingFaultInfo bfi = getBindingFaultInfo(msg, ex, boi);
+
+            if (bfi == null 
+                && msg.get(FaultMode.class) != FaultMode.UNCHECKED_APPLICATION_FAULT
+                && msg.get(FaultMode.class) != FaultMode.CHECKED_APPLICATION_FAULT) {
+                return;
+            }
+            
+            EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination);
+            if (effectivePolicy != null) {
+                faultInterceptors.addAll(effectivePolicy.getInterceptors());
+                assertions.addAll(effectivePolicy.getChosenAlternative());            
+            }
         }
         
-        
-        EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, boi, bfi, destination);
-        if (effectivePolicy == null) {
-            return;
-        }
-        
-        List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
-        for (Interceptor<? extends Message> oi : interceptors) {
+        // add interceptors into message chain
+        for (Interceptor<? extends Message> oi : faultInterceptors) {
             msg.getInterceptorChain().add(oi);
             LOG.log(Level.FINE, "Added interceptor of type {0}", oi.getClass().getSimpleName());
         }
         
         // insert assertions of the chosen alternative into the message
-        
-        Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
         if (null != assertions && !assertions.isEmpty()) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }
