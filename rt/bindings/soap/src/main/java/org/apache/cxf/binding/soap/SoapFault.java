@@ -62,6 +62,15 @@ public class SoapFault extends Fault {
     public SoapFault(String message, QName faultCode) {
         super(new Message(message, (ResourceBundle)null), faultCode);
     }
+    public SoapFault(String message, ResourceBundle bundle, QName faultCode) {
+        super(new Message(message, bundle), faultCode);
+    }
+    public SoapFault(String message, ResourceBundle bundle, Throwable t, QName faultCode) {
+        super(new Message(message, bundle), t, faultCode);
+    }
+    public SoapFault(String message, ResourceBundle bundle, QName faultCode, Object ... params) {
+        super(new Message(message, bundle, params), faultCode);
+    }
 
     public SoapFault(String message, Throwable t, QName faultCode) {
         super(new Message(message, (ResourceBundle)null), t, faultCode);
