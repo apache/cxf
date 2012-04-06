@@ -46,7 +46,6 @@ import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TrustManagersType;
-import org.apache.cxf.transport.https.SSLUtils;
 
 /**
  * This class provides some functionality to convert the JAXB

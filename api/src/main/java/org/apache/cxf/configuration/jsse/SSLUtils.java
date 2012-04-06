@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.https;
+package org.apache.cxf.configuration.jsse;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,7 +28,6 @@ import java.lang.reflect.Method;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -44,13 +43,10 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.security.FiltersType;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.security.transport.TLSSessionInfo;
 
 
 /**
@@ -65,8 +61,6 @@ public final class SSLUtils {
     private static final String DEFAULT_TRUST_STORE_TYPE = "JKS";
     private static final String DEFAULT_SECURE_SOCKET_PROTOCOL = "TLSv1";
     private static final String CERTIFICATE_FACTORY_TYPE = "X.509";
-    private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
-    private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
     
     private static final boolean DEFAULT_REQUIRE_CLIENT_AUTHENTICATION = false;
     private static final boolean DEFAULT_WANT_CLIENT_AUTHENTICATION = true;
@@ -573,26 +567,7 @@ public final class SSLUtils {
         return wantClientAuthentication;
     }    
    
-    /**
-     * Propogate in the message a TLSSessionInfo instance representative  
-     * of the TLS-specific information in the HTTP request.
-     * 
-     * @param req the Jetty request
-     * @param message the Message
-     */
-    public static void propogateSecureSession(HttpServletRequest request,
-                                              Message message) {    
-        final String cipherSuite = 
-            (String) request.getAttribute(SSL_CIPHER_SUITE_ATTRIBUTE);
-        if (cipherSuite != null) {
-            final Certificate[] certs = 
-                (Certificate[]) request.getAttribute(SSL_PEER_CERT_CHAIN_ATTRIBUTE);
-            message.put(TLSSessionInfo.class,
-                        new TLSSessionInfo(cipherSuite,
-                                           null,
-                                           certs));
-        }
-    }
+
     
     public static void logUnSupportedPolicies(Object policy,
                                                  boolean client,

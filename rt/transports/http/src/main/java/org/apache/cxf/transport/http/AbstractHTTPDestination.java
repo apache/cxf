@@ -62,6 +62,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
@@ -70,7 +71,6 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.http.policy.impl.ServerPolicyCalculator;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
-import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -88,7 +88,7 @@ public abstract class AbstractHTTPDestination
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
     public static final String HTTP_CONTEXT_MATCH_STRATEGY = "HTTP_CONTEXT_MATCH_STRATEGY";
-    
+        
     public static final String RESPONSE_HEADERS_COPIED = "http.headers.copied";
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
@@ -97,7 +97,10 @@ public abstract class AbstractHTTPDestination
 
     public static final String SERVICE_REDIRECTION = "http.service.redirection";
     private static final String HTTP_BASE_PATH = "http.base.path";
-    
+
+    private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
+    private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     protected final Bus bus;
@@ -315,14 +318,33 @@ public abstract class AbstractHTTPDestination
         AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials);
         inMessage.put(AuthorizationPolicy.class, authPolicy);
         
-        SSLUtils.propogateSecureSession(req, inMessage);
+        propogateSecureSession(req, inMessage);
 
         inMessage.put(CertConstraints.class.getName(), certConstraints);
         inMessage.put(Message.IN_INTERCEPTORS,
                 Arrays.asList(new Interceptor[] {CertConstraintsInterceptor.INSTANCE}));
 
     }
-
+    /**
+     * Propogate in the message a TLSSessionInfo instance representative  
+     * of the TLS-specific information in the HTTP request.
+     * 
+     * @param req the Jetty request
+     * @param message the Message
+     */
+    private static void propogateSecureSession(HttpServletRequest request,
+                                              Message message) {    
+        final String cipherSuite = 
+            (String) request.getAttribute(SSL_CIPHER_SUITE_ATTRIBUTE);
+        if (cipherSuite != null) {
+            final java.security.cert.Certificate[] certs = 
+                (java.security.cert.Certificate[]) request.getAttribute(SSL_PEER_CERT_CHAIN_ATTRIBUTE);
+            message.put(TLSSessionInfo.class,
+                        new TLSSessionInfo(cipherSuite,
+                                           null,
+                                           certs));
+        }
+    }
     private String setEncoding(final Message inMessage, 
                                final HttpServletRequest req, 
                                final String contentType) throws IOException {

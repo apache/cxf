@@ -30,10 +30,10 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.configuration.jsse.SSLUtils;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
-import org.apache.cxf.transport.https.SSLUtils;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 
 /**
