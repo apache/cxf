@@ -486,9 +486,12 @@ public class AttachmentDeserializerTest extends Assert {
             byte bts[] = new byte[1024];
             
             InputStream ins = ds.getInputStream();
-            int count = ins.read(bts, 0, bts.length);
-            int sz = ins.read(bts, count, bts.length - count);
+            int count = 0;
+            int sz = ins.read(bts, 0, bts.length);
             while (sz != -1) {
+                count += sz;
+                // We do not expect the data to fill up the buffer:
+                assertTrue(count < bts.length);
                 sz = ins.read(bts, count, bts.length - count);
             }
             assertEquals(x + 1, count);
