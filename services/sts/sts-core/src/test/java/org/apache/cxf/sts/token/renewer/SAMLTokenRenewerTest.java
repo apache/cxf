@@ -314,6 +314,65 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
     }
     
+    /**
+     * Renew a valid SAML1 Assertion
+     */
+    @org.junit.Test
+    public void renewValidSAML1Assertion() throws Exception {
+        // Create the Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        // Validate the Assertion
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+                samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+        
+        // Renew the Assertion
+        TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
+        renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
+        renewerParameters.setStsProperties(validatorParameters.getStsProperties());
+        renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
+        renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
+        renewerParameters.setTokenStore(validatorParameters.getTokenStore());
+        renewerParameters.setToken(validatorResponse.getToken());
+        
+        TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
+        
+        TokenRenewerResponse renewerResponse = 
+                samlTokenRenewer.renewToken(renewerParameters);
+        assertTrue(renewerResponse != null);
+        assertTrue(renewerResponse.getToken() != null);
+        
+        // Now validate it again
+        validateTarget = new ReceivedToken(renewerResponse.getToken());
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        validatorResponse = samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+    }
+    
 
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
