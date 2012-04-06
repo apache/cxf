@@ -205,12 +205,16 @@ public class RequestImpl implements Request {
 
 
     public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
-        ResponseBuilder rb = evaluatePreconditions(eTag);
+        final ResponseBuilder rb = evaluatePreconditions(eTag);
         if (rb != null) {
-            return rb;
+            // the ETag conditions match; so now conditions for last modified must match
+            return evaluatePreconditions(lastModified);
+        } else {
+            // the ETag conditions do not match, so last modified should be ignored
+            // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html (section 14.26 for
+            // "If-None-Match", behavior not specified for "If-Match", section 14.24)
+            return null;
         }
-        return evaluatePreconditions(lastModified);
-                
     }
     
     public String getMethod() {
