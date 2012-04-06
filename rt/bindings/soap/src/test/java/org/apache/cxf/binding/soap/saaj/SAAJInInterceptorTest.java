@@ -33,7 +33,7 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.Soap12;
@@ -126,8 +126,15 @@ public class SAAJInInterceptorTest extends TestBase {
         assertEquals("soap:Server", fault.getFaultCode());
         assertEquals("This is a fault string", fault.getFaultString());
         Detail faultDetail = fault.getDetail();
-        NodeList faultDetailChildNodes = faultDetail.getChildNodes();
-        assertEquals(2, faultDetailChildNodes.getLength());
+        int count = 0;
+        Node nd = faultDetail.getFirstChild();
+        while (nd != null) {
+            if (nd instanceof Element) {
+                count++;
+            }
+            nd = nd.getNextSibling();
+        }
+        assertEquals(2, count);
         
         Iterator<?> detailEntries = faultDetail.getDetailEntries();
         DetailEntry detailEntry = (DetailEntry)detailEntries.next();
