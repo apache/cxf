@@ -34,12 +34,12 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
-import org.apache.cxf.systest.ws.util.InMessageRecorder;
 import org.apache.cxf.systest.ws.util.MessageFlow;
-import org.apache.cxf.systest.ws.util.MessageRecorder;
-import org.apache.cxf.systest.ws.util.OutMessageRecorder;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.recorders.InMessageRecorder;
+import org.apache.cxf.testutil.recorders.MessageRecorder;
+import org.apache.cxf.testutil.recorders.OutMessageRecorder;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.rm.RM10Constants;
 

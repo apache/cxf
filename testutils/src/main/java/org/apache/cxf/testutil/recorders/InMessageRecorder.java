@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.util;
+package org.apache.cxf.testutil.recorders;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
