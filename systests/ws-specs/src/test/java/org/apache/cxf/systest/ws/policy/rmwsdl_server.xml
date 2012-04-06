@@ -86,4 +86,4 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                     <wsrmp:BaseRetransmissionInterval Milliseconds="30000"/>
                 </wsrmp:RMAssertion>
     </wsp:Policy>
-</beans>
+</beans>
