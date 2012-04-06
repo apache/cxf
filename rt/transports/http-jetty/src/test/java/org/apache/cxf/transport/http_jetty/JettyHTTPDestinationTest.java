@@ -61,6 +61,7 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.ContinuationProviderFactory;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transports.http.QueryHandler;
@@ -571,6 +572,8 @@ public class JettyHTTPDestinationTest extends Assert {
             bus = EasyMock.createMock(Bus.class);
             bus.getExtension(EndpointResolverRegistry.class);
             EasyMock.expectLastCall().andReturn(null);
+            bus.getExtension(ContinuationProviderFactory.class);
+            EasyMock.expectLastCall().andReturn(null).anyTimes();
             bus.getExtension(PolicyDataEngine.class);
             EasyMock.expectLastCall().andReturn(null).anyTimes();
             bus.hasExtensionByName("org.apache.cxf.ws.policy.PolicyEngine");

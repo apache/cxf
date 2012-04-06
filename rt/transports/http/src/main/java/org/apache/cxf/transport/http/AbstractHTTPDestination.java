@@ -114,6 +114,7 @@ public abstract class AbstractHTTPDestination
     protected boolean multiplexWithAddress;
     protected CertConstraints certConstraints;
     protected boolean isServlet3;
+    protected ContinuationProviderFactory cproviderFactory;
     
     /**
      * Constructor
@@ -373,6 +374,9 @@ public abstract class AbstractHTTPDestination
     }
     protected Message retrieveFromContinuation(HttpServletRequest req) {
         if (!isServlet3) {
+            if (cproviderFactory != null) {
+                return cproviderFactory.retrieveFromContinuation(req);
+            }
             return null;
         }
         return retrieveFromServlet3Async(req);
@@ -387,12 +391,18 @@ public abstract class AbstractHTTPDestination
         return null;
     }
 
-    protected void setupContinuation(Message inMessage, final HttpServletRequest req,
+    protected void setupContinuation(Message inMessage,
+                                     final HttpServletRequest req,
                                      final HttpServletResponse resp) {
         try {
             if (isServlet3 && req.isAsyncSupported()) {
                 inMessage.put(ContinuationProvider.class.getName(),
                               new Servlet3ContinuationProvider(req, resp, inMessage));
+            } else if (cproviderFactory != null) {
+                ContinuationProvider p = cproviderFactory.createContinuationProvider(inMessage, req, resp);
+                if (p != null) {
+                    inMessage.put(ContinuationProvider.class.getName(), p);
+                }
             }
         } catch (Throwable ex) {
             // the request may not implement the Servlet3 API
@@ -451,6 +461,8 @@ public abstract class AbstractHTTPDestination
             server = endpointInfo.getTraversedExtensor(
                     new HTTPServerPolicy(), HTTPServerPolicy.class);
         }
+        
+        cproviderFactory = bus.getExtension(ContinuationProviderFactory.class);
     }
 
     /**

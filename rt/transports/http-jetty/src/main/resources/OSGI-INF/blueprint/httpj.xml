@@ -26,4 +26,8 @@
     </service-properties>
     <bean class="org.apache.cxf.transport.http_jetty.blueprint.HTTPJettyTransportNamespaceHandler"/>
   </service>
+  
+  <service interface="org.apache.cxf.transport.http.ContinuationProviderFactory">
+      <bean class="org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProviderFactory"/>
+  </service>
 </blueprint>
