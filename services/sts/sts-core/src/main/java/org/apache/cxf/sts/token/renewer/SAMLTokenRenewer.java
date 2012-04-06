@@ -58,14 +58,18 @@ import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 
 /**
- * A TokenRenewer implementation that renews a (valid) SAML Token.
+ * A TokenRenewer implementation that renews a (valid or expired) SAML Token.
  */
 public class SAMLTokenRenewer implements TokenRenewer {
+    
+    // The default maximum expired time a token is allowed to be is 30 minutes
+    public static final long DEFAULT_MAX_EXPIRY = 60L * 30L;
     
     private static final Logger LOG = LogUtils.getL7dLogger(SAMLTokenRenewer.class);
     private boolean signToken = true;
     private ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
     private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
+    private long maxExpiry = DEFAULT_MAX_EXPIRY;
     
     /**
      * Return true if this TokenRenewer implementation is able to renew a token.
@@ -98,6 +102,21 @@ public class SAMLTokenRenewer implements TokenRenewer {
         //
     }
     
+    /**
+     * Set a new value (in seconds) for how long a token is allowed to be expired for before renewal. 
+     * The default is 30 minutes.
+     */
+    public void setMaxExpiry(long newExpiry) {
+        maxExpiry = newExpiry;
+    }
+    
+    /**
+     * Get how long a token is allowed to be expired for before renewal (in seconds). The default is 
+     * 30 minutes.
+     */
+    public long getMaxExpiry() {
+        return maxExpiry;
+    }
     
     /**
      * Renew a token given a TokenRenewerParameters
@@ -115,6 +134,18 @@ public class SAMLTokenRenewer implements TokenRenewer {
         
         try {
             AssertionWrapper assertion = new AssertionWrapper((Element)tokenToRenew.getToken());
+            
+            // Check to see whether the token has expired greater than the configured max expiry time
+            if (tokenToRenew.getState() == STATE.EXPIRED) {
+                DateTime expiryDate = getExpiryDate(assertion);
+                DateTime currentDate = new DateTime();
+                if ((currentDate.getMillis() - expiryDate.getMillis()) > (maxExpiry * 1000L)) {
+                    LOG.log(Level.WARNING, "The token expired too long ago to be renewed");
+                    throw new STSException(
+                        "The token expired too long ago to be renewed", STSException.REQUEST_FAILED
+                    );
+                }
+            }
             
             // Create new Conditions & sign the Assertion
             createNewConditions(assertion, tokenParameters);
@@ -350,5 +381,13 @@ public class SAMLTokenRenewer implements TokenRenewer {
         }
     }
 
+    
+    private DateTime getExpiryDate(AssertionWrapper assertion) {
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            return assertion.getSaml2().getConditions().getNotOnOrAfter();
+        } else {
+            return assertion.getSaml1().getConditions().getNotOnOrAfter();
+        }
+    }
 
 }

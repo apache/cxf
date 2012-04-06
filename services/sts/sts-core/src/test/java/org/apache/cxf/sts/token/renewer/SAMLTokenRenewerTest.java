@@ -47,6 +47,7 @@ import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
@@ -373,6 +374,61 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
     }
     
+    
+    /**
+     * Renew an expired SAML2 Assertion that has expired greater than the maximum allowable time
+     * for renewal.
+     */
+    @org.junit.Test
+    public void renewTooFarExpiredSAML2Assertion() throws Exception {
+        // Create the Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        // Sleep to expire the token
+        Thread.sleep(2000);
+        
+        // Validate the Assertion
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+                samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
+        
+        // Renew the Assertion
+        TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
+        renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
+        renewerParameters.setStsProperties(validatorParameters.getStsProperties());
+        renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
+        renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
+        renewerParameters.setTokenStore(validatorParameters.getTokenStore());
+        renewerParameters.setToken(validatorResponse.getToken());
+        
+        TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        ((SAMLTokenRenewer)samlTokenRenewer).setMaxExpiry(1L);
+        assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
+        
+        try {
+            samlTokenRenewer.renewToken(renewerParameters);
+            fail("Failure expected as the token expired too long ago");
+        } catch (STSException ex) {
+            // Expected
+        }
+    }
 
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
