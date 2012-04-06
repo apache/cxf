@@ -311,7 +311,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
     }
     
     private void awaitMessages(int nExpectedOut, int nExpectedIn) {
-        awaitMessages(nExpectedOut, nExpectedIn, 10000);
+        awaitMessages(nExpectedOut, nExpectedIn, 20000);
     }
     
     private void awaitMessages(int nExpectedOut, int nExpectedIn, int timeout) {
