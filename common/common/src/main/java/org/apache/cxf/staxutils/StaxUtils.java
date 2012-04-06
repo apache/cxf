@@ -781,6 +781,9 @@ public final class StaxUtils {
                     } else if (attrPrefix.length() == 0) {
                         writer.writeAttribute(attns, name, value);
                     } else {
+                        if (repairing && DOMUtils.getNamespace(e, attrPrefix) == null) {
+                            writer.writeNamespace(attrPrefix, attns);
+                        }
                         writer.writeAttribute(attrPrefix, attns, name, value);
                     }                    
                 }
