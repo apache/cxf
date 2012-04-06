@@ -90,7 +90,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
             return element;
         }
         if (getSchema() == null) {
-            throw new RuntimeException("No XmlSchma in SchemaInfo");
+            throw new RuntimeException("No XmlSchema in SchemaInfo");
         }
 
         XmlSchema sch = getSchema();
