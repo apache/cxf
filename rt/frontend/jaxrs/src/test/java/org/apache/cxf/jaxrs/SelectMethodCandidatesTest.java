@@ -91,6 +91,8 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.setInMessage(m);
         m.setExchange(ex);
         Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
         e.size();
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         e.getEndpointInfo();
@@ -141,6 +143,8 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.setInMessage(m);
         m.setExchange(ex);
         Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
         e.size();
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         e.getEndpointInfo();
@@ -188,6 +192,8 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.setInMessage(m);
         m.setExchange(ex);
         Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
         e.size();
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         e.getEndpointInfo();
