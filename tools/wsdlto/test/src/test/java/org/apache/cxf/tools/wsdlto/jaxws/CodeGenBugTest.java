@@ -1158,4 +1158,19 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
+    
+    @Test
+    public void testCXF4128() throws Exception {
+        try {
+            env.put(ToolConstants.CFG_ALL, "all");
+            env.put(ToolConstants.CFG_COMPILE, "compile");
+            env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
+            env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf4128/cxf4128.wsdl"));
+            processor.setContext(env);
+            processor.execute();
+        } catch (Exception e) {
+            fail("shouldn't get exception");
+        }
+    }
 }

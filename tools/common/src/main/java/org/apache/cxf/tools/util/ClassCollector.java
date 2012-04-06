@@ -24,11 +24,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class ClassCollector {
 
-    private final Map<String, String> seiClassNames = new HashMap<String, String>();
+    private final Map<String, String> seiClassNames 
+        = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
     private final Map<String, String> typesClassNames = new HashMap<String, String>();
     private final Map<String, String> exceptionClassNames = new HashMap<String, String>();
     private final Map<String, String> serviceClassNames = new HashMap<String, String>();
