@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec10.server.AuthorizedServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -56,6 +57,11 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
             // set this to false to fork
             launchServer(AuthorizedServer.class, true)
         );
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
     }
 
     @Test

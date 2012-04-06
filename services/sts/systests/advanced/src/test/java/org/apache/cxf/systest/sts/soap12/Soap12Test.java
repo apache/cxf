@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -73,6 +74,11 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
                 // set this to false to fork
                 launchServer(STSServer.class, true)
         );
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
     }
 
     @org.junit.Test

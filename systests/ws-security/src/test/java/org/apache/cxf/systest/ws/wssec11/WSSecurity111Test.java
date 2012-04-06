@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.wssec11;
 
+import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec11.server.Server;
 import org.apache.cxf.systest.ws.wssec11.server.ServerRestricted;
 import org.junit.BeforeClass;
@@ -58,6 +59,11 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     launchServer(ServerRestricted.class, true)
             );
         }
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
     }
 
     @Test

@@ -53,6 +53,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.systest.ws.common.DoubleItImpl;
+import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -194,6 +195,11 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
         setCryptoProperties(ei, "alice.properties", "alice.properties");
         ei.setProperty(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE); 
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
     }
     
     private static void setCryptoProperties(EndpointInfo ei, String sigProps, String encProps) {

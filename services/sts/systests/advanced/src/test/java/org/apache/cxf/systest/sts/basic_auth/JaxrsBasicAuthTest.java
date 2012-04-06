@@ -20,6 +20,7 @@ package org.apache.cxf.systest.sts.basic_auth;
 
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -50,6 +51,11 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(STSServer.class, true)
         );
+    }
+    
+    @org.junit.AfterClass
+    public static void cleanup() {
+        SecurityTestUtil.cleanup();
     }
 
     @org.junit.Test
