@@ -36,6 +36,11 @@ public interface TokenRenewer {
      * Return true if this TokenRenewer implementation is able to renew a token.
      */
     boolean canHandleToken(ReceivedToken renewTarget);
+    
+    /**
+     * Return true if this TokenRenewer implementation is able to renew a token in the given realm.
+     */
+    boolean canHandleToken(ReceivedToken renewTarget, String realm);
 
     /**
      * Renew a token given a TokenRenewerParameters

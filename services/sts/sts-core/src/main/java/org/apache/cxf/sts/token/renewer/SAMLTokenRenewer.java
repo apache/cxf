@@ -71,6 +71,16 @@ public class SAMLTokenRenewer implements TokenRenewer {
      * Return true if this TokenRenewer implementation is able to renew a token.
      */
     public boolean canHandleToken(ReceivedToken renewTarget) {
+        return canHandleToken(renewTarget, null);
+    }
+    
+    /**
+     * Return true if this TokenRenewer implementation is able to renew a token in the given realm.
+     */
+    public boolean canHandleToken(ReceivedToken renewTarget, String realm) {
+        if (realm != null && !realmMap.containsKey(realm)) {
+            return false;
+        }
         Object token = renewTarget.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;
