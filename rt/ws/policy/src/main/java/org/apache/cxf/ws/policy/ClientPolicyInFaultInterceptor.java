@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,6 +36,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 
 /**
  * 
@@ -72,27 +74,44 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         
         Conduit conduit = exchange.getConduit(msg);
         LOG.fine("conduit: " + conduit);
+
+        List<Interceptor<? extends Message>> faultInterceptors = 
+            new ArrayList<Interceptor<? extends Message>>();
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
         
-        // We do not know the underlying message type yet - so we pre-emptively add interceptors 
-        // that can deal with all faults returned to this client endpoint.
-        
-        EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);        
-        LOG.fine("ep: " + ep);
-        
-        List<Interceptor<? extends Message>> faultInterceptors = ep.getFaultInterceptors();
-        
-        LOG.fine("faultInterceptors: " + faultInterceptors);
-        if (null != faultInterceptors) {
-            for (Interceptor<? extends Message> i : faultInterceptors) {
-                msg.getInterceptorChain().add(i);
-                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+        // 1. Check overridden policy
+        Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
+        if (p != null) {
+            EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
+            EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
+            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, true, true);
+            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
+                                  effectivePolicy.getPolicy());
+            
+            faultInterceptors.addAll(effectivePolicy.getInterceptors());
+            assertions.addAll(effectivePolicy.getChosenAlternative());
+        } else {
+            // 2. Process endpoint policy
+            // We do not know the underlying message type yet - so we pre-emptively add interceptors 
+            // that can deal with all faults returned to this client endpoint.
+            
+            EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);        
+            LOG.fine("ep: " + ep);
+            if (ep != null) {
+                faultInterceptors.addAll(ep.getFaultInterceptors());
+                assertions.addAll(ep.getFaultVocabulary());
             }
         }
         
-        // insert assertions of endpoint's fault vocabulary into message
+        // add interceptors into message chain
+        LOG.fine("faultInterceptors: " + faultInterceptors);
+        for (Interceptor<? extends Message> i : faultInterceptors) {
+            msg.getInterceptorChain().add(i);
+            LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+        }
         
-        Collection<Assertion> assertions = ep.getFaultVocabulary();
-        if (null != assertions && !assertions.isEmpty()) {
+        // insert assertions of endpoint's fault vocabulary into message        
+        if (!assertions.isEmpty()) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }
     }

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -66,6 +67,9 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             return;
         }
 
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        
         // 1. Check overridden policy
         Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
         if (p != null) {
@@ -76,56 +80,31 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
-            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor<? extends Message> i : interceptors) {            
-                msg.getInterceptorChain().add(i);
-                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
-            }
-            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
-            if (null != assertions && !assertions.isEmpty()) {
-                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
-            }
-        }
-        
-        // 2. Process client policy
-        if (MessageUtils.isRequestor(msg)) {
+            interceptors.addAll(effectivePolicy.getInterceptors());
+            assertions.addAll(effectivePolicy.getChosenAlternative());
             
+        } else if (MessageUtils.isRequestor(msg)) {
+            // 2. Process client policy
             BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
             if (boi == null) {
                 Conduit conduit = exchange.getConduit(msg);
-            
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
-                
-                List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
-                if (null != interceptors) {
-                    for (Interceptor<? extends Message> i : interceptors) {
-                        msg.getInterceptorChain().add(i);
-                    }
-                }
-                
-                // Insert assertions of endpoint's vocabulary into message
-                Collection<Assertion> assertions = ep.getVocabulary();
-                if (null != assertions && !assertions.isEmpty()) {
-                    msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                    msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
+                if (ep != null) {
+                    interceptors.addAll(ep.getInterceptors());
+                    assertions.addAll(ep.getVocabulary());
                 }
             } else {
                 // We do not know the underlying message type yet - so we pre-emptively add interceptors 
                 // that can deal with any resposes or faults returned to this client endpoint.
                 
                 EffectivePolicy ep = pe.getEffectiveClientResponsePolicy(ei, boi);
-        
-                List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
-                if (null != interceptors) {
-                    for (Interceptor<? extends Message> i : interceptors) {
-                        msg.getInterceptorChain().add(i);
+                if (ep != null) {
+                    interceptors.addAll(ep.getInterceptors());
+                    // insert assertions of endpoint's vocabulary into message
+                    if (ep.getPolicy() != null) {
+                        msg.put(AssertionInfoMap.class, new AssertionInfoMap(ep.getPolicy()));
+                        msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
                     }
-                }
-                // insert assertions of endpoint's vocabulary into message
-                if (ep.getPolicy() != null) {
-                    msg.put(AssertionInfoMap.class, new AssertionInfoMap(ep.getPolicy()));
-                    msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
                 }
             }
         } else {            
@@ -136,22 +115,22 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             // that can deal with any messages to this endpoint
             
             EndpointPolicy ep = pe.getServerEndpointPolicy(ei, destination);
-            
-            List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
-            if (null != interceptors) {
-                for (Interceptor<? extends Message> i : interceptors) {
-                    msg.getInterceptorChain().add(i);
-                    LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
-                }
-            }
-            
-            // insert assertions of endpoint's vocabulary into message
-            
-            Collection<Assertion> assertions = ep.getVocabulary();
-            if (null != assertions && !assertions.isEmpty()) {
-                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
+            if (ep != null) {
+                interceptors.addAll(ep.getInterceptors());
+                assertions.addAll(ep.getVocabulary());
             }
         }
+        
+        // add interceptors into message chain
+        for (Interceptor<? extends Message> i : interceptors) {
+            msg.getInterceptorChain().add(i);
+        }
+        
+        // Insert assertions of endpoint's vocabulary into message
+        if (!assertions.isEmpty()) {
+            msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
+            msg.getInterceptorChain().add(PolicyVerificationInInterceptor.INSTANCE);
+        }
+        
     }
 }

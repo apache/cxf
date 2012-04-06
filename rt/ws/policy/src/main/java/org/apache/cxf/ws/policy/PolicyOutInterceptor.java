@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -73,6 +74,11 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
         if (null == pe) {
             return;
         }
+
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
+        Collection<Assertion> assertions = new ArrayList<Assertion>();
+
+        // 1. Check overridden policy
         Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
@@ -82,82 +88,56 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
-            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor<? extends Message> i : interceptors) {            
-                msg.getInterceptorChain().add(i);
-                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
-            }
-            
-            // insert assertions of the chosen alternative into the message
-            
-            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
-            if (null != assertions && !assertions.isEmpty()) {
-                if (LOG.isLoggable(Level.FINEST)) {
-                    StringBuilder buf = new StringBuilder();
-                    buf.append("Chosen alternative: ");
-                    String nl = SystemPropertyAction.getProperty("line.separator");
-                    buf.append(nl);
-                    for (Assertion a : assertions) {
-                        PolicyUtils.printPolicyComponent(a, buf, 1);
-                    }
-                    LOG.finest(buf.toString());
-                }
-                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);
-            }
+            interceptors.addAll(effectivePolicy.getInterceptors());
+            assertions.addAll(effectivePolicy.getChosenAlternative());
         } else if (MessageUtils.isRequestor(msg)) {
+            // 2. Process client policy
             Conduit conduit = exchange.getConduit(msg);
             
             // add the required interceptors
             EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(ei, boi, conduit);
             msg.put(EffectivePolicy.class, effectivePolicy);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy());
-            
-            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor<? extends Message> i : interceptors) {            
-                msg.getInterceptorChain().add(i);
-                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
-            }
-            
-            // insert assertions of the chosen alternative into the message
-            
-            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
-            if (null != assertions && !assertions.isEmpty()) {
-                if (LOG.isLoggable(Level.FINEST)) {
-                    StringBuilder buf = new StringBuilder();
-                    buf.append("Chosen alternative: ");
-                    String nl = SystemPropertyAction.getProperty("line.separator");
-                    buf.append(nl);
-                    for (Assertion a : assertions) {
-                        PolicyUtils.printPolicyComponent(a, buf, 1);
-                    }
-                    LOG.finest(buf.toString());
-                }
-                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);
+            if (effectivePolicy != null) {
+                interceptors.addAll(effectivePolicy.getInterceptors());
+                assertions.addAll(effectivePolicy.getChosenAlternative());
             }
         } else {
+            // 3. Process server policy
             Destination destination = exchange.getDestination();
             @SuppressWarnings("unchecked")
             List<List<Assertion>> incoming = (List)exchange.get("ws-policy.validated.alternatives");
             EffectivePolicy effectivePolicy 
                 = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming);
             msg.put(EffectivePolicy.class, effectivePolicy);
-            
-            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor<? extends Message> oi : interceptors) {
-                msg.getInterceptorChain().add(oi);
-                LOG.log(Level.FINE, "Added interceptor of type {0}",
-                        oi.getClass().getSimpleName());           
+            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy());
+            if (effectivePolicy != null) {
+                interceptors.addAll(effectivePolicy.getInterceptors());
+                assertions.addAll(effectivePolicy.getChosenAlternative());
             }
-            
-            // insert assertions of the chosen alternative into the message
-                 
-            Collection<Assertion> assertions = effectivePolicy.getChosenAlternative();
-            if (null != assertions && !assertions.isEmpty()) {
-                msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
-                msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);
+        }
+        
+        // add interceptors into message chain
+        for (Interceptor<? extends Message> oi : interceptors) {
+            msg.getInterceptorChain().add(oi);
+            LOG.log(Level.FINE, "Added interceptor of type {0}",
+                    oi.getClass().getSimpleName());           
+        }
+
+        // insert assertions of endpoint's fault vocabulary into message        
+        if (null != assertions && !assertions.isEmpty()) {
+            if (LOG.isLoggable(Level.FINEST)) {
+                StringBuilder buf = new StringBuilder();
+                buf.append("Chosen alternative: ");
+                String nl = SystemPropertyAction.getProperty("line.separator");
+                buf.append(nl);
+                for (Assertion a : assertions) {
+                    PolicyUtils.printPolicyComponent(a, buf, 1);
+                }
+                LOG.finest(buf.toString());
             }
+            msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
+            msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);
         }
     }
 }
