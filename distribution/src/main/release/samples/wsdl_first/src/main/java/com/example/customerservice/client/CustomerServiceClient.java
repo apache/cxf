@@ -34,7 +34,7 @@ public class CustomerServiceClient {
             File wsdlFile = new File(args[0]);
             URL wsdlURL;
             if (wsdlFile.exists()) {
-                wsdlURL = wsdlFile.toURL();
+                wsdlURL = wsdlFile.toURI().toURL();
             } else {
                 wsdlURL = new URL(args[0]);
             }
