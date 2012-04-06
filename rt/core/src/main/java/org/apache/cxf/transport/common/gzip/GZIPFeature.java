@@ -37,23 +37,15 @@ import org.apache.cxf.message.Message;
  * <![CDATA[
  * <jaxws:endpoint ...>
  *   <jaxws:features>
- *     <bean class="org.apache.cxf.transport.http.gzip.GZIPFeature"/>
+ *     <bean class="org.apache.cxf.transport.common.gzip.GZIPFeature"/>
  *   </jaxws:features>
  * </jaxws:endpoint>
  * ]]>
  * </pre>
- * Attaching this feature to a client will cause outgoing request messages to
- * be compressed and incoming compressed responses to be uncompressed.  If you
- * want the service to know that your client can accept compressed responses,
- * you will also need to set the "AcceptEncoding" value in the relevant HTTP
- * conduit client configuration.
- * <pre>
- * <![CDATA[
- * <http-conf:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
- *   <http-conf:client AcceptEncoding="gzip" />
- * </http-conf:conduit>
- * ]]>
- * </pre>
+ * Attaching this feature to a client will cause outgoing request messages 
+ * to be compressed and incoming compressed responses to be uncompressed. 
+ * Accept-Encoding header is sent to let the service know 
+ * that your client can accept compressed responses. 
  */
 @NoJSR250Annotations
 public class GZIPFeature extends AbstractFeature {
