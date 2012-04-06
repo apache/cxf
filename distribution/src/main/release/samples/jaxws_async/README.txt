@@ -7,9 +7,9 @@ invocation model. Please refer to the JAX-WS 2.0 specification
 for background.
 
 This demo also illustrates the use of CXF specific server side 
-asynchronous handling.   The JAX-WS specification only addresses
-asynchronous requests on the Client side.   This demo shows how to
-enable CXF to call upon the asynchronous methods to allow processing
+asynchronous handling.   (The JAX-WS specification only addresses
+asynchronous requests on the client side.)   This demo shows how to
+enable CXF to call asynchronous methods to allow processing
 on separate threads.
 
 
@@ -46,25 +46,26 @@ Server Side Asynchronous models
 ===============================
 CXF provides two methods of handling requests asynchronously 
 on the server side.   
-- Continuations: CXF provides an API that a developer can use 
+-  Continuations: CXF provides an API that a developer can use 
 to create a Continuation, suspend the request, resume it later, 
 etc...  For more details, see:
    http://sberyozkin.blogspot.com/2008/12/continuations-in-cxf.html
 
-- @UseAsyncMethod annotation: You can annotation the Impls 
-synchronous method with the @UseAsyncMethod annotation.  If possible,
-CXF will instead call the async method (as generated for the client
+- @UseAsyncMethod annotation: You can annotate the Impls 
+synchronous method with the @UseAsyncMethod annotation (which uses
+continuations internally).  If possible, CXF will instead 
+call the async method (as generated for the client
 above) with an AsyncHandler object that you can call back on when
 the response is ready.
 
 This sample uses the second method (much simpler).  When using the 
 -Pserver profile to run the server, it will use the embedded Jetty
-server which supports the Continuations that are needed and you will
+server which supports the continuations that are needed and you will
 see logs mentioning it is responding asynchronously.  When 
 deploying a war, if you deploy to a Servlet 3 container (such as 
 Tomcat 7), you will also see those logs.  If you deploy to a
 Servlet 2.5 container, continuations are not available and the
-synchronous methods will be called.
+synchronous methods will be called instead.
 
 
 Please review the README in the samples directory before
