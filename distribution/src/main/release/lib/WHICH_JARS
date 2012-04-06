@@ -76,6 +76,7 @@ For WS-Security support:
 - serializer.jar
 - wss4j.jar
 - xmlsec.jar
+- ehcache-core.jar
 
 For SAML support in WS-Security
 - joda-time.jar 
@@ -95,6 +96,7 @@ For JAX-RS support:
 - axiom* (Needed for Abdera)
 - jsr311-api.jar
 - jettison.jar (Needed for JSON services only)
+- oauth*.jar (Needed for OAuth support)
 
 For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
