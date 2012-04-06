@@ -37,4 +37,4 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
     <p:externalAttachment location="${client.temp.location}/addr-external-anonymous-client.xml"/>
 
-</beans>
+</beans>
