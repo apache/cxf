@@ -67,7 +67,7 @@ public final class TransformTestUtils {
             StaxUtils.createXMLStreamReader(
                       TransformTestUtils.class.getResourceAsStream(outname));
         
-        verifyReaders(teacher, reader, false);
+        verifyReaders(teacher, reader, false, true);
     }
 
     static void transformOutStreamAndCompare(String inname, String outname, 
@@ -85,8 +85,8 @@ public final class TransformTestUtils {
         XMLStreamReader teacher = 
             StaxUtils.createXMLStreamReader(
                       TransformTestUtils.class.getResourceAsStream(outname));
-        
-        verifyReaders(teacher, reader, false);
+ 
+        verifyReaders(teacher, reader, false, true);
     }
 
     static XMLStreamReader createInTransformedStreamReader(
@@ -129,7 +129,7 @@ public final class TransformTestUtils {
      * @throws XMLStreamException
      */
     static void verifyReaders(XMLStreamReader teacher, XMLStreamReader reader, 
-                               boolean eec) throws XMLStreamException {
+                               boolean eec, boolean pfx) throws XMLStreamException {
         // compare the elements and attributes while ignoring comments, line breaks, etc
         for (;;) {
             int revent = getNextEvent(reader);
@@ -145,6 +145,10 @@ public final class TransformTestUtils {
             case XMLStreamConstants.START_ELEMENT:
                 LOG.fine("Start Element " + teacher.getName() + " ? " + reader.getName());
                 Assert.assertEquals(teacher.getName(), reader.getName());
+                if (pfx) {
+                    // verify if the namespace prefix are preserved
+                    Assert.assertEquals(teacher.getPrefix(), reader.getPrefix());
+                }
                 verifyAttributes(teacher, reader);
                 break;
             case XMLStreamConstants.END_ELEMENT:

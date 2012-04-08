@@ -17,17 +17,17 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<ps1:TheEnvelope xmlns:ps1="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Header xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:TheEnvelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
     <ns2:SoapHeaderIn xmlns:ns4="http://cxf.apache.org/transform/fault" 
-      xmlns:ps2="http://cxf.apache.org/transform/header/otherelement" 
+      xmlns:ns3="http://cxf.apache.org/transform/header/otherelement" 
       xmlns:ns2="http://cxf.apache.org/transform/header" 
-      xmlns:ps3="http://cxf.apache.org/transform/othertest">
+      xmlns="http://cxf.apache.org/transform/othertest">
       <ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>
       <ns2:SomeComplexHeaderType>
-        <ps2:CallerCorrelationId>SomeComplexValue</ps2:CallerCorrelationId>
+        <ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>
       </ns2:SomeComplexHeaderType>
     </ns2:SoapHeaderIn>
   </soap:Header>
   <soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"/>
-</ps1:TheEnvelope>
+</soap:TheEnvelope>

@@ -20,12 +20,12 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Header>
     <ns2:SoapHeaderIn xmlns:ns4="http://cxf.apache.org/transform/fault"
-      xmlns:ps1="http://cxf.apache.org/transform/header/element"
+      xmlns:ns3="http://cxf.apache.org/transform/header/element"
       xmlns:ns2="http://cxf.apache.org/transform/header"
       xmlns="http://cxf.apache.org/transform/test">
       <ns2:OperationalMode>SIMULATION1</ns2:OperationalMode>
       <ns2:SomeComplexHeaderType>
-        <ps1:CallerCorrelationId>SomeComplexValue</ps1:CallerCorrelationId>
+        <ns3:CallerCorrelationId>SomeComplexValue</ns3:CallerCorrelationId>
       </ns2:SomeComplexHeaderType>
     </ns2:SoapHeaderIn>
   </soap:Header>
