@@ -105,7 +105,7 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
      * @param signedResults a list of all of the signed results
      * @return true if the credentials of the assertion were used to verify a signature
      */
-    private boolean compareCredentials(
+    protected boolean compareCredentials(
         SAMLKeyInfo subjectKeyInfo,
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts

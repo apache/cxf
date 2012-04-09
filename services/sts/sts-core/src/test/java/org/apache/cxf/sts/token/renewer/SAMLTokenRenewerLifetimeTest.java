@@ -62,6 +62,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
     public void testSaml2ValidLifetime() throws Exception {
         int requestedLifetime = 60;
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
@@ -106,6 +107,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
     @org.junit.Test
     public void testSaml2ProviderLifetime() throws Exception {
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         
         long providerLifetime = 10 * 600L;
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
@@ -143,6 +145,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
     public void testSaml2ExceededConfiguredMaxLifetime() throws Exception {
         long maxLifetime = 30 * 60L;  // 30 minutes
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setMaxLifetime(maxLifetime);
         conditionsProvider.setAcceptClientLifetime(true);
@@ -190,6 +193,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
     @org.junit.Test
     public void testSaml2ExceededDefaultMaxLifetime() throws Exception {
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
@@ -239,6 +243,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         
         long maxLifetime = 30 * 60L;  // 30 minutes
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setMaxLifetime(maxLifetime);
         conditionsProvider.setFailLifetimeExceedance(false);

@@ -112,6 +112,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
         
         TokenRenewerResponse renewerResponse = 
@@ -174,6 +175,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
         
         TokenRenewerResponse renewerResponse = 
@@ -235,6 +237,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
         
         TokenRenewerResponse renewerResponse = 
@@ -297,6 +300,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
         
         TokenRenewerResponse renewerResponse = 
@@ -356,6 +360,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
         
         TokenRenewerResponse renewerResponse = 
@@ -419,6 +424,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         ((SAMLTokenRenewer)samlTokenRenewer).setMaxExpiry(1L);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
         

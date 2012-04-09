@@ -20,6 +20,8 @@
 package org.apache.cxf.sts.token.renewer;
 
 import java.security.Principal;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +31,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
@@ -46,14 +51,20 @@ import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.AbstractSamlPolicyValidator;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 
@@ -70,6 +81,8 @@ public class SAMLTokenRenewer implements TokenRenewer {
     private ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
     private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
     private long maxExpiry = DEFAULT_MAX_EXPIRY;
+    // boolean to enable/disable the check of proof of possession
+    private boolean verifyProofOfPossession = true;
     
     /**
      * Return true if this TokenRenewer implementation is able to renew a token.
@@ -98,8 +111,11 @@ public class SAMLTokenRenewer implements TokenRenewer {
         return false;
     }
 
+    /**
+     * Set whether proof of possession is required or not to renew a token
+     */
     public void setVerifyProofOfPossession(boolean verifyProofOfPossession) {
-        //
+        this.verifyProofOfPossession = verifyProofOfPossession;
     }
     
     /**
@@ -145,6 +161,16 @@ public class SAMLTokenRenewer implements TokenRenewer {
                         "The token expired too long ago to be renewed", STSException.REQUEST_FAILED
                     );
                 }
+            }
+            
+            ProofOfPossessionValidator popValidator = new ProofOfPossessionValidator();
+            if (verifyProofOfPossession 
+                && !popValidator.checkProofOfPossession(tokenParameters, assertion.getSubjectKeyInfo())) {
+                throw new STSException(
+                    "Failed to verify the proof of possession of the key associated with the "
+                    + "saml token. No matching key found in the request.",
+                    STSException.INVALID_REQUEST
+                );
             }
             
             // Create new Conditions & sign the Assertion
@@ -390,4 +416,32 @@ public class SAMLTokenRenewer implements TokenRenewer {
         }
     }
 
+    private static class ProofOfPossessionValidator extends AbstractSamlPolicyValidator {
+        
+        public boolean checkProofOfPossession(
+            TokenRenewerParameters tokenParameters,
+            SAMLKeyInfo subjectKeyInfo
+        ) {
+            MessageContext messageContext = tokenParameters.getWebServiceContext().getMessageContext();
+            final List<WSHandlerResult> handlerResults = 
+                CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
+
+            List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+            if (handlerResults != null && handlerResults.size() > 0) {
+                WSHandlerResult handlerResult = handlerResults.get(0);
+                List<WSSecurityEngineResult> results = handlerResult.getResults();
+                
+                WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
+                WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
+            }
+            
+            TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class);
+            Certificate[] tlsCerts = null;
+            if (tlsInfo != null) {
+                tlsCerts = tlsInfo.getPeerCertificates();
+            }
+            
+            return compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
+        }
+    }
 }

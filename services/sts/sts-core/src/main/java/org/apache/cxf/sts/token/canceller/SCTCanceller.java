@@ -141,6 +141,9 @@ public class SCTCanceller implements TokenCanceller {
         return result;
     }
 
+    /**
+     * Set whether proof of possession is required or not to cancel a token
+     */
     public void setVerifyProofOfPossession(boolean verifyProofOfPossession) {
         this.verifyProofOfPossession = verifyProofOfPossession;
     }

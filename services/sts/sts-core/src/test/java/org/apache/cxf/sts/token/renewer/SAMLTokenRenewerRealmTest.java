@@ -111,6 +111,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         Map<String, SAMLRealm> samlRealms = getSamlRealms();
         ((SAMLTokenRenewer)samlTokenRenewer).setRealmMap(samlRealms);
         String realm = validatorResponse.getTokenRealm();
@@ -178,6 +179,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         renewerParameters.setToken(validatorResponse.getToken());
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
         Map<String, SAMLRealm> samlRealms = getSamlRealms();
         ((SAMLTokenRenewer)samlTokenRenewer).setRealmMap(samlRealms);
         String realm = validatorResponse.getTokenRealm();
