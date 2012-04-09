@@ -267,6 +267,7 @@
                         <Require-Bundle>org.apache.cxf.cxf-api;visibility:=reexport,
                             org.apache.cxf.cxf-rt-core;visibility:=reexport,
                             org.apache.cxf.cxf-rt-frontend-jaxws;visibility:=reexport,
+                            org.apache.cxf.cxf-rt-frontend-jaxrs;visibility:=reexport, 
                             org.apache.cxf.cxf-rt-transports-http;visibility:=reexport,
                             org.springframework.beans</Require-Bundle>
                         <_failok>true</_failok>
