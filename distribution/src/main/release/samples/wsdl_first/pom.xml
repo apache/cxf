@@ -32,7 +32,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.xjc-utils.version>2.4.1-SNAPSHOT</cxf.xjc-utils.version>
+        <cxf.xjc-utils.version>2.6.0</cxf.xjc-utils.version>
         <cxf.release.base>${basedir}/../..</cxf.release.base>
     </properties>
     <build>
