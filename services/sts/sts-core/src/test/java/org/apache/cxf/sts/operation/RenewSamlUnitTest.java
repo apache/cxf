@@ -1,0 +1,323 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.cxf.sts.operation;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.jaxws.context.WebServiceContextImpl;
+import org.apache.cxf.jaxws.context.WrappedMessageContext;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.sts.QNameConstants;
+import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.STSPropertiesMBean;
+import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.common.PasswordCallbackHandler;
+import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.Lifetime;
+import org.apache.cxf.sts.request.TokenRequirements;
+import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
+import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
+import org.apache.cxf.sts.token.provider.TokenProviderParameters;
+import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
+import org.apache.cxf.sts.token.renewer.TokenRenewer;
+import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
+import org.apache.cxf.sts.token.validator.TokenValidator;
+import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
+import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.util.DOM2Writer;
+import org.apache.ws.security.util.XmlSchemaDateFormat;
+
+/**
+ * Some unit tests for the renew operation to renew SAML tokens.
+ */
+public class RenewSamlUnitTest extends org.junit.Assert {
+    
+    public static final QName REQUESTED_SECURITY_TOKEN = 
+        QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
+    
+    /**
+     * Test to successfully renew an expire Saml 1.1 token without using the cache
+     */
+    @org.junit.Test
+    public void testRenewExpiredSaml1TokenNoCache() throws Exception {
+        TokenRenewOperation renewOperation = new TokenRenewOperation();
+        
+        // Add Token Renewer
+        List<TokenRenewer> renewerList = new ArrayList<TokenRenewer>();
+        TokenRenewer tokenRenewer = new SAMLTokenRenewer();
+        tokenRenewer.setVerifyProofOfPossession(false);
+        renewerList.add(tokenRenewer);
+        renewOperation.setTokenRenewers(renewerList);
+        
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        validatorList.add(new SAMLTokenValidator());
+        renewOperation.setTokenValidators(validatorList);
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        renewOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, STSConstants.BEARER_KEY_KEYTYPE
+            );
+        request.getAny().add(tokenType);
+        
+        // Get a SAML Token via the SAMLTokenProvider
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50);
+        // Sleep to expire the token
+        Thread.sleep(1000);
+        
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        RenewTargetType renewTarget = new RenewTargetType();
+        renewTarget.setAny(samlToken);
+        
+        JAXBElement<RenewTargetType> renewTargetType = 
+            new JAXBElement<RenewTargetType>(
+                QNameConstants.RENEW_TARGET, RenewTargetType.class, renewTarget
+            );
+        request.getAny().add(renewTargetType);
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Validate a token
+        RequestSecurityTokenResponseType response = 
+            renewOperation.renew(request, webServiceContext);
+        
+        assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
+        
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : response.getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+        
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
+    }
+    
+    /**
+     * Test to successfully renew a Saml 2 token.
+    @org.junit.Test
+    public void testRenewSaml2Token() throws Exception {
+        TokenRenewOperation renewOperation = new TokenRenewOperation();
+        
+        // Add Token Validator
+        List<TokenRenewer> validatorList = new ArrayList<TokenRenewer>();
+        validatorList.add(new SAMLTokenRenewer());
+        renewOperation.setTokenRenewers(validatorList);
+        
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        renewOperation.setStsProperties(stsProperties);
+        
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
+            );
+        request.getAny().add(tokenType);
+        
+        // Get a SAML Token via the SAMLTokenProvider
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        ValidateTargetType validateTarget = new ValidateTargetType();
+        validateTarget.setAny(samlToken);
+        
+        JAXBElement<ValidateTargetType> validateTargetType = 
+            new JAXBElement<ValidateTargetType>(
+                QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
+            );
+        request.getAny().add(validateTargetType);
+        
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+            SecurityContext.class.getName(), 
+            createSecurityContext(new CustomTokenPrincipal("alice"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        
+        // Validate a token
+        RequestSecurityTokenResponseType response = 
+            renewOperation.validate(request, webServiceContext);
+        assertTrue(validateResponse(response));
+    }
+    */
+    
+    /*
+     * Create a security context object
+     */
+    private SecurityContext createSecurityContext(final Principal p) {
+        return new SecurityContext() {
+            public Principal getUserPrincipal() {
+                return p;
+            }
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+        };
+    }
+    
+    private Properties getEncryptionProperties() {
+        Properties properties = new Properties();
+        properties.put(
+            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+        );
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        
+        return properties;
+    }
+    
+    private Element createSAMLAssertion(
+        String tokenType, Crypto crypto, String signatureUsername, 
+        CallbackHandler callbackHandler, long ttlMs
+    ) throws WSSecurityException {
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
+        conditionsProvider.setAcceptClientLifetime(true);
+        samlTokenProvider.setConditionsProvider(conditionsProvider);
+        
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
+            );
+        
+        if (ttlMs != 0) {
+            Lifetime lifetime = new Lifetime();
+            Date creationTime = new Date();
+            Date expirationTime = new Date();
+            expirationTime.setTime(creationTime.getTime() + ttlMs);
+
+            XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+            lifetime.setCreated(fmt.format(creationTime));
+            lifetime.setExpires(fmt.format(expirationTime));
+
+            providerParameters.getTokenRequirements().setLifetime(lifetime);
+        }
+        
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
+        return providerResponse.getToken();
+    }
+
+    private TokenProviderParameters createProviderParameters(
+        String tokenType, String keyType, Crypto crypto, 
+        String signatureUsername, CallbackHandler callbackHandler
+    ) throws WSSecurityException {
+        TokenProviderParameters parameters = new TokenProviderParameters();
+
+        TokenRequirements tokenRequirements = new TokenRequirements();
+        tokenRequirements.setTokenType(tokenType);
+        parameters.setTokenRequirements(tokenRequirements);
+
+        KeyRequirements keyRequirements = new KeyRequirements();
+        keyRequirements.setKeyType(keyType);
+        parameters.setKeyRequirements(keyRequirements);
+
+        parameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+        parameters.setWebServiceContext(webServiceContext);
+
+        parameters.setAppliesToAddress("http://dummy-service.com/dummy");
+
+        // Add STSProperties object
+        StaticSTSProperties stsProperties = new StaticSTSProperties();
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setSignatureUsername(signatureUsername);
+        stsProperties.setCallbackHandler(callbackHandler);
+        stsProperties.setIssuer("STS");
+        parameters.setStsProperties(stsProperties);
+
+        parameters.setEncryptionProperties(new EncryptionProperties());
+
+        return parameters;
+    }
+
+    
+}
