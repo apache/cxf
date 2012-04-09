@@ -30,40 +30,9 @@ public class TokenRenewerResponse {
     private Element token;
     private String tokenId;
     private long lifetime;
-    private byte[] entropy;
-    private long keySize;
-    private boolean computedKey;
     private TokenReference attachedReference;
     private TokenReference unAttachedReference;
     
-    /**
-     * Return true if the entropy represents a Computed Key.
-     */
-    public boolean isComputedKey() {
-        return computedKey;
-    }
-
-    /**
-     * Set whether the entropy represents a Computed Key or not
-     */
-    public void setComputedKey(boolean computedKey) {
-        this.computedKey = computedKey;
-    }
-
-    /**
-     * Get the KeySize that the TokenProvider set
-     */
-    public long getKeySize() {
-        return keySize;
-    }
-
-    /**
-     * Set the KeySize
-     */
-    public void setKeySize(long keySize) {
-        this.keySize = keySize;
-    }
-
     /**
      * Set the token
      * @param token the token to set
@@ -110,22 +79,6 @@ public class TokenRenewerResponse {
      */
     public long getLifetime() {
         return lifetime;
-    }
-    
-    /**
-     * Set the entropy associated with the token.
-     * @param entropy the entropy associated with the token.
-     */
-    public void setEntropy(byte[] entropy) {
-        this.entropy = entropy;
-    }
-    
-    /**
-     * Get the entropy associated with the token.
-     * @return the entropy associated with the token.
-     */
-    public byte[] getEntropy() {
-        return entropy;
     }
     
     /**

@@ -174,6 +174,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
             }
             
             // Create new Conditions & sign the Assertion
+            byte[] oldSignature = assertion.getSignatureValue();
             createNewConditions(assertion, tokenParameters);
             signAssertion(assertion, tokenParameters);
             
@@ -185,6 +186,13 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 token.setIdAttributeNS(null, "ID", true);
             }
             doc.appendChild(token);
+            
+            // Remove the previous token (now expired) from the cache
+            if (tokenParameters.getTokenStore() != null) {
+                tokenParameters.getTokenStore().remove(assertion.getId());
+                int hash = Arrays.hashCode(oldSignature);
+                tokenParameters.getTokenStore().remove(Integer.toString(hash));
+            }
             
             // Cache the token
             String realm = tokenParameters.getRealm();
@@ -208,13 +216,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 lifetime = validTill.getMillis() - validFrom.getMillis();
             }
             response.setLifetime(lifetime / 1000);
-            /*
-            response.setEntropy(entropyBytes);
-            if (keySize > 0) {
-                response.setKeySize(keySize);
-            }
-            response.setComputedKey(computedKey);
-            */
+
             return response;
             
         } catch (Exception ex) {

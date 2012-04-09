@@ -44,14 +44,11 @@ import org.apache.cxf.sts.token.renewer.TokenRenewerParameters;
 import org.apache.cxf.sts.token.renewer.TokenRenewerResponse;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.cxf.ws.security.sts.provider.model.BinarySecretType;
-import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
-import org.apache.cxf.ws.security.sts.provider.model.RequestedProofTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
@@ -278,78 +275,12 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         // AppliesTo
         response.getAny().add(tokenRequirements.getAppliesTo());
 
-        // RequestedProofToken
-        if (tokenRenewerResponse.isComputedKey() && keyRequirements.getComputedKeyAlgorithm() != null) {
-            JAXBElement<String> computedKey = 
-                QNameConstants.WS_TRUST_FACTORY.createComputedKey(keyRequirements.getComputedKeyAlgorithm());
-            RequestedProofTokenType requestedProofTokenType = 
-                QNameConstants.WS_TRUST_FACTORY.createRequestedProofTokenType();
-            requestedProofTokenType.setAny(computedKey);
-            JAXBElement<RequestedProofTokenType> requestedProofToken = 
-                QNameConstants.WS_TRUST_FACTORY.createRequestedProofToken(requestedProofTokenType);
-            response.getAny().add(requestedProofToken);
-        } else if (tokenRenewerResponse.getEntropy() != null) {
-            Object token = 
-                constructSecretToken(tokenRenewerResponse.getEntropy(), encryptionProperties, keyRequirements);
-            RequestedProofTokenType requestedProofTokenType = 
-                QNameConstants.WS_TRUST_FACTORY.createRequestedProofTokenType();
-            requestedProofTokenType.setAny(token);
-            JAXBElement<RequestedProofTokenType> requestedProofToken = 
-                QNameConstants.WS_TRUST_FACTORY.createRequestedProofToken(requestedProofTokenType);
-            response.getAny().add(requestedProofToken);
-        }
-
-        // Entropy
-        if (tokenRenewerResponse.isComputedKey() && tokenRenewerResponse.getEntropy() != null) {
-            Object token = 
-                constructSecretToken(tokenRenewerResponse.getEntropy(), encryptionProperties, keyRequirements);
-            EntropyType entropyType = QNameConstants.WS_TRUST_FACTORY.createEntropyType();
-            entropyType.getAny().add(token);
-            JAXBElement<EntropyType> entropyElement = 
-                QNameConstants.WS_TRUST_FACTORY.createEntropy(entropyType);
-            response.getAny().add(entropyElement);
-        }
-
         // Lifetime
         LifetimeType lifetime = createLifetime(tokenRenewerResponse.getLifetime());
         JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
         response.getAny().add(lifetimeType);
 
-        // KeySize
-        long keySize = tokenRenewerResponse.getKeySize();
-        if (keySize <= 0) {
-            keySize = keyRequirements.getKeySize();
-        }
-        if (keyRequirements.getKeySize() > 0) {
-            JAXBElement<Long> keySizeType = 
-                QNameConstants.WS_TRUST_FACTORY.createKeySize(keySize);
-            response.getAny().add(keySizeType);
-        }
-
         return response;
-    }
-
-    /**
-     * Construct a token containing the secret to return to the client. If encryptIssuedToken is set
-     * then the token is wrapped in an EncryptedKey DOM element, otherwise it is returned in a 
-     * BinarySecretType JAXBElement.
-     */
-    private Object constructSecretToken(
-            byte[] secret,
-            EncryptionProperties encryptionProperties, 
-            KeyRequirements keyRequirements
-    ) throws WSSecurityException {
-        if (encryptIssuedToken) {
-            return encryptSecret(secret, encryptionProperties, keyRequirements);
-        } else {
-            BinarySecretType binarySecretType = QNameConstants.WS_TRUST_FACTORY.createBinarySecretType();
-            String nonce = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Nonce";
-            binarySecretType.setType(nonce);
-            binarySecretType.setValue(secret);
-            JAXBElement<BinarySecretType> binarySecret = 
-                QNameConstants.WS_TRUST_FACTORY.createBinarySecret(binarySecretType);
-            return binarySecret;
-        }
     }
 
     private TokenRenewerParameters createTokenRenewerParameters(
