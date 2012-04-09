@@ -154,6 +154,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public void destroyBus() {
         if (bus != null) {
             bus.shutdown(true);
+            bus = null;
         }
     }
 }
