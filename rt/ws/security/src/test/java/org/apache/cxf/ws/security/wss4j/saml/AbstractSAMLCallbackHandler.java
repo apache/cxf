@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.saml;
 
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -58,6 +59,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected Statement statement = Statement.AUTHN;
     protected CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
     protected byte[] ephemeralKey;
+    protected boolean multiValue = true;
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
@@ -92,16 +94,53 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             callback.setAuthenticationStatementData(Collections.singletonList(authBean));
         } else if (statement == Statement.ATTR) {
             AttributeStatementBean attrBean = new AttributeStatementBean();
-            AttributeBean attributeBean = new AttributeBean();
-            if (subjectBean != null) {
-                attrBean.setSubject(subjectBean);
-                attributeBean.setSimpleName("role");
-                attributeBean.setQualifiedName("http://custom-ns");
+            
+            if (multiValue) {
+//              <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+//                AttributeNamespace="http://schemas.xmlsoap.org/claims" AttributeName="roles">
+//                <saml:AttributeValue>Value1</saml:AttributeValue>
+//                <saml:AttributeValue>Value2</saml:AttributeValue>
+//              </saml:Attribute>
+                AttributeBean attributeBean = new AttributeBean();
+                if (subjectBean != null) {
+                    attrBean.setSubject(subjectBean);
+                    attributeBean.setSimpleName("role");
+                    attributeBean.setQualifiedName("http://custom-ns");
+                } else {
+                    attributeBean.setQualifiedName("role");
+                }
+                attributeBean.setAttributeValues(Arrays.asList("user", "admin"));
+                attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             } else {
-                attributeBean.setQualifiedName("role");
+//              <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+//                AttributeNamespace="http://schemas.xmlsoap.org/claims" AttributeName="roles">
+//                <saml:AttributeValue>Value1</saml:AttributeValue>
+//              </saml:Attribute>
+//              <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+//                AttributeNamespace="http://schemas.xmlsoap.org/claims" AttributeName="roles">
+//                <saml:AttributeValue>Value2</saml:AttributeValue>
+//              </saml:Attribute>
+                AttributeBean attributeBean = new AttributeBean();
+                if (subjectBean != null) {
+                    attrBean.setSubject(subjectBean);
+                    attributeBean.setSimpleName("role");
+                    attributeBean.setQualifiedName("http://custom-ns");
+                } else {
+                    attributeBean.setQualifiedName("role");
+                }
+                attributeBean.setAttributeValues(Collections.singletonList("user"));
+                
+                AttributeBean attributeBean2 = new AttributeBean();
+                if (subjectBean != null) {
+                    attributeBean2.setSimpleName("role");
+                    attributeBean2.setQualifiedName("http://custom-ns");
+                } else {
+                    attributeBean2.setQualifiedName("role");
+                }
+                attributeBean2.setAttributeValues(Collections.singletonList("admin"));
+                attrBean.setSamlAttributes(Arrays.asList(attributeBean, attributeBean2));
             }
-            attributeBean.setAttributeValues(Collections.singletonList("user"));
-            attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
+            
             callback.setAttributeStatementData(Collections.singletonList(attrBean));
         } else {
             AuthDecisionStatementBean authzBean = new AuthDecisionStatementBean();

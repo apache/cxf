@@ -52,6 +52,11 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
         confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     }
     
+    public SAML2CallbackHandler(boolean multivalue) throws Exception {
+        this();
+        this.multiValue = multivalue;
+    }
+    
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

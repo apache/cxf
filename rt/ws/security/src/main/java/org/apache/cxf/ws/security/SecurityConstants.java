@@ -91,6 +91,13 @@ public final class SecurityConstants {
      * constructed. The default is false.
      */
     public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
+
+    /**
+     * This configuration tag specifies the attribute URI of the SAML attributestatement
+     * where the role information is stored.
+     * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
+     */
+    public static final String SAML_ROLE_ATTRIBUTENAME = "ws-security.saml-role-attributename";
     
     /**
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
@@ -188,7 +195,8 @@ public final class SecurityConstants {
             KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
             ENABLE_NONCE_CACHE, NONCE_CACHE_INSTANCE, ENABLE_TIMESTAMP_CACHE,
-            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE
+            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE,
+            SAML_ROLE_ATTRIBUTENAME
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

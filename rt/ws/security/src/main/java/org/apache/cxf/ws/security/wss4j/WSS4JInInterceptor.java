@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -77,9 +80,13 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.processor.Processor;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.NoOpValidator;
 import org.apache.ws.security.validate.Validator;
+
+import org.opensaml.common.SAMLVersion;
+import org.opensaml.xml.XMLObject;
 
 /**
  * Performs WS-Security inbound actions.
@@ -88,6 +95,13 @@ import org.apache.ws.security.validate.Validator;
  */
 public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
+    /**
+     * This configuration tag specifies the default attribute name where the roles are present
+     * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
+     */
+    public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
+    
     public static final String TIMESTAMP_RESULT = "wss4j.timestamp.result";
     public static final String SIGNATURE_RESULT = "wss4j.signature.result";
     public static final String PRINCIPAL_RESULT = "wss4j.principal.result";
@@ -444,8 +458,27 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 if (!utWithCallbacks) {
                     WSS4JTokenConverter.convertToken(msg, p);
                 }
-                msg.put(SecurityContext.class, createSecurityContext(p));
-            }            
+                AssertionWrapper receivedAssertion = null;
+                
+                List<String> roles = null;
+                if (o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
+                    String roleAttributeName = (String)msg.getContextualProperty(
+                            SecurityConstants.SAML_ROLE_ATTRIBUTENAME);
+                    if (roleAttributeName == null || roleAttributeName.length() == 0) {
+                        roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
+                    }
+                    receivedAssertion = 
+                        (AssertionWrapper) o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                    if (receivedAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+                        roles = this.parseRolesInAssertion(receivedAssertion.getSaml2(), roleAttributeName);
+                    } else {
+                        roles = this.parseRolesInAssertion(receivedAssertion.getSaml1(), roleAttributeName);
+                    }
+                    msg.put(SecurityContext.class, createSecurityContext(p, roles));
+                } else {
+                    msg.put(SecurityContext.class, createSecurityContext(p));
+                }
+            }
         }
     }
 
@@ -483,12 +516,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
     
     protected SecurityContext createSecurityContext(final Principal p) {
+        return createSecurityContext(p, null);
+    }
+    
+    protected SecurityContext createSecurityContext(final Principal p, final List<String> roles) {
         return new SecurityContext() {
             public Principal getUserPrincipal() {
                 return p;
             }
             public boolean isUserInRole(String role) {
-                return false;
+                if (roles == null) {
+                    return false;
+                }
+                return roles.contains(role);
             }
         };
     }
@@ -722,6 +762,80 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         return fault;
     }
+    
+    protected List<String> parseRolesInAssertion(org.opensaml.saml1.core.Assertion assertion,
+            String roleAttributeName) {
+        List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
+            assertion.getAttributeStatements();
+        if (attributeStatements == null || attributeStatements.isEmpty()) {
+            return null;
+        }
+        List<String> roles = new ArrayList<String>();
+        
+        for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
+            
+            List<org.opensaml.saml1.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml1.core.Attribute attribute : attributes) {
+                
+                if (attribute.getAttributeName().equals(roleAttributeName)) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String value = attributeValueElement.getTextContent();
+                        roles.add(value);                    
+                    }
+                    if (attribute.getAttributeValues().size() > 1) {
+//                        Don't search for other attributes with the same name if                         
+//                        <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+//                             AttributeNamespace="http://schemas.xmlsoap.org/claims" AttributeName="roles">
+//                        <saml:AttributeValue>Value1</saml:AttributeValue>
+//                        <saml:AttributeValue>Value2</saml:AttributeValue>
+//                        </saml:Attribute>
+                        break;
+                    }
+                }
+                
+            }
+        }
+        return Collections.unmodifiableList(roles);
+    }
+    
+
+    protected List<String> parseRolesInAssertion(org.opensaml.saml2.core.Assertion assertion,
+            String roleAttributeName) {
+        List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
+            assertion.getAttributeStatements();
+        if (attributeStatements == null || attributeStatements.isEmpty()) {
+            return null;
+        }
+        List<String> roles = new ArrayList<String>();
+        
+        for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
+            
+            List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml2.core.Attribute attribute : attributes) {
+                
+                if (attribute.getName().equals(roleAttributeName)) {
+                    for (XMLObject attributeValue : attribute.getAttributeValues()) {
+                        Element attributeValueElement = attributeValue.getDOM();
+                        String value = attributeValueElement.getTextContent();
+                        roles.add(value);                    
+                    }
+                    if (attribute.getAttributeValues().size() > 1) {
+//                        Don't search for other attributes with the same name if                         
+//                        <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+//                             AttributeNamespace="http://schemas.xmlsoap.org/claims" AttributeName="roles">
+//                        <saml:AttributeValue>Value1</saml:AttributeValue>
+//                        <saml:AttributeValue>Value2</saml:AttributeValue>
+//                        </saml:Attribute>
+                        break;
+                    }
+                }
+                
+            }
+        }
+        return Collections.unmodifiableList(roles);
+    }
+    
     
     static class CXFRequestData extends RequestData {
         public CXFRequestData() {
