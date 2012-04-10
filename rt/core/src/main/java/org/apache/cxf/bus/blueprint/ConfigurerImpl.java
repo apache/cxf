@@ -131,11 +131,13 @@ public class ConfigurerImpl implements Configurer {
                 //Aries blueprint 0.3.x
                 m = ReflectionUtil.findMethod(container.getClass(), "getRepository");
                 Object o = ReflectionUtil.setAccessible(m).invoke(container);
-                m = ReflectionUtil.findMethod(container.getClass(), "getRecipe", String.class);
+                m = ReflectionUtil.findMethod(o.getClass(), "getRecipe", String.class);
                 o = ReflectionUtil.setAccessible(m).invoke(o, bn);  //returns the recipe
-                m = ReflectionUtil.findMethod(o.getClass(), "setProperties", Object.class);
-                if (m != null) {
-                    ReflectionUtil.setAccessible(m).invoke(o, beanInstance);
+                if (o != null) {
+                    m = ReflectionUtil.findMethod(o.getClass(), "setProperties", Object.class);
+                    if (m != null) {
+                        ReflectionUtil.setAccessible(m).invoke(o, beanInstance);
+                    }
                 }
             }
         } catch (InvocationTargetException ite) {
