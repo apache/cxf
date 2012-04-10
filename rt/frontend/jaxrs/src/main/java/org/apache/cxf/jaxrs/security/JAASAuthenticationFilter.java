@@ -86,10 +86,12 @@ public class JAASAuthenticationFilter implements RequestHandler {
             return null;
         } catch (AuthenticationException ex) {
             return handleAuthenticationException(ex, m);
+        } catch (SecurityException ex) {
+            return handleAuthenticationException(ex, m);
         }
     }
 
-    protected Response handleAuthenticationException(AuthenticationException ex, Message m) {
+    protected Response handleAuthenticationException(SecurityException ex, Message m) {
         HttpHeaders headers = new HttpHeadersImpl(m);
         if (redirectURI != null && isRedirectPossible(headers)) {
             
