@@ -221,18 +221,20 @@ public class EffectivePolicyImpl implements EffectivePolicy {
                                  boolean fault) {
         QName qn = a.getName();
         PolicyInterceptorProvider pp = reg.get(qn);
-        List<Interceptor<? extends org.apache.cxf.message.Message>> i = null;
-        if (useIn & !fault) {
-            i = pp.getInInterceptors();
-        } else if (!useIn && !fault) {
-            i = pp.getOutInterceptors();
-        } else if (useIn && fault) {
-            i = pp.getInFaultInterceptors();
-        } else if (!useIn && fault) {
-            i = pp.getOutFaultInterceptors();
-        }
-        if (i != null) {
-            out.addAll(i);
+        if (pp != null) {
+            List<Interceptor<? extends org.apache.cxf.message.Message>> i = null;
+            if (useIn & !fault) {
+                i = pp.getInInterceptors();
+            } else if (!useIn && !fault) {
+                i = pp.getOutInterceptors();
+            } else if (useIn && fault) {
+                i = pp.getInFaultInterceptors();
+            } else if (!useIn && fault) {
+                i = pp.getOutFaultInterceptors();
+            }
+            if (i != null) {
+                out.addAll(i);
+            }
         }
 
         if (a instanceof PolicyContainingAssertion) {
