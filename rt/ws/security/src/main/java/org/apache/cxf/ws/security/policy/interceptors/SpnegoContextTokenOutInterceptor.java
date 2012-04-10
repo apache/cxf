@@ -56,12 +56,10 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 return;
             }
             if (isRequestor(message)) {
-                SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-                if (tok == null) {
-                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                    if (tokId != null) {
-                        tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
-                    }
+                String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                SecurityToken tok = null;
+                if (tokId != null) {
+                    tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
                 }
                 if (tok == null) {
                     tok = issueToken(message, aim);

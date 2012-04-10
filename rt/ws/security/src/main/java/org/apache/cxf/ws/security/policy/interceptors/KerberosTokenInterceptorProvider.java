@@ -108,12 +108,10 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     return;
                 }
                 if (isRequestor(message)) {
-                    SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-                    if (tok == null) {
-                        String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                        if (tokId != null) {
-                            tok = getTokenStore(message).getToken(tokId);
-                        }
+                    SecurityToken tok = null;
+                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                    if (tokId != null) {
+                        tok = getTokenStore(message).getToken(tokId);
                     }
                     if (tok == null) {
                         try {
@@ -193,7 +191,8 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 if (valid) {
                     SecurityToken token = createSecurityToken(kerberosToken);
                     token.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
-                    message.getExchange().put(SecurityConstants.TOKEN, token);
+                    getTokenStore(message).add(token);
+                    message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                     return;
                 }
             }

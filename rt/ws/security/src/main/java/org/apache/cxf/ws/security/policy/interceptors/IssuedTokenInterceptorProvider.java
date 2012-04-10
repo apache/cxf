@@ -252,20 +252,14 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 );
             SecurityToken tok = null;
             if (cacheIssuedToken) {
-                tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-                if (tok == null) {
-                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                    if (tokId != null) {
-                        tok = getTokenStore(message).getToken(tokId);
-                    }
+                String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                if (tokId != null) {
+                    tok = getTokenStore(message).getToken(tokId);
                 }
             } else {
-                tok = (SecurityToken)message.get(SecurityConstants.TOKEN);
-                if (tok == null) {
-                    String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
-                    if (tokId != null) {
-                        tok = getTokenStore(message).getToken(tokId);
-                    }
+                String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
+                if (tokId != null) {
+                    tok = getTokenStore(message).getToken(tokId);
                 }
             }
             return tok;

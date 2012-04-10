@@ -311,7 +311,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
             tempTok.setSecret(secret);
             getTokenStore().add(tempTok);
-            message.setContextualProperty(SecurityConstants.TOKEN, tempTok);
+            message.setContextualProperty(SecurityConstants.TOKEN_ID, tempTok.getId());
             
             addSig(
                 signatureValues, 

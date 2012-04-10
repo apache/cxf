@@ -630,14 +630,17 @@ public abstract class AbstractBindingBuilder {
 
     protected SecurityToken getSecurityToken() {
         SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-        if (st == null) {
+        if (st == null || st.isExpired()) {
             String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
             if (id != null) {
                 st = getTokenStore().getToken(id);
             }
         }
-        getTokenStore().add(st);
-        return st;
+        if (st != null && !st.isExpired()) {
+            getTokenStore().add(st);
+            return st;
+        }
+        return null;
     }
 
     protected void addSignatureParts(Map<Token, Object> tokenMap,
@@ -966,7 +969,7 @@ public abstract class AbstractBindingBuilder {
         }
         secToken.setToken(assertion.getElement());
         getTokenStore().add(secToken);
-        message.setContextualProperty(SecurityConstants.TOKEN, secToken);
+        message.setContextualProperty(SecurityConstants.TOKEN_ID, secToken.getId());
     }
     
     protected String findIDFromSamlToken(Element samlToken) {
