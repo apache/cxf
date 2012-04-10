@@ -685,11 +685,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (target != null) {
             writer.writeStartElement("wst", "RenewTarget", namespace);
             client.getRequestContext().put(SecurityConstants.TOKEN, target);
-            Element el = target.getUnattachedReference();
-            if (el == null) {
-                el = target.getAttachedReference();
-            }
-            StaxUtils.copy(el, writer);
+            StaxUtils.copy(target.getToken(), writer);
             writer.writeEndElement();
         }
         
@@ -852,12 +848,79 @@ public class STSClient implements Configurable, InterceptorProvider {
         return (Element)nd;
     }
 
-    public void renewSecurityToken(SecurityToken tok) throws Exception {
-        String action = null;
+    public SecurityToken renewSecurityToken(SecurityToken tok) throws Exception {
+        createClient();
+        BindingOperationInfo boi = findOperation("/RST/Renew");
+
+        client.getRequestContext().putAll(ctx);
         if (isSecureConv) {
-            action = namespace + "/RST/SCT/Renew";
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, namespace + "/RST/SCT/Renew");
+        } else {
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, namespace + "/RST/Renew");
         }
-        requestSecurityToken(tok.getIssuerAddress(), action, "/Renew", tok);
+
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
+        if (context != null) {
+            writer.writeAttribute(null, "Context", context);
+        }
+        
+        String sptt = null;
+        if (template != null) {
+            if (this.useSecondaryParameters()) {
+                writer.writeStartElement("wst", "SecondaryParameters", namespace);
+            }
+            
+            Element tl = DOMUtils.getFirstElement(template);
+            while (tl != null) {
+                StaxUtils.copy(tl, writer);
+                if ("TokenType".equals(tl.getLocalName())) {
+                    sptt = DOMUtils.getContent(tl);
+                }
+                tl = DOMUtils.getNextElement(tl);
+            }
+            
+            if (this.useSecondaryParameters()) {
+                writer.writeEndElement();
+            }
+        }
+        
+        if (isSpnego) {
+            tokenType = STSUtils.getTokenTypeSCT(namespace);
+        }
+
+        addRequestType("/Renew", writer);
+        if (enableAppliesTo) {
+            addAppliesTo(writer, tok.getIssuerAddress());
+        }
+        
+        if (sptt == null) {
+            addTokenType(writer);
+        }
+        if (isSecureConv || enableLifetime) {
+            addLifetime(writer);
+        }
+
+        writer.writeStartElement("wst", "RenewTarget", namespace);
+        client.getRequestContext().put(SecurityConstants.TOKEN, tok);
+        StaxUtils.copy(tok.getToken(), writer);
+        writer.writeEndElement();
+        
+        writer.writeEndElement();
+
+        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+
+        SecurityToken token = createSecurityToken(getDocumentElement((DOMSource)obj[0]), null);
+        if (token.getTokenType() == null) {
+            if (sptt != null) {
+                token.setTokenType(sptt);
+            } else if (tokenType != null) {
+                token.setTokenType(tokenType);
+            }
+        }
+        return token;
+        
     }
 
     protected PrimitiveAssertion getAddressingAssertion() {
