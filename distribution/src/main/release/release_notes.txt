@@ -1,5 +1,5 @@
 
-Apache CXF 2.3.9 Release Notes
+Apache CXF 2.3.10 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ New features include:
    for the Stax parser
 
 
-2.3.9 fixes over 8 JIRA issues reported by users and the community.
+2.3.10 fixes over 30 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -106,12 +106,37 @@ for caveats when upgrading from CXF 2.2.x to 2.3.x.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-3984] - Impossible to handle Locale parameters with country qualifiers 
-    * [CXF-3986] - Update MessageContext.getContextualProperty to check Exchange if the property is of type Class 
-    * [CXF-4007] - Jetty threading parameters doesn't setup threadpool properly
-    * [CXF-4018] - JAX-WS Providers created from class (instead of an actual instance bean) do not get the JAXWSMethodInvoker
-    * [CXF-4027] - Aegis BeanType does not ignore super type of java.lang.Enum
-    * [CXF-4031] - NullPoint Exception Raised when input is nothing  and using Holder to return response
-    * [CXF-4044] - ensure publishedEndpointUrl property could be set to endpoint
-    * [CXF-4045] - BusFactory does not catch NoClassDefFoundError
+    * [CXF-3916] - partial response problem with SOAP 1.1 use of WS-Addressing
+    * [CXF-4055] - Parameter Handler not Invoked if Constructor or Static Methods Succeed
+    * [CXF-4056] - Faults on server are echoing headers back to the client
+    * [CXF-4057] - Echoed Addressing headers can cause client hangs and timeouts
+    * [CXF-4067] - JAX-RS WebClient proxy sometimes fails to set Content-Type from @Consumes
+    * [CXF-4086] - Providers.getContextResolvers is only partially implemented 
+    * [CXF-4088] - Class.getGenericSuperclass also needs to be checked by ProviderFactory
+    * [CXF-4105] - Slf4jLogger doesn't mapping the level as the SLF4JBridgeHandler does
+    * [CXF-4110] - Java first @Policy annotations aren't working
+    * [CXF-4115] - The operation property of the MessageContext may return wrong value if erroneous request is sent
+    * [CXF-4117] - Argument type mismatch when using Implicit Headers and @RequestWrapper with Service from WSDL
+    * [CXF-4121] - Default WebApplicationException mapper dramatically increases the response time
+    * [CXF-4125] - StackOverflowError when requesting WADL
+    * [CXF-4128] - Code Gen plugin fails silently when generated classes have name collisions
+    * [CXF-4130] - Server using Provider implementation writes contents of SOAP body in SOAP header
+    * [CXF-4133] - CachedOutputStream lost charsetName param
+    * [CXF-4141] - response_code 500 ignored when set in JAXRSOutInterceptor.handleWriteException 
+    * [CXF-4149] - org.apache.cxf.endpoint.ClientImpl raises 
+    * [CXF-4171] - Static resource resolution not possible with CXFNonSpringJaxrsServlet
+    * [CXF-4172] - Default JAX-RS XML, JSON and Form providers are open to the hash collision attacks
+    * [CXF-4177] - ClientProxyImpl does not order Path parameter values according to the template order
+    * [CXF-4192] - WSDLValidator doesn't pass the test for WSI-BP-1.0 R2726
+    * [CXF-4195] - http-config conduit doesn't work on the http conduit for WsdlUrl
+    * [CXF-4200] - UriInfoImpl.getPathSegments(decode) does not pass 'decode' flag to getPath()
+    * [CXF-4227] - AttachmentDeserializerTest contains buggy code for reading an InputStream.
+    * [CXF-4231] - Incorrect handling of "If-None-Match" and "If-Modified-Since" request header combination
+
+** Improvement
+    * [CXF-4085] - introduce org.apache.cxf.jaxws.checkPublishEndpointPermissionWithSecurityManager for EndpointImpl so that get chance to bypass SecurityManager Check in some cases
+    * [CXF-4120] - JMS Transport content-type should be consistent with the HTTP transport
+    * [CXF-4134] - GZIPOutInterceptor compiles Patterns constantly; they should be compiled once and reused
+    * [CXF-4217] - Introduce Nullable annotations to override the default handling of empty payloads by JAXB providers
+
 
