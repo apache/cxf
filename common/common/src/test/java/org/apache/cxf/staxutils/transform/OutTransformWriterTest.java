@@ -77,7 +77,7 @@ public class OutTransformWriterTest extends Assert {
                                                                     Collections.<String, String>emptyMap(),
                                                                     Collections.<String>emptyList(),
                                                                     false,
-                                                                    null);
+                                                                    "");
         JAXBContext context = JAXBContext.newInstance(TestBean.class);
         Marshaller m = context.createMarshaller();
         m.marshal(new TestBean(), transformWriter);
@@ -175,7 +175,7 @@ public class OutTransformWriterTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 OutTransformWriter.class.getResourceAsStream("../resources/complexReq1.xml"));
-        TransformTestUtils.verifyReaders(reader2, reader, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
     
     @Test
@@ -192,8 +192,8 @@ public class OutTransformWriterTest extends Assert {
         
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
-                InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));        
-        TransformTestUtils.verifyReaders(reader2, reader, true);
+                InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));
+        TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
     
     @Test
@@ -214,7 +214,7 @@ public class OutTransformWriterTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq3.xml"));        
-        TransformTestUtils.verifyReaders(reader2, reader, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true, false);
     }
 
     @Test
@@ -226,7 +226,6 @@ public class OutTransformWriterTest extends Assert {
         Map<String, String> appendElements = new HashMap<String, String>();
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
-
         TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeReqIn1.xml", 
                                                      "../resources/greetMeReq.xml",
                                   transformElements, appendElements, null, null, null);
@@ -310,7 +309,7 @@ public class OutTransformWriterTest extends Assert {
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn2.xml", 
-                                                     "../resources/AddRequest.xml",
+                                                     "../resources/AddRequest2.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -323,7 +322,7 @@ public class OutTransformWriterTest extends Assert {
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn2nospace.xml", 
-                                                     "../resources/AddRequest.xml",
+                                                     "../resources/AddRequest2.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -391,7 +390,7 @@ public class OutTransformWriterTest extends Assert {
         dropElements.add("param");
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn3.xml", 
-                                                     "../resources/AddRequest.xml",
+                                                     "../resources/AddRequest3.xml",
                                   transformElements, appendElements, dropElements, null, null);
         
     }
@@ -404,6 +403,17 @@ public class OutTransformWriterTest extends Assert {
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/wstrustReqSTRCIn1.xml", 
                                                      "../resources/wstrustReqSTRC.xml",
+                                  transformElements, null, null, null, null);
+    }
+
+    @Test
+    public void testPreservePrefixBindings() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("{urn:abc}*",
+                              "{urn:a}*");
+
+        TransformTestUtils.transformOutStreamAndCompare("../resources/multiNSIn1.xml", 
+                                                     "../resources/multiNS.xml",
                                   transformElements, null, null, null, null);
     }
 }

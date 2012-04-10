@@ -122,6 +122,18 @@ public class InTransformReader extends DepthXMLStreamReader {
             QName expected = inElementsMap.get(theName);
             if (expected == null) {
                 expected = theName;
+            } else {
+                String prefix = theName.getPrefix();
+                if (prefix.length() == 0 && theName.getNamespaceURI().length() == 0
+                    && expected.getNamespaceURI().length() > 0) {
+                    prefix = namespaceContext.getPrefix(expected.getNamespaceURI());
+                    if (prefix == null) {
+                        prefix = namespaceContext.findUniquePrefix(expected.getNamespaceURI());
+                    }
+                } else if (prefix.length() > 0 && expected.getNamespaceURI().length() == 0) {
+                    prefix = "";
+                }
+                expected = new QName(expected.getNamespaceURI(), expected.getLocalPart(), prefix);
             }
 
             if (null != appendProp && !replaceContent) {
@@ -278,8 +290,11 @@ public class InTransformReader extends DepthXMLStreamReader {
     public String getPrefix() {
         QName name = readCurrentElement();
         String prefix = name.getPrefix();
-        if (prefix.length() == 0) {
-            prefix = namespaceContext.findUniquePrefix(name.getNamespaceURI());
+        if (prefix.length() == 0 && getNamespaceURI().length() > 0) {
+            prefix = getNamespaceContext().getPrefix(getNamespaceURI());
+            if (prefix == null) {
+                prefix = "";
+            }
         }
         return prefix;
     }
@@ -298,7 +313,11 @@ public class InTransformReader extends DepthXMLStreamReader {
         String ns = super.getNamespaceURI(index);
         String actualNs = nsMap.get(ns);
         if (actualNs != null) {
-            return namespaceContext.findUniquePrefix(actualNs);
+            if (actualNs.length() > 0) {
+                return super.getNamespacePrefix(index);
+            } else {
+                return "";
+            }
         } else {
             return namespaceContext.getPrefix(ns);
         }

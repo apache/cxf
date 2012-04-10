@@ -84,7 +84,7 @@ public class InTransformReaderTest extends Assert {
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
         assertEquals(
-                "<ps1:test xmlns:ps1=\"http://foo\"><ps1:a>1 2 3</ps1:a></ps1:test>", value);        
+                "<ns:test xmlns:ns=\"http://foo\"><ns:a>1 2 3</ns:a></ns:test>", value);        
     }
     
     @Test
@@ -99,7 +99,7 @@ public class InTransformReaderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
-        assertEquals("<ps1:test xmlns:ps1=\"http://bar\"><subtest xmlns=\"\"/></ps1:test>",
+        assertEquals("<test xmlns=\"http://bar\"><subtest xmlns=\"\"/></test>",
                      value);        
     }
     
@@ -120,7 +120,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq1.xml"));
-        TransformTestUtils.verifyReaders(reader2, reader, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
     
     @Test
@@ -142,7 +142,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));        
-        TransformTestUtils.verifyReaders(reader2, reader, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
     
     @Test
@@ -166,7 +166,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq3.xml"));        
-        TransformTestUtils.verifyReaders(reader2, reader, true);
+        TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
 
     @Test
@@ -188,7 +188,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq1partial.xml"));        
-        TransformTestUtils.verifyReaders(reader2, filteredReader, false);
+        TransformTestUtils.verifyReaders(reader2, filteredReader, false, true);
     }
     
     @Test
@@ -213,7 +213,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq2partial.xml"));        
-        TransformTestUtils.verifyReaders(reader2, filteredReader, false);
+        TransformTestUtils.verifyReaders(reader2, filteredReader, false, true);
     }
     
     @Test
@@ -241,7 +241,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader2 = 
             StaxUtils.createXMLStreamReader(
                   InTransformReader.class.getResourceAsStream("../resources/complexReq3partial.xml"));        
-        TransformTestUtils.verifyReaders(reader2, filteredReader, false);
+        TransformTestUtils.verifyReaders(reader2, filteredReader, false, true);
     }
     
     
@@ -338,7 +338,7 @@ public class InTransformReaderTest extends Assert {
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2.xml", 
-                                                     "../resources/AddRequest.xml",
+                                                     "../resources/AddRequest2.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -351,7 +351,7 @@ public class InTransformReaderTest extends Assert {
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2nospace.xml", 
-                                                     "../resources/AddRequest.xml",
+                                                     "../resources/AddRequest2.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
@@ -419,7 +419,7 @@ public class InTransformReaderTest extends Assert {
         dropElements.add("param");
 
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn3.xml", 
-                                                     "../resources/AddRequest.xml",
+                                                     "../resources/AddRequest3.xml",
                                   transformElements, appendElements, dropElements, null, null);
         
     }
@@ -436,6 +436,17 @@ public class InTransformReaderTest extends Assert {
                                                      "../resources/wstrustReqSTRC.xml",
                                   transformElements, null, null, null, null);
         
+    }
+
+    @Test
+    public void testPreservePrefixBindings() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("{urn:abc}*",
+                              "{urn:a}*");
+
+        TransformTestUtils.transformInStreamAndCompare("../resources/multiNSIn1.xml", 
+                                                     "../resources/multiNS.xml",
+                                  transformElements, null, null, null, null);
     }
 
 }
