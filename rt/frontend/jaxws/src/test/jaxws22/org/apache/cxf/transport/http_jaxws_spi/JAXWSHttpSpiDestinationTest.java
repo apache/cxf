@@ -57,6 +57,8 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
     public void setUp() {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
+        bus.getExtension(org.apache.cxf.policy.PolicyDataEngine.class);
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         observer = control.createMock(MessageObserver.class);
         context = control.createMock(HttpContext.class);
         endpoint = new EndpointInfo();
@@ -72,6 +74,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
     
     @Test
     public void testCtor() throws Exception {
+        control.replay();
         JAXWSHttpSpiDestination destination = 
             new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
 
