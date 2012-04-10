@@ -44,12 +44,16 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.AbstractSecurityTest;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.cxf.ws.security.wss4j.saml.AbstractSAMLCallbackHandler.Statement;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngine;
@@ -96,8 +100,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
@@ -133,8 +138,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
@@ -176,8 +182,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
@@ -224,8 +231,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
@@ -283,8 +291,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         }
         validator.setRequireSenderVouches(false);
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
@@ -349,8 +358,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
         }
         validator.setRequireSAML1Assertion(false);
 
-        List<WSHandlerResult> handlerResults = 
-            makeInvocation(outProperties, xpaths, inProperties);
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
         WSSecurityEngineResult actionResult =
             WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_SIGNED);
@@ -364,7 +374,147 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assertTrue(actionResult != null);
     }
     
-    private List<WSHandlerResult> makeInvocation(
+    /**
+     * This test creates a SAML2 Assertion and sends it in the security header to the provider.
+     * An single attribute is created for the roles but multiple attribute value elements.
+     */
+    @Test
+    public void testSaml2TokenWithRoles() throws Exception {
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
+        
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(Statement.ATTR);
+        outProperties.put(
+            WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
+        );
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        validator.setRequireSAML1Assertion(false);
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
+        
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/saml2:Assertion");
+
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
+        
+        SecurityContext sc = message.get(SecurityContext.class);
+        assertNotNull(sc);
+        assertTrue(sc.isUserInRole("user"));
+        assertTrue(sc.isUserInRole("admin"));
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
+        assert !receivedAssertion.isSigned();
+    }
+    
+    /**
+     * This test creates a SAML2 Assertion and sends it in the security header to the provider.
+     * An attribute is created per role. There are several attributes with the same name.
+     */
+    @Test
+    public void testSaml2TokenWithRolesSingleValue() throws Exception {
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
+        
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler(false);
+        callbackHandler.setStatement(Statement.ATTR);
+        outProperties.put(
+            WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
+        );
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        validator.setRequireSAML1Assertion(false);
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
+        
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/saml2:Assertion");
+
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
+        
+        SecurityContext sc = message.get(SecurityContext.class);
+        assertNotNull(sc);
+        assertTrue(sc.isUserInRole("user"));
+        assertTrue(sc.isUserInRole("admin"));
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
+        assert !receivedAssertion.isSigned();
+    }
+    
+    /**
+     * This test creates a SAML1 Assertion and sends it in the security header to the provider.
+     */
+    @Test
+    //@Ignore
+    public void testSaml1TokenWithRoles() throws Exception {
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(WSHandlerConstants.SAML_PROP_FILE, "saml_sv.properties");
+        
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(Statement.ATTR);
+        outProperties.put(
+            WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
+        );
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
+        
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/saml1:Assertion");
+
+        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
+        
+        SecurityContext sc = message.get(SecurityContext.class);
+        assertNotNull(sc);
+        assertTrue(sc.isUserInRole("user"));
+        assertTrue(sc.isUserInRole("admin"));
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
+        assert !receivedAssertion.isSigned();
+    }
+    
+    private SoapMessage makeInvocation(
         Map<String, Object> outProperties,
         List<String> xpaths,
         Map<String, Object> inProperties
@@ -414,14 +564,13 @@ public class SamlTokenTest extends AbstractSecurityTest {
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor(inProperties);
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        inmsg.put(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, "role");
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
         inHandler.handleMessage(inmsg);
 
-        final List<WSHandlerResult> handlerResults = 
-            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
-        return handlerResults;
+        return inmsg;
     }
     
     private byte[] getMessageBytes(Document doc) throws Exception {
