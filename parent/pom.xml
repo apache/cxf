@@ -98,7 +98,7 @@
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
         <cxf.xmlbeans.version>2.5.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.0.1</cxf.xmlschema.version>
+        <cxf.xmlschema.version>2.0.2</cxf.xmlschema.version>
         <cxf.jibx.version>1.2.3</cxf.jibx.version>
         <cxf.axiom.version>1.2.10</cxf.axiom.version>
         <cxf.jettison.version>1.3.1</cxf.jettison.version>
@@ -108,7 +108,7 @@
         <cxf.opensamlws.version>1.4.2-1</cxf.opensamlws.version>
         <cxf.opensaml.osgi.version>2.5.1_2</cxf.opensaml.osgi.version>
         <cxf.opensaml.xmltooling.version>1.3.2-1</cxf.opensaml.xmltooling.version>
-        <cxf.neethi.version>3.0.1</cxf.neethi.version>
+        <cxf.neethi.version>3.0.2</cxf.neethi.version>
         <cxf.velocity.version>1.7</cxf.velocity.version>
 
         <cxf.geronimo.annotation.version>1.1.1</cxf.geronimo.annotation.version>
