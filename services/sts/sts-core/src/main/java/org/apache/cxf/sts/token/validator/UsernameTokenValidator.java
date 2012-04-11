@@ -34,10 +34,10 @@ import javax.xml.bind.Marshaller;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
