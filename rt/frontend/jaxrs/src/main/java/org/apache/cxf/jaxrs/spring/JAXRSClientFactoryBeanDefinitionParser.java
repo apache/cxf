@@ -48,7 +48,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
     
     @Override
     protected Class getFactoryClass() {
-        return JAXRSClientFactoryBean.class;
+        return JAXRSSpringClientFactoryBean.class;
     }
 
     @Override
