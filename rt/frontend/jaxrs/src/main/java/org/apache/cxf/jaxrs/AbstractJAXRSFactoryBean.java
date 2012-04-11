@@ -94,7 +94,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
      */
     public Bus getBus() {
         Bus b = super.getBus();
-        checkBindingFactory(bus);
+        checkBindingFactory(b);
         return b;
     }
 
