@@ -33,6 +33,11 @@ public interface TokenRenewer {
     void setVerifyProofOfPossession(boolean verifyProofOfPossession);
     
     /**
+     * boolean for enabling/disabling renewal after expiry.
+     */
+    void setAllowRenewalAfterExpiry(boolean allowRenewalAfterExpiry);
+    
+    /**
      * Return true if this TokenRenewer implementation is able to renew a token.
      */
     boolean canHandleToken(ReceivedToken renewTarget);

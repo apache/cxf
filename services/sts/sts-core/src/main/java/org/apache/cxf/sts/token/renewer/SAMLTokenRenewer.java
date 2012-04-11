@@ -87,6 +87,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
     private long maxExpiry = DEFAULT_MAX_EXPIRY;
     // boolean to enable/disable the check of proof of possession
     private boolean verifyProofOfPossession = true;
+    private boolean allowRenewalAfterExpiry;
     
     /**
      * Return true if this TokenRenewer implementation is able to renew a token.
@@ -123,6 +124,20 @@ public class SAMLTokenRenewer implements TokenRenewer {
     }
     
     /**
+     * Get whether we allow renewal after expiry. The default is false.
+     */
+    public boolean isAllowRenewalAfterExpiry() {
+        return allowRenewalAfterExpiry;
+    }
+
+    /**
+     * Set whether we allow renewal after expiry. The default is false.
+     */
+    public void setAllowRenewalAfterExpiry(boolean allowRenewalAfterExpiry) {
+        this.allowRenewalAfterExpiry = allowRenewalAfterExpiry;
+    }
+    
+    /**
      * Set a new value (in seconds) for how long a token is allowed to be expired for before renewal. 
      * The default is 30 minutes.
      */
@@ -152,15 +167,33 @@ public class SAMLTokenRenewer implements TokenRenewer {
             );
         }
         
+        TokenStore tokenStore = tokenParameters.getTokenStore();
+        if (tokenStore == null) {
+            LOG.log(Level.FINE, "A cache must be configured to use the SAMLTokenRenewer");
+            throw new STSException("Can't renew SAML assertion", STSException.REQUEST_FAILED);
+        }
+        
         try {
             AssertionWrapper assertion = new AssertionWrapper((Element)tokenToRenew.getToken());
             
-            validateAssertion(assertion, tokenToRenew, tokenParameters);
+            byte[] oldSignature = assertion.getSignatureValue();
+            // Remove the previous token (now expired) from the cache
+            int hash = Arrays.hashCode(oldSignature);
+            SecurityToken cachedToken = tokenStore.getToken(Integer.toString(hash));
+            if (cachedToken == null) {
+                LOG.log(Level.FINE, "The token to be renewed must be stored in the cache");
+                throw new STSException("Can't renew SAML assertion", STSException.REQUEST_FAILED);
+            }
+            
+            // Validate the Assertion
+            validateAssertion(assertion, tokenToRenew, cachedToken, tokenParameters);
+            
+            String oldId = createNewId(assertion);
+            tokenStore.remove(oldId);
+            tokenStore.remove(Integer.toString(hash));
             
             // Create new Conditions & sign the Assertion
-            byte[] oldSignature = assertion.getSignatureValue();
             createNewConditions(assertion, tokenParameters);
-            String oldId = createNewId(assertion);
             signAssertion(assertion, tokenParameters);
             
             Document doc = DOMUtils.createDocument();
@@ -172,17 +205,9 @@ public class SAMLTokenRenewer implements TokenRenewer {
             }
             doc.appendChild(token);
             
-            // Remove the previous token (now expired) from the cache
-            if (tokenParameters.getTokenStore() != null) {
-                tokenParameters.getTokenStore().remove(oldId);
-                int hash = Arrays.hashCode(oldSignature);
-                tokenParameters.getTokenStore().remove(Integer.toString(hash));
-            }
-            
             // Cache the token
-            String realm = tokenParameters.getRealm();
             storeTokenInCache(
-                tokenParameters.getTokenStore(), assertion, tokenParameters.getPrincipal(), realm
+                tokenStore, assertion, tokenParameters.getPrincipal(), tokenParameters.getRealm()
             );
             
             response.setToken(token);
@@ -257,10 +282,37 @@ public class SAMLTokenRenewer implements TokenRenewer {
     private void validateAssertion(
         AssertionWrapper assertion,
         ReceivedToken tokenToRenew,
+        SecurityToken token,
         TokenRenewerParameters tokenParameters
     ) {
+        // Check the cached renewal properties
+        Properties props = token.getProperties();
+        if (props == null) {
+            LOG.log(Level.WARNING, "Error in getting properties from cached token");
+            throw new STSException("Error in getting properties from cached token", STSException.REQUEST_FAILED);
+        }
+        String isAllowRenewal = (String)props.get(STSConstants.TOKEN_RENEWING_ALLOW);
+        String isAllowRenewalAfterExpiry = 
+            (String)props.get(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY);
+        if (isAllowRenewal == null || isAllowRenewalAfterExpiry == null) {
+            LOG.log(Level.WARNING, "One of isAllowRenewal or isAllowRenewalAfterExpiry not set");
+            throw new STSException("Error with cached token", STSException.REQUEST_FAILED);
+        }
+        
+        if (isAllowRenewal == null || !Boolean.valueOf(isAllowRenewal)) {
+            LOG.log(Level.WARNING, "The token is not allowed to be renewed");
+            throw new STSException("The token is not allowed to be renewed", STSException.REQUEST_FAILED);
+        }
+        
         // Check to see whether the token has expired greater than the configured max expiry time
         if (tokenToRenew.getState() == STATE.EXPIRED) {
+            if (!allowRenewalAfterExpiry || isAllowRenewalAfterExpiry == null
+                || !Boolean.valueOf(isAllowRenewalAfterExpiry)) {
+                LOG.log(Level.WARNING, "Renewal after expiry is not allowed");
+                throw new STSException(
+                    "Renewal after expiry is not allowed", STSException.REQUEST_FAILED
+                );
+            }
             DateTime expiryDate = getExpiryDate(assertion);
             DateTime currentDate = new DateTime();
             if ((currentDate.getMillis() - expiryDate.getMillis()) > (maxExpiry * 1000L)) {

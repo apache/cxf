@@ -62,15 +62,6 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
     private static final Logger LOG = LogUtils.getL7dLogger(TokenRenewOperation.class);
 
     private List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
-    private boolean allowRenewalBeforeExpiry;
-    
-    public boolean isAllowRenewalBeforeExpiry() {
-        return allowRenewalBeforeExpiry;
-    }
-
-    public void setAllowRenewalBeforeExpiry(boolean allowRenewalBeforeExpiry) {
-        this.allowRenewalBeforeExpiry = allowRenewalBeforeExpiry;
-    }
 
     public void setTokenRenewers(List<TokenRenewer> tokenRenewerList) {
         this.tokenRenewers = tokenRenewerList;
@@ -129,10 +120,10 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             );
         }
         
-        // Reject a non-expired token (valid or invalid) by default
+        // Reject an invalid token
         if (tokenResponse.getToken().getState() != STATE.EXPIRED
-            && !(allowRenewalBeforeExpiry && tokenResponse.getToken().getState() == STATE.VALID)) {
-            LOG.fine("The token is not expired, and so it cannot be renewed");
+            && tokenResponse.getToken().getState() != STATE.VALID) {
+            LOG.fine("The token is not valid or expired, and so it cannot be renewed");
             throw new STSException(
                 "No Token Validator has been found that can handle this token" 
                 + tokenRequirements.getTokenType(), 

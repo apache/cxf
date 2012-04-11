@@ -130,6 +130,7 @@
 	
 	<bean id="transportSamlTokenRenewer" class="org.apache.cxf.sts.token.renewer.SAMLTokenRenewer">
 	    <property name="verifyProofOfPossession" value="false"/>
+	    <property name="allowRenewalAfterExpiry" value="true"/>
 	    <property name="conditionsProvider" ref="SAMLConditionsProvider"/>
     </bean>
     

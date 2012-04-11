@@ -129,6 +129,19 @@ public final class STSConstants {
      */
     public static final String TOKEN_REALM = "org.apache.cxf.sts.token.realm";
     
+    /**
+     * Constant to store whether the token is allowed to be renewed or not in the cached Security
+     * Token properties.
+     */
+    public static final String TOKEN_RENEWING_ALLOW = "org.apache.cxf.sts.token.renewing.allow";
+    
+    /**
+     * Constant to store whether the token is allowed to be renewed after it has expired or not 
+     * in the cached Security Token properties.
+     */
+    public static final String TOKEN_RENEWING_ALLOW_AFTER_EXPIRY = 
+        "org.apache.cxf.sts.token.renewing.allow.after.expiry";
+    
     private STSConstants() {
         // complete
     }

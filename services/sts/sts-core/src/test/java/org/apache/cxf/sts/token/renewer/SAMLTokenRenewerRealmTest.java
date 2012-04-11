@@ -33,11 +33,13 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
@@ -52,17 +54,26 @@ import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.CustomTokenPrincipal;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.junit.BeforeClass;
 
 /**
  * Some unit tests for renewing a SAML token in different realms.
  */
 public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
+    
+    private static TokenStore tokenStore;
+    
+    @BeforeClass
+    public static void init() {
+        tokenStore = new DefaultInMemoryTokenStore();
+    }
     
     /**
      * Test a SAML 1.1 Assertion created in realm "A".
@@ -72,10 +83,14 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         // Create a RenewTarget consisting of a SAML Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "A", 50
+        
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey", 
+                callbackHandler
             );
+        
+        Element samlToken = createSAMLAssertion(providerParameters, "A", 50, true, true);
         // Sleep to expire the token
         Thread.sleep(1000);
         Document doc = samlToken.getOwnerDocument();
@@ -112,6 +127,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
+        samlTokenRenewer.setAllowRenewalAfterExpiry(true);
         Map<String, SAMLRealm> samlRealms = getSamlRealms();
         ((SAMLTokenRenewer)samlTokenRenewer).setRealmMap(samlRealms);
         String realm = validatorResponse.getTokenRealm();
@@ -140,10 +156,14 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         // Create a RenewTarget consisting of a SAML Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(
-                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, "B", 50
+        
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, crypto, "mystskey", 
+                callbackHandler
             );
+        
+        Element samlToken = createSAMLAssertion(providerParameters, "B", 50, true, true);
         // Sleep to expire the token
         Thread.sleep(1000);
         Document doc = samlToken.getOwnerDocument();
@@ -180,6 +200,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
+        samlTokenRenewer.setAllowRenewalAfterExpiry(true);
         Map<String, SAMLRealm> samlRealms = getSamlRealms();
         ((SAMLTokenRenewer)samlTokenRenewer).setRealmMap(samlRealms);
         String realm = validatorResponse.getTokenRealm();
@@ -228,26 +249,30 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         stsProperties.setIssuer("STS-2");
         parameters.setStsProperties(stsProperties);
         
+        parameters.setTokenStore(tokenStore);
+        
         return parameters;
     }
     
     private Element createSAMLAssertion(
-        String tokenType, 
-        Crypto crypto, 
-        String signatureUsername, 
-        CallbackHandler callbackHandler,
+        TokenProviderParameters providerParameters,
         String realm,
-        long ttlMs
+        long ttlMs,
+        boolean allowRenewing,
+        boolean allowRenewingAfterExpiry
     ) throws WSSecurityException {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         ((SAMLTokenProvider)samlTokenProvider).setConditionsProvider(conditionsProvider);
-        TokenProviderParameters providerParameters = 
-            createProviderParameters(
-                tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
-            );
+
         providerParameters.setRealm(realm);
+        
+        Renewing renewing = new Renewing();
+        renewing.setAllowRenewing(allowRenewing);
+        renewing.setAllowRenewingAfterExpiry(allowRenewingAfterExpiry);
+        providerParameters.getTokenRequirements().setRenewing(renewing);
+        
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
             Date creationTime = new Date();
@@ -316,6 +341,8 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         parameters.setStsProperties(stsProperties);
 
         parameters.setEncryptionProperties(new EncryptionProperties());
+        
+        parameters.setTokenStore(tokenStore);
 
         return parameters;
     }

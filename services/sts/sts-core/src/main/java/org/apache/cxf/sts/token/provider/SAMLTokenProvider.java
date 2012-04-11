@@ -40,6 +40,7 @@ import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
 import org.apache.cxf.sts.request.KeyRequirements;
+import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -135,14 +136,32 @@ public class SAMLTokenProvider implements TokenProvider {
                 SecurityToken securityToken = new SecurityToken(assertion.getId(), null, expires);
                 securityToken.setToken(token);
                 securityToken.setPrincipal(tokenParameters.getPrincipal());
-                if (tokenParameters.getRealm() != null) {
-                    Properties props = securityToken.getProperties();
-                    if (props == null) {
-                        props = new Properties();
-                    }
-                    props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
-                    securityToken.setProperties(props);
+
+                Properties props = securityToken.getProperties();
+                if (props == null) {
+                    props = new Properties();
                 }
+                securityToken.setProperties(props);
+                if (tokenParameters.getRealm() != null) {
+                    props.setProperty(STSConstants.TOKEN_REALM, tokenParameters.getRealm());
+                }
+
+                // Handle Renewing logic
+                Renewing renewing = tokenParameters.getTokenRequirements().getRenewing();
+                if (renewing != null) {
+                    props.put(
+                        STSConstants.TOKEN_RENEWING_ALLOW, 
+                        String.valueOf(renewing.isAllowRenewing())
+                    );
+                    props.put(
+                        STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, 
+                        String.valueOf(renewing.isAllowRenewingAfterExpiry())
+                    );
+                } else {
+                    props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW, "true");
+                    props.setProperty(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
+                }
+                    
                 int hash = Arrays.hashCode(signatureValue);
                 securityToken.setTokenHash(hash);
                 String identifier = Integer.toString(hash);

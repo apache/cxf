@@ -58,6 +58,8 @@ public final class QNameConstants {
         WS_TRUST_FACTORY.createRequestType("").getName();
     public static final QName CLAIMS = 
         WS_TRUST_FACTORY.createClaims(null).getName();
+    public static final QName RENEWING = 
+        WS_TRUST_FACTORY.createRenewing(null).getName();
     
     //
     // Key Requirement QNames

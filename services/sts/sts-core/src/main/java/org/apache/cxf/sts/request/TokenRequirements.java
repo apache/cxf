@@ -37,7 +37,16 @@ public class TokenRequirements {
     private ReceivedToken renewTarget;
     private Lifetime lifetime;
     private RequestClaimCollection claims;
+    private Renewing renewing;
     
+    public Renewing getRenewing() {
+        return renewing;
+    }
+
+    public void setRenewing(Renewing renewing) {
+        this.renewing = renewing;
+    }
+
     public String getTokenType() {
         return tokenType;
     }

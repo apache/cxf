@@ -64,6 +64,7 @@ import org.apache.cxf.ws.security.sts.provider.model.EntropyType;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
 import org.apache.cxf.ws.security.sts.provider.model.RenewTargetType;
+import org.apache.cxf.ws.security.sts.provider.model.RenewingType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.UseKeyType;
 import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
@@ -108,16 +109,24 @@ public class RequestParser {
             // JAXB types
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
-                boolean found = 
-                    parseTokenRequirements(jaxbElement, tokenRequirements, wsContext, claimsParsers);
-                if (!found) {
-                    found = parseKeyRequirements(jaxbElement, keyRequirements, wsContext, stsProperties);
-                }
-                if (!found) {
-                    LOG.log(Level.WARNING, "Found a JAXB object of unknown type: " + jaxbElement.getName());
-                    throw new STSException(
-                        "An unknown element was received", STSException.BAD_REQUEST
-                    );
+                try {
+                    boolean found = 
+                        parseTokenRequirements(jaxbElement, tokenRequirements, wsContext, claimsParsers);
+                    if (!found) {
+                        found = parseKeyRequirements(jaxbElement, keyRequirements, wsContext, stsProperties);
+                    }
+                    if (!found) {
+                        LOG.log(Level.WARNING, "Found a JAXB object of unknown type: " + jaxbElement.getName());
+                        throw new STSException(
+                            "An unknown element was received", STSException.BAD_REQUEST
+                        );
+                    }
+                } catch (STSException ex) {
+                    LOG.log(Level.WARNING, "", ex);
+                    throw ex;
+                } catch (RuntimeException ex) {
+                    LOG.log(Level.WARNING, "", ex);
+                    throw ex;
                 }
             // SecondaryParameters/AppliesTo
             } else if (requestObject instanceof Element) {
@@ -280,6 +289,17 @@ public class RequestParser {
             RequestClaimCollection requestedClaims = parseClaims(claimsType, claimsParsers);
             tokenRequirements.setClaims(requestedClaims);
             LOG.fine("Found Claims token");
+        } else if (QNameConstants.RENEWING.equals(jaxbElement.getName())) {
+            RenewingType renewingType = (RenewingType)jaxbElement.getValue();
+            Renewing renewing = new Renewing();
+            if (renewingType.isAllow() != null) {
+                renewing.setAllowRenewing(renewingType.isAllow());
+            }
+            if (renewingType.isOK() != null) {
+                renewing.setAllowRenewingAfterExpiry(renewingType.isOK());
+            }
+            tokenRequirements.setRenewing(renewing);
+            LOG.fine("Found Renewing token");
         } else {
             return false;
         }

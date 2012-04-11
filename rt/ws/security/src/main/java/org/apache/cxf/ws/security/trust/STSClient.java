@@ -165,6 +165,8 @@ public class STSClient implements Configurable, InterceptorProvider {
     protected boolean isSpnego;
     protected boolean enableLifetime;
     protected int ttl = 300;
+    protected boolean allowRenewing = true;
+    protected boolean allowRenewingAfterExpiry;
     
     protected Object actAs;
     protected String tokenType;
@@ -290,6 +292,22 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     public void setSpnego(boolean spnego) {
         this.isSpnego = spnego;
+    }
+    
+    public boolean isAllowRenewing() {
+        return allowRenewing;
+    }
+
+    public void setAllowRenewing(boolean allowRenewing) {
+        this.allowRenewing = allowRenewing;
+    }
+
+    public boolean isAllowRenewingAfterExpiry() {
+        return allowRenewingAfterExpiry;
+    }
+
+    public void setAllowRenewingAfterExpiry(boolean allowRenewingAfterExpiry) {
+        this.allowRenewingAfterExpiry = allowRenewingAfterExpiry;
     }
     
     public boolean isEnableAppliesTo() {
@@ -581,16 +599,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (isSecureConv) {
             action = namespace + "/RST/SCT";
         }
-        return requestSecurityToken(appliesTo, action, "/Issue", null, binaryExchange);
+        return requestSecurityToken(appliesTo, action, "/Issue", binaryExchange);
     }
     
-    public SecurityToken requestSecurityToken(String appliesTo, String action, String requestType,
-            SecurityToken target) throws Exception {
-        return requestSecurityToken(appliesTo, action, requestType, target, null);
-    }
-
-    public SecurityToken requestSecurityToken(String appliesTo, String action, String requestType,
-                                              SecurityToken target, String binaryExchange) throws Exception {
+    public SecurityToken requestSecurityToken(
+        String appliesTo, String action, String requestType, String binaryExchange
+    ) throws Exception {
         createClient();
         BindingOperationInfo boi = findOperation("/RST/Issue");
 
@@ -682,13 +696,6 @@ public class STSClient implements Configurable, InterceptorProvider {
             addKeySize(keySize, writer);
         }
         
-        if (target != null) {
-            writer.writeStartElement("wst", "RenewTarget", namespace);
-            client.getRequestContext().put(SecurityConstants.TOKEN, target);
-            StaxUtils.copy(target.getToken(), writer);
-            writer.writeEndElement();
-        }
-        
         if (binaryExchange != null) {
             addBinaryExchange(binaryExchange, writer);
         }
@@ -699,6 +706,16 @@ public class STSClient implements Configurable, InterceptorProvider {
             StaxUtils.copy(actAsSecurityToken, writer);
             writer.writeEndElement();
         }
+        
+        // Write out renewal semantics
+        writer.writeStartElement("wst", "Renewing", namespace);
+        if (!allowRenewing) {
+            writer.writeAttribute(null, "Allow", "false");
+        }
+        if (allowRenewing && allowRenewingAfterExpiry) {
+            writer.writeAttribute(null, "OK", "true");
+        }
+        writer.writeEndElement();
         
         writer.writeEndElement();
 
