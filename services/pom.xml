@@ -22,7 +22,7 @@
     <artifactId>cxf-services</artifactId>
     <packaging>pom</packaging>
     <version>2.5.3-SNAPSHOT</version>
-    <name>Apache CXF Runtime</name>
+    <name>Apache CXF Services</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
