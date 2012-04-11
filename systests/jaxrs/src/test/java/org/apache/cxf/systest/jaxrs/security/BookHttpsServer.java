@@ -32,7 +32,7 @@ public class BookHttpsServer extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-https");
     
     private static final String SERVER_CONFIG_FILE =
-        "org/apache/cxf/systest/jaxrs/security/jaxrs-https.xml";
+        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-server.xml";
     
     protected void run() {
         
