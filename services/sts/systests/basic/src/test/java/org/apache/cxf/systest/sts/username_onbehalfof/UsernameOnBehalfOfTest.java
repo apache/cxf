@@ -32,6 +32,7 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.delegation.WSSUsernameCallbackHandler;
@@ -205,6 +206,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         
         // Reset the cache - this invocation should fail
         p.getRequestContext().put(TokenStore.class.getName(), new MemoryTokenStore());
+        p.getRequestContext().put(SecurityConstants.TOKEN, new SecurityToken());
         try {
             doubleIt(bearerPort2, 40);
             fail("Failure expected as the cache is reset");

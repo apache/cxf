@@ -118,6 +118,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         Client client = ClientProxy.getClient(transportSaml1Port);
         Endpoint ep = client.getEndpoint();
         ep.remove(SecurityConstants.TOKEN_ID);
+        ep.remove(SecurityConstants.TOKEN);
 
         try {
             doubleIt(transportSaml1Port, 35);
