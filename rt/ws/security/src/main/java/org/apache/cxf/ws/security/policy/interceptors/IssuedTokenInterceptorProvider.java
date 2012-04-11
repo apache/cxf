@@ -203,7 +203,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                             }
                         }
                     } else {
-                        //renew token?
+                        tok = renewToken(message, aim, itok, tok);
                     }
                     if (tok != null) {
                         for (AssertionInfo ai : ais) {
@@ -214,10 +214,12 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                 message, SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true
                             );
                         if (cacheIssuedToken) {
-                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
-                                                                          tok.getId());
+                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN, tok);
+                            message.getExchange().put(SecurityConstants.TOKEN, tok);
                             message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
+                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
                         } else {
+                            message.put(SecurityConstants.TOKEN, tok);
                             message.put(SecurityConstants.TOKEN_ID, tok.getId());
                         }
                         getTokenStore(message).add(tok);
@@ -252,14 +254,20 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 );
             SecurityToken tok = null;
             if (cacheIssuedToken) {
-                String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                if (tokId != null) {
-                    tok = getTokenStore(message).getToken(tokId);
+                tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
+                if (tok == null) {
+                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                    if (tokId != null) {
+                        tok = getTokenStore(message).getToken(tokId);
+                    }
                 }
             } else {
-                String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
-                if (tokId != null) {
-                    tok = getTokenStore(message).getToken(tokId);
+                tok = (SecurityToken)message.get(SecurityConstants.TOKEN);
+                if (tok == null) {
+                    String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
+                    if (tokId != null) {
+                        tok = getTokenStore(message).getToken(tokId);
+                    }
                 }
             }
             return tok;
@@ -397,6 +405,49 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         
+        private SecurityToken renewToken(
+            Message message, 
+            AssertionInfoMap aim,
+            IssuedToken itok,
+            SecurityToken tok
+        ) {
+            if (!tok.isExpired()) {
+                return tok;
+            }
+            
+            STSClient client = STSUtils.getClient(message, "sts", itok);
+            AddressingProperties maps =
+                (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context.outbound");
+            if (maps == null) {
+                maps = (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context");
+            }
+            synchronized (client) {
+                try {
+                    Map<String, Object> ctx = client.getRequestContext();
+                    mapSecurityProps(message, ctx);
+                
+                    client.setMessage(message);
+                    
+                    client.setTrust(getTrust10(aim));
+                    client.setTrust(getTrust13(aim));
+                    
+                    client.setTemplate(itok.getRstTemplate());
+                    return client.renewSecurityToken(tok);
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new Fault(e);
+                } finally {
+                    client.setTrust((Trust10)null);
+                    client.setTrust((Trust13)null);
+                    client.setTemplate(null);
+                    client.setAddressingNamespace(null);
+                }
+            }
+        }
+        
     }
     
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -447,7 +498,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
                 if (valid) {
                     SecurityToken token = createSecurityToken(assertionWrapper);
-                    message.getExchange().put(SecurityConstants.TOKEN, token);
+                    getTokenStore(message).add(token);
+                    message.getExchange().remove(SecurityConstants.TOKEN);
+                    message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                     return;
                 }
             }
@@ -455,7 +508,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 boolean valid = issuedValidator.validatePolicy(issuedAis, binarySecurityToken);
                 if (valid) {
                     SecurityToken token = createSecurityToken(binarySecurityToken);
-                    message.getExchange().put(SecurityConstants.TOKEN, token);
+                    getTokenStore(message).add(token);
+                    message.getExchange().remove(SecurityConstants.TOKEN);
+                    message.getExchange().put(SecurityConstants.TOKEN_ID, token.getId());
                     return;
                 }
             }

@@ -630,13 +630,13 @@ public abstract class AbstractBindingBuilder {
 
     protected SecurityToken getSecurityToken() {
         SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-        if (st == null || st.isExpired()) {
+        if (st == null) {
             String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
             if (id != null) {
                 st = getTokenStore().getToken(id);
             }
         }
-        if (st != null && !st.isExpired()) {
+        if (st != null) {
             getTokenStore().add(st);
             return st;
         }

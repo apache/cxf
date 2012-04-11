@@ -259,7 +259,7 @@ final class NegotiationUtils {
                         token.setToken(tok.getElement());
                         token.setSecret(secret);
                         token.setTokenType(tok.getTokenType());
-                        message.getExchange().put(SecurityConstants.TOKEN, token);
+                        getTokenStore(message).add(token);
                     }
                     return true;
                 }

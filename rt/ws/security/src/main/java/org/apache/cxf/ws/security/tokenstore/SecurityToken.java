@@ -247,6 +247,13 @@ public class SecurityToken implements Serializable {
     }
     
     /**
+     * Set the id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    /**
      * @return Returns the id.
      */
     public String getId() {
