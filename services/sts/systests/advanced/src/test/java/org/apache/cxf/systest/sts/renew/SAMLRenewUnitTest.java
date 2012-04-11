@@ -74,7 +74,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Thread.sleep(5000);
         
         // Renew the token
-        SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token);
+        SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
         assertFalse(token.equals(renewedToken));
         
         // Try to validate old token -> fail.
@@ -108,7 +108,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Thread.sleep(5000);
         
         // Renew the token
-        SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token);
+        SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
         assertFalse(token.equals(renewedToken));
         
         // Try to validate old token -> fail.
@@ -147,8 +147,36 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         // Renew the token - this should fail as the STS will reject an attempt to renew a valid token
         // unless it has been configured otherwise
         try {
-            renewSecurityToken(bus, wsdlLocation, token);
+            renewSecurityToken(bus, wsdlLocation, token, true);
             fail("Failure expected on trying to renew a valid token");
+        } catch (Exception ex) {
+            // expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testRenewSAML2TokenDifferentAppliesTo() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String wsdlLocation = 
+            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+        
+        // Request the token
+        SecurityToken token = requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 5);
+        assertNotNull(token);
+        // Sleep to expire the token
+        Thread.sleep(5000);
+        
+        // Renew the token
+        token.setIssuerAddress("http://www.apache.org");
+        try {
+            renewSecurityToken(bus, wsdlLocation, token, true);
+            fail("Failure expected on a different AppliesTo address");
         } catch (Exception ex) {
             // expected
         }
@@ -206,7 +234,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
     }
     
     private SecurityToken renewSecurityToken(
-        Bus bus, String wsdlLocation, SecurityToken securityToken
+        Bus bus, String wsdlLocation, SecurityToken securityToken, boolean enableAppliesTo
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation(wsdlLocation);
@@ -221,7 +249,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
 
-        stsClient.setEnableAppliesTo(false);
+        stsClient.setEnableAppliesTo(enableAppliesTo);
         // Request a token with a TTL of 60 minutes
         stsClient.setTtl(60 * 60);
         stsClient.setEnableLifetime(true);

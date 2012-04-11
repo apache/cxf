@@ -64,9 +64,13 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.builder.SAML1ComponentBuilder;
 import org.apache.ws.security.saml.ext.builder.SAML2ComponentBuilder;
+import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml1.core.Audience;
+import org.opensaml.saml1.core.AudienceRestrictionCondition;
+import org.opensaml.saml2.core.AudienceRestriction;
 
 /**
  * A TokenRenewer implementation that renews a (valid or expired) SAML Token.
@@ -151,31 +155,12 @@ public class SAMLTokenRenewer implements TokenRenewer {
         try {
             AssertionWrapper assertion = new AssertionWrapper((Element)tokenToRenew.getToken());
             
-            // Check to see whether the token has expired greater than the configured max expiry time
-            if (tokenToRenew.getState() == STATE.EXPIRED) {
-                DateTime expiryDate = getExpiryDate(assertion);
-                DateTime currentDate = new DateTime();
-                if ((currentDate.getMillis() - expiryDate.getMillis()) > (maxExpiry * 1000L)) {
-                    LOG.log(Level.WARNING, "The token expired too long ago to be renewed");
-                    throw new STSException(
-                        "The token expired too long ago to be renewed", STSException.REQUEST_FAILED
-                    );
-                }
-            }
-            
-            ProofOfPossessionValidator popValidator = new ProofOfPossessionValidator();
-            if (verifyProofOfPossession 
-                && !popValidator.checkProofOfPossession(tokenParameters, assertion.getSubjectKeyInfo())) {
-                throw new STSException(
-                    "Failed to verify the proof of possession of the key associated with the "
-                    + "saml token. No matching key found in the request.",
-                    STSException.INVALID_REQUEST
-                );
-            }
+            validateAssertion(assertion, tokenToRenew, tokenParameters);
             
             // Create new Conditions & sign the Assertion
             byte[] oldSignature = assertion.getSignatureValue();
             createNewConditions(assertion, tokenParameters);
+            String oldId = createNewId(assertion);
             signAssertion(assertion, tokenParameters);
             
             Document doc = DOMUtils.createDocument();
@@ -189,7 +174,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
             
             // Remove the previous token (now expired) from the cache
             if (tokenParameters.getTokenStore() != null) {
-                tokenParameters.getTokenStore().remove(assertion.getId());
+                tokenParameters.getTokenStore().remove(oldId);
                 int hash = Arrays.hashCode(oldSignature);
                 tokenParameters.getTokenStore().remove(Integer.toString(hash));
             }
@@ -267,6 +252,100 @@ public class SAMLTokenRenewer implements TokenRenewer {
      */
     public Map<String, SAMLRealm> getRealmMap() {
         return realmMap;
+    }
+    
+    private void validateAssertion(
+        AssertionWrapper assertion,
+        ReceivedToken tokenToRenew,
+        TokenRenewerParameters tokenParameters
+    ) {
+        // Check to see whether the token has expired greater than the configured max expiry time
+        if (tokenToRenew.getState() == STATE.EXPIRED) {
+            DateTime expiryDate = getExpiryDate(assertion);
+            DateTime currentDate = new DateTime();
+            if ((currentDate.getMillis() - expiryDate.getMillis()) > (maxExpiry * 1000L)) {
+                LOG.log(Level.WARNING, "The token expired too long ago to be renewed");
+                throw new STSException(
+                    "The token expired too long ago to be renewed", STSException.REQUEST_FAILED
+                );
+            }
+        }
+        
+        // Verify Proof of Possession
+        ProofOfPossessionValidator popValidator = new ProofOfPossessionValidator();
+        if (verifyProofOfPossession 
+            && !popValidator.checkProofOfPossession(tokenParameters, assertion.getSubjectKeyInfo())) {
+            throw new STSException(
+                "Failed to verify the proof of possession of the key associated with the "
+                + "saml token. No matching key found in the request.",
+                STSException.INVALID_REQUEST
+            );
+        }
+        
+        // Check the AppliesTo address
+        String appliesToAddress = tokenParameters.getAppliesToAddress();
+        if (appliesToAddress != null) {
+            if (assertion.getSaml1() != null) {
+                List<AudienceRestrictionCondition> restrConditions = 
+                    assertion.getSaml1().getConditions().getAudienceRestrictionConditions();
+                if (!matchSaml1AudienceRestriction(appliesToAddress, restrConditions)) {
+                    LOG.log(Level.WARNING, "The AppliesTo address does not match the Audience Restriction");
+                    throw new STSException(
+                        "The AppliesTo address does not match the Audience Restriction",
+                        STSException.INVALID_REQUEST
+                    );
+                }
+            } else {
+                List<AudienceRestriction> audienceRestrs = 
+                    assertion.getSaml2().getConditions().getAudienceRestrictions();
+                if (!matchSaml2AudienceRestriction(appliesToAddress, audienceRestrs)) {
+                    LOG.log(Level.WARNING, "The AppliesTo address does not match the Audience Restriction");
+                    throw new STSException(
+                        "The AppliesTo address does not match the Audience Restriction",
+                        STSException.INVALID_REQUEST
+                    );
+                }
+            }
+        }
+        
+    }
+    
+    private boolean matchSaml1AudienceRestriction(
+        String appliesTo, List<AudienceRestrictionCondition> restrConditions
+    ) {
+        boolean found = false;
+        if (restrConditions != null && !restrConditions.isEmpty()) {
+            for (AudienceRestrictionCondition restrCondition : restrConditions) {
+                if (restrCondition.getAudiences() != null) {
+                    for (Audience audience : restrCondition.getAudiences()) {
+                        if (appliesTo.equals(audience.getUri())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return found;
+    }
+    
+    private boolean matchSaml2AudienceRestriction(
+        String appliesTo, List<AudienceRestriction> audienceRestrictions
+    ) {
+        boolean found = false;
+        if (audienceRestrictions != null && !audienceRestrictions.isEmpty()) {
+            for (AudienceRestriction audienceRestriction : audienceRestrictions) {
+                if (audienceRestriction.getAudiences() != null) {
+                    for (org.opensaml.saml2.core.Audience audience : audienceRestriction.getAudiences()) {
+                        if (appliesTo.equals(audience.getAudienceURI())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return found;
     }
     
     private void signAssertion(
@@ -373,6 +452,22 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 SAML2ComponentBuilder.createConditions(conditions);
             
             saml2Assertion.setConditions(saml2Conditions);
+        }
+    }
+    
+    private String createNewId(AssertionWrapper assertion) {
+        if (assertion.getSaml1() != null) {
+            org.opensaml.saml1.core.Assertion saml1Assertion = assertion.getSaml1();
+            String oldId = saml1Assertion.getID();
+            saml1Assertion.setID("_" + UUIDGenerator.getUUID());
+            
+            return oldId;
+        } else {
+            org.opensaml.saml2.core.Assertion saml2Assertion = assertion.getSaml2();
+            String oldId = saml2Assertion.getID();
+            saml2Assertion.setID("_" + UUIDGenerator.getUUID());
+            
+            return oldId;
         }
     }
     

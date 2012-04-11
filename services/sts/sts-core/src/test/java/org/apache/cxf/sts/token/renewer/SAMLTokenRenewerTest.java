@@ -54,6 +54,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
@@ -120,6 +121,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
         
+        String oldId = new AssertionWrapper(samlToken).getId();
+        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        assertFalse(oldId.equals(newId));
+        
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
@@ -183,6 +188,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
         
+        String oldId = new AssertionWrapper(samlToken).getId();
+        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        assertFalse(oldId.equals(newId));
+        
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
@@ -244,6 +253,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
                 samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
+        
+        String oldId = new AssertionWrapper(samlToken).getId();
+        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        assertFalse(oldId.equals(newId));
         
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
@@ -308,6 +321,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
         
+        String oldId = new AssertionWrapper(samlToken).getId();
+        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        assertFalse(oldId.equals(newId));
+        
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
@@ -367,6 +384,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
                 samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
+        
+        String oldId = new AssertionWrapper(samlToken).getId();
+        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        assertFalse(oldId.equals(newId));
         
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
@@ -433,6 +454,58 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
             fail("Failure expected as the token expired too long ago");
         } catch (STSException ex) {
             // Expected
+        }
+    }
+    
+    /**
+     * Renew a valid SAML1 Assertion but sending a different AppliesTo address.
+     */
+    @org.junit.Test
+    public void renewSAML1AssertionDifferentAppliesTo() throws Exception {
+        // Create the Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        // Validate the Assertion
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+                samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+        
+        // Renew the Assertion
+        TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
+        renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy2");
+        renewerParameters.setStsProperties(validatorParameters.getStsProperties());
+        renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        renewerParameters.setWebServiceContext(validatorParameters.getWebServiceContext());
+        renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
+        renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
+        renewerParameters.setTokenStore(validatorParameters.getTokenStore());
+        renewerParameters.setToken(validatorResponse.getToken());
+        
+        TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
+        assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
+        
+        try {
+            samlTokenRenewer.renewToken(renewerParameters);
+            fail("Failure expected on sending a different AppliesTo address");
+        } catch (Exception ex) {
+            // expected
         }
     }
 
