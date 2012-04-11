@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-management-web</artifactId>
     <packaging>jar</packaging>
-    <version>2.3.10-SNAPSHOT</version>
+    <version>2.3.10</version>
     <name>Apache CXF Runtime Web Management</name>
     <description>Apache CXF Runtime Web Management</description>
     <url>http://cxf.apache.org</url>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.3.10-SNAPSHOT</version>
+        <version>2.3.10</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
