@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf.services.wsn</groupId>
     <artifactId>cxf-services-wsn-core</artifactId>
     <packaging>bundle</packaging>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.6.0</version>
     <name>Apache CXF WSN Core</name>
     <description>Apache CXF WSN Core Service</description>
     <url>http://cxf.apache.org</url>
@@ -29,14 +29,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>2.6.0</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
     <properties>
         <!-- bug in jaxb is causing an assertion error if -ea is turned on -->
-        <cxf.surefire.fork.vmargs></cxf.surefire.fork.vmargs>
-        <cxf.server.launcher.vmargs></cxf.server.launcher.vmargs>
+        <cxf.surefire.fork.vmargs />
+        <cxf.server.launcher.vmargs />
         <cxf.surefire.enable.assertions>false</cxf.surefire.enable.assertions>
     </properties>
 
