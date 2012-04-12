@@ -136,6 +136,7 @@ for caveats when upgrading from CXF 2.4.x to 2.5.x.
     * [CXF-4227] - AttachmentDeserializerTest contains buggy code for reading an InputStream.
     * [CXF-4231] - Incorrect handling of "If-None-Match" and "If-Modified-Since" request header combination
     * [CXF-4234] - JAX-RS JAASAuthenticatingFilter leaks SecurityException
+    * [CXF-4238] - Spring JAXRSClientFactoryBeanDefinitionParser reports a wrong factory bean class
 
 ** Improvement
     * [CXF-1636] - Have WSS4J in/out interceptors require nonces and timestamps when using UsernameTokens?
@@ -168,6 +169,7 @@ for caveats when upgrading from CXF 2.4.x to 2.5.x.
     * [CXF-4223] - Extend fault policy interceptors with POLICY_OVERRIDE
     * [CXF-4225] - Update JAXB providers to support Listener properties
     * [CXF-4230] - Update Javadoc of GZIPFeature
+    * [CXF-4236] - Changing Maven Name for CXF-Services from CXF Runtime to CXF Services
 
 ** New Feature
     * [CXF-2864] - Support UsernameToken derived keys
@@ -184,5 +186,9 @@ for caveats when upgrading from CXF 2.4.x to 2.5.x.
 ** Task
     * [CXF-4074] - Move the CORS code to rs/security/cors
     * [CXF-4135] - Allow xsd shema file as a jaxb binding file to pass into JAXB schmeCompiler
+
+
+
+
 
 
