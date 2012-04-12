@@ -35,7 +35,7 @@ under the License.
     <!-- -->
     <!-- HTTP/S configuration for proxy & web clients -->
     <!-- -->
-    <http:conduit id="httpConduit" name="{http://service.rs}BookService.http-conduit">
+    <http:conduit name="*.http-conduit">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
@@ -51,7 +51,6 @@ under the License.
 
 
     <jaxrs:client id="bookService" 
-       xmlns:s="http://service.rs" serviceName="s:BookService"
        address="https://localhost:${testutil.ports.jaxrs-https}"
 serviceClass="org.apache.cxf.systest.jaxrs.BookStore"/>
 
