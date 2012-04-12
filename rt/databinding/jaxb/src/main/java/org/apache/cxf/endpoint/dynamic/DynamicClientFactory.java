@@ -510,7 +510,7 @@ public class DynamicClientFactory {
                     if (key.contains("#")) {
                         for (ServiceInfo si : serviceList) {
                             for (SchemaInfo sci : si.getSchemas()) {
-                                if (key.equals(sci.getSystemId())) {
+                                if (key != null && key.equals(sci.getSystemId())) {
                                     key = null;
                                 }
                             }
