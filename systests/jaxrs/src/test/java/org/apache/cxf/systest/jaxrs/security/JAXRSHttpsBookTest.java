@@ -43,7 +43,8 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client2.xml";
     private static final String CLIENT_CONFIG_FILE3 =
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client3.xml";
-        
+    private static final String CLIENT_CONFIG_FILE4 =
+        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client4.xml";    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -78,9 +79,17 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBook123ProxyFromSpring() throws Exception {
+        doTestGetBook123ProxyFromSpring(CLIENT_CONFIG_FILE3);
+    }
+    @Test
+    public void testGetBook123ProxyFromSpringWildcard() throws Exception {
+        doTestGetBook123ProxyFromSpring(CLIENT_CONFIG_FILE4);
+    }
+    
+    private void doTestGetBook123ProxyFromSpring(String cfgFile) throws Exception {
         
         ClassPathXmlApplicationContext ctx =
-            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE3});
+            new ClassPathXmlApplicationContext(new String[] {cfgFile});
         Object bean = ctx.getBean("bookService.proxyFactory");
         assertNotNull(bean);
         JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
