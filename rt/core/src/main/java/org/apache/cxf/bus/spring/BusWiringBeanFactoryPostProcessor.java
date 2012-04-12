@@ -74,7 +74,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
             ConfigurableApplicationContext cctx = (ConfigurableApplicationContext)context;
             cctx.getBeanFactory().registerSingleton(name, b);
         }
-        return context.getBean(name, Bus.class);
+        return (Bus)context.getBean(name, Bus.class);
     }
     private Object getBusForName(String name,
                                  ConfigurableListableBeanFactory factory,
@@ -89,7 +89,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
             df.registerBeanDefinition(name, rbd);
         } else if (cn != null) {
             BeanDefinition bd = factory.getBeanDefinition(name);
-            bd.getPropertyValues().add("busConfig", new RuntimeBeanReference(cn));
+            bd.getPropertyValues().addPropertyValue("busConfig", new RuntimeBeanReference(cn));
         }
         return new RuntimeBeanReference(name);        
     }

@@ -96,7 +96,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     private void copyProps(BeanDefinitionBuilder src, BeanDefinition def) {
         for (PropertyValue v : src.getBeanDefinition().getPropertyValues().getPropertyValues()) {
             if (!"bus".equals(v.getName())) {
-                def.getPropertyValues().add(v.getName(), v.getValue());
+                def.getPropertyValues().addPropertyValue(v.getName(), v.getValue());
             }
             src.getBeanDefinition().getPropertyValues().removePropertyValue(v);
         }
