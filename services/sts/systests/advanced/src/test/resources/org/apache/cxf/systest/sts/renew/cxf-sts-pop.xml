@@ -158,16 +158,16 @@
 	</bean>
 
 	<jaxws:endpoint id="localSTS" implementor="#transportSTSProviderBean"
-		address="https://localhost:${testutil.ports.STSServer}/SecurityTokenService/Transport"
+		address="https://localhost:${testutil.ports.STSServerPOP}/SecurityTokenService/Transport"
 		wsdlLocation="src/test/resources/org/apache/cxf/systest/sts/deployment/ws-trust-1.4-service.wsdl"
 		xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
 		depends-on="ClientAuthHttpsSettings" serviceName="ns1:SecurityTokenService"
 		endpointName="ns1:Transport_Port">
 	</jaxws:endpoint>
-
+	
 	<httpj:engine-factory id="ClientAuthHttpsSettings"
 		bus="cxf">
-		<httpj:engine port="${testutil.ports.STSServer}">
+		<httpj:engine port="${testutil.ports.STSServerPOP}">
 			<httpj:tlsServerParameters>
 				<sec:trustManagers>
 					<sec:keyStore type="jks" password="stsspass" resource="stsstore.jks" />

@@ -44,7 +44,7 @@ import org.junit.BeforeClass;
  */
 public class SAMLRenewTest extends AbstractBusClientServerTestBase {
     
-    static final String STSPORT = allocatePort(STSServer.class);
+    static final String STSPORT = allocatePort(STSServerPOP.class);
     
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
@@ -73,7 +73,6 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testRenewExpiredSAML1Token() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -142,7 +141,6 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testRenewExpiredSAML2Token() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
