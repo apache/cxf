@@ -53,10 +53,13 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AbstractSamlPolicyValidator;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.saml.SAMLKeyInfo;
@@ -284,7 +287,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
         ReceivedToken tokenToRenew,
         SecurityToken token,
         TokenRenewerParameters tokenParameters
-    ) {
+    ) throws WSSecurityException {
         // Check the cached renewal properties
         Properties props = token.getProperties();
         if (props == null) {
@@ -325,13 +328,31 @@ public class SAMLTokenRenewer implements TokenRenewer {
         
         // Verify Proof of Possession
         ProofOfPossessionValidator popValidator = new ProofOfPossessionValidator();
-        if (verifyProofOfPossession 
-            && !popValidator.checkProofOfPossession(tokenParameters, assertion.getSubjectKeyInfo())) {
-            throw new STSException(
-                "Failed to verify the proof of possession of the key associated with the "
-                + "saml token. No matching key found in the request.",
-                STSException.INVALID_REQUEST
+        if (verifyProofOfPossession) {
+            STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
+            Crypto sigCrypto = stsProperties.getSignatureCrypto();
+            CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
+            RequestData requestData = new RequestData();
+            requestData.setSigCrypto(sigCrypto);
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            requestData.setWssConfig(wssConfig);
+            requestData.setCallbackHandler(callbackHandler);
+            // Parse the HOK subject if it exists
+            assertion.parseHOKSubject(
+                requestData, new WSDocInfo(((Element)tokenToRenew.getToken()).getOwnerDocument())
             );
+        
+            SAMLKeyInfo keyInfo = assertion.getSubjectKeyInfo();
+            if (keyInfo == null) {
+                keyInfo = new SAMLKeyInfo((byte[])null);
+            }
+            if (!popValidator.checkProofOfPossession(tokenParameters, keyInfo)) {
+                throw new STSException(
+                    "Failed to verify the proof of possession of the key associated with the "
+                    + "saml token. No matching key found in the request.",
+                    STSException.INVALID_REQUEST
+                );
+            }
         }
         
         // Check the AppliesTo address
@@ -584,7 +605,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
             }
             
-            TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class);
+            TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class.getName());
             Certificate[] tlsCerts = null;
             if (tlsInfo != null) {
                 tlsCerts = tlsInfo.getPeerCertificates();
