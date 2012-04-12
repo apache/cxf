@@ -180,7 +180,6 @@ public class SAMLTokenRenewer implements TokenRenewer {
             AssertionWrapper assertion = new AssertionWrapper((Element)tokenToRenew.getToken());
             
             byte[] oldSignature = assertion.getSignatureValue();
-            // Remove the previous token (now expired) from the cache
             int hash = Arrays.hashCode(oldSignature);
             SecurityToken cachedToken = tokenStore.getToken(Integer.toString(hash));
             if (cachedToken == null) {
@@ -192,6 +191,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
             validateAssertion(assertion, tokenToRenew, cachedToken, tokenParameters);
             
             String oldId = createNewId(assertion);
+            // Remove the previous token (now expired) from the cache
             tokenStore.remove(oldId);
             tokenStore.remove(Integer.toString(hash));
             
@@ -297,10 +297,6 @@ public class SAMLTokenRenewer implements TokenRenewer {
         String isAllowRenewal = (String)props.get(STSConstants.TOKEN_RENEWING_ALLOW);
         String isAllowRenewalAfterExpiry = 
             (String)props.get(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY);
-        if (isAllowRenewal == null || isAllowRenewalAfterExpiry == null) {
-            LOG.log(Level.WARNING, "One of isAllowRenewal or isAllowRenewalAfterExpiry not set");
-            throw new STSException("Error with cached token", STSException.REQUEST_FAILED);
-        }
         
         if (isAllowRenewal == null || !Boolean.valueOf(isAllowRenewal)) {
             LOG.log(Level.WARNING, "The token is not allowed to be renewed");
