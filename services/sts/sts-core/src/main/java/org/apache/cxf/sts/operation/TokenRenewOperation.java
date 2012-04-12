@@ -45,8 +45,6 @@ import org.apache.cxf.sts.token.renewer.TokenRenewerResponse;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
-import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
-import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
@@ -71,18 +69,6 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         return tokenRenewers;
     }
 
-    public RequestSecurityTokenResponseCollectionType renew(
-        RequestSecurityTokenCollectionType requestCollection, WebServiceContext context
-    ) {
-        RequestSecurityTokenResponseCollectionType responseCollection = 
-            QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
-        for (RequestSecurityTokenType request : requestCollection.getRequestSecurityToken()) {
-            RequestSecurityTokenResponseType response = renew(request, context);
-            responseCollection.getRequestSecurityTokenResponse().add(response);
-        }
-        return responseCollection;
-    }
-    
     public RequestSecurityTokenResponseType renew(
         RequestSecurityTokenType request, WebServiceContext context
     ) {

@@ -99,7 +99,10 @@ public class ValidateUnitTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testValidateMultipleTokens() throws Exception {
+        TokenRequestCollectionOperation requestCollectionOperation = 
+            new TokenRequestCollectionOperation();
         TokenValidateOperation validateOperation = new TokenValidateOperation();
+        requestCollectionOperation.setValidateOperation(validateOperation);
         
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
@@ -119,6 +122,14 @@ public class ValidateUnitTest extends org.junit.Assert {
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
+        
+        JAXBElement<String> requestType = 
+            new JAXBElement<String>(
+                QNameConstants.REQUEST_TYPE, String.class, 
+                TokenRequestCollectionOperation.WSTRUST_REQUESTTYPE_BATCH_VALIDATE
+            );
+        request.getAny().add(requestType);
+        
         ValidateTargetType validateTarget = new ValidateTargetType();
         JAXBElement<BinarySecurityTokenType> token = createToken();
         validateTarget.setAny(token);
@@ -131,6 +142,7 @@ public class ValidateUnitTest extends org.junit.Assert {
         
         request = new RequestSecurityTokenType();
         request.getAny().add(tokenType);
+        request.getAny().add(requestType);
         validateTarget.setAny(token);
         request.getAny().add(validateTargetType);
         requestCollection.getRequestSecurityToken().add(request);
@@ -142,7 +154,7 @@ public class ValidateUnitTest extends org.junit.Assert {
         
         // Validate a token
         RequestSecurityTokenResponseCollectionType response = 
-            validateOperation.validate(requestCollection, webServiceContext);
+            requestCollectionOperation.requestCollection(requestCollection, webServiceContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
         assertEquals(securityTokenResponse.size(), 2);

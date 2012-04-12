@@ -54,6 +54,7 @@ import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.KeyExchangeTokenOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.RequestCollectionOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 
 @ServiceMode(value = Service.Mode.PAYLOAD)
@@ -63,20 +64,14 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     private static final String WSTRUST_REQUESTTYPE_ELEMENTNAME = "RequestType";
     private static final String WSTRUST_REQUESTTYPE_ISSUE = WSTRUST_13_NAMESPACE
             + "/Issue";
-    private static final String WSTRUST_REQUESTTYPE_BATCH_ISSUE = WSTRUST_13_NAMESPACE
-        + "/BatchIssue";
     private static final String WSTRUST_REQUESTTYPE_CANCEL = WSTRUST_13_NAMESPACE
             + "/Cancel";
-    private static final String WSTRUST_REQUESTTYPE_BATCH_CANCEL = WSTRUST_13_NAMESPACE
-        + "/BatchCancel";
     private static final String WSTRUST_REQUESTTYPE_RENEW = WSTRUST_13_NAMESPACE
             + "/Renew";
-    private static final String WSTRUST_REQUESTTYPE_BATCH_RENEW = WSTRUST_13_NAMESPACE
-        + "/BatchRenew";
     private static final String WSTRUST_REQUESTTYPE_VALIDATE = WSTRUST_13_NAMESPACE
             + "/Validate";
-    private static final String WSTRUST_REQUESTTYPE_BATCH_VALIDATE = WSTRUST_13_NAMESPACE
-        + "/BatchValidate";
+    private static final String WSTRUST_REQUESTTYPE_REQUESTCOLLECTION = WSTRUST_13_NAMESPACE
+            + "/RequestCollection";
     private static final String WSTRUST_REQUESTTYPE_KEYEXCHANGETOKEN = WSTRUST_13_NAMESPACE
             + "/KeyExchangeToken";
     
@@ -88,45 +83,30 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
                                                               WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_ISSUE, m);
             
-            m = IssueOperation.class.getDeclaredMethod("issue", 
-                                                       RequestSecurityTokenCollectionType.class, 
-                                                       WebServiceContext.class);
-            OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_BATCH_ISSUE, m);
-            
             m = CancelOperation.class.getDeclaredMethod("cancel", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_CANCEL, m);
-            
-            m = CancelOperation.class.getDeclaredMethod("cancel", 
-                                                        RequestSecurityTokenCollectionType.class, 
-                                                        WebServiceContext.class);
-            OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_BATCH_CANCEL, m);
             
             m = RenewOperation.class.getDeclaredMethod("renew", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_RENEW, m);
             
-            m = RenewOperation.class.getDeclaredMethod("renew", 
-                                                       RequestSecurityTokenCollectionType.class, 
-                                                       WebServiceContext.class);
-            OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_BATCH_RENEW, m);
-            
             m = ValidateOperation.class.getDeclaredMethod("validate", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_VALIDATE, m);
             
-            m = ValidateOperation.class.getDeclaredMethod("validate", 
-                                                          RequestSecurityTokenCollectionType.class, 
-                                                          WebServiceContext.class);
-            OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_BATCH_VALIDATE, m);
-            
             m = KeyExchangeTokenOperation.class.getDeclaredMethod("keyExchangeToken", 
                                                        RequestSecurityTokenType.class, 
                                                        WebServiceContext.class);
             OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_KEYEXCHANGETOKEN, m);
+            
+            m = RequestCollectionOperation.class.getDeclaredMethod("requestCollection", 
+                                                       RequestSecurityTokenCollectionType.class, 
+                                                       WebServiceContext.class);
+            OPERATION_METHODS.put(WSTRUST_REQUESTTYPE_REQUESTCOLLECTION, m);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -142,6 +122,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     private IssueSingleOperation issueSingleOperation;
     private KeyExchangeTokenOperation keyExchangeTokenOperation;
     private RenewOperation renewOperation;
+    private RequestCollectionOperation requestCollectionOperation;
     private ValidateOperation validateOperation;
     private Map<String, Object> operationMap = new HashMap<String, Object>();
 
@@ -199,6 +180,13 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
         operationMap.put(WSTRUST_REQUESTTYPE_RENEW, renewOperation);
     }
 
+    public void setRequestCollectionOperation(
+            RequestCollectionOperation requestCollectionOperation) {
+        this.requestCollectionOperation = requestCollectionOperation;
+        operationMap.put(WSTRUST_REQUESTTYPE_REQUESTCOLLECTION,
+                requestCollectionOperation);
+    }
+
     public void setValidateOperation(ValidateOperation validateOperation) {
         this.validateOperation = validateOperation;
         operationMap.put(WSTRUST_REQUESTTYPE_VALIDATE, validateOperation);
@@ -213,31 +201,8 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
             Object operationImpl = null;
             Method method = null;
             if (obj instanceof RequestSecurityTokenCollectionType) {
-                RequestSecurityTokenCollectionType rstCollection = (RequestSecurityTokenCollectionType)obj;
-                List<RequestSecurityTokenType> typeList = rstCollection.getRequestSecurityToken();
-                String requestType = null;
-                for (RequestSecurityTokenType rst : typeList) {
-                    List<?> objectList = rst.getAny();
-                    for (Object o : objectList) {
-                        if (o instanceof JAXBElement) {
-                            QName qname = ((JAXBElement<?>) o).getName();
-                            if (qname.equals(new QName(WSTRUST_13_NAMESPACE,
-                                    WSTRUST_REQUESTTYPE_ELEMENTNAME))) {
-                                String val = ((JAXBElement<?>) o).getValue().toString();
-                                // All batch requests must have the same RequestType
-                                if (requestType != null && !requestType.equals(val)) {
-                                    operationImpl = null;
-                                    method = null;
-                                    break;
-                                } else {
-                                    requestType = val;
-                                }
-                                operationImpl = operationMap.get(val);
-                                method = OPERATION_METHODS.get(val);
-                            }
-                        }
-                    }
-                }
+                operationImpl = operationMap.get(WSTRUST_REQUESTTYPE_REQUESTCOLLECTION);
+                method = OPERATION_METHODS.get(WSTRUST_REQUESTTYPE_REQUESTCOLLECTION);
             } else {
                 RequestSecurityTokenType rst = (RequestSecurityTokenType)obj;
                 List<?> objectList = rst.getAny();
@@ -248,7 +213,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
                                 WSTRUST_REQUESTTYPE_ELEMENTNAME))) {
                             String val = ((JAXBElement<?>) o).getValue().toString();
                             operationImpl = operationMap.get(val);
-                            method = OPERATION_METHODS.get(val);
+                            method =  OPERATION_METHODS.get(val);
                             break;
                         }
                     }
@@ -337,6 +302,10 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
 
     public RenewOperation getRenewOperation() {
         return renewOperation;
+    }
+
+    public RequestCollectionOperation getRequestCollectionOperation() {
+        return requestCollectionOperation;
     }
 
     public ValidateOperation getValidateOperation() {

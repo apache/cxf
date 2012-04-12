@@ -16,17 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.sts.batch;
 
-package org.apache.cxf.ws.security.sts.provider.operation;
+import java.net.URL;
 
-import javax.xml.ws.WebServiceContext;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
-import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+public class STSServer extends AbstractBusTestServerBase {
 
-public interface ValidateOperation {
+    public STSServer() {
 
-    RequestSecurityTokenResponseType validate(RequestSecurityTokenType request,
-                                              WebServiceContext context);
+    }
+
+    protected void run()  {
+        URL busFile = STSServer.class.getResource("cxf-sts.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
+
+        try {
+            new STSServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
+    public static void main(String args[]) {
+        new STSServer().run();
+    }
 }

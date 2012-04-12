@@ -69,19 +69,6 @@ public interface SecurityTokenService {
         RequestSecurityTokenType request
     );
     
-    @WebResult(name = "RequestSecurityTokenResponseCollection",
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
-               partName = "responseCollection")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchIssue", 
-            output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchIssue")
-    @WebMethod(operationName = "Issue")
-    RequestSecurityTokenResponseCollectionType issue(
-        @WebParam(partName = "requestCollection",
-                  name = "RequestSecurityTokenCollection", 
-                  targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
-        RequestSecurityTokenCollectionType requestCollection
-    );
-    
     @WebResult(name = "RequestSecurityTokenResponse",
               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
               partName = "response")
@@ -106,18 +93,6 @@ public interface SecurityTokenService {
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
-    
-    @WebResult(name = "RequestSecurityTokenResponseCollection", 
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
-               partName = "responseCollection")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchCancel", 
-            output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchCancel")
-    @WebMethod(operationName = "Cancel")
-    RequestSecurityTokenResponseCollectionType cancel(
-        @WebParam(partName = "requestCollection", name = "RequestSecurityTokenCollection", 
-                  targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
-        RequestSecurityTokenCollectionType requestCollection
-    );
 
     @WebResult(name = "RequestSecurityTokenResponse", 
                targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
@@ -130,15 +105,14 @@ public interface SecurityTokenService {
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
-    
+
     @WebResult(name = "RequestSecurityTokenResponseCollection", 
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
+               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "responseCollection")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate", 
-    output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate")
-    @WebMethod(operationName = "Validate")
-    RequestSecurityTokenResponseCollectionType validate(
-        @WebParam(partName = "requestCollection", name = "RequestSecurityTokenCollection", 
+    @WebMethod(operationName = "RequestCollection")
+    RequestSecurityTokenResponseCollectionType requestCollection(
+        @WebParam(partName = "requestCollection",
+                  name = "RequestSecurityTokenCollection",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenCollectionType requestCollection
     );
@@ -154,18 +128,5 @@ public interface SecurityTokenService {
                   name = "RequestSecurityToken", 
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
-    );
-    
-    @WebResult(name = "RequestSecurityTokenResponseCollection", 
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
-               partName = "responseCollection")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchRenew", 
-            output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchRenew")
-    @WebMethod(operationName = "Renew")
-    RequestSecurityTokenResponseCollectionType renew(
-        @WebParam(partName = "requestCollection", 
-                  name = "RequestSecurityTokenCollection", 
-                  targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
-        RequestSecurityTokenCollectionType requestCollection
     );
 }

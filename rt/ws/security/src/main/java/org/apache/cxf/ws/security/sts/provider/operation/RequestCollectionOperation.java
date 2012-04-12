@@ -21,12 +21,13 @@ package org.apache.cxf.ws.security.sts.provider.operation;
 
 import javax.xml.ws.WebServiceContext;
 
-import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
-import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
+import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 
-public interface ValidateOperation {
+public interface RequestCollectionOperation {
 
-    RequestSecurityTokenResponseType validate(RequestSecurityTokenType request,
-                                              WebServiceContext context);
-    
+    RequestSecurityTokenResponseCollectionType requestCollection(
+            RequestSecurityTokenCollectionType requestCollection,
+            WebServiceContext context);
+
 }

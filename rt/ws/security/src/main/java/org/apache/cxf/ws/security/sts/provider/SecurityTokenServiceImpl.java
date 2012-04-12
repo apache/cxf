@@ -36,6 +36,7 @@ import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.KeyExchangeTokenOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.RequestCollectionOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 
 
@@ -46,6 +47,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
     private IssueSingleOperation issueSingleOperation;
     private KeyExchangeTokenOperation keyExchangeTokenOperation;
     private RenewOperation renewOperation;
+    private RequestCollectionOperation requestCollectionOperation;
     private ValidateOperation validateOperation;
     
     @Resource
@@ -72,6 +74,11 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         this.renewOperation = renewOperation;
     }
 
+    public void setRequestCollectionOperation(
+            RequestCollectionOperation requestCollectionOperation) {
+        this.requestCollectionOperation = requestCollectionOperation;
+    }
+
     public void setValidateOperation(ValidateOperation validateOperation) {
         this.validateOperation = validateOperation;
     }
@@ -83,14 +90,14 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         }
         return validateOperation.validate(request, context);
     }
-    
-    public RequestSecurityTokenResponseCollectionType validate(
-        RequestSecurityTokenCollectionType requestCollection
-    ) {
-        if (validateOperation == null) {
-            throwUnsupportedOperation("Validate");
+
+
+    public RequestSecurityTokenResponseCollectionType requestCollection(
+            RequestSecurityTokenCollectionType requestCollection) {
+        if (requestCollectionOperation == null) {
+            throwUnsupportedOperation("RequestCollection");
         }
-        return validateOperation.validate(requestCollection, context);
+        return requestCollectionOperation.requestCollection(requestCollection, context);
     }
 
     public RequestSecurityTokenResponseType keyExchangeToken(
@@ -109,15 +116,6 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         return issueOperation.issue(request, context);
     }
     
-    public RequestSecurityTokenResponseCollectionType issue(
-        RequestSecurityTokenCollectionType requestCollection
-    ) {
-        if (issueOperation == null) {
-            throwUnsupportedOperation("Issue");
-        }
-        return issueOperation.issue(requestCollection, context);
-    }
-
     public RequestSecurityTokenResponseType issueSingle(
             RequestSecurityTokenType request) {
         if (issueSingleOperation == null) {
@@ -133,15 +131,6 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         }
         return cancelOperation.cancel(request, context);
     }
-    
-    public RequestSecurityTokenResponseCollectionType cancel(
-        RequestSecurityTokenCollectionType requestCollection
-    ) {
-        if (cancelOperation == null) {
-            throwUnsupportedOperation("Cancel");
-        }
-        return cancelOperation.cancel(requestCollection, context);
-    }
 
     public RequestSecurityTokenResponseType renew(
             RequestSecurityTokenType request) {
@@ -149,15 +138,6 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
             throwUnsupportedOperation("Renew");
         }
         return renewOperation.renew(request, context);
-    }
-    
-    public RequestSecurityTokenResponseCollectionType renew(
-        RequestSecurityTokenCollectionType requestCollection
-    ) {
-        if (renewOperation == null) {
-            throwUnsupportedOperation("Renew");
-        }
-        return renewOperation.renew(requestCollection, context);
     }
     
     
