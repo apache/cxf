@@ -20,12 +20,16 @@ package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Collection;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.helpers.CastUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -49,7 +53,7 @@ public class CXFServlet extends CXFNonSpringServlet
             getWebApplicationContext(sc.getServletContext());
         
         if (wac instanceof AbstractApplicationContext) {
-            ((AbstractApplicationContext)wac).getApplicationListeners().add(this);
+            addListener((AbstractApplicationContext)wac);
         }
         
         String configLocation = sc.getInitParameter("config-location");
@@ -68,10 +72,22 @@ public class CXFServlet extends CXFNonSpringServlet
             wac = createSpringContext(wac, sc, configLocation);
         }
         if (wac != null) {
-            setBus(wac.getBean("cxf", Bus.class));
+            setBus((Bus)wac.getBean("cxf", Bus.class));
         } else {
             busCreated = true;
             setBus(BusFactory.newInstance().createBus());
+        }
+    }
+
+    protected void addListener(AbstractApplicationContext wac) {
+        try {
+            //spring 2 vs spring 3 return type is different
+            Method m = wac.getClass().getMethod("getApplicationListeners");
+            Collection<Object> c = CastUtils.cast((Collection<?>)ReflectionUtil
+                                                      .setAccessible(m).invoke(wac));
+            c.add(this);
+        } catch (Throwable t) {
+            //ignore.
         }
     }
 

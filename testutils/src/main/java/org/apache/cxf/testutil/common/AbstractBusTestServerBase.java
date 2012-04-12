@@ -28,7 +28,11 @@ public abstract class AbstractBusTestServerBase extends AbstractTestServerBase {
     public boolean stopInProcess() throws Exception {
         boolean ret = super.stopInProcess();
         if (bus != null) {
-            bus.shutdown(true);
+            try {
+                bus.shutdown(true);
+            } catch (Throwable t) {
+                //ignore, we're shutting down
+            }
         }
         return ret;
     }    
