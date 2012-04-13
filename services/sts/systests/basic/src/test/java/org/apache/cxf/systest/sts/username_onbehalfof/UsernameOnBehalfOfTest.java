@@ -84,6 +84,10 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testUsernameOnBehalfOf() throws Exception {
+        // Only run these tests for the standalone scenario.
+        if (!standalone) {
+            return;
+        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfTest.class.getResource("cxf-client.xml");
@@ -131,7 +135,11 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testUsernameOnBehalfOfCaching() throws Exception {
-
+        // Only run these tests for the standalone scenario.
+        if (!standalone) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfTest.class.getResource("cxf-client.xml");
 
@@ -220,7 +228,11 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testDifferentUsersCaching() throws Exception {
-
+        // Only run these tests for the standalone scenario.
+        if (!standalone) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfTest.class.getResource("cxf-client.xml");
 
@@ -310,7 +322,11 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testAppliesToCaching() throws Exception {
-
+        // Only run these tests for the standalone scenario.
+        if (!standalone) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfTest.class.getResource("cxf-client.xml");
 
@@ -401,7 +417,11 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
      */
     @org.junit.Test
     public void testNoAppliesToCaching() throws Exception {
-
+        // Only run these tests for the standalone scenario.
+        if (!standalone) {
+            return;
+        }
+        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfTest.class.getResource("cxf-client.xml");
 

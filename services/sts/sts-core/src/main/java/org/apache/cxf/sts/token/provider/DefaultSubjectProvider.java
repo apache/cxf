@@ -110,6 +110,11 @@ public class DefaultSubjectProvider implements SubjectProvider {
             principal = providerParameters.getPrincipal();
         }
         
+        if (principal == null) {
+            LOG.fine("Error in getting principal");
+            throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
+        }
+        
         SubjectBean subjectBean = 
             new SubjectBean(principal.getName(), subjectNameQualifier, confirmationMethod);
         LOG.fine("Creating new subject with principal name: " + principal.getName());
