@@ -526,32 +526,33 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         return null;
     }
 
-    public List<SecurityToken> requestBatchSecurityTokens(BatchRequest batchRequest) throws Exception {
+    public List<SecurityToken> requestBatchSecurityTokens(
+        List<BatchRequest> batchRequestList, String action, String requestType
+    ) throws Exception {
         createClient();
         BindingOperationInfo boi = findOperation("/RST/RequestCollection");
 
         client.getRequestContext().putAll(ctx);
-        client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, batchRequest.getAction());
+        client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, action);
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityTokenCollection", namespace);
         writer.writeNamespace("wst", namespace);
 
-        List<String> tokenTypes = batchRequest.getTokenTypes();
-        for (int i = 0; i < tokenTypes.size(); i++) {
+        for (BatchRequest batchRequest : batchRequestList) {
             writer.writeStartElement("wst", "RequestSecurityToken", namespace);
             writer.writeNamespace("wst", namespace);
             
-            addRequestType(batchRequest.getRequestType(), writer);
+            addRequestType(requestType, writer);
             if (enableAppliesTo) {
-                addAppliesTo(writer, batchRequest.getAppliesTo().get(i));
+                addAppliesTo(writer, batchRequest.getAppliesTo());
             }
             
-            writeKeyType(writer, batchRequest.getKeyTypes().get(i));
+            writeKeyType(writer, batchRequest.getKeyType());
             
             addLifetime(writer);
             
-            addTokenType(writer, tokenTypes.get(i));
+            addTokenType(writer, batchRequest.getTokenType());
             
             writer.writeEndElement();
         }
@@ -572,6 +573,75 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             child = child.getNextSibling();
         }
 
+        return tokens;
+    }
+    
+    protected List<SecurityToken> validateBatchSecurityTokens(
+        List<BatchRequest> batchRequestList, String action, String requestType
+    ) throws Exception {
+        createClient();
+        BindingOperationInfo boi = findOperation("/RST/RequestCollection");
+
+        client.getRequestContext().putAll(ctx);
+        client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, action);
+
+        W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+        writer.writeStartElement("wst", "RequestSecurityTokenCollection", namespace);
+        writer.writeNamespace("wst", namespace);
+
+        for (BatchRequest batchRequest : batchRequestList) {
+            writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+            writer.writeNamespace("wst", namespace);
+            
+            addRequestType(requestType, writer);
+            
+            addTokenType(writer, batchRequest.getTokenType());
+            
+            writer.writeStartElement("wst", "ValidateTarget", namespace);
+
+            Element el = batchRequest.getValidateTarget();
+            StaxUtils.copy(el, writer);
+
+            writer.writeEndElement();
+            
+            writer.writeEndElement();
+        }
+        writer.writeEndElement();
+
+        Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
+        
+        Element responseCollection = getDocumentElement((DOMSource)obj[0]);
+        Node child = responseCollection.getFirstChild();
+        List<SecurityToken> tokens = new ArrayList<SecurityToken>();
+        while (child != null) {
+            if (child instanceof Element 
+                && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {
+                Element rstrChild = DOMUtils.getFirstElement((Element)child);
+                while (rstrChild != null) {
+                    if ("Status".equals(rstrChild.getLocalName())) {
+                        Element e2 = 
+                            DOMUtils.getFirstChildWithName(rstrChild, rstrChild.getNamespaceURI(), "Code");
+                        String s = DOMUtils.getContent(e2);
+                        if (!s.endsWith("/status/valid")) {
+                            throw new TrustException(LOG, "VALIDATION_FAILED");
+                        }
+                        
+                    } else if ("RequestedSecurityToken".equals(rstrChild.getLocalName())) {
+                        Element requestedSecurityTokenElement = DOMUtils.getFirstElement(rstrChild);
+                        String id = findID(null, null, requestedSecurityTokenElement);
+                        if (StringUtils.isEmpty(id)) {
+                            throw new TrustException("NO_ID", LOG);
+                        }
+                        SecurityToken requestedSecurityToken = new SecurityToken(id);
+                        requestedSecurityToken.setToken(requestedSecurityTokenElement);
+                        tokens.add(requestedSecurityToken);
+                    }
+                    rstrChild = DOMUtils.getNextElement(rstrChild);
+                }
+            }
+            child = child.getNextSibling();
+        }
+        
         return tokens;
     }
 

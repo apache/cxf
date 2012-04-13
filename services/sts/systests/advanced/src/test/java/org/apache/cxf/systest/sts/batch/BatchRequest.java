@@ -18,45 +18,38 @@
  */
 package org.apache.cxf.systest.sts.batch;
 
-import java.util.List;
+import org.w3c.dom.Element;
 
 public class BatchRequest {
 
-    List<String> tokenTypes;
-    List<String> keyTypes;
-    String requestType;
-    String action;
-    List<String> appliesTo;
+    private String tokenType;
+    private String keyType;
+    private String appliesTo;
+    private Element validateTarget;
     
-    public List<String> getTokenTypes() {
-        return tokenTypes;
+    public String getTokenType() {
+        return tokenType;
     }
-    public void setTokenTypes(List<String> tokenTypes) {
-        this.tokenTypes = tokenTypes;
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
     }
-    public List<String> getKeyTypes() {
-        return keyTypes;
+    public String getKeyType() {
+        return keyType;
     }
-    public void setKeyTypes(List<String> keyTypes) {
-        this.keyTypes = keyTypes;
+    public void setKeyType(String keyType) {
+        this.keyType = keyType;
     }
-    public String getRequestType() {
-        return requestType;
-    }
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
-    public String getAction() {
-        return action;
-    }
-    public void setAction(String action) {
-        this.action = action;
-    }
-    public List<String> getAppliesTo() {
+    public String getAppliesTo() {
         return appliesTo;
     }
-    public void setAppliesTo(List<String> appliesTo) {
+    public void setAppliesTo(String appliesTo) {
         this.appliesTo = appliesTo;
+    }
+    public Element getValidateTarget() {
+        return validateTarget;
+    }
+    public void setValidateTarget(Element validateTarget) {
+        this.validateTarget = validateTarget;
     }
     
     

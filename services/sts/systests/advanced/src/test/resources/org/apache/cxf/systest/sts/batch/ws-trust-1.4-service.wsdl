@@ -179,11 +179,98 @@
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
+  	<wsdl:operation name="RequestCollection">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  </wsdl:binding>
+  
+    <wsdl:binding name="Transport_Binding_2" type="wstrust:STS">
+    <wsp:PolicyReference URI="#Transport_policy" />
+  	<soap:binding style="document"
+  		transport="http://schemas.xmlsoap.org/soap/http" />
+  	<wsdl:operation name="Issue">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" />
+  		<wsdl:input>
+  		    <wsp:PolicyReference
+               URI="#Input_policy" />
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  		    <wsp:PolicyReference
+               URI="#Output_policy" />
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="Validate">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate" />
+  		<wsdl:input>
+  		    <wsp:PolicyReference
+               URI="#Input_policy" />
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  		    <wsp:PolicyReference
+               URI="#Output_policy" />
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="Cancel">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="Renew">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="KeyExchangeToken">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KeyExchangeToken" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
+  	<wsdl:operation name="RequestCollection">
+  		<soap:operation
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate" />
+  		<wsdl:input>
+  			<soap:body use="literal" />
+  		</wsdl:input>
+  		<wsdl:output>
+  			<soap:body use="literal" />
+  		</wsdl:output>
+  	</wsdl:operation>
   </wsdl:binding>
   
   <wsdl:service name="SecurityTokenService">
       <wsdl:port name="Transport_Port" binding="tns:Transport_Binding">
          <soap:address location="https://localhost:8084/SecurityTokenService/Transport" />
+      </wsdl:port>
+      <wsdl:port name="Transport_Port2" binding="tns:Transport_Binding_2">
+         <soap:address location="https://localhost:8084/SecurityTokenService/Transport2" />
       </wsdl:port>
   </wsdl:service>
   
