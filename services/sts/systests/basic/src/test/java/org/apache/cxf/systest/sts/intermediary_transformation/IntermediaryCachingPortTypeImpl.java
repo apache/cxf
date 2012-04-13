@@ -87,7 +87,7 @@ public class IntermediaryCachingPortTypeImpl extends AbstractBusClientServerTest
         
         Assert.assertNotNull("Principal must not be null", pr);
         Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
-        Assert.assertEquals("Princiapl must be alice", "alice", pr.getName());
+        Assert.assertTrue("Principal must be alice", pr.getName().contains("alice"));
         
         // Disable the STSClient after the first invocation
         if (i > 0) {
