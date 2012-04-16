@@ -42,7 +42,23 @@ public class DefaultConditionsProvider implements ConditionsProvider {
     private long maxLifetime = DEFAULT_MAX_LIFETIME;
     private boolean failLifetimeExceedance = true;
     private boolean acceptClientLifetime;
+    private long futureTimeToLive = 60L;
     
+    /**
+     * Get how long (in seconds) a client-supplied Created Element is allowed to be in the future.
+     * The default is 60 seconds to avoid common problems relating to clock skew.
+     */
+    public long getFutureTimeToLive() {
+        return futureTimeToLive;
+    }
+
+    /**
+     * Set how long (in seconds) a client-supplied Created Element is allowed to be in the future.
+     * The default is 60 seconds to avoid common problems relating to clock skew.
+     */
+    public void setFutureTimeToLive(long futureTimeToLive) {
+        this.futureTimeToLive = futureTimeToLive;
+    }
     
     /**
      * Set the default lifetime in seconds for issued SAML tokens
@@ -117,11 +133,25 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         ConditionsBean conditions = new ConditionsBean();
         if (lifetime > 0) {
             Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
-            if (acceptClientLifetime && tokenLifetime != null) {
+            if (acceptClientLifetime && tokenLifetime != null
+                && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
                 try {
                     XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
                     Date creationTime = fmt.parse(tokenLifetime.getCreated());
                     Date expirationTime = fmt.parse(tokenLifetime.getExpires());
+                    
+                    // Check to see if the created time is in the future
+                    Date validCreation = new Date();
+                    long currentTime = validCreation.getTime();
+                    if (futureTimeToLive > 0) {
+                        validCreation.setTime(currentTime + futureTimeToLive * 1000);
+                    }
+                    if (creationTime != null && creationTime.after(validCreation)) {
+                        LOG.fine("The Created Time is too far in the future");
+                        throw new STSException(
+                            "The Created Time is too far in the future", STSException.INVALID_TIME
+                        );
+                    }
                     
                     long requestedLifetime = expirationTime.getTime() - creationTime.getTime();
                     if (requestedLifetime > (getMaxLifetime() * 1000L)) {
@@ -158,5 +188,5 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         
         return conditions;
     }
-        
+
 }
