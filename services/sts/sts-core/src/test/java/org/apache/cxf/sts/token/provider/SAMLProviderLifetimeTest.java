@@ -235,6 +235,128 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
     }
     
+    /**
+     * Issue SAML 2 token with a near future Created Lifetime. This should pass as we allow a future
+     * dated Lifetime up to 60 seconds to avoid clock skew problems.
+     */
+    @org.junit.Test
+    public void testSaml2NearFutureCreatedLifetime() throws Exception {
+        
+        int requestedLifetime = 60;
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
+        conditionsProvider.setAcceptClientLifetime(true);
+        samlTokenProvider.setConditionsProvider(conditionsProvider);
+               
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE
+            );
+        
+        // Set expected lifetime to 1 minute
+        Date creationTime = new Date();
+        Date expirationTime = new Date();
+        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        creationTime.setTime(creationTime.getTime() + (10 * 1000L));
+        Lifetime lifetime = new Lifetime();
+        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+        lifetime.setCreated(fmt.format(creationTime));
+        lifetime.setExpires(fmt.format(expirationTime));
+        providerParameters.getTokenRequirements().setLifetime(lifetime);    
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        assertEquals(providerResponse.getLifetime(), 60 - 10);
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+    }
+    
+    /**
+     * Issue SAML 2 token with a future Created Lifetime. This should fail as we only allow a future
+     * dated Lifetime up to 60 seconds to avoid clock skew problems.
+     */
+    @org.junit.Test
+    public void testSaml2FarFutureCreatedLifetime() throws Exception {
+        
+        int requestedLifetime = 60;
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
+        conditionsProvider.setAcceptClientLifetime(true);
+        samlTokenProvider.setConditionsProvider(conditionsProvider);
+               
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE
+            );
+        
+        // Set expected lifetime to 1 minute
+        Date creationTime = new Date();
+        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
+        Date expirationTime = new Date();
+        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Lifetime lifetime = new Lifetime();
+        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+        lifetime.setCreated(fmt.format(creationTime));
+        lifetime.setExpires(fmt.format(expirationTime));
+        providerParameters.getTokenRequirements().setLifetime(lifetime);    
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        try {
+            samlTokenProvider.createToken(providerParameters);
+            fail("Failure expected on a Created Element too far in the future");
+        } catch (STSException ex) {
+            // expected
+        }
+        
+        // Now allow this sort of Created Element
+        conditionsProvider.setFutureTimeToLive(60L * 60L);
+        
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+    }
+    
+    /**
+     * Issue SAML 2 token with no Expires element. This will be rejected, but will default to the
+     * configured TTL and so the request will pass.
+     */
+    @org.junit.Test
+    public void testSaml2NoExpires() throws Exception {
+        
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
+        conditionsProvider.setAcceptClientLifetime(true);
+        samlTokenProvider.setConditionsProvider(conditionsProvider);
+               
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE
+            );
+        
+        // Set expected lifetime to 1 minute
+        Date creationTime = new Date();
+        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
+        Lifetime lifetime = new Lifetime();
+        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
+        lifetime.setCreated(fmt.format(creationTime));
+        providerParameters.getTokenRequirements().setLifetime(lifetime);    
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        assertEquals(providerResponse.getLifetime(), conditionsProvider.getLifetime());
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+    }
     
     private TokenProviderParameters createProviderParameters(
             String tokenType, String keyType
