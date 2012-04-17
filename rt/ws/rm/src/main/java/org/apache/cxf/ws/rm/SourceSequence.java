@@ -144,10 +144,17 @@ public class SourceSequence extends AbstractSequence {
         acknowledgement = a;
         source.getManager().getRetransmissionQueue().purgeAcknowledged(this);
         if (allAcknowledged()) {
-            RMEndpoint rme = source.getReliableEndpoint();
-            Proxy proxy = rme.getProxy();
-            proxy.terminate(this);
-            source.removeSequence(this);
+            if (null == target || RMUtils.getAddressingConstants().getAnonymousURI().equals(
+                target.getAddress().getValue())) {
+                LOG.log(Level.WARNING, "STANDALONE_ANON_TERMINATE_SEQUENCE_MSG");
+                // keep the sequence and let RMOutInterceptor remove it after building the TS message
+                // if we remove the sequence here, RMOutInterceptor should check for a null sequence
+            } else {
+                RMEndpoint rme = source.getReliableEndpoint();
+                Proxy proxy = rme.getProxy();
+                proxy.terminate(this);
+                source.removeSequence(this);
+            }
         }
     }
 

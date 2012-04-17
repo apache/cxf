@@ -469,6 +469,17 @@ public class RMEndpoint {
         partInfo.setElementQName(consts.getTerminateSequenceOperationName());
         partInfo.setElement(true);
         partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
+        
+        // for the TerminateSequence operation to an anonymous endpoint
+        operationInfo = ii.addOperation(consts.getTerminateSequenceAnonymousOperationName());
+        messageInfo = operationInfo.createMessage(consts.getTerminateSequenceAnonymousOperationName(),
+                                                  MessageInfo.Type.OUTPUT);
+        operationInfo.setOutput(messageInfo.getName().getLocalPart(), messageInfo);
+        partInfo = messageInfo.addMessagePart(TERMINATE_PART_NAME);
+        partInfo.setElementQName(consts.getTerminateSequenceOperationName());
+        partInfo.setElement(true);
+        partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
+        
     }
 
     void buildSequenceAckOperationInfo(InterfaceInfo ii) {
@@ -533,6 +544,11 @@ public class RMEndpoint {
             addAction(boi, consts.getTerminateSequenceAction());
             bi.addOperation(boi);
 
+            boi = bi.buildOperation(consts.getTerminateSequenceAnonymousOperationName(),
+                                    null, consts.getTerminateSequenceAnonymousOperationName().getLocalPart());
+            addAction(boi, consts.getTerminateSequenceAction());
+            bi.addOperation(boi);
+
             boi = bi.buildOperation(consts.getSequenceAckOperationName(), null, null);
             addAction(boi, consts.getSequenceAckAction());
             bi.addOperation(boi);
@@ -571,7 +587,9 @@ public class RMEndpoint {
         boi.addExtensor(soi);
 
         MessageInfo info = boi.getOperationInfo().getInput();
-        info.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action);
+        if (info != null) {
+            info.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action);
+        }
         
         info = boi.getOperationInfo().getOutput();
         if (info != null) {

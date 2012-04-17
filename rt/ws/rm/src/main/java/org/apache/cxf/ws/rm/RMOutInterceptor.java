@@ -20,20 +20,32 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
+import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
  * 
@@ -153,6 +165,19 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             }
         } else if (!MessageUtils.isRequestor(msg) && constants.getCreateSequenceAction().equals(action)) {
             maps.getAction().setValue(constants.getCreateSequenceResponseAction());
+        } else if (isPartialResponse && action == null
+            && isResponseToAction(msg, constants.getSequenceAckAction())) {
+            Collection<SequenceAcknowledgement> acks = rmpsIn.getAcks();
+            if (acks.size() == 1) {
+                SourceSequence ss = source.getSequence(acks.iterator().next().getIdentifier());
+                if (ss != null && ss.allAcknowledged()) {
+                    setAction(maps, constants.getTerminateSequenceAction());
+                    setTerminateSequence(msg, ss.getIdentifier(), protocol);
+                    msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
+                    // removing this sequence now. See the comment in SourceSequence.setAcknowledged()
+                    source.removeSequence(ss);
+                }
+            }
         }
         
         // add Acknowledgements (to application messages or explicitly 
@@ -162,13 +187,10 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
             if (isPartialResponse && rmpsOut.getAcks() != null && rmpsOut.getAcks().size() > 0) {
-                AttributedURIType actionURI = new AttributedURIType();
-                actionURI.setValue(constants.getSequenceAckAction());
-                maps.setAction(actionURI);
+                setAction(maps, constants.getSequenceAckAction());
                 msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
             }
         } 
-        
         if (constants.getSequenceAckAction().equals(action)
             || constants.getTerminateSequenceAction().equals(action)) {
             maps.setReplyTo(RMUtils.createNoneReference());
@@ -224,5 +246,54 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return false;
         }
         return FaultMode.CHECKED_APPLICATION_FAULT != mode;
+    }
+
+    private boolean isResponseToAction(Message msg, String action) {
+        AddressingPropertiesImpl inMaps = RMContextUtils.retrieveMAPs(msg, false, false);
+        String inAction = null;
+        if (null != inMaps.getAction()) {
+            inAction = inMaps.getAction().getValue();
+        }
+        return action.equals(inAction);
+    }
+    
+    private void setTerminateSequence(Message msg, Identifier identifier, ProtocolVariation protocol) 
+        throws RMException {
+        TerminateSequenceType ts = new TerminateSequenceType();
+        ts.setIdentifier(identifier);
+        MessageContentsList contents = 
+            new MessageContentsList(new Object[]{protocol.getCodec().convertToSend(ts)});
+        msg.setContent(List.class, contents);
+
+        // create a new exchange for this output-only exchange
+        Exchange newex = new ExchangeImpl();
+        Exchange oldex = msg.getExchange();
+        
+        newex.put(Bus.class, oldex.getBus());
+        newex.put(Endpoint.class, oldex.getEndpoint());
+        newex.put(Service.class, oldex.getEndpoint().getService());
+        newex.put(Binding.class, oldex.getEndpoint().getBinding());
+        newex.setConduit(oldex.getConduit(msg));
+        newex.setDestination(oldex.getDestination());
+        
+        //Setup the BindingOperationInfo
+        RMEndpoint rmep = getManager().getReliableEndpoint(msg);
+        OperationInfo oi = rmep.getEndpoint().getEndpointInfo().getService().getInterface()
+            .getOperation(protocol.getConstants().getTerminateSequenceAnonymousOperationName());
+        BindingInfo bi = rmep.getBindingInfo();
+        BindingOperationInfo boi = bi.getOperation(oi);
+        
+        newex.put(BindingInfo.class, bi);
+        newex.put(BindingOperationInfo.class, boi);
+        newex.put(OperationInfo.class, boi.getOperationInfo());
+        
+        msg.setExchange(newex);
+        newex.setOutMessage(msg);
+    }
+
+    private static void setAction(AddressingPropertiesImpl maps, String action) {
+        AttributedURIType actionURI = new AttributedURIType();
+        actionURI.setValue(action);
+        maps.setAction(actionURI);
     }
 }

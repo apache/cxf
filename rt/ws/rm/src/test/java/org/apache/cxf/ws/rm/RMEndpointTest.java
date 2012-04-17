@@ -369,7 +369,7 @@ public class RMEndpointTest extends Assert {
 
         InterfaceInfo intf = si.getInterface();
 
-        assertEquals(7, intf.getOperations().size());
+        assertEquals(8, intf.getOperations().size());
 
         String ns = RM10Constants.NAMESPACE_URI;
         OperationInfo oi = intf.getOperation(new QName(ns, "CreateSequence"));
@@ -382,6 +382,10 @@ public class RMEndpointTest extends Assert {
         oi = intf.getOperation(new QName(ns, "TerminateSequence"));
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());
+
+        oi = intf.getOperation(new QName(ns, "TerminateSequenceAnonymous"));
+        assertNotNull("No operation info.", oi);
+        assertTrue("Operation is oneway.", !oi.isOneWay());
 
         oi = intf.getOperation(new QName(ns, "SequenceAcknowledgement"));
         assertNotNull("No operation info.", oi);
