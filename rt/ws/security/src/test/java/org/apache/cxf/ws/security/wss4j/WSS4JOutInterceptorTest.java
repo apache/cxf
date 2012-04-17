@@ -179,7 +179,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
     }
     
     @Test
-    public void testCustomAction() throws Exception {
+    public void testOverrideCustomAction() throws Exception {
         SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
@@ -226,6 +226,41 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         }
     }
     
+    
+    @Test
+    public void testAddCustomAction() throws Exception {
+        SOAPMessage saaj = readSAAJDocument("wsse-request-clean.xml");
+
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
+        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
+
+        SoapMessage msg = new SoapMessage(new MessageImpl());
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(msg);
+
+        msg.setContent(SOAPMessage.class, saaj);
+        
+        CountingUsernameTokenAction action = new CountingUsernameTokenAction();
+        Map<Object, Object> customActions = new HashMap<Object, Object>(1);
+        customActions.put(12345, action);
+                
+        msg.put(WSHandlerConstants.ACTION, "12345");
+        msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        msg.put(WSHandlerConstants.USER, "username");
+        msg.put("password", "myAliasPassword");
+        msg.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        msg.put(WSS4JOutInterceptor.WSS4J_ACTION_MAP, customActions);
+        handler.handleMessage(msg);
+
+        SOAPPart doc = saaj.getSOAPPart();
+        assertValid("//wsse:Security", doc);
+        assertValid("//wsse:Security/wsse:UsernameToken", doc);
+        assertValid("//wsse:Security/wsse:UsernameToken/wsse:Username[text()='username']", doc);
+        // Test to see that the plaintext password is used in the header
+        assertValid("//wsse:Security/wsse:UsernameToken/wsse:Password[text()='myAliasPassword']", doc);
+        assertEquals(1, action.getExecutions());
+    }
+    
     private static class CountingUsernameTokenAction extends UsernameTokenAction {
 
         private int executions;
@@ -235,6 +270,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
                 RequestData reqData) throws WSSecurityException {
             
             this.executions++;
+            reqData.setPwType(WSConstants.PW_TEXT);
             super.execute(handler, actionToDo, doc, reqData);
         }
 
