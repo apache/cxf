@@ -84,6 +84,10 @@ public class StaxTransformFeature extends AbstractFeature {
         in.setInTransformElements(inElements);
     }
     
+    public void setOutDefaultNamespace(String ns) {
+        out.setDefaultNamespace(ns);
+    }
+    
     public void setContextPropertyName(String propertyName) {
         in.setContextPropertyName(propertyName);
         out.setContextPropertyName(propertyName);
