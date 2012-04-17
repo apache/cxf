@@ -99,6 +99,8 @@ public abstract class RMConstants {
     
     public abstract QName getTerminateSequenceOperationName();
     
+    public abstract QName getTerminateSequenceAnonymousOperationName();
+    
     public abstract QName getSequenceAckOperationName();
     
     public abstract QName getAckRequestedOperationName();
