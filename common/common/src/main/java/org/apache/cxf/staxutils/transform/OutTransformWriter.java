@@ -119,7 +119,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         String value = nsMap.get(uri);
-        if (value != null && value.length() == 0) {
+        if ((value != null && value.length() == 0) 
+            || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))) {
             return;
         }
         
@@ -139,7 +140,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         String value = nsMap.get(uri);
-        if (value != null && value.length() == 0) {
+        if ((value != null && value.length() == 0)
+            || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))) {
             return;
         }
         

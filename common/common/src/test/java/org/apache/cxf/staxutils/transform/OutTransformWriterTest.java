@@ -416,4 +416,25 @@ public class OutTransformWriterTest extends Assert {
                                                      "../resources/multiNS.xml",
                                   transformElements, null, null, null, null);
     }
+
+    @Test
+    public void testReplaceDefaultNamespace() throws Exception {
+        InputStream is = new ByteArrayInputStream(
+                "<test xmlns=\"http://bar\"><a>1</a></test>".getBytes());
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XMLStreamWriter writer = 
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, "UTF-8"), 
+                                   null, null, null, null, false, "");
+        StaxUtils.copy(new StreamSource(is), writer);
+        writer.flush();
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(os.toByteArray()));
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        StaxUtils.copy(reader, bos);
+        String value = bos.toString();
+        assertEquals("<ps1:test xmlns:ps1=\"http://bar\"><ps1:a>1</ps1:a></ps1:test>", value);        
+    }
+
 }
