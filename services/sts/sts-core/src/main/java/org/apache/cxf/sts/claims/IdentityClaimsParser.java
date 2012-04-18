@@ -76,7 +76,7 @@ public class IdentityClaimsParser implements ClaimsParser {
             Node valueNode = claimType.getFirstChild();
             if (valueNode != null) {
                 if ("Value".equals(valueNode.getLocalName())) {
-                    requestClaim.setClaimValue(valueNode.getTextContent());
+                    requestClaim.setClaimValue(valueNode.getTextContent().trim());
                 } else {
                     LOG.warning("Unsupported child element of ClaimValue element "
                             + valueNode.getLocalName());

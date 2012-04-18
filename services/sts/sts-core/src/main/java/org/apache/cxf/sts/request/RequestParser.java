@@ -342,7 +342,7 @@ public class RequestParser {
                     SecurityTokenReferenceType.class.cast(useKeyJaxb.getValue());
                 Element token = fetchTokenElementFromReference(strType, wsContext);
                 try {
-                    x509 = Base64Utility.decode(token.getTextContent());
+                    x509 = Base64Utility.decode(token.getTextContent().trim());
                     LOG.fine("Found X509Certificate UseKey type via reference");
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "", e);
@@ -353,7 +353,7 @@ public class RequestParser {
             if (isTokenReferenced(useKey.getAny())) {
                 Element token = fetchTokenElementFromReference(useKey.getAny(), wsContext);
                 try {
-                    x509 = Base64Utility.decode(token.getTextContent());
+                    x509 = Base64Utility.decode(token.getTextContent().trim());
                     LOG.fine("Found X509Certificate UseKey type via reference");
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "", e);
@@ -370,7 +370,7 @@ public class RequestParser {
                         );
                     if (x509CertData != null && x509CertData.getLength() > 0) {
                         try {
-                            x509 = Base64Utility.decode(x509CertData.item(0).getTextContent());
+                            x509 = Base64Utility.decode(x509CertData.item(0).getTextContent().trim());
                             LOG.fine("Found X509Certificate UseKey type");
                         } catch (Exception e) {
                             LOG.log(Level.WARNING, "", e);
@@ -528,17 +528,17 @@ public class RequestParser {
             String namespace = child.getNamespaceURI();
             if (keyRequirements.getKeySize() == 0 && "KeySize".equals(localName) 
                 && STSConstants.WST_NS_05_12.equals(namespace)) {
-                long keySize = Integer.parseInt(child.getTextContent());
+                long keySize = Integer.parseInt(child.getTextContent().trim());
                 keyRequirements.setKeySize(keySize);
                 LOG.fine("Found KeySize: " + keySize);
             } else if (tokenRequirements.getTokenType() == null 
                 && "TokenType".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
-                String tokenType = child.getTextContent();
+                String tokenType = child.getTextContent().trim();
                 tokenRequirements.setTokenType(tokenType);
                 LOG.fine("Found TokenType: " + tokenType);
             } else if (keyRequirements.getKeyType() == null 
                 && "KeyType".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
-                String keyType = child.getTextContent();
+                String keyType = child.getTextContent().trim();
                 LOG.fine("Found KeyType: " + keyType);
                 keyRequirements.setKeyType(keyType);
             } else if (tokenRequirements.getClaims() == null 
