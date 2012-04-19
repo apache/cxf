@@ -24,7 +24,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -78,11 +80,15 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
      */
     private Map<Object, Class> responseMethodClassCache;
     private Map<Object, Class> requestMethodClassCache;
+    private List<Method> responseMethodClassNotFoundCache;
+    private List<Method> requestMethodClassNotFoundCache;
     private Map<Method, Annotation[][]> methodAnnotationCache;
     
     public JaxWsServiceConfiguration() {
         responseMethodClassCache = new HashMap<Object, Class>();
         requestMethodClassCache = new HashMap<Object, Class>();
+        responseMethodClassNotFoundCache = new ArrayList<Method>();
+        requestMethodClassNotFoundCache = new ArrayList<Method>();
         methodAnnotationCache = new HashMap<Method, Annotation[][]>();
     }
 
@@ -598,6 +604,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     
     @Override
     public Class getResponseWrapper(Method selected) {
+        if (this.responseMethodClassNotFoundCache.contains(selected)) {
+            return null;
+        }
         Class cachedClass = responseMethodClassCache.get(selected);
         if (cachedClass != null) {
             return cachedClass;
@@ -635,7 +644,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 //do nothing, we will mock a schema for wrapper bean later on
             }
         }
-
+        responseMethodClassNotFoundCache.add(selected);
         return null;
     }
 
@@ -669,6 +678,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     
     @Override
     public Class getRequestWrapper(Method selected) {
+        if (this.requestMethodClassNotFoundCache.contains(selected)) {
+            return null;
+        }
         Class cachedClass = requestMethodClassCache.get(selected);
         if (cachedClass != null) {
             return cachedClass;
@@ -703,7 +715,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 //do nothing, we will mock a schema for wrapper bean later on
             }
         }
-
+        requestMethodClassNotFoundCache.add(selected);
         return null;
     }
     
