@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.saml.sso.filter;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.UUID;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -118,7 +119,7 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         
         SamlRequestInfo info = new SamlRequestInfo();
         info.setEncodedSamlRequest(authnRequestEncoded);
-        // set relay state if any
+        info.setRelayState(UUID.randomUUID().toString());
         return info;
     }
     
