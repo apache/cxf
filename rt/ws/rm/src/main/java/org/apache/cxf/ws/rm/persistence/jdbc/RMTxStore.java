@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -146,6 +147,7 @@ public class RMTxStore implements RMStore {
     private PreparedStatement selectInboundMessagesStmt;
     private PreparedStatement selectOutboundMessagesStmt;
     
+    private DataSource dataSource;
     private String driverClassName = "org.apache.derby.jdbc.EmbeddedDriver";
     private String url = MessageFormat.format("jdbc:derby:{0};create=true", DEFAULT_DATABASE_NAME);
     private String userName;
@@ -199,6 +201,14 @@ public class RMTxStore implements RMStore {
         } else {
             throw new IllegalArgumentException("Invalid schema name: " + sn);
         }
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(DataSource ds) {
+        dataSource = ds;
     }
 
     public String getTableExistsState() {
@@ -713,21 +723,31 @@ public class RMTxStore implements RMStore {
         if (null == connection) {
             LOG.log(Level.FINE, "Using derby.system.home: {0}", 
                     SystemPropertyAction.getProperty("derby.system.home"));
-            assert null != url;
-            assert null != driverClassName;
-            try {
-                Class.forName(driverClassName);
-            } catch (ClassNotFoundException ex) {
-                LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
-                return;
-            }
+            if (null != dataSource) {
+                try {
+                    LOG.log(Level.FINE, "Using dataSource: " + dataSource);
+                    connection = dataSource.getConnection();
+                } catch (SQLException ex) {
+                    LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
+                    return;
+                }
+            } else {
+                assert null != url;
+                assert null != driverClassName;
+                try {
+                    Class.forName(driverClassName);
+                } catch (ClassNotFoundException ex) {
+                    LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
+                    return;
+                }
     
-            try {
-                LOG.log(Level.FINE, "Using url: " + url);
-                connection = DriverManager.getConnection(url, userName, password);
-            } catch (SQLException ex) {
-                LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
-                return;
+                try {
+                    LOG.log(Level.FINE, "Using url: " + url);
+                    connection = DriverManager.getConnection(url, userName, password);
+                } catch (SQLException ex) {
+                    LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
+                    return;
+                }
             }
         }
         
