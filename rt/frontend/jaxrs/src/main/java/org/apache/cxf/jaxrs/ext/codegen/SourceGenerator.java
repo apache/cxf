@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.tools.wadlto.jaxrs;
+package org.apache.cxf.jaxrs.ext.codegen;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -72,10 +72,6 @@ import org.xml.sax.SAXParseException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
-import org.apache.cxf.common.jaxb.JAXBUtils;
-import org.apache.cxf.common.jaxb.JAXBUtils.JCodeModel;
-import org.apache.cxf.common.jaxb.JAXBUtils.S2JJAXBModel;
-import org.apache.cxf.common.jaxb.JAXBUtils.SchemaCompiler;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
@@ -83,6 +79,10 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
+import org.apache.cxf.jaxb.JAXBUtils.JCodeModel;
+import org.apache.cxf.jaxb.JAXBUtils.S2JJAXBModel;
+import org.apache.cxf.jaxb.JAXBUtils.SchemaCompiler;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
