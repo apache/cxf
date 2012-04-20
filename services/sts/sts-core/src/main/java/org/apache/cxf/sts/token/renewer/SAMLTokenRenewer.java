@@ -494,6 +494,12 @@ public class SAMLTokenRenewer implements TokenRenewer {
             assertion.signAssertion(
                 alias, password, signatureCrypto, useKeyValue, c14nAlgorithm, signatureAlgorithm
             );
+        } else {
+            if (assertion.getSaml1().getSignature() != null) {
+                assertion.getSaml1().setSignature(null);
+            } else if (assertion.getSaml2().getSignature() != null) {
+                assertion.getSaml2().setSignature(null);
+            } 
         }
         
     }
