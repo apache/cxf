@@ -851,7 +851,8 @@ public class SourceGenerator {
                 }
             }
             boolean isRepeating = Boolean.valueOf(paramEl.getAttribute("repeating"));
-            String type = getPrimitiveType(paramEl, info, imports);
+            String type = enumCreated ? getTypicalClassName(name)
+                : getPrimitiveType(paramEl, info, imports);
             if (paramAnn == QueryParam.class
                 && (isRepeating || !Boolean.valueOf(paramEl.getAttribute("required")))    
                 && AUTOBOXED_PRIMITIVES_MAP.containsKey(type)) {
@@ -861,8 +862,7 @@ public class SourceGenerator {
                 addImport(imports, List.class.getName());
                 type = "List<" + type + ">";
             }
-            String paramName = enumCreated ? getTypicalClassName(name) 
-                                           : name.replaceAll("[\\.\\-]", "_");
+            String paramName = name.replaceAll("[\\.\\-]", "_");
             sbCode.append(type).append(" ").append(paramName);
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
