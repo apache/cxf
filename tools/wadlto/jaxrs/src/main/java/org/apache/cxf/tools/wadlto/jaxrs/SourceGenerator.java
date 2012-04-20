@@ -924,7 +924,8 @@ public class SourceGenerator {
         if (theName.length() == 1) {
             return theName;
         } else {
-            return theName.substring(0, 1) + theName.substring(1).toLowerCase();
+            theName = theName.substring(0, 1) + theName.substring(1).toLowerCase();
+            return theName.replaceAll("[\\.\\-]", "_");
         }
     }
     
