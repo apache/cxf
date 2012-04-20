@@ -909,12 +909,38 @@ public class SourceGenerator {
         
         for (int i = 0; i < options.size(); i++) {
             String value = options.get(i).getAttribute("value");
-            sbCode.append(TAB).append(value.toUpperCase());
+            sbCode.append(TAB).append(value.toUpperCase().replaceAll("[\\,\\-]", "_"))
+                .append("(\"").append(value).append("\")");
             if (i + 1 < options.size()) {
                 sbCode.append(",");
+            } else {
+                sbCode.append(";");
             }
             sbCode.append(getLineSep());
         }
+        
+        sbCode.append(TAB).append("private String value;").append(getLineSep());
+        sbCode.append(TAB).append("private ").append(clsName).append("(String v) ").append("{")
+            .append(getLineSep());
+        sbCode.append(TAB).append(TAB).append("this.value = v;").append(getLineSep());
+        sbCode.append(TAB).append("}").append(getLineSep());
+        
+        sbCode.append(TAB).append("public static ").append(clsName).append(" fromString(String value) ")
+            .append("{").append(getLineSep());
+        sbCode.append(TAB).append(TAB);
+        sbCode.append("if (").append("value").append(" != null) {").append(getLineSep());
+        sbCode.append(TAB).append(TAB).append(TAB);
+        sbCode.append("for (").append(clsName).append(" v : ").append(clsName).append(".values()) {")
+            .append(getLineSep());
+        sbCode.append(TAB).append(TAB).append(TAB).append(TAB);
+        sbCode.append("if (value.equalsIgnoreCase(v.value)) {").append(getLineSep());
+        sbCode.append(TAB).append(TAB).append(TAB).append(TAB).append(TAB).append("return v;")
+            .append(getLineSep());
+        sbCode.append(TAB).append(TAB).append(TAB).append(TAB).append("}").append(getLineSep());
+        sbCode.append(TAB).append(TAB).append(TAB).append("}").append(getLineSep());
+        sbCode.append(TAB).append(TAB).append("}").append(getLineSep());
+        sbCode.append(TAB).append(TAB).append("return null;").append(getLineSep());
+        sbCode.append(TAB).append("}").append(getLineSep());
         sbCode.append("}");
         createJavaSourceFile(src, new QName(classPackage, clsName), sbCode, sbImports, false);
     }
@@ -925,7 +951,7 @@ public class SourceGenerator {
             return theName;
         } else {
             theName = theName.substring(0, 1) + theName.substring(1).toLowerCase();
-            return theName.replaceAll("[\\.\\-]", "_");
+            return theName.replaceAll("[\\.\\-]", "");
         }
     }
     
