@@ -37,6 +37,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -117,6 +118,9 @@ public class RMTxStore implements RMStore {
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
     
+    private static final String CREATE_SCHEMA_STMT_STR = "CREATE SCHEMA {0}";
+    private static final String SET_CURRENT_SCHEMA_STMT_STR = "SET CURRENT SCHEMA {0}";
+    
     private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
     private static final int ORACLE_TABLE_EXISTS_CODE = 955;
     
@@ -146,6 +150,7 @@ public class RMTxStore implements RMStore {
     private String url = MessageFormat.format("jdbc:derby:{0};create=true", DEFAULT_DATABASE_NAME);
     private String userName;
     private String password;
+    private String schemaName;
     
     private String tableExistsState = DERBY_TABLE_EXISTS_STATE;
     private int tableExistsCode = ORACLE_TABLE_EXISTS_CODE;
@@ -184,6 +189,18 @@ public class RMTxStore implements RMStore {
         return userName;
     }
     
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String sn) {
+        if (sn == null || Pattern.matches("[a-zA-Z\\d]{1,32}", sn)) {
+            schemaName = sn;
+        } else {
+            throw new IllegalArgumentException("Invalid schema name: " + sn);
+        }
+    }
+
     public String getTableExistsState() {
         return tableExistsState;
     }
@@ -666,6 +683,30 @@ public class RMTxStore implements RMStore {
         }
     }
     
+    protected void setCurrentSchema() throws SQLException {
+        if (schemaName == null || connection == null) {
+            return;
+        }
+        
+        Statement stmt = connection.createStatement();
+        // schemaName has been verified at setSchemaName(String)
+        try {
+            stmt.executeUpdate(MessageFormat.format(CREATE_SCHEMA_STMT_STR, 
+                                                    schemaName));
+        } catch (SQLException ex) {
+            // pass through to assume it is already created
+        }
+        stmt.close();
+        stmt = connection.createStatement();
+        try {
+            stmt.executeUpdate(MessageFormat.format(SET_CURRENT_SCHEMA_STMT_STR, 
+                                                    schemaName));
+        } catch (SQLException ex) {
+            throw ex;
+        }
+        stmt.close();
+    }
+
     @PostConstruct     
     public synchronized void init() {
         
@@ -684,7 +725,6 @@ public class RMTxStore implements RMStore {
             try {
                 LOG.log(Level.FINE, "Using url: " + url);
                 connection = DriverManager.getConnection(url, userName, password);
-    
             } catch (SQLException ex) {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
                 return;
@@ -693,6 +733,7 @@ public class RMTxStore implements RMStore {
         
         try {
             connection.setAutoCommit(true);
+            setCurrentSchema();
             createTables();
         } catch (SQLException ex) {
             LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);

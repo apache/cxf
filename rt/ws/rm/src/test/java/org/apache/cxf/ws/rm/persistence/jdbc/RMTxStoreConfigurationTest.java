@@ -46,6 +46,7 @@ public class RMTxStoreConfigurationTest extends Assert {
         assertEquals("scott", store.getUserName());
         assertEquals("tiger", store.getPassword());
         assertEquals("jdbc:derby://localhost:1527/rmdb;create=true", store.getUrl());
+        assertNull("schema should be unset", store.getSchemaName());
     }
    
     @Test
