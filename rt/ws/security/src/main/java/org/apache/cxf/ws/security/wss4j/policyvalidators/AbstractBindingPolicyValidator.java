@@ -114,12 +114,14 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                     CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             for (WSDataRef dataRef : dataRefs) {
                 String xpath = dataRef.getXpath();
-                String[] nodes = xpath.split("/");
-                // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
-                if (nodes.length == 5 && nodes[3].contains("Security")) {
-                    continue;
-                } else if (nodes.length < 3 || nodes.length > 4) {
-                    return false;
+                if (xpath != null) {
+                    String[] nodes = xpath.split("/");
+                    // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
+                    if (nodes.length == 5 && nodes[3].contains("Security")) {
+                        continue;
+                    } else if (nodes.length < 3 || nodes.length > 4) {
+                        return false;
+                    }
                 }
             }
         }
