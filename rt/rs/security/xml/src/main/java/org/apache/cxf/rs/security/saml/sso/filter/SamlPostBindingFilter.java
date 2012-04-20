@@ -31,12 +31,12 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
             return null;
         } else {
             try {
-                SamlRequestInfo info = createSamlResponseInfo(m);
+                SamlRequestInfo info = createSamlRequestInfo(m);
                 info.setIdpServiceAddress(getIdpServiceAddress());
                 // This depends on RequestDispatcherProvider linking
                 // SamlResponseInfo with the jsp page which will fill
                 // in the XHTML form using SamlResponseInfo
-                // in principle we could've builf the XHTML form right here
+                // in principle we could've built the XHTML form right here
                 // but it will be cleaner to get that done in JSP
                 return Response.ok(info).type("text/html").build();
                 

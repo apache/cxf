@@ -32,7 +32,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
             return null;
         } else {
             try {
-                SamlRequestInfo info = createSamlResponseInfo(m);
+                SamlRequestInfo info = createSamlRequestInfo(m);
                 UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
                 ub.queryParam(SAML_REQUEST, info.getEncodedSamlRequest());
                 if (info.getRelayState() != null) {

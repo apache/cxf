@@ -109,7 +109,7 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         return URLEncoder.encode(encodedRequestMessage, "UTF-8");
     }
 
-    protected SamlRequestInfo createSamlResponseInfo(Message m) throws Exception {
+    protected SamlRequestInfo createSamlRequestInfo(Message m) throws Exception {
         Document doc = DOMUtils.createDocument();
         doc.appendChild(doc.createElement("root"));
  
