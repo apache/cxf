@@ -202,11 +202,16 @@ final class InternalContextUtils {
                                 }
                             });
                         } catch (RejectedExecutionException e) {
-                            //the executor queue is full, so run the task in the caller thread
                             LOG.warning(
                                         "Executor queue is full, use the caller thread." 
                                         + "  Users can specify a larger executor queue to avoid this.");
-                            inMessage.getInterceptorChain().resume();
+                            // only block the thread if the prop is unset or set to false, otherwise let it go
+                            if (!MessageUtils.isTrue(
+                                inMessage.getContextualProperty(
+                                    "org.apache.cxf.oneway.rejected_execution_exception"))) {
+                                //the executor queue is full, so run the task in the caller thread
+                                inMessage.getInterceptorChain().resume();
+                            }
                         }
                     }
                 }
