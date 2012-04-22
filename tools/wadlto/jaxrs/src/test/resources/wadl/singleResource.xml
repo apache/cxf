@@ -21,7 +21,10 @@
 
  <resources base="http://localhost:8080/baz">
    <resource path="/bookstore/{id}">
-     <param name="id" style="template" type="xs:long"/>
+     <param name="theid" style="template" type="xs:string">
+       <option value="one"/>
+       <option value="two"/>
+     </param>
      <method name="GET">
       <request/>
       <response>

@@ -279,6 +279,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/singleResource.xml"));
             context.put(WadlToolConstants.CFG_RESOURCENAME, "CustomResource");
+            context.put(WadlToolConstants.CFG_GENERATE_ENUMS, "true");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
@@ -287,12 +288,14 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertNotNull(output.list());
             
             List<File> javaFiles = FileUtils.getFilesRecurse(output, ".+\\." + "java" + "$");
-            assertEquals(1, javaFiles.size());
+            assertEquals(2, javaFiles.size());
             assertTrue(checkContains(javaFiles, "application.CustomResource.java"));
+            assertTrue(checkContains(javaFiles, "application.Theid.java"));
             
             List<File> classFiles = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
-            assertEquals(1, classFiles.size());
+            assertEquals(2, classFiles.size());
             assertTrue(checkContains(classFiles, "application.CustomResource.class"));
+            assertTrue(checkContains(classFiles, "application.Theid.class"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
