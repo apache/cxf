@@ -905,7 +905,7 @@ public class SourceGenerator {
             .append(";").append(getLineSep()).append(getLineSep());
         
         sbCode.append("public enum " + clsName);
-        sbCode.append(" {" + getLineSep());
+        openBlock(sbCode);
         
         for (int i = 0; i < options.size(); i++) {
             String value = options.get(i).getAttribute("value");
@@ -920,29 +920,51 @@ public class SourceGenerator {
         }
         
         sbCode.append(TAB).append("private String value;").append(getLineSep());
-        sbCode.append(TAB).append("private ").append(clsName).append("(String v) ").append("{")
-            .append(getLineSep());
-        sbCode.append(TAB).append(TAB).append("this.value = v;").append(getLineSep());
-        sbCode.append(TAB).append("}").append(getLineSep());
+        sbCode.append(TAB).append("private ").append(clsName).append("(String v)");
+        openBlock(sbCode);
+        tab(sbCode, 2).append("this.value = v;").append(getLineSep());
+        tabCloseBlock(sbCode, 1);
         
-        sbCode.append(TAB).append("public static ").append(clsName).append(" fromString(String value) ")
-            .append("{").append(getLineSep());
-        sbCode.append(TAB).append(TAB);
-        sbCode.append("if (").append("value").append(" != null) {").append(getLineSep());
-        sbCode.append(TAB).append(TAB).append(TAB);
-        sbCode.append("for (").append(clsName).append(" v : ").append(clsName).append(".values()) {")
-            .append(getLineSep());
-        sbCode.append(TAB).append(TAB).append(TAB).append(TAB);
-        sbCode.append("if (value.equalsIgnoreCase(v.value)) {").append(getLineSep());
-        sbCode.append(TAB).append(TAB).append(TAB).append(TAB).append(TAB).append("return v;")
-            .append(getLineSep());
-        sbCode.append(TAB).append(TAB).append(TAB).append(TAB).append("}").append(getLineSep());
-        sbCode.append(TAB).append(TAB).append(TAB).append("}").append(getLineSep());
-        sbCode.append(TAB).append(TAB).append("}").append(getLineSep());
-        sbCode.append(TAB).append(TAB).append("return null;").append(getLineSep());
-        sbCode.append(TAB).append("}").append(getLineSep());
+        sbCode.append(TAB).append("public static ")
+            .append(clsName).append(" fromString(String value)");
+        openBlock(sbCode);    
+        tab(sbCode, 2);
+        sbCode.append("if (").append("value").append(" != null)");
+        openBlock(sbCode);
+        tab(sbCode, 3);
+        sbCode.append("for (").append(clsName).append(" v : ")
+            .append(clsName).append(".values())");
+        openBlock(sbCode);    
+        tab(sbCode, 4);
+        sbCode.append("if (value.equalsIgnoreCase(v.value))");
+        openBlock(sbCode);
+        tab(sbCode, 5);
+        sbCode.append("return v;").append(getLineSep());
+        tabCloseBlock(sbCode, 4);
+        tabCloseBlock(sbCode, 3);
+        tabCloseBlock(sbCode, 2);
+        tab(sbCode, 2);
+        sbCode.append("throw new IllegalArgumentException();").append(getLineSep());
+        tabCloseBlock(sbCode, 1);
         sbCode.append("}");
         createJavaSourceFile(src, new QName(classPackage, clsName), sbCode, sbImports, false);
+    }
+    
+    private static StringBuilder tab(StringBuilder sb, int count) {
+        for (int i = 0; i < count; i++) {
+            sb.append(TAB);
+        }
+        return sb;
+    }
+    
+    private StringBuilder tabCloseBlock(StringBuilder sb, int count) {
+        tab(sb, count).append("}").append(getLineSep());
+        return sb;
+    }
+    
+    private StringBuilder openBlock(StringBuilder sb) {
+        sb.append(" {").append(getLineSep());
+        return sb;
     }
     
     private String getTypicalClassName(String name) { 

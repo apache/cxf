@@ -32,9 +32,42 @@ import org.junit.Test;
 
 public class JAXRSContainerTest extends ProcessorTestBase {
 
+    public enum Theid {
+        ONE("one"),
+        TWO("two");
+        private String value;
+        private Theid(String v) {
+            this.value = v;
+        }
+        public static Theid fromString(String value) {
+            if (value != null) {
+                for (Theid v : Theid.values()) {
+                    if (value.equalsIgnoreCase(v.value)) {
+                        return v;
+                    }
+                }
+            }
+            throw new IllegalArgumentException();
+        }
+    }
+    
+    @Test    
+    public void test1() {
+        try {
+        assertSame(Theid.ONE, Theid.fromString("on"));
+        fail();
+        } catch (IllegalArgumentException ex) {
+            
+        }
+    }
+    
+    
     @Test    
     public void testCodeGenInterfaces() {
         try {
+            
+            
+            
             JAXRSContainer container = new JAXRSContainer(null);
 
             ToolContext context = new ToolContext();
