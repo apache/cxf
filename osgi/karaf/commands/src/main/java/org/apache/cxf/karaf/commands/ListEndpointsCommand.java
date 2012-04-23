@@ -35,8 +35,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cxf", name = "list-endpoints", 
     description = "Lists all CXF Endpoints on a Bus.")
 public class ListEndpointsCommand extends OsgiCommandSupport {
-    protected static final String HEADER_FORMAT = "%-25s %-10s %-60s";
-    protected static final String OUTPUT_FORMAT = "[%-23s] [%-8s] [%-58s]";
+    protected static final String HEADER_FORMAT = "%-25s %-10s %-60s %-40s";
+    protected static final String OUTPUT_FORMAT = "[%-23s] [%-8s] [%-58s] [%-38s]";
     
     @Argument(index = 0, name = "bus", 
         description = "The CXF bus name where to look for the Endpoints", 
@@ -65,12 +65,13 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
             ServerRegistry reg = b.getExtension(ServerRegistry.class);
             List<Server> servers = reg.getServers();
             System.out.println(String.format(HEADER_FORMAT, 
-                                             "Name", "State", "Address"));
+                                             "Name", "State", "Address", "BusID"));
             for (Server serv : servers) {
                 String qname = serv.getEndpoint().getEndpointInfo().getName().getLocalPart();
                 String started = serv.isStarted() ? "Started" : "Stopped";
                 String address = serv.getEndpoint().getEndpointInfo().getAddress();
-                System.out.println(String.format(OUTPUT_FORMAT, qname, started, address));
+                String busId = b.getId();
+                System.out.println(String.format(OUTPUT_FORMAT, qname, started, address, busId));
             }
         }
         return null;
