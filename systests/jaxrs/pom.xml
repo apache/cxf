@@ -182,6 +182,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jibx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-management-web</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -332,6 +337,41 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+        <groupId>org.jibx</groupId>
+        <artifactId>jibx-maven-plugin</artifactId>
+        <version>${cxf.jibx.version}</version>
+        <executions>
+            <execution>
+                <id>generate-java-code-from-schema</id>
+                <goals>
+                    <goal>schema-codegen</goal>
+                </goals>
+                <configuration>
+                    <schemaLocation>${basedir}/src/test/resources/jibx</schemaLocation>
+                    <schemaBindingDirectory>${basedir}/target/generated/src/main/java</schemaBindingDirectory>
+                    <options>
+                        <package>org.apache.cxf.systest.jaxrs.codegen.jibx</package>
+                    </options>
+                </configuration>
+            </execution>
+            <execution>
+                <id>compile-binding</id>
+                <goals>
+                    <goal>bind</goal>
+                </goals>
+                <configuration>
+                    <schemaBindingDirectory>${basedir}/target/generated/src/main/java</schemaBindingDirectory>
+                    <includeSchemaBindings>
+                      <includeSchemaBindings>binding.xml</includeSchemaBindings>
+                    </includeSchemaBindings>
+                    <load>true</load>
+                    <validate>true</validate>
+                    <verify>true</verify>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-wadl2java-plugin</artifactId>

@@ -40,6 +40,15 @@ import org.jibx.runtime.impl.StAXWriter;
 public class JibxDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void write(Object obj, XMLStreamWriter output) {
+        try {
+            IBindingFactory factory = BindingDirectory.getFactory(obj.getClass());
+            IMarshallingContext ctx = getMarshallingContext(obj);
+            StAXWriter writer = new StAXWriter(factory.getNamespaces(), output);
+            ctx.setXmlWriter(writer);
+            ((IMarshallable)obj).marshal(ctx);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {

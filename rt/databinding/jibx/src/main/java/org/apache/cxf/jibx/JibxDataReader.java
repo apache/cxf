@@ -62,7 +62,12 @@ public class JibxDataReader implements DataReader<XMLStreamReader> {
     }
 
     public Object read(QName elementQName, XMLStreamReader input, Class type) {
-        throw new UnsupportedOperationException("Not Implemented");
+        try {
+            UnmarshallingContext ctx = getUnmarshallingContext(input, type);
+            return ctx.unmarshalElement(type);
+        } catch (JiBXException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setAttachments(Collection<Attachment> attachments) {

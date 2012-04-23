@@ -30,8 +30,10 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.jaxrs.provider.DataBindingJSONProvider;
+import org.apache.cxf.jibx.JibxDataBinding;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.sdo.SDODataBinding;
+import org.apache.cxf.systest.jaxrs.jibx.JibxResource;
 import org.apache.cxf.systest.jaxrs.sdo.SDOResource;
 import org.apache.cxf.systest.jaxrs.sdo.Structure;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -58,7 +60,17 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF in Action", book.getName());
     }
     
-    //@org.junit.Ignore
+    @Test
+    public void testGetBookJIBX() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setDataBinding(new JibxDataBinding());
+        bean.setAddress("http://localhost:" + PORT + "/databinding/jibx");
+        bean.setResourceClass(JibxResource.class);
+        JibxResource client = bean.create(JibxResource.class);
+        org.apache.cxf.systest.jaxrs.codegen.jibx.Book b = client.getBook();
+        assertEquals("JIBX", b.getName());
+    }
+    
     @Test
     public void testGetBookAegis() throws Exception {
         WebClient client = WebClient.create("http://localhost:"

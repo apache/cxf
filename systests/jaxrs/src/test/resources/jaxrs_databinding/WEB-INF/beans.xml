@@ -55,6 +55,15 @@ http://cxf.apache.org/schemas/core.xsd">
       <bean class="org.apache.cxf.jaxb.JAXBDataBinding"/>
     </jaxrs:dataBinding> 
   </jaxrs:server>
+  <jaxrs:server id="jibx" address="/jibx">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.jibx.JibxResource" />
+    </jaxrs:serviceBeans>		   
+    <jaxrs:dataBinding> 
+      <bean class="org.apache.cxf.jibx.JibxDataBinding"/>
+    </jaxrs:dataBinding> 
+  </jaxrs:server>
+  
   <jaxrs:server id="aegisbook" address="/aegis">
     <jaxrs:serviceBeans>
       <ref bean="serviceBean" />
