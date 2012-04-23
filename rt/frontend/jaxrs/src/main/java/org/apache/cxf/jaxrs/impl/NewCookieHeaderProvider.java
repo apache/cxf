@@ -30,6 +30,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String MAX_AGE = "Max-Age";
     private static final String COMMENT = "Comment";
     private static final String SECURE = "Secure";
+    private static final String EXPIRES = "Expires";
     
     public NewCookie fromString(String c) {
         
@@ -60,6 +61,9 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 comment = theToken.substring(COMMENT.length() + 1);
             } else if (theToken.startsWith(SECURE)) {
                 isSecure = true;
+            } else if (theToken.startsWith(EXPIRES)) {
+                // ignore
+                continue;
             } else {
                 int i = theToken.indexOf('=');
                 if (i != -1) {

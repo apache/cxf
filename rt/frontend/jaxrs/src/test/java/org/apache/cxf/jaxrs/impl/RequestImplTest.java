@@ -86,9 +86,9 @@ public class RequestImplTest extends Assert {
     
     @Test
     public void testSingleNonMatchingVariant() {
-        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
-        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
-        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        metadata.putSingle(HttpHeaders.ACCEPT, "application/xml");
+        metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "utf-8");
         
         List<Variant> list = new ArrayList<Variant>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
@@ -98,9 +98,9 @@ public class RequestImplTest extends Assert {
     
     @Test
     public void testMultipleNonMatchingVariants() {
-        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
-        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
-        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        metadata.putSingle(HttpHeaders.ACCEPT, "application/xml");
+        metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "utf-8");
         
         List<Variant> list = new ArrayList<Variant>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
@@ -112,15 +112,15 @@ public class RequestImplTest extends Assert {
     
     @Test
     public void testMultipleVariantsSingleMatch() {
-        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
-        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
-        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        metadata.putSingle(HttpHeaders.ACCEPT, "application/xml");
+        metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip");
         
         List<Variant> list = new ArrayList<Variant>();
         list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
         list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("es"), "utf-8"));
         
-        Variant var3 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "utf-8");
+        Variant var3 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "gzip");
         list.add(var3);
         assertSame(var3, new RequestImpl(m).selectVariant(list));
         
@@ -128,13 +128,13 @@ public class RequestImplTest extends Assert {
     
     @Test
     public void testMultipleVariantsBestMatch() {
-        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
-        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
-        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        metadata.putSingle(HttpHeaders.ACCEPT, "application/xml");
+        metadata.putSingle(HttpHeaders.ACCEPT_LANGUAGE, "en-us");
+        metadata.putSingle(HttpHeaders.ACCEPT_ENCODING, "gzip;q=1.0, compress");
         
         List<Variant> list = new ArrayList<Variant>();
-        list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
-        Variant var2 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "utf-8");
+        list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "gzip"));
+        Variant var2 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "gzip");
         list.add(var2);
         Variant var3 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), null);
         list.add(var3);
@@ -142,7 +142,6 @@ public class RequestImplTest extends Assert {
         list.clear();
         list.add(var3);
         assertSame(var3, new RequestImpl(m).selectVariant(list));
-        
     }
     
     private void assertSameVariant(MediaType mt, Locale lang, String enc) {

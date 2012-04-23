@@ -38,6 +38,13 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && "foo".equals(c.getName()));
     }
     
+    @Test
+    public void testFromSimpleStringWithExpires() {
+        NewCookie c = NewCookie.valueOf("foo=bar;Expires=Wed, 09 Jun 2021 10:18:14 GMT");
+        assertTrue("bar".equals(c.getValue())
+                   && "foo".equals(c.getName()));
+    }
+    
         
     @Test
     public void testFromComplexString() {
