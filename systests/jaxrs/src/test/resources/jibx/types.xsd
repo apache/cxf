@@ -1,0 +1,9 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://books/types" elementFormDefault="qualified" targetNamespace="http://books/types">
+  <xs:complexType name="book">
+    <xs:sequence>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:long" name="id"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element type="tns:book" name="book"/>
+</xs:schema>
