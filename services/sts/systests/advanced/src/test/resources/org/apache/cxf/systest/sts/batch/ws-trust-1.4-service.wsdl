@@ -179,16 +179,6 @@
   			<soap:body use="literal" />
   		</wsdl:output>
   	</wsdl:operation>
-  	<wsdl:operation name="RequestCollection">
-  		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate" />
-  		<wsdl:input>
-  			<soap:body use="literal" />
-  		</wsdl:input>
-  		<wsdl:output>
-  			<soap:body use="literal" />
-  		</wsdl:output>
-  	</wsdl:operation>
   </wsdl:binding>
   
     <wsdl:binding name="Transport_Binding_2" type="wstrust:STS">
