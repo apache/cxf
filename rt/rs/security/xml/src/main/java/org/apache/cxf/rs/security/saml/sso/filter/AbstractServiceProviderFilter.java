@@ -52,7 +52,17 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
     
     private String idpServiceAddress;
     private String issuerId;
+    private String assertionConsumerServiceAddress;
     
+    public String getAssertionConsumerServiceAddress() {
+        return assertionConsumerServiceAddress;
+    }
+
+    public void setAssertionConsumerServiceAddress(
+            String assertionConsumerServiceAddress) {
+        this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
+    }
+
     protected boolean checkSecurityContext(Message m) {
         return false;
     }
@@ -83,10 +93,9 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
                 Collections.singletonList(authnCtxClassRef), null
             );
         
-        UriInfo ui = new UriInfoImpl(m);
         //CHECKSTYLE:OFF
         return SamlpRequestComponentBuilder.createAuthnRequest(
-                ui.getRequestUri().toString(), 
+                assertionConsumerServiceAddress, 
                 false, 
                 false,
                 "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", 
