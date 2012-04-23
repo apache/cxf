@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -61,22 +62,25 @@ public class RequestImpl implements Request {
         if (vars == null || vars.isEmpty()) {
             throw new IllegalArgumentException("List of Variants is either null or empty");
         }
-        MediaType inMediaType = headers.getMediaType();
-        Locale inLang = headers.getLanguage();
-        String inEnc = headers.getRequestHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
+        List<MediaType> acceptMediaTypes = headers.getAcceptableMediaTypes();
+        List<Locale> acceptLangs = headers.getAcceptableLanguages();
+        List<String> acceptEncs = parseAcceptEnc(
+            headers.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING));
         
         List<Variant> matchingVars = new LinkedList<Variant>();
         for (Variant var : vars) {
             MediaType mt = var.getMediaType();
             Locale lang = var.getLanguage();
             String enc = var.getEncoding();
+                        
+            boolean mtMatched = mt == null || acceptMediaTypes.isEmpty()
+                || JAXRSUtils.intersectMimeTypes(acceptMediaTypes, mt).size() != 0;
             
-            boolean mtMatched = mt == null || inMediaType == null
-                || JAXRSUtils.intersectMimeTypes(Collections.singletonList(inMediaType), mt).size() != 0;
+            boolean encMatched = acceptEncs.isEmpty() || enc == null 
+                || acceptEncs.contains(enc);
             
-            boolean encMatched = inEnc == null || enc == null || inEnc.equalsIgnoreCase(enc);
-            
-            boolean langMatched = inLang == null || lang == null || inLang.equals(lang);
+            boolean langMatched = lang == null || acceptLangs.isEmpty()
+                || isLanguageMatched(acceptLangs, lang);
             
             if (mtMatched && encMatched && langMatched) {
                 matchingVars.add(var);
@@ -88,8 +92,29 @@ public class RequestImpl implements Request {
         return matchingVars.isEmpty() ? null : matchingVars.get(0);
     }
 
+    private static boolean isLanguageMatched(List<Locale> locales, Locale l) {
+        for (Locale locale : locales) {
+            if (locale.getLanguage().equalsIgnoreCase(l.getLanguage())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-
+    private static List<String> parseAcceptEnc(String acceptEnc) {
+        if (StringUtils.isEmpty(acceptEnc)) {
+            return Collections.emptyList();
+        }
+        List<String> list = new LinkedList<String>();
+        String[] values = acceptEnc.split(",");
+        for (String value : values) {
+            String[] pair = value.trim().split(";");
+            // ignore encoding qualifiers if any for now
+            list.add(pair[0]);
+        }
+        return list;
+    }
+    
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
         ResponseBuilder rb = evaluateIfMatch(eTag);
         if (rb == null) {
