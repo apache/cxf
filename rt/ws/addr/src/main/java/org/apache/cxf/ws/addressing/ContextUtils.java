@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -447,12 +448,25 @@ public final class ContextUtils {
                         // pause dispatch on current thread ...
                         inMessage.getInterceptorChain().pause();
 
-                        // ... and resume on executor thread
-                        getExecutor(inMessage).execute(new Runnable() {
-                            public void run() {
+                        try {
+                            // ... and resume on executor thread
+                            getExecutor(inMessage).execute(new Runnable() {
+                                    public void run() {
+                                        inMessage.getInterceptorChain().resume();
+                                    }
+                                });
+                        } catch (RejectedExecutionException e) {
+                            LOG.warning(
+                                        "Executor queue is full, use the caller thread." 
+                                        + "  Users can specify a larger executor queue to avoid this.");
+                            // only block the thread if the prop is unset or set to false, otherwise let it go
+                            if (!MessageUtils.isTrue(
+                                inMessage.getContextualProperty(
+                                    "org.apache.cxf.oneway.rejected_execution_exception"))) {
+                                //the executor queue is full, so run the task in the caller thread
                                 inMessage.getInterceptorChain().resume();
                             }
-                        });
+                        }
                     }
                 }
             } catch (Exception e) {
