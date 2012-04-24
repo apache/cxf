@@ -216,7 +216,10 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             }
             soapFault.setFaultString(((SoapFault)ex).getReason());
             soapFault.setFaultCode(((SoapFault)ex).getFaultCode());
-            soapFault.setFaultActor(((SoapFault)ex).getRole());
+            String role = ((SoapFault)ex).getRole();
+            if (role != null) {
+                soapFault.setFaultActor(role);
+            }
             if (((SoapFault)ex).getSubCode() != null) {
                 soapFault.appendFaultSubcode(((SoapFault)ex).getSubCode());
             }
