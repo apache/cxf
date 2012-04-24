@@ -51,7 +51,6 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         docBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
-        doc.appendChild(doc.createElement("root"));
         
         Issuer issuer = 
             SamlpRequestComponentBuilder.createIssuer("http://localhost:8888/saml2-demo/simple");
@@ -78,6 +77,7 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
             );
         
         Element policyElement = OpenSAMLUtil.toDom(authnRequest, doc);
+        doc.appendChild(policyElement);
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
