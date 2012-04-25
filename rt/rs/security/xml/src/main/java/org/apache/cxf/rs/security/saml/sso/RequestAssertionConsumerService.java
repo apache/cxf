@@ -116,7 +116,14 @@ public class RequestAssertionConsumerService {
     }
     
     protected void validateSamlResponse(org.opensaml.saml2.core.Response samlResponse) {
-        
+        SAMLProtocolResponseValidator protocolValidator = 
+                new SAMLProtocolResponseValidator();
+        // TODO Configure Crypto & CallbackHandler object here to validate signatures
+        try {
+            protocolValidator.validateSamlResponse(samlResponse, null, null);
+        } catch (WSSecurityException ex) {
+            throw new WebApplicationException(400);
+        }
     }
     
     public void setUseDeflateEncoding(boolean deflate) {
