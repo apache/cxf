@@ -343,7 +343,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         bus.getOutInterceptors().remove(PolicyOutInterceptor.INSTANCE);
         bus.getInFaultInterceptors().remove(ClientPolicyInFaultInterceptor.INSTANCE);
         bus.getOutFaultInterceptors().remove(ServerPolicyOutFaultInterceptor.INSTANCE);
-        bus.getInFaultInterceptors().add(PolicyVerificationInFaultInterceptor.INSTANCE);
+        bus.getInFaultInterceptors().remove(PolicyVerificationInFaultInterceptor.INSTANCE);
         addedBusInterceptors = false;
     }
 
