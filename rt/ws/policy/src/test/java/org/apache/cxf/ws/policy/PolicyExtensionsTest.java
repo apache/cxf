@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -28,6 +29,8 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilder;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry;
@@ -50,7 +53,39 @@ public class PolicyExtensionsTest extends Assert {
         = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");
     
     private static final QName UNKNOWN = new QName("http://cxf.apache.org/test/policy", "unknown");
-    
+
+    @Test
+    public void testCXF4258() {
+        Bus bus = null;
+        try {
+            bus = new SpringBusFactory().createBus("/org/apache/cxf/ws/policy/disable-policy-bus.xml", false);
+
+            AssertionBuilderRegistry abr = bus.getExtension(AssertionBuilderRegistry.class);
+            assertNotNull(abr);
+
+            PolicyEngine e = bus.getExtension(PolicyEngine.class);
+            assertNotNull(e);
+            
+            assertNoPolicyInterceptors(bus.getInInterceptors());
+            assertNoPolicyInterceptors(bus.getInFaultInterceptors());
+            assertNoPolicyInterceptors(bus.getOutFaultInterceptors());
+            assertNoPolicyInterceptors(bus.getOutInterceptors());
+            
+        } finally {
+            if (null != bus) {
+                bus.shutdown(true);
+                BusFactory.setDefaultBus(null);
+            }
+        }
+    }
+
+    private void assertNoPolicyInterceptors(List<Interceptor<? extends Message>> ints) {
+        for (Interceptor<? extends Message> m : ints) {
+            assertFalse("Found " + m.getClass().getName(),
+                        m.getClass().getName().contains("org.apache.cxf.ws.policy"));
+        }
+    }
+
     @Test
     public void testExtensions() {
         Bus bus = null;
