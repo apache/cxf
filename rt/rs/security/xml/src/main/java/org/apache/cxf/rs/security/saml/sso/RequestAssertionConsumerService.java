@@ -21,6 +21,9 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
 import javax.ws.rs.Encoded;
@@ -33,10 +36,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
@@ -48,30 +52,39 @@ import org.opensaml.xml.XMLObject;
 
 @Path("sso")
 public class RequestAssertionConsumerService {
+    private static final Logger LOG = 
+        LogUtils.getL7dLogger(RequestAssertionConsumerService.class);
+    private static final ResourceBundle BUNDLE = 
+        BundleUtils.getBundle(RequestAssertionConsumerService.class);
+    
     private static final String SAML_RESPONSE = "SAMLResponse"; 
     private static final String RELAY_STATE = "RelayState";
 
     private boolean useDeflateEncoding = true;
     
+    public void setUseDeflateEncoding(boolean deflate) {
+        useDeflateEncoding = deflate;
+    }
+    public boolean useDeflateEncoding() {
+        return useDeflateEncoding;
+    }
+    
     @POST
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response processSamlResponse(@Encoded @FormParam(RELAY_STATE) String relayState,
                                      @Encoded @FormParam(SAML_RESPONSE) String encodedSamlResponse) {
+        
+        URI relayURI = getRelayURI(relayState);
+        
         org.opensaml.saml2.core.Response samlResponse = 
             readSAMLResponse(encodedSamlResponse);
 
         validateSamlResponse(samlResponse);
         
-        // TODO: set the security context, 
-        // perhaps using the cookie or adding some query parameter 
-        // (relayState?) to the redirect URI
-        
+        // TODO: set the security context
+                
         // finally, redirect to the service provider endpoint
-        String responseTo = samlResponse.getInResponseTo();
-        UriBuilder builder = UriBuilder.fromPath(responseTo); 
-        // if needed: builder.queryParam("RelayState", relayState);
-        
-        return Response.seeOther(builder.build()).build();
+        return Response.seeOther(relayURI).build();
         
     }
     
@@ -83,6 +96,7 @@ public class RequestAssertionConsumerService {
     
     private org.opensaml.saml2.core.Response readSAMLResponse(String samlResponse) {
         if (StringUtils.isEmpty(samlResponse)) {
+            reportError("MISSING_SAML_RESPONSE");
             throw new WebApplicationException(400);
         }
         InputStream tokenStream = null;
@@ -122,14 +136,27 @@ public class RequestAssertionConsumerService {
         try {
             protocolValidator.validateSamlResponse(samlResponse, null, null);
         } catch (WSSecurityException ex) {
+            reportError("INVALID_SAML_RESPONSE");
             throw new WebApplicationException(400);
         }
     }
     
-    public void setUseDeflateEncoding(boolean deflate) {
-        useDeflateEncoding = deflate;
+    private URI getRelayURI(String relayState) {
+        if (relayState != null) {
+            try {
+                return URI.create(relayState);
+            } catch (IllegalArgumentException ex) {
+                reportError("INVALID_RELAY_STATE");
+            }
+        } else {
+            reportError("MISSING_RELAY_STATE");
+        }
+        throw new WebApplicationException(400);
     }
-    public boolean useDeflateEncoding() {
-        return useDeflateEncoding;
+    
+    private void reportError(String code) {
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message(code, BUNDLE);
+        LOG.warning(errorMsg.toString());
     }
 }
