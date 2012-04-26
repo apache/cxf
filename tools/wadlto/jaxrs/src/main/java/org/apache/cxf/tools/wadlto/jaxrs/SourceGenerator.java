@@ -66,7 +66,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.Bus;
@@ -88,6 +90,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.xml.resolver.tools.CatalogResolver;
 
 /**
  * TODO: This will need to be moved into a separate module
@@ -1256,8 +1259,9 @@ public class SourceGenerator {
     
     private JCodeModel createCodeModel(List<SchemaInfo> schemaElements, Set<String> type) {
         
-
         SchemaCompiler compiler = createCompiler(type);
+        compiler.setEntityResolver(OASISCatalogManager.getCatalogManager(bus)
+                                       .getEntityResolver());
         if (compilerArgs.size() > 0) {
             compiler.getOptions().addGrammar(new InputSource("null"));
             compiler.getOptions().parseArguments(compilerArgs.toArray(new String[] {}));
