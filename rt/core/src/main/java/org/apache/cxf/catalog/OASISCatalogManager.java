@@ -34,10 +34,13 @@ import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 
+import org.xml.sax.EntityResolver;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.xml.resolver.Catalog;
 import org.apache.xml.resolver.CatalogManager;
 import org.apache.xml.resolver.tools.CatalogResolver;
@@ -53,21 +56,31 @@ public class OASISCatalogManager {
         = SystemPropertyAction.getPropertyOrNull(CATALOG_DEBUG_KEY);
     
 
-    private Object resolver;
+    private EntityResolver resolver;
+    private Object catalog;
     private Set<URI> loadedCatalogs = Collections.synchronizedSet(new HashSet<URI>());
     private Bus bus;
 
     public OASISCatalogManager() {
         resolver = getResolver();
+        catalog = getCatalog(resolver);
     }
     
     public OASISCatalogManager(Bus b) {
         bus = b;
         resolver = getResolver();
+        catalog = getCatalog(resolver);
         loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
-    
-    private static Object getResolver() {
+    private static Object getCatalog(EntityResolver resolver) {
+        try {
+            return ((CatalogResolver)resolver).getCatalog();
+        } catch (Throwable t) {
+            //ignore
+        }
+        return null;
+    }
+    private static EntityResolver getResolver() {
         try {
             CatalogManager catalogManager = new CatalogManager();
             if (DEBUG_LEVEL != null) {
@@ -75,8 +88,24 @@ public class OASISCatalogManager {
             }
             catalogManager.setUseStaticCatalog(false);
             catalogManager.setIgnoreMissingProperties(true);
-            CatalogResolver catalogResolver = new CatalogResolver(catalogManager);
-            return catalogResolver.getCatalog();
+            CatalogResolver catalogResolver = new CatalogResolver(catalogManager) {
+                public String getResolvedEntity(String publicId, String systemId) {
+                    String s = super.getResolvedEntity(publicId, systemId);
+                    if (s != null && s.startsWith("classpath:")) {
+                        try {
+                            URIResolver r = new URIResolver(s);
+                            if (r.isResolved()) {
+                                r.getInputStream().close();
+                                return r.getURL().toExternalForm();
+                            }
+                        } catch (IOException e) {
+                            //ignore
+                        }
+                    }
+                    return s;
+                }
+            };
+            return catalogResolver;
         } catch (Throwable t) {
             //ignore
         }        
@@ -108,7 +137,7 @@ public class OASISCatalogManager {
     }
 
     public final void loadCatalogs(ClassLoader classLoader, String name) throws IOException {
-        if (classLoader == null || resolver == null) {
+        if (classLoader == null || catalog == null) {
             return;
         }
 
@@ -116,14 +145,14 @@ public class OASISCatalogManager {
         while (catalogs.hasMoreElements()) {
             URL catalogURL = catalogs.nextElement();
             if (!loadedCatalogs.contains(URI.create(catalogURL.toString()))) {
-                ((Catalog)resolver).parseCatalog(catalogURL);
+                ((Catalog)catalog).parseCatalog(catalogURL);
                 loadedCatalogs.add(URI.create(catalogURL.toString()));
             }
         }
     }
 
     public final void loadCatalog(URL catalogURL) throws IOException {
-        if (!loadedCatalogs.contains(URI.create(catalogURL.toString())) && resolver != null) {
+        if (!loadedCatalogs.contains(URI.create(catalogURL.toString())) && catalog != null) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {
                     File file = new File(catalogURL.toURI());
@@ -135,7 +164,7 @@ public class OASISCatalogManager {
                 }
             }
 
-            ((Catalog)resolver).parseCatalog(catalogURL);
+            ((Catalog)catalog).parseCatalog(catalogURL);
 
             loadedCatalogs.add(URI.create(catalogURL.toString()));
         }
@@ -167,23 +196,27 @@ public class OASISCatalogManager {
     }
 
     public String resolveSystem(String sys) throws MalformedURLException, IOException {
-        if (resolver == null) {
+        if (catalog == null) {
             return null;
         }
-        return ((Catalog)resolver).resolveSystem(sys);
+        return ((Catalog)catalog).resolveSystem(sys);
     }
 
     public String resolveURI(String uri) throws MalformedURLException, IOException {
-        if (resolver == null) {
+        if (catalog == null) {
             return null;
         }
-        return ((Catalog)resolver).resolveURI(uri);
+        return ((Catalog)catalog).resolveURI(uri);
     }
     public String resolvePublic(String uri, String parent) throws MalformedURLException, IOException {
         if (resolver == null) {
             return null;
         }
-        return ((Catalog)resolver).resolvePublic(uri, parent);
+        return ((Catalog)catalog).resolvePublic(uri, parent);
+    }
+    
+    public EntityResolver getEntityResolver() {
+        return resolver;
     }
 
 }

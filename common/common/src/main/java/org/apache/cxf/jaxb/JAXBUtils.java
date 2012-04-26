@@ -65,6 +65,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -939,7 +940,8 @@ public final class JAXBUtils {
     }
     
     public interface SchemaCompiler {
-
+        void setEntityResolver(EntityResolver entityResolver);
+        
         void setErrorListener(Object elForRun);
 
         void setClassNameAllocator(Object allocator);
