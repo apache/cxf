@@ -589,7 +589,11 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                                  + "]);");
                 px++;
             }
+        } else if (isRPC) {
+            //make sure the rpc element has a valid prefix
+            prefixAccumulator.xmlElementString(currentOperation.getName());
         }
+
 
         if (soapBindingInfo != null) {
             SoapVersion soapVersion = soapBindingInfo.getSoapVersion();
