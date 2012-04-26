@@ -21,10 +21,17 @@ package org.apache.cxf.rs.security.saml.sso.filter;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -45,24 +52,24 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
     
     protected static final String SAML_REQUEST = "SAMLRequest"; 
     protected static final String RELAY_STATE = "RelayState";
+    protected static final Logger LOG = 
+        LogUtils.getL7dLogger(AbstractServiceProviderFilter.class);
+    protected static final ResourceBundle BUNDLE = 
+        BundleUtils.getBundle(AbstractServiceProviderFilter.class);
     
     private String idpServiceAddress;
     private String issuerId;
     private String assertionConsumerServiceAddress;
     
-    public String getAssertionConsumerServiceAddress() {
-        return assertionConsumerServiceAddress;
-    }
-
     public void setAssertionConsumerServiceAddress(
             String assertionConsumerServiceAddress) {
         this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
     }
 
-    protected boolean checkSecurityContext(Message m) {
-        return false;
+    public void setIssuerId(String issuerId) {
+        this.issuerId = issuerId;
     }
-
+    
     public void setIdpServiceAddress(String idpServiceAddress) {
         this.idpServiceAddress = idpServiceAddress;
     }
@@ -71,6 +78,10 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         return idpServiceAddress;
     }
 
+    protected boolean checkSecurityContext(Message m) {
+        return false;
+    }
+    
     protected AuthnRequest createAuthnRequest(Message m, Document doc) throws Exception {
         Issuer issuer =
             SamlpRequestComponentBuilder.createIssuer(issuerId);
@@ -91,7 +102,7 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         
         //CHECKSTYLE:OFF
         return SamlpRequestComponentBuilder.createAuthnRequest(
-                assertionConsumerServiceAddress, 
+                getAbsoluteAssertionServiceAddress(m), 
                 false, 
                 false,
                 "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", 
@@ -130,7 +141,27 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         return info;
     }
     
-    public void setIssuerId(String issuerId) {
-        this.issuerId = issuerId;
+    private String getAbsoluteAssertionServiceAddress(Message m) {
+        if (assertionConsumerServiceAddress == null) {    
+            //TODO: Review the possibility of using this filter
+            //for validating SAMLResponse too
+            reportError("MISSING_ASSERTION_SERVICE_URL");
+            throw new WebApplicationException(500);
+        }
+        if (!assertionConsumerServiceAddress.startsWith("http")) {
+            String httpBasePath = (String)m.get("http.base.path");
+            return UriBuilder.fromUri(httpBasePath)
+                             .path(assertionConsumerServiceAddress)
+                             .build()
+                             .toString();
+        } else {
+            return assertionConsumerServiceAddress;
+        }
+    }
+    
+    protected void reportError(String code) {
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message(code, BUNDLE);
+        LOG.warning(errorMsg.toString());
     }
 }
