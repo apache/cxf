@@ -62,7 +62,9 @@ public class AttachmentDataSource implements DataSource {
         cache.holdTempFile();
     }
     public void release() {
-        cache.releaseTempFileHold();
+        if (cache != null) {
+            cache.releaseTempFileHold();
+        }
     }
     
     public String getContentType() {
