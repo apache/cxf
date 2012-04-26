@@ -122,7 +122,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         LOG.fine("Created greeter client.");
 
         org.apache.cxf.endpoint.Endpoint ep = ClientProxy.getClient(greeter).getEndpoint();
-        String epId = RMUtils.getEndpointIdentifier(ep);
+        String epId = RMUtils.getEndpointIdentifier(ep, clientBus);
         
         greeter.greetMeOneWay("one"); // sent
 

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.rm;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
@@ -31,7 +32,7 @@ public class AbstractEndpoint {
     }
     
     public String getName() {
-        return RMUtils.getEndpointIdentifier(getEndpoint());
+        return RMUtils.getEndpointIdentifier(getEndpoint(), getBus());
     }
     
     /** 
@@ -62,5 +63,9 @@ public class AbstractEndpoint {
      */
     public Identifier generateSequenceIdentifier() {
         return reliableEndpoint.getManager().getIdGenerator().generateSequenceIdentifier();
+    }
+    
+    private Bus getBus() {
+        return reliableEndpoint.getManager().getBus();
     }
 }

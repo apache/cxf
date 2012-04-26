@@ -571,7 +571,7 @@ public class RMManagerTest extends Assert {
         if (null != ss) {
             sss.add(ss);            
         }
-        EasyMock.expect(store.getSourceSequences("{S}s.{P}p"))
+        EasyMock.expect(store.getSourceSequences("{S}s.{P}p@cxf"))
             .andReturn(sss);
         if (null == ss) {
             return;
@@ -581,7 +581,7 @@ public class RMManagerTest extends Assert {
         if (null != ds) {
             dss.add(ds);            
         }
-        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p"))
+        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p@cxf"))
             .andReturn(dss);
         if (null == ds) {
             return;

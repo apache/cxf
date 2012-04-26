@@ -130,7 +130,7 @@ public class RMManager {
         if (null == store || null == retransmissionQueue) {
             return;
         }        
-        String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
+        String id = RMUtils.getEndpointIdentifier(client.getEndpoint(), getBus());
         Collection<SourceSequence> sss = store.getSourceSequences(id);
         if (null == sss || 0 == sss.size()) {                        
             return;
@@ -507,7 +507,7 @@ public class RMManager {
             return;
         }        
         
-        String id = RMUtils.getEndpointIdentifier(endpoint);
+        String id = RMUtils.getEndpointIdentifier(endpoint, getBus());
         
         Collection<SourceSequence> sss = store.getSourceSequences(id);
         Collection<DestinationSequence> dss = store.getDestinationSequences(id);
