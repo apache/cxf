@@ -53,10 +53,10 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
     Bus bus;
      
     public BindingFactoryManagerImpl() {
-        bindingFactories = new ConcurrentHashMap<String, BindingFactory>();
+        bindingFactories = new ConcurrentHashMap<String, BindingFactory>(8, 0.75f, 4);
     }
     public BindingFactoryManagerImpl(Bus b) {
-        bindingFactories = new ConcurrentHashMap<String, BindingFactory>();
+        bindingFactories = new ConcurrentHashMap<String, BindingFactory>(8, 0.75f, 4);
         setBus(b);
     }
     

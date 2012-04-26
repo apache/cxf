@@ -162,13 +162,13 @@ public class WSDLGetUtils {
 
             if (mp == null) {
                 endpointInfo.getService().setProperty(WSDLS_KEY,
-                                                      new ConcurrentHashMap<String, Definition>());
+                                                      new ConcurrentHashMap<String, Definition>(8, 0.75f, 4));
                 mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
                                     .getProperty(WSDLS_KEY));
             }
             if (smp == null) {
                 endpointInfo.getService().setProperty(SCHEMAS_KEY,
-                                                      new ConcurrentHashMap<String, SchemaReference>());
+                                                      new ConcurrentHashMap<String, SchemaReference>(8, 0.75f, 4));
                 smp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
                                     .getProperty(SCHEMAS_KEY));
             }

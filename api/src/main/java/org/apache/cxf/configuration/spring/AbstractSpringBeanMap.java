@@ -48,7 +48,7 @@ abstract class AbstractSpringBeanMap<X, V>
     protected String idsProperty;
     protected String staticFieldName;
     protected Map<X, List<String>> idToBeanName = new ConcurrentHashMap<X, List<String>>();
-    protected Map<X, V> putStore = new ConcurrentHashMap<X, V>();
+    protected Map<X, V> putStore = new ConcurrentHashMap<X, V>(4, 0.75f, 4);
 
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.context = ctx;

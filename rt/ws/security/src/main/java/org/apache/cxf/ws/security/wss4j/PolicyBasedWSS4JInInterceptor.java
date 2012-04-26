@@ -117,7 +117,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             Map<Object, Properties> o = 
                 CastUtils.cast((Map<?, ?>)message.getContextualProperty(PROPERTIES_CACHE));
             if (o == null) {
-                o = new ConcurrentHashMap<Object, Properties>();
+                o = new ConcurrentHashMap<Object, Properties>(16, 0.75f, 2);
                 info.setProperty(PROPERTIES_CACHE, o);
             }
             return o;

@@ -124,7 +124,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             return;
         }
         if (null == propertyMap.get()) {
-            propertyMap.compareAndSet(null, new ConcurrentHashMap<String, Object>(4));
+            propertyMap.compareAndSet(null, new ConcurrentHashMap<String, Object>(4, 0.75f, 2));
         }
         if (v == null) {
             propertyMap.get().remove(name);

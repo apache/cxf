@@ -30,7 +30,7 @@ public class Cookies {
     /**
      * Variables for holding session state if sessions are supposed to be maintained
      */
-    private final Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>();
+    private final Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>(4, 0.75f, 4);
     private boolean maintainSession;
     
     public Map<String, Cookie> getSessionCookies() {

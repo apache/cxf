@@ -137,7 +137,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     }
 
     private void initMessagesMap() {
-        messages = new ConcurrentHashMap<QName, MessageInfo>();
+        messages = new ConcurrentHashMap<QName, MessageInfo>(16, 0.75f, 2);
         for (OperationInfo operation : getInterface().getOperations()) {
             if (operation.getInput() != null) {
                 messages.put(operation.getInput().getName(), operation.getInput());

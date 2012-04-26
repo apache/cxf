@@ -52,10 +52,10 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     private Bus bus;
 
     public DestinationFactoryManagerImpl() {
-        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>();
+        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>(8, 0.75f, 4);
     }
     public DestinationFactoryManagerImpl(Bus b) {
-        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>();
+        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>(8, 0.75f, 4);
         setBus(b);
     }
 

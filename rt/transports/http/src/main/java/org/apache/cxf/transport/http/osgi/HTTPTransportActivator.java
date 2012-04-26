@@ -125,7 +125,7 @@ public class HTTPTransportActivator
     ServiceRegistration reg;
     ServiceRegistration reg2;
     Map<String, PidInfo> props 
-        = new ConcurrentHashMap<String, PidInfo>();
+        = new ConcurrentHashMap<String, PidInfo>(4, 0.75f, 2);
     CopyOnWriteArrayList<PidInfo> sorted = new CopyOnWriteArrayList<PidInfo>();
     
     public void start(BundleContext context) throws Exception {

@@ -57,7 +57,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     protected String id;
     private BusState state;      
     private final Collection<AbstractFeature> features = new CopyOnWriteArrayList<AbstractFeature>();
-    private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
+    private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>(16, 0.75f, 4);
     
     public CXFBusImpl() {
         this(null);
@@ -65,7 +65,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
 
     public CXFBusImpl(Map<Class<?>, Object> extensions) {
         if (extensions == null) {
-            extensions = new ConcurrentHashMap<Class<?>, Object>();
+            extensions = new ConcurrentHashMap<Class<?>, Object>(16, 0.75f, 4);
         } else {
             extensions = new ConcurrentHashMap<Class<?>, Object>(extensions);
         }
