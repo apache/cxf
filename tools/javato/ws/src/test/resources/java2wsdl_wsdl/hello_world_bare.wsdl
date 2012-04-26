@@ -48,7 +48,7 @@ under the License.
     <wsdl:message name="sayHiRequest"/>
 
     <wsdl:message name="sayHiResponse">
-        <wsdl:part type="xsd:string" name="out"/>
+        <wsdl:part type="xsd:string" name="sayHiOut"/>
     </wsdl:message>
 
     <wsdl:message name="greetMeRequest">
