@@ -69,10 +69,9 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
         public void run() {
             long start = System.currentTimeMillis();
             try {
-                greeter.greetMeLater(2 * 1000);
+                greeter.greetMeLater(1600);
             } catch (Throwable t) {
                 //ignore
-                t.printStackTrace();
             }
             long end = System.currentTimeMillis();
             total = end - start;
@@ -84,6 +83,9 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
 
     @Test
     public void testFallbackThreadPoolConfig() throws Exception {
+        //make sure things are running
+        greeter.greetMeLater(1);
+        greeter.greetMeLater(1);
         TestRunnable r[] = new TestRunnable[5];
         Thread[] invokers = new Thread[5];
         for (int i = 0; i < invokers.length; i++) {
