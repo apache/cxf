@@ -136,7 +136,7 @@ public class RMManager {
         if (null == store || null == retransmissionQueue) {
             return;
         }        
-        String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
+        String id = RMUtils.getEndpointIdentifier(client.getEndpoint(), getBus());
         ProtocolVariation protocol = getConfiguredProtocol();
         Collection<SourceSequence> sss = store.getSourceSequences(id, protocol);
         if (null == sss || 0 == sss.size()) {                        
@@ -524,7 +524,7 @@ public class RMManager {
             return;
         }        
         
-        String id = RMUtils.getEndpointIdentifier(endpoint);
+        String id = RMUtils.getEndpointIdentifier(endpoint, getBus());
         
         Collection<SourceSequence> sss = store.getSourceSequences(id, protocol);
         Collection<DestinationSequence> dss = store.getDestinationSequences(id, protocol);

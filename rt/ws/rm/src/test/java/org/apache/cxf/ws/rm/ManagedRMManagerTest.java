@@ -114,7 +114,7 @@ public class ManagedRMManagerTest extends Assert {
         o = mbs.invoke(managerName, "getEndpointIdentifiers", null, null);
         assertEquals("One Endpoint", 1, ((String[])o).length);
         assertEquals("Endpoint identifier must match", 
-                     RMUtils.getEndpointIdentifier(endpoint), ((String[])o)[0]);
+                     RMUtils.getEndpointIdentifier(endpoint, bus), ((String[])o)[0]);
 
         // test some endpoint methods
         o = mbs.getAttribute(endpointName, "Address");

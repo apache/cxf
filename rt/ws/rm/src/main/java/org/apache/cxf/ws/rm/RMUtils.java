@@ -115,8 +115,20 @@ public final class RMUtils {
     }
     
     public static String getEndpointIdentifier(Endpoint endpoint) {
+        return getEndpointIdentifier(endpoint, null);
+    }
+
+    public static String getEndpointIdentifier(Endpoint endpoint, Bus bus) {
+        String busId = null;
+        if (bus != null) {
+            busId = bus.getId();
+        }
+        if (bus == null || busId.startsWith(Bus.DEFAULT_BUS_ID)) {
+            // no bus id or a generated anonymous id needs to be mapped to the default constant 
+            busId = Bus.DEFAULT_BUS_ID;
+        }
         return endpoint.getEndpointInfo().getService().getName() + "."
-            + endpoint.getEndpointInfo().getName();
+            + endpoint.getEndpointInfo().getName() + "@" + busId;
     }
     
     public static WriteOnCloseOutputStream createCachedStream(Message message, OutputStream os) {

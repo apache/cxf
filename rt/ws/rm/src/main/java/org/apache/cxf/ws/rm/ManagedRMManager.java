@@ -66,7 +66,7 @@ public class ManagedRMManager implements ManagedComponent {
         //FIXME find this method for 2.5
 //        for (Endpoint ep : manager.getReliableEndpointsMap().keySet()) {
         for (Endpoint ep : getReliableEndpointsMap().keySet()) {
-            identifiers.add(RMUtils.getEndpointIdentifier(ep));
+            identifiers.add(RMUtils.getEndpointIdentifier(ep, manager.getBus()));
         }
         return identifiers.toArray(new String[identifiers.size()]);
     }

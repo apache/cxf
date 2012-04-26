@@ -21,6 +21,8 @@ package org.apache.cxf.ws.rm;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -50,6 +52,7 @@ public class RMUtilsTest extends Assert {
     
     @Test
     public void testGetName() {
+        // no bus given
         Endpoint e = control.createMock(Endpoint.class);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
@@ -60,6 +63,28 @@ public class RMUtilsTest extends Assert {
         QName sqn = new QName("ns1", "service");
         EasyMock.expect(si.getName()).andReturn(sqn);
         control.replay();
-        assertEquals("{ns1}service.{ns2}endpoint", RMUtils.getEndpointIdentifier(e));
+        assertEquals("{ns1}service.{ns2}endpoint@cxf", RMUtils.getEndpointIdentifier(e));
+
+        // a named bus
+        control.reset();
+        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
+        EasyMock.expect(ei.getName()).andReturn(eqn);
+        EasyMock.expect(ei.getService()).andReturn(si);
+        EasyMock.expect(si.getName()).andReturn(sqn);
+        Bus b = control.createMock(Bus.class);
+        EasyMock.expect(b.getId()).andReturn("mybus");
+        control.replay();
+        assertEquals("{ns1}service.{ns2}endpoint@mybus", RMUtils.getEndpointIdentifier(e, b));
+
+        // this test makes sure that an automatically generated id will be
+        // mapped to the static default bus name "cxf".
+        control.reset();
+        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
+        EasyMock.expect(ei.getName()).andReturn(eqn);
+        EasyMock.expect(ei.getService()).andReturn(si);
+        EasyMock.expect(si.getName()).andReturn(sqn);
+        control.replay();
+        assertEquals("{ns1}service.{ns2}endpoint@cxf", 
+                     RMUtils.getEndpointIdentifier(e, BusFactory.getDefaultBus()));
     } 
 }

@@ -568,7 +568,7 @@ public class RMManagerTest extends Assert {
         if (null != ss) {
             sss.add(ss);            
         }
-        EasyMock.expect(store.getSourceSequences("{S}s.{P}p", ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(store.getSourceSequences("{S}s.{P}p@cxf", ProtocolVariation.RM10WSA200408))
             .andReturn(sss);
         if (null == ss) {
             return;
@@ -578,7 +578,7 @@ public class RMManagerTest extends Assert {
         if (null != ds) {
             dss.add(ds);            
         }
-        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p", ProtocolVariation.RM10WSA200408))
+        EasyMock.expect(store.getDestinationSequences("{S}s.{P}p@cxf", ProtocolVariation.RM10WSA200408))
             .andReturn(dss);
         if (null == ds) {
             return;
