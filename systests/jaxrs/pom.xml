@@ -348,8 +348,8 @@
                     <goal>schema-codegen</goal>
                 </goals>
                 <configuration>
-                    <schemaLocation>${basedir}/src/test/resources/jibx</schemaLocation>
-                    <schemaBindingDirectory>${basedir}/target/generated/src/main/java</schemaBindingDirectory>
+                    <schemaLocation>src/test/resources/jibx</schemaLocation>
+                    <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
                     <options>
                         <package>org.apache.cxf.systest.jaxrs.codegen.jibx</package>
                     </options>
@@ -361,7 +361,7 @@
                     <goal>bind</goal>
                 </goals>
                 <configuration>
-                    <schemaBindingDirectory>${basedir}/target/generated/src/main/java</schemaBindingDirectory>
+                    <schemaBindingDirectory>target/generated/src/main/java</schemaBindingDirectory>
                     <includeSchemaBindings>
                       <includeSchemaBindings>binding.xml</includeSchemaBindings>
                     </includeSchemaBindings>
