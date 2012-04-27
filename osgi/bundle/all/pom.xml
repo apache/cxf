@@ -364,7 +364,7 @@
                             javax.resource*;resolution:=optional,
                             javax.xml.soap,
                             junit.framework*;resolution:=optional,
-                            net.sf.cglib*;resolution:=optional;version="[2.1.3, 3.0.0)",
+                            net.sf.cglib*;resolution:=optional;version="${cxf.cglib.osgi.version}",
                             net.oauth*;resolution:=optional,
                             org.apache.abdera*;resolution:=optional;version="[1.0,2)",
                             org.apache.aries*;resolution:=optional;version="[0.2,2)",
