@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.DestinationSequence;
@@ -533,6 +534,135 @@ public class RMTxStoreTest extends Assert {
             store.removeMessages(sid1, msgNrs, false);
         }
     }
+
+    @Test
+    public void testCreateSequenceStoreOutboundMessage() throws SQLException, IOException {
+        Identifier sid1 = null;
+        try {
+            SourceSequence seq = control.createMock(SourceSequence.class);
+            sid1 = new Identifier();
+            sid1.setValue("sequence1");
+            EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
+            EasyMock.expect(seq.getExpires()).andReturn(null);
+            EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
+            EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
+        
+            control.replay();
+            store.createSourceSequence(seq);   
+            control.reset();
+            
+            Collection<SourceSequence> seqs = 
+                store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            assertEquals(1, seqs.size());
+            SourceSequence rseq = seqs.iterator().next();
+            assertFalse(rseq.isLastMessage());
+            
+            Collection<RMMessage> out = store.getMessages(sid1, true);
+            assertEquals(0, out.size());
+            
+            // set the last message flag
+            EasyMock.expect(seq.getIdentifier()).andReturn(sid1).anyTimes();
+            EasyMock.expect(seq.isLastMessage()).andReturn(true);
+
+            setupOutboundMessage(seq, 1L, null);
+            out = store.getMessages(sid1, true);
+            assertEquals(1, out.size());
+            checkRecoveredMessages(out);
+
+            // verify the updated sequence
+            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            assertEquals(1, seqs.size());
+            rseq = seqs.iterator().next();
+            
+            assertTrue(rseq.isLastMessage());
+            
+            // set the last message flag
+            EasyMock.expect(seq.getIdentifier()).andReturn(sid1).anyTimes();
+            EasyMock.expect(seq.getCurrentMessageNr()).andReturn(2L);
+            EasyMock.expect(seq.isLastMessage()).andReturn(true);
+
+            control.replay();
+            store.persistOutgoing(seq, null);
+            control.reset();
+            
+            seqs = store.getSourceSequences(CLIENT_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            assertEquals(1, seqs.size());
+            rseq = seqs.iterator().next();
+            
+            assertEquals(2, rseq.getCurrentMessageNr());
+        } finally {
+            if (null != sid1) {
+                store.removeSourceSequence(sid1);
+            }
+            Collection<Long> msgNrs = new ArrayList<Long>();
+            msgNrs.add(ONE);
+            store.removeMessages(sid1, msgNrs, true);
+        }
+    }
+
+    @Test
+    public void testCreateSequenceStoreInboundMessage() throws SQLException, IOException {
+        Identifier sid1 = null;
+        try {
+            DestinationSequence seq = control.createMock(DestinationSequence.class);
+            sid1 = new Identifier();
+            sid1.setValue("sequence1");
+            EndpointReferenceType epr = RMUtils.createAnonymousReference();
+            EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
+            EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
+            EasyMock.expect(seq.getEndpointIdentifier()).andReturn(SERVER_ENDPOINT_ID);
+        
+            control.replay();
+            store.createDestinationSequence(seq);   
+
+            
+            Collection<DestinationSequence> seqs = 
+                store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            assertEquals(1, seqs.size());
+            DestinationSequence rseq = seqs.iterator().next();
+            assertFalse(rseq.isAcknowledged(1));
+            
+            Collection<RMMessage> in = store.getMessages(sid1, false);
+            assertEquals(0, in.size());
+            
+            control.reset();            
+            EasyMock.expect(seq.getIdentifier()).andReturn(sid1).anyTimes();
+            EasyMock.expect(seq.getAcknowledgment()).andReturn(ack1);        
+            EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
+            
+            setupInboundMessage(seq, 1L, null);
+            in = store.getMessages(sid1, false);
+            assertEquals(1, in.size());
+            checkRecoveredMessages(in);
+            
+            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            assertEquals(1, seqs.size());
+            rseq = seqs.iterator().next();
+            assertTrue(rseq.isAcknowledged(1));
+            assertFalse(rseq.isAcknowledged(10));
+            
+            EasyMock.expect(seq.getIdentifier()).andReturn(sid1).anyTimes();
+            EasyMock.expect(seq.getAcknowledgment()).andReturn(ack2);        
+            EasyMock.expect(seq.getAcksTo()).andReturn(epr);        
+
+            control.replay();
+            store.persistIncoming(seq, null);
+            control.reset();
+
+            seqs = store.getDestinationSequences(SERVER_ENDPOINT_ID, ProtocolVariation.RM10WSA200408);
+            assertEquals(1, seqs.size());
+            rseq = seqs.iterator().next();
+            assertTrue(rseq.isAcknowledged(10));
+            
+        } finally {
+            if (null != sid1) {
+                store.removeDestinationSequence(sid1);
+            }
+            Collection<Long> msgNrs = new ArrayList<Long>();
+            msgNrs.add(ONE);
+            store.removeMessages(sid1, msgNrs, false);
+        }
+    }
     
     private Identifier setupDestinationSequence(String s) throws IOException, SQLException {
         DestinationSequence seq = control.createMock(DestinationSequence.class);
@@ -650,12 +780,7 @@ public class RMTxStoreTest extends Assert {
     
     private void setupMessage(Identifier sid, Long mn, String to, boolean outbound) 
         throws IOException, SQLException  {
-        RMMessage msg = control.createMock(RMMessage.class);
-        EasyMock.expect(msg.getMessageNumber()).andReturn(mn);
-        EasyMock.expect(msg.getTo()).andReturn(to);
-        byte[] value = ("Message " + mn.longValue()).getBytes();
-        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(value));
-        EasyMock.expect(msg.getSize()).andReturn((long)value.length);
+        RMMessage msg = createRMMessage(mn, to);
         
         control.replay();
         store.beginTransaction();
@@ -663,7 +788,34 @@ public class RMTxStoreTest extends Assert {
         store.commit();
         control.reset();
     }
+
+    private void setupOutboundMessage(SourceSequence seq, long mn, String to) 
+        throws IOException, SQLException  {
+        RMMessage msg = createRMMessage(ONE, to);
+        control.replay();
+        store.persistOutgoing(seq, msg);
+        control.reset();
+    }
+
+    private void setupInboundMessage(DestinationSequence seq, long mn, String to)
+        throws IOException, SQLException  {
+        RMMessage msg = createRMMessage(ONE, to);
+        control.replay();
+        store.persistIncoming(seq, msg);
+        control.reset();
+    }
     
+    private RMMessage createRMMessage(Long mn, String to) throws IOException {
+        RMMessage msg = control.createMock(RMMessage.class);
+        EasyMock.expect(msg.getMessageNumber()).andReturn(mn);
+        EasyMock.expect(msg.getTo()).andReturn(to);
+        byte[] value = ("Message " + mn.longValue()).getBytes();
+        EasyMock.expect(msg.getInputStream()).andReturn(new ByteArrayInputStream(value));
+        EasyMock.expect(msg.getSize()).andReturn((long)value.length);
+        EasyMock.expect(msg.getCachedOutputStream()).andReturn(new CachedOutputStream()).anyTimes();
+        return msg;
+    }
+
     private void checkRecoveredDestinationSequences(Collection<DestinationSequence> seqs) {
         
         for (DestinationSequence recovered : seqs) {
