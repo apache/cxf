@@ -34,6 +34,11 @@
         <version>2.6.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.osgi.import>
+            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+        </cxf.osgi.import>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -52,6 +57,8 @@
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <version>${cxf.servlet-api.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <!--test dependencies-->
         <dependency>
