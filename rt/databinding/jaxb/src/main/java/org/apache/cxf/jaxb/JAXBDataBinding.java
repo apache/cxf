@@ -20,12 +20,12 @@
 package org.apache.cxf.jaxb;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,6 +57,8 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import org.xml.sax.InputSource;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
@@ -72,7 +74,6 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentSchemaValidationHack;
@@ -84,6 +85,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.ObjectFactory;
 
 @NoJSR250Annotations
@@ -106,17 +108,41 @@ public class JAXBDataBinding extends AbstractDataBinding
                                                                                Node.class,
                                                                                XMLEventWriter.class,
                                                                                XMLStreamWriter.class};
-
+    
+    private static class DelayedDOMResult extends DOMResult {
+        private final URL resource;
+        private final String publicId;
+        public DelayedDOMResult(URL url, String sysId, String pId) {
+            super(null, sysId);
+            resource = url;
+            publicId = pId;
+        }
+        public synchronized Node getNode() {
+            Node nd = super.getNode();
+            if (nd == null) {
+                try {
+                    InputSource src = new InputSource(resource.openStream());
+                    src.setSystemId(this.getSystemId());
+                    src.setPublicId(publicId);
+                    Document doc = StaxUtils.read(src);
+                    setNode(doc);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            return nd;
+        }
+    }
     private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
     static {
         URIResolver resolver = new URIResolver();
         try {
             resolver.resolve("", "classpath:/schemas/wsdl/ws-addr-wsdl.xsd", JAXBDataBinding.class);
             if (resolver.isResolved()) {
-                InputStream ins = resolver.getInputStream();
-                Document doc = XMLUtils.parse(ins);
-                ins.close();
-                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/ws-addr-wsdl.xsd");
+                resolver.getInputStream().close();
+                DOMResult dr = new DelayedDOMResult(resolver.getURL(),
+                                                    "classpath:/schemas/wsdl/ws-addr-wsdl.xsd",
+                                                    "http://www.w3.org/2005/02/addressing/wsdl");
                 BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/02/addressing/wsdl", dr);
                 resolver.unresolve();
             }
@@ -126,10 +152,10 @@ public class JAXBDataBinding extends AbstractDataBinding
         try {
             resolver.resolve("", "classpath:/schemas/wsdl/ws-addr.xsd", JAXBDataBinding.class);
             if (resolver.isResolved()) {
-                InputStream ins = resolver.getInputStream();
-                Document doc = XMLUtils.parse(ins);
-                ins.close();
-                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/ws-addr.xsd");
+                resolver.getInputStream().close();
+                DOMResult dr = new DelayedDOMResult(resolver.getURL(),
+                                                    "classpath:/schemas/wsdl/ws-addr.xsd",
+                                                    "http://www.w3.org/2005/08/addressing");
                 BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/08/addressing", dr);
                 resolver.unresolve();
             }
@@ -139,10 +165,10 @@ public class JAXBDataBinding extends AbstractDataBinding
         try {
             resolver.resolve("", "classpath:/schemas/wsdl/wsrm.xsd", JAXBDataBinding.class);
             if (resolver.isResolved()) {
-                InputStream ins = resolver.getInputStream();
-                Document doc = XMLUtils.parse(ins);
-                ins.close();
-                DOMResult dr = new DOMResult(doc, "classpath:/schemas/wsdl/wsrm.xsd");
+                resolver.getInputStream().close();
+                DOMResult dr = new DelayedDOMResult(resolver.getURL(),
+                                                    "classpath:/schemas/wsdl/wsrm.xsd",
+                                                    "http://schemas.xmlsoap.org/ws/2005/02/rm");
                 BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
                 resolver.unresolve();
             }
