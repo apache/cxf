@@ -40,6 +40,7 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -53,6 +54,7 @@ import org.apache.ws.security.util.UUIDGenerator;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.utils.EncryptionConstants;
 
 public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
@@ -106,20 +108,34 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         Document encryptedDataDoc = DOMUtils.createDocument();
         Element encryptedDataElement = createEncryptedDataElement(encryptedDataDoc);
         if (encryptSymmetricKey) {
-            CryptoLoader loader = new CryptoLoader();
-            Crypto crypto = loader.getCrypto(message, 
-                                      SecurityConstants.ENCRYPT_CRYPTO,
-                                      SecurityConstants.ENCRYPT_PROPERTIES);
+            X509Certificate receiverCert = null;
             
-            String user = 
-                SecurityUtils.getUserName(message, crypto, SecurityConstants.ENCRYPT_USERNAME);
-            if (StringUtils.isEmpty(user)) {
-                return null;
+            String userName = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+            if (userName != null 
+                && SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
+                && !MessageUtils.isRequestor(message)) {
+                XMLSignature sig = message.getExchange().getInMessage().getContent(XMLSignature.class);
+                if (sig != null) {
+                    receiverCert = sig.getKeyInfo().getX509Certificate(); 
+                }
+            } else {
+                CryptoLoader loader = new CryptoLoader();
+                Crypto crypto = loader.getCrypto(message, 
+                                          SecurityConstants.ENCRYPT_CRYPTO,
+                                          SecurityConstants.ENCRYPT_PROPERTIES);
+                
+                userName = SecurityUtils.getUserName(crypto, userName);
+                if (StringUtils.isEmpty(userName)) {
+                    throw new WSSecurityException("User name is not available");
+                }
+                receiverCert = getReceiverCertificateFromCrypto(crypto, userName);
             }
-            X509Certificate cert = getReceiverCertificate(crypto, user);
-            byte[] encryptedSecretKey = encryptSymmetricKey(secretKey, cert, crypto);
+            if (receiverCert == null) {
+                throw new WSSecurityException("Receiver certificate is not available");
+            }
 
-            addEncryptedKeyElement(encryptedDataElement, cert, encryptedSecretKey);
+            byte[] encryptedSecretKey = encryptSymmetricKey(secretKey, receiverCert);
+            addEncryptedKeyElement(encryptedDataElement, receiverCert, encryptedSecretKey);
         }
                
         // encrypt payloadDoc
@@ -150,7 +166,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         return symmetricKey.getEncoded();
     }
     
-    private X509Certificate getReceiverCertificate(Crypto crypto, String user) throws Exception {
+    private X509Certificate getReceiverCertificateFromCrypto(Crypto crypto, String user) throws Exception {
         X509Certificate[] certs = SecurityUtils.getCertificates(crypto, user);
         return certs[0];
     }
@@ -183,8 +199,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     // Apache Security XMLCipher does not support 
     // Certificates for encrypting the keys
     protected byte[] encryptSymmetricKey(byte[] keyBytes, 
-                                         X509Certificate remoteCert,
-                                         Crypto crypto) throws WSSecurityException {
+                                         X509Certificate remoteCert) throws WSSecurityException {
         Cipher cipher = 
             EncryptionUtils.initCipherWithCert(
                 keyEncAlgo, digestAlgo, Cipher.ENCRYPT_MODE, remoteCert

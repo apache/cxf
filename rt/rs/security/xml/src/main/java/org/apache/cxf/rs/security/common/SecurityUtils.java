@@ -34,6 +34,7 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
@@ -45,9 +46,19 @@ public final class SecurityUtils {
     
     public static final String X509_KEY = "X509_KEY";
     public static final String X509_ISSUER_SERIAL = "X509_ISSUER_SERIAL";
+    public static final String USE_REQUEST_SIGNATURE_CERT = "useReqSigCert";
     
     private SecurityUtils() {
         
+    }
+    
+    public static boolean isSignedAndEncryptedTwoWay(Message m) {
+        Message outMessage = m.getExchange().getOutMessage();
+        Message requestMessage = outMessage != null && MessageUtils.isRequestor(outMessage) 
+            ? outMessage : m;
+        return "POST".equals((String)requestMessage.get(Message.HTTP_REQUEST_METHOD))
+            && m.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES) != null 
+            && m.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES) != null;
     }
     
     public static X509Certificate loadX509Certificate(Crypto crypto, Element certNode) 
@@ -90,14 +101,18 @@ public final class SecurityUtils {
     
     public static String getUserName(Message message, Crypto crypto, String userNameKey) {
         String user = (String)message.getContextualProperty(userNameKey);
-        if (crypto != null && StringUtils.isEmpty(user)) {
+        return getUserName(crypto, user);
+    }
+    
+    public static String getUserName(Crypto crypto, String userName) {
+        if (crypto != null && StringUtils.isEmpty(userName)) {
             try {
-                user = crypto.getDefaultX509Identifier();
+                userName = crypto.getDefaultX509Identifier();
             } catch (WSSecurityException e1) {
                 throw new Fault(e1);
             }
         }
-        return user;
+        return userName;
     }
     
     public static String getPassword(Message message, String userName, 

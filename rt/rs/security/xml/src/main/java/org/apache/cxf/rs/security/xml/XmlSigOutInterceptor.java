@@ -103,16 +103,10 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         Crypto crypto = loader.getCrypto(message, 
                                          SecurityConstants.SIGNATURE_CRYPTO,
                                          SecurityConstants.SIGNATURE_PROPERTIES);
-        if (crypto == null) {
-            crypto = loader.getCrypto(message, 
-                                      SecurityConstants.ENCRYPT_CRYPTO,
-                                      SecurityConstants.ENCRYPT_PROPERTIES);
-            userNameKey = SecurityConstants.ENCRYPT_USERNAME;
-        }
         String user = SecurityUtils.getUserName(message, crypto, userNameKey);
          
-        if (StringUtils.isEmpty(user)) {
-            return null;
+        if (StringUtils.isEmpty(user) || SecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(user)) {
+            throw new WSSecurityException("User name is not available");
         }
 
         String password = 
