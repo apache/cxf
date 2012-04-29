@@ -32,6 +32,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
+import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.common.TrustValidator;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -71,17 +72,20 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             throwFault("XML Signature is not available", null);
         }
         
+        String cryptoKey = null; 
+        String propKey = null;
+        if (SecurityUtils.isSignedAndEncryptedTwoWay(message)) {
+            cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
+            propKey = SecurityConstants.ENCRYPT_PROPERTIES;
+        } else {
+            cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
+            propKey = SecurityConstants.SIGNATURE_PROPERTIES;    
+        }
+        
         Crypto crypto = null;
         try {
             CryptoLoader loader = new CryptoLoader();
-            crypto = loader.getCrypto(message, 
-                               SecurityConstants.SIGNATURE_CRYPTO,
-                               SecurityConstants.SIGNATURE_PROPERTIES);
-            if (crypto == null) {
-                crypto = loader.getCrypto(message, 
-                                   SecurityConstants.ENCRYPT_CRYPTO,
-                                   SecurityConstants.ENCRYPT_PROPERTIES);
-            }
+            crypto = loader.getCrypto(message, cryptoKey, propKey);
         } catch (Exception ex) {
             throwFault("Crypto can not be loaded", ex);
         }

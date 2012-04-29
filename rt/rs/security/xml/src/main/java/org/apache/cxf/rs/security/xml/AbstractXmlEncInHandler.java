@@ -87,11 +87,20 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
     
     // Subclasses can overwrite it and return the bytes, assuming they know the actual key
     protected byte[] getSymmetricKeyBytes(Message message, Element encDataElement) {
+        
+        String cryptoKey = null; 
+        String propKey = null;
+        if (SecurityUtils.isSignedAndEncryptedTwoWay(message)) {
+            cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
+            propKey = SecurityConstants.SIGNATURE_PROPERTIES;
+        } else {
+            cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
+            propKey = SecurityConstants.ENCRYPT_PROPERTIES;
+        }
+        
         Crypto crypto = null;
         try {
-            crypto = new CryptoLoader().getCrypto(message,
-                               SecurityConstants.ENCRYPT_CRYPTO,
-                               SecurityConstants.ENCRYPT_PROPERTIES);
+            crypto = new CryptoLoader().getCrypto(message, cryptoKey, propKey);
         } catch (Exception ex) {
             throwFault("Crypto can not be loaded", ex);
         }

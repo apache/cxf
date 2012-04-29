@@ -123,22 +123,22 @@ under the License.
           <ref bean="xmlSigHandler"/>
        </jaxrs:providers> 
        <jaxrs:outInterceptors>
+          <ref bean="xmlSigOutHandler"/>
           <ref bean="xmlEncOutHandler"/>
        </jaxrs:outInterceptors>
        <jaxrs:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
            <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
            <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>       
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>       
        </jaxrs:properties> 
      
     </jaxrs:server>
-
-    <!-- Encryption properties are shared by encryption and signature handlers -->     
+    
     <jaxrs:server 
-       address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsec2"> 
+       address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsec-useReqSigCert"> 
        <jaxrs:serviceBeans>
           <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
@@ -147,15 +147,20 @@ under the License.
           <ref bean="xmlSigHandler"/>
        </jaxrs:providers> 
        <jaxrs:outInterceptors>
+          <ref bean="xmlSigOutHandler"/>
           <ref bean="xmlEncOutHandler"/>
        </jaxrs:outInterceptors>
        <jaxrs:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+               value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
            <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>       
+           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
        </jaxrs:properties> 
      
     </jaxrs:server>
 
+    
 </beans>
