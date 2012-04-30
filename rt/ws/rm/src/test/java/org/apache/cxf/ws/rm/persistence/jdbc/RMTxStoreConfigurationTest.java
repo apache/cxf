@@ -22,6 +22,8 @@ package org.apache.cxf.ws.rm.persistence.jdbc;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -110,6 +112,10 @@ public class RMTxStoreConfigurationTest extends Assert {
         public Connection getConnection(String username, String password) throws SQLException {
             // avoid creating a connection and tables at RMTxStore.init()
             throw new SQLException("test");
+        }
+
+        public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+            return null;
         }
     }
 }
