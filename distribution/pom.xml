@@ -379,8 +379,8 @@
             <artifactId>jettison</artifactId>
         </dependency>
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
+            <groupId>${cxf.asm.groupId}</groupId>
+            <artifactId>${cxf.asm.artifactId}</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>

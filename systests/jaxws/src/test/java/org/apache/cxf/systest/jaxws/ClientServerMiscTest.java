@@ -409,7 +409,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
 
     private void setASM(boolean b) throws Exception {
-        Field f = ASMHelper.class.getDeclaredField("oldASM");
+        Field f = ASMHelper.class.getDeclaredField("badASM");
         f.setAccessible(true);
         f.set(null, !b);
     }

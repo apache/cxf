@@ -41,11 +41,6 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.UnwrappedOperationInfo;
 import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 public class TypeClassInitializer extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getL7dLogger(TypeClassInitializer.class);
@@ -215,29 +210,29 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                 mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
                                     "(Ljava/lang/String;" + beanClassCode + ")V", null, null);
                 mv.visitCode();
-                mv.visitLabel(new Label());
+                mv.visitLabel(createLabel());
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitVarInsn(Opcodes.ALOAD, 1);
                 mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Exception",
                                    "<init>", "(Ljava/lang/String;)V");
-                mv.visitLabel(new Label());
+                mv.visitLabel(createLabel());
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitVarInsn(Opcodes.ALOAD, 2);
                 mv.visitFieldInsn(Opcodes.PUTFIELD, newClassName, "faultInfo", beanClassCode);
-                mv.visitLabel(new Label());
+                mv.visitLabel(createLabel());
                 mv.visitInsn(Opcodes.RETURN);
-                mv.visitLabel(new Label());
+                mv.visitLabel(createLabel());
                 mv.visitMaxs(2, 3);
                 mv.visitEnd();
 
                 mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getFaultInfo", 
                                     "()" + beanClassCode, null, null);
                 mv.visitCode();
-                mv.visitLabel(new Label());
+                mv.visitLabel(createLabel());
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, newClassName, "faultInfo", beanClassCode);
                 mv.visitInsn(Opcodes.ARETURN);
-                mv.visitLabel(new Label());
+                mv.visitLabel(createLabel());
                 mv.visitMaxs(1, 1);
                 mv.visitEnd();
 

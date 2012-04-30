@@ -93,8 +93,8 @@
 
 
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
+            <groupId>${cxf.asm.groupId}</groupId>
+            <artifactId>${cxf.asm.artifactId}</artifactId>
             <scope>test</scope>
         </dependency>
 

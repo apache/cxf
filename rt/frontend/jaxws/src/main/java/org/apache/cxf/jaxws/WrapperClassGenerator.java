@@ -55,12 +55,6 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 public final class WrapperClassGenerator extends ASMHelper {
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
@@ -225,12 +219,12 @@ public final class WrapperClassGenerator extends ASMHelper {
         // add constructor
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
-        Label lbegin = new Label();
+        Label lbegin = createLabel();
         mv.visitLabel(lbegin);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
         mv.visitInsn(Opcodes.RETURN);
-        Label lend = new Label();
+        Label lend = createLabel();
         mv.visitLabel(lend);
         mv.visitLocalVariable("this", "L" + classFileName + ";", null, lbegin, lend, 0);
         mv.visitMaxs(1, 1);
@@ -268,13 +262,11 @@ public final class WrapperClassGenerator extends ASMHelper {
         if (clz.getPackage() != null && clz.getPackage().getAnnotations() != null) {
             for (Annotation ann : clz.getPackage().getAnnotations()) {
                 if (ann instanceof XmlJavaTypeAdapters) {
-                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapters;",
-                                             true);
+                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapters;", true);
                     generateXmlJavaTypeAdapters(av0, (XmlJavaTypeAdapters)ann);
                     av0.visitEnd();
                 } else if (ann instanceof XmlJavaTypeAdapter) {
-                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;",
-                                             true);
+                    av0 = cw.visitAnnotation("Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;", true);
                     generateXmlJavaTypeAdapter(av0, (XmlJavaTypeAdapter)ann);
                     av0.visitEnd();
                 }
@@ -298,14 +290,15 @@ public final class WrapperClassGenerator extends ASMHelper {
     }
     private void generateXmlJavaTypeAdapter(AnnotationVisitor av, XmlJavaTypeAdapter adapter) {
         if (adapter.value() != null) {
-            av.visit("value", org.objectweb.asm.Type.getType(getClassCode(adapter.value())));
+            av.visit("value", getType(getClassCode(adapter.value())));
         }
         if (adapter.type() != javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT.class) {
-            av.visit("type", org.objectweb.asm.Type.getType(getClassCode(adapter.type())));
+            av.visit("type", getType(getClassCode(adapter.type())));
         }
     }
     
-    private void generateMessagePart(ClassWriter cw, MessagePartInfo mpi, Method method, String className) {
+    private void generateMessagePart(ClassWriter cw, MessagePartInfo mpi,
+                                     Method method, String className) {
         if (Boolean.TRUE.equals(mpi.getProperty(ReflectionServiceFactoryBean.HEADER))) {
             return;
         }
@@ -331,7 +324,7 @@ public final class WrapperClassGenerator extends ASMHelper {
             if (Collection.class.isAssignableFrom(clz) || clz.isArray()) {
                 ParameterizedType ptype = (ParameterizedType)genericType;
 
-                Type[] types = ptype.getActualTypeArguments();
+                java.lang.reflect.Type[] types = ptype.getActualTypeArguments();
                 // TODO: more complex Parameterized type
                 if (types.length > 0) {
                     if (types[0] instanceof Class) {
@@ -383,7 +376,7 @@ public final class WrapperClassGenerator extends ASMHelper {
 
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitFieldInsn(Opcodes.GETFIELD, classFileName, fieldName, classCode);
-        mv.visitInsn(org.objectweb.asm.Type.getType(classCode).getOpcode(Opcodes.IRETURN));
+        mv.visitInsn(getType(classCode).getOpcode(Opcodes.IRETURN));
         mv.visitMaxs(0, 0);
         mv.visitEnd();
         
@@ -392,7 +385,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                             fieldDescriptor == null ? null : "(" + fieldDescriptor + ")V", null);
         mv.visitCode();
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        org.objectweb.asm.Type setType = org.objectweb.asm.Type.getType(classCode);
+        ASMType setType = getType(classCode);
         mv.visitVarInsn(setType.getOpcode(Opcodes.ILOAD), 1);
         mv.visitFieldInsn(Opcodes.PUTFIELD, className, fieldName, classCode);       
         mv.visitInsn(Opcodes.RETURN);

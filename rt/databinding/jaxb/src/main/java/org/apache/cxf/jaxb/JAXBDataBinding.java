@@ -796,14 +796,8 @@ public class JAXBDataBinding extends AbstractDataBinding
     private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method setMethods[],
                                                       Method getMethods[], Method jaxbMethods[],
                                                       Field fields[], Object objectFactory) {
-        try {
-            Class.forName("org.objectweb.asm.ClassWriter");
-            return WrapperHelperCompiler.compileWrapperHelper(wrapperType, setMethods, getMethods,
-                                                              jaxbMethods, fields, objectFactory);
-        } catch (ClassNotFoundException e) {
-            // ASM not found, just use reflection based stuff
-        }
-        return null;
+        return WrapperHelperCompiler.compileWrapperHelper(wrapperType, setMethods, getMethods,
+                                                          jaxbMethods, fields, objectFactory);
     }
 
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {

@@ -68,8 +68,8 @@
         </dependency>
 
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
+            <groupId>${cxf.asm.groupId}</groupId>
+            <artifactId>${cxf.asm.artifactId}</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>

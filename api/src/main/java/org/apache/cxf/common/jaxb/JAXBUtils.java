@@ -70,6 +70,11 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ASMHelper.ClassWriter;
+import org.apache.cxf.common.util.ASMHelper.FieldVisitor;
+import org.apache.cxf.common.util.ASMHelper.Label;
+import org.apache.cxf.common.util.ASMHelper.MethodVisitor;
+import org.apache.cxf.common.util.ASMHelper.Opcodes;
 import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
@@ -78,11 +83,6 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.JavaUtils;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
 
 public final class JAXBUtils {
@@ -1064,24 +1064,24 @@ public final class JAXBUtils {
                             "(Ljava/util/Map;)V", 
                             "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V", null);
         mv.visitCode();
-        Label l0 = new Label();
+        Label l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(30, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
                            "com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper", "<init>", "()V");
-        Label l1 = new Label();
+        Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(31, l1);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitFieldInsn(Opcodes.PUTFIELD, "org/apache/cxf/jaxb/NamespaceMapperInternal",
                           "nspref", "Ljava/util/Map;");
-        Label l2 = new Label();
+        Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLineNumber(32, l2);
         mv.visitInsn(Opcodes.RETURN);
-        Label l3 = new Label();
+        Label l3 = helper.createLabel();
         mv.visitLabel(l3);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapperInternal;", null, l0, l3, 0);
         mv.visitLocalVariable("nspref", "Ljava/util/Map;",
@@ -1094,7 +1094,7 @@ public final class JAXBUtils {
                             "(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;",
                             null, null);
         mv.visitCode();
-        l0 = new Label();
+        l0 = helper.createLabel();
         mv.visitLabel(l0);
         mv.visitLineNumber(38, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -1106,13 +1106,13 @@ public final class JAXBUtils {
                            "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
         mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
         mv.visitVarInsn(Opcodes.ASTORE, 4);
-        l1 = new Label();
+        l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(39, l1);
         mv.visitVarInsn(Opcodes.ALOAD, 4);
-        l2 = new Label();
+        l2 = helper.createLabel();
         mv.visitJumpInsn(Opcodes.IFNULL, l2);
-        l3 = new Label();
+        l3 = helper.createLabel();
         mv.visitLabel(l3);
         mv.visitLineNumber(40, l3);
         mv.visitVarInsn(Opcodes.ALOAD, 4);
@@ -1121,7 +1121,7 @@ public final class JAXBUtils {
         mv.visitLineNumber(42, l2);
         mv.visitVarInsn(Opcodes.ALOAD, 2);
         mv.visitInsn(Opcodes.ARETURN);
-        Label l4 = new Label();
+        Label l4 = helper.createLabel();
         mv.visitLabel(l4);
         mv.visitLocalVariable("this", "Lorg/apache/cxf/jaxb/NamespaceMapperInternal;", null, l0, l4, 0);
         mv.visitLocalVariable("namespaceUri", "Ljava/lang/String;", null, l0, l4, 1);
