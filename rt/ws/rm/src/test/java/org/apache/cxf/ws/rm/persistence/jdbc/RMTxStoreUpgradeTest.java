@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
 import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -134,6 +135,24 @@ public class RMTxStoreUpgradeTest extends Assert {
             upgraded = true;
         }
         
+        @Override
+        public synchronized void init() {
+            if (upgraded) {
+                super.init();
+            } else {
+                // just create the old tables
+                try {
+                    setConnection(DriverManager.getConnection(getUrl()));
+                    createTables();
+                } catch (SQLException e) {
+                    // ignore this error
+                }
+                
+            }
+        }
+
+
+
         @Override
         protected void createTables() throws SQLException {
             if (upgraded) {
