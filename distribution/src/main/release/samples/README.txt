@@ -11,7 +11,7 @@ Kit (JDK) 5.0 or later.
 
 Most of the samples are built using Apache Maven, version 2.2.x or
 later.  You can build the Mavenized samples all at once by running 
-"mvn build install" from the samples root folder or by running
+"mvn clean install" from the samples root folder or by running
 the same command within individual sample folders.  For running
 each sample, follow the READMEs located in each sample's folder.
 
