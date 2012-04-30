@@ -66,9 +66,39 @@ under the License.
     </httpj:engine-factory>
     
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
-    <bean id="xmlSigHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler"/>
+    
+    <bean id="sigProps" class="org.apache.cxf.rs.security.xml.SignatureProperties">
+       <property name="signatureAlgo" 
+                 value="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+       <property name="signatureDigestAlgo" 
+                 value="http://www.w3.org/2000/09/xmldsig#sha1"/>
+       <property name="signatureC14Method" 
+                 value="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+       <property name="signatureC14Transform" 
+                 value="http://www.w3.org/2001/10/xml-exc-c14n#"/>                                                  
+    </bean>
+    
+    <bean id="encProps" class="org.apache.cxf.rs.security.xml.EncryptionProperties">
+       <property name="encryptionKeyTransportAlgo" 
+                 value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+       <property name="encryptionSymmetricKeyAlgo" 
+                 value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+    </bean>
+    
+    <bean id="xmlSigInHandler" class="org.apache.cxf.rs.security.xml.XmlSigInHandler"/>
+    
+    <bean id="xmlSigInHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSigInHandler">
+        <property name="signatureProperties" ref="sigProps"/>
+    </bean>
+    
     <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor"/>
-    <bean id="xmlEncHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
+    <bean id="xmlEncInHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
+    
+    <bean id="xmlEncInHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlEncInHandler">
+        <property name="encryptionProperties" ref="encProps"/>
+    </bean>
+    
+    
     <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
         <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
     </bean>
@@ -79,7 +109,7 @@ under the License.
           <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
-          <ref bean="xmlSigHandler"/>
+          <ref bean="xmlSigInHandler"/>
        </jaxrs:providers> 
        <jaxrs:outInterceptors>
           <ref bean="xmlSigOutHandler"/>
@@ -99,7 +129,7 @@ under the License.
           <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
-          <ref bean="xmlEncHandler"/>
+          <ref bean="xmlEncInHandler"/>
        </jaxrs:providers>
        <jaxrs:outInterceptors>
           <ref bean="xmlEncOutHandler"/>
@@ -119,8 +149,32 @@ under the License.
           <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
-          <ref bean="xmlEncHandler"/>
-          <ref bean="xmlSigHandler"/>
+          <ref bean="xmlEncInHandler"/>
+          <ref bean="xmlSigInHandler"/>
+       </jaxrs:providers> 
+       <jaxrs:outInterceptors>
+          <ref bean="xmlSigOutHandler"/>
+          <ref bean="xmlEncOutHandler"/>
+       </jaxrs:outInterceptors>
+       <jaxrs:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>       
+       </jaxrs:properties> 
+     
+    </jaxrs:server>
+    
+    <jaxrs:server 
+       address="https://localhost:${testutil.ports.jaxrs-xmlsec}/xmlsec-validate"> 
+       <jaxrs:serviceBeans>
+          <ref bean="serviceBean"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:providers>
+          <ref bean="xmlEncInHandlerWithProps"/>
+          <ref bean="xmlSigInHandlerWithProps"/>
        </jaxrs:providers> 
        <jaxrs:outInterceptors>
           <ref bean="xmlSigOutHandler"/>
@@ -143,8 +197,8 @@ under the License.
           <ref bean="serviceBean"/>
        </jaxrs:serviceBeans>
        <jaxrs:providers>
-          <ref bean="xmlEncHandler"/>
-          <ref bean="xmlSigHandler"/>
+          <ref bean="xmlEncInHandler"/>
+          <ref bean="xmlSigInHandler"/>
        </jaxrs:providers> 
        <jaxrs:outInterceptors>
           <ref bean="xmlSigOutHandler"/>
