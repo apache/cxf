@@ -45,7 +45,7 @@ import org.apache.xml.security.utils.Constants;
 public final class SecurityUtils {
     
     public static final String X509_CERT = "X509Certificate";
-    public static final String X509_ISSUER_SERIAL = "X509IssuerCerial";
+    public static final String X509_ISSUER_SERIAL = "X509IssuerSerial";
     public static final String USE_REQUEST_SIGNATURE_CERT = "useReqSigCert";
     
     private SecurityUtils() {
