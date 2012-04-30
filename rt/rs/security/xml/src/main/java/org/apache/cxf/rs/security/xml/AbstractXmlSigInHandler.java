@@ -41,6 +41,7 @@ import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.Reference;
+import org.apache.xml.security.signature.SignedInfo;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transform;
 import org.apache.xml.security.transforms.Transforms;
@@ -50,6 +51,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
     
     private boolean removeSignature = true;
     private boolean persistSignature = true;
+    private SignatureProperties sigProps;
     
     public void setRemoveSignature(boolean remove) {
         this.removeSignature = remove;
@@ -92,7 +94,20 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         boolean valid = false;
         Reference ref = null;
         try {
-            XMLSignature signature = new XMLSignature(signatureElement, "", true);  
+            XMLSignature signature = new XMLSignature(signatureElement, "", true);
+            
+            if (sigProps != null) {
+                SignedInfo sInfo = signature.getSignedInfo();
+                if (sigProps.getSignatureAlgo() != null
+                    && !sigProps.getSignatureAlgo().equals(sInfo.getSignatureMethodURI())) {
+                    throwFault("Signature Algorithm is not supported", null);
+                }
+                if (sigProps.getSignatureC14Method() != null
+                    && !sigProps.getSignatureC14Method().equals(sInfo.getCanonicalizationMethodURI())) {
+                    throwFault("Signature Algorithm is not supported", null);
+                }
+            }
+            
             ref = getReference(signature);
             Element signedElement = validateReference(root, ref);
             if (signedElement.hasAttributeNS(null, "ID")) {
@@ -204,21 +219,35 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         } catch (XMLSecurityException ex) {
             throwFault("Signature transforms can not be obtained", ex);
         }
-        if (enveloped) {
-            boolean isEnveloped = false;
-            for (int i = 0; i < transforms.getLength(); i++) {
-                try {
-                    Transform tr = transforms.item(i);
-                    if (Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(tr.getURI())) {
-                        isEnveloped = true;
-                        break;
-                    }
-                } catch (Exception ex) {
-                    throwFault("Problem accessing Transform instance", ex);    
-                }
+        
+        boolean c14TransformConfirmed = false;
+        String c14TransformExpected = sigProps != null ? sigProps.getSignatureC14Transform() : null;
+        boolean envelopedConfirmed = false;
+        for (int i = 0; i < transforms.getLength(); i++) {
+            try {
+                Transform tr = transforms.item(i);
+                if (Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(tr.getURI())) {
+                    envelopedConfirmed = true;
+                } else if (c14TransformExpected != null && c14TransformExpected.equals(tr.getURI())) {
+                    c14TransformConfirmed = true;
+                } 
+            } catch (Exception ex) {
+                throwFault("Problem accessing Transform instance", ex);    
             }
-            if (!isEnveloped) {
-                throwFault("Only enveloped signatures are currently supported", null);
+        }
+        if (enveloped && !envelopedConfirmed) {
+            throwFault("Only enveloped signatures are currently supported", null);
+        }
+        if (c14TransformExpected != null && !c14TransformConfirmed) {
+            throwFault("Transform Canonicalization is not supported", null);
+        }
+        
+        if (sigProps != null && sigProps.getSignatureDigestAlgo() != null) {
+            Element dm = 
+                DOMUtils.getFirstChildWithName(ref.getElement(), Constants.SignatureSpecNS, "DigestMethod");
+            if (dm != null && !dm.getAttribute("Algorithm").equals(
+                sigProps.getSignatureDigestAlgo())) {
+                throwFault("Signature Digest Algorithm is not supported", null);
             }
         }
         return signedEl;
@@ -309,4 +338,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         return foundElement;
     }
     
+    public void setSignatureProperties(SignatureProperties properties) {
+        this.sigProps = properties;
+    }
 }

@@ -80,7 +80,7 @@ public abstract class AbstractXmlSecInHandler {
     
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
-        Response response = Response.status(401).entity(error).build();
+        Response response = Response.status(400).entity(error).build();
         throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
     }
 
@@ -91,4 +91,5 @@ public abstract class AbstractXmlSecInHandler {
         } 
         return null;
     }
+    
 }
