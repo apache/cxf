@@ -22,6 +22,7 @@ public class EncryptionProperties {
     private String encryptionKeyTransportAlgo;
     private String encryptionSymmetricKeyAlgo;
     private String encryptionDigestAlgo;
+    private String encryptionKeyIdType;
     
     public void setEncryptionKeyTransportAlgo(String encryptionKeyTransportAlgo) {
         this.encryptionKeyTransportAlgo = encryptionKeyTransportAlgo;
@@ -40,6 +41,12 @@ public class EncryptionProperties {
     }
     public String getEncryptionDigestAlgo() {
         return encryptionDigestAlgo;
+    }
+    public void setEncryptionKeyIdType(String encryptionKeyIdType) {
+        this.encryptionKeyIdType = encryptionKeyIdType;
+    }
+    public String getEncryptionKeyIdType() {
+        return encryptionKeyIdType;
     }
     
 }
