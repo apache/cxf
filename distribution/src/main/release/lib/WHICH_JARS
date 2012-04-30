@@ -84,10 +84,6 @@ For SAML support in WS-Security
 - openws.jar
 - xmltooling.jar
 
-For HTTP Binding support:
-- jra.jar
-- jettison.jar (Needed for JSON services only)
-
 For JAX-RS support:
 - abdera*  (optional: for AtomPub support, but also needed for the 
             Management log browser console)
