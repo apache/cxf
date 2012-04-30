@@ -13,7 +13,7 @@ All of the samples (with the exception of the "antbuild" sample,
 which shows how to manage a project using Ant as the buildtool)
 are built using Apache Maven, version 2.2.x or 3.x.  You can 
 build the Mavenized samples all at once by running 
-"mvn build install" from the samples root folder or by running
+"mvn clean install" from the samples root folder or by running
 the same command within individual sample folders.  For running
 each sample, follow the READMEs located in each sample's folder.
 
