@@ -170,22 +170,27 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
          * 
          */
         
-        Element certNode = getNode(encKeyElement, 
-                                   Constants.SignatureSpecNS, "X509Certificate", 0);
-        if (certNode != null) {
-            try {
-                return SecurityUtils.loadX509Certificate(crypto, certNode);
-            } catch (Exception ex) {
-                throwFault("X509Certificate can not be created", ex);
+        String keyIdentifierType = encProps != null ? encProps.getEncryptionKeyIdType() : null;
+        if (keyIdentifierType == null || keyIdentifierType.equals(SecurityUtils.X509_CERT)) {
+            Element certNode = getNode(encKeyElement, 
+                                       Constants.SignatureSpecNS, "X509Certificate", 0);
+            if (certNode != null) {
+                try {
+                    return SecurityUtils.loadX509Certificate(crypto, certNode);
+                } catch (Exception ex) {
+                    throwFault("X509Certificate can not be created", ex);
+                }
             }
         }
-        certNode = getNode(encKeyElement, 
-                Constants.SignatureSpecNS, "X509IssuerSerial", 0);
-        if (certNode != null) {
-            try {
-                return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
-            } catch (Exception ex) {
-                throwFault("X509Certificate can not be created", ex);
+        if (keyIdentifierType == null || keyIdentifierType.equals(SecurityUtils.X509_ISSUER_SERIAL)) {
+            Element certNode = getNode(encKeyElement, 
+                    Constants.SignatureSpecNS, "X509IssuerSerial", 0);
+            if (certNode != null) {
+                try {
+                    return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
+                } catch (Exception ex) {
+                    throwFault("X509Certificate can not be created", ex);
+                }
             }
         }
         throwFault("Certificate is missing", null);

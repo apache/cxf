@@ -68,7 +68,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     private SecretKey symmetricKey;
     private String keyEncAlgo = XMLCipher.RSA_OAEP; 
     private String symEncAlgo = XMLCipher.AES_256;
-    private String keyIdentifierType = SecurityUtils.X509_KEY;
+    private String keyIdentifierType = SecurityUtils.X509_CERT;
     private String digestAlgo;
     
     public XmlEncOutInterceptor() {
@@ -286,7 +286,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             );
         
         Node keyIdentifierNode = null; 
-        if (keyIdentifierType.equals(SecurityUtils.X509_KEY)) {
+        if (keyIdentifierType.equals(SecurityUtils.X509_CERT)) {
             byte data[] = null;
             try {
                 data = remoteCert.getEncoded();

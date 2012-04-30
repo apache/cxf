@@ -167,7 +167,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         String aes128GCM = "http://www.w3.org/2009/xmlenc11#aes128-gcm";
-        doTestPostEncryptedBook(address, false, properties, SecurityUtils.X509_KEY, aes128GCM, null, false);
+        doTestPostEncryptedBook(address, false, properties, SecurityUtils.X509_CERT, aes128GCM, null, false);
     }
     
     @Test
@@ -180,7 +180,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.encryption.properties", 
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         doTestPostEncryptedBook(
-            address, false, properties, SecurityUtils.X509_KEY, XMLCipher.AES_128, XMLCipher.SHA256, false
+            address, false, properties, SecurityUtils.X509_CERT, XMLCipher.AES_128, XMLCipher.SHA256, false
         );
     }
     
@@ -227,7 +227,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.signature.properties", 
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         try {
-            doTestPostEncryptedBook(address, true, properties, SecurityUtils.X509_KEY, 
+            doTestPostEncryptedBook(address, true, properties, SecurityUtils.X509_CERT, 
                                 "http://www.w3.org/2009/xmlenc11#aes128-gcm", null, true);
         } catch (ServerWebApplicationException ex) {
             assertEquals(400, ex.getStatus());
@@ -253,7 +253,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     public void doTestPostEncryptedBook(String address, boolean sign, Map<String, Object> properties) 
         throws Exception {
         doTestPostEncryptedBook(
-            address, sign, properties, SecurityUtils.X509_KEY, XMLCipher.AES_128, null, false
+            address, sign, properties, SecurityUtils.X509_CERT, XMLCipher.AES_128, null, false
         );
     }
     
