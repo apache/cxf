@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -47,7 +48,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         WrapReturn wr = method.getAnnotation(WrapReturn.class);
         try {
-            Method m = target.getClass().getMethod(method.getName(), method.getParameterTypes());
+            Method m = target.getClass().getMethod(method.getName(), getParameterTypes(method, args));
             ReflectionUtil.setAccessible(m);
             return wrapReturn(wr, m.invoke(target, args));                
         } catch (NoSuchMethodException e) {
@@ -70,6 +71,39 @@ public class ReflectionInvokationHandler implements InvocationHandler {
             throw e;
         }
     }
+    private Class<?>[] getParameterTypes(Method method, Object[] args) {
+        Class<?>[] types = method.getParameterTypes();
+        for (int x = 0; x < types.length; x++) {
+            UnwrapParam p = getUnwrapParam(method.getParameterAnnotations()[x]);
+            if (p != null) {
+                String s = p.methodName();
+                String tn = p.typeMethodName();
+                try {
+                    Method m = args[x].getClass().getMethod(s);
+                    if ("#default".equals(tn)) {
+                        types[x] = m.getReturnType();
+                    } else {
+                        Method m2 = args[x].getClass().getMethod(tn);
+                        types[x] = (Class<?>)ReflectionUtil.setAccessible(m2).invoke(args[x]);
+                    }
+                    args[x] = ReflectionUtil.setAccessible(m).invoke(args[x]);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+        return types;
+    }
+
+    private UnwrapParam getUnwrapParam(Annotation[] annotations) {
+        for (Annotation a : annotations) {
+            if (a instanceof UnwrapParam) {
+                return (UnwrapParam)a;
+            }
+        }
+        return null;
+    }
+
     private static Object wrapReturn(WrapReturn wr, Object t) {
         if (wr == null || t == null) {
             return t;
@@ -92,7 +126,18 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         boolean iterator() default false;
     }
     
+<<<<<<< HEAD:common/common/src/main/java/org/apache/cxf/common/util/ReflectionInvokationHandler.java
     private static class WrapperIterator implements Iterator {
+=======
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public static @interface UnwrapParam {
+        String methodName() default "getValue";
+        String typeMethodName() default "#default";
+    }
+    
+    private static class WrapperIterator implements Iterator<Object> {
+>>>>>>> ef63251... Add ability to unwrap a parameter into a real type.:api/src/main/java/org/apache/cxf/common/util/ReflectionInvokationHandler.java
         Class<?> cls;
         Iterator internal;
         public WrapperIterator(Class<?> c, Iterator it) {
