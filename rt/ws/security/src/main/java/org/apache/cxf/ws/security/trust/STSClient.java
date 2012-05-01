@@ -706,8 +706,8 @@ public class STSClient implements Configurable, InterceptorProvider {
     protected void writeElementsForRSTPublicKey(W3CDOMStreamWriter writer,
             X509Certificate cert) throws Exception {
         writer.writeStartElement("wst", "UseKey", namespace);
-        writer.writeStartElement("dsig", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
-        writer.writeNamespace("dsig", "http://www.w3.org/2000/09/xmldsig#");
+        writer.writeStartElement("ds", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
+        writer.writeNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
 
         boolean useCert = useCertificateForConfirmationKeyInfo;
         String useCertStr = (String)getProperty(SecurityConstants.STS_TOKEN_USE_CERT_FOR_KEYINFO);
@@ -719,7 +719,7 @@ public class STSClient implements Configurable, InterceptorProvider {
             certElem.addCertificate(cert);
             writer.getCurrentNode().appendChild(certElem.getElement());
         } else {
-            writer.writeStartElement("dsig", "KeyValue", "http://www.w3.org/2000/09/xmldsig#");
+            writer.writeStartElement("ds", "KeyValue", "http://www.w3.org/2000/09/xmldsig#");
             PublicKey key = cert.getPublicKey();
             String pubKeyAlgo = key.getAlgorithm();
             if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
