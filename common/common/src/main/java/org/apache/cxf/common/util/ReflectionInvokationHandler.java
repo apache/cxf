@@ -126,9 +126,6 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         boolean iterator() default false;
     }
     
-<<<<<<< HEAD:common/common/src/main/java/org/apache/cxf/common/util/ReflectionInvokationHandler.java
-    private static class WrapperIterator implements Iterator {
-=======
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
     public static @interface UnwrapParam {
@@ -137,7 +134,6 @@ public class ReflectionInvokationHandler implements InvocationHandler {
     }
     
     private static class WrapperIterator implements Iterator<Object> {
->>>>>>> ef63251... Add ability to unwrap a parameter into a real type.:api/src/main/java/org/apache/cxf/common/util/ReflectionInvokationHandler.java
         Class<?> cls;
         Iterator internal;
         public WrapperIterator(Class<?> c, Iterator it) {
