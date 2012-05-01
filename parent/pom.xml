@@ -119,6 +119,7 @@
         <cxf.commons-collections.version>3.2.1</cxf.commons-collections.version>
 
         <cxf.cglib.bundle.version>2.2_2</cxf.cglib.bundle.version>
+        <cxf.cglib.osgi.version>[2.1.3,3.0.0)</cxf.cglib.osgi.version>
         <cxf.fastinfoset.bundle.version>1.2.7_4</cxf.fastinfoset.bundle.version>
 
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
