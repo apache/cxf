@@ -1130,13 +1130,7 @@ public final class StaxUtils {
                             return sysId;
                         }
                     };
-                    node.setUserData("location", loc2, new UserDataHandler() {
-                        public void handle(short operation, String key, Object data, Node src, Node dst) {
-                            if (operation == NODE_CLONED) {
-                                dst.setUserData(key, data, this);
-                            }
-                        }
-                    });
+                    node.setUserData("location", loc2, LocationUserDataHandler.INSTANCE);
                 } catch (Exception ex) {
                     //possibly not DOM level 3, won't be able to record this then
                     return false;
@@ -1144,6 +1138,16 @@ public final class StaxUtils {
             }
         }
         return recordLoc;
+    }
+    
+    private static class LocationUserDataHandler implements UserDataHandler {
+        public static final LocationUserDataHandler INSTANCE = new LocationUserDataHandler();
+        
+        public void handle(short operation, String key, Object data, Node src, Node dst) {
+            if (operation == NODE_CLONED) {
+                dst.setUserData(key, data, this);
+            }
+        }
     }
 
     private static void declare(Element node, String uri, String prefix) {
