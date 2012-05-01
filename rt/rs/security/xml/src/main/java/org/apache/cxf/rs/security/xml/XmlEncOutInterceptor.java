@@ -66,17 +66,19 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     private boolean encryptSymmetricKey = true;
     private SecretKey symmetricKey;
-    private String keyEncAlgo = XMLCipher.RSA_OAEP; 
-    private String symEncAlgo = XMLCipher.AES_256;
-    private String keyIdentifierType = SecurityUtils.X509_CERT;
-    private String digestAlgo;
+    
+    private EncryptionProperties encProps = new EncryptionProperties();
     
     public XmlEncOutInterceptor() {
         addAfter(XmlSigOutInterceptor.class.getName());
     } 
 
+    public void setEncryptionProperties(EncryptionProperties props) {
+        this.encProps = props;
+    }
+    
     public void setKeyIdentifierType(String type) {
-        keyIdentifierType = type;
+        encProps.setEncryptionKeyIdType(type);   
     }
     
     public void setSymmetricEncAlgorithm(String algo) {
@@ -84,15 +86,15 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             || algo.startsWith(EncryptionConstants.EncryptionSpec11NS))) {
             algo = EncryptionConstants.EncryptionSpecNS + algo;
         }
-        symEncAlgo = algo;
+        encProps.setEncryptionSymmetricKeyAlgo(algo);
     }
     
     public void setKeyEncAlgorithm(String algo) {
-        keyEncAlgo = algo;
+        encProps.setEncryptionKeyTransportAlgo(algo);
     }
     
     public void setDigestAlgorithm(String algo) {
-        digestAlgo = algo;
+        encProps.setEncryptionDigestAlgo(algo);
     }
     
     protected Document processDocument(Message message, Document payloadDoc) 
@@ -103,10 +105,13 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     protected Document encryptDocument(Message message, Document payloadDoc) 
         throws Exception {
         
-        byte[] secretKey = getSymmetricKey();
+        String symEncAlgo = encProps.getEncryptionSymmetricKeyAlgo() == null 
+            ? XMLCipher.AES_256 : encProps.getEncryptionSymmetricKeyAlgo();
+        
+        byte[] secretKey = getSymmetricKey(symEncAlgo);
 
         Document encryptedDataDoc = DOMUtils.createDocument();
-        Element encryptedDataElement = createEncryptedDataElement(encryptedDataDoc);
+        Element encryptedDataElement = createEncryptedDataElement(encryptedDataDoc, symEncAlgo);
         if (encryptSymmetricKey) {
             X509Certificate receiverCert = null;
             
@@ -134,8 +139,14 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 throw new WSSecurityException("Receiver certificate is not available");
             }
 
-            byte[] encryptedSecretKey = encryptSymmetricKey(secretKey, receiverCert);
-            addEncryptedKeyElement(encryptedDataElement, receiverCert, encryptedSecretKey);
+            String keyEncAlgo = encProps.getEncryptionKeyTransportAlgo() == null
+                ? XMLCipher.RSA_OAEP : encProps.getEncryptionKeyTransportAlgo();
+            String digestAlgo = encProps.getEncryptionDigestAlgo();
+            
+            byte[] encryptedSecretKey = encryptSymmetricKey(secretKey, receiverCert,
+                                                            keyEncAlgo, digestAlgo);
+            addEncryptedKeyElement(encryptedDataElement, receiverCert, encryptedSecretKey,
+                                   keyEncAlgo, digestAlgo);
         }
                
         // encrypt payloadDoc
@@ -156,10 +167,10 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         return encryptedDataDoc;
     }
     
-    private byte[] getSymmetricKey() throws Exception {
+    private byte[] getSymmetricKey(String symEncAlgo) throws Exception {
         synchronized (this) {
             if (symmetricKey == null) {
-                KeyGenerator keyGen = getKeyGenerator();
+                KeyGenerator keyGen = getKeyGenerator(symEncAlgo);
                 symmetricKey = keyGen.generateKey();
             } 
         }
@@ -171,7 +182,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         return certs[0];
     }
     
-    private KeyGenerator getKeyGenerator() throws WSSecurityException {
+    private KeyGenerator getKeyGenerator(String symEncAlgo) throws WSSecurityException {
         try {
             //
             // Assume AES as default, so initialize it
@@ -199,7 +210,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     // Apache Security XMLCipher does not support 
     // Certificates for encrypting the keys
     protected byte[] encryptSymmetricKey(byte[] keyBytes, 
-                                         X509Certificate remoteCert) throws WSSecurityException {
+                                         X509Certificate remoteCert,
+                                         String keyEncAlgo,
+                                         String digestAlgo) throws WSSecurityException {
         Cipher cipher = 
             EncryptionUtils.initCipherWithCert(
                 keyEncAlgo, digestAlgo, Cipher.ENCRYPT_MODE, remoteCert
@@ -237,12 +250,14 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     private void addEncryptedKeyElement(Element encryptedDataElement,
                                         X509Certificate cert,
-                                        byte[] encryptedKey) throws Exception {
+                                        byte[] encryptedKey,
+                                        String keyEncAlgo,
+                                        String digestAlgo) throws Exception {
         
         Document doc = encryptedDataElement.getOwnerDocument();
         
         String encodedKey = Base64Utility.encode(encryptedKey);
-        Element encryptedKeyElement = createEncryptedKeyElement(doc);
+        Element encryptedKeyElement = createEncryptedKeyElement(doc, keyEncAlgo, digestAlgo);
         String encKeyId = "EK-" + UUIDGenerator.getUUID();
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
                 
@@ -285,8 +300,11 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
             );
         
+        String keyIdType = encProps.getEncryptionKeyIdType() == null
+            ? SecurityUtils.X509_CERT : encProps.getEncryptionKeyIdType();
+        
         Node keyIdentifierNode = null; 
-        if (keyIdentifierType.equals(SecurityUtils.X509_CERT)) {
+        if (keyIdType.equals(SecurityUtils.X509_CERT)) {
             byte data[] = null;
             try {
                 data = remoteCert.getEncoded();
@@ -304,7 +322,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             
             x509Data.appendChild(cert);
             keyIdentifierNode = x509Data;
-        } else if (keyIdentifierType.equals(SecurityUtils.X509_ISSUER_SERIAL)) {
+        } else if (keyIdType.equals(SecurityUtils.X509_ISSUER_SERIAL)) {
             String issuer = remoteCert.getIssuerDN().getName();
             java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
             DOMX509IssuerSerial domIssuerSerial = 
@@ -314,7 +332,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             DOMX509Data domX509Data = new DOMX509Data(encryptedDataDoc, domIssuerSerial);
             keyIdentifierNode = domX509Data.getElement();
         } else {
-            throw new WSSecurityException("Unsupported key identifier:" + keyIdentifierType);
+            throw new WSSecurityException("Unsupported key identifier:" + keyIdType);
         }
  
         keyInfoElement.appendChild(keyIdentifierNode);
@@ -322,7 +340,9 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         return keyInfoElement;
     }
     
-    protected Element createEncryptedKeyElement(Document encryptedDataDoc) {
+    protected Element createEncryptedKeyElement(Document encryptedDataDoc, 
+                                                String keyEncAlgo,
+                                                String digestAlgo) {
         Element encryptedKey = 
             encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedKey");
 
@@ -341,7 +361,7 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         return encryptedKey;
     }
     
-    protected Element createEncryptedDataElement(Document encryptedDataDoc) {
+    protected Element createEncryptedDataElement(Document encryptedDataDoc, String symEncAlgo) {
         Element encryptedData = 
             encryptedDataDoc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
 
