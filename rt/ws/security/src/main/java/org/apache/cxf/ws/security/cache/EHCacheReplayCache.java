@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.cache;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.URL;
 
 import net.sf.ehcache.Cache;
@@ -31,7 +33,7 @@ import org.apache.ws.security.cache.ReplayCache;
  * An in-memory EHCache implementation of the ReplayCache interface. The default TTL is 60 minutes and the
  * max TTL is 12 hours.
  */
-public class EHCacheReplayCache implements ReplayCache {
+public class EHCacheReplayCache implements ReplayCache, Closeable {
     
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
@@ -40,13 +42,7 @@ public class EHCacheReplayCache implements ReplayCache {
     private long ttl = DEFAULT_TTL;
     
     public EHCacheReplayCache(String key, URL configFileURL) {
-        if (cacheManager == null) {
-            if (configFileURL == null) {
-                cacheManager = CacheManager.create();
-            } else {
-                cacheManager = CacheManager.create(configFileURL);
-            }
-        }
+        cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
         if (!cacheManager.cacheExists(key)) {
             cache = new Cache(key, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
             cacheManager.addCache(cache);
@@ -116,6 +112,14 @@ public class EHCacheReplayCache implements ReplayCache {
             return true;
         }
         return false;
+    }
+
+    public void close() throws IOException {
+        if (cacheManager != null) {
+            EHCacheManagerHolder.releaseCacheManger(cacheManager);
+            cacheManager = null;
+            cache = null;
+        }
     }
     
 }

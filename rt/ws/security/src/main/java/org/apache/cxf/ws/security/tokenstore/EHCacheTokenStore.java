@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
+import java.io.Closeable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,12 +32,13 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.ws.security.cache.EHCacheManagerHolder;
 
 /**
  * An in-memory EHCache implementation of the TokenStore interface. The default TTL is 60 minutes
  * and the max TTL is 12 hours.
  */
-public class EHCacheTokenStore implements TokenStore {
+public class EHCacheTokenStore implements TokenStore, Closeable {
 
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
@@ -47,14 +49,7 @@ public class EHCacheTokenStore implements TokenStore {
     private long ttl = DEFAULT_TTL;
     
     public EHCacheTokenStore(String key, URL configFileURL) {
-        if (cacheManager == null) {
-            if (configFileURL == null) {
-                cacheManager = CacheManager.create();
-            } else {
-                cacheManager = CacheManager.create(configFileURL);
-            }
-        }
-        
+        cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
         if (!cacheManager.cacheExists(key)) {
             // Cannot overflow to disk as SecurityToken Elements can't be serialized
             cache = new Cache(key, MAX_ELEMENTS, false, false, DEFAULT_TTL, DEFAULT_TTL);
@@ -158,6 +153,14 @@ public class EHCacheTokenStore implements TokenStore {
             }
         }
         return parsedTTL;
+    }
+
+    public void close() {
+        if (cacheManager != null) {
+            EHCacheManagerHolder.releaseCacheManger(cacheManager);
+            cacheManager = null;
+            cache = null;
+        }
     }
     
 }

@@ -64,5 +64,5 @@ public interface TokenStore {
      * @return The requested <code>Token</code> identified by the given identifier
      */
     SecurityToken getToken(String identifier);
-    
+
 }

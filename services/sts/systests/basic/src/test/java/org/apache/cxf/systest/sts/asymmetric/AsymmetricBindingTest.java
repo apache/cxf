@@ -61,7 +61,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
                 launchServer(Server.class, true)
         );
         String deployment = System.getProperty("sts.deployment");
-        if ("standalone".equals(deployment)) {
+        if ("standalone".equals(deployment) || deployment == null) {
             standalone = true;
             assertTrue(
                     "Server failed to launch",
@@ -98,6 +98,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         }
         
         doubleIt(asymmetricSaml1Port, 25);
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -123,6 +124,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(asymmetricSaml2Port, 30);
 
         TokenTestUtils.verifyToken(asymmetricSaml2Port);
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -146,6 +148,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         }
         
         doubleIt(asymmetricSaml1EncryptedPort, 40);
+        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
