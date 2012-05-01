@@ -126,6 +126,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                     src.setPublicId(publicId);
                     Document doc = StaxUtils.read(src);
                     setNode(doc);
+                    nd = super.getNode();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
