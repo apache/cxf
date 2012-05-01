@@ -92,15 +92,22 @@ under the License.
     </bean>
     
     <bean id="xmlSigOutHandler" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor"/>
+    <bean id="xmlSigOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlSigOutInterceptor">
+        <property name="signatureProperties" ref="sigProps"/>
+    </bean>
+    
     <bean id="xmlEncInHandler" class="org.apache.cxf.rs.security.xml.XmlEncInHandler"/>
     
     <bean id="xmlEncInHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlEncInHandler">
         <property name="encryptionProperties" ref="encProps"/>
     </bean>
     
-    
     <bean id="xmlEncOutHandler" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
         <property name="symmetricEncAlgorithm" value="aes128-cbc"/>
+    </bean>
+    
+    <bean id="xmlEncOutHandlerWithProps" class="org.apache.cxf.rs.security.xml.XmlEncOutInterceptor">
+        <property name="encryptionProperties" ref="encProps"/>
     </bean>
     
     <jaxrs:server 
@@ -177,8 +184,8 @@ under the License.
           <ref bean="xmlSigInHandlerWithProps"/>
        </jaxrs:providers> 
        <jaxrs:outInterceptors>
-          <ref bean="xmlSigOutHandler"/>
-          <ref bean="xmlEncOutHandler"/>
+          <ref bean="xmlSigOutHandlerWithProps"/>
+          <ref bean="xmlEncOutHandlerWithProps"/>
        </jaxrs:outInterceptors>
        <jaxrs:properties>
            <entry key="ws-security.callback-handler" 

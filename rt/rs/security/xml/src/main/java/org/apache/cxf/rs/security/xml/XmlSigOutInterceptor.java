@@ -66,12 +66,16 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     
     private QName envelopeQName = DEFAULT_ENV_QNAME;
     private String sigStyle = ENVELOPED_SIG;
-    private String defaultSigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
-    private String digestAlgo = Constants.ALGO_ID_DIGEST_SHA1;
+    
+    private SignatureProperties sigProps = new SignatureProperties();
     
     public XmlSigOutInterceptor() {
     } 
 
+    public void setSignatureProperties(SignatureProperties props) {
+        this.sigProps = props;
+    }
+    
     public void setStyle(String style) {
         if (!SUPPORTED_STYLES.contains(style)) {
             throw new IllegalArgumentException("Unsupported XML Signature style");
@@ -80,11 +84,11 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     }
     
     public void setSignatureAlgorithm(String algo) {
-        defaultSigAlgo = algo;
+        sigProps.setSignatureAlgo(algo);
     }
     
     public void setDigestAlgorithm(String algo) {
-        digestAlgo = algo;
+        sigProps.setSignatureDigestAlgo(algo);
     }
     
     
@@ -114,7 +118,9 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     
         X509Certificate[] issuerCerts = SecurityUtils.getCertificates(crypto, user);
         
-        String sigAlgo = defaultSigAlgo;
+        String sigAlgo = sigProps.getSignatureAlgo() == null 
+            ? SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1 : sigProps.getSignatureAlgo();
+        
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = XMLSignature.ALGO_ID_SIGNATURE_DSA;
@@ -131,13 +137,16 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
         String id = UUID.randomUUID().toString();
         String referenceId = "#" + id;
         
+        String digestAlgo = sigProps.getSignatureDigestAlgo() == null 
+            ? Constants.ALGO_ID_DIGEST_SHA1 : sigProps.getSignatureDigestAlgo();
+        
         XMLSignature sig = null;
         if (ENVELOPING_SIG.equals(sigStyle)) {
-            sig = prepareEnvelopingSignature(doc, id, referenceId, sigAlgo);
+            sig = prepareEnvelopingSignature(doc, id, referenceId, sigAlgo, digestAlgo);
         } else if (DETACHED_SIG.equals(sigStyle)) {
-            sig = prepareDetachedSignature(doc, id, referenceId, sigAlgo);
+            sig = prepareDetachedSignature(doc, id, referenceId, sigAlgo, digestAlgo);
         } else {
-            sig = prepareEnvelopedSignature(doc, id, referenceId, sigAlgo);
+            sig = prepareEnvelopedSignature(doc, id, referenceId, sigAlgo, digestAlgo);
         }
         
         
@@ -150,7 +159,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private XMLSignature prepareEnvelopingSignature(Document doc, 
                                                     String id, 
                                                     String referenceId,
-                                                    String sigAlgo) throws Exception {
+                                                    String sigAlgo,
+                                                    String digestAlgo) throws Exception {
         Element docEl = doc.getDocumentElement();
         Document newDoc = DOMUtils.createDocument();
         doc.removeChild(docEl);
@@ -174,7 +184,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private XMLSignature prepareDetachedSignature(Document doc, 
             String id, 
             String referenceId,
-            String sigAlgo) throws Exception {
+            String sigAlgo,
+            String digestAlgo) throws Exception {
         Element docEl = doc.getDocumentElement();
         Document newDoc = DOMUtils.createDocument();
         doc.removeChild(docEl);
@@ -200,7 +211,8 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
     private XMLSignature prepareEnvelopedSignature(Document doc, 
             String id, 
             String referenceURI,
-            String sigAlgo) throws Exception {
+            String sigAlgo,
+            String digestAlgo) throws Exception {
         doc.getDocumentElement().setAttributeNS(null, "ID", id);
         doc.getDocumentElement().setIdAttributeNS(null, "ID", true);    
     
