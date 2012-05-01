@@ -64,7 +64,6 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
     /**
      * @parameter expression="${project.build.outputDirectory}"
-     * @readonly
      * @required
      */
     protected String classesDirectory;
