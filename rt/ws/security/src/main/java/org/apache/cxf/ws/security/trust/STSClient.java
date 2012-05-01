@@ -627,7 +627,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         String keyTypeTemplate = null;
         String sptt = null;
         
-        if (template != null) {
+        if (template != null && DOMUtils.getFirstElement(template) != null) {
             if (this.useSecondaryParameters()) {
                 writer.writeStartElement("wst", "SecondaryParameters", namespace);
             }
@@ -884,7 +884,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
         
         String sptt = null;
-        if (template != null) {
+        if (template != null && DOMUtils.getFirstElement(template) != null) {
             if (this.useSecondaryParameters()) {
                 writer.writeStartElement("wst", "SecondaryParameters", namespace);
             }
