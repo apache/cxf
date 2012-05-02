@@ -562,15 +562,6 @@ public class RMTxStore implements RMStore {
                     new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
         }
         PreparedStatement stmt = outbound ? createOutboundMessageStmt : createInboundMessageStmt;
-        if (null == stmt) {
-            stmt = connection.prepareStatement(MessageFormat.format(CREATE_MESSAGE_STMT_STR,
-                outbound ? OUTBOUND_MSGS_TABLE_NAME : INBOUND_MSGS_TABLE_NAME));
-            if (outbound) {
-                createOutboundMessageStmt = stmt;                    
-            } else {
-                createInboundMessageStmt = stmt;
-            }
-        }
         int i = 1;
         stmt.setString(i++, id);  
         stmt.setLong(i++, nr);
