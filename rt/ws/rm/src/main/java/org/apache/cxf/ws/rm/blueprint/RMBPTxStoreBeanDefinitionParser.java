@@ -16,35 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.rm.spring;
+
+package org.apache.cxf.ws.rm.blueprint;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+import org.apache.aries.blueprint.ParserContext;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
+import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
-public class RMTxStoreBeanDefinitionParser extends AbstractBeanDefinitionParser {
+/**
+ * This class provides some common functions used by the two BP TxStore bean definition parsers
+ * in this package. 
+ * 
+ */
+public class RMBPTxStoreBeanDefinitionParser extends SimpleBPBeanDefinitionParser {
 
+    public RMBPTxStoreBeanDefinitionParser() {
+        super(RMTxStore.class);
+    }
+    
     @Override
-    protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
+    protected void mapAttribute(MutableBeanMetadata bean, Element e, String name, String val,
+                                ParserContext context) {
         if ("dataSource".equals(name)) {
             if (val != null && val.trim().length() > 0) {
-                bean.addPropertyReference("dataSource", val);
+                bean.addProperty("dataSource", createRef(context, val));
             }
         } else {
-            super.mapAttribute(bean, e, name, val);    
+            super.mapAttribute(bean, e, name, val, context);    
         }
     }
 
-    @Override
-    protected Class getBeanClass(Element element) {
-        return RMTxStore.class;
-    }
-
-    @Override
-    protected boolean shouldGenerateIdAsFallback() {
-        return true;
-    }
-       
 }

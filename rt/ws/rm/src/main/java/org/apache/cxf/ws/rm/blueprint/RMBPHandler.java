@@ -25,10 +25,8 @@ import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
-import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.feature.RMFeature;
-import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
@@ -59,7 +57,7 @@ public class RMBPHandler implements NamespaceHandler {
         } else if ("rmManager".equals(s)) {
             return new RMBPBeanDefinitionParser(RMManager.class).parse(element, context);
         } else if ("jdbcStore".equals(s)) {
-            return new SimpleBPBeanDefinitionParser(RMTxStore.class).parse(element, context);
+            return new RMBPTxStoreBeanDefinitionParser().parse(element, context);
         }
 
         return null;
