@@ -36,6 +36,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -47,7 +48,9 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
@@ -68,6 +71,9 @@ public class RequestAssertionConsumerService {
 
     private SPStateManager stateProvider;
     private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;
+    
+    @Context 
+    private MessageContext jaxrsContext;
     
     public void setSupportDeflateEncoding(boolean deflate) {
         supportDeflateEncoding = deflate;
@@ -178,11 +184,20 @@ public class RequestAssertionConsumerService {
     
     protected void validateSamlResponse(org.opensaml.saml2.core.Response samlResponse,
                                         RequestState requestState) {
-        SAMLProtocolResponseValidator protocolValidator = 
-                new SAMLProtocolResponseValidator();
-        // TODO Configure Crypto & CallbackHandler object here to validate signatures
         try {
+            SAMLProtocolResponseValidator protocolValidator = new SAMLProtocolResponseValidator();
+            // TODO Configure Crypto & CallbackHandler object here to validate signatures
             protocolValidator.validateSamlResponse(samlResponse, null, null);
+            
+            SAMLSSOResponseValidator ssoResponseValidator = new SAMLSSOResponseValidator();
+            ssoResponseValidator.setAssertionConsumerURL((String)jaxrsContext.get(Message.REQUEST_URL));
+            // TODO client address ssoResponseValidator.setClientAddress(clientAddress);
+            ssoResponseValidator.setIssuerIDP(requestState.getIdpServiceAddress());
+            ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
+            ssoResponseValidator.setSpIdentifier(requestState.getIssuerId());
+            
+            // TODO post binding
+            ssoResponseValidator.validateSamlResponse(samlResponse, false);
         } catch (WSSecurityException ex) {
             reportError("INVALID_SAML_RESPONSE");
             throw new WebApplicationException(400);

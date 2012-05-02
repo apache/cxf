@@ -42,6 +42,7 @@ import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 
 /**
@@ -68,6 +69,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String resource;
     protected List<?> customAttributeValues;
     protected ConditionsBean conditions;
+    protected SubjectConfirmationDataBean subjectConfirmationData;
+    
+    public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
+        this.subjectConfirmationData = subjectConfirmationData;
+    }
     
     public void setConditions(ConditionsBean conditionsBean) {
         this.conditions = conditionsBean;
