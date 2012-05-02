@@ -147,6 +147,13 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
+          <xs:attribute name="dataSource" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                  The optional datasource reference to be used.          
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
           <xs:attribute name="url" type="xs:string" default="jdbc:derby:rmdb;create=true">
             <xs:annotation>
               <xs:documentation>
@@ -154,24 +161,38 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
-           <xs:attribute name="userName" type="xs:string">
+          <xs:attribute name="userName" type="xs:string">
             <xs:annotation>
               <xs:documentation>
-                  The username.          
+                  The username.
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
            <xs:attribute name="password" type="xs:string">
             <xs:annotation>
               <xs:documentation>
-                  The password.          
+                  The password.
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
-           <xs:attribute name="schemaName" type="xs:string">
+          <xs:attribute name="schemaName" type="xs:string">
             <xs:annotation>
               <xs:documentation>
-                  The default schema name.          
+                  The default schema name.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="tableExistsState" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                  The SQL state to verify a vendor specific table-exists condition.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="tableExistsCode" type="xs:int">
+            <xs:annotation>
+              <xs:documentation>
+                  The SQL error code to verify a vendor specific table-exists condition.
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>

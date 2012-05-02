@@ -68,6 +68,19 @@ public class RMTxStoreConfigurationTest extends Assert {
     }
 
     @Test
+    public void testSetCustomTableExistsState2() {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-custom-error-bean2.xml");
+        RMManager manager = bus.getExtension(RMManager.class);
+        assertNotNull(manager);
+        RMTxStore store = (RMTxStore)manager.getStore();
+                
+        assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
+        
+        assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
+    }
+
+    @Test
     public void testTxStoreWithDataSource() {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-ds-bean.xml");
@@ -80,6 +93,19 @@ public class RMTxStoreConfigurationTest extends Assert {
         assertNull(store.getConnection());
     }
     
+    @Test
+    public void testTxStoreWithDataSource2() {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-ds-bean2.xml");
+        RMManager manager = bus.getExtension(RMManager.class);
+        assertNotNull(manager);
+        RMTxStore store = (RMTxStore)manager.getStore();
+                
+        assertNotNull(store.getDataSource());
+        
+        assertNull(store.getConnection());
+    }
+
     static class TestDataSource implements DataSource {
         public PrintWriter getLogWriter() throws SQLException {
             return null;
