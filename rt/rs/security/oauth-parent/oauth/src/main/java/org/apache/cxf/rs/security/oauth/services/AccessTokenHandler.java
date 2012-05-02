@@ -31,6 +31,7 @@ import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.AccessToken;
 import org.apache.cxf.rs.security.oauth.data.AccessTokenRegistration;
@@ -64,7 +65,7 @@ public class AccessTokenHandler {
             }
             
             String oauthVerifier = oAuthMessage.getParameter(OAuth.OAUTH_VERIFIER);
-            if (oauthVerifier == null) {
+            if (StringUtils.isEmpty(oauthVerifier)) {
                 if (requestToken.getSubject() != null && requestToken.isPreAuthorized()) {
                     LOG.fine("Preauthorized request token");
                 } else {
