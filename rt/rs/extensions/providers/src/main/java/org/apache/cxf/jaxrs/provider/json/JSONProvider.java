@@ -44,6 +44,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -238,11 +239,11 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (DepthExceededStaxException e) {
             throw new WebApplicationException(413);
         } catch (XMLStreamException e) {
-            throw new WebApplicationException(e);
+            throw new WebApplicationException(e, Response.status(400).build());
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new WebApplicationException(e, Response.status(400).build());
         }
         // unreachable
         return null;
