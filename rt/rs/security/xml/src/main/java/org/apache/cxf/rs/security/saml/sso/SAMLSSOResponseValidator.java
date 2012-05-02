@@ -165,10 +165,9 @@ public class SAMLSSOResponseValidator {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
         
-        // TODO clock skew - future TTL required here.
         // We must have a NotOnOrAfter timestamp
         if (subjectConfData.getNotOnOrAfter() == null
-            || subjectConfData.getNotOnOrAfter().isAfterNow()) {
+            || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
             LOG.fine("Subject Conf Data does not contain NotOnOrAfter or it has expired");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
