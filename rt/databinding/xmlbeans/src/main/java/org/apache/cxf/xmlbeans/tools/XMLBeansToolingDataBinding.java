@@ -236,6 +236,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             }
             */
             options.setGenerateJavaVersion("1.5");
+            options.setCharacterEncoding((String)context.get(ToolConstants.CFG_ENCODING));
 
             // save .xsb files
             typeSystem.save(filer);

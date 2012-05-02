@@ -46,6 +46,8 @@ public class ClassUtils {
             compiler.setVerbose(true);
         }
         
+        compiler.setEncoding((String)context.get(ToolConstants.CFG_ENCODING));
+        
         if ("1.5".equals(System.getProperty("java.specification.version"))) {
             compiler.setTarget("1.5");
         }

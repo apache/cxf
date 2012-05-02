@@ -23,11 +23,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JPackage;
+
+import org.apache.cxf.common.util.ReflectionUtil;
 
 public class TypesCodeWriter extends CodeWriter {
 
@@ -39,9 +42,23 @@ public class TypesCodeWriter extends CodeWriter {
     
     private List<File> generatedFiles = new ArrayList<File>();
 
-    public TypesCodeWriter(File ftarget, List<String> excludePkgs) throws IOException {
+    public TypesCodeWriter(File ftarget, List<String> excludePkgs, String e)
+        throws IOException {
         target = ftarget;
         excludePkgList = excludePkgs;
+        setEncoding(e);
+    }
+    
+    private void setEncoding(String s) {
+        if (s != null) {
+            try {
+                //requires XJC 2.2.5 or newer
+                Field f = CodeWriter.class.getDeclaredField("encoding");
+                ReflectionUtil.setAccessible(f).set(this, s);
+            } catch (Throwable t) {
+                //ignore - should be caught in JAXBDataBinding.checkEncoding already
+            }
+        }
     }
 
     public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {

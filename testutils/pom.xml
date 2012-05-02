@@ -165,9 +165,9 @@
                                 <include>rt-javascript/*.wsdl</include>
                             </includes>
                             <defaultOptions>
-                                <extraargs>
+                                <!--extraargs>
                                     <extraarg>-verbose</extraarg>
-                                </extraargs>
+                                </extraargs-->
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
                             </defaultOptions>

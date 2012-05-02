@@ -353,6 +353,15 @@ Examples:
                     <annotation>fault-serialVersionUID</annotation>
                 </associatedArgument>
             </option>
+            <option id="encoding" maxOccurs="1">
+                <annotation>
+                    Specifies the charset encoding to use when generating java sources 
+                </annotation>
+                <switch>encoding</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>encoding</annotation>
+                </associatedArgument>
+            </option>
 
             <option id="exceptionSuper" maxOccurs="1">
                 <annotation>
@@ -413,7 +422,6 @@ Examples:
 	            </annotation>
 	            <switch>wsdlList</switch>
 	        </option>
-
         </optionGroup>
         <argument id="wsdlurl" minOccurs="1" maxOccurs="1">
             <annotation>
