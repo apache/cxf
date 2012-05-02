@@ -38,7 +38,9 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                 // in the XHTML form using SamlResponseInfo
                 // in principle we could've built the XHTML form right here
                 // but it will be cleaner to get that done in JSP
-                return Response.ok(info).type("text/html").build();
+                return Response.ok(info)
+                               .type("text/html")
+                               .build();
                 
             } catch (Exception ex) {
                 throw new WebApplicationException(ex);

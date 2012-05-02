@@ -21,10 +21,15 @@ package org.apache.cxf.rs.security.saml.sso.filter;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 
 import org.w3c.dom.Document;
@@ -35,8 +40,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
+import org.apache.cxf.rs.security.saml.sso.SSOConstants;
+import org.apache.cxf.rs.security.saml.sso.state.RequestState;
+import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.common.SAMLVersion;
@@ -50,8 +60,6 @@ import org.opensaml.xml.io.MarshallingException;
 
 public abstract class AbstractServiceProviderFilter implements RequestHandler {
     
-    protected static final String SAML_REQUEST = "SAMLRequest"; 
-    protected static final String RELAY_STATE = "RelayState";
     protected static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractServiceProviderFilter.class);
     protected static final ResourceBundle BUNDLE = 
@@ -60,6 +68,9 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
     private String idpServiceAddress;
     private String issuerId;
     private String assertionConsumerServiceAddress;
+    private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;
+    
+    private SPStateManager stateProvider;
     
     public void setAssertionConsumerServiceAddress(
             String assertionConsumerServiceAddress) {
@@ -79,7 +90,29 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
     }
 
     protected boolean checkSecurityContext(Message m) {
-        return false;
+        HttpHeaders headers = new HttpHeadersImpl(m);
+        Map<String, Cookie> cookies = headers.getCookies();
+        
+        Cookie securityContextCookie = cookies.get(SSOConstants.SECURITY_CONTEXT_TOKEN);
+        if (securityContextCookie == null) {
+            reportError("MISSING_RESPONSE_STATE");
+            return false;
+        }
+        String contextKey = securityContextCookie.getValue();
+        ResponseState responseState = stateProvider.getResponseState(contextKey);
+        if (responseState == null) {
+            reportError("MISSING_RESPONSE_STATE");
+            return false;
+        }
+        long stateCreatedAt = responseState.getCreatedAt();
+        if (new Date().after(new Date(stateCreatedAt + stateTimeToLive))) {
+            reportError("EXPIRED_RESPONSE_STATE");
+            stateProvider.removeResponseState(contextKey);
+            return false;
+        }
+        //TODO: use ResponseState to set up a proper SecurityContext 
+        //      on the current message
+        return true;
     }
     
     protected AuthnRequest createAuthnRequest(Message m, Document doc) throws Exception {
@@ -137,7 +170,16 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         info.setEncodedSamlRequest(authnRequestEncoded);
         
         String originalRequestURI = (String)m.get(Message.REQUEST_URI);
-        info.setRelayState(originalRequestURI);
+        RequestState requestState = new RequestState(originalRequestURI,
+                                                     idpServiceAddress,
+                                                     authnRequest.getID(),
+                                                     issuerId,
+                                                     System.currentTimeMillis());
+        
+        String relayState = UUID.randomUUID().toString();
+        stateProvider.setRequestState(relayState, requestState);
+        info.setRelayState(relayState);
+        
         return info;
     }
     
@@ -164,4 +206,13 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
     }
+    
+    public void setStateTimeToLive(long stateTime) {
+        this.stateTimeToLive = stateTime;
+    }
+
+    public void setStateProvider(SPStateManager provider) {
+        this.stateProvider = provider;
+    }
+    
 }

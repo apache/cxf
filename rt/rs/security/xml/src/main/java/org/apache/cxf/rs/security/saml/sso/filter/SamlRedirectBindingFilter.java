@@ -19,11 +19,13 @@
 package org.apache.cxf.rs.security.saml.sso.filter;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.saml.sso.SSOConstants;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     
@@ -34,11 +36,13 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
                 UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
-                ub.queryParam(SAML_REQUEST, info.getEncodedSamlRequest());
-                if (info.getRelayState() != null) {
-                    ub.queryParam(RELAY_STATE, info.getRelayState());    
-                }
-                return Response.seeOther(ub.build()).build();
+                ub.queryParam(SSOConstants.SAML_REQUEST, info.getEncodedSamlRequest());
+                ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());    
+                
+                return Response.seeOther(ub.build())
+                               .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                               .header("Pragma", "no-cache") 
+                               .build();
             } catch (Exception ex) {
                 throw new WebApplicationException(ex);
             }

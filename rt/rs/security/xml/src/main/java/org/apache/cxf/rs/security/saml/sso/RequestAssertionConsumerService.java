@@ -21,12 +21,14 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
-import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -45,7 +47,11 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
+import org.apache.cxf.rs.security.saml.sso.state.RequestState;
+import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.xml.XMLObject;
@@ -57,40 +63,73 @@ public class RequestAssertionConsumerService {
     private static final ResourceBundle BUNDLE = 
         BundleUtils.getBundle(RequestAssertionConsumerService.class);
     
-    private static final String SAML_RESPONSE = "SAMLResponse"; 
-    private static final String RELAY_STATE = "RelayState";
+    private boolean supportDeflateEncoding = true;
+    private boolean supportBase64Encoding = true;
 
-    private boolean useDeflateEncoding = true;
+    private SPStateManager stateProvider;
+    private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;
     
-    public void setUseDeflateEncoding(boolean deflate) {
-        useDeflateEncoding = deflate;
+    public void setSupportDeflateEncoding(boolean deflate) {
+        supportDeflateEncoding = deflate;
     }
-    public boolean useDeflateEncoding() {
-        return useDeflateEncoding;
+    public boolean isSupportDeflateEncoding() {
+        return supportDeflateEncoding;
+    }
+    
+    public void setSupportBase64Encoding(boolean supportBase64Encoding) {
+        this.supportBase64Encoding = supportBase64Encoding;
+    }
+    public boolean isSupportBase64Encoding() {
+        return supportBase64Encoding;
     }
     
     @POST
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response processSamlResponse(@Encoded @FormParam(RELAY_STATE) String relayState,
-                                     @Encoded @FormParam(SAML_RESPONSE) String encodedSamlResponse) {
+    public Response processSamlResponse(@FormParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
+                                        @FormParam(SSOConstants.RELAY_STATE) String relayState) {
+        if (relayState == null) {
+            reportError("MISSING_RELAY_STATE");
+            throw new WebApplicationException(400);
+        }
+        RequestState requestState = stateProvider.removeRequestState(relayState);
+        if (requestState == null) {
+            reportError("MISSING_REQUEST_STATE");
+            throw new WebApplicationException(400);
+        }
+        long stateCreatedAt = requestState.getCreatedAt();
+        if (new Date().after(new Date(stateCreatedAt + stateTimeToLive))) {
+            reportError("EXPIRED_REQUEST_STATE");
+            throw new WebApplicationException(400);
+        }
         
-        URI relayURI = getRelayURI(relayState);
+        URI targetURI = getTargetURI(requestState.getTargetAddress());
         
         org.opensaml.saml2.core.Response samlResponse = 
             readSAMLResponse(encodedSamlResponse);
 
-        validateSamlResponse(samlResponse);
+        validateSamlResponse(samlResponse, requestState);
         
-        // TODO: set the security context
+        // Set the security context
+        String securityContextKey = UUID.randomUUID().toString();
+        
+        long currentTime = System.currentTimeMillis();
+        ResponseState responseState = new ResponseState(currentTime);
+        stateProvider.setResponseState(securityContextKey, responseState);
+        
+        String contextCookie = 
+            SSOConstants.SECURITY_CONTEXT_TOKEN + "=" + securityContextKey;
+        Date expiresDate = new Date(currentTime + stateTimeToLive);
+        String cookieExpires = HttpUtils.getHttpDateFormat().format(expiresDate);
+        contextCookie += ";Expires=" + cookieExpires;
                 
-        // finally, redirect to the service provider endpoint
-        return Response.seeOther(relayURI).build();
+        // Finally, redirect to the service provider endpoint
+        return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();
         
     }
     
     @GET
-    public Response getSamlResponse(@Encoded @QueryParam(RELAY_STATE) String relayState,
-                                    @Encoded @QueryParam(SAML_RESPONSE) String samlResponse) {
+    public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String samlResponse,
+                                    @QueryParam(SSOConstants.RELAY_STATE) String relayState) {
         return processSamlResponse(relayState, samlResponse);       
     }
     
@@ -100,16 +139,24 @@ public class RequestAssertionConsumerService {
             throw new WebApplicationException(400);
         }
         InputStream tokenStream = null;
-        try {
-            byte[] deflatedToken = Base64Utility.decode(samlResponse);
-            tokenStream = useDeflateEncoding() 
-                ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
-                : new ByteArrayInputStream(deflatedToken); 
-        } catch (Base64Exception ex) {
-            throw new WebApplicationException(400);
-        } catch (DataFormatException ex) {
-            throw new WebApplicationException(400);
-        }    
+        if (isSupportBase64Encoding()) {
+            try {
+                byte[] deflatedToken = Base64Utility.decode(samlResponse);
+                tokenStream = isSupportDeflateEncoding() 
+                    ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
+                    : new ByteArrayInputStream(deflatedToken); 
+            } catch (Base64Exception ex) {
+                throw new WebApplicationException(400);
+            } catch (DataFormatException ex) {
+                throw new WebApplicationException(400);
+            }
+        } else {
+            try {
+                tokenStream = new ByteArrayInputStream(samlResponse.getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException ex) {
+                throw new WebApplicationException(400);
+            }
+        }
         
         Document responseDoc = null;
         try {
@@ -129,7 +176,8 @@ public class RequestAssertionConsumerService {
         return (org.opensaml.saml2.core.Response)responseObject;
     }
     
-    protected void validateSamlResponse(org.opensaml.saml2.core.Response samlResponse) {
+    protected void validateSamlResponse(org.opensaml.saml2.core.Response samlResponse,
+                                        RequestState requestState) {
         SAMLProtocolResponseValidator protocolValidator = 
                 new SAMLProtocolResponseValidator();
         // TODO Configure Crypto & CallbackHandler object here to validate signatures
@@ -141,15 +189,15 @@ public class RequestAssertionConsumerService {
         }
     }
     
-    private URI getRelayURI(String relayState) {
-        if (relayState != null) {
+    private URI getTargetURI(String targetAddress) {
+        if (targetAddress != null) {
             try {
-                return URI.create(relayState);
+                return URI.create(targetAddress);
             } catch (IllegalArgumentException ex) {
-                reportError("INVALID_RELAY_STATE");
+                reportError("INVALID_TARGET_URI");
             }
         } else {
-            reportError("MISSING_RELAY_STATE");
+            reportError("MISSING_TARGET_URI");
         }
         throw new WebApplicationException(400);
     }
@@ -158,5 +206,13 @@ public class RequestAssertionConsumerService {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
+    }
+    
+    public void setStateTimeToLive(long stateTime) {
+        this.stateTimeToLive = stateTime;
+    }
+    
+    public void setStateProvider(SPStateManager provider) {
+        this.stateProvider = provider;
     }
 }
