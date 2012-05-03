@@ -41,6 +41,108 @@ public class MetadataMapTest extends Assert {
         List<Object> value2 = m.get("baz");
         assertEquals("Only a single value should be in the list", 1, value2.size());
         assertEquals("Value is wrong", "clazz", value2.get(0));
+        assertNull(m.get("baZ"));
+    }
+    
+    @Test
+    public void testPutSingleCaseInsensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        List<Object> value1 = new ArrayList<Object>();
+        value1.add("bar");
+        value1.add("foo");
+        m.put("baz", value1);
+        
+        m.putSingle("baz", "clazz");
+        assertEquals(1, m.size());
+        
+        List<Object> value2 = m.get("baz");
+        assertEquals("Only a single value should be in the list", 1, value2.size());
+        assertEquals("Value is wrong", "clazz", value2.get(0));
+        
+        m.putSingle("Baz", "clazz2");
+        assertEquals(1, m.size());
+        value2 = m.get("baz");
+        assertEquals("Only a single value should be in the list", 1, value2.size());
+        assertEquals("Value is wrong", "clazz2", value2.get(0));
+   
+        assertTrue(m.containsKey("Baz"));
+        assertTrue(m.containsKey("baz"));
+    }
+    
+    @Test
+    public void testContainsKeyCaseInsensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        m.putSingle("a", "b");
+        assertTrue(m.containsKey("a"));
+        assertTrue(m.containsKey("A"));
+    }
+    
+    @Test
+    public void testContainsKeyCaseSensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("a", "b");
+        assertTrue(m.containsKey("a"));
+        assertFalse(m.containsKey("A"));
+    }
+    
+    
+    @Test
+    public void testKeySetCaseInsensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        m.putSingle("a", "b");
+        assertTrue(m.keySet().contains("a"));
+        assertTrue(m.keySet().contains("A"));
+    }
+    
+    @Test
+    public void testKeySetCaseSensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("a", "b");
+        assertTrue(m.keySet().contains("a"));
+        assertFalse(m.keySet().contains("A"));
+    }
+    
+    @Test
+    public void testPutAllCaseInsensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        List<Object> value1 = new ArrayList<Object>();
+        value1.add("bar");
+        value1.add("foo");
+        m.put("baz", value1);
+        assertEquals(1, m.size());
+        List<Object> values = m.get("baz");
+        assertEquals(2, values.size());
+        assertEquals("bar", values.get(0));
+        assertEquals("foo", values.get(1));
+        
+        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(false, true);
+        List<Object> value2 = new ArrayList<Object>();
+        value2.add("bar2");
+        value2.add("foo2");
+        m2.put("BaZ", value2);
+        
+        m.putAll(m2);
+        
+        assertEquals(1, m.size());
+        values = m.get("Baz");
+        assertEquals(2, values.size());
+        assertEquals("bar2", values.get(0));
+        assertEquals("foo2", values.get(1));
+    }
+    
+    @Test
+    public void testRemoveCaseInsensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        List<Object> value1 = new ArrayList<Object>();
+        value1.add("bar");
+        value1.add("foo");
+        m.put("baz", value1);
+        
+        m.putSingle("baz", "clazz");
+        assertEquals(1, m.size());
+        
+        m.remove("Baz");
+        assertEquals(0, m.size());
     }
     
     @Test

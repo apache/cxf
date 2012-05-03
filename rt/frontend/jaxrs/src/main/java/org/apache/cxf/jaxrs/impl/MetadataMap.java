@@ -22,10 +22,12 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -96,12 +98,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         if (!caseInsensitive) {
             return m.containsKey(key);
         }
-        for (K theKey : m.keySet()) {
-            if (theKey.toString().toLowerCase().equals(key.toString().toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
+        return getMatchingKey(key) != null;
     }
 
     public boolean containsValue(Object value) {
@@ -116,9 +113,14 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         if (!caseInsensitive) {
             return m.get(key);
         }
-        for (Map.Entry<K, List<V>> entry : m.entrySet()) {
-            if (entry.getKey().toString().toLowerCase().equals(key.toString().toLowerCase())) {
-                return entry.getValue();
+        K realKey = getMatchingKey(key);
+        return realKey == null ? null : m.get(realKey);
+    }
+    
+    private K getMatchingKey(Object key) {
+        for (K entry : m.keySet()) {
+            if (entry.toString().equalsIgnoreCase(key.toString())) {
+                return entry;
             }
         }
         return null;
@@ -129,19 +131,37 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public Set<K> keySet() {
-        return m.keySet();
+        if (!caseInsensitive) {
+            return m.keySet();
+        } else {
+            Set<K> set = new TreeSet<K>(new KeyComparator<K>());
+            set.addAll(m.keySet());
+            return set;
+        }
     }
 
     public List<V> put(K key, List<V> value) {
-        return m.put(key, value);
+        K realKey = !caseInsensitive ? key : getMatchingKey(key);
+        return m.put(realKey == null ? key : realKey, value);
     }
 
     public void putAll(Map<? extends K, ? extends List<V>> map) {
-        m.putAll(map);
+        if (!caseInsensitive) {
+            m.putAll(map);
+        } else {
+            for (Map.Entry<? extends K, ? extends List<V>> entry : map.entrySet()) {
+                this.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public List<V> remove(Object key) {
-        return m.remove(key);
+        if (caseInsensitive) {
+            K realKey = getMatchingKey(key);
+            return m.remove(realKey == null ? key : realKey);
+        } else {
+            return m.remove(key);
+        }
     }
 
     public int size() {
@@ -166,5 +186,13 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         return m.toString();
     }
     
-    
+    private static class KeyComparator<K> implements Comparator<K> {
+
+        public int compare(K k1, K k2) {
+            String s1 = k1.toString();
+            String s2 = k2.toString();
+            return s1.compareToIgnoreCase(s2);
+        }
+        
+    }
 }
