@@ -623,6 +623,14 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(expected, uri.toString());        
     }
     
+    @Test
+    public void testFromPathUriOnly() {
+        String expected = "http://localhost:8080";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080").build();
+        assertEquals(expected, uri.toString());        
+    }
+    
     @Test(expected = IllegalArgumentException.class)
     public void testQueryParamNameNull() throws Exception {
         new UriBuilderImpl().queryParam(null, "baz");
