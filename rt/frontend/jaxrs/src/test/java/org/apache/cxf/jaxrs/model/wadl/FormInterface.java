@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.model.wadl;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -44,7 +45,8 @@ public interface FormInterface {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
-    String form3(@PathParam("id") String id, 
+    String form3(@HeaderParam("headerId") String headerId,
+                 @PathParam("id") String id, 
                  @FormParam("field1") String f1, @FormParam("field2") String f2);
     
     @Path("/form4/{id}")

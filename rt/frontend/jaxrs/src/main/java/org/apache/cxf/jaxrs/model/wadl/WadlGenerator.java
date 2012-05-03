@@ -413,14 +413,19 @@ public class WadlGenerator implements RequestHandler {
         if (getMethod(ori).getParameterTypes().length != 0 || classParams.size() != 0) {
             sb.append("<request>");
             handleDocs(anns, sb, DocTarget.REQUEST, false, isJson);
-            if (isFormRequest(ori)) {
+            
+            boolean isForm = isFormRequest(ori);
+            
+            doHandleClassParams(sb, classParams, isJson, ParameterType.QUERY, ParameterType.HEADER);
+            for (Parameter p : ori.getParameters()) {
+                if (isForm && p.getType() == ParameterType.REQUEST_BODY) {
+                    continue;
+                }
+                handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p, isJson);
+            }
+            if (isForm) {
                 handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori), 
                         isJson);
-            } else {
-                doHandleClassParams(sb, classParams, isJson, ParameterType.QUERY, ParameterType.HEADER);
-                for (Parameter p : ori.getParameters()) {
-                    handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p, isJson);
-                }
             }
             sb.append("</request>");
         }

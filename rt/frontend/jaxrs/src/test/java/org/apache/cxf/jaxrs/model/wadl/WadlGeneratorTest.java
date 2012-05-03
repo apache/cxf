@@ -500,7 +500,20 @@ public class WadlGeneratorTest extends Assert {
         // verify book-subresource /book resource
         // GET 
         verifyGetResourceMethod(subResourceEls.get(0), bookEl, null);
-        // verify book-subresource /form1 resource
+        
+        verifyFormSubResources(subResourceEls);
+        
+        // verify subresource /chapter/{id}
+        List<Element> chapterMethodEls = getElements(subResourceEls.get(5), "resource", 1);
+        assertEquals("/id", chapterMethodEls.get(0).getAttribute("path"));
+        verifyParameters(subResourceEls.get(5), 1, 
+                         new Param("cid", "template", "xs:int"));
+        // GET
+        verifyGetResourceMethod(chapterMethodEls.get(0), chapterEl, "Get the chapter");
+    }
+    
+    private void verifyFormSubResources(List<Element> subResourceEls) {
+     // verify book-subresource /form1 resource
         List<Element> form1MethodEls = getElements(subResourceEls.get(1), "method", 1);
         
         assertEquals("POST", form1MethodEls.get(0).getAttribute("name"));
@@ -519,14 +532,17 @@ public class WadlGeneratorTest extends Assert {
                          new Param("field1", "query", "xs:string"),
                          new Param("field2", "query", "xs:string"));
         
-        
-        // verify subresource /chapter/{id}
-        List<Element> chapterMethodEls = getElements(subResourceEls.get(5), "resource", 1);
-        assertEquals("/id", chapterMethodEls.get(0).getAttribute("path"));
-        verifyParameters(subResourceEls.get(5), 1, 
-                         new Param("cid", "template", "xs:int"));
-        // GET
-        verifyGetResourceMethod(chapterMethodEls.get(0), chapterEl, "Get the chapter");
+        // verify book-subresource /form2 resource
+        verifyParameters(subResourceEls.get(3), 1, 
+                         new Param("id", "template", "xs:string"));
+        List<Element> form3MethodEls = getElements(subResourceEls.get(3), "method", 1);
+        List<Element> form3RequestEls = getElements(form3MethodEls.get(0), "request", 1);
+        verifyParameters(form3RequestEls.get(0), 1, 
+                         new Param("headerId", "header", "xs:string"));
+        List<Element> form3RequestRepEls = getElements(form3RequestEls.get(0), "representation", 1);
+        verifyParameters(form3RequestRepEls.get(0), 2, 
+                         new Param("field1", "query", "xs:string"),
+                         new Param("field2", "query", "xs:string"));
     }
     
     private List<Element> getElements(Element resource, String name, int expectedSize) {
