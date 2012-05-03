@@ -116,7 +116,10 @@ public class RequestParser {
                         found = parseKeyRequirements(jaxbElement, keyRequirements, wsContext, stsProperties);
                     }
                     if (!found) {
-                        LOG.log(Level.WARNING, "Found a JAXB object of unknown type: " + jaxbElement.getName());
+                        LOG.log(
+                            Level.WARNING, 
+                            "Found a JAXB object of unknown type: " + jaxbElement.getName()
+                        );
                         throw new STSException(
                             "An unknown element was received", STSException.BAD_REQUEST
                         );

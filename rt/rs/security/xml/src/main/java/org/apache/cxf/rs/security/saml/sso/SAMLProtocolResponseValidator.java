@@ -114,11 +114,13 @@ public class SAMLProtocolResponseValidator {
     ) throws WSSecurityException {
         // Check the Status Code
         if (samlResponse.getStatus() == null
-            || samlResponse.getStatus().getStatusCode() == null) {
+            || samlResponse.getStatus().getStatusCode() == null
+            || samlResponse.getStatus().getStatusCode().getValue() == null) {
             LOG.fine("Either the SAML Response Status or StatusCode is null");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
-        if (!SAML1_STATUSCODE_SUCCESS.equals(samlResponse.getStatus().getStatusCode().getValue())) {
+        String statusValue = samlResponse.getStatus().getStatusCode().getValue().getLocalPart();
+        if (!SAML1_STATUSCODE_SUCCESS.equals(statusValue)) {
             LOG.fine(
                 "SAML Status code of " + samlResponse.getStatus().getStatusCode().getValue()
                 + "does not equal " + SAML1_STATUSCODE_SUCCESS

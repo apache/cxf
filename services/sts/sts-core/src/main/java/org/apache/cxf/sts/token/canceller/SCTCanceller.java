@@ -78,15 +78,20 @@ public class SCTCanceller implements TokenCanceller {
         LOG.fine("Trying to cancel a SecurityContextToken");
         TokenCancellerResponse response = new TokenCancellerResponse();
         ReceivedToken cancelTarget = tokenParameters.getToken();
-        cancelTarget.setState(STATE.NONE);
-        response.setToken(cancelTarget);
         
         if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTCanceller");
             return response;
         }
+        if (cancelTarget == null) {
+            LOG.log(Level.FINE, "Cancel Target is null");
+            return response;
+        }
         
-        if (cancelTarget != null && cancelTarget.isDOMElement()) {
+        cancelTarget.setState(STATE.NONE);
+        response.setToken(cancelTarget);
+        
+        if (cancelTarget.isDOMElement()) {
             try {
                 Element cancelTargetElement = (Element)cancelTarget.getToken();
                 SecurityContextToken sct = new SecurityContextToken(cancelTargetElement);

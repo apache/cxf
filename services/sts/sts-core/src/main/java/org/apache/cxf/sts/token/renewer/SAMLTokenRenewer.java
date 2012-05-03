@@ -292,7 +292,9 @@ public class SAMLTokenRenewer implements TokenRenewer {
         Properties props = token.getProperties();
         if (props == null) {
             LOG.log(Level.WARNING, "Error in getting properties from cached token");
-            throw new STSException("Error in getting properties from cached token", STSException.REQUEST_FAILED);
+            throw new STSException(
+                "Error in getting properties from cached token", STSException.REQUEST_FAILED
+            );
         }
         String isAllowRenewal = (String)props.get(STSConstants.TOKEN_RENEWING_ALLOW);
         String isAllowRenewalAfterExpiry = 

@@ -148,14 +148,21 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                     XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
                     Date creationTime = fmt.parse(tokenLifetime.getCreated());
                     Date expirationTime = fmt.parse(tokenLifetime.getExpires());
+                    if (creationTime == null || expirationTime == null) {
+                        LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
+                        throw new STSException(
+                            "Error in parsing Timestamp Created or Expiration Strings",
+                            STSException.INVALID_TIME
+                        );
+                    }
                     
                     // Check to see if the created time is in the future
                     Date validCreation = new Date();
                     long currentTime = validCreation.getTime();
                     if (futureTimeToLive > 0) {
-                        validCreation.setTime(currentTime + futureTimeToLive * 1000);
+                        validCreation.setTime(currentTime + futureTimeToLive * 1000L);
                     }
-                    if (creationTime != null && creationTime.after(validCreation)) {
+                    if (creationTime.after(validCreation)) {
                         LOG.fine("The Created Time is too far in the future");
                         throw new STSException(
                             "The Created Time is too far in the future", STSException.INVALID_TIME

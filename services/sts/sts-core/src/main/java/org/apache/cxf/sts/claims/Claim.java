@@ -35,7 +35,7 @@ public class Claim implements Serializable {
     private URI claimType;
     private String issuer;
     private String originalIssuer;
-    private Principal principal;
+    private transient Principal principal;
     private String value;
     private URI namespace = ClaimTypes.URI_BASE;
 

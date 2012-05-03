@@ -90,8 +90,8 @@ public class SymmetricKeyHandler {
             } else if (STSConstants.SYMMETRIC_KEY_TYPE.equals(binarySecret.getBinarySecretType())
                 || binarySecret.getBinarySecretType() == null) {
                 byte[] secretValue = binarySecret.getBinarySecretValue();
-                if ((secretValue.length * 8) < signatureProperties.getMinimumKeySize()
-                    || (secretValue.length * 8) > signatureProperties.getMaximumKeySize()) {
+                if (((long)secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
+                    || ((long)secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
                     LOG.log(
                         Level.WARNING, "Received secret of length " + secret.length 
                         + " bits is not accepted" 
@@ -109,8 +109,8 @@ public class SymmetricKeyHandler {
             }
         } else if (clientEntropy.getDecryptedKey() != null) {
             byte[] secretValue = clientEntropy.getDecryptedKey();
-            if ((secretValue.length * 8) < signatureProperties.getMinimumKeySize()
-                || (secretValue.length * 8) > signatureProperties.getMaximumKeySize()) {
+            if (((long)secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
+                || ((long)secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
                 LOG.log(
                     Level.WARNING, "Received secret of length " + secret.length 
                     + " bits is not accepted" 

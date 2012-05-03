@@ -41,17 +41,17 @@ import org.opensaml.xml.XMLObjectBuilderFactory;
 */
 public final class SamlpRequestComponentBuilder {
     
-    private static SAMLObjectBuilder<AuthnRequest> authnRequestBuilder;
+    private static volatile SAMLObjectBuilder<AuthnRequest> authnRequestBuilder;
     
-    private static SAMLObjectBuilder<Issuer> issuerBuilder;
+    private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
     
-    private static SAMLObjectBuilder<NameIDPolicy> nameIDBuilder;
+    private static volatile SAMLObjectBuilder<NameIDPolicy> nameIDBuilder;
     
-    private static SAMLObjectBuilder<RequestedAuthnContext> requestedAuthnCtxBuilder;
+    private static volatile SAMLObjectBuilder<RequestedAuthnContext> requestedAuthnCtxBuilder;
     
-    private static SAMLObjectBuilder<AuthnContextClassRef> requestedAuthnCtxClassRefBuilder;
+    private static volatile SAMLObjectBuilder<AuthnContextClassRef> requestedAuthnCtxClassRefBuilder;
     
-    private static XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     
     private SamlpRequestComponentBuilder() {
         
