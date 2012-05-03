@@ -35,10 +35,6 @@ import org.junit.AfterClass;
 
 public abstract class AbstractBusClientServerTestBase extends AbstractClientServerTestBase {
 
-    static {
-        System.setProperty("javax.xml.ws.spi.Provider", "org.apache.cxf.jaxws.spi.ProviderImpl");
-    }
-    
     protected static String defaultConfigFileName;
     protected static Bus staticBus; 
     
