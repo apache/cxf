@@ -332,7 +332,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 secondEncrParts.addAll(encryptedTokensList);
             }
 
-            if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()) {
+            if (encryptionToken.isDerivedKeys() && !secondEncrParts.isEmpty()
+                && encrBase instanceof WSSecDKEncrypt) {
                 try {
                     Element secondRefList 
                         = ((WSSecDKEncrypt)encrBase).encryptForExternalRef(null, secondEncrParts);
@@ -341,7 +342,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } catch (WSSecurityException ex) {
                     throw new Fault(ex);
                 }
-            } else if (!secondEncrParts.isEmpty()) {
+            } else if (!secondEncrParts.isEmpty() && encrBase instanceof WSSecEncrypt) {
                 try {
                     // Encrypt, get hold of the ref list and add it
                     Element secondRefList = saaj.getSOAPPart()

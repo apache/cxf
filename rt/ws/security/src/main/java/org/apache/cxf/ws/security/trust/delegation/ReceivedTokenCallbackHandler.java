@@ -75,13 +75,15 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
     }
     
     private Element getTokenFromMessage(SoapMessage soapMessage) {
-        List<WSHandlerResult> results = 
-            CastUtils.cast((List<?>)soapMessage.get(WSHandlerConstants.RECV_RESULTS));
-        if (results != null) {
-            for (WSHandlerResult rResult : results) {
-                Element token = findToken(rResult.getResults());
-                if (token != null) {
-                    return token;
+        if (soapMessage != null) {
+            List<WSHandlerResult> results = 
+                CastUtils.cast((List<?>)soapMessage.get(WSHandlerConstants.RECV_RESULTS));
+            if (results != null) {
+                for (WSHandlerResult rResult : results) {
+                    Element token = findToken(rResult.getResults());
+                    if (token != null) {
+                        return token;
+                    }
                 }
             }
         }

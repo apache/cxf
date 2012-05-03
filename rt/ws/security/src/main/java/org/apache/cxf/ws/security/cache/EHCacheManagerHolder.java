@@ -48,13 +48,15 @@ public final class EHCacheManagerHolder {
             COUNTS.putIfAbsent(cacheManager.getName(), new AtomicInteger());
             a = COUNTS.get(cacheManager.getName());
         }
-        a.incrementAndGet();
+        if (a != null) {
+            a.incrementAndGet();
+        }
         return cacheManager;
     }
     
     public static void releaseCacheManger(CacheManager cacheManager) {
         AtomicInteger a = COUNTS.get(cacheManager.getName());
-        if (a.decrementAndGet() == 0) {
+        if (a != null && a.decrementAndGet() == 0) {
             cacheManager.shutdown();
         }
     }

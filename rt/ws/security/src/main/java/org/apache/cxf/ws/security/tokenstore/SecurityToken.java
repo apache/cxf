@@ -58,7 +58,7 @@ public class SecurityToken implements Serializable {
     /**
      * The actual token in its current state
      */
-    private Element token;
+    private transient Element token;
     
     /**
      * The RequestedAttachedReference element
@@ -68,7 +68,7 @@ public class SecurityToken implements Serializable {
      * wsse:SecurityTokenReference\wsse:Reference case and only hold the URI and 
      * the ValueType values.
      */
-    private Element attachedReference;
+    private transient Element attachedReference;
     
     /**
      * The RequestedUnattachedReference element
@@ -78,7 +78,7 @@ public class SecurityToken implements Serializable {
      * wsse:SecurityTokenReference\wsse:Reference case and only hold the URI and 
      * the ValueType values.
      */
-    private Element unattachedReference;
+    private transient Element unattachedReference;
     
     /**
      * A bag to hold any other properties
@@ -133,7 +133,7 @@ public class SecurityToken implements Serializable {
     /**
      * The principal of this SecurityToken
      */
-    private Principal principal;
+    private transient Principal principal;
     
     public SecurityToken() {
         
@@ -145,8 +145,12 @@ public class SecurityToken implements Serializable {
 
     public SecurityToken(String id, Date created, Date expires) {
         this.id = id;
-        this.created = created;
-        this.expires = expires;
+        if (created != null) {
+            this.created = new Date(created.getTime());
+        }
+        if (expires != null) {
+            this.expires = new Date(expires.getTime());
+        }
     }
     
     public SecurityToken(String id,
@@ -155,8 +159,12 @@ public class SecurityToken implements Serializable {
                  Date expires) {
         this.id = id;
         this.token = cloneElement(tokenElem);
-        this.created = created;
-        this.expires = expires;
+        if (created != null) {
+            this.created = new Date(created.getTime());
+        }
+        if (expires != null) {
+            this.expires = new Date(expires.getTime());
+        }
     }
 
     public SecurityToken(String id,
@@ -310,14 +318,20 @@ public class SecurityToken implements Serializable {
      * @return Returns the created.
      */
     public Date getCreated() {
-        return created;
+        if (created == null) {
+            return null;
+        }
+        return (Date)created.clone();
     }
 
     /**
      * @return Returns the expires.
      */
     public Date getExpires() {
-        return expires;
+        if (expires == null) {
+            return null;
+        }
+        return (Date)expires.clone();
     }
     
     /**
@@ -337,7 +351,11 @@ public class SecurityToken implements Serializable {
      * @param expires The expires to set.
      */
     public void setExpires(Date expires) {
-        this.expires = expires;
+        if (expires == null) {
+            this.expires = null;
+        } else {
+            this.expires = new Date(expires.getTime());
+        }
     }
 
     public String getIssuerAddress() {

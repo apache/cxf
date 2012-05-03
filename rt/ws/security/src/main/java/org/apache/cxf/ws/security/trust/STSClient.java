@@ -1195,7 +1195,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     protected void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
         Date creationTime = new Date();
         Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (ttl * 1000L));
+        expirationTime.setTime(creationTime.getTime() + ((long)ttl * 1000L));
 
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         writer.writeStartElement("wst", "Lifetime", namespace);

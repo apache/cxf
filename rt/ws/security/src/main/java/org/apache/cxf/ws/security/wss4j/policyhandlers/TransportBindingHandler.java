@@ -390,7 +390,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
                 return sig.getSignatureValue();
             } else {
-                return null;
+                return new byte[0];
             }
         }
     }

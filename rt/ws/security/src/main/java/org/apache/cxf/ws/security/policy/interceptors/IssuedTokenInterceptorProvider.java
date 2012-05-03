@@ -217,7 +217,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                             message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN, tok);
                             message.getExchange().put(SecurityConstants.TOKEN, tok);
                             message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, tok.getId());
+                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
+                                                                          tok.getId());
                         } else {
                             message.put(SecurityConstants.TOKEN, tok);
                             message.put(SecurityConstants.TOKEN_ID, tok.getId());

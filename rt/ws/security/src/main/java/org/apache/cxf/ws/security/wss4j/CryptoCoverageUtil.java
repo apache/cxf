@@ -32,13 +32,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityException;
@@ -350,20 +348,6 @@ public final class CryptoCoverageUtil {
         case ELEMENT:
         default:
             content = false;
-        }
-        
-        // Get the Element Id
-        Attr idAttr = el.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
-        
-        // We didn't get it with a qualified name, so
-        // look for the attribute using only the local name.
-        if (idAttr == null) {
-            idAttr = el.getAttributeNode("Id");
-        }
-        
-        String id = idAttr == null ? null : idAttr.getValue();
-        if (id != null && id.charAt(0) == '#') {
-            id = id.substring(1);
         }
         
         for (WSDataRef r : refs) {

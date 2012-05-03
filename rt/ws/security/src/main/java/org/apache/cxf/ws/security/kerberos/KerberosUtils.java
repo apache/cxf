@@ -33,11 +33,6 @@ public final class KerberosUtils {
     }
     
     public static KerberosClient getClient(Message message, String type) {
-        if (type == null) {
-            type = "";
-        } else {
-            type = "." + type + "-client";
-        }
         KerberosClient client = (KerberosClient)message
             .getContextualProperty(SecurityConstants.KERBEROS_CLIENT);
         if (client == null) {

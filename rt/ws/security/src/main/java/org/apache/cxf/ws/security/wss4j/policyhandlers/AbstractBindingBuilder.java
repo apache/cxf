@@ -1443,7 +1443,7 @@ public abstract class AbstractBindingBuilder {
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             String encrUser = (String)message.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
-            if (crypto != null && encrUser == null) {
+            if (encrUser == null) {
                 try {
                     encrUser = crypto.getDefaultX509Identifier();
                 } catch (WSSecurityException e1) {
