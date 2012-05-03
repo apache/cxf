@@ -115,7 +115,7 @@ public class AbstractWSDLToProcessor implements Processor {
         }
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(bus);
         wsdlDefinition = builder.build(wsdlURL);
-        if (env.optionSet(ToolConstants.CFG_VALIDATE_WSDL)) {
+        if (env.fullValidateWSDL()) {
             validate(wsdlDefinition, env, bus);
         }
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
@@ -154,7 +154,7 @@ public class AbstractWSDLToProcessor implements Processor {
     }
 
     public void validateWSDL() throws ToolException {
-        if (env.validateWSDL()) {
+        if (env.fullValidateWSDL()) {
             WSDL11Validator validator = new WSDL11Validator(this.wsdlDefinition, this.env);
             validator.isValid();
         }

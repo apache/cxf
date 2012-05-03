@@ -121,7 +121,8 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         wsdlRefValidator.setSuppressWarnings(env.optionSet(ToolConstants.CFG_SUPPRESS_WARNINGS));        
         validators.add(wsdlRefValidator);
         
-        if (env.optionSet(ToolConstants.CFG_VALIDATE_WSDL)) {
+        
+        if (env.fullValidateWSDL()) {
             validators.add(new UniqueBodyPartsValidator(this.def));
             validators.add(new WSIBPValidator(this.def));
             validators.add(new MIMEBindingValidator(this.def));
@@ -139,7 +140,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         }
 
         // By default just use WsdlRefValidator
-        if (!env.optionSet(ToolConstants.CFG_VALIDATE_WSDL)) {
+        if (!env.fullValidateWSDL()) {
             return true;
         }
 

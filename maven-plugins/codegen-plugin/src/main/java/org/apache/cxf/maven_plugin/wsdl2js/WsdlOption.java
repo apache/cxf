@@ -98,8 +98,8 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
         } else {
             options.add(outputDirFile.getAbsolutePath());
         }
-        if (validate != null && validate) {
-            options.add("-validate");
+        if (validate != null) {
+            options.add("-validate=" + validate);
         }
         if (debug) {
             options.add("-v");

@@ -139,7 +139,7 @@ public class Option {
     /**
      * Enables validating the WSDL before generating the code. 
      */
-    Boolean validateWsdl;
+    String validateWsdl;
     
     
     /**
@@ -340,12 +340,17 @@ public class Option {
         this.extendedSoapHeaders = extendedSoapHeaders;
     }
 
-    public boolean isValidateWsdl() {
-        return validateWsdl == null ? false : validateWsdl;
+    public String getValidateWsdl() {
+        return validateWsdl;
     }
 
-    public void setValidateWsdl(boolean validateWsdl) {
+    public void setValidateWsdl(String validateWsdl) {
+        System.out.println("Validate: " + validateWsdl);
         this.validateWsdl = validateWsdl;
+    }
+    public void setValidate(String v) {
+        System.out.println("Validate: " + v);
+        this.validateWsdl = v;
     }
     
     public boolean isNoTypes() {
@@ -446,7 +451,7 @@ public class Option {
         destination.setOutputDir(getOutputDir());
         destination.setPackagenames(getPackagenames());
         destination.setServiceName(getServiceName());
-        destination.setValidateWsdl(isValidateWsdl());
+        destination.setValidateWsdl(getValidateWsdl());
         destination.setNoTypes(isNoTypes());
         destination.setFaultSerialVersionUID(getFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());

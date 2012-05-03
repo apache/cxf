@@ -242,10 +242,11 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         generateTypes();
 
         for (ServiceInfo service : serviceList) {
-
             context.put(ServiceInfo.class, service);
 
-            validate(service);
+            if (context.basicValidateWSDL()) {
+                validate(service);
+            }
 
             // Build the JavaModel from the ServiceModel
             processor.setEnvironment(context);

@@ -165,7 +165,9 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
         }
         addIfTrue(list, isNoTypes(), "-noTypes");
         addIfTrue(list, isAllowElementRefs(), "-" + ToolConstants.CFG_ALLOW_ELEMENT_REFS);
-        addIfTrue(list, isValidateWsdl(), "-" + ToolConstants.CFG_VALIDATE_WSDL);
+        if (getValidateWsdl() != null) {
+            list.add("-validate=" + getValidateWsdl());
+        }
         addIfTrue(list, isMarkGenerated() != null && isMarkGenerated(),
             "-" + ToolConstants.CFG_MARK_GENERATED);
         addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");

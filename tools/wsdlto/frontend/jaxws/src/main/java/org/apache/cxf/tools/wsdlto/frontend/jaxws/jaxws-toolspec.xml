@@ -265,8 +265,14 @@ Examples:
             <option id="validate" maxOccurs="1">
                 <annotation>
                     Specifies that the WSDL is validated before generating the code. Using 
-                    this option is highly recommended.
+                    this option is highly recommended.  By default, only very basic validation
+                    is done to make sure the WSDL meets the WSI-BasicProfile standards that
+                    CXF requires.  -validate=none can turn off those checks while -validate or 
+                    -validate=all turns on additional schema validation and other checks.
                 </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation>[=all|basic|none]</annotation>
+                </associatedArgument>
                 <switch>validate</switch>
             </option>
 

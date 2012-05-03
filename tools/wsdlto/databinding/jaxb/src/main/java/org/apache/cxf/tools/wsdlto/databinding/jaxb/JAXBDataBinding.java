@@ -578,7 +578,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
                 Element ele = docs[0].getDocumentElement();
                 ele = removeImportElement(ele, key, catalog);
-                if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
+                if (context.fullValidateWSDL()) {
                     String uri = null;
                     try {
                         uri = docs[0].getDocumentURI();
@@ -653,7 +653,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 ids.add(key);
                 Element ele = sci.getElement();
                 ele = removeImportElement(ele, key, catalog);
-                if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
+                if (context.fullValidateWSDL()) {
                     validateSchema(ele, sci.getSystemId(), catalog);
                 }
                 InputSource is = new InputSource((InputStream)null);

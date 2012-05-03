@@ -81,7 +81,7 @@ public class Option {
     /**
      * Whether to validate the WSDL. 
      */
-    Boolean validate;
+    String validate;
     /**
      * The wsdl version.
      */
@@ -103,7 +103,7 @@ public class Option {
             output = other.getOutput();
         }
         if (validate == null) {
-            validate = other.isValidate();
+            validate = other.getValidate();
         }
         if (wsdlVersion == null) {
             wsdlVersion = other.getWsdlVersion();
@@ -159,15 +159,15 @@ public class Option {
     /**
      * @return Validating the WSDL?
      */
-    public Boolean isValidate() {
+    public String getValidate() {
         return validate;
     }
 
     /**
      * Control WSDL validation.
-     * @param validate true to validate.
+     * @param validate true or all to validate.
      */
-    public void setValidate(Boolean validate) {
+    public void setValidate(String validate) {
         this.validate = validate;
     }
 

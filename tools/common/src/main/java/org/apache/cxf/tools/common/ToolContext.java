@@ -167,9 +167,25 @@ public class ToolContext {
     }
 
     // REVIST: Prefer using optionSet, to keep the context clean
-    public boolean validateWSDL() {
-        return get(ToolConstants.CFG_VALIDATE_WSDL) != null;
-
+    public boolean fullValidateWSDL() {
+        Object s = get(ToolConstants.CFG_VALIDATE_WSDL);
+        if (s instanceof String && ((String)s).length() > 0 && ((String)s).charAt(0) == '=') {
+            s = ((String)s).substring(1);
+        }
+        if (s == null || "none".equals(s) || "false".equals(s) || "basic".equals(s)) {
+            return false;
+        }
+        return true;
+    }
+    public boolean basicValidateWSDL() {
+        Object s = get(ToolConstants.CFG_VALIDATE_WSDL);
+        if (s instanceof String && ((String)s).length() > 0 && ((String)s).charAt(0) == '=') {
+            s = ((String)s).substring(1);
+        }
+        if ("none".equals(s) || "false".equals(s)) {
+            return false;
+        }
+        return true;
     }
 
     public void addNamespacePackageMap(String namespace, String pn) {
