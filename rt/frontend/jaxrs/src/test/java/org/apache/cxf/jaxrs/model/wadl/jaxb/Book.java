@@ -76,7 +76,7 @@ public class Book implements FormInterface {
         return "";
     }
 
-    public String form3(String identificator, String f1, String f2) {
+    public String form3(String headerId, String identificator, String f1, String f2) {
         return "";
     }
 
