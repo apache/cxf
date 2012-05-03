@@ -536,8 +536,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
-    
-    protected static void handleJAXBException(JAXBException e, boolean read) {
+    //TODO: move these methods into the dedicated utility class
+    protected static StringBuilder handleExceptionStart(Exception e) {
         LOG.warning(getStackTrace(e));
         StringBuilder sb = new StringBuilder();
         if (e.getMessage() != null) {
@@ -546,6 +546,19 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         if (e.getCause() != null && e.getCause().getMessage() != null) {
             sb.append(e.getCause().getMessage()).append(". ");
         }
+        return sb;
+    }
+    
+    protected static void handleExceptionEnd(Throwable t, String message, boolean read) {
+        Response.Status status = read 
+            ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR; 
+        Response r = Response.status(status)
+            .type(MediaType.TEXT_PLAIN).entity(message).build();
+        throw new WebApplicationException(t, r);
+    }
+    
+    protected static void handleJAXBException(JAXBException e, boolean read) {
+        StringBuilder sb = handleExceptionStart(e);
         if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
             sb.append(e.getLinkedException().getMessage()).append(". ");
         }
@@ -553,11 +566,12 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
                              BUNDLE, sb.toString()).toString();
-        Response.Status status = read 
-            ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR; 
-        Response r = Response.status(status)
-            .type(MediaType.TEXT_PLAIN).entity(message).build();
-        throw new WebApplicationException(t, r);
+        handleExceptionEnd(t, message, read);
+    }
+    
+    protected static void handleXMLStreamException(XMLStreamException e, boolean read) {
+        StringBuilder sb = handleExceptionStart(e);
+        handleExceptionEnd(e, sb.toString(), read);
     }
     
     public void setOutTransformElements(Map<String, String> outElements) {
