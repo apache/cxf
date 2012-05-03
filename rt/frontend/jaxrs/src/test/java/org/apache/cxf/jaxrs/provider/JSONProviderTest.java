@@ -36,7 +36,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.ws.rs.WebApplicationException; 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -72,6 +74,21 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testReadMalformedJson() throws Exception {
+        MessageBodyReader<?> p = new JSONProvider();
+        byte[] bytes = "junk".getBytes();
+         
+        try {
+            p.readFrom((Class)Tags.class, null, null, 
+                                           null, null, new ByteArrayInputStream(bytes));
+            fail("404 is expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), ex.getResponse().getStatus());
+        }
+    }
 
     @SuppressWarnings("unchecked")
     @Test
