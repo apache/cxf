@@ -49,10 +49,6 @@ public class MemorySPStateManager implements SPStateManager {
         return requestStateMap.remove(relayState);
     }
     
-    public RequestState getRequestState(String relayState) {
-        return requestStateMap.get(relayState);
-    }
-
     public void close() {
         // complete
     }

@@ -39,9 +39,14 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                 ub.queryParam(SSOConstants.SAML_REQUEST, info.getEncodedSamlRequest());
                 ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());    
                 
+                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                    info.getRelayState(),
+                                                    info.getWebAppContext());
+                
                 return Response.seeOther(ub.build())
                                .header(HttpHeaders.CACHE_CONTROL, "no-store")
                                .header("Pragma", "no-cache") 
+                               .header("Set-Cookie", contextCookie)
                                .build();
             } catch (Exception ex) {
                 throw new WebApplicationException(ex);

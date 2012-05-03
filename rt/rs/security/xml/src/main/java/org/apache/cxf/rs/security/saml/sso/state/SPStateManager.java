@@ -31,7 +31,6 @@ package org.apache.cxf.rs.security.saml.sso.state;
 public interface SPStateManager {
     
     void setRequestState(String relayState, RequestState state);
-    RequestState getRequestState(String relayState);
     RequestState removeRequestState(String relayState);
     
     void setResponseState(String contextKey, ResponseState state);

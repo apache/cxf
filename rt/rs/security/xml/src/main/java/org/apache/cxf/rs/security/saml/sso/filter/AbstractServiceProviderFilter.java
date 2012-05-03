@@ -19,9 +19,9 @@
 package org.apache.cxf.rs.security.saml.sso.filter;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -41,12 +41,13 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
+import org.apache.cxf.rs.security.saml.sso.AbstractSSOSpHandler;
 import org.apache.cxf.rs.security.saml.sso.SSOConstants;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
-import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.common.SAMLVersion;
@@ -58,7 +59,8 @@ import org.opensaml.saml2.core.NameIDPolicy;
 import org.opensaml.saml2.core.RequestedAuthnContext;
 import org.opensaml.xml.io.MarshallingException;
 
-public abstract class AbstractServiceProviderFilter implements RequestHandler {
+public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
+    implements RequestHandler {
     
     protected static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractServiceProviderFilter.class);
@@ -68,9 +70,6 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
     private String idpServiceAddress;
     private String issuerId;
     private String assertionConsumerServiceAddress;
-    private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;
-    
-    private SPStateManager stateProvider;
     
     public void setAssertionConsumerServiceAddress(
             String assertionConsumerServiceAddress) {
@@ -89,6 +88,14 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         return idpServiceAddress;
     }
 
+    private String getIssuerId(Message m) {
+        if (issuerId == null) {
+            return new UriInfoImpl(m).getBaseUri().toString();
+        } else {
+            return issuerId;
+        }
+    }
+    
     protected boolean checkSecurityContext(Message m) {
         HttpHeaders headers = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = headers.getCookies();
@@ -99,15 +106,24 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
             return false;
         }
         String contextKey = securityContextCookie.getValue();
-        ResponseState responseState = stateProvider.getResponseState(contextKey);
+        ResponseState responseState = getStateProvider().getResponseState(contextKey);
         if (responseState == null) {
             reportError("MISSING_RESPONSE_STATE");
             return false;
         }
-        long stateCreatedAt = responseState.getCreatedAt();
-        if (new Date().after(new Date(stateCreatedAt + stateTimeToLive))) {
+        if (isStateExpired(responseState.getCreatedAt())) {
             reportError("EXPIRED_RESPONSE_STATE");
-            stateProvider.removeResponseState(contextKey);
+            getStateProvider().removeResponseState(contextKey);
+            return false;
+        }
+        Cookie relayStateCookie = cookies.get(SSOConstants.RELAY_STATE);
+        if (relayStateCookie == null) {
+            reportError("MISSING_RELAY_COOKIE");
+            return false;
+        }
+        String originalRelayState = responseState.getRelayState();
+        if (!originalRelayState.equals(relayStateCookie.getValue())) {
+            reportError("INVALID_RELAY_STATE");
             return false;
         }
         //TODO: use ResponseState to set up a proper SecurityContext 
@@ -117,7 +133,7 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
     
     protected AuthnRequest createAuthnRequest(Message m, Document doc) throws Exception {
         Issuer issuer =
-            SamlpRequestComponentBuilder.createIssuer(issuerId);
+            SamlpRequestComponentBuilder.createIssuer(getIssuerId(m));
         NameIDPolicy nameIDPolicy =
             SamlpRequestComponentBuilder.createNameIDPolicy(
                 true, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "Issuer"
@@ -169,16 +185,21 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
         SamlRequestInfo info = new SamlRequestInfo();
         info.setEncodedSamlRequest(authnRequestEncoded);
         
+        String httpBasePath = (String)m.get("http.base.path");
+        String webAppContext = URI.create(httpBasePath).getRawPath();
         String originalRequestURI = (String)m.get(Message.REQUEST_URI);
+        
         RequestState requestState = new RequestState(originalRequestURI,
-                                                     idpServiceAddress,
+                                                     getIdpServiceAddress(),
                                                      authnRequest.getID(),
-                                                     issuerId,
+                                                     getIssuerId(m),
+                                                     webAppContext,
                                                      System.currentTimeMillis());
         
         String relayState = UUID.randomUUID().toString();
-        stateProvider.setRequestState(relayState, requestState);
+        getStateProvider().setRequestState(relayState, requestState);
         info.setRelayState(relayState);
+        info.setWebAppContext(webAppContext);
         
         return info;
     }
@@ -206,13 +227,5 @@ public abstract class AbstractServiceProviderFilter implements RequestHandler {
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
     }
-    
-    public void setStateTimeToLive(long stateTime) {
-        this.stateTimeToLive = stateTime;
-    }
-
-    public void setStateProvider(SPStateManager provider) {
-        this.stateProvider = provider;
-    }
-    
+        
 }

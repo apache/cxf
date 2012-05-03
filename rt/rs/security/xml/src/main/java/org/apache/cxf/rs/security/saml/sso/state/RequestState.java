@@ -24,17 +24,20 @@ public class RequestState {
     private String idpServiceAddress;
     private String samlRequestId;
     private String issuerId;
+    private String webAppContext;
     private long createdAt;
  
     public RequestState(String targetAddress,
                         String idpServiceAddress,
                         String samlRequestId,
                         String issuerId,
+                        String webAppContext,
                         long createdAt) {
         this.targetAddress = targetAddress;
         this.idpServiceAddress = idpServiceAddress;
         this.samlRequestId = samlRequestId;
         this.issuerId = issuerId;
+        this.webAppContext = webAppContext;
         this.createdAt = createdAt;
     }
 
@@ -56,5 +59,9 @@ public class RequestState {
 
     public long getCreatedAt() {
         return createdAt;
+    }
+
+    public String getWebAppContext() {
+        return webAppContext;
     }
 }

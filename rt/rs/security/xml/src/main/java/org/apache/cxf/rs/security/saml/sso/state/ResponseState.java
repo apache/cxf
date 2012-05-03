@@ -20,13 +20,19 @@ package org.apache.cxf.rs.security.saml.sso.state;
 
 public class ResponseState {
 
+    private String relayState;
     private long createdAt;
     
-    public ResponseState(long createdAt) {
+    public ResponseState(String relayState, long createdAt) {
+        this.relayState = relayState;
         this.createdAt = createdAt;
     }
 
     public long getCreatedAt() {
         return createdAt;
+    }
+
+    public String getRelayState() {
+        return relayState;
     }
 }
