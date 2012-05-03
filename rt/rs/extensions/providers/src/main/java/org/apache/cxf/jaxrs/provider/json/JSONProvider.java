@@ -239,7 +239,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (DepthExceededStaxException e) {
             throw new WebApplicationException(413);
         } catch (XMLStreamException e) {
-            throw new WebApplicationException(e, Response.status(400).build());
+            handleXMLStreamException(e, true);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -360,7 +360,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (JAXBException e) {
             handleJAXBException(e, false);
         } catch (XMLStreamException e) {
-            throw new WebApplicationException(e);
+            handleXMLStreamException(e, false);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
