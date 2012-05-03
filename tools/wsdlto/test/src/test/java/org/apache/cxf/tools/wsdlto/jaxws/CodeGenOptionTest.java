@@ -23,8 +23,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+
+import com.sun.codemodel.CodeWriter;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ToolConstants;
@@ -315,6 +318,41 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir,
                                                                                "SOAPService.java")));
         assertTrue(str, str.contains("getResource"));
+    }
+    @Test
+    public void testEncoding() throws Exception {
+        try {
+            CodeWriter.class.getDeclaredField("encoding");
+        } catch (Throwable t) {
+            //version of jaxb that doesn't support this.  We'll just not run the test.
+            return;
+        }
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_encoding.wsdl"));
+        env.put(ToolConstants.CFG_WSDLLOCATION, "/wsdl2java_wsdl/hello_world_encoding.wsdl");
+        env.put(ToolConstants.CFG_ENCODING, "Cp1251");
+        processor.setContext(env);
+        processor.execute();
+
+        File dir = new File(output, "org");
+        assertTrue("org directory is not found", dir.exists());
+        dir = new File(dir, "apache");
+        assertTrue("apache directory is not found", dir.exists());
+        dir = new File(dir, "cxf");
+        assertTrue("cxf directory is not found", dir.exists());
+        dir = new File(dir, "w2j");
+        assertTrue("w2j directory is not found", dir.exists());
+        dir = new File(dir, "hello_world_soap_http");
+        assertTrue("hello_world_soap_http directory is not found", dir.exists());
+
+        String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir,
+                                                                               "SOAPService.java")));
+        assertTrue(str, str.contains("getResource"));
+        
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter");
+        for (Method m : clz.getMethods()) {
+            String s = m.getName();
+            assertEquals(1039, s.charAt(2));
+        }
     }
 
 }

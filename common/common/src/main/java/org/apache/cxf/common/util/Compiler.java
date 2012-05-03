@@ -38,6 +38,7 @@ public class Compiler {
     private String target;
     private String outputDir;
     private String classPath;
+    private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
     
     public Compiler() {
@@ -69,6 +70,10 @@ public class Compiler {
     private void addArgs(List<String> list) {
         if (verbose) {
             list.add("-verbose");
+        }
+        if (!StringUtils.isEmpty(encoding)) {
+            list.add("-encoding");
+            list.add(encoding);
         }
         if (!StringUtils.isEmpty(target)) {
             list.add("-target");
@@ -280,6 +285,10 @@ public class Compiler {
             strBuffer.append(args[i]);
         }
         return strBuffer.toString().length() > 4096 ? true : false;
+    }
+
+    public void setEncoding(String string) {
+        encoding = string;
     }
 
     

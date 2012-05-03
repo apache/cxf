@@ -40,6 +40,7 @@ public final class ToolConstants {
     public static final String CFG_OUTPUTFILE = "outputfile";
     public static final String CFG_WSDLURL = "wsdlurl";
     public static final String CFG_WSDLLOCATION = "wsdlLocation";
+    public static final String CFG_ENCODING = "encoding";
     public static final String CFG_WSDLLIST = "wsdlList";
     public static final String CFG_NAMESPACE = "namespace";
     public static final String CFG_VERBOSE = "verbose";

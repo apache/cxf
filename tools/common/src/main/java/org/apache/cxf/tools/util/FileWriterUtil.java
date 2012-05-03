@@ -53,7 +53,7 @@ public class FileWriterUtil {
     }
 
     public static Writer getWriter(File fn) throws IOException {
-        return new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(fn)), "UTF-8");
+        return getWriter(fn, "UTF-8");
     }
 
     public static Writer getWriter(File fn, String encoding) throws IOException {
@@ -65,6 +65,9 @@ public class FileWriterUtil {
     
     public Writer getWriter(String packageName, String fileName) throws IOException {
         return getWriter(getFileToWrite(packageName, fileName));
+    }
+    public Writer getWriter(String packageName, String fileName, String encoding) throws IOException {
+        return getWriter(getFileToWrite(packageName, fileName), encoding);
     }
 
     public boolean isCollision(String packageName, String fileName) throws ToolException {

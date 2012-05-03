@@ -55,10 +55,10 @@ import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.StreamConsumer;
 
 public abstract class AbstractCodegenMoho extends AbstractMojo {
 
@@ -352,6 +352,17 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     
     protected abstract String getMarkerSuffix();
     
+    protected List<String> generateCommandLine(GenericWsdlOption wsdlOption)
+        throws MojoExecutionException {
+        
+        File outputDirFile = wsdlOption.getOutputDir();
+        outputDirFile.mkdirs();
+        URI basedir = project.getBasedir().toURI();
+        URI wsdlURI = getWsdlURI(wsdlOption, basedir);
+        return wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI,
+                                              getLog().isDebugEnabled());
+    }
+    
     protected void forkOnce(Set<URI> classPath, List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
         List<GenericWsdlOption> toDo = new LinkedList<GenericWsdlOption>();
@@ -370,8 +381,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
             toDo.add(wsdlOption);
 
-            wargs.add(wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
-                .isDebugEnabled()));
+            wargs.add(generateCommandLine(wsdlOption));
         }
         if (wargs.isEmpty()) {
             return;
@@ -485,9 +495,19 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
         cmd.addArguments(args);
 
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
-
+        StreamConsumer out = new StreamConsumer() {
+            public void consumeLine(String line) {
+                getLog().info(line);
+            }
+        };
+        final StringBuilder b = new StringBuilder();
+        StreamConsumer err = new StreamConsumer() {
+            public void consumeLine(String line) {
+                b.append(line);
+                b.append("\n");
+                getLog().warn(line);
+            }
+        };
         int exitCode;
         try {
             exitCode = CommandLineUtils.executeCommandLine(cmd, out, err);
@@ -496,20 +516,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage(), e);
         }
         
-        String output = StringUtils.isEmpty(out.getOutput()) ? null : '\n' + out.getOutput().trim();
 
         String cmdLine = CommandLineUtils.toString(cmd.getCommandline());
 
         if (exitCode != 0) {
-            if (StringUtils.isNotEmpty(output)) {
-                getLog().info(output);
-            }
-
             StringBuffer msg = new StringBuffer("\nExit code: ");
             msg.append(exitCode);
-            if (StringUtils.isNotEmpty(err.getOutput())) {
-                msg.append(" - ").append(err.getOutput());
-            }
             msg.append('\n');
             msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');
 
@@ -519,9 +531,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (file != null) {
             file.delete();
         }
-        if (StringUtils.isNotEmpty(err.getOutput()) && err.getOutput().contains("WSDL2Java Error")) {
+        if (b.toString().contains("WSDL2Java Error")) {
             StringBuffer msg = new StringBuffer();
-            msg.append(err.getOutput());
+            msg.append(b.toString());
             msg.append('\n');
             msg.append("Command line was: ").append(cmdLine).append('\n').append('\n');
             throw new MojoExecutionException(msg.toString());

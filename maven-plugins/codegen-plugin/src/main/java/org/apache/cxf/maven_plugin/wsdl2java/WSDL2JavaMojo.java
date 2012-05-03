@@ -75,6 +75,13 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     Option defaultOptions = new Option();
     
     /**
+     * Encoding to use for generated sources
+     * 
+     * @parameter default-value="${project.build.sourceEncoding}"
+     */
+    String encoding;
+    
+    /**
      * Merge WsdlOptions that point to the same file by adding the extraargs to the first option and deleting
      * the second from the options list
      * 
@@ -163,8 +170,14 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         }
         return doWork;
     }
-
-
+    
+    protected List<String> generateCommandLine(GenericWsdlOption wsdlOption)
+        throws MojoExecutionException {
+        List<String> ret = super.generateCommandLine(wsdlOption);
+        ret.add(0, "-encoding");
+        ret.add(1, encoding);
+        return ret;
+    }
 
     @Override
     protected Bus generate(GenericWsdlOption genericWsdlOption, 
@@ -182,9 +195,11 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         }
         doneFile.delete();
 
-        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
-                                                           .isDebugEnabled());
-        String[] args = (String[])list.toArray(new String[list.size()]);
+        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, 
+                                                           getLog().isDebugEnabled());
+        list.add(0, "-encoding");
+        list.add(1, encoding);
+        String[] args = list.toArray(new String[list.size()]);
         getLog().debug("Calling wsdl2java with args: " + Arrays.toString(args));
         
         if (!"false".equals(fork)) {

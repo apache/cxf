@@ -82,7 +82,12 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
 
         fw = new FileWriterUtil(getOutputDir());
         try {
-            writer = fw.getWriter(packageName, filename + ext);
+            if (".java".equals(ext)) {
+                writer = fw.getWriter(packageName, filename + ext, 
+                                      (String)getEnvironment().get(ToolConstants.CFG_ENCODING));
+            } else {
+                writer = fw.getWriter(packageName, filename + ext);
+            }
         } catch (IOException ioe) {
             Message msg = new Message("FAIL_TO_WRITE_FILE", LOG, packageName + "." + filename + ext);
             throw new ToolException(msg, ioe);

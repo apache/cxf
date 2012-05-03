@@ -67,12 +67,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 import com.sun.codemodel.ClassType;
+import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.BadCommandLineException;
+import com.sun.tools.xjc.Driver;
 import com.sun.tools.xjc.ErrorReceiver;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
@@ -277,9 +279,26 @@ public class JAXBDataBinding implements DataBindingProfile {
         DEFAULT_TYPE_MAP.addAll(JLDEFAULT_TYPE_MAP.keySet());
     }
 
+    private void checkEncoding(ToolContext c) {
+        String encoding = (String)c.get(ToolConstants.CFG_ENCODING);
+        if (encoding != null) {
+            try {
+                CodeWriter.class.getDeclaredField("encoding");
+            } catch (Throwable t) {
+                c.remove(ToolConstants.CFG_ENCODING);
+                String fenc = System.getProperty("file.encoding");
+                if (!encoding.equals(fenc)) {
+                    LOG.log(Level.WARNING, "JAXB_NO_ENCODING_SUPPORT", 
+                            new String[] {Driver.getBuildID(), fenc});
+                }
+            }
+        }
+        
+    }
+    
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
-
+        checkEncoding(c);
         SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
         Bus bus = context.get(Bus.class);
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
@@ -713,7 +732,9 @@ public class JAXBDataBinding implements DataBindingProfile {
         try {
             String dir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
 
-            TypesCodeWriter fileCodeWriter = new TypesCodeWriter(new File(dir), context.getExcludePkgList());
+            TypesCodeWriter fileCodeWriter = new TypesCodeWriter(new File(dir),
+                                                                 context.getExcludePkgList(),
+                                                                 (String)context.get(ToolConstants.CFG_ENCODING));
 
             if (rawJaxbModelGenCode instanceof S2JJAXBModel) {
                 S2JJAXBModel schem2JavaJaxbModel = (S2JJAXBModel)rawJaxbModelGenCode;
