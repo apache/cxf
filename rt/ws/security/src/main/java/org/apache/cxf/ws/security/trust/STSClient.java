@@ -921,6 +921,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         Element lte = null;
         Element entropy = null;
         String tt = null;
+        String retKeySize = null;
 
         while (el != null) {
             String ln = el.getLocalName();
@@ -939,6 +940,8 @@ public class STSClient implements Configurable, InterceptorProvider {
                     entropy = el;
                 } else if ("TokenType".equals(ln)) {
                     tt = DOMUtils.getContent(el);
+                } else if ("KeySize".equals(ln)) {
+                    retKeySize = DOMUtils.getContent(el);
                 }
             }
             el = DOMUtils.getNextElement(el);
@@ -984,9 +987,18 @@ public class STSClient implements Configurable, InterceptorProvider {
                     // Right now we only use PSHA1 as the computed key algo
                     P_SHA1 psha1 = new P_SHA1();
 
-                    int length = (keySize > 0) ? keySize : 256;
-                    if (algorithmSuite != null) {
-                        length = (keySize > 0) ? keySize : algorithmSuite.getMaximumSymmetricKeyLength();
+                    int length = 0;
+                    if (retKeySize != null) {
+                        try {
+                            length = Integer.parseInt(retKeySize);
+                        } catch (NumberFormatException ex) {
+                            // do nothing
+                        }
+                    } else {
+                        length = keySize;
+                    }
+                    if (length <= 0) {
+                        length = 256;
                     }
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
