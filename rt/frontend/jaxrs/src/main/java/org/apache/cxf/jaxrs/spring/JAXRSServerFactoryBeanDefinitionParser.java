@@ -164,7 +164,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 tempFactories.clear();
                 super.setResourceProviders(factories);
             }
-            if (getBus() == null) {
+            if (bus == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();
                 BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
                 setBus(bus);

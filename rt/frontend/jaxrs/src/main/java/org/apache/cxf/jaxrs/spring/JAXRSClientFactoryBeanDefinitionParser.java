@@ -106,7 +106,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
         }
         
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (getBus() == null) {
+            if (bus == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();
                 BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
                 setBus(bus);
