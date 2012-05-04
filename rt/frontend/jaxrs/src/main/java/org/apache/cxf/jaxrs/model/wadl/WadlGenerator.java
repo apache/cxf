@@ -37,6 +37,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -220,7 +222,7 @@ public class WadlGenerator implements RequestHandler {
             schemaWriter == null ? null : createElementQNameResolver(context);
 
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
-        Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
+        Set<ClassResourceInfo> visitedResources = new LinkedHashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
             startResourceTag(sbResources, cri.getServiceClass(), cri.getURITemplate().getValue());
             Annotation[] anns = cri.getServiceClass().getAnnotations();
@@ -323,7 +325,7 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private Map<Parameter, Object> getClassParameters(ClassResourceInfo cri) {
-        Map<Parameter, Object> classParams = new HashMap<Parameter, Object>();
+        Map<Parameter, Object> classParams = new LinkedHashMap<Parameter, Object>();
         List<Method> paramMethods = cri.getParameterMethods();
         for (Method m : paramMethods) {
             classParams.put(ResourceUtils.getParameter(0, m.getAnnotations(),
@@ -514,7 +516,7 @@ public class WadlGenerator implements RequestHandler {
     
     private void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params,
                                      boolean isJson, ParameterType... pType) {
-        Set<ParameterType> pTypes = new HashSet<ParameterType>(Arrays.asList(pType));
+        Set<ParameterType> pTypes = new LinkedHashSet<ParameterType>(Arrays.asList(pType));
         for (Map.Entry<Parameter, Object> entry : params.entrySet()) {
             Parameter pm = entry.getKey();
             Object obj = entry.getValue();
