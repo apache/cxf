@@ -56,9 +56,27 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
         }
     }
     
+    protected String createMethodSig(Method method) {
+        StringBuilder b = new StringBuilder(method.getReturnType().getName());
+        b.append(' ').append(method.getName()).append('(');
+        boolean first = true;
+        for (Class<?> cls : method.getParameterTypes()) {
+            if (!first) {
+                b.append(", ");
+                first = false;
+            }
+            b.append(cls.getName());
+        }
+        b.append(')');
+        return b.toString();
+    }
+    
     @Override
     protected List<String> getExpectedRoles(Method method) {
-        List<String> roles = methodRolesMap.get(method.getName());
+        List<String> roles = methodRolesMap.get(createMethodSig(method));
+        if (roles == null) {
+            roles = methodRolesMap.get(method.getName());
+        }
         if (roles != null) {
             return roles;
         }

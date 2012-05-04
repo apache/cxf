@@ -85,6 +85,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             String theRoles = methodRolesAllowed != null ? methodRolesAllowed : classRolesAllowed;
             if (theRoles != null) {
                 rolesMap.put(m.getName(), theRoles);
+                rolesMap.put(createMethodSig(m), theRoles);
             }
         }
         if (!rolesMap.isEmpty()) {
