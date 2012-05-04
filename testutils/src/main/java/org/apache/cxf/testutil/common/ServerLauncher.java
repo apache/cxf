@@ -382,7 +382,6 @@ public class ServerLauncher {
             cmd.add(vmargs);
         }
         
-        cmd.add("-Djavax.xml.ws.spi.Provider=org.apache.cxf.jaxws.spi.ProviderImpl");
         String portClose = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
         if (portClose != null) {
             cmd.add("-Dorg.apache.cxf.transports.http_jetty.DontClosePort=" + portClose);
@@ -428,6 +427,10 @@ public class ServerLauncher {
         String derbyHome = System.getProperty("derby.system.home");
         if (null != derbyHome) {
             cmd.add("-Dderby.system.home=" + derbyHome);
+        }
+        String tmp = System.getProperty("java.io.tmpdir");
+        if (null != tmp) {
+            cmd.add("-Djava.io.tmpdir=" + tmp);
         }
         
         cmd.add(className);
