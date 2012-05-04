@@ -337,6 +337,7 @@
                         <argLine>${cxf.surefire.fork.vmargs}</argLine>
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
+                            <java.io.tmpdir>${basedir}/target</java.io.tmpdir>
                             <cxf.useRandomFirstPort>true</cxf.useRandomFirstPort>
                             <org.apache.ws.commons.schema.protectReadOnlyCollections>${cxf.protect-xmlschema-collections}</org.apache.ws.commons.schema.protectReadOnlyCollections>
                             <cxf.validateServiceSchemas>${cxf.validateServices}</cxf.validateServiceSchemas>
