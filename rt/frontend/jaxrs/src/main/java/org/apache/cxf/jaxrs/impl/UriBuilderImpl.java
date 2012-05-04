@@ -386,9 +386,7 @@ public class UriBuilderImpl extends UriBuilder {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
-        // this is the cheapest way to figure out if a given path is a full-fledged 
-        // URI with the http(s) scheme but a more formal approach may be needed 
-        if (path.startsWith("http")) {
+        if (isAbsoluteUriPath(path)) {
             uri(URI.create(path));
             return this;
         }
@@ -577,14 +575,34 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder replacePath(String path) {
         if (path == null) {
-            paths.clear();
-            matrix.clear();
+            clearPathAndMatrix();
+        } else if (isAbsoluteUriPath(path)) {
+            clearPathAndMatrix();
+            uri(URI.create(path));
         } else {
             setPathAndMatrix(path);
         }
         return this;
     }
 
+    private void clearPathAndMatrix() {
+        paths.clear();
+        matrix.clear();
+    }
+    
+    private boolean isAbsoluteUriPath(String path) {
+        // This is the cheapest way to figure out if a given path is an absolute 
+        // URI with the http(s) scheme, more expensive way is to always convert 
+        // a path to URI and check if it starts from some scheme or not
+        
+        // Given that the list of schemes can be open-ended it is recommended that
+        // UriBuilder.fromUri is called instead for schemes like 'file', 'jms', etc
+        // be supported though the use of non-http schemes for *building* new URIs
+        // is pretty limited in the context of working with JAX-RS services
+         
+        return path.startsWith("http");
+    }
+    
     @Override
     public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
         if (queryValue != null) {

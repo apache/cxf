@@ -978,6 +978,26 @@ public class UriBuilderImplTest extends Assert {
     }
 
     @Test
+    public void testFromEncodedDuplicateVarReplacePath() {
+        String expected = "http://localhost:8080/1/2/3/1";
+        URI uri = UriBuilder.fromPath("")
+                            .replacePath("http://localhost:8080")
+                            .path("/{a}/{b}/{c}/{a}")
+                            .buildFromEncoded("1", "2", "3");
+
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
+    public void testNullScheme() {
+        String expected = "//localhost:8080";
+        URI uri = UriBuilder.fromUri("http://localhost:8080")
+                            .scheme(null)
+                            .build();
+        assertEquals(expected, uri.toString());        
+    }
+
+    @Test
     public void testNullMapValue() {
         try {
             Map<String, String> maps = new HashMap<String, String>();
