@@ -74,32 +74,4 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
 
-    <!-- -->
-    <!-- HTTP/S configuration for clients -->
-    <!-- -->
-    <http:conduit name="{http://www.example.org/contract/DoubleIt}DoubleItPortHttps.http-conduit">
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="JKS" password="password" 
-                     resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>
-            </sec:keyManagers>
-            <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password"
-                     resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
-            </sec:trustManagers>
-            <sec:cipherSuitesFilter>
-                <!-- these filters ensure that a ciphersuite with
-		          export-suitable or null encryption is used,
-		          but exclude anonymous Diffie-Hellman key change as
-		          this is vulnerable to man-in-the-middle attacks -->
-		        <sec:include>.*_EXPORT_.*</sec:include>
-		        <sec:include>.*_EXPORT1024_.*</sec:include>
-		        <sec:include>.*_WITH_DES_.*</sec:include>
-		        <sec:include>.*_WITH_AES_.*</sec:include>
-		        <sec:include>.*_WITH_NULL_.*</sec:include>
-		        <sec:exclude>.*_DH_anon_.*</sec:exclude>
-            </sec:cipherSuitesFilter>
-        </http:tlsClientParameters>
-    </http:conduit>
-
 </beans>

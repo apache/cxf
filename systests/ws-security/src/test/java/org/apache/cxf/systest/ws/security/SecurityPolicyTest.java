@@ -214,7 +214,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public void testPolicy() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
-        Bus bus = bf.createBus();
+        URL busFile = SecurityPolicyTest.class.getResource("https_config_client.xml");
+        Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
