@@ -746,8 +746,6 @@ public class BookStore {
         }
         
         book.setId(bookId + 1);
-        books.put(book.getId(), book);
-
         return Response.ok(book).build();
     }
     
@@ -795,8 +793,7 @@ public class BookStore {
 
         Response r;
         if (b != null) {
-            books.put(book.getId(), book);
-            r = Response.ok().build();
+            r = Response.ok(book).build();
         } else {
             r = Response.notModified().build();
         }
@@ -813,8 +810,7 @@ public class BookStore {
         if (b == null) {
             Book newBook = new Book();
             newBook.setId(id);
-            books.put(newBook.getId(), newBook);
-            r = Response.ok().build();
+            r = Response.ok(newBook).build();
         } else {
             r = Response.notModified().build();
         }
@@ -837,8 +833,7 @@ public class BookStore {
 
         Response r;
         if (b != null) {
-            books.put(book.getId(), book);
-            r = Response.ok().build();
+            r = Response.ok(book).build();
         } else {
             r = Response.notModified().build();
         }
