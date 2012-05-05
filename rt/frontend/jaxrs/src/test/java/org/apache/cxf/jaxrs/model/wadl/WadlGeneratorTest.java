@@ -519,7 +519,14 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(number, params.length);
         
         for (int i = 0; i < number; i++) {
-            checkParameter(paramsEls.get(i), params[i]);
+            boolean found = false;
+            for (int y = 0; y < params.length; y++) {
+                if (params[y].getName().equals(paramsEls.get(i).getAttribute("name"))) {
+                    checkParameter(paramsEls.get(i), params[y]);
+                    found = true;
+                }
+            }
+            assertTrue(found);
         }
     }
     
