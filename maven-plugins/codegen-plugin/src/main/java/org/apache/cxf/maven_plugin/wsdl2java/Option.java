@@ -345,11 +345,9 @@ public class Option {
     }
 
     public void setValidateWsdl(String validateWsdl) {
-        System.out.println("Validate: " + validateWsdl);
         this.validateWsdl = validateWsdl;
     }
     public void setValidate(String v) {
-        System.out.println("Validate: " + v);
         this.validateWsdl = v;
     }
     
