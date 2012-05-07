@@ -135,7 +135,6 @@
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${cxf.wss4j.version}">wss4j</feature>
         <feature version="${project.version}">cxf-ws-addr</feature>
-        <bundle start-level='40' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
     </feature>
     <feature name="http-whiteboard" version="2.2.5" resolver='(obr)'>
@@ -333,8 +332,6 @@
 
     <feature name="cxf-sts" version="${project.version}" resolver='(obr)'>
         <bundle start-level='40' dependency="true">mvn:com.hazelcast/hazelcast/${cxf.hazelcast.version}</bundle>
-        <bundle start-level='40' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
-
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-ws-security</feature>
 
