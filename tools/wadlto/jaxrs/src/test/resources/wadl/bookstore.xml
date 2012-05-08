@@ -43,15 +43,32 @@
             <xs:element minOccurs="0" name="name" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+    
+    <xs:simpleType name="patternType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([A-z0-9_@$\-]+)|(([A-z][A-z0-9_\-]*(\.[A-z][A-z0-9_\-]*)*)(\,[A-z0-9_@$\-]+)(\,(latest|([0-9]+(\.[0-9]+)*)))?)"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="enumType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="text-only"/>
+			<xs:enumeration value="rich-xml"/>
+			<xs:enumeration value="original"/>
+		</xs:restriction>
+	</xs:simpleType>
+    
   </xs:schema>
  </grammars>
  <resources base="http://localhost:8080/baz">
    <resource path="/bookstore/{id}" id="org.apache.cxf.jaxrs.model.wadl.BookStore">
      <doc xml:lang="en-us" title="book store resource">super resource</doc>
      <param name="id" style="template" type="xs:long"/>
+     <param name="patternId" style="template" type="prefix1:patternType"/>
 
      <method name="GET" id="getName">
       <request>
+        <param name="enumType" style="query" type="prefix1:enumType"/>
         <param name="a" style="query" type="xs:int"/>
         <param name="c.a" style="query" type="xs:int"/>
         <param name="c.b" style="query" type="xs:int"/>
