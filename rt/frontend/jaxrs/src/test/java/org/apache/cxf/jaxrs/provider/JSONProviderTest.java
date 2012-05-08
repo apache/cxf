@@ -50,6 +50,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
@@ -602,7 +603,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        System.out.println(s);
         assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
         
     }
@@ -1145,7 +1145,87 @@ public class JSONProviderTest extends Assert {
     private TagVO2 createTag2(String name, String group) {
         return new TagVO2(name, group);
     }
+ 
+    @Test
+    public void testWriteReadDerivedNamespace() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        provider.setMarshallAsJaxbElement(true);
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://derivedtest", "derivedtestnamespace");
+        provider.setNamespaceMap(namespaceMap);
+
+        Base1 b = new Derived1("base", "derived");
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(b, Base1.class, Base1.class,
+                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
+                        new MetadataMap<String, Object>(), bos);
+        
+        readBase(bos.toString());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readBase(String data) throws Exception {
+        JSONProvider provider = new JSONProvider();
+        provider.setUnmarshallAsJaxbElement(true);
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://derivedtest", "derivedtestnamespace");
+        provider.setNamespaceMap(namespaceMap);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+
+        Base1 base = (Base1)provider.readFrom(
+                        (Class)Base1.class, Base1.class,
+                        new Annotation[0], MediaType.APPLICATION_JSON_TYPE,
+                        new MetadataMap<String, String>(), is);
+        assertEquals("base", base.getBase1Field());
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "Base1", namespace = "http://derivedtest")
+    @XmlSeeAlso({Derived1.class })
+    public static class Base1 {
     
+        protected String base1Field;
+    
+        Base1() { }
+    
+        Base1(String base) {
+            base1Field = base;
+        }
+    
+        public String getBase1Field() {
+            return base1Field;
+        }
+    
+        public void setBase1Field(String value) {
+            this.base1Field = value;
+        }
+    }
+
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "Derived1", namespace = "http://derivedtest")
+    public static class Derived1 extends Base1 {
+    
+        protected String derived1Field;
+    
+        Derived1() { }
+        public Derived1(String base, String derived) {
+            super(base);
+            derived1Field = derived;
+        }
+    
+        public String getDerived1Field() {
+            return derived1Field;
+        }
+    
+        public void setDerived1Field(String value) {
+            this.derived1Field = value;
+        }
+    
+    }
+   
     @XmlRootElement()
     public static class Books {
         @XmlMixed
