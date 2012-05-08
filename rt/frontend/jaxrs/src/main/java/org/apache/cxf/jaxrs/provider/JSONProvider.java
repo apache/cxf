@@ -504,6 +504,9 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
         
         Marshaller ms = createMarshaller(actualObject, actualClass, genericType, enc);
+        if (!namespaceMap.isEmpty()) {
+            setNamespaceMapper(ms, namespaceMap);
+        }
         marshal(ms, actualObject, actualClass, genericType, enc, os, false);
     }
     

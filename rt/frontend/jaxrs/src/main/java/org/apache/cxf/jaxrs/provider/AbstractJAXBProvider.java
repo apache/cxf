@@ -46,6 +46,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlAnyElement;
@@ -64,6 +65,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
+import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -83,8 +85,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
 
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
+    protected static final String NS_MAPPER_PROPERTY = "com.sun.xml.bind.namespacePrefixMapper";
+    protected static final String NS_MAPPER_PROPERTY_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
+    
     
     protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
     
@@ -121,6 +126,21 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private DocumentDepthProperties depthProperties;
+    
+    protected static void setNamespaceMapper(Marshaller ms, Map<String, String> map) throws Exception {
+        NamespaceMapper nsMapper = new NamespaceMapper(map);
+        setMarshallerProp(ms, nsMapper, NS_MAPPER_PROPERTY, NS_MAPPER_PROPERTY_INT);
+    }
+    
+    protected static void setMarshallerProp(Marshaller ms, Object value, 
+                                          String name1, String name2) throws Exception {
+        try {
+            ms.setProperty(name1, value);
+        } catch (PropertyException ex) {
+            ms.setProperty(name2, value);
+        }
+        
+    }
     
     public void setValidationHandler(ValidationEventHandler handler) {
         eventHandler = handler;
