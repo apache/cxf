@@ -33,11 +33,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.manager.DeliveryAssuranceType;
+import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -162,6 +164,17 @@ public class DestinationSequence extends AbstractSequence {
                 }
             }
             mergeRanges();
+        }
+
+        RMStore store = destination.getManager().getStore();
+        if (null != store) {
+            RMMessage msg = null;
+            if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
+                msg = new RMMessage();
+                msg.setContent((CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT));
+                msg.setMessageNumber(st.getMessageNumber());
+            }
+            store.persistIncoming(this, msg);
         }
         
         RMAssertion rma = RM10PolicyUtils.getRMAssertion(destination.getManager().getRMAssertion(), message);
