@@ -47,8 +47,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,8 +72,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,8 +97,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -376,8 +376,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "custom.books", 10);
-            verifyFiles("class", true, false, "superbooks", "custom.books", 10);
+            verifyFiles("java", true, false, "superbooks", "custom.books", 10, true);
+            verifyFiles("class", true, false, "superbooks", "custom.books", 10, true);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -402,8 +402,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "custom.books.schema", "custom.books.service", 10);
-            verifyFiles("class", true, false, "custom.books.schema", "custom.books.service", 10);
+            verifyFiles("java", true, false, "custom.books.schema", "custom.books.service", 10, true);
+            verifyFiles("class", true, false, "custom.books.schema", "custom.books.service", 10, true);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -427,8 +427,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
-            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10);
+            verifyFiles("java", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
+            verifyFiles("class", true, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 10, true);
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -452,8 +452,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyFiles("java", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 11);
-            verifyFiles("class", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 11);
+            verifyFiles("java", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 12, true);
+            verifyFiles("class", true, true, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 12, true);
         } catch (Exception e) {
             fail();
             e.printStackTrace();
@@ -475,7 +475,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
 
             assertNotNull(output.list());
             
-            verifyTypes("superbooks", "java");
+            verifyTypes("superbooks", "java", true);
             
         } catch (Exception e) {
             fail();
@@ -484,9 +484,17 @@ public class JAXRSContainerTest extends ProcessorTestBase {
     }
     
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
-                             String schemaPackage, String resourcePackage, int expectedCount) {    
+                             String schemaPackage, String resourcePackage, int expectedCount) {
+        verifyFiles(ext, subresourceExpected, interfacesAndImpl, schemaPackage, resourcePackage,
+                    expectedCount, false);
+    }
+    
+    private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
+                             String schemaPackage, String resourcePackage, int expectedCount,
+                             boolean enumTypeExpected) {    
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
-        int size = interfacesAndImpl ? expectedCount : expectedCount - 2;
+        int offset = enumTypeExpected ? 1 : 2;
+        int size = interfacesAndImpl ? expectedCount : expectedCount - offset;
         if (!subresourceExpected) {
             size--;
         }
@@ -506,9 +514,9 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
-    private void verifyTypes(String schemaPackage, String ext) {
+    private void verifyTypes(String schemaPackage, String ext, boolean enumTypeExpected) {
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
-        assertEquals(5, files.size());
+        assertEquals(enumTypeExpected ? 6 : 5, files.size());
         doVerifyTypes(files, schemaPackage, ext);
     }
     

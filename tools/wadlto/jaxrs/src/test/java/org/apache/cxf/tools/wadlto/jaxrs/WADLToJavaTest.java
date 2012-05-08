@@ -59,7 +59,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
                              String schemaPackage, String resourcePackage) {    
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
-        int size = interfacesAndImpl ? 10 : 8;
+        int size = interfacesAndImpl ? 11 : 9;
         if (!subresourceExpected) {
             size--;
         }
@@ -78,6 +78,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
     }
     
     private void doVerifyTypes(List<File> files, String schemaPackage, String ext) {
+        assertTrue(checkContains(files, schemaPackage + ".EnumType." + ext));
         assertTrue(checkContains(files, schemaPackage + ".Book." + ext));
         assertTrue(checkContains(files, schemaPackage + ".TheBook2." + ext));
         assertTrue(checkContains(files, schemaPackage + ".Chapter." + ext));

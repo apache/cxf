@@ -1004,8 +1004,8 @@ public class SourceGenerator {
             return XSD_SPECIFIC_TYPE_MAP.get(value);
         } else {
             String actualValue = value.replaceAll("[\\-\\_]", "");
-            if (!actualValue.equals(value) && pair.length > 1) {
-                actualValue = convertRefToClassName(pair[0], actualValue, actualValue, info, imports);
+            if (pair.length > 1) {
+                actualValue = convertRefToClassName(pair[0], actualValue, "String", info, imports);
             }
             return actualValue;
         }
@@ -1026,17 +1026,15 @@ public class SourceGenerator {
                 if (clsName != null) {
                     addImport(imports, clsName);
                     int index = clsName.lastIndexOf(".");
+                    
                     if (index != -1) {
-                        actualValue = clsName.substring(index + 1);
-                    } else {
-                        actualValue = clsName;
-                    }       
+                        clsName = clsName.substring(index + 1);
+                    } 
+                    return clsName;      
                 }
-            } else {
-                actualValue = defaultValue;
             }
         }
-        return actualValue;
+        return defaultValue;
     }
     
     private String getElementRefName(Element repElement,
