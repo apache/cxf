@@ -244,7 +244,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         Map<Object, Object> customActions = new HashMap<Object, Object>(1);
         customActions.put(12345, action);
                 
-        msg.put(WSHandlerConstants.ACTION, "12345");
+        msg.put(WSHandlerConstants.ACTION, "12345 Timestamp");
         msg.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         msg.put(WSHandlerConstants.USER, "username");
         msg.put("password", "myAliasPassword");
