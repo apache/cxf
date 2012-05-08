@@ -29,14 +29,12 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
-import org.apache.cxf.ws.rm.persistence.RMMessage;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 
 public class Destination extends AbstractEndpoint {
@@ -108,8 +106,9 @@ public class Destination extends AbstractEndpoint {
                 if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
                     return;
                 }
-                seq.acknowledge(message);
     
+                seq.acknowledge(message);
+
                 if (null != sequenceType.getLastMessage()) {
                     seq.setLastMessageNumber(sequenceType.getMessageNumber());
                     ackImmediately(seq, message);
@@ -136,17 +135,6 @@ public class Destination extends AbstractEndpoint {
         } else {
             SequenceFaultFactory sff = new SequenceFaultFactory();
             throw sff.createUnknownSequenceFault(sequenceType.getIdentifier());
-        }
-
-        RMStore store = getReliableEndpoint().getManager().getStore();
-        if (null != store) {
-            RMMessage msg = null;
-            if (!MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
-                msg = new RMMessage();
-                msg.setContent((CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT));
-                msg.setMessageNumber(sequenceType.getMessageNumber());
-            }
-            store.persistIncoming(seq, msg);
         }
 
     }

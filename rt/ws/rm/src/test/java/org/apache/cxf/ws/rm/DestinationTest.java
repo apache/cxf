@@ -173,7 +173,7 @@ public class DestinationTest extends Assert {
         Identifier id = control.createMock(Identifier.class);
         EasyMock.expect(st.getIdentifier()).andReturn(id); 
         long nr = 10;
-        EasyMock.expect(st.getMessageNumber()).andReturn(nr).times(3);
+        EasyMock.expect(st.getMessageNumber()).andReturn(nr).anyTimes();
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         EasyMock.expect(destination.getSequence(id)).andReturn(ds);
         
@@ -191,7 +191,7 @@ public class DestinationTest extends Assert {
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(null);
         EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
         EndpointReferenceType replyToEPR = control.createMock(EndpointReferenceType.class);
-        EasyMock.expect(maps.getReplyTo()).andReturn(replyToEPR).times(2);
+        EasyMock.expect(maps.getReplyTo()).andReturn(replyToEPR).anyTimes();
         AttributedURIType replyToURI = control.createMock(AttributedURIType.class);
         EasyMock.expect(replyToEPR.getAddress()).andReturn(replyToURI);
         String replyToAddress = "replyTo";        
@@ -204,11 +204,11 @@ public class DestinationTest extends Assert {
         String acksToAddress = "acksTo";
         EasyMock.expect(acksToURI.getValue()).andReturn(acksToAddress);
         EasyMock.expect(ds.canPiggybackAckOnPartialResponse()).andReturn(false);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme).times(2);
+        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme).anyTimes();
         RMManager manager = control.createMock(RMManager.class);
-        EasyMock.expect(rme.getManager()).andReturn(manager);
+        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
         RMStore store = control.createMock(RMStore.class);
-        EasyMock.expect(manager.getStore()).andReturn(store);
+        EasyMock.expect(manager.getStore()).andReturn(store).anyTimes();
         Proxy proxy = control.createMock(Proxy.class);
         EasyMock.expect(rme.getProxy()).andReturn(proxy);
         proxy.acknowledge(ds);
