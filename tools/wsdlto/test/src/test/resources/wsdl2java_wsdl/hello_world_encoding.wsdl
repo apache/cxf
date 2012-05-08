@@ -26,14 +26,14 @@
     targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http" name="HelloWorld">
     <wsdl:types>
         <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://cxf.apache.org/w2j/hello_world_soap_http/types" elementFormDefault="qualified">
-            <element name="saЏHi">
+            <element name="sayHi">
                 <complexType>
                 	<sequence>
                 	    <element name="cдмРДпЎ" type="string"/>
                 	</sequence>
                 </complexType>
             </element>
-            <element name="saЏHiResponse">
+            <element name="sayHiResponse">
                 <complexType>
                     <sequence>
                         <element name="responseType" type="string"/>
@@ -43,10 +43,10 @@
         </schema>
     </wsdl:types>
     <wsdl:message name="saЏHiRequest">
-        <wsdl:part name="in" element="x1:saЏHi"/>
+        <wsdl:part name="in" element="x1:sayHi"/>
     </wsdl:message>
     <wsdl:message name="saЏHiResponse">
-        <wsdl:part name="out" element="x1:saЏHiResponse"/>
+        <wsdl:part name="out" element="x1:sayHiResponse"/>
     </wsdl:message>
 
     <wsdl:portType name="Greeter">
