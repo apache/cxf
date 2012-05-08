@@ -172,7 +172,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     }
 
     protected List<String> generateCommandLine(GenericWsdlOption wsdlOption)
-    throws MojoExecutionException {
+        throws MojoExecutionException {
         List<String> ret = super.generateCommandLine(wsdlOption);
         if (encoding != null) {
             ret.add(0, "-encoding");
@@ -257,7 +257,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
      * @throws MojoExecutionException
      */
     protected List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions()
-    throws MojoExecutionException {
+        throws MojoExecutionException {
         List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<GenericWsdlOption>();
 
         if (wsdlOptions != null) {
