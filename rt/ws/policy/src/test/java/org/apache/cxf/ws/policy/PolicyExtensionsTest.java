@@ -62,6 +62,7 @@ public class PolicyExtensionsTest extends Assert {
 
             PolicyEngine e = bus.getExtension(PolicyEngine.class);
             assertNotNull(e);
+            e.setEnabled(false);
             
             assertNoPolicyInterceptors(bus.getInInterceptors());
             assertNoPolicyInterceptors(bus.getInFaultInterceptors());
