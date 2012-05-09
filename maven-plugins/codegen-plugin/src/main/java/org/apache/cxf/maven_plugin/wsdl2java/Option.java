@@ -344,11 +344,11 @@ public class Option {
         return validateWsdl == null ? false : validateWsdl;
     }
 
-    public void setValidateWsdl(String validateWsdl) {
+    public void setValidateWsdl(boolean validateWsdl) {
         this.validateWsdl = validateWsdl;
     }
     public void setValidate(String v) {
-        this.validateWsdl = v;
+        this.validateWsdl = v == null ? false : Boolean.parseBoolean(v);
     }
     
     public boolean isNoTypes() {
