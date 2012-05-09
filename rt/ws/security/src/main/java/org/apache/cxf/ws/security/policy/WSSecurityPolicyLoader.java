@@ -119,7 +119,6 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             cm.registerListener(new ClientLifeCycleListener() {
                 public void clientCreated(Client client) {
                 }
-                @Override
                 public void clientDestroyed(Client client) {
                     shutdownResources(client.getEndpoint().getEndpointInfo());
                 }
