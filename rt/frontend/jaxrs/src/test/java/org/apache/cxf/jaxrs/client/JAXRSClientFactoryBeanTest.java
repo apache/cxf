@@ -62,6 +62,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setClassLoader(loader);
         BookStore client = (BookStore)bean.createWithValues(BookStore.class);
         assertNotNull(client);
+        assertSame(client.getClass().getClassLoader(), loader);
         // tricky to test the loader has been used correctly with Maven 
         // given that the system loader loads all the test classes  
         
