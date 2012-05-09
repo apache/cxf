@@ -103,6 +103,8 @@ public class LazyDataSource implements DataSource {
     }
 
     public DataSource getDataSource() {
+        load();
+        
         return dataSource;
     }
 
