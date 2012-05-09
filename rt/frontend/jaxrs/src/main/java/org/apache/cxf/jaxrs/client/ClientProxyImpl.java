@@ -78,22 +78,28 @@ public class ClientProxyImpl extends AbstractClient implements
     private static final String SLASH = "/";
     
     private ClassResourceInfo cri;
+    private ClassLoader proxyLoader;
     private boolean inheritHeaders;
     private boolean isRoot;
     private Map<String, Object> valuesMap = Collections.emptyMap();
     
-    public ClientProxyImpl(URI baseURI, ClassResourceInfo cri, boolean isRoot, 
-                           boolean inheritHeaders, Object... varValues) {
-        super(baseURI);
-        this.cri = cri;
-        this.isRoot = isRoot;
-        this.inheritHeaders = inheritHeaders;
-        initValuesMap(varValues);
+    public ClientProxyImpl(URI baseURI,
+                           ClassLoader loader,
+                           ClassResourceInfo cri, 
+                           boolean isRoot, 
+                           boolean inheritHeaders, 
+                           Object... varValues) {
+        this(new LocalClientState(baseURI), loader, cri, isRoot, inheritHeaders, varValues);
     }
     
-    public ClientProxyImpl(ClientState initialState, ClassResourceInfo cri, boolean isRoot, 
-                           boolean inheritHeaders, Object... varValues) {
+    public ClientProxyImpl(ClientState initialState,
+                           ClassLoader loader,
+                           ClassResourceInfo cri, 
+                           boolean isRoot, 
+                           boolean inheritHeaders, 
+                           Object... varValues) {
         super(initialState);
+        this.proxyLoader = loader;
         this.cri = cri;
         this.isRoot = isRoot;
         this.inheritHeaders = inheritHeaders;
@@ -174,9 +180,10 @@ public class ClientProxyImpl extends AbstractClient implements
             
             ClientState newState = getState().newState(uri, subHeaders, 
                  getTemplateParametersMap(ori.getURITemplate(), pathParams));
-            ClientProxyImpl proxyImpl = new ClientProxyImpl(newState, subCri, false, inheritHeaders);
+            ClientProxyImpl proxyImpl = 
+                new ClientProxyImpl(newState, proxyLoader, subCri, false, inheritHeaders);
             proxyImpl.setConfiguration(getConfiguration());
-            return JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
+            return JAXRSClientFactory.createProxy(m.getReturnType(), proxyLoader, proxyImpl);
         } 
         
         headers.putAll(paramHeaders);

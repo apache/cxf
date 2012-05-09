@@ -49,6 +49,19 @@ public final class JAXRSClientFactory {
     }
     
     /**
+     * Creates a proxy using a custom class loader
+     * @param baseAddress baseAddress
+     * @param loader class loader
+     * @param cls resource class, if not interface then a CGLIB proxy will be created
+     * @return typed proxy
+     */
+    public static <T> T create(String baseAddress, Class<T> cls, ClassLoader loader) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, null);
+        bean.setClassLoader(loader);
+        return bean.create(cls);
+    }
+    
+    /**
      * Creates a proxy
      * @param baseURI baseURI
      * @param cls resource class, if not interface then a CGLIB proxy will be created
@@ -282,9 +295,11 @@ public final class JAXRSClientFactory {
         return proxy;
     }
     
-    static <T> T create(Class<T> cls, InvocationHandler handler) {
+    static <T> T createProxy(Class<T> cls, ClassLoader loader, InvocationHandler handler) {
         
-        return cls.cast(ProxyHelper.getProxy(cls.getClassLoader(), new Class[]{cls, Client.class}, handler));
+        return cls.cast(ProxyHelper.getProxy(loader == null ? cls.getClassLoader() : loader, 
+                                             new Class[]{cls, Client.class}, 
+                                             handler));
     }
     
     private static JAXRSClientFactoryBean getBean(String baseAddress, Class<?> cls, String configLocation) {
