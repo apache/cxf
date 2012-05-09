@@ -55,8 +55,9 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
     
     /**
@@ -81,6 +82,8 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
 }

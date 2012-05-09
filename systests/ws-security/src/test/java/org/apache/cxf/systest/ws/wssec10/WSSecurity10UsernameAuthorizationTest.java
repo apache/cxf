@@ -60,25 +60,30 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @Test
     public void testClientServerUTOnlyAuthorized() {
 
-        IPingService port = getUTOnlyPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml", false);
+        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
+        Bus bus = new SpringBusFactory().createBus(configName);
+        IPingService port = getUTOnlyPort(bus, false);
         
         final String output = port.echo(INPUT);
         assertEquals(INPUT, output);
+        
+        bus.shutdown(true);
     }
     
     @Test
     public void testClientServerUTOnlyUnauthorized() {
 
-        IPingService port = getUTOnlyPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml", true);
+        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
+        Bus bus = new SpringBusFactory().createBus(configName);
+        IPingService port = getUTOnlyPort(bus, true);
         
         try {
             port.echo(INPUT);
@@ -86,23 +91,29 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         } catch (Exception ex) {
             assertEquals("Unauthorized", ex.getMessage());
         }
+        
+        bus.shutdown(true);
     }
     
     @Test
     public void testClientServerComplexPolicyAuthorized() {
 
-        IPingService port = getComplexPolicyPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");
+        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
+        Bus bus = new SpringBusFactory().createBus(configName);
+        IPingService port = getComplexPolicyPort(bus);
         
         final String output = port.echo(INPUT);
         assertEquals(INPUT, output);
+        
+        bus.shutdown(true);
     }
     
     @Test
     public void testClientServerComplexPolicyUnauthorized() {
 
-        IPingService port = getComplexPolicyPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml");
+        String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
+        Bus bus = new SpringBusFactory().createBus(configName);
+        IPingService port = getComplexPolicyPort(bus);
         
         try {
             port.echo(INPUT);
@@ -110,10 +121,11 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         } catch (Exception ex) {
             assertEquals("Unauthorized", ex.getMessage());
         }
+        
+        bus.shutdown(true);
     }
     
-    private static IPingService getComplexPolicyPort(String configName) {
-        Bus bus = new SpringBusFactory().createBus(configName);
+    private static IPingService getComplexPolicyPort(Bus bus) {
         
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
@@ -129,8 +141,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         return port;
     }
     
-    private static IPingService getUTOnlyPort(String configName, boolean hashed) {
-        Bus bus = new SpringBusFactory().createBus(configName);
+    private static IPingService getUTOnlyPort(Bus bus, boolean hashed) {
         
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);

@@ -56,8 +56,9 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
     
     /**
@@ -81,6 +82,8 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT2);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -109,6 +112,8 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -132,6 +137,8 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT2);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
 }

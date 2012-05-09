@@ -63,8 +63,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -106,6 +107,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -163,6 +166,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -200,6 +205,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().contains("Assertion fails sender-vouches requirements"));
         }
+        
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -245,6 +252,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -269,6 +278,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -298,6 +309,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -325,6 +338,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -352,6 +367,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -380,6 +397,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -410,6 +429,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     
@@ -438,6 +459,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -464,6 +487,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error));
         }
+        
+        bus.shutdown(true);
     }
     
     

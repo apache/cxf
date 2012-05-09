@@ -198,8 +198,10 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        getStaticBus().shutdown(true);
+        stopAllServers();
     }
     
     private static void setCryptoProperties(EndpointInfo ei, String sigProps, String encProps) {
@@ -301,6 +303,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 throw ex;
             }
         }
+        
+        bus.shutdown(true);
     }
     
     @Test
@@ -344,6 +348,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             assertTrue(ex.getMessage().contains("policy alternatives"));
         }
         
+        bus.shutdown(true);
     }
     
     @Test
@@ -382,6 +387,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         XPathUtils xp = new XPathUtils(ns);
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
         assertEquals(XMLUtils.toString(nd), "50", o);
+        
+        bus.shutdown(true);
     }
     
     @WebServiceProvider(targetNamespace = "http://www.example.org/contract/DoubleIt", 
@@ -441,6 +448,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         assertEquals(10, pt.doubleIt(5));
+        
+        bus.shutdown(true);
     }
 
     @Test
@@ -467,6 +476,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("alice.properties"));
         assertEquals(10, pt.doubleIt(5));
+        
+        bus.shutdown(true);
     }
     
     @Test
@@ -496,6 +507,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleIt di = new DoubleIt();
         di.setNumberToDouble(5);
         assertEquals(10, pt.doubleIt(di, 1).getDoubledNumber());
+        
+        bus.shutdown(true);
     }
     
     @Test
@@ -536,6 +549,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Certificate revocation")
                        || errorMessage.contains("Error during certificate path validation"));
         }
+        
+        bus.shutdown(true);
     }
     
     @Test
@@ -584,5 +599,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Error during certificate path validation"));
         }
 
+        bus.shutdown(true);
     }
 }
