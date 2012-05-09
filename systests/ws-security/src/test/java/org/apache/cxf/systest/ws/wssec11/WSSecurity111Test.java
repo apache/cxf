@@ -20,8 +20,8 @@
 package org.apache.cxf.systest.ws.wssec11;
 
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.wssec11.server.Server;
-import org.apache.cxf.systest.ws.wssec11.server.ServerRestricted;
+import org.apache.cxf.systest.ws.wssec11.server.Server11;
+import org.apache.cxf.systest.ws.wssec11.server.Server11Restricted;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     "Server failed to launch",
                     // run the server in the same process
                     // set this to false to fork
-                    launchServer(Server.class, true)
+                    launchServer(Server11.class, true)
             );
         } else {
             if (WSSecurity11Common.isIBMJDK16()) {
@@ -56,7 +56,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
                     "Server failed to launch",
                     // run the server in the same process
                     // set this to false to fork
-                    launchServer(ServerRestricted.class, true)
+                    launchServer(Server11Restricted.class, true)
             );
         }
     }
@@ -85,7 +85,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
             "UX-SEES",
             "UXD-SEES", 
         };
-        runClientServer(argv, unrestrictedPoliciesInstalled);
+        runClientServer(argv, unrestrictedPoliciesInstalled, false);
     }
     
  
