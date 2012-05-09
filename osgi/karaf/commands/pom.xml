@@ -73,7 +73,7 @@
               org.apache.felix.service.command;version="[0.6,1)",
               org.apache.felix.gogo.commands;version="[0.6,1)",
               org.apache.cxf*;version="[2.5,3)",
-              org.apache.karaf.shell.console,
+              org.apache.karaf.shell.console;version="[2.2,4)",
               *
                         </Import-Package>
                         <_nouses>true</_nouses>
