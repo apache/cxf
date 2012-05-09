@@ -202,9 +202,6 @@
          </dependency>
 
     </dependencies>
-    <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-    </properties>
     <profiles>
         <profile>
             <id>jaxws22</id>
