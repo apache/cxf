@@ -57,6 +57,7 @@ class CglibProxyHelper extends ProxyHelper {
         }
         if (superClass != null) {
             Enhancer enhancer = new Enhancer();
+            enhancer.setClassLoader(loader);
             enhancer.setSuperclass(superClass);
             enhancer.setInterfaces(theInterfaces.toArray(new Class[]{}));
             enhancer.setCallback(new MethodInterceptor() {
