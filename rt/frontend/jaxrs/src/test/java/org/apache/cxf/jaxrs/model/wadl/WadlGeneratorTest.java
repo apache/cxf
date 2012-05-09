@@ -307,7 +307,9 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, null);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
-        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        String wadl = r.getEntity().toString();
+        //System.out.println(wadl);
+        Document doc = DOMUtils.readXml(new StringReader(wadl));
         checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
