@@ -37,9 +37,10 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
-import org.junit.AfterClass;
+
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
@@ -49,13 +50,13 @@ public class ApplicationContextTest extends Assert {
     private static final String S1 = 
         ApplicationContextTest.class.getResource("/META-INF/cxf/cxf.xml").toString();
     
-    @BeforeClass
-    public static void classUp() {
+    @Before
+    public void setUp() {
         BusFactory.setDefaultBus(null);
     }
     
-    @AfterClass
-    public static void classDown() {
+    @After
+    public void clearBus() {
         BusFactory.setDefaultBus(null);
     }
     
@@ -83,6 +84,8 @@ public class ApplicationContextTest extends Assert {
         
         //ctx.refresh();
         checkContext(ctx);
+        ctx.close();
+        ctx.destroy();
     }
     @Test
     public void testContextWithProperties() throws Exception {
@@ -92,6 +95,8 @@ public class ApplicationContextTest extends Assert {
         TestApplicationContext ctx = new TestApplicationContext(
             new String[] {S1, s4});
         checkContext(ctx);
+        ctx.close();
+        ctx.destroy();
     }
     private void checkContext(TestApplicationContext ctx) throws Exception {
         ConfigurerImpl cfg = new ConfigurerImpl(ctx);
