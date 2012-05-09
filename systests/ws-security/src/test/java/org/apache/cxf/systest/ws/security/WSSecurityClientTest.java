@@ -105,8 +105,9 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
     
     @Test

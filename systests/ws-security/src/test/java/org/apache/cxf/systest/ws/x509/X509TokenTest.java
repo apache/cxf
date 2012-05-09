@@ -63,8 +63,9 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -87,6 +88,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -109,6 +112,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -131,6 +136,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -153,6 +160,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -175,6 +184,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -197,6 +208,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -219,6 +232,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -241,6 +256,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -263,6 +280,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -285,6 +304,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -307,6 +328,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -329,6 +352,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -351,6 +376,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -387,6 +414,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             String error = "A replay attack has been detected";
             assertTrue(ex.getMessage().contains(error));
         }
+        
+        bus.shutdown(true);
     }
     
     private boolean checkUnrestrictedPoliciesInstalled() {

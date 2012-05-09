@@ -67,8 +67,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     /**
@@ -92,6 +93,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -115,6 +118,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT2);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -138,6 +143,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT2);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -161,6 +168,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -184,6 +193,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     
@@ -208,6 +219,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -231,6 +244,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT2);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -254,6 +269,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT2);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -277,6 +294,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(samlPort, PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -301,6 +320,8 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         updateSTSPort((BindingProvider)samlPort, STS_PORT);
         
         samlPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     private static void updateSTSPort(BindingProvider p, String port) {

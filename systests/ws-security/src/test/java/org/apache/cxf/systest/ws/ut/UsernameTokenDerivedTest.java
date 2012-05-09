@@ -55,8 +55,9 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     /**
@@ -81,6 +82,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -105,6 +108,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -129,6 +134,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -153,6 +160,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT2);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -177,6 +186,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -201,6 +212,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -225,6 +238,8 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
+        
+        bus.shutdown(true);
     }
     
 }

@@ -62,8 +62,9 @@ public class WSSecurity111Test extends WSSecurity11Common {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @Test

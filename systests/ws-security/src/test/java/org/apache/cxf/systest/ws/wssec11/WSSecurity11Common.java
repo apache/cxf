@@ -85,6 +85,8 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
             final String output = port.echo(INPUT);
             assertEquals(INPUT, output);
         }
+        
+        bus.shutdown(true);
     }
     
  
