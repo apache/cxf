@@ -51,6 +51,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     private boolean threadSafe;
     private long timeToKeepState;
     private Class serviceClass;
+    private ClassLoader proxyLoader;
     
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -60,6 +61,15 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         super(serviceFactory);
         serviceFactory.setEnableStaticResolution(true);
         
+    }
+    
+    /**
+     * Sets the custom class loader to be used 
+     * for creating proxies 
+     * @param loader
+     */
+    public void setClassLoader(ClassLoader loader) {
+        proxyLoader = loader;
     }
     
     /**
@@ -275,22 +285,28 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ClientState actualState = getActualState();
             if (actualState == null) {
                 proxyImpl = 
-                    new ClientProxyImpl(URI.create(getAddress()), cri, isRoot, inheritHeaders, varValues);
+                    new ClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot, 
+                                        inheritHeaders, varValues);
             } else {
                 proxyImpl = 
-                    new ClientProxyImpl(actualState, cri, isRoot, inheritHeaders, varValues);
+                    new ClientProxyImpl(actualState, proxyLoader, cri, isRoot, 
+                                        inheritHeaders, varValues);
             }
             initClient(proxyImpl, ep, actualState == null);    
             
             Client actualClient = null;
             try {
-                actualClient = (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
-                                        new Class[]{cri.getServiceClass(), Client.class, 
+                ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() 
+                                                            : proxyLoader;
+                actualClient = (Client)ProxyHelper.getProxy(theLoader,
+                                        new Class[]{cri.getServiceClass(), 
+                                                    Client.class, 
                                                     InvocationHandlerAware.class}, 
                                         proxyImpl);
             } catch (Exception ex) {
                 actualClient = (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
-                                                    new Class[]{cri.getServiceClass(), Client.class, 
+                                                    new Class[]{cri.getServiceClass(), 
+                                                                Client.class, 
                                                                 InvocationHandlerAware.class}, 
                                      proxyImpl);
             }

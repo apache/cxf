@@ -52,6 +52,22 @@ public class JAXRSClientFactoryBeanTest extends Assert {
     }
     
     @Test
+    public void testCreateClientCustomLoader() throws Exception {
+        ProxyClassLoader loader = new ProxyClassLoader();
+        loader.addLoader(BookStore.class.getClassLoader());
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookStore.class);
+        bean.setClassLoader(loader);
+        BookStore client = (BookStore)bean.createWithValues(BookStore.class);
+        assertNotNull(client);
+        // tricky to test the loader has been used correctly with Maven 
+        // given that the system loader loads all the test classes  
+        
+    }
+    
+    @Test
     public void testCreateClientWithUserResource() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress("http://bar");
@@ -197,5 +213,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         }
 
     }
+    
+
     
 }
