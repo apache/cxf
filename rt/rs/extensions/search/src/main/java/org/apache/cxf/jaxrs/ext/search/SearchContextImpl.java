@@ -44,7 +44,7 @@ public class SearchContextImpl implements SearchContext {
     public <T> SearchCondition<T> getCondition(Class<T> cls) {
         
         if (InjectionUtils.isPrimitive(cls)) {
-            String errorMessage = "The condition type can not be a primitive type"; 
+            String errorMessage = "Primitive condition types are not supported"; 
             LOG.warning(errorMessage);
             throw new IllegalArgumentException(errorMessage);
         }
