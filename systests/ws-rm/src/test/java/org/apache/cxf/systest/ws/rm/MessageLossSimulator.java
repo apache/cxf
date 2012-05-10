@@ -43,13 +43,30 @@ import org.apache.cxf.ws.rm.RMContextUtils;
  * 
  */
 public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
-
     private static final Logger LOG = LogUtils.getLogger(MessageLossSimulator.class);
-    private int appMessageCount; 
-    
+    private int appMessageCount;
+    private boolean throwsException;
+    private int mode;
+
     public MessageLossSimulator() {
         super(Phase.PREPARE_SEND);
         addBefore(MessageSenderInterceptor.class.getName());
+    }
+    
+    public boolean isThrowsException() {
+        return throwsException;
+    }
+
+    public void setThrowsException(boolean throwsException) {
+        this.throwsException = throwsException;
+    }
+
+    public int getMode() {
+        return mode;
+    }
+
+    public void setMode(int mode) {
+        this.mode = mode;
     }
 
     public void handleMessage(Message message) throws Fault {
@@ -64,10 +81,18 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (MessageUtils.isPartialResponse(message)) {
             return;
         }
-        synchronized (this) {
-            appMessageCount++;
-            if (0 != (appMessageCount % 2)) {
-                return;
+        if (mode == 1) {
+            // never lose
+            return;
+        } else if (mode == -1) {
+            // always lose
+        } else { 
+            // alternatively lose
+            synchronized (this) {
+                appMessageCount++;
+                if (0 != (appMessageCount % 2)) {
+                    return;
+                }
             }
         }
         
@@ -89,6 +114,9 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
             public void handleMessage(Message message) throws Fault {
                 try {
                     message.getContent(OutputStream.class).close();
+                    if (throwsException) {
+                        throw new IOException("simulated transmission exception");
+                    }
                 } catch (IOException e) {
                     throw new Fault(e);
                 }

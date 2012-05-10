@@ -39,10 +39,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests the decoupling the soap fault handling if the fault occurs after 
- * the message is queued and retransmission is scheduled.
+ * Tests the gzip feature does not interfere with the ws-rm retransmission.
+ * Note that the current retransmission logic isn't optimal (in some sense, wrong)
+ * and stores the wire-message and retransmits this wire-message directly. This  
+ * approach is not practical when ws-security is enabled and each message needs to be
+ * timestamped and signed. Therefore, the current retransmission logic needs to be
+ * changed one day.
+ *  
+ * Independently of this fix, this test verifies the gzip feature does not interfere
+ * with retransmission.
  */
-public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
+public class RetransmissionGZIPTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
 
@@ -53,7 +60,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
       
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/message-loss.xml");
+            Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/gzip-enabled.xml");
             BusFactory.setDefaultBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
             bus.getInInterceptors().add(in);
@@ -93,7 +100,7 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
     @Test
     public void testDecoupleFaultHandling() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        bus = bf.createBus("/org/apache/cxf/systest/ws/rm/message-loss.xml");
+        bus = bf.createBus("/org/apache/cxf/systest/ws/rm/gzip-enabled.xml");
         BusFactory.setDefaultBus(bus);
         LoggingInInterceptor in = new LoggingInInterceptor();
         bus.getInInterceptors().add(in);
