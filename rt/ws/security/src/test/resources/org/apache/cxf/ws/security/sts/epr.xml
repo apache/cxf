@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing">
+<wsaws:Address xmlns:wsaws="http://www.w3.org/2005/08/addressing">http://localhost:8080/jaxws-samples-wsse-policy-trust-sts/SecurityTokenService</wsaws:Address>
+<wsaws:Metadata xmlns:wsaws="http://www.w3.org/2005/08/addressing"
+                xmlns:wsdli="http://www.w3.org/2006/01/wsdl-instance"
+                wsdli:wsdlLocation="http://localhost:8080/jaxws-samples-wsse-policy-trust-sts/SecurityTokenService?wsdl">
+   <wsaw:ServiceName xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                     xmlns:stsns="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+                     EndpointName="UT_Port">stsns:SecurityTokenService</wsaw:ServiceName>
+</wsaws:Metadata>
+</wsa:EndpointReference>
+
