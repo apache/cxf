@@ -25,6 +25,7 @@ import java.net.URL;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 import org.apache.ws.security.cache.ReplayCache;
@@ -37,18 +38,15 @@ public class EHCacheReplayCache implements ReplayCache, Closeable {
     
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private Cache cache;
+    private Ehcache cache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
     public EHCacheReplayCache(String key, URL configFileURL) {
         cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
-        if (!cacheManager.cacheExists(key)) {
-            cache = new Cache(key, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
-            cacheManager.addCache(cache);
-        } else {
-            cache = cacheManager.getCache(key);
-        }
+        
+        Ehcache newCache = new Cache(key, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
+        cache = cacheManager.addCacheIfAbsent(newCache);
     }
     
     /**
