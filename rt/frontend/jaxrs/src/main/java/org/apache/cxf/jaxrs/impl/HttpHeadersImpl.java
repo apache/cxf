@@ -49,6 +49,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         "org.apache.cxf.http.cookie.separator";
     private static final String COOKIE_SEPARATOR_CRLF = "crlf";
     private static final String DEFAULT_SEPARATOR = ",";
+    private static final String DEFAULT_COOKIE_SEPARATOR = ";";
     
     private static final String COMPLEX_HEADER_EXPRESSION = 
         "(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+))(;(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+)))?";
@@ -114,7 +115,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             return COOKIE_SEPARATOR_CRLF.equals(cookiePropValue.toString()) 
                 ? "\r\n" : cookiePropValue.toString();
         } else {
-            return DEFAULT_SEPARATOR;
+            return DEFAULT_COOKIE_SEPARATOR;
         }
     }
     

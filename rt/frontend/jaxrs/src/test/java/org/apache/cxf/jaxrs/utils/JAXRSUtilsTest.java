@@ -753,7 +753,7 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testMultipleCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
-        headers.add("Cookie", "c1=c1Value, c2=c2Value");
+        headers.add("Cookie", "c1=c1Value; c2=c2Value");
         headers.add("Cookie", "c3=c3Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
