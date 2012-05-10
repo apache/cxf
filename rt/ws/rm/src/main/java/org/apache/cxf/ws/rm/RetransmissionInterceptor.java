@@ -21,15 +21,12 @@ package org.apache.cxf.ws.rm;
 
 import java.io.OutputStream;
 
-//import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
-//import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 
 /**
  * 
@@ -41,10 +38,7 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
     public RetransmissionInterceptor() {
         super(Phase.PREPARE_SEND);
         addAfter(MessageSenderInterceptor.class.getName());
-        addBefore(GZIPOutInterceptor.class.getName());
-//        super(Phase.PRE_STREAM);
-//        addBefore(StaxOutInterceptor.class.getName());
-//        addBefore(AttachmentOutInterceptor.class.getName());
+        addBefore("org.apache.cxf.transport.common.GZIPOutInterceptor");
     }
     
     public RMManager getManager() {
