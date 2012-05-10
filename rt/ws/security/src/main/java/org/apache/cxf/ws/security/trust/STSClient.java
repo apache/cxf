@@ -437,6 +437,18 @@ public class STSClient implements Configurable, InterceptorProvider {
             return;
         }
         location = EndpointReferenceUtils.getAddress(ref);
+        final QName sName = EndpointReferenceUtils.getServiceName(ref, bus);
+        if (sName != null) {
+            serviceName = sName;
+            final QName epName = EndpointReferenceUtils.getPortQName(ref, bus);
+            if (epName != null) {
+                endpointName = epName;
+            }
+        }
+        final String wsdlLoc = EndpointReferenceUtils.getWSDLLocation(ref);
+        if (wsdlLoc != null) {
+            wsdlLocation = wsdlLoc;
+        }
         String mexLoc = findMEXLocation(ref);
         if (mexLoc != null) {
             try {
@@ -486,7 +498,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 }
             }
         }
-        return EndpointReferenceUtils.getAddress(ref);
+        return null;
     }
     protected String findMEXLocation(Element ref) {
         Element el = DOMUtils.getFirstElement(ref);
