@@ -34,6 +34,11 @@
       <artifactId>cxf-rt-transports-http</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>3.0.6.RELEASE</version>
+    </dependency>    
   </dependencies>
 
   <build>
