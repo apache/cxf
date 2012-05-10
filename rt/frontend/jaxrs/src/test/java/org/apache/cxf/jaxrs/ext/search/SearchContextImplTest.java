@@ -36,6 +36,11 @@ public class SearchContextImplTest extends Assert {
             SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testIllegalConditionType() {
+        SearchContext context = new SearchContextImpl(new MessageImpl());
+        context.getCondition(String.class);
+    }
     @Test
     public void testFiqlSearchConditionWithShortQuery() {
         doTestFiqlSearchCondition(

@@ -240,7 +240,7 @@ public class HttpHeadersImplTest extends Assert {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
+        headers.putSingle(HttpHeaders.COOKIE, "a=b;c=d");
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
@@ -250,15 +250,15 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
-    public void testGetCookiesWithSemiColon() throws Exception {
+    public void testGetCookiesWithComma() throws Exception {
         
         Message m = new MessageImpl();
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
-        ex.put("org.apache.cxf.http.cookie.separator", ";");
+        ex.put("org.apache.cxf.http.cookie.separator", ",");
         m.setExchange(ex);
         MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.COOKIE, "a=b" + ";" + "c=d");
+        headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();

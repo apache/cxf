@@ -21,9 +21,12 @@ package org.apache.cxf.jaxrs.ext.search;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -31,6 +34,7 @@ public class SearchContextImpl implements SearchContext {
 
     public static final String SEARCH_QUERY = "_search";
     public static final String SHORT_SEARCH_QUERY = "_s";
+    private static final Logger LOG = LogUtils.getL7dLogger(SearchContextImpl.class);
     private Message message;
     
     public SearchContextImpl(Message message) {
@@ -38,6 +42,11 @@ public class SearchContextImpl implements SearchContext {
     }
     
     public <T> SearchCondition<T> getCondition(Class<T> cls) {
+        if (InjectionUtils.isPrimitive(cls)) {
+            String errorMessage = "Primitive condition types are not supported";
+            LOG.warning(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
         FiqlParser<T> parser = getParser(cls);
         
         String expression = getSearchExpression();
@@ -70,7 +79,6 @@ public class SearchContextImpl implements SearchContext {
     }
     
     private <T> FiqlParser<T> getParser(Class<T> cls) {
-        
         // we can use this method as a parser factory, ex
         // we can get parsers capable of parsing XQuery and other languages
         // depending on the properties set by a user
