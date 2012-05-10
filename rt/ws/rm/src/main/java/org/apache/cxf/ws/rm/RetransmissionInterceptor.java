@@ -38,7 +38,7 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
     public RetransmissionInterceptor() {
         super(Phase.PREPARE_SEND);
         addAfter(MessageSenderInterceptor.class.getName());
-        addBefore("org.apache.cxf.transport.common.GZIPOutInterceptor");
+        addBefore("org.apache.cxf.transport.common.gzip.GZIPOutInterceptor");
     }
     
     public RMManager getManager() {
