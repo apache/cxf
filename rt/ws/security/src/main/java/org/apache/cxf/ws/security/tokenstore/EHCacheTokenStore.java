@@ -29,6 +29,7 @@ import java.util.List;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -44,19 +45,16 @@ public class EHCacheTokenStore implements TokenStore, Closeable {
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     public static final int MAX_ELEMENTS = 1000000;
     
-    private Cache cache;
+    private Ehcache cache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
     public EHCacheTokenStore(String key, URL configFileURL) {
         cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
-        if (!cacheManager.cacheExists(key)) {
-            // Cannot overflow to disk as SecurityToken Elements can't be serialized
-            cache = new Cache(key, MAX_ELEMENTS, false, false, DEFAULT_TTL, DEFAULT_TTL);
-            cacheManager.addCache(cache);
-        } else {
-            cache = cacheManager.getCache(key);
-        }
+
+        // Cannot overflow to disk as SecurityToken Elements can't be serialized
+        Ehcache newCache = new Cache(key, MAX_ELEMENTS, false, false, DEFAULT_TTL, DEFAULT_TTL);
+        cache = cacheManager.addCacheIfAbsent(newCache);
     }
     
     /**
