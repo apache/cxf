@@ -21,10 +21,8 @@ package org.apache.cxf.ws.rm;
 
 import java.io.OutputStream;
 
-//import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.MessageSenderInterceptor;
-//import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -42,9 +40,6 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
         super(Phase.PREPARE_SEND);
         addAfter(MessageSenderInterceptor.class.getName());
         addBefore(GZIPOutInterceptor.class.getName());
-//        super(Phase.PRE_STREAM);
-//        addBefore(StaxOutInterceptor.class.getName());
-//        addBefore(AttachmentOutInterceptor.class.getName());
     }
     
     public RMManager getManager() {
