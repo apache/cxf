@@ -50,7 +50,7 @@ public final class FormUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
     private static final String MULTIPART_FORM_DATA_TYPE = "form-data";  
     private static final String MAX_FORM_PARAM_COUNT = "maxFormParameterCount";  
-        
+    private static final String CONTENT_DISPOSITION_FILES_PARAM = "files";    
     private FormUtils() {
         
     }
@@ -165,10 +165,18 @@ public final class FormUtils {
             if (StringUtils.isEmpty(name)) { 
                 throw new WebApplicationException(400);
             }
+            if (CONTENT_DISPOSITION_FILES_PARAM.equals(name)) {
+                // this is a reserved name in Content-Disposition for parts containing files
+                continue;
+            }
             try {
                 String value = IOUtils.toString(a.getDataHandler().getInputStream());
                 params.add(HttpUtils.urlDecode(name),
                            decode ? HttpUtils.urlDecode(value) : value);
+            } catch (IllegalArgumentException ex) {
+                LOG.warning("Illegal URL-encoded characters, make sure that no "
+                    + "@FormParam and @Multipart annotations are mixed up");
+                throw new WebApplicationException(415);
             } catch (IOException ex) {
                 throw new WebApplicationException(415);
             }

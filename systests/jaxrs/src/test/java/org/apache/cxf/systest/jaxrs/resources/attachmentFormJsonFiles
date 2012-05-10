@@ -19,6 +19,6 @@ Content-Disposition: form-data; name="book2"
 Content-Type: application/json; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 
-{"Book":{"name":"CXF in Action - 2","id":124}}
+{"Book":{"name":"CXF in Action - 2%","id":124}}
 --_Part_4_701508.1145579811786--
 --bqJky99mlBWa-ZuqjC53mG6EzbmlxB--

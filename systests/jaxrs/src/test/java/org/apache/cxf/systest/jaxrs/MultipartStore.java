@@ -412,13 +412,23 @@ public class MultipartStore {
         Book b1 = books.get(0);
         Book b2 = books.get(1);
         if (!"CXF in Action - 1".equals(b1.getName())
-            || !"CXF in Action - 2".equals(b2.getName())
+            || !"CXF in Action - 2%".equals(b2.getName())
             || !"Larry".equals(name)) {
             throw new WebApplicationException();
         }
         b1.setId(124);
         b1.setName("CXF in Action - 2");
         return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/filesform/mixup")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookFilesFormMixUp(@FormParam("owner") String name, 
+                                          @Multipart("files") List<Book> books)
+        throws Exception {
+        return addBookFilesForm(name, books);
     }
     
     @POST
