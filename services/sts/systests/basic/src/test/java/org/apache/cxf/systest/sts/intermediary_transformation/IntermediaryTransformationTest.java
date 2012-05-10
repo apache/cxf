@@ -83,8 +83,9 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -108,6 +109,8 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         }
 
         doubleIt(transportPort, 25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -136,6 +139,8 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         } catch (Exception ex) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

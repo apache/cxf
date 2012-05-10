@@ -71,8 +71,9 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -97,6 +98,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml1Port, 25);
         
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -120,6 +122,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         }
         
         doubleIt(transportSaml2Port, 30);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -154,6 +158,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -177,6 +183,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         }
         
         doubleIt(transportSaml1Port, 40);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -210,6 +218,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
 
     

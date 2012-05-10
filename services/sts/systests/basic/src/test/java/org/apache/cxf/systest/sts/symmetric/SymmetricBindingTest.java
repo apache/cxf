@@ -73,8 +73,9 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
     
     @org.junit.Test
@@ -99,6 +100,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(symmetricSaml1Port, 25);
 
         TokenTestUtils.verifyToken(symmetricSaml1Port);
+        
+        bus.shutdown(true);
     }
 
     @org.junit.Test
@@ -124,6 +127,8 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(symmetricSaml2Port, 30);
 
         TokenTestUtils.verifyToken(symmetricSaml2Port);
+        
+        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
