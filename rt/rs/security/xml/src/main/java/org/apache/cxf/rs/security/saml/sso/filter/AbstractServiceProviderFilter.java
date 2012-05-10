@@ -136,7 +136,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             SamlpRequestComponentBuilder.createIssuer(getIssuerId(m));
         NameIDPolicy nameIDPolicy =
             SamlpRequestComponentBuilder.createNameIDPolicy(
-                true, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "Issuer"
+                true, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", getIssuerId(m)
             );
         
         AuthnContextClassRef authnCtxClassRef =
