@@ -77,8 +77,9 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -99,6 +100,8 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         updateAddressPort(transportSaml2Port, PORT);
         
         doubleIt(transportSaml2Port, 30);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -122,6 +125,8 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         } catch (SoapFault ex) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
     
     private SecurityToken requestSecurityToken(

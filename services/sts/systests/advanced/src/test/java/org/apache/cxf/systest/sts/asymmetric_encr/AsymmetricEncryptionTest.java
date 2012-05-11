@@ -53,8 +53,9 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -68,6 +69,8 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
         
         SecurityToken token = requestSecurityToken(bus);
         assertTrue(token != null);
+        
+        bus.shutdown(true);
     }
 
     private SecurityToken requestSecurityToken(Bus bus) throws Exception {

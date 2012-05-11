@@ -63,8 +63,9 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -84,6 +85,8 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         updateAddressPort(transportPort, PORT);
 
         doubleIt(transportPort, 25);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -103,6 +106,8 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         updateAddressPort(symmetricPort, PORT2);
 
         doubleIt(symmetricPort, 30);
+        
+        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

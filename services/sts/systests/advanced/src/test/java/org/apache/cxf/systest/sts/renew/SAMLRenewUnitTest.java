@@ -51,8 +51,9 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -88,6 +89,8 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -123,6 +126,8 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -151,6 +156,8 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -181,6 +188,8 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -210,6 +219,8 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
     
     

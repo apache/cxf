@@ -50,8 +50,9 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     @org.junit.Test
@@ -68,6 +69,8 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -84,6 +87,8 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -100,6 +105,8 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
+        
+        bus.shutdown(true);
     }
     
     @org.junit.Test
@@ -116,6 +123,8 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         SecurityToken token = 
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
+        
+        bus.shutdown(true);
     }
     
     private SecurityToken requestSecurityToken(
