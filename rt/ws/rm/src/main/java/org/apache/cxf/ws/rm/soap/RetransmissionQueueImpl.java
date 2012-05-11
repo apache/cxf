@@ -49,6 +49,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -427,7 +428,11 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             Executor executor = ep.getExecutor();
             if (null == executor) {
                 executor = ep.getService().getExecutor();
-                LOG.log(Level.FINE, "Using service executor {0}", executor.getClass().getName());
+                if (executor == null) {
+                    executor = SynchronousExecutor.getInstance();
+                } else {
+                    LOG.log(Level.FINE, "Using service executor {0}", executor.getClass().getName());
+                }
             } else {
                 LOG.log(Level.FINE, "Using endpoint executor {0}", executor.getClass().getName());
             }
