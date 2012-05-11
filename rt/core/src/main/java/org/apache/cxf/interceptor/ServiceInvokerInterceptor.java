@@ -88,7 +88,8 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
         };
         
         Executor executor = getExecutor(endpoint);
-        if (exchange.get(Executor.class) == executor) {
+        Executor executor2 = exchange.get(Executor.class);
+        if (executor2 == executor || executor == null) {
             // already executing on the appropriate executor
             invocation.run();
         } else {

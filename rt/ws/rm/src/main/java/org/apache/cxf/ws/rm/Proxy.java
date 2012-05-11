@@ -23,6 +23,7 @@ package org.apache.cxf.ws.rm;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +43,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
@@ -155,7 +157,11 @@ public class Proxy {
                     }
                 }
             };
-            reliableEndpoint.getApplicationEndpoint().getExecutor().execute(r);
+            Executor ex = reliableEndpoint.getApplicationEndpoint().getExecutor();
+            if (ex == null) {
+                ex = SynchronousExecutor.getInstance();
+            }
+            ex.execute(r);
             return null;
         }
         

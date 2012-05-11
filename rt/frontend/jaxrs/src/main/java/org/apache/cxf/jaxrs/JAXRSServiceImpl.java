@@ -50,7 +50,6 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.workqueue.SynchronousExecutor;
 
 /**
  * The CXF Service implementation which is used 
@@ -73,7 +72,6 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
 
     public JAXRSServiceImpl(List<ClassResourceInfo> cri, QName qname) {
         this.classResourceInfos = cri;
-        executor = SynchronousExecutor.getInstance();    
         this.serviceName = qname;
     }
     
