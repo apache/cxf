@@ -179,6 +179,13 @@ public final class SecurityConstants {
     public static final String CACHE_CONFIG_FILE = 
         "ws-security.cache.config.file";
     
+    /**
+     * Set this property to avoid STS client trying send WS-MetadataExchange call using
+     * STS EPR WSA address when the endpoint contract contains no WS-MetadataExchange info.
+     */
+    public static final String DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS =
+        "ws-security.sts.disable-wsmex-call-using-epr-address";
+    
     public static final Set<String> ALL_PROPERTIES;
     
     static {
@@ -196,7 +203,7 @@ public final class SecurityConstants {
             KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
             ENABLE_NONCE_CACHE, NONCE_CACHE_INSTANCE, ENABLE_TIMESTAMP_CACHE,
             TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE,
-            SAML_ROLE_ATTRIBUTENAME
+            SAML_ROLE_ATTRIBUTENAME, DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

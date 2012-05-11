@@ -432,7 +432,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         return client;
     }
     
-    public void configureViaEPR(EndpointReferenceType ref) {
+    public void configureViaEPR(EndpointReferenceType ref, boolean useEPRWSAAddrAsMEXLocation) {
         if (client != null) {
             return;
         }
@@ -449,7 +449,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (wsdlLoc != null) {
             wsdlLocation = wsdlLoc;
         }
-        String mexLoc = findMEXLocation(ref);
+        String mexLoc = findMEXLocation(ref, useEPRWSAAddrAsMEXLocation);
         if (mexLoc != null) {
             try {
                 JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
@@ -487,7 +487,7 @@ public class STSClient implements Configurable, InterceptorProvider {
             }
         }
     }
-    protected String findMEXLocation(EndpointReferenceType ref) {
+    protected String findMEXLocation(EndpointReferenceType ref, boolean useEPRWSAAddrAsMEXLocation) {
         if (ref.getMetadata() != null && ref.getMetadata().getAny() != null) {
             for (Object any : ref.getMetadata().getAny()) {
                 if (any instanceof Element) {
@@ -498,7 +498,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 }
             }
         }
-        return null;
+        return useEPRWSAAddrAsMEXLocation ? EndpointReferenceUtils.getAddress(ref) : null;
     }
     protected String findMEXLocation(Element ref) {
         Element el = DOMUtils.getFirstElement(ref);
