@@ -53,7 +53,7 @@ public class STSClientTest extends Assert {
 
         Bus bus = BusFactory.getThreadDefaultBus();
         STSClient client = new STSClient(bus);
-        client.configureViaEPR(ref);
+        client.configureViaEPR(ref, false);
 
         assertEquals("http://localhost:8080/jaxws-samples-wsse-policy-trust-sts/SecurityTokenService?wsdl",
                      client.getWsdlLocation());

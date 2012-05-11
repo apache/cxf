@@ -112,7 +112,9 @@ public final class STSUtils {
             client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
             if (itok.getIssuerEpr() != null) {
                 //configure via mex
-                client.configureViaEPR(itok.getIssuerEpr());
+                boolean useEPRWSAAddrAsMEXLocation = !Boolean.valueOf((String)message
+                        .getContextualProperty(SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
+                client.configureViaEPR(itok.getIssuerEpr(), useEPRWSAAddrAsMEXLocation);
             }
         }
         return client;
