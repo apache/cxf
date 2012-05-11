@@ -93,7 +93,6 @@ import org.apache.cxf.tools.common.extensions.soap.SoapBinding;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.workqueue.OneShotAsyncExecutor;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -466,15 +465,6 @@ public class ServiceImpl extends ServiceDelegate {
         
         // Configure the Service
         Service service = serviceFactory.getService();
-        service.setExecutor(new Executor() {
-            public void execute(Runnable command) {
-                Executor ex = getExecutor();
-                if (ex == null) {
-                    ex = OneShotAsyncExecutor.getInstance();
-                } 
-                ex.execute(command);
-            }
-        });
         configureObject(service);
                 
         // Configure the JaxWsEndpoitnImpl
