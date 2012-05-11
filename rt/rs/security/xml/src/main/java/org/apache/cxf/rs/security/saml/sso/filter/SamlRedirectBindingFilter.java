@@ -44,7 +44,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                                                     info.getWebAppContext());
                 
                 return Response.seeOther(ub.build())
-                               .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                               .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                                .header("Pragma", "no-cache") 
                                .header("Set-Cookie", contextCookie)
                                .build();

@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso.filter;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -44,6 +45,8 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                 
                 return Response.ok(info)
                                .type("text/html")
+                               .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
+                               .header("Pragma", "no-cache") 
                                .build();
                 
             } catch (Exception ex) {
