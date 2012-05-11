@@ -147,6 +147,24 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="Saml1SelfSignedTokenOverTransportSP11"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml1SelfSignedTransportSP11" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml1SelfSignedTransportSP11Port"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="Saml2EndorsingOverTransport"
        address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingTransport" 
        serviceName="s:DoubleItService"
@@ -164,7 +182,25 @@
      
     </jaxws:endpoint> 
     
-     <jaxws:endpoint 
+    <jaxws:endpoint 
+       id="Saml2EndorsingOverTransportSP11"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItSaml2EndorsingTransportSP11" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml2EndorsingTransportSP11Port"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="AsymmetricSamlInitiatorPort"
        address="http://localhost:${testutil.ports.Server}/DoubleItAsymmetricSamlInitiator" 
        serviceName="s:DoubleItService"

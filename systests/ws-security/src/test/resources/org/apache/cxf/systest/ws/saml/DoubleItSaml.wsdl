@@ -68,8 +68,46 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSaml1SelfSignedTransportSP11Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSaml1SelfSignedTransportSP11Policy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItSaml2EndorsingTransportBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItSaml2EndorsingTransportPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItSaml2EndorsingTransportSP11Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSaml2EndorsingTransportSP11Policy" />
         <soap:binding style="document"
             transport="http://schemas.xmlsoap.org/soap/http" />
         <wsdl:operation name="DoubleIt">
@@ -274,9 +312,17 @@
                    binding="tns:DoubleItSaml1SelfSignedTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml1SelfSignedTransport" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSaml1SelfSignedTransportSP11Port" 
+                   binding="tns:DoubleItSaml1SelfSignedTransportSP11Binding">
+            <soap:address location="https://localhost:9009/DoubleItSaml1SelfSignedTransportSP11" />
+        </wsdl:port>
         <wsdl:port name="DoubleItSaml2EndorsingTransportPort" 
                    binding="tns:DoubleItSaml2EndorsingTransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml2EndorsingTransport" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSaml2EndorsingTransportSP11Port" 
+                   binding="tns:DoubleItSaml2EndorsingTransportSP11Binding">
+            <soap:address location="https://localhost:9009/DoubleItSaml2EndorsingTransportSP11" />
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricSamlInitiatorPort" 
                    binding="tns:DoubleItAsymmetricSamlInitiatorBinding">
@@ -379,6 +425,44 @@
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItSaml1SelfSignedTransportSP11Policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:SignedSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:SamlToken
+                            sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:WssSamlV11Token11/>
+                            </wsp:Policy>
+                        </sp:SamlToken>
+                    </wsp:Policy>
+                </sp:SignedSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
     <wsp:Policy wsu:Id="DoubleItSaml2EndorsingTransportPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
@@ -408,6 +492,44 @@
                     <wsp:Policy>
                         <sp:SamlToken
                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <wsp:Policy>
+                                <sp:WssSamlV20Token11/>
+                            </wsp:Policy>
+                        </sp:SamlToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+     <wsp:Policy wsu:Id="DoubleItSaml2EndorsingTransportSP11Policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:SamlToken
+                            sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
                             <wsp:Policy>
                                 <sp:WssSamlV20Token11/>
                             </wsp:Policy>

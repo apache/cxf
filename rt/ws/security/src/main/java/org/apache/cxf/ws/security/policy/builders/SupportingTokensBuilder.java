@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
@@ -97,20 +98,21 @@ public class SupportingTokensBuilder implements AssertionBuilder<Element> {
 
             Assertion primitive = (Assertion)iterator.next();
             QName qname = primitive.getName();
-
-            if (SP11Constants.ALGORITHM_SUITE.equals(qname)) {
+            String localName = qname.getLocalPart();
+            
+            if (SPConstants.ALGO_SUITE.equals(localName)) {
                 supportingToken.setAlgorithmSuite((AlgorithmSuite)primitive);
 
-            } else if (SP11Constants.SIGNED_PARTS.equals(qname)) {
+            } else if (SPConstants.SIGNED_PARTS.equals(localName)) {
                 supportingToken.setSignedParts((SignedEncryptedParts)primitive);
 
-            } else if (SP11Constants.SIGNED_ELEMENTS.equals(qname)) {
+            } else if (SPConstants.SIGNED_ELEMENTS.equals(localName)) {
                 supportingToken.setSignedElements((SignedEncryptedElements)primitive);
 
-            } else if (SP11Constants.ENCRYPTED_PARTS.equals(qname)) {
+            } else if (SPConstants.ENCRYPTED_PARTS.equals(localName)) {
                 supportingToken.setEncryptedParts((SignedEncryptedParts)primitive);
 
-            } else if (SP11Constants.ENCRYPTED_ELEMENTS.equals(qname)) {
+            } else if (SPConstants.ENCRYPTED_ELEMENTS.equals(localName)) {
                 supportingToken.setEncryptedElements((SignedEncryptedElements)primitive);
 
             } else if (primitive instanceof Token) {

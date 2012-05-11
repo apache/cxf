@@ -182,6 +182,25 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItTransportEndorsingSP11Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItTransportEndorsingSP11Policy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItTransportSignedEndorsingBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItTransportSignedEndorsingPolicy" />
         <soap:binding style="document"
@@ -269,6 +288,10 @@
         <wsdl:port name="DoubleItTransportEndorsingPort" 
                    binding="tns:DoubleItTransportEndorsingBinding">
             <soap:address location="https://localhost:9002/DoubleItX509TransportEndorsing" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItTransportEndorsingSP11Port" 
+                   binding="tns:DoubleItTransportEndorsingSP11Binding">
+            <soap:address location="https://localhost:9002/DoubleItX509TransportEndorsingSP11" />
         </wsdl:port>
         <wsdl:port name="DoubleItTransportSignedEndorsingPort" 
                    binding="tns:DoubleItTransportSignedEndorsingBinding">
@@ -590,6 +613,48 @@
                               <sp:WssX509V3Token10 />
                            </wsp:Policy>
                         </sp:X509Token>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+     <wsp:Policy wsu:Id="DoubleItTransportEndorsingSP11Policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+                   <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                        <sp:SignedParts>
+                            <sp:Body/>
+                        </sp:SignedParts>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
             </wsp:All>
