@@ -640,10 +640,17 @@ public class WadlGenerator implements RequestHandler {
         }
         SchemaCollection xmlSchemaCollection = new SchemaCollection();
         Collection<DOMSource> schemas = new HashSet<DOMSource>();
+        List<String> targetNamespaces = new ArrayList<String>();
         try {
             for (DOMResult r : JAXBUtils.generateJaxbSchemas(context, 
                                     CastUtils.cast(Collections.emptyMap(), String.class, DOMResult.class))) {
-                schemas.add(new DOMSource(r.getNode(), r.getSystemId()));
+                DOMSource source = new DOMSource(r.getNode(), r.getSystemId());
+                schemas.add(source);
+                String tns = 
+                    ((Document)source.getNode()).getDocumentElement().getAttribute("targetNamespace");
+                if (!StringUtils.isEmpty(tns)) {
+                    targetNamespaces.add(tns);
+                }
             }
         } catch (IOException e) {
             LOG.fine("No schema can be generated");
@@ -652,11 +659,13 @@ public class WadlGenerator implements RequestHandler {
         
         boolean hackAroundEmptyNamespaceIssue = false;
         for (DOMSource r : schemas) {
-            hackAroundEmptyNamespaceIssue = 
-                              addSchemaDocument(xmlSchemaCollection, 
-                             (Document)r.getNode(),
-                              r.getSystemId(),
-                              hackAroundEmptyNamespaceIssue);
+            hackAroundEmptyNamespaceIssue =
+                              addSchemaDocument(
+                                  xmlSchemaCollection,
+                                  targetNamespaces,
+                                  (Document)r.getNode(),
+                                  r.getSystemId(),
+                                  hackAroundEmptyNamespaceIssue);
         }
         return xmlSchemaCollection;
     }
@@ -665,13 +674,13 @@ public class WadlGenerator implements RequestHandler {
         
         XmlRootElement root = type.getAnnotation(XmlRootElement.class);
         if (root != null) {
-            QName qname = getQNameFromParts(root.name(), root.namespace(), clsMap);
+            QName qname = getQNameFromParts(root.name(), root.namespace(), type, clsMap);
             if (qname != null) {
                 return qname;
             }
             String ns = JAXBUtils.getPackageNamespace(type);
             if (ns != null) {
-                return getQNameFromParts(root.name(), ns, clsMap);
+                return getQNameFromParts(root.name(), ns, type, clsMap);
             } else {
                 return null;
             }
@@ -685,6 +694,7 @@ public class WadlGenerator implements RequestHandler {
             Object instance = type.newInstance();
             return getQNameFromParts(jaxbInfo.getElementLocalName(instance), 
                                      jaxbInfo.getElementNamespaceURI(instance),
+                                     type,
                                      clsMap);
         } catch (Exception ex) {
             // ignore    
@@ -729,6 +739,7 @@ public class WadlGenerator implements RequestHandler {
 
     // TODO : can we reuse this block with JAXBBinding somehow ?
     public boolean addSchemaDocument(SchemaCollection col, 
+                                     List<String> tnsList,
                                      Document d,
                                      String systemId,
                                      boolean hackAroundEmptyNamespaceIssue) {
@@ -742,7 +753,7 @@ public class WadlGenerator implements RequestHandler {
             //create a copy of the dom so we 
             //can modify it.
             d = copy(d);
-            ns = "";
+            ns = tnsList.isEmpty() ? "" : tnsList.get(0);
             d.getDocumentElement().setAttribute("targetNamespace", ns);
         }
         
@@ -809,14 +820,25 @@ public class WadlGenerator implements RequestHandler {
     }
     
     
-    private QName getQNameFromParts(String name, String namespace, Map<Class<?>, QName> clsMap) {
-        if (name == null || JAXB_DEFAULT_NAME.equals(name) || name.length() == 0) {
+    private QName getQNameFromParts(String name, 
+                                    String namespace,
+                                    Class<?> type,
+                                    Map<Class<?>, QName> clsMap) {
+        if (namespace == null || JAXB_DEFAULT_NAMESPACE.equals(namespace) || namespace.length() == 0) {
             return null; 
         }
-        if (namespace == null || JAXB_DEFAULT_NAMESPACE.equals(namespace) || namespace.length() == 0) {
+        if (name == null || name.length() == 0) {
             return null;
         }
-        
+        if (JAXB_DEFAULT_NAME.equals(name)) {
+            name = type.getSimpleName();
+            StringBuilder sb = new StringBuilder();
+            sb.append(Character.toLowerCase(name.charAt(0))); 
+            if (name.length() > 1) {
+                sb.append(name.substring(1));
+            }
+            name = sb.toString();
+        }
         String prefix = getPrefix(namespace, clsMap);
         return new QName(namespace, name, prefix);
     }
@@ -1118,7 +1140,9 @@ public class WadlGenerator implements RequestHandler {
                     return qname;
                 } else {
                     return getQNameFromParts(qname.getLocalPart(),
-                                             qname.getNamespaceURI(), clsMap);                    
+                                             qname.getNamespaceURI(),
+                                             type,
+                                             clsMap);
                 }
             }
             return null;
@@ -1144,7 +1168,7 @@ public class WadlGenerator implements RequestHandler {
                     elementName = name.toLowerCase();                    
                 }  
                 if (elementName != null) {
-                    return getQNameFromParts(elementName, entry.getKey(), clsMap);
+                    return getQNameFromParts(elementName, entry.getKey(), type, clsMap);
                 }
             }
             return null;

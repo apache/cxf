@@ -23,9 +23,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -206,6 +211,35 @@ public class WadlGeneratorTest extends Assert {
         checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "ns1:thebook", "ns1:thebook2", "ns1:thechapter");
+    }
+    
+    @Test
+    public void testTwoSchemasSameNs() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setApplicationTitle("My Application");
+        wg.setNamespacePrefix("ns");
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(TestResource.class, TestResource.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkDocs(doc.getDocumentElement(), "My Application", "", "");
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
+                                                                WadlGenerator.WADL_NS, 
+                                                                "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+              XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+        assertEquals(2, schemasEls.size());
+        assertEquals("http://example.com/test", schemasEls.get(0).getAttribute("targetNamespace"));
+        assertEquals("http://example.com/test", schemasEls.get(1).getAttribute("targetNamespace"));
+        List<Element> reps = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
+                                       WadlGenerator.WADL_NS, "representation");
+        assertEquals(2, reps.size());
+        assertEquals("ns1:testCompositeObject", reps.get(0).getAttribute("element"));
+        assertEquals("ns1:testCompositeObject", reps.get(1).getAttribute("element"));
     }
     
     @Test
@@ -619,6 +653,35 @@ public class WadlGeneratorTest extends Assert {
         
         public String getSchemaType() {
             return schemaType;
+        }
+    }
+    
+    @XmlRootElement(namespace = "http://example.com/test")
+    public static class TestCompositeObject {
+        private int id;
+        private String name;
+        public int getId() {
+            return id;
+        }
+        public void setId(int id) {
+            this.id = id;
+        }
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class TestResource {
+    
+        @PUT
+        @Path("setTest3")
+        @Produces("application/xml")
+        @Consumes("application/xml")
+        public TestCompositeObject setTest3(TestCompositeObject transfer) {
+            return transfer;
         }
     }
 }
