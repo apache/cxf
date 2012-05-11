@@ -283,6 +283,32 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml1SelfSignedOverTransportSP11() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1SelfSignedTransportSP11Port");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testAsymmetricSamlInitiator() throws Exception {
 
         if (!unrestrictedPoliciesInstalled) {
@@ -355,6 +381,35 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT2);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
+        );
+
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml2EndorsingOverTransportSP11() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportSP11Port");
         DoubleItPortType saml2Port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(saml2Port, PORT2);
