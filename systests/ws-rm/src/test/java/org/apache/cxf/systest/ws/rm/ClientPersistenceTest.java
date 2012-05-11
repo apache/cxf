@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
+import junit.framework.AssertionFailedError;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -271,8 +273,16 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
 //        mf.verifyActions(expectedActions, false);
 //        mf.verifyAcknowledgements(new boolean[]{true, true, false}, false);
         
-        // verify the final ack range to be complete 
-        mf.verifyAcknowledgementRange(1, 5);
+        // verify the final ack range to be complete
+        try {
+            mf.verifyAcknowledgementRange(1, 5);
+        } catch (AssertionFailedError er) {
+            //possibly only got the first 2 ranges when split in 3, lets 
+            //wait for the third and then recheck
+            awaitMessages(1, 3);
+            mf.reset(out.getOutboundMessages(), in.getInboundMessages());
+            mf.verifyAcknowledgementRange(1, 5);
+        }
     }
 
     void recover() throws Exception {
