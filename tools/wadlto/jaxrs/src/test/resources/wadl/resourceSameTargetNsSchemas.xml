@@ -1,0 +1,31 @@
+<application xmlns="http://wadl.dev.java.net/2009/02" 
+ xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+ xmlns:ns1="http://example.com/test"><doc title="My Application"/>
+  <grammars>
+   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" 
+    elementFormDefault="unqualified"  targetNamespace="http://example.com/test">
+    <xs:complexType name="testCompositeObject">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element minOccurs="0" name="name" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+  </xs:schema>
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://example.com/test" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://example.com/test">
+    <xs:import/>
+    <xs:element name="test" type="testCompositeObject"/>
+  </xs:schema>
+</grammars>
+<resources base="http://localhost:8080/baz">
+<resource path="/"><resource path="setTest3"><method name="PUT">
+  <request>
+    <representation mediaType="application/xml" element="ns1:test"/>
+  </request>
+  <response>
+    <representation mediaType="application/xml" element="ns1:test"/>
+  </response>
+  </method>
+  </resource>
+  </resource>
+</resources>
+</application>

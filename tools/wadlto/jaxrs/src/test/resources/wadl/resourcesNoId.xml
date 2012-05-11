@@ -1,0 +1,25 @@
+<application xmlns="http://wadl.dev.java.net/2009/02" 
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+ 
+  <resources base="http://localhost:8080/baz">
+       <resource path="/TestRs">
+          <resource path="/helloWorld">
+           <method name="GET">
+           <response>
+             <representation mediaType="application/octet-stream">
+               <param name="result" style="plain" type="xs:string"/>
+             </representation></response>
+           </method>
+          </resource>
+          <resource path="/helloWorld2">
+           <method name="GET">
+            <response>
+              <representation mediaType="application/octet-stream">
+                <param name="result" style="plain" type="xs:string"/>
+              </representation>
+            </response>
+           </method>
+          </resource>
+        </resource>
+  </resources>
+</application>
