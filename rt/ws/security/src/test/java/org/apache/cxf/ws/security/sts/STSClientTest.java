@@ -48,7 +48,7 @@ public class STSClientTest extends Assert {
                                                                       true).getContext();
         Unmarshaller um = ctx.createUnmarshaller();
         InputStream inStream = getClass().getResourceAsStream("epr.xml");
-        JAXBElement el = (JAXBElement)um.unmarshal(inStream);
+        JAXBElement<?> el = (JAXBElement<?>)um.unmarshal(inStream);
         EndpointReferenceType ref = (EndpointReferenceType)el.getValue();
 
         Bus bus = BusFactory.getThreadDefaultBus();
