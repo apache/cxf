@@ -232,16 +232,18 @@ public class DoMerges {
         line = reader.readLine();
         while (line != null) {
             int idx = line.indexOf(':');
-            propSource = line.substring(0, idx);
-            svnSource = svnRoot + propSource;
-            if (isGit) {
-                gitSource = line.substring(0, idx);
-                if (gitSource.contains("/")) {
-                    gitSource = gitSource.substring(gitSource.lastIndexOf('/') + 1);
+            if (idx != -1) {
+                propSource = line.substring(0, idx);
+                svnSource = svnRoot + propSource;
+                if (isGit) {
+                    gitSource = line.substring(0, idx);
+                    if (gitSource.contains("/")) {
+                        gitSource = gitSource.substring(gitSource.lastIndexOf('/') + 1);
+                    }
+                    gitSource = "origin/" + gitSource;
                 }
-                gitSource = "origin/" + gitSource;
+                parseRevs(line.substring(idx + 1), merged);
             }
-            parseRevs(line.substring(idx + 1), merged);
             line = reader.readLine();
         } 
         p.waitFor();
