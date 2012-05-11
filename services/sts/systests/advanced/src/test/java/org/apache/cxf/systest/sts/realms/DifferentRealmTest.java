@@ -68,8 +68,9 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.AfterClass
-    public static void cleanup() {
+    public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+        stopAllServers();
     }
 
     /**
@@ -94,6 +95,8 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         doubleIt(transportPort, 25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -119,6 +122,8 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         doubleIt(transportPort, 25);
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -147,6 +152,8 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
+        
+        bus.shutdown(true);
     }
     
     /**
@@ -173,6 +180,8 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         doubleIt(transportPort, 25);
+        
+        bus.shutdown(true);
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

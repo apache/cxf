@@ -150,11 +150,7 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>
-    
-   <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-   </properties>
+   </build>
     
    <profiles>
         <profile>
