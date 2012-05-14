@@ -182,23 +182,46 @@ public final class OAuthClientUtils {
             throw new ClientWebApplicationException(ex);
         }
         if (200 == response.getStatus()) {
-            if (map.containsKey(OAuthConstants.ACCESS_TOKEN)
-                && map.containsKey(OAuthConstants.ACCESS_TOKEN_TYPE)) {
-                String tokenType = map.get(OAuthConstants.ACCESS_TOKEN_TYPE);
-                
-                ClientAccessToken token = new ClientAccessToken(
-                                              tokenType,
-                                              map.get(OAuthConstants.ACCESS_TOKEN));
-                return token;
-            } else {
+            ClientAccessToken token = fromMapToClientToken(map);
+            if (token == null) {
                 throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+            } else {
+                return token;
             }
         } else if (400 == response.getStatus() && map.containsValue(OAuthConstants.ERROR_KEY)) {
             OAuthError error = new OAuthError(map.get(OAuthConstants.ERROR_KEY),
                                               map.get(OAuthConstants.ERROR_DESCRIPTION_KEY));
+            error.setErrorUri(map.get(OAuthConstants.ERROR_URI_KEY));
             throw new OAuthServiceException(error);
         } 
         throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
+    }
+    
+    public static ClientAccessToken fromMapToClientToken(Map<String, String> map) {
+        if (map.containsKey(OAuthConstants.ACCESS_TOKEN)
+            && map.containsKey(OAuthConstants.ACCESS_TOKEN_TYPE)) {
+            ClientAccessToken token = new ClientAccessToken(
+                                          map.remove(OAuthConstants.ACCESS_TOKEN_TYPE),
+                                          map.remove(OAuthConstants.ACCESS_TOKEN));
+            
+            String refreshToken = map.remove(OAuthConstants.REFRESH_TOKEN);
+            if (refreshToken != null) {
+                token.setRefreshToken(refreshToken);
+            }
+            String expiresInStr = map.remove(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN);
+            if (expiresInStr != null) {
+                token.setExpiresIn(Long.valueOf(expiresInStr));
+            }
+            String scope = map.remove(OAuthConstants.SCOPE);
+            if (scope != null) {
+                token.setApprovedScope(scope);
+            }
+            
+            token.setParameters(map);
+            return token;
+        } else {
+            return null;
+        }
     }
     
     /**

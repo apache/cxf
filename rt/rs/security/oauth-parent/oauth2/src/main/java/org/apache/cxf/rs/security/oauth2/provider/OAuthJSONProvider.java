@@ -38,6 +38,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
+import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -46,7 +47,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 @Produces("application/json")
 @Consumes("application/json")
 public class OAuthJSONProvider implements MessageBodyWriter<Object>,
-    MessageBodyReader<Map<String, String>> {
+    MessageBodyReader<Object> {
 
     public long getSize(Object obj, Class<?> clt, Type t, Annotation[] anns, MediaType mt) {
         return -1;
@@ -74,7 +75,11 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             sb.append(",");
             appendJsonPair(sb, OAuthConstants.ERROR_DESCRIPTION_KEY, obj.getErrorDescription());
         }
-        // etc
+        if (obj.getErrorUri() != null) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.ERROR_URI_KEY, obj.getErrorUri());
+        }
+        
         sb.append("}");
         String result = sb.toString();
         os.write(result.getBytes("UTF-8"));
@@ -86,28 +91,65 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         sb.append("{");
         appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN, obj.getTokenKey());
         sb.append(",");
-        appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType().toString());
-        // etc
+        appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_TYPE, obj.getTokenType());
+        if (obj.getExpiresIn() != -1) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.ACCESS_TOKEN_EXPIRES_IN, obj.getExpiresIn(), false);
+        }
+        if (obj.getApprovedScope() != null) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.SCOPE, obj.getApprovedScope());
+        }
+        if (obj.getRefreshToken() != null) {
+            sb.append(",");
+            appendJsonPair(sb, OAuthConstants.REFRESH_TOKEN, obj.getRefreshToken());
+        }
+        Map<String, String> parameters = obj.getParameters();
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            sb.append(",");
+            appendJsonPair(sb, entry.getKey(), entry.getValue());
+        }
         sb.append("}");
         String result = sb.toString();
         os.write(result.getBytes("UTF-8"));
         os.flush();
     }
 
-    private void appendJsonPair(StringBuilder sb, String key, String value) {
+    private void appendJsonPair(StringBuilder sb, String key, Object value) {
+        appendJsonPair(sb, key, value, true);
+    }
+    
+    private void appendJsonPair(StringBuilder sb, String key, Object value,
+                                boolean valueQuote) {
         sb.append("\"").append(key).append("\"");
         sb.append(":");
-        sb.append("\"").append(value).append("\"");
+        if (valueQuote) {
+            sb.append("\"");
+        }
+        sb.append(value);
+        if (valueQuote) {
+            sb.append("\"");
+        }
     }
     
     public boolean isReadable(Class<?> cls, Type t, Annotation[] anns, MediaType mt) {
-        return Map.class.isAssignableFrom(cls);
+        return Map.class.isAssignableFrom(cls) || ClientAccessToken.class.isAssignableFrom(cls);
     }
 
-    public Map<String, String> readFrom(Class<Map<String, String>> cls, Type t, Annotation[] anns, 
-                                        MediaType mt, MultivaluedMap<String, String> headers, InputStream is) 
+    public Object readFrom(Class<Object> cls, Type t, Annotation[] anns, 
+                           MediaType mt, MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
-        return readJSONResponse(is);
+        Map<String, String> params = readJSONResponse(is);
+        if (Map.class.isAssignableFrom(cls)) {
+            return params;
+        }
+        ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(params);
+        if (token == null) {
+            throw new WebApplicationException(500);
+        } else {
+            return token;
+        }
+        
     }
 
     public Map<String, String> readJSONResponse(InputStream is) throws IOException  {

@@ -28,6 +28,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 /**
@@ -38,6 +39,17 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static String convertPermissionsToScope(List<OAuthPermission> perms) {
+        StringBuilder sb = new StringBuilder();
+        for (OAuthPermission perm : perms) {
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append(perm.getPermission());
+        }
+        return sb.toString();
+    }
+    
     public static boolean isGrantSupportedForClient(Client client, 
                                                     boolean isConfidential, 
                                                     String grantType) {

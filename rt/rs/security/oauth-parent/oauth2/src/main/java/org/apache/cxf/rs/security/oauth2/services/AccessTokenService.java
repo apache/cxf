@@ -36,6 +36,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler;
@@ -43,6 +44,7 @@ import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * OAuth2 Access Token Service implementation
@@ -50,6 +52,11 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 @Path("/token")
 public class AccessTokenService extends AbstractOAuthService {
     private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
+    private boolean writeOptionalParameters = true;
+    
+    public void setWriteOptionalParameters(boolean write) {
+        writeOptionalParameters = write;
+    }
     
     /**
      * Sets the list of optional grant handlers
@@ -92,8 +99,16 @@ public class AccessTokenService extends AbstractOAuthService {
         // Extract the information to be of use for the client
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
                                                               serverToken.getTokenKey());
-        clientToken.setParameters(serverToken.getParameters());
+        if (writeOptionalParameters) {
+            clientToken.setExpiresIn(serverToken.getLifetime());
+            List<OAuthPermission> perms = serverToken.getScopes();
+            if (!perms.isEmpty()) {
+                clientToken.setApprovedScope(OAuthUtils.convertPermissionsToScope(perms));    
+            }
+            clientToken.setParameters(serverToken.getParameters());
+        }
         
+        //TODO: also set a refresh token if any
         
         // Return it to the client
         return Response.ok(clientToken)

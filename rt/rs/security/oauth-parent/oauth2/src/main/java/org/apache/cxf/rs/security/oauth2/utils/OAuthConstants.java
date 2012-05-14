@@ -31,9 +31,11 @@ public final class OAuthConstants {
     public static final String STATE = "state";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_TYPE = "token_type";
+    public static final String ACCESS_TOKEN_EXPIRES_IN = "expires_in";
     public static final String GRANT_TYPE = "grant_type";
     public static final String RESPONSE_TYPE = "response_type";
     public static final String TOKEN_RESPONSE_TYPE = "token";
+    public static final String REFRESH_TOKEN = "refresh_token";
     
     // Well-known grant types
     public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
@@ -60,6 +62,7 @@ public final class OAuthConstants {
     // Error constants
     public static final String ERROR_KEY = "error";
     public static final String ERROR_DESCRIPTION_KEY = "error_description";
+    public static final String ERROR_URI_KEY = "error_uri";
     
     public static final String SERVER_ERROR = "server_error";
     public static final String INVALID_REQUEST = "invalid_request";

@@ -169,16 +169,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         addAuthenticityTokenToSession(secData);
                 
         secData.setPermissions(perms);
-        
-        StringBuilder sb = new StringBuilder();
-        for (OAuthPermission perm : perms) {
-            if (sb.length() > 0) {
-                sb.append(" ");
-            }
-            sb.append(perm.getPermission());
-        }
-        secData.setProposedScope(sb.toString());
-        
+        secData.setProposedScope(OAuthUtils.convertPermissionsToScope(perms));
         secData.setClientId(client.getClientId());
         secData.setRedirectUri(params.getFirst(OAuthConstants.REDIRECT_URI));
         secData.setState(params.getFirst(OAuthConstants.STATE));
