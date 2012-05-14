@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 import javax.ws.rs.core.Application;
@@ -37,22 +38,25 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public abstract class AbstractResourceInfo {
-    
-    private static Map<Class<?>, List<Field>> contextFields;
-    private static Map<Class<?>, List<Field>> resourceFields;
-    private static Map<Class<?>, Map<Class<?>, Method>> contextMethods;
-    private static Map<Class<?>, Map<Field, ThreadLocalProxy<?>>> fieldProxyMap;
-    private static Map<Class<?>, Map<Field, ThreadLocalProxy<?>>> resourceProxyMap;
-    private static Map<Class<?>, Map<Method, ThreadLocalProxy<?>>> setterProxyMap;
+    private static Map<Class<?>, Map<Field, ThreadLocalProxy<?>>> fieldProxyMap
+        = new ConcurrentHashMap<Class<?>, Map<Field, ThreadLocalProxy<?>>>(2);
+    private static Map<Class<?>, Map<Field, ThreadLocalProxy<?>>> resourceProxyMap
+        = new ConcurrentHashMap<Class<?>, Map<Field, ThreadLocalProxy<?>>>(2);
+    private static Map<Class<?>, Map<Method, ThreadLocalProxy<?>>> setterProxyMap
+        = new ConcurrentHashMap<Class<?>, Map<Method, ThreadLocalProxy<?>>>(2);
     
     protected boolean root;
     protected Class<?> resourceClass;
     protected Class<?> serviceClass;
+
+    private Map<Class<?>, List<Field>> contextFields;
+    private Map<Class<?>, List<Field>> resourceFields;
+    private Map<Class<?>, Map<Class<?>, Method>> contextMethods;
     
     protected AbstractResourceInfo() {
         
     }
-    
+
     protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot) {
         this.serviceClass = serviceClass;
         this.resourceClass = resourceClass;
@@ -178,6 +182,12 @@ public abstract class AbstractResourceInfo {
     }
     
     public abstract boolean isSingleton();
+
+    public static void clearAllMaps() {
+        fieldProxyMap.clear();
+        resourceProxyMap.clear();
+        setterProxyMap.clear();
+    }
     
     public void clearThreadLocalProxies() {
         clearProxies(fieldProxyMap);
