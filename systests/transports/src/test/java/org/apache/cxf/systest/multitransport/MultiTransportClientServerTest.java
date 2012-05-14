@@ -98,7 +98,7 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
 
         assertTrue("server did not launch correctly", launchServer(MyServer.class, true));
-        
+        createStaticBus();
     }
     
     // the purpose of this test shows how one service include two ports with different

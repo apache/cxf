@@ -52,6 +52,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus(SERVER_CONFIG_FILE);
+            setBus(bus);
             BusFactory.setDefaultBus(bus);
             
             Object implementor = new HelloImplWithWrapppedContinuation();
@@ -93,6 +94,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();
         doTest(helloPort);
+        bus.shutdown(true);
     }
         
     @Test
@@ -109,6 +111,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();
         doTest(helloPort);
+        bus.shutdown(true);
     }
 
     private void doTest(final HelloContinuation helloPort) throws Exception {
