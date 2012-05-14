@@ -348,4 +348,21 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="TransportSupportingSigned"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportSupportingSigned" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportSupportingSignedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>

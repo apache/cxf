@@ -57,6 +57,12 @@
         <wsdl:port name="DoubleItNoSecurityPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="http://localhost:9010/DoubleItNoSecurity" />
         </wsdl:port>
+        <wsdl:port name="DoubleItTransportSupportingSignedPort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9011/DoubleItTransportSupportingSigned" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItTransportUTSupportingSignedPort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9011/DoubleItTransportUTSupportingSigned" />
+        </wsdl:port>
     </wsdl:service>
 
 </wsdl:definitions>
