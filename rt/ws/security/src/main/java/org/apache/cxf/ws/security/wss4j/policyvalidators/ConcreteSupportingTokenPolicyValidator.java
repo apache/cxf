@@ -38,13 +38,12 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.ws.security.WSSecurityEngineResult;
 
 /**
- * Validate an EndorsingEncryptedSupportingToken policy. 
+ * Validate SupportingToken policies.
  */
-public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
+public class ConcreteSupportingTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
     
-    public EndorsingEncryptedTokenPolicyValidator() {
-        setEndorsed(true);
-        setEncrypted(true);
+    public ConcreteSupportingTokenPolicyValidator() {
+        setSigned(false);
     }
     
     public boolean validatePolicy(
@@ -54,7 +53,7 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
         if (ais == null || ais.isEmpty()) {                       
             return true;
         }
@@ -63,11 +62,10 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
         setResults(results);
         setSignedResults(signedResults);
         setEncryptedResults(encryptedResults);
-
+        
         for (AssertionInfo ai : ais) {
             SupportingToken binding = (SupportingToken)ai.getAssertion();
-            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENDORSING_ENCRYPTED 
-                != binding.getTokenType()) {
+            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_SUPPORTING != binding.getTokenType()) {
                 continue;
             }
             ai.setAsserted(true);
@@ -76,17 +74,23 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
             setEncryptedElements(binding.getEncryptedElements());
-
+            
             List<Token> tokens = binding.getTokens();
             for (Token token : tokens) {
                 if (!isTokenRequired(token, message)) {
                     continue;
                 }
                 
-                boolean derived = token.isDerivedKeys();
-                setDerived(derived);
                 boolean processingFailed = false;
-                if (token instanceof KerberosToken) {
+                if (token instanceof UsernameToken) {
+                    if (!processUsernameTokens()) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof SamlToken) {
+                    if (!processSAMLTokens()) {
+                        processingFailed = true;
+                    }
+                } else if (token instanceof KerberosToken) {
                     if (!processKerberosTokens()) {
                         processingFailed = true;
                     }
@@ -94,16 +98,8 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
                     if (!processX509Tokens()) {
                         processingFailed = true;
                     }
-                } else if (token instanceof UsernameToken) {
-                    if (!processUsernameTokens()) {
-                        processingFailed = true;
-                    }
                 } else if (token instanceof SecurityContextToken) {
                     if (!processSCTokens()) {
-                        processingFailed = true;
-                    }
-                } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens()) {
                         processingFailed = true;
                     }
                 } else if (!(token instanceof IssuedToken)) {
@@ -112,12 +108,12 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
                 
                 if (processingFailed) {
                     ai.setNotAsserted(
-                        "The received token does not match the endorsing encrypted "
-                        + "supporting token requirement"
+                        "The received token does not match the supporting token requirement"
                     );
                     return false;
                 }
             }
+
         }
         
         return true;
