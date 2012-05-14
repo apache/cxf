@@ -108,7 +108,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     
     @Test
     public void testGetBook123Fail() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/text/xml/123");
         wc.accept("text/xml");
         wc.header("fail-write", "");
         Response r = wc.get();
@@ -117,7 +117,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     
     @Test
     public void testGetBookUsingStaxWriter() throws Exception {
-        getAndCompare("http://localhost:" + PORT + "/bookstore/books/123",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/books/text/xml/123",
                       "text/xml", 200);
     }
     
