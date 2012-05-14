@@ -39,7 +39,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = SpringServer.PORT;
+    public static final int PORT = SpringServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -126,10 +126,10 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
     
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
-        public static final String PORT = AbstractSpringServer.PORT;
+        public static final int PORT = allocatePortAsInt(SpringServer.class);
         
         public SpringServer() {
-            super("/jaxrs_many_destinations");
+            super("/jaxrs_many_destinations", PORT);
         }
     }
     

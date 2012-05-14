@@ -46,7 +46,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase {
-    public static final String PORT = SpringServer.PORT;
+    public static final int PORT = SpringServer.PORT;
 
     private JAXBContext context; 
     private int fakyLogger;
@@ -63,8 +63,9 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
 
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
+        public static final int PORT = allocatePortAsInt(SpringServer.class);
         public SpringServer() {
-            super("/jaxrs_logging_atompush");
+            super("/jaxrs_logging_atompush", PORT);
         }
     }
 

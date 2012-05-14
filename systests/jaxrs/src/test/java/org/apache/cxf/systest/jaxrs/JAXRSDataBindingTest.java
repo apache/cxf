@@ -47,7 +47,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookDataBindingServer.class));
+                   launchServer(BookDataBindingServer.class, true));
     }
     
     

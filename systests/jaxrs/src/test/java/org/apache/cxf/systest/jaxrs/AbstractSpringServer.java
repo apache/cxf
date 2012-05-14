@@ -30,24 +30,16 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
-    public static final String PORT = allocatePort(AbstractSpringServer.class);
 
     private org.eclipse.jetty.server.Server server;
     private String resourcePath;
     private String contextPath;
     private int port;
     
-    protected AbstractSpringServer(String path) {
-        this(path, "/", Integer.parseInt(PORT));
-    }
-    
     protected AbstractSpringServer(String path, int portNumber) {
         this(path, "/", portNumber);
     }
-    protected AbstractSpringServer(String path, String cPath) {
-        this(path, cPath, Integer.parseInt(PORT));
-    }
-    
+
     protected AbstractSpringServer(String path, String cPath, int portNumber) {
         resourcePath = path;
         contextPath = cPath;

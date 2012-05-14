@@ -48,7 +48,7 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookHttpsServer.class));
+                   launchServer(BookHttpsServer.class, true));
     }
     
     @Test

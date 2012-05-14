@@ -30,7 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
-    public static final String PORT = BookServerJaasSecurity.PORT;
+    public static final int PORT = BookServerJaasSecurity.PORT;
     
     @BeforeClass
     public static void startServers() throws Exception {

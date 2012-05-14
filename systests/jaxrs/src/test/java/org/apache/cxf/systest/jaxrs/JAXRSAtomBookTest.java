@@ -51,6 +51,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(AtomBookServer.class, true));
+        createStaticBus();
     }
     
     @Test

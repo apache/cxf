@@ -23,9 +23,10 @@ package org.apache.cxf.systest.jaxrs;
 
 
 public class BookNonSpringServer extends AbstractSpringServer {
+    public static final int PORT = allocatePortAsInt(BookNonSpringServer.class);
 
     public BookNonSpringServer() {
-        super("/jaxrs_non_spring");
+        super("/jaxrs_non_spring", PORT);
     }
     
     public static void main(String args[]) {

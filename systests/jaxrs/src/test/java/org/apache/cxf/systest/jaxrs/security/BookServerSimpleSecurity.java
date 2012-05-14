@@ -28,9 +28,10 @@ import org.eclipse.jetty.security.LoginService;
 
 
 public class BookServerSimpleSecurity extends AbstractSpringServer {
+    public static final int PORT = allocatePortAsInt(BookServerSimpleSecurity.class);
 
     public BookServerSimpleSecurity() {
-        super("/jaxrs_simple_security");
+        super("/jaxrs_simple_security", PORT);
     }
     
     @Override

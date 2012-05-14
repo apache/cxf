@@ -26,13 +26,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -48,8 +46,6 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private boolean ignoreJaxrsClient;
-    @Resource
-    private WebServiceContext jaxwsContext;
     @Resource
     private MessageContext jaxrsContext;
     
@@ -114,7 +110,6 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
                 return webClient.getBook(id);
             }
             invocationInProcess = false;
-            System.out.println(getContentType());
         }
         
         
@@ -134,17 +129,6 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
         books.put(book.getId(), book);
     }
  
-    private String getContentType() {
-        
-        // TODO : it may be worth indeed to introduce a shared ServiceContext
-        // such that users combining JAXWS and JAXRS won't have to write if/else code 
-        HttpServletRequest request = jaxrsContext.getHttpServletRequest();
-        if (request == null) {
-            request = (HttpServletRequest)jaxwsContext.getMessageContext().get(
-                 javax.xml.ws.handler.MessageContext.SERVLET_REQUEST);
-        }
-        return request.getContentType();
-    }
 
     @WebMethod(exclude = true)
     public BookSubresource getBookSubresource(String id) {

@@ -66,11 +66,12 @@ import org.junit.Test;
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServer.PORT;
     public static final String PORT2 = allocatePort(JAXRSClientServerBookTest.class);
-
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class, true));
+        createStaticBus();
     }
     
     @Test

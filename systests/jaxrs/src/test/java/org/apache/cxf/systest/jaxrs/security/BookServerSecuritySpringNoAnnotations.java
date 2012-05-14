@@ -24,9 +24,10 @@ import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 
 
 public class BookServerSecuritySpringNoAnnotations extends AbstractSpringServer {
+    public static final int PORT = allocatePortAsInt(BookServerSecuritySpringNoAnnotations.class);
 
     public BookServerSecuritySpringNoAnnotations() {
-        super("/jaxrs_security_no_annotations");
+        super("/jaxrs_security_no_annotations", PORT);
     }
     
     public static void main(String args[]) {
