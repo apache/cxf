@@ -69,6 +69,7 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.BindingPolicyValidator;
+import org.apache.cxf.ws.security.wss4j.policyvalidators.ConcreteSupportingTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingEncryptedTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.EndorsingTokenPolicyValidator;
@@ -562,9 +563,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             LOG.fine("Incoming request failed supporting token policy validation");
         }
         
-        // The supporting tokens are already validated
-        assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
-        
         // relatively irrelevant stuff from a verification standpoint
         assertPolicy(aim, SP12Constants.LAYOUT);
         assertPolicy(aim, SP12Constants.WSS10);
@@ -703,7 +701,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         
         boolean check = true;
         
-        SupportingTokenPolicyValidator validator = new SignedTokenPolicyValidator();
+        SupportingTokenPolicyValidator validator = new ConcreteSupportingTokenPolicyValidator();
+        validator.setUsernameTokenResults(utResults, utWithCallbacks);
+        validator.setSAMLTokenResults(samlResults);
+        validator.setTimestampElement(timestamp);
+        check &= validator.validatePolicy(aim, msg, results, signedResults, encryptedResults);
+        
+        validator = new SignedTokenPolicyValidator();
         validator.setUsernameTokenResults(utResults, utWithCallbacks);
         validator.setSAMLTokenResults(samlResults);
         validator.setTimestampElement(timestamp);

@@ -79,7 +79,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT2);
+        updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
         
@@ -104,7 +104,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItNoSecurityPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT2);
+        updateAddressPort(utPort, PORT);
         
         try {
             utPort.doubleIt(25);
@@ -134,11 +134,70 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
         DoubleItPortType utPort = 
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT2);
+        updateAddressPort(utPort, PORT);
         
         utPort.doubleIt(25);
         
         bus.shutdown(true);
+    }
+    
+    /**
+     * The client uses a Transport binding policy with a Endorsing Supporting X509 Token. The client does
+     * not sign part of the WSA header though and so the invocation should fail.
+     */
+    @org.junit.Test
+    public void testTransportSupportingSigned() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PolicyAlternativeTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingSignedPort");
+        DoubleItPortType transportPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportPort, PORT2);
+
+        try {
+            transportPort.doubleIt(25);
+            fail("Failure expected on not signing a wsa header");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+    }
+    
+    /**
+     * The client uses a Transport binding policy with a Endorsing Supporting X509 Token as well as a 
+     * Signed Endorsing UsernameToken. Here the client is trying to trick the Service Provider as 
+     * the UsernameToken signs the wsa:To Header, not the X.509 Token.
+     */
+    @org.junit.Test
+    public void testTransportUTSupportingSigned() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PolicyAlternativeTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportUTSupportingSignedPort");
+        DoubleItPortType transportPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportPort, PORT2);
+
+        try {
+            transportPort.doubleIt(25);
+            fail("Failure expected on not signing a wsa header");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
     }
     
 }

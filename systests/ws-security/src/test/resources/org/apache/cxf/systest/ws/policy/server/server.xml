@@ -44,8 +44,32 @@
         </cxf:features>
     </cxf:bus>
     
+    <!-- -->
+    <!-- Any services listening on port 9009 must use the following -->
+    <!-- Transport Layer Security (TLS) settings -->
+    <!-- -->
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.Server.2}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    
 	<jaxws:endpoint id="AsymmetricEndpoint"
-		address="http://localhost:${testutil.ports.Server.2}/DoubleItAsymmetric"
+		address="http://localhost:${testutil.ports.Server}/DoubleItAsymmetric"
 		serviceName="s:DoubleItService" endpointName="s:DoubleItAsymmetricPort"
 		xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
 		wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
@@ -68,7 +92,7 @@
 	</jaxws:endpoint>
 
     <jaxws:endpoint id="NoSecurityEndpoint"
-        address="http://localhost:${testutil.ports.Server.2}/DoubleItNoSecurity"
+        address="http://localhost:${testutil.ports.Server}/DoubleItNoSecurity"
         serviceName="s:DoubleItService" endpointName="s:DoubleItNoSecurityPort"
         xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
         wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
@@ -91,7 +115,7 @@
     </jaxws:endpoint>
     
     <jaxws:endpoint id="UsernameTokenEndpoint"
-        address="http://localhost:${testutil.ports.Server.2}/DoubleItUsernameToken"
+        address="http://localhost:${testutil.ports.Server}/DoubleItUsernameToken"
         serviceName="s:DoubleItService" endpointName="s:DoubleItUsernameTokenPort"
         xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
         wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
@@ -112,6 +136,54 @@
         </jaxws:features>
 
     </jaxws:endpoint>
+    
+    <jaxws:endpoint 
+       id="TransportSupportingSigned"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItTransportSupportingSigned" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportSupportingSignedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+       </jaxws:properties> 
+       <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
+                                     URI="#DoubleItTransportSupportingSignedPolicy" />
+            </p:policies>
+        </jaxws:features>
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="TransportUTSupportingSigned"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItTransportUTSupportingSigned" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportUTSupportingSignedPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+       </jaxws:properties> 
+       <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
+                                     URI="#DoubleItTransportSupportingSignedPolicy" />
+            </p:policies>
+        </jaxws:features>
+     
+    </jaxws:endpoint> 
 
 
 	<wsp:Policy wsu:Id="Combined"
@@ -188,6 +260,52 @@
 			</wsp:All>
 		</wsp:ExactlyOne>
 	</wsp:Policy>
+	
+	<wsp:Policy wsu:Id="DoubleItTransportSupportingSignedPolicy"
+	    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
+                <sp:TransportBinding xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"  >
+                   <wsp:Policy>
+                        <sp:X509Token
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                           <wsp:Policy>
+                              <sp:WssX509V3Token10 />
+                           </wsp:Policy>
+                        </sp:X509Token>
+                        <sp:SignedParts>
+                            <sp:Body/>
+                            <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing"/>
+                        </sp:SignedParts>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
 	
 
     

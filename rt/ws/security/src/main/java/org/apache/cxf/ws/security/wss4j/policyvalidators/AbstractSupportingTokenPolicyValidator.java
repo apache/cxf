@@ -23,14 +23,30 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.ws.security.policy.model.Header;
+import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
+import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngine;
@@ -48,6 +64,8 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 public abstract class AbstractSupportingTokenPolicyValidator 
     extends AbstractTokenPolicyValidator implements SupportingTokenPolicyValidator {
     
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractSupportingTokenPolicyValidator.class);
+    
     private Message message;
     private List<WSSecurityEngineResult> results;
     private List<WSSecurityEngineResult> signedResults;
@@ -59,7 +77,11 @@ public abstract class AbstractSupportingTokenPolicyValidator
     private boolean signed;
     private boolean encrypted;
     private boolean derived;
-    private boolean endorsed;
+    private boolean endorsed; 
+    private SignedEncryptedElements signedElements;
+    private SignedEncryptedElements encryptedElements;
+    private SignedEncryptedParts signedParts;
+    private SignedEncryptedParts encryptedParts;
 
     /**
      * Set the list of UsernameToken results
@@ -130,7 +152,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
         tokenResults.addAll(utResults);
         List<WSSecurityEngineResult> dktResults = new ArrayList<WSSecurityEngineResult>();
         for (WSSecurityEngineResult wser : utResults) {
-            if (endorsed && derived) {
+            if (derived) {
                 byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                 WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
                 if (dktResult != null) {
@@ -150,9 +172,10 @@ public abstract class AbstractSupportingTokenPolicyValidator
             return false;
         }
         tokenResults.addAll(dktResults);
-        if (endorsed && !checkEndorsed(tokenResults)) {
+        if ((endorsed && !checkEndorsed(tokenResults)) || !validateSignedEncryptedPolicies(tokenResults)) {
             return false;
         }
+        
         return true;
     }
     
@@ -174,6 +197,11 @@ public abstract class AbstractSupportingTokenPolicyValidator
         if (endorsed && !checkEndorsed(samlResults)) {
             return false;
         }
+        
+        if (!validateSignedEncryptedPolicies(samlResults)) {
+            return false;
+        }
+        
         return true;
     }
     
@@ -190,7 +218,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 BinarySecurity binarySecurity = 
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof KerberosSecurity) {
-                    if (endorsed && derived) {
+                    if (derived) {
                         byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                         WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
                         if (dktResult != null) {
@@ -216,6 +244,11 @@ public abstract class AbstractSupportingTokenPolicyValidator
         if (endorsed && !checkEndorsed(tokenResults)) {
             return false;
         }
+        
+        if (!validateSignedEncryptedPolicies(tokenResults)) {
+            return false;
+        }
+        
         return true;
     }
     
@@ -233,7 +266,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (binarySecurity instanceof X509Security
                     || binarySecurity instanceof PKIPathSecurity) {
-                    if (endorsed && derived) {
+                    if (derived) {
                         WSSecurityEngineResult resultToStore = processX509DerivedTokenResult(wser);
                         if (resultToStore != null) {
                             dktResults.add(resultToStore);
@@ -258,6 +291,35 @@ public abstract class AbstractSupportingTokenPolicyValidator
         if (endorsed && !checkEndorsed(tokenResults)) {
             return false;
         }
+        
+        if (!validateSignedEncryptedPolicies(tokenResults)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Validate (SignedParts|SignedElements|EncryptedParts|EncryptedElements) policies of this
+     * SupportingToken.
+     */
+    private boolean validateSignedEncryptedPolicies(List<WSSecurityEngineResult> tokenResults) {
+        if (!validateSignedEncryptedParts(signedParts, false, signedResults, tokenResults)) {
+            return false;
+        }
+        
+        if (!validateSignedEncryptedParts(encryptedParts, true, encryptedResults, tokenResults)) {
+            return false;
+        }
+        
+        if (!validateSignedEncryptedElements(signedElements, false, signedResults, tokenResults)) {
+            return false;
+        }
+        
+        if (!validateSignedEncryptedElements(encryptedElements, false, encryptedResults, tokenResults)) {
+            return false;
+        }
+        
         return true;
     }
     
@@ -271,7 +333,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SCT) {
-                if (endorsed && derived) {
+                if (derived) {
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                     WSSecurityEngineResult dktResult = getMatchingDerivedKey(secret);
                     if (dktResult != null) {
@@ -296,6 +358,11 @@ public abstract class AbstractSupportingTokenPolicyValidator
         if (endorsed && !checkEndorsed(tokenResults)) {
             return false;
         }
+        
+        if (!validateSignedEncryptedPolicies(tokenResults)) {
+            return false;
+        }
+        
         return true;
     }
     
@@ -417,7 +484,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
             if (sl != null) {
                 for (WSDataRef dataRef : sl) {
                     if (timestamp == dataRef.getProtectedElement()
-                        && checkSignature(signedResult, tokenResults)) {
+                        && checkSignatureOrEncryptionResult(signedResult, tokenResults)) {
                         return true;
                     }
                 }
@@ -441,7 +508,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
                     if (WSSecurityEngine.SIGNATURE.equals(signedQName)
-                        && checkSignature(signedResult, tokenResults)) {
+                        && checkSignatureOrEncryptionResult(signedResult, tokenResults)) {
                         return true;
                     }
                 }
@@ -451,20 +518,20 @@ public abstract class AbstractSupportingTokenPolicyValidator
     }
     
     /**
-     * Check that a WSSecurityEngineResult corresponding to a signature uses the same 
-     * signing credential as one of the tokens.
-     * @param signatureResult a WSSecurityEngineResult corresponding to a signature
+     * Check that a WSSecurityEngineResult corresponding to a signature or encryption uses the same 
+     * signing/encrypting credential as one of the tokens.
+     * @param signatureResult a WSSecurityEngineResult corresponding to a signature or encryption
      * @param tokenResult A list of WSSecurityEngineResults corresponding to tokens
      * @return 
      */
-    private boolean checkSignature(
-        WSSecurityEngineResult signatureResult,
+    private boolean checkSignatureOrEncryptionResult(
+        WSSecurityEngineResult result,
         List<WSSecurityEngineResult> tokenResult
     ) {
-        // See what was used to sign this result
+        // See what was used to sign/encrypt this result
         X509Certificate cert = 
-            (X509Certificate)signatureResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        byte[] secret = (byte[])signatureResult.get(WSSecurityEngineResult.TAG_SECRET);
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         
         // Now see if the same credential exists in the tokenResult list
         for (WSSecurityEngineResult token : tokenResult) {
@@ -510,6 +577,165 @@ public abstract class AbstractSupportingTokenPolicyValidator
     }
     
     /**
+     * Validate the SignedParts or EncryptedParts policies
+     */
+    private boolean validateSignedEncryptedParts(
+        SignedEncryptedParts parts,
+        boolean content,
+        List<WSSecurityEngineResult> protResults,
+        List<WSSecurityEngineResult> tokenResults
+    ) {
+        if (parts == null) {
+            return true;
+        }
+        
+        if (parts.isBody()) {
+            SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
+            Element soapBody = null;
+            try {
+                soapBody = soapMessage.getSOAPBody();
+            } catch (SOAPException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+                return false;
+            }
+            
+            if (!checkProtectionResult(soapBody, content, protResults, tokenResults)) {
+                return false;
+            }
+        }
+        
+        for (Header h : parts.getHeaders()) {
+            SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
+            Element soapHeader = null;
+            try {
+                soapHeader = soapMessage.getSOAPHeader();
+            } catch (SOAPException ex) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+                return false;
+            }
+            
+            final List<Element> elements;
+            if (h.getName() == null) {
+                elements = DOMUtils.getChildrenWithNamespace(soapHeader, h.getNamespace());
+            } else {
+                elements = DOMUtils.getChildrenWithName(soapHeader, h.getNamespace(), h.getName());
+            }
+            
+            for (Element el : elements) {
+                if (!checkProtectionResult(el, false, protResults, tokenResults)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check that an Element is signed or encrypted by one of the token results
+     */
+    private boolean checkProtectionResult(
+        Element elementToProtect,
+        boolean content,
+        List<WSSecurityEngineResult> protResults,
+        List<WSSecurityEngineResult> tokenResults
+    ) {
+        for (WSSecurityEngineResult result : protResults) {
+            List<WSDataRef> dataRefs = 
+                CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+            if (dataRefs != null) {
+                for (WSDataRef dataRef : dataRefs) {
+                    if (elementToProtect == dataRef.getProtectedElement()
+                        && content == dataRef.isContent()
+                        && checkSignatureOrEncryptionResult(result, tokenResults)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Validate SignedElements or EncryptedElements policies
+     */
+    private boolean validateSignedEncryptedElements(
+        SignedEncryptedElements elements,
+        boolean content,
+        List<WSSecurityEngineResult> protResults,
+        List<WSSecurityEngineResult> tokenResults
+    ) {
+        if (elements == null) {
+            return true;
+        }
+        
+        Map<String, String> namespaces = elements.getDeclaredNamespaces();
+        List<String> xpaths = elements.getXPathExpressions();
+        
+        if (xpaths != null) {
+            SOAPMessage soapMessage = message.getContent(SOAPMessage.class);
+            Element soapEnvelope = soapMessage.getSOAPPart().getDocumentElement();
+            
+            for (String xPath : xpaths) {
+                if (!checkXPathResult(soapEnvelope, xPath, namespaces, protResults, tokenResults)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check a particular XPath result
+     */
+    private boolean checkXPathResult(
+        Element soapEnvelope,
+        String xPath,
+        Map<String, String> namespaces,
+        List<WSSecurityEngineResult> protResults,
+        List<WSSecurityEngineResult> tokenResults
+    ) {
+        // XPathFactory and XPath are not thread-safe so we must recreate them
+        // each request.
+        final XPathFactory factory = XPathFactory.newInstance();
+        final XPath xpath = factory.newXPath();
+        
+        if (namespaces != null) {
+            xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+        }
+        
+        // For each XPath
+        for (String xpathString : Arrays.asList(xPath)) {
+            // Get the matching nodes
+            NodeList list;
+            try {
+                list = (NodeList)xpath.evaluate(
+                        xpathString, 
+                        soapEnvelope,
+                        XPathConstants.NODESET);
+            } catch (XPathExpressionException e) {
+                LOG.log(Level.FINE, e.getMessage(), e);
+                return false;
+            }
+            
+            // If we found nodes then we need to do the check.
+            if (list.getLength() != 0) {
+                // For each matching element, check for a ref that
+                // covers it.
+                for (int x = 0; x < list.getLength(); x++) {
+                    final Element el = (Element)list.item(x);
+                    
+                    if (!checkProtectionResult(el, false, protResults, tokenResults)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
+    /**
      * Return true if a token was signed, false otherwise.
      */
     private boolean isTokenSigned(Element token) {
@@ -542,6 +768,34 @@ public abstract class AbstractSupportingTokenPolicyValidator
             }
         }
         return false;
+    }
+
+    public void setUtResults(List<WSSecurityEngineResult> utResults) {
+        this.utResults = utResults;
+    }
+
+    public void setValidateUsernameToken(boolean validateUsernameToken) {
+        this.validateUsernameToken = validateUsernameToken;
+    }
+
+    public void setTimestamp(Element timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setSignedElements(SignedEncryptedElements signedElements) {
+        this.signedElements = signedElements;
+    }
+
+    public void setEncryptedElements(SignedEncryptedElements encryptedElements) {
+        this.encryptedElements = encryptedElements;
+    }
+
+    public void setSignedParts(SignedEncryptedParts signedParts) {
+        this.signedParts = signedParts;
+    }
+
+    public void setEncryptedParts(SignedEncryptedParts encryptedParts) {
+        this.encryptedParts = encryptedParts;
     }
     
 }

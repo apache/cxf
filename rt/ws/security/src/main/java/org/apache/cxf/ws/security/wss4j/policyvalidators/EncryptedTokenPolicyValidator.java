@@ -69,6 +69,11 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 continue;
             }
             ai.setAsserted(true);
+            
+            setSignedParts(binding.getSignedParts());
+            setEncryptedParts(binding.getEncryptedParts());
+            setSignedElements(binding.getSignedElements());
+            setEncryptedElements(binding.getEncryptedElements());
 
             List<Token> tokens = binding.getTokens();
             for (Token token : tokens) {
