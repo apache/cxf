@@ -19,21 +19,32 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServerResourceCreatedOutside extends AbstractBusTestServerBase {
+
     public static final String PORT = allocatePort(BookServerResourceCreatedOutside.class);
 
+    Server server;
     protected void run() {
+        setBus(BusFactory.getDefaultBus());
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setBus(getBus());
         BookStore bs = new BookStore();
         sf.setServiceBean(bs);
         sf.setAddress("http://localhost:" + PORT + "/");
-        sf.create();
-        
+        server = sf.create();
     }
-
+    @Override
+    public void tearDown() throws Exception {
+        server.stop();
+        server.destroy();
+        server = null;
+    }
+    
     public static void main(String[] args) {
         try {
             BookServerResourceCreatedOutside s = new BookServerResourceCreatedOutside();

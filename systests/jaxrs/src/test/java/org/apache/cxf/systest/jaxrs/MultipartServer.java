@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.Collections;
 
 import org.apache.cxf.attachment.AttachmentDeserializer;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -29,6 +30,8 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class MultipartServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(MultipartServer.class);
+    Server server;
+    
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
@@ -40,9 +43,13 @@ public class MultipartServer extends AbstractBusTestServerBase {
                                new SingletonResourceProvider(new MultipartStore()));
         sf.setAddress("http://localhost:" + PORT + "/");
 
-        sf.create();        
+        server = sf.create();        
     }
-
+    public void tearDown() throws Exception {
+        server.stop();
+        server.destroy();
+        server = null;
+    }
     public static void main(String[] args) {
         try {
             MultipartServer s = new MultipartServer();

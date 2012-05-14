@@ -30,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.UserOperation;
@@ -46,7 +47,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
 
     @Ignore
     public static class Server extends AbstractBusTestServerBase {        
-
+        org.apache.cxf.endpoint.Server server;
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setAddress("http://localhost:" + PORT + "/");
@@ -84,10 +85,15 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             String modelRef = "classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml";
             sf.setModelRefWithServiceClass(modelRef, BookStoreNoAnnotationsInterface.class);
             sf.setServiceBean(new BookStoreNoAnnotationsImpl());
-            sf.create();
-
+            server = sf.create();
         }
 
+        @Override
+        public void tearDown() {
+            server.stop();
+            server.destroy();
+            server = null;
+        }
         public static void main(String[] args) {
             try {
                 Server s = new Server();
@@ -103,6 +109,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
     
     @BeforeClass
     public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
     }

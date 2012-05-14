@@ -39,6 +39,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSUtils;
@@ -55,6 +56,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         if (serversStarted) {
             return;
         }
+        AbstractResourceInfo.clearAllMaps();
         Map<String, String> props = new HashMap<String, String>();                
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
             props.put("org.apache.activemq.default.directory.prefix",

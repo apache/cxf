@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Assert;
@@ -39,6 +40,7 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(BookContinuationServer.class, true));
     }

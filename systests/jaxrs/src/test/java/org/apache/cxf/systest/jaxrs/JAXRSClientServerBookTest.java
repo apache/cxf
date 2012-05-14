@@ -53,6 +53,7 @@ import org.apache.cxf.jaxrs.client.ResponseReader;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
@@ -69,6 +70,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class, true));
         createStaticBus();

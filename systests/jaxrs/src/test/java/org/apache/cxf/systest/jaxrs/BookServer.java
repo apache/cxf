@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
@@ -36,9 +38,14 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServer.class);
-
+ 
+    org.apache.cxf.endpoint.Server server; 
+    
     protected void run() {
+        Bus bus = BusFactory.getDefaultBus();
+        setBus(bus);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+        sf.setBus(bus);
         sf.setResourceClasses(BookStore.class, SimpleBookStore.class, BookStorePerRequest.class);
         
         List<Object> providers = new ArrayList<Object>();
@@ -68,7 +75,15 @@ public class BookServer extends AbstractBusTestServerBase {
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
 
-        sf.create();        
+        server = sf.create();
+        BusFactory.setDefaultBus(null);
+        BusFactory.setThreadDefaultBus(null);
+    }
+    
+    public void tearDown() throws Exception {
+        server.stop();
+        server.destroy();
+        server = null;
     }
 
     public static void main(String[] args) {

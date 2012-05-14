@@ -29,6 +29,7 @@ import java.net.URLConnection;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,6 +39,7 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
 
     @BeforeClass
     public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerResourceCreatedOutside.class, true));
         createStaticBus();

@@ -36,6 +36,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -49,6 +50,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
+        AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(AtomBookServer.class, true));
         createStaticBus();
