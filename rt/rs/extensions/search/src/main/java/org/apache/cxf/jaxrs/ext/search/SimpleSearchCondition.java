@@ -135,12 +135,16 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             List<SearchCondition<T>> list = new ArrayList<SearchCondition<T>>();
             Map<String, Object> get2val = getGettersAndValues();
             
-            for (String getter : get2val.keySet()) {
+            Set<String> keySet = get2val != null ? get2val.keySet()
+                : ((SearchBean)condition).getKeySet();
+            
+            for (String getter : keySet) {
                 ConditionType ct = getters2operators == null ? sharedType : getters2operators.get(getter);
                 if (ct == null) {
                     continue;
                 }
-                Object rval = get2val.get(getter);
+                Object rval = get2val != null 
+                    ? get2val.get(getter) : ((SearchBean)condition).get(getter);
                 if (rval == null) {
                     continue;
                 }
@@ -236,16 +240,19 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * @return template (condition) object getters mapped to their non-null values
      */
     private Map<String, Object> getGettersAndValues() {
-        
-        Map<String, Object> getters2values = new HashMap<String, Object>();
-        Beanspector<T> beanspector = new Beanspector<T>(condition);
-        for (String getter : beanspector.getGettersNames()) {
-            Object value = getValue(beanspector, getter, condition);
-            getters2values.put(getter, value);
+        if (!SearchBean.class.isAssignableFrom(condition.getClass())) {
+            Map<String, Object> getters2values = new HashMap<String, Object>();
+            Beanspector<T> beanspector = new Beanspector<T>(condition);
+            for (String getter : beanspector.getGettersNames()) {
+                Object value = getValue(beanspector, getter, condition);
+                getters2values.put(getter, value);
+            }
+            //we do not need compare class objects
+            getters2values.keySet().remove("class");
+            return getters2values; 
+        } else {
+            return null;
         }
-        //we do not need compare class objects
-        getters2values.keySet().remove("class");
-        return getters2values;
     }
 
     private Object getValue(Beanspector<T> beanspector, String getter, T pojo) {

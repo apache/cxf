@@ -23,6 +23,7 @@ import java.util.Date;
 
 import org.apache.cxf.jaxrs.ext.search.FiqlParseException;
 import org.apache.cxf.jaxrs.ext.search.FiqlParser;
+import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
 import org.junit.Assert;
@@ -45,6 +46,18 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
+    public void testSQL1WithSearchBean() throws FiqlParseException {
+        FiqlParser<SearchBean> beanParser = new FiqlParser<SearchBean>(SearchBean.class);
+        SearchCondition<SearchBean> filter = beanParser.parse("name==ami*;level=gt=10");
+        SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
+        filter.accept(visitor);
+        String sql = visitor.getResult();
+        
+        assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)
+                   || "SELECT * FROM table WHERE (level > '10') AND (name LIKE 'ami%')".equals(sql));
+    }
+    
+    @Test
     public void testSQL2() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
@@ -58,6 +71,19 @@ public class SQLPrinterVisitorTest extends Assert {
     public void testSQL3() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
+        filter.accept(visitor);
+        String sql = visitor.getResult();
+        assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
+                   + "OR (level > '10'))").equals(sql)
+                   || ("SELECT * FROM table WHERE (name LIKE 'foo%') AND "
+                   + "((level > '10') OR (name NOT LIKE '%bar'))").equals(sql));
+    }
+    
+    @Test
+    public void testSQL3WithSearchBean() throws FiqlParseException {
+        FiqlParser<SearchBean> beanParser = new FiqlParser<SearchBean>(SearchBean.class);
+        SearchCondition<SearchBean> filter = beanParser.parse("name==foo*;(name!=*bar,level=gt=10)");
+        SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
         filter.accept(visitor);
         String sql = visitor.getResult();
         assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "

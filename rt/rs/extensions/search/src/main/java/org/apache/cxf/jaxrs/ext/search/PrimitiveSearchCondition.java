@@ -39,7 +39,8 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         this.condition = condition;
         this.cType = ct;
         if (propertyName != null) {
-            this.beanspector = new Beanspector<T>(condition);
+            this.beanspector = SearchBean.class.isAssignableFrom(condition.getClass()) 
+                ? null : new Beanspector<T>(condition);
         }
     }
     
@@ -80,7 +81,11 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
 
     private Object getValue(String getter, T pojo) {
         try {
-            return beanspector.swap(pojo).getValue(getter);
+            if (beanspector != null) {
+                return beanspector.swap(pojo).getValue(getter);
+            } else {
+                return ((SearchBean)pojo).get(getter);
+            }
         } catch (Throwable e) {
             return null;
         }
