@@ -35,8 +35,10 @@ import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -66,7 +68,6 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                 + TestUtil.getPortNumber(DispatchClientServerWithHugeResponseTest.class)
                 + "/SOAPDispatchService/SoapDispatchPort";
             ep = Endpoint.publish(address, implementor);
-
         }
         @Override
         public void tearDown() {
@@ -93,8 +94,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     
     @org.junit.Before
     public void setUp() throws Exception {
-        System.setProperty("org.apache.cxf.staxutils.innerElementLevelThreshold", "12");
-        System.setProperty("org.apache.cxf.staxutils.innerElementCountThreshold", "12");
+        StaxUtils.setInnerElementCountThreshold(12);
+        StaxUtils.setInnerElementLevelThreshold(12);
         createBus();
         getBus().getOutInterceptors().add(new LoggingOutInterceptor());
         getBus().getInInterceptors().add(new LoggingInInterceptor());
@@ -102,8 +103,8 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     
     @AfterClass
     public static void cleanup() throws Exception {
-        System.clearProperty("org.apache.cxf.staxutils.innerElementLevelThreshold");
-        System.clearProperty("org.apache.cxf.staxutils.innerElementCountThreshold");
+        StaxUtils.setInnerElementCountThreshold(-1);
+        StaxUtils.setInnerElementLevelThreshold(-1);
     }
     
     @Test
@@ -181,7 +182,7 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     }
 
     @Test
-    public void testElementCountThresholdfForSOAPMessageWithHugeResponse() throws Exception {
+    public void testElementCountThresholdfForSOAPMessageWithHugeResponse() throws Throwable {
         HugeResponseInterceptor hugeResponseInterceptor = 
             new HugeResponseInterceptor(ResponseInterceptorType.ElementCountThreshold);
         getBus().getInInterceptors().add(hugeResponseInterceptor);
@@ -211,6 +212,12 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
             fail("We should not have encountered a timeout, " 
                 + "should get some exception tell me stackoverflow");
         } catch (Throwable e) {
+            if (e.getCause() == null) {
+                throw e;
+            }
+            if (e.getCause().getMessage() == null) {
+                throw e;
+            }
             assertTrue(e.getCause().getMessage().startsWith("reach the innerElementCountThreshold"));
         } finally {
             getBus().getInInterceptors().remove(hugeResponseInterceptor);
