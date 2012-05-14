@@ -36,6 +36,12 @@ public class SearchContextImplTest extends Assert {
             SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
     
+    @Test
+    public void testFiqlSearchBean() {
+        doTestFiqlSearchBean(
+            SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
+    }
+    
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalConditionType() {
         SearchContext context = new SearchContextImpl(new MessageImpl());
@@ -71,5 +77,41 @@ public class SearchContextImplTest extends Assert {
         List<Book> found = sc.findAll(books);
         assertEquals(1, found.size());
         assertEquals(new Book("CXF Rocks", 125L), found.get(0));
+    }
+    
+    private void doTestFiqlSearchBean(String queryString) {
+        Message m = new MessageImpl();
+        m.put(Message.QUERY_STRING, queryString);
+        SearchContext context = new SearchContextImpl(m);
+        SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
+        assertNotNull(sc);
+        
+        List<SearchBean> beans = new ArrayList<SearchBean>();
+        SearchBean sb1 = new SearchBean();
+        sb1.set("name", "CXF is cool");
+        beans.add(sb1);
+        SearchBean sb2 = new SearchBean();
+        sb2.set("name", "CXF Rocks");
+        sb2.set("id", "124");
+        beans.add(sb2);
+        
+        List<SearchBean> found = sc.findAll(beans);
+        assertEquals(1, found.size());
+        assertEquals(sb2, found.get(0));
+        
+        assertTrue(sc instanceof AndSearchCondition);
+        assertNull(sc.getStatement());
+        List<SearchCondition<SearchBean>> scs = sc.getSearchConditions();
+        assertEquals(2, scs.size());
+        SearchCondition<SearchBean> sc1 = scs.get(0);
+        assertEquals("name", sc1.getStatement().getProperty());
+        SearchCondition<SearchBean> sc2 = scs.get(1);
+        assertEquals("id", sc2.getStatement().getProperty());
+        
+        assertTrue("123".equals(sc1.getStatement().getValue())
+                   && "CXF Rocks".equals(sc2.getStatement().getValue())
+                   || "123".equals(sc2.getStatement().getValue())
+                   && "CXF Rocks".equals(sc1.getStatement().getValue()));
+        
     }
 }
