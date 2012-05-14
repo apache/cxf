@@ -124,6 +124,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, false));
+        createStaticBus();
         
     }
     

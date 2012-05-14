@@ -56,6 +56,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
         
         assertTrue("server did not launch correctly", launchServer(Server.class));
+        createStaticBus();
     }
     @Test
     public void testSwa() throws Exception {
