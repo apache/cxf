@@ -77,6 +77,7 @@ public class FiqlParser<T> {
     }
 
     private Beanspector<T> beanspector;
+    private Class<T> conditionClass;
     private Map<String, String> properties;
     /**
      * Creates FIQL parser.
@@ -96,7 +97,9 @@ public class FiqlParser<T> {
      * @param contextProperties            
      */
     public FiqlParser(Class<T> tclass, Map<String, String> contextProperties) {
-        beanspector = new Beanspector<T>(tclass);
+        beanspector = SearchBean.class.isAssignableFrom(tclass) 
+            ? null : new Beanspector<T>(tclass);
+        conditionClass = tclass;
         properties = contextProperties;
     }
 
@@ -226,7 +229,7 @@ public class FiqlParser<T> {
         Object castedValue = value;
         Class<?> valueType;
         try {
-            valueType = beanspector.getAccessorType(setter);
+            valueType = beanspector != null ? beanspector.getAccessorType(setter) : String.class;
         } catch (Exception e) {
             throw new FiqlParseException(e);
         }
@@ -308,7 +311,7 @@ public class FiqlParser<T> {
                     break;
                 }
             }
-            if (!hasSubtree && AND.equals(operator)) {
+            if (!hasSubtree && AND.equals(operator) && beanspector != null) {
                 try {
                     // Optimization: single SimpleSearchCondition for 'AND' conditions
                     Map<String, ConditionType> map = new LinkedHashMap<String, ConditionType>();
@@ -380,10 +383,17 @@ public class FiqlParser<T> {
             return pojo.getClass().getName().startsWith("java.lang");
         }
         
+        @SuppressWarnings("unchecked")
         private T createTemplate(String setter, Object val) throws FiqlParseException {
             try {
-                beanspector.instantiate().setValue(setter, val);
-                return beanspector.getBean();
+                if (beanspector != null) {
+                    beanspector.instantiate().setValue(setter, val);
+                    return beanspector.getBean();
+                } else {
+                    SearchBean bean = (SearchBean)conditionClass.newInstance();
+                    bean.set(setter, value.toString());
+                    return (T)bean;
+                }
             } catch (Throwable e) {
                 throw new FiqlParseException(e);
             }
