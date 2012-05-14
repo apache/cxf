@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.addr_fromjava.server;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -26,18 +27,26 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
     
+    EndpointImpl ep1;
+    EndpointImpl ep2;
+    
     protected void run() {
+        setBus(BusFactory.getDefaultBus());
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/AddNumberImplPort";
-        EndpointImpl ep = new EndpointImpl(implementor);
-        ep.getFeatures().add(new WSAddressingFeature());
-        ep.publish(address);
+        ep1 = new EndpointImpl(implementor);
+        ep1.getFeatures().add(new WSAddressingFeature());
+        ep1.publish(address);
         
-        ep = new EndpointImpl(new AddNumberImplNoAddr());
-        ep.publish(address + "-noaddr");
-        
+        ep2 = new EndpointImpl(new AddNumberImplNoAddr());
+        ep2.publish(address + "-noaddr");
     }
-
+    public void tearDown() {
+        ep1.stop();
+        ep2.stop();
+        ep1 = null;
+        ep2 = null;
+    }
     public static void main(String[] args) {
         try {
             Server s = new Server();

@@ -21,6 +21,8 @@ package org.apache.cxf.systest.ws.addr_wsdl;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -47,6 +49,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
+    List<Endpoint> eps = new LinkedList<Endpoint>();
 
     protected void run() {
         Object implementor = new AddNumberImpl();
@@ -58,9 +61,16 @@ public class Server extends AbstractBusTestServerBase {
                                            getWsdl());
 
         ep.publish(address);
+        eps.add(ep);
         
-        Endpoint.publish(address + "-provider", new AddNumberProvider());
-        Endpoint.publish(address + "-providernows", new AddNumberProviderNoWsdl());
+        eps.add(Endpoint.publish(address + "-provider", new AddNumberProvider()));
+        eps.add(Endpoint.publish(address + "-providernows", new AddNumberProviderNoWsdl()));
+    }
+    public void tearDown() {
+        for (Endpoint ep: eps) {
+            ep.stop();
+        }
+        eps = null;
     }
     
     private String getWsdl() {

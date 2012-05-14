@@ -37,6 +37,7 @@ import org.junit.Test;
  * in the non-decoupled case.
  */
 public class DecoupledJMSTest extends MAPTestBase {
+    static final String PORT = allocatePort(DecoupledJMSTest.class);
     private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0001?"
         + "jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:" 
@@ -50,6 +51,9 @@ public class DecoupledJMSTest extends MAPTestBase {
         return CONFIG;
     }
     protected void updateAddressPort(Object o, int port) throws MalformedURLException {
+    }
+    public String getPort() {
+        return PORT;
     }
 
     @Test

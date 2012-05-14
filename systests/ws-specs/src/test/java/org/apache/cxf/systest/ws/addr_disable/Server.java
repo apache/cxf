@@ -26,15 +26,22 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
 
+    EndpointImpl ep;
+    
     protected void run() {
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/jaxws/add";
-        
-        EndpointImpl ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
-                                           getWsdl());
+        setBus(BusFactory.getThreadDefaultBus());
+        ep = new EndpointImpl(getBus(), 
+                              implementor, 
+                              null, 
+                              getWsdl());
         ep.publish(address);
+    }
+    
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
     
     private String getWsdl() {

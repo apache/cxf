@@ -20,6 +20,9 @@
 package org.apache.cxf.systest.ws.addr_fromwsdl;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.jws.WebService;
 
 import org.apache.cxf.BusFactory;
@@ -30,6 +33,7 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
+    List<EndpointImpl> eps = new LinkedList<EndpointImpl>();
     
     @WebService(serviceName = "AddNumbersService",
                 portName = "AddNumbersPort",
@@ -60,6 +64,7 @@ public class Server extends AbstractBusTestServerBase {
 
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
+        eps.add(ep);
 
         implementor = new AddNumberNonAnon();
         address = "http://localhost:" + PORT + "/jaxws/addNonAnon";
@@ -71,6 +76,7 @@ public class Server extends AbstractBusTestServerBase {
 
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
+        eps.add(ep);
 
         implementor = new AddNumberOnlyAnon();
         address = "http://localhost:" + PORT + "/jaxws/addAnon";
@@ -82,7 +88,16 @@ public class Server extends AbstractBusTestServerBase {
 
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
+        eps.add(ep);
     }
+    
+    public void tearDown() {
+        for (EndpointImpl ep: eps) {
+            ep.stop();
+        }
+        eps = null;
+    }
+    
 
     private String getWsdl() {
         try {

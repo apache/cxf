@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
  * Tests the addition of WS-Addressing Message Addressing Properties.
  */
 public class MAPTest extends MAPTestBase {
+    static final String PORT = allocatePort(MAPTest.class);
     static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     private static final String CONFIG;
@@ -44,6 +45,9 @@ public class MAPTest extends MAPTestBase {
     }
     public String getAddress() {
         return ADDRESS;
+    }
+    public String getPort() {
+        return PORT;
     }
     
 
