@@ -34,7 +34,6 @@
 
 
     <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
         <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
         <doc.lit.bare.binding.file>doc_lit_bare.xml</doc.lit.bare.binding.file>
     </properties>
