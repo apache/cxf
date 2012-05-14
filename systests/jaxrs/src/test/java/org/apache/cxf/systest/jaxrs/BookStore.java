@@ -554,7 +554,7 @@ public class BookStore {
     }
     
     @GET
-    @Path("/books/{bookId}/")
+    @Path("/books/text/xml/{bookId}")
     @Produces("text/xml")
     public Book getBookTextXml(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
