@@ -23,9 +23,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.xml.crypto.dsig.Reference;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,6 +48,7 @@ import org.apache.cxf.ws.security.policy.model.KeyValueToken;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
+import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
@@ -148,6 +152,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 addSignatureConfirmation(null);
             }
         } catch (Exception e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             throw new Fault(e);
         }
     }
@@ -272,7 +277,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     private void handleEndorsingToken(
         Token token, SupportingToken wrapper, List<byte[]> signatureValues
     ) throws Exception {
-        SignedEncryptedParts signdParts = wrapper.getSignedParts();
         if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
@@ -280,13 +284,13 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             || token instanceof KerberosToken) {
             addSig(
                 signatureValues, 
-                doIssuedTokenSignature(token, signdParts, wrapper)
+                doIssuedTokenSignature(token, wrapper)
             );
         } else if (token instanceof X509Token
             || token instanceof KeyValueToken) {
             addSig(
                 signatureValues, 
-                doX509TokenSignature(token, signdParts, wrapper)
+                doX509TokenSignature(token, wrapper)
             );
         } else if (token instanceof SamlToken) {
             AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
@@ -294,7 +298,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             storeAssertionAsSecurityToken(assertionWrapper);
             addSig(
                 signatureValues, 
-                doIssuedTokenSignature(token, signdParts, wrapper)
+                doIssuedTokenSignature(token, wrapper)
             );
         } else if (token instanceof UsernameToken) {
             // Create a UsernameToken object for derived keys and store the security token
@@ -313,37 +317,20 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             addSig(
                 signatureValues, 
-                doIssuedTokenSignature(token, signdParts, wrapper)
+                doIssuedTokenSignature(token, wrapper)
             );
         }
     }
     
 
-    private byte[] doX509TokenSignature(Token token, SignedEncryptedParts signedParts,
-                                        TokenWrapper wrapper) 
+    private byte[] doX509TokenSignature(Token token, SupportingToken wrapper) 
         throws Exception {
         
         Document doc = saaj.getSOAPPart();
         
-        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> sigParts = 
+            signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
-        if (timestampEl != null) {
-            WSEncryptionPart timestampPart = convertToEncryptionPart(timestampEl.getElement());
-            sigParts.add(timestampPart);                          
-        }
-        
-        if (signedParts != null) {
-            if (signedParts.isBody()) {
-                WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
-                sigParts.add(bodyPart);
-            }
-            for (Header header : signedParts.getHeaders()) {
-                WSEncryptionPart wep = new WSEncryptionPart(header.getName(), 
-                        header.getNamespace(),
-                        "Content");
-                sigParts.add(wep);
-            }
-        }
         if (token.isDerivedKeys()) {
             WSSecEncryptedKey encrKey = getEncryptedKeyBuilder(wrapper, token);
             
@@ -394,12 +381,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
     }
 
     private byte[] doIssuedTokenSignature(
-        Token token, SignedEncryptedParts signdParts, TokenWrapper wrapper
+        Token token, SupportingToken wrapper
     ) throws Exception {
         boolean tokenIncluded = false;
         // Get the issued token
         SecurityToken secTok = getSecurityToken();
-        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
         
         if (includeToken(token.getInclusion())) {
             //Add the token
@@ -414,29 +400,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             tokenIncluded = true;
         }
         
-        if (timestampEl != null) {
-            WSEncryptionPart timestampPart = convertToEncryptionPart(timestampEl.getElement());
-            sigParts.add(timestampPart);                          
-        }
-        
-        if (signdParts != null) {
-            if (signdParts.isBody()) {
-                WSEncryptionPart bodyPart = convertToEncryptionPart(saaj.getSOAPBody());
-                sigParts.add(bodyPart);
-            }
-            if (secTok.getX509Certificate() != null) {
-                //the "getX509Certificate" this is to workaround an issue in WCF
-                //In WCF, for TransportBinding, in most cases, it doesn't want any of
-                //the headers signed even if the policy says so.   HOWEVER, for KeyValue
-                //IssuedTokens, it DOES want them signed
-                for (Header header : signdParts.getHeaders()) {
-                    WSEncryptionPart wep = new WSEncryptionPart(header.getName(), 
-                            header.getNamespace(),
-                            "Content");
-                    sigParts.add(wep);
-                }
-            }
-        }
+        List<WSEncryptionPart> sigParts = 
+                signPartsAndElements(wrapper.getSignedParts(), wrapper.getSignedElements());
         
         if (token.isDerivedKeys()) {
             return doDerivedKeySignature(tokenIncluded, secTok, token, sigParts);
@@ -590,6 +555,61 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         return sig.getSignatureValue();
     }
 
+    /**
+     * Identifies the portions of the message to be signed/encrypted.
+     */
+    private List<WSEncryptionPart> signPartsAndElements(
+        SignedEncryptedParts signedParts,
+        SignedEncryptedElements signedElements
+    ) throws SOAPException {
+        
+        List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
+        List<Element> found = new ArrayList<Element>();
+        
+        // Add timestamp
+        if (timestampEl != null) {
+            WSEncryptionPart timestampPart = 
+                    new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, "Element");
+            String id = addWsuIdToElement(timestampEl.getElement());
+            timestampPart.setId(id);
+            timestampPart.setElement(timestampEl.getElement());
+            
+            found.add(timestampPart.getElement());
+            result.add(timestampPart);
+        }
+
+        // Add SignedParts
+        if (signedParts != null) {
+            List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+            boolean isSignBody = signedParts.isBody();
+            
+            for (Header head : signedParts.getHeaders()) {
+                WSEncryptionPart wep = 
+                    new WSEncryptionPart(head.getName(), head.getNamespace(), "Element");
+                parts.add(wep);
+            }
+            
+            // Handle sign/enc parts
+            result.addAll(this.getParts(true, isSignBody, parts, found));
+        }
+        
+        if (signedElements != null) {
+            // Handle SignedElements
+            try {
+                result.addAll(
+                    this.getElements(
+                        "Element", signedElements.getXPathExpressions(), 
+                        signedElements.getDeclaredNamespaces(), found
+                    )
+                );
+            } catch (XPathExpressionException e) {
+                LOG.log(Level.FINE, e.getMessage(), e);
+                // REVISIT
+            }
+        }
+
+        return result;
+    }
 
 
 }

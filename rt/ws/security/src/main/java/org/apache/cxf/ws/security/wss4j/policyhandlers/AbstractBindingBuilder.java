@@ -531,6 +531,7 @@ public abstract class AbstractBindingBuilder {
                     try {
                         uname = crypto.getX509Identifier(secToken.getX509Certificate());
                     } catch (WSSecurityException e1) {
+                        LOG.log(Level.FINE, e1.getMessage(), e1);
                         throw new Fault(e1);
                     }
 
@@ -539,6 +540,7 @@ public abstract class AbstractBindingBuilder {
                     try {
                         sig.prepare(saaj.getSOAPPart(), secToken.getCrypto(), secHeader);
                     } catch (WSSecurityException e) {
+                        LOG.log(Level.FINE, e.getMessage(), e);
                         throw new Fault(e);
                     }
                     
@@ -1217,7 +1219,8 @@ public abstract class AbstractBindingBuilder {
         // Handle sign/enc elements
         try {
             result.addAll(this.getElements("Element", xpaths, namespaces, found));
-        } catch (XPathExpressionException e) {  
+        } catch (XPathExpressionException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             // REVISIT
         }
         
@@ -1225,6 +1228,7 @@ public abstract class AbstractBindingBuilder {
         try {
             result.addAll(this.getElements("Content", contentXpaths, cnamespaces, found));
         } catch (XPathExpressionException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             // REVISIT
         }
         
@@ -1254,7 +1258,7 @@ public abstract class AbstractBindingBuilder {
      *             if there is an error extracting SOAP content from the SAAJ
      *             model
      */
-    private List<WSEncryptionPart> getParts(boolean sign,
+    protected List<WSEncryptionPart> getParts(boolean sign,
             boolean includeBody, List<WSEncryptionPart> parts,
             List<Element> found) throws SOAPException {
         
@@ -1333,7 +1337,7 @@ public abstract class AbstractBindingBuilder {
      *             if there is an error extracting SOAP content from the SAAJ
      *             model
      */
-    private List<WSEncryptionPart> getElements(String encryptionModifier,
+    protected List<WSEncryptionPart> getElements(String encryptionModifier,
             List<String> xpaths, Map<String, String> namespaces,
             List<Element> found) throws XPathExpressionException, SOAPException {
         
@@ -1761,6 +1765,7 @@ public abstract class AbstractBindingBuilder {
             try {
                 user = crypto.getDefaultX509Identifier();
             } catch (WSSecurityException e1) {
+                LOG.log(Level.FINE, e1.getMessage(), e1);
                 throw new Fault(e1);
             }
         }
@@ -1778,6 +1783,7 @@ public abstract class AbstractBindingBuilder {
         try {
             sig.prepare(saaj.getSOAPPart(), crypto, secHeader);
         } catch (WSSecurityException e) {
+            LOG.log(Level.FINE, e.getMessage(), e);
             policyNotAsserted(token, e);
         }
         
@@ -1849,8 +1855,7 @@ public abstract class AbstractBindingBuilder {
                         doSymmSignature(ent.getKey(), token, sigParts, isTokenProtection);
                     }
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.log(Level.FINE, e.getMessage(), e);
                 }
             } else if (tempTok instanceof WSSecUsernameToken) {
                 WSSecUsernameToken utBuilder = (WSSecUsernameToken)tempTok;
@@ -1876,8 +1881,7 @@ public abstract class AbstractBindingBuilder {
                         doSymmSignature(ent.getKey(), secToken, sigParts, isTokenProtection);
                     }
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOG.log(Level.FINE, e.getMessage(), e);
                 }
                 
             }
