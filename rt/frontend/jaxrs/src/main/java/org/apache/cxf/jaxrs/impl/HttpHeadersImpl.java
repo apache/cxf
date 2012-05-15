@@ -100,7 +100,9 @@ public class HttpHeadersImpl implements HttpHeaders {
             if (value == null) {
                 continue;
             }
-            List<String> cs = getHeaderValues(HttpHeaders.COOKIE, value, getCookieSeparator());
+            List<String> cs = value.contains("$")
+                ? Collections.singletonList(value)
+                : getHeaderValues(HttpHeaders.COOKIE, value, getCookieSeparator());
             for (String c : cs) {
                 Cookie cookie = Cookie.valueOf(c);
                 cl.put(cookie.getName(), cookie);
