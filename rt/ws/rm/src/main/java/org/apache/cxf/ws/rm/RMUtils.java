@@ -20,6 +20,8 @@
 package org.apache.cxf.ws.rm;
 
 import java.io.OutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.JMException;
 import javax.management.ObjectName;
@@ -37,7 +39,8 @@ public final class RMUtils {
     private static final org.apache.cxf.ws.rm.v200702.ObjectFactory WSRM_FACTORY;
     private static final org.apache.cxf.ws.rm.v200502.ObjectFactory WSRM200502_FACTORY;
     private static final org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory WSRM200502_WSA200508_FACTORY;
-    private static final AddressingConstants WSA_CONSTANTS; 
+    private static final AddressingConstants WSA_CONSTANTS;
+    private static final Pattern GENERATED_BUS_ID_PATTERN = Pattern.compile(Bus.DEFAULT_BUS_ID + "\\d+$");
     
     static {
         WSRM_FACTORY = new org.apache.cxf.ws.rm.v200702.ObjectFactory();        
@@ -120,12 +123,15 @@ public final class RMUtils {
 
     public static String getEndpointIdentifier(Endpoint endpoint, Bus bus) {
         String busId = null;
-        if (bus != null) {
-            busId = bus.getId();
-        }
-        if (bus == null || busId.startsWith(Bus.DEFAULT_BUS_ID)) {
-            // no bus id or a generated anonymous id needs to be mapped to the default constant 
+        if (bus == null) {
             busId = Bus.DEFAULT_BUS_ID;
+        } else {
+            busId = bus.getId();
+            // bus-ids of form cxfnnn or artifactid-cxfnnn must drop the variable part nnn
+            Matcher m = GENERATED_BUS_ID_PATTERN.matcher(busId);
+            if (m.find()) {
+                busId = busId.substring(0, m.start() + Bus.DEFAULT_BUS_ID.length());
+            }
         }
         return endpoint.getEndpointInfo().getService().getName() + "."
             + endpoint.getEndpointInfo().getName() + "@" + busId;
