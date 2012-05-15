@@ -121,7 +121,8 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         
         String contextCookie = createCookie(SSOConstants.SECURITY_CONTEXT_TOKEN,
                                             securityContextKey,
-                                            requestState.getWebAppContext());
+                                            requestState.getWebAppContext(),
+                                            requestState.getWebAppDomain());
         
         // Finally, redirect to the service provider endpoint
         return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();

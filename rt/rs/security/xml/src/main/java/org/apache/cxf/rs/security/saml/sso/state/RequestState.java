@@ -25,6 +25,7 @@ public class RequestState {
     private String samlRequestId;
     private String issuerId;
     private String webAppContext;
+    private String webAppDomain;
     private long createdAt;
  
     public RequestState(String targetAddress,
@@ -32,12 +33,14 @@ public class RequestState {
                         String samlRequestId,
                         String issuerId,
                         String webAppContext,
+                        String webAppDomain,
                         long createdAt) {
         this.targetAddress = targetAddress;
         this.idpServiceAddress = idpServiceAddress;
         this.samlRequestId = samlRequestId;
         this.issuerId = issuerId;
         this.webAppContext = webAppContext;
+        this.webAppDomain = webAppDomain;
         this.createdAt = createdAt;
     }
 
@@ -63,5 +66,9 @@ public class RequestState {
 
     public String getWebAppContext() {
         return webAppContext;
+    }
+
+    public String getWebAppDomain() {
+        return webAppDomain;
     }
 }

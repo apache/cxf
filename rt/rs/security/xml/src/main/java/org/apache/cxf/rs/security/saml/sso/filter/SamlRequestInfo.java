@@ -23,6 +23,7 @@ public class SamlRequestInfo {
     private String relayState;
     private String idpServiceAddress;
     private String webAppContext;
+    private String webAppDomain;
     
     public void setEncodedSamlRequest(String encodedSaml) {
         this.encodedSamlRequest = encodedSaml;
@@ -47,5 +48,11 @@ public class SamlRequestInfo {
     }
     public String getWebAppContext() {
         return webAppContext;
+    }
+    public String getWebAppDomain() {
+        return webAppDomain;
+    }
+    public void setWebAppDomain(String webAppDomain) {
+        this.webAppDomain = webAppDomain;
     }
 }

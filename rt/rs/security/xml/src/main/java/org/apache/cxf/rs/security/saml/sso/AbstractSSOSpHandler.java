@@ -30,15 +30,27 @@ public class AbstractSSOSpHandler {
     private SPStateManager stateProvider;
     private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;
     
-    protected String createCookie(String name, String value, String path) { 
+    //TODO: support attaching a signature to the cookie value
+    protected String createCookie(String name, 
+                                  String value, 
+                                  String path,
+                                  String domain) { 
         
         String contextCookie = name + "=" + value;
-        // Make sure all the SP application filters can get this token;
-        // Path property should be enough for a single container, Domain
-        // property may need to be used for more complex environments
+        // Setting a specific path restricts the browsers
+        // to return a cookie only to the web applications
+        // listening on that specific context path
         if (path != null) {
             contextCookie += ";Path=" + path;
         }
+        
+        // Setting a specific domain further restricts the browsers
+        // to return a cookie only to the web applications
+        // listening on the specific context path within a particular domain
+        if (domain != null) {
+            contextCookie += ";Domain=" + domain;
+        }
+        
         // Keep the cookie across the browser restarts until it actually expires.
         // Note that the Expires property has been deprecated but apparently is 
         // supported better than 'max-age' property by different browsers 

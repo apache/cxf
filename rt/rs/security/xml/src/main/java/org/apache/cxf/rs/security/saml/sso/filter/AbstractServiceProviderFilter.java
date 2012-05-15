@@ -70,6 +70,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private String idpServiceAddress;
     private String issuerId;
     private String assertionConsumerServiceAddress;
+    private String webAppDomain;
     
     public void setAssertionConsumerServiceAddress(
             String assertionConsumerServiceAddress) {
@@ -194,12 +195,14 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                                                      authnRequest.getID(),
                                                      getIssuerId(m),
                                                      webAppContext,
+                                                     getWebAppDomain(),
                                                      System.currentTimeMillis());
         
         String relayState = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
         getStateProvider().setRequestState(relayState, requestState);
         info.setRelayState(relayState);
         info.setWebAppContext(webAppContext);
+        info.setWebAppDomain(getWebAppDomain());
         
         return info;
     }
@@ -226,6 +229,14 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
+    }
+
+    public String getWebAppDomain() {
+        return webAppDomain;
+    }
+
+    public void setWebAppDomain(String webAppDomain) {
+        this.webAppDomain = webAppDomain;
     }
         
 }

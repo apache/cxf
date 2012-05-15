@@ -41,7 +41,8 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                 
                 String contextCookie = createCookie(SSOConstants.RELAY_STATE,
                                                     info.getRelayState(),
-                                                    info.getWebAppContext());
+                                                    info.getWebAppContext(),
+                                                    info.getWebAppDomain());
                 
                 return Response.seeOther(ub.build())
                                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
