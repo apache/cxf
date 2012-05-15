@@ -196,7 +196,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                                                      webAppContext,
                                                      System.currentTimeMillis());
         
-        String relayState = UUID.randomUUID().toString();
+        String relayState = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
         getStateProvider().setRequestState(relayState, requestState);
         info.setRelayState(relayState);
         info.setWebAppContext(webAppContext);

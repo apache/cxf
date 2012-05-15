@@ -91,6 +91,10 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             reportError("MISSING_RELAY_STATE");
             throw new WebApplicationException(400);
         }
+        if (relayState.getBytes().length < 0 || relayState.getBytes().length > 80) {
+            reportError("INVALID_RELAY_STATE");
+            throw new WebApplicationException(400);
+        }
         RequestState requestState = getStateProvider().removeRequestState(relayState);
         if (requestState == null) {
             reportError("MISSING_REQUEST_STATE");
