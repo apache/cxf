@@ -63,7 +63,8 @@ public class RMUtilsTest extends Assert {
         QName sqn = new QName("ns1", "service");
         EasyMock.expect(si.getName()).andReturn(sqn);
         control.replay();
-        assertEquals("{ns1}service.{ns2}endpoint@cxf", RMUtils.getEndpointIdentifier(e));
+        assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID, 
+                     RMUtils.getEndpointIdentifier(e));
 
         // a named bus
         control.reset();
@@ -84,7 +85,30 @@ public class RMUtilsTest extends Assert {
         EasyMock.expect(ei.getService()).andReturn(si);
         EasyMock.expect(si.getName()).andReturn(sqn);
         control.replay();
-        assertEquals("{ns1}service.{ns2}endpoint@cxf", 
+        assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID, 
                      RMUtils.getEndpointIdentifier(e, BusFactory.getDefaultBus()));
+
+        // a generated bundle artifact bus
+        control.reset();
+        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
+        EasyMock.expect(ei.getName()).andReturn(eqn);
+        EasyMock.expect(ei.getService()).andReturn(si);
+        EasyMock.expect(si.getName()).andReturn(sqn);
+        EasyMock.expect(b.getId()).andReturn("mybus-" + Bus.DEFAULT_BUS_ID + "12345");
+        control.replay();
+        assertEquals("{ns1}service.{ns2}endpoint@mybus-" + Bus.DEFAULT_BUS_ID, 
+                     RMUtils.getEndpointIdentifier(e, b));
+
+        // look like a generated bundle artifact bus but not
+        control.reset();
+        EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
+        EasyMock.expect(ei.getName()).andReturn(eqn);
+        EasyMock.expect(ei.getService()).andReturn(si);
+        EasyMock.expect(si.getName()).andReturn(sqn);
+        EasyMock.expect(b.getId()).andReturn("mybus." + Bus.DEFAULT_BUS_ID + ".foo");
+        control.replay();
+        assertEquals("{ns1}service.{ns2}endpoint@mybus." + Bus.DEFAULT_BUS_ID + ".foo", 
+                     RMUtils.getEndpointIdentifier(e, b));
+        
     } 
 }
