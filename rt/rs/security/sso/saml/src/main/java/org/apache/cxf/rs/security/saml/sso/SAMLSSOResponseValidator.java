@@ -68,9 +68,9 @@ public class SAMLSSOResponseValidator {
         }
         
         // The Response must contain a Destination that matches the assertionConsumerURL if it is
-        // signed and received over the POST Binding.
+        // signed and received over the redirect Binding.
         String destination = samlResponse.getDestination();
-        if (postBinding && samlResponse.isSigned()
+        if (!postBinding && samlResponse.isSigned()
             && (destination == null || !destination.equals(assertionConsumerURL))) {
             LOG.fine("The Response must contain a destination that matches the assertion consumer URL");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
