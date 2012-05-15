@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -140,10 +141,17 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             reportError("MISSING_SAML_RESPONSE");
             throw new WebApplicationException(400);
         }
+        
+        String samlResponseDecoded = null;
+        try {
+            samlResponseDecoded = URLDecoder.decode(samlResponse, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new WebApplicationException(400);
+        }
         InputStream tokenStream = null;
         if (isSupportBase64Encoding()) {
             try {
-                byte[] deflatedToken = Base64Utility.decode(samlResponse);
+                byte[] deflatedToken = Base64Utility.decode(samlResponseDecoded);
                 tokenStream = isSupportDeflateEncoding() 
                     ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
                     : new ByteArrayInputStream(deflatedToken); 
@@ -154,7 +162,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             }
         } else {
             try {
-                tokenStream = new ByteArrayInputStream(samlResponse.getBytes("UTF-8"));
+                tokenStream = new ByteArrayInputStream(samlResponseDecoded.getBytes("UTF-8"));
             } catch (UnsupportedEncodingException ex) {
                 throw new WebApplicationException(400);
             }
