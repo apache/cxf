@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -75,7 +77,11 @@ public final class AuthorizationUtils {
             }
             sb.append(challenge);
         }
-        Response r = Response.status(401).header("WWW-Authenticate", sb.toString()).build();
+        ResponseBuilder rb = Response.status(401);
+        if (sb.length() > 0) {
+            rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
+        }
+        Response r = rb.build();
         throw new WebApplicationException(r);
     }
 
