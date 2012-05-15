@@ -837,11 +837,9 @@
                             <sp:Body/>
                             <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing"/>
                         </sp:SignedParts>
-                        <!--
                         <sp:SignedElements>
-                            <sp:XPath>//ReplyTo</sp:XPath>
+                            <sp:XPath>//*[local-name()='ReplyTo']</sp:XPath>
                         </sp:SignedElements>
-                        -->
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
             </wsp:All>
