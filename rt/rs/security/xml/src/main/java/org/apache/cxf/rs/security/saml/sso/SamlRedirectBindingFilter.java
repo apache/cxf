@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.sso.filter;
+package org.apache.cxf.rs.security.saml.sso;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
-public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
+public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         if (checkSecurityContext(m)) {
@@ -33,22 +34,20 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         } else {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
-                info.setIdpServiceAddress(getIdpServiceAddress());
-                // This depends on RequestDispatcherProvider linking
-                // SamlResponseInfo with the jsp page which will fill
-                // in the XHTML form using SamlResponseInfo
-                // in principle we could've built the XHTML form right here
-                // but it will be cleaner to get that done in JSP
+                UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
+                ub.queryParam(SSOConstants.SAML_REQUEST, info.getEncodedSamlRequest());
+                ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());    
                 
-                // Note the view handler will also need to set a RelayState 
-                // cookie
+                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                    info.getRelayState(),
+                                                    info.getWebAppContext(),
+                                                    info.getWebAppDomain());
                 
-                return Response.ok(info)
-                               .type("text/html")
+                return Response.seeOther(ub.build())
                                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                                .header("Pragma", "no-cache") 
+                               .header("Set-Cookie", contextCookie)
                                .build();
-                
             } catch (Exception ex) {
                 throw new WebApplicationException(ex);
             }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.saml.sso.filter;
+package org.apache.cxf.rs.security.saml.sso;
 
 import java.util.ArrayList;
 import java.util.List;

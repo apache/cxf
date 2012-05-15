@@ -16,18 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.sso.filter;
+package org.apache.cxf.rs.security.saml.sso;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rs.security.saml.sso.SSOConstants;
 
-public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
+public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         if (checkSecurityContext(m)) {
@@ -35,20 +33,22 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         } else {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
-                UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
-                ub.queryParam(SSOConstants.SAML_REQUEST, info.getEncodedSamlRequest());
-                ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());    
+                info.setIdpServiceAddress(getIdpServiceAddress());
+                // This depends on RequestDispatcherProvider linking
+                // SamlResponseInfo with the jsp page which will fill
+                // in the XHTML form using SamlResponseInfo
+                // in principle we could've built the XHTML form right here
+                // but it will be cleaner to get that done in JSP
                 
-                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
-                                                    info.getRelayState(),
-                                                    info.getWebAppContext(),
-                                                    info.getWebAppDomain());
+                // Note the view handler will also need to set a RelayState 
+                // cookie
                 
-                return Response.seeOther(ub.build())
+                return Response.ok(info)
+                               .type("text/html")
                                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                                .header("Pragma", "no-cache") 
-                               .header("Set-Cookie", contextCookie)
                                .build();
+                
             } catch (Exception ex) {
                 throw new WebApplicationException(ex);
             }

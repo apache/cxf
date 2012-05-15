@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.sso.filter;
+package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,8 +44,6 @@ import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
-import org.apache.cxf.rs.security.saml.sso.AbstractSSOSpHandler;
-import org.apache.cxf.rs.security.saml.sso.SSOConstants;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;

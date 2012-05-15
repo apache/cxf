@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.sso.filter;
+package org.apache.cxf.rs.security.saml.sso;
 
 public class SamlRequestInfo {
     private String encodedSamlRequest;
