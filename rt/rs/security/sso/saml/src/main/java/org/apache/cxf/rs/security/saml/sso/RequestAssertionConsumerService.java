@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -57,6 +58,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -250,7 +252,11 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             
             SAMLSSOResponseValidator ssoResponseValidator = new SAMLSSOResponseValidator();
             ssoResponseValidator.setAssertionConsumerURL((String)jaxrsContext.get(Message.REQUEST_URL));
-            // TODO client address ssoResponseValidator.setClientAddress(clientAddress);
+            
+            HttpServletRequest httpRequest = 
+                (HttpServletRequest)jaxrsContext.get(AbstractHTTPDestination.HTTP_REQUEST);
+            ssoResponseValidator.setClientAddress(httpRequest.getRemoteAddr());
+            
             ssoResponseValidator.setIssuerIDP(requestState.getIdpServiceAddress());
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
             ssoResponseValidator.setSpIdentifier(requestState.getIssuerId());

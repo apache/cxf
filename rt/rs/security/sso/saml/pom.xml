@@ -32,6 +32,12 @@
         <version>2.6.1-SNAPSHOT</version>
         <relativePath>../../../../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <cxf.osgi.import>
+            javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
+        </cxf.osgi.import>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -58,6 +64,10 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-security-xml</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${cxf.servlet-api.group}</groupId>
+            <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
     </dependencies>
     <build>
