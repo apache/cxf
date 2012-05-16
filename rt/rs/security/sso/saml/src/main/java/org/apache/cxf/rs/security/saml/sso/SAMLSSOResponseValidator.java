@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,15 +26,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.opensaml.saml2.core.AudienceRestriction;
+import org.opensaml.saml2.core.AuthnStatement;
 
 /**
  * Validate a SAML 2.0 Protocol Response according to the Web SSO profile. The Response
  * should be validated by the SAMLProtocolResponseValidator first.
  * 
- * TODO If an <AuthnStatement> used to establish a security context for the principal contains a
-SessionNotOnOrAfter attribute, the security context SHOULD be discarded once this time is
-reached
-
 TODO The service provider MUST ensure that bearer assertions are not replayed, by maintaining the set of used
 ID values for the length of time for which the assertion would be considered valid based on the
 NotOnOrAfter attribute in the <SubjectConfirmationData>.
@@ -52,9 +50,10 @@ public class SAMLSSOResponseValidator {
      * Validate a SAML 2 Protocol Response
      * @param samlResponse
      * @param postBinding
+     * @return a SSOValidatorResponse object
      * @throws WSSecurityException
      */
-    public void validateSamlResponse(
+    public SSOValidatorResponse validateSamlResponse(
         org.opensaml.saml2.core.Response samlResponse,
         boolean postBinding
     ) throws WSSecurityException {
@@ -78,6 +77,7 @@ public class SAMLSSOResponseValidator {
         
         // Validate Assertions
         boolean foundValidSubject = false;
+        Date sessionNotOnOrAfter = null;
         for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
             // Check the Issuer
             if (assertion.getIssuer() == null) {
@@ -99,6 +99,12 @@ public class SAMLSSOResponseValidator {
                 if (validateAuthenticationSubject(subject)) {
                     validateAudienceRestrictionCondition(assertion.getConditions());
                     foundValidSubject = true;
+                    // Store Session NotOnOrAfter
+                    for (AuthnStatement authnStatment : assertion.getAuthnStatements()) {
+                        if (authnStatment.getSessionNotOnOrAfter() != null) {
+                            sessionNotOnOrAfter = authnStatment.getSessionNotOnOrAfter().toDate();
+                        }
+                    }
                 }
             }
             
@@ -109,6 +115,12 @@ public class SAMLSSOResponseValidator {
                      + "the Subject Confirmation criteria");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
+        
+        SSOValidatorResponse validatorResponse = new SSOValidatorResponse();
+        validatorResponse.setResponseId(samlResponse.getID());
+        validatorResponse.setSessionNotOnOrAfter(sessionNotOnOrAfter);
+        
+        return validatorResponse;
     }
     
     /**

@@ -16,29 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.saml.sso.state;
+package org.apache.cxf.rs.security.saml.sso;
 
-public class ResponseState {
+import java.util.Date;
 
-    private String relayState;
-    private long createdAt;
-    private long expiresAt;
+/**
+ * Some information that encapsulates a successful validation by the SAMLSSOResponseValidator
+ */
+public class SSOValidatorResponse {
+    private Date sessionNotOnOrAfter;
+    private String responseId;
     
-    public ResponseState(String relayState, long createdAt, long expiresAt) {
-        this.relayState = relayState;
-        this.createdAt = createdAt;
-        this.expiresAt = expiresAt;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
+    public Date getSessionNotOnOrAfter() {
+        return sessionNotOnOrAfter;
     }
     
-    public long getExpiresAt() {
-        return expiresAt;
+    public void setSessionNotOnOrAfter(Date sessionNotOnOrAfter) {
+        this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
-
-    public String getRelayState() {
-        return relayState;
+    
+    public String getResponseId() {
+        return responseId;
+    }
+    
+    public void setResponseId(String responseId) {
+        this.responseId = responseId;
     }
 }

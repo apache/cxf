@@ -110,7 +110,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             reportError("MISSING_RESPONSE_STATE");
             return false;
         }
-        if (isStateExpired(responseState.getCreatedAt())) {
+        if (isStateExpired(responseState.getCreatedAt(), responseState.getExpiresAt())) {
             reportError("EXPIRED_RESPONSE_STATE");
             getStateProvider().removeResponseState(contextKey);
             return false;
