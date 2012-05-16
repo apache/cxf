@@ -54,6 +54,7 @@ public class SpringBusFactoryTest extends Assert {
         checkOtherCoreExtensions(bus);
         //you should include instumentation extenstion to get the instrumentation manager 
         assertNotNull("No instrumentation manager", bus.getExtension(InstrumentationManager.class));
+        bus.shutdown(true);
     }
     
     @Test

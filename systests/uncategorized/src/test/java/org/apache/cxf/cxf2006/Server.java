@@ -31,17 +31,24 @@ import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
 
 public class Server extends AbstractBusTestServerBase {        
     public static final String PORT = allocatePort(Server.class);
+    Endpoint ep;
+    
     protected void run()  {
         String address;
         Object implementor = new RPCLitGreeterImpl();
         address = "http://localhost:" + PORT + "/SOAPServiceRPCLit/SoapPort";
-        Endpoint ep = Endpoint.create(implementor);
+        ep = Endpoint.create(implementor);
 
         URL wsdl = getClass().getResource("/wsdl_systest/cxf2006.wsdl");
         ((EndpointImpl)ep).setWsdlLocation(wsdl.toString());
         ((EndpointImpl)ep).getInInterceptors().add(new LoggingInInterceptor());
         ((EndpointImpl)ep).getOutInterceptors().add(new LoggingOutInterceptor());
         ep.publish(address);
+    }
+    
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
 
     public static void main(String[] args) {

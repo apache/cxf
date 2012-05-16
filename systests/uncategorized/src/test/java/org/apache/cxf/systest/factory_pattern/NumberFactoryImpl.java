@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.Bus;
 import org.apache.cxf.factory_pattern.NumberFactory;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -55,8 +55,10 @@ public class NumberFactoryImpl implements NumberFactory {
 
     protected EndpointReferenceType templateEpr;
     protected NumberImpl servant;
+    protected Bus bus;
 
-    public NumberFactoryImpl() {
+    public NumberFactoryImpl(Bus b) {
+        bus = b;
     }
 
     public W3CEndpointReference create(String id) {
@@ -72,8 +74,7 @@ public class NumberFactoryImpl implements NumberFactory {
         }
         EndpointReferenceType epr = EndpointReferenceUtils.getEndpointReferenceWithId(NUMBER_SERVICE_QNAME,
                                                                                       portName, id,
-                                                                                      BusFactory
-                                                                                          .getDefaultBus());
+                                                                                      bus);
         Source source = EndpointReferenceUtils.convertToXML(epr);
         return new W3CEndpointReference(source);
     }
@@ -91,15 +92,15 @@ public class NumberFactoryImpl implements NumberFactory {
         String wsdlLocation = "testutils/factory_pattern.wsdl";
         String bindingId = null;
 
-        EndpointImpl ep = new EndpointImpl(BusFactory.getDefaultBus(), 
+        EndpointImpl ep = new EndpointImpl(bus, 
                                            servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(NUMBER_SERVANT_ADDRESS_ROOT);
         templateEpr = ep.getServer().getDestination().getAddress();
 
         // jms port
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(), wsdlLocation);        
-        ep = new EndpointImpl(BusFactory.getDefaultBus(), servant, bindingId, wsdlLocation);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlLocation);        
+        ep = new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPortJMS"));
         ep.publish();
         ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());

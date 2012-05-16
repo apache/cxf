@@ -46,6 +46,7 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus();
     }
 
     @Test
@@ -66,7 +67,7 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
         EndpointReference w3cEpr = ep.getEndpointReference();              
         String resp = port.registerCallback((W3CEndpointReference)w3cEpr);
         assertEquals("registerCallback called", resp);
-            
+        ep.stop(); 
     }
     
     

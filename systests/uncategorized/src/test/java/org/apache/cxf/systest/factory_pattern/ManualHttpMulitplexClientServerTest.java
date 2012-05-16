@@ -29,6 +29,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.factory_pattern.IsEvenResponse;
 import org.apache.cxf.factory_pattern.Number;
@@ -50,10 +51,15 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
     static final String FACTORY_ADDRESS = NumberFactoryImpl.FACTORY_ADDRESS;
     
     public static class Server extends AbstractBusTestServerBase {        
-
+        Endpoint ep;
         protected void run() {
-            Object implementor = new ManualNumberFactoryImpl();
-            Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);            
+            setBus(BusFactory.getDefaultBus());
+            Object implementor = new ManualNumberFactoryImpl(getBus());
+            ep = Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);            
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
 
         public static void main(String[] args) {
@@ -72,7 +78,8 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
     @BeforeClass
     public static void startServers() throws Exception {        
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class));
+                   launchServer(Server.class, true));
+        createStaticBus();
     }
 
     

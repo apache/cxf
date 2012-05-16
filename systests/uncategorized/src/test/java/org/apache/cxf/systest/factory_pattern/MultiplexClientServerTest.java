@@ -48,10 +48,15 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     
     public static class Server extends AbstractBusTestServerBase {        
-
+        Endpoint ep;
         protected void run() {
-            Object implementor = new NumberFactoryImpl();
-            Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);
+            setBus(BusFactory.getDefaultBus());
+            Object implementor = new NumberFactoryImpl(getBus());
+            ep = Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
 
         public static void main(String[] args) {

@@ -23,9 +23,6 @@ import org.apache.stringarray.StringListTest;
 
 public class StringArrayTestImpl implements StringListTest {
     public String[] stringListTest(String[] in) {
-        for (String str : in) {
-            System.out.println("--str-- " + str);
-        }
         return in;
     }
 

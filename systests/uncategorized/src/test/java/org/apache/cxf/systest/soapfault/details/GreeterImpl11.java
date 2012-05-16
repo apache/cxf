@@ -50,12 +50,12 @@ public class GreeterImpl11 {
         // throw the exception out with some cause
         Exception cause = new IllegalArgumentException("Get a wrong name <sayHi>"
                                                        , new NullPointerException("Test cause."));
-        cause.printStackTrace();
+        cause.fillInStackTrace();
         throw new Fault("sayHiFault", LOG, cause);
     }
 
     public void greetMeOneWay(String requestType) {
-        System.out.println("*********  greetMeOneWay: " + requestType);
+        //System.out.println("*********  greetMeOneWay: " + requestType);
     }
 
     public void pingMe() throws PingMeFault {
@@ -63,7 +63,7 @@ public class GreeterImpl11 {
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
         LOG.info("Executing operation pingMe, throwing PingMeFault exception");
-        System.out.println("Executing operation pingMe, throwing PingMeFault exception\n");
+        //System.out.println("Executing operation pingMe, throwing PingMeFault exception\n");
         throw new PingMeFault("PingMeFault raised by server", faultDetail);        
     }
 

@@ -95,10 +95,10 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
             
     @Before
     public void setUp() {
-        targets = new ArrayList<String>();
         SpringBusFactory bf = new SpringBusFactory();    
         bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
+        targets = new ArrayList<String>();
     }
     
     @After
@@ -112,6 +112,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         targets = null;
         if (bus != null) {
             bus.shutdown(true);
+            bus = null;
         }
     }
 
@@ -195,7 +196,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
     protected String getCurrentEndpoint(Object proxy) {
         return ClientProxy.getClient(proxy).getEndpoint().getEndpointInfo().getAddress();
     }
-    
+
     protected void setupGreeterA() throws Exception {
         greeter = new ClusteredGreeterService().getReplicatedPortA();
         updateAddressPort(greeter, PORT_A);

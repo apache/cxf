@@ -36,7 +36,7 @@ public class AppleFindClientServerTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(AppleServer.class));
+        assertTrue("server did not launch correctly", launchServer(AppleServer.class, true));
     }
 
     @Test
