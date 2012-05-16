@@ -27,6 +27,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.AuthnContextClassRef;
@@ -37,7 +39,7 @@ import org.opensaml.saml2.core.NameIDPolicy;
 import org.opensaml.saml2.core.RequestedAuthnContext;
 
 /**
- * Some unit tests for the SamlpRequestComponentBuilder.
+ * Some unit tests for the SamlpRequestComponentBuilder and AuthnRequestBuilder
  */
 public class AuthnRequestBuilderTest extends org.junit.Assert {
     
@@ -53,7 +55,7 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         Document doc = docBuilder.newDocument();
         
         Issuer issuer = 
-            SamlpRequestComponentBuilder.createIssuer("http://localhost:8888/saml2-demo/simple");
+            SamlpRequestComponentBuilder.createIssuer("http://localhost:9001/app");
         NameIDPolicy nameIDPolicy = 
             SamlpRequestComponentBuilder.createNameIDPolicy(
                 true, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "Issuer"
@@ -71,7 +73,7 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         
         AuthnRequest authnRequest = 
             SamlpRequestComponentBuilder.createAuthnRequest(
-                "http://localhost:8888/saml2-demo/simple", false, false, 
+                "http://localhost:9001/sso", false, false, 
                 "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", SAMLVersion.VERSION_20,
                 issuer, nameIDPolicy, authnCtx
             );
@@ -82,5 +84,24 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         assertNotNull(policyElement);
     }
     
+    @org.junit.Test
+    public void testAuthnRequestBuilder() throws Exception {
+        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        docBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        
+        AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
+        Message message = new MessageImpl();
+        
+        AuthnRequest authnRequest = 
+            authnRequestBuilder.createAuthnRequest(
+                message, "http://localhost:9001/app", "http://localhost:9001/sso"
+            );
+        Element policyElement = OpenSAMLUtil.toDom(authnRequest, doc);
+        doc.appendChild(policyElement);
+        // String outputString = DOM2Writer.nodeToString(policyElement);
+        assertNotNull(policyElement);
+    }
     
 }

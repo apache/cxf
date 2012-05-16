@@ -21,7 +21,6 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -48,14 +47,8 @@ import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml2.core.AuthnContextComparisonTypeEnumeration;
+
 import org.opensaml.saml2.core.AuthnRequest;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.NameIDPolicy;
-import org.opensaml.saml2.core.RequestedAuthnContext;
-import org.opensaml.xml.io.MarshallingException;
 
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
     implements RequestHandler {
@@ -69,6 +62,11 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private String issuerId;
     private String assertionConsumerServiceAddress;
     private String webAppDomain;
+    private AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
+    
+    public void setAuthnRequestBuilder(AuthnRequestBuilder authnRequestBuilder) {
+        this.authnRequestBuilder = authnRequestBuilder;
+    }
     
     public void setAssertionConsumerServiceAddress(
             String assertionConsumerServiceAddress) {
@@ -130,40 +128,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         return true;
     }
     
-    protected AuthnRequest createAuthnRequest(Message m, Document doc) throws Exception {
-        Issuer issuer =
-            SamlpRequestComponentBuilder.createIssuer(getIssuerId(m));
-        NameIDPolicy nameIDPolicy =
-            SamlpRequestComponentBuilder.createNameIDPolicy(
-                true, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", getIssuerId(m)
-            );
-        
-        AuthnContextClassRef authnCtxClassRef =
-            SamlpRequestComponentBuilder.createAuthnCtxClassRef(
-                "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
-            );
-        RequestedAuthnContext authnCtx =
-            SamlpRequestComponentBuilder.createRequestedAuthnCtxPolicy(
-                AuthnContextComparisonTypeEnumeration.EXACT,
-                Collections.singletonList(authnCtxClassRef), null
-            );
-        
-        //CHECKSTYLE:OFF
-        return SamlpRequestComponentBuilder.createAuthnRequest(
-                getAbsoluteAssertionServiceAddress(m), 
-                false, 
-                false,
-                "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", 
-                SAMLVersion.VERSION_20,
-                issuer, 
-                nameIDPolicy, 
-                authnCtx
-        );
-      //CHECKSTYLE:ON
-    }
-    
     protected String encodeAuthnRequest(Element authnRequestElement)
-        throws MarshallingException, IOException {
+        throws IOException {
         String requestMessage = DOM2Writer.nodeToString(authnRequestElement);
         
         DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
@@ -177,7 +143,11 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         Document doc = DOMUtils.createDocument();
         doc.appendChild(doc.createElement("root"));
  
-        AuthnRequest authnRequest = createAuthnRequest(m, doc);
+        // Create the AuthnRequest
+        AuthnRequest authnRequest = 
+            authnRequestBuilder.createAuthnRequest(
+                m, getIssuerId(m), getAbsoluteAssertionServiceAddress(m)
+            );
         Element authnRequestElement = OpenSAMLUtil.toDom(authnRequest, doc);
         String authnRequestEncoded = encodeAuthnRequest(authnRequestElement);
         
