@@ -19,15 +19,12 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -47,7 +44,6 @@ import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
@@ -61,8 +57,6 @@ import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.xml.XMLObject;
 
@@ -75,8 +69,6 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     
     private boolean supportDeflateEncoding = true;
     private boolean supportBase64Encoding = true;
-    private Crypto signatureCrypto;
-    private String signaturePropertiesFile;
     private boolean enforceAssertionsSigned = true;
 
     @Context 
@@ -101,19 +93,6 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     }
     public boolean isSupportBase64Encoding() {
         return supportBase64Encoding;
-    }
-    
-    public void setSignatureCrypto(Crypto crypto) {
-        signatureCrypto = crypto;
-    }
-    
-    /**
-     * Set the String corresponding to the signature Properties class
-     * @param signaturePropertiesFile the String corresponding to the signature properties file
-     */
-    public void setSignaturePropertiesFile(String signaturePropertiesFile) {
-        this.signaturePropertiesFile = signaturePropertiesFile;
-        LOG.fine("Setting signature properties: " + signaturePropertiesFile);
     }
     
     @POST
@@ -328,58 +307,6 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
-    }
-    
-    private Crypto getSignatureCrypto() {
-        if (signatureCrypto == null && signaturePropertiesFile != null) {
-            Properties sigProperties = getProps(signaturePropertiesFile);
-            if (sigProperties == null) {
-                LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
-                return null;
-            }
-            try {
-                signatureCrypto = CryptoFactory.getInstance(sigProperties);
-            } catch (WSSecurityException ex) {
-                LOG.fine("Error in loading the signature Crypto object: " + ex.getMessage());
-                return null;
-            }
-        }
-        return signatureCrypto;
-    }
-    
-    private static Properties getProps(Object o) {
-        Properties properties = null;
-        if (o instanceof Properties) {
-            properties = (Properties)o;
-        } else if (o instanceof String) {
-            URL url = null;
-            try {
-                url = ClassLoaderUtils.getResource((String)o, RequestAssertionConsumerService.class);
-                if (url == null) {
-                    url = new URL((String)o);
-                }
-                if (url != null) {
-                    properties = new Properties();
-                    InputStream ins = url.openStream();
-                    properties.load(ins);
-                    ins.close();
-                }
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }
-        } else if (o instanceof URL) {
-            properties = new Properties();
-            try {
-                InputStream ins = ((URL)o).openStream();
-                properties.load(ins);
-                ins.close();
-            } catch (IOException e) {
-                LOG.fine(e.getMessage());
-                properties = null;
-            }            
-        }
-        return properties;
     }
     
 }
