@@ -63,7 +63,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                 return Response.seeOther(ub.build())
                                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                                .header("Pragma", "no-cache") 
-                               .header("Set-Cookie", contextCookie)
+                               .header(HttpHeaders.SET_COOKIE, contextCookie)
                                .build();
             } catch (Exception ex) {
                 ex.printStackTrace();

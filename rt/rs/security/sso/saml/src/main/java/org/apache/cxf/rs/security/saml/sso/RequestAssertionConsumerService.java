@@ -38,6 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -167,7 +168,8 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
                                             requestState.getWebAppDomain());
         
         // Finally, redirect to the service provider endpoint
-        return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();
+        return Response.seeOther(targetURI).header(HttpHeaders.SET_COOKIE,
+                                                   contextCookie).build();
     }
     
     private RequestState processRelayState(String relayState) {

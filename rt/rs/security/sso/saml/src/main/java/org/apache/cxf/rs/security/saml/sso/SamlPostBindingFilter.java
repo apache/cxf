@@ -22,6 +22,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
@@ -40,8 +41,12 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                 // in principle we could've built the XHTML form right here
                 // but it will be cleaner to get that done in JSP
                 
-                // Note the view handler will also need to set a RelayState 
-                // cookie
+                String contextCookie = createCookie(SSOConstants.RELAY_STATE,
+                                                    info.getRelayState(),
+                                                    info.getWebAppContext(),
+                                                    info.getWebAppDomain());
+                new MessageContextImpl(m).getHttpServletResponse().addHeader(
+                    HttpHeaders.SET_COOKIE, contextCookie);
                 
                 return Response.ok(info)
                                .type("text/html")
