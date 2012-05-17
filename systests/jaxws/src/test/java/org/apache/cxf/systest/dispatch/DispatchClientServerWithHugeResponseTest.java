@@ -35,6 +35,7 @@ import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
