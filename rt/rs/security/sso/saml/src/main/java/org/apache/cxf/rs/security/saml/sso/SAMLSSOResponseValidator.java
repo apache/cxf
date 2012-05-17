@@ -45,6 +45,14 @@ public class SAMLSSOResponseValidator {
     private String clientAddress;
     private String requestId;
     private String spIdentifier;
+    private boolean enforceAssertionsSigned = true;
+    
+    /**
+     * Enforce that Assertions must be signed if the POST binding was used. The default is true.
+     */
+    public void setEnforceAssertionsSigned(boolean enforceAssertionsSigned) {
+        this.enforceAssertionsSigned = enforceAssertionsSigned;
+    }
     
     /**
      * Validate a SAML 2 Protocol Response
@@ -86,7 +94,7 @@ public class SAMLSSOResponseValidator {
             }
             validateIssuer(assertion.getIssuer());
             
-            if (postBinding && assertion.getSignature() == null) {
+            if (enforceAssertionsSigned && postBinding && assertion.getSignature() == null) {
                 LOG.fine("If the HTTP Post binding is used to deliver the Response, "
                          + "the enclosed assertions must be signed");
                 throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");

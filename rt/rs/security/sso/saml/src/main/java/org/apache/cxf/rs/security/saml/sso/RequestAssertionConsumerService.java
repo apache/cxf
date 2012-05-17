@@ -77,6 +77,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     private boolean supportBase64Encoding = true;
     private Crypto signatureCrypto;
     private String signaturePropertiesFile;
+    private boolean enforceAssertionsSigned = true;
 
     @Context 
     private MessageContext jaxrsContext;
@@ -86,6 +87,13 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     }
     public boolean isSupportDeflateEncoding() {
         return supportDeflateEncoding;
+    }
+    
+    /**
+     * Enforce that Assertions must be signed if the POST binding was used. The default is true.
+     */
+    public void setEnforceAssertionsSigned(boolean enforceAssertionsSigned) {
+        this.enforceAssertionsSigned = enforceAssertionsSigned;
     }
     
     public void setSupportBase64Encoding(boolean supportBase64Encoding) {
@@ -294,9 +302,9 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             ssoResponseValidator.setIssuerIDP(requestState.getIdpServiceAddress());
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
             ssoResponseValidator.setSpIdentifier(requestState.getIssuerId());
+            ssoResponseValidator.setEnforceAssertionsSigned(enforceAssertionsSigned);
 
-            // TODO post binding
-            return ssoResponseValidator.validateSamlResponse(samlResponse, false);
+            return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);
         } catch (WSSecurityException ex) {
             reportError("INVALID_SAML_RESPONSE");
             throw new WebApplicationException(400);
