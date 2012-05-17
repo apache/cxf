@@ -19,17 +19,17 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 public class SamlRequestInfo {
-    private String encodedSamlRequest;
+    private String samlRequest;
     private String relayState;
     private String idpServiceAddress;
     private String webAppContext;
     private String webAppDomain;
     
-    public void setEncodedSamlRequest(String encodedSaml) {
-        this.encodedSamlRequest = encodedSaml;
+    public void setSamlRequest(String encodedSaml) {
+        this.samlRequest = encodedSaml;
     }
-    public String getEncodedSamlRequest() {
-        return encodedSamlRequest;
+    public String getSamlRequest() {
+        return samlRequest;
     }
     public void setRelayState(String relayState) {
         this.relayState = relayState;

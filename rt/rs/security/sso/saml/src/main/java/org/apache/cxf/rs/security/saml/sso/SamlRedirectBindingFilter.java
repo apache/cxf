@@ -22,7 +22,6 @@ import java.net.URLEncoder;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
-
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -45,8 +44,12 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         } else {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
+                String urlEncodedRequest = 
+                    URLEncoder.encode(info.getSamlRequest(), "UTF-8");
+                
                 UriBuilder ub = UriBuilder.fromUri(getIdpServiceAddress());
-                ub.queryParam(SSOConstants.SAML_REQUEST, info.getEncodedSamlRequest());
+                
+                ub.queryParam(SSOConstants.SAML_REQUEST, urlEncodedRequest);
                 ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());
                 if (isSignRequest()) {
                     signRequest(ub);

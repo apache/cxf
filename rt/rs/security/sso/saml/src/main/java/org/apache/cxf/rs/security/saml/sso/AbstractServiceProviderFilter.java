@@ -159,15 +159,14 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         return true;
     }
     
-    protected String encodeAuthnRequest(Element authnRequestElement)
+    protected String deflateEncodeAuthnRequest(Element authnRequestElement)
         throws IOException {
         String requestMessage = DOM2Writer.nodeToString(authnRequestElement);
         
         DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
         byte[] deflatedBytes = encoder.deflateToken(requestMessage.getBytes("UTF-8"));
         
-        String encodedRequestMessage = Base64Utility.encode(deflatedBytes);
-        return URLEncoder.encode(encodedRequestMessage, "UTF-8");
+        return Base64Utility.encode(deflatedBytes);
     }
 
     protected SamlRequestInfo createSamlRequestInfo(Message m) throws Exception {
@@ -180,10 +179,10 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                 m, getIssuerId(m), getAbsoluteAssertionServiceAddress(m)
             );
         Element authnRequestElement = OpenSAMLUtil.toDom(authnRequest, doc);
-        String authnRequestEncoded = encodeAuthnRequest(authnRequestElement);
+        String authnRequestEncoded = deflateEncodeAuthnRequest(authnRequestElement);
         
         SamlRequestInfo info = new SamlRequestInfo();
-        info.setEncodedSamlRequest(authnRequestEncoded);
+        info.setSamlRequest(authnRequestEncoded);
         
         String httpBasePath = (String)m.get("http.base.path");
         String webAppContext = URI.create(httpBasePath).getRawPath();

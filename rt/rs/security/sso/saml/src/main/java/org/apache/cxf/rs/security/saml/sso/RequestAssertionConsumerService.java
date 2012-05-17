@@ -30,7 +30,6 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -51,11 +50,9 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.xml.XMLObject;
@@ -71,8 +68,12 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     private boolean supportBase64Encoding = true;
     private boolean enforceAssertionsSigned = true;
 
+    private MessageContext messageContext;
+    
     @Context 
-    private MessageContext jaxrsContext;
+    public void setMessageContext(MessageContext mc) {
+        this.messageContext = mc;
+    }
     
     public void setSupportDeflateEncoding(boolean deflate) {
         supportDeflateEncoding = deflate;
@@ -272,11 +273,11 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     ) {
         try {
             SAMLSSOResponseValidator ssoResponseValidator = new SAMLSSOResponseValidator();
-            ssoResponseValidator.setAssertionConsumerURL((String)jaxrsContext.get(Message.REQUEST_URL));
+            ssoResponseValidator.setAssertionConsumerURL(
+                messageContext.getUriInfo().getAbsolutePath().toString());
 
-            HttpServletRequest httpRequest = 
-                (HttpServletRequest)jaxrsContext.get(AbstractHTTPDestination.HTTP_REQUEST);
-            ssoResponseValidator.setClientAddress(httpRequest.getRemoteAddr());
+            ssoResponseValidator.setClientAddress(
+                 messageContext.getHttpServletRequest().getRemoteAddr());
 
             ssoResponseValidator.setIssuerIDP(requestState.getIdpServiceAddress());
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
