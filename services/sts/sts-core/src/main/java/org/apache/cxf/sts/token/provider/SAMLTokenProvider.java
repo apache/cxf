@@ -39,6 +39,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.SignatureProperties;
+import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -457,7 +458,8 @@ public class SAMLTokenProvider implements TokenProvider {
             }
         }
         
-        // If no statements, then default to the DefaultAttributeStatementProvider
+        // If no statements, then default to the DefaultAttributeStatementProvider and the
+        // ClaimsAttributeStatementProvider
         if ((attrBeanList == null || attrBeanList.isEmpty()) 
             && (authBeanList == null || authBeanList.isEmpty())
             && (authDecisionBeanList == null || authDecisionBeanList.isEmpty())) {
@@ -465,6 +467,12 @@ public class SAMLTokenProvider implements TokenProvider {
             AttributeStatementProvider attributeProvider = new DefaultAttributeStatementProvider();
             AttributeStatementBean attributeBean = attributeProvider.getStatement(tokenParameters);
             attrBeanList.add(attributeBean);
+            
+            attributeProvider = new ClaimsAttributeStatementProvider();
+            attributeBean = attributeProvider.getStatement(tokenParameters);
+            if (attributeBean != null) {
+                attrBeanList.add(attributeBean);
+            }
         }
         
         // Get the Subject and Conditions

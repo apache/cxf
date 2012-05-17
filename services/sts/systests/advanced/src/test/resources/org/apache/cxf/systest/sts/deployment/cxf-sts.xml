@@ -89,9 +89,9 @@
 	</bean>
 
 	<bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-		<property name="attributeStatementProviders" ref="attributeStatementProvidersList" />
+		<!-- <property name="attributeStatementProviders" ref="attributeStatementProvidersList" />-->
 	</bean>
-
+<!-- 
 	<util:list id="attributeStatementProvidersList">
 		<ref bean="defaultAttributeProvider" />
 		<ref bean="customAttributeProvider" />
@@ -104,7 +104,7 @@
 	<bean id="customAttributeProvider"
 		class="org.apache.cxf.systest.sts.deployment.CustomAttributeStatementProvider">
 	</bean>
-
+-->
 	<bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
 		<property name="claimHandlers" ref="claimHandlerList" />
 	</bean>
