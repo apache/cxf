@@ -65,6 +65,11 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
     private boolean signRequest;
     private String signatureUsername;
+    private boolean addEndpointAddressToContext;
+    
+    public void setAddEndpointAddressToContext(boolean add) {
+        addEndpointAddressToContext = add;
+    }
     
     public void setSignRequest(boolean signRequest) {
         this.signRequest = signRequest;
@@ -184,8 +189,13 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         SamlRequestInfo info = new SamlRequestInfo();
         info.setSamlRequest(authnRequestEncoded);
         
-        String httpBasePath = (String)m.get("http.base.path");
-        String webAppContext = URI.create(httpBasePath).getRawPath();
+        String webAppContext = null;
+        if (addEndpointAddressToContext) {
+            webAppContext = new UriInfoImpl(m).getBaseUri().getRawPath();
+        } else {
+            String httpBasePath = (String)m.get("http.base.path");
+            webAppContext = URI.create(httpBasePath).getRawPath();
+        }
         String originalRequestURI = new UriInfoImpl(m).getRequestUri().toString();
         
         RequestState requestState = new RequestState(originalRequestURI,
