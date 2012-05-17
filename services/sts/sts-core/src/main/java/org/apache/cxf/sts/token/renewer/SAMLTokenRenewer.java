@@ -190,18 +190,19 @@ public class SAMLTokenRenewer implements TokenRenewer {
             // Validate the Assertion
             validateAssertion(assertion, tokenToRenew, cachedToken, tokenParameters);
             
-            String oldId = createNewId(assertion);
+            AssertionWrapper renewedAssertion = new AssertionWrapper(assertion.getXmlObject());
+            String oldId = createNewId(renewedAssertion);
             // Remove the previous token (now expired) from the cache
             tokenStore.remove(oldId);
             tokenStore.remove(Integer.toString(hash));
             
             // Create new Conditions & sign the Assertion
-            createNewConditions(assertion, tokenParameters);
-            signAssertion(assertion, tokenParameters);
+            createNewConditions(renewedAssertion, tokenParameters);
+            signAssertion(renewedAssertion, tokenParameters);
             
             Document doc = DOMUtils.createDocument();
-            Element token = assertion.toDOM(doc);
-            if (assertion.getSaml1() != null) {
+            Element token = renewedAssertion.toDOM(doc);
+            if (renewedAssertion.getSaml1() != null) {
                 token.setIdAttributeNS(null, "AssertionID", true);
             } else {
                 token.setIdAttributeNS(null, "ID", true);
@@ -210,22 +211,22 @@ public class SAMLTokenRenewer implements TokenRenewer {
             
             // Cache the token
             storeTokenInCache(
-                tokenStore, assertion, tokenParameters.getPrincipal(), tokenParameters.getRealm()
+                tokenStore, renewedAssertion, tokenParameters.getPrincipal(), tokenParameters.getRealm()
             );
             
             response.setToken(token);
-            response.setTokenId(assertion.getId());
+            response.setTokenId(renewedAssertion.getId());
             
             DateTime validFrom = null;
             DateTime validTill = null;
             long lifetime = 0;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                validFrom = assertion.getSaml2().getConditions().getNotBefore();
-                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+            if (renewedAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+                validFrom = renewedAssertion.getSaml2().getConditions().getNotBefore();
+                validTill = renewedAssertion.getSaml2().getConditions().getNotOnOrAfter();
                 lifetime = validTill.getMillis() - validFrom.getMillis();
             } else {
-                validFrom = assertion.getSaml1().getConditions().getNotBefore();
-                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+                validFrom = renewedAssertion.getSaml1().getConditions().getNotBefore();
+                validTill = renewedAssertion.getSaml1().getConditions().getNotOnOrAfter();
                 lifetime = validTill.getMillis() - validFrom.getMillis();
             }
             response.setLifetime(lifetime / 1000);
