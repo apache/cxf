@@ -20,13 +20,10 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.util.Date;
 
-import javax.ws.rs.Path;
-
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 
-@Path("sso")
 public class AbstractSSOSpHandler {
     private SPStateManager stateProvider;
     private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;

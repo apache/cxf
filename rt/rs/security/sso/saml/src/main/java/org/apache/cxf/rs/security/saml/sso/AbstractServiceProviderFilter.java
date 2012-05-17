@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -47,7 +48,6 @@ import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
-
 import org.opensaml.saml2.core.AuthnRequest;
 
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
@@ -99,7 +99,11 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         
         Cookie securityContextCookie = cookies.get(SSOConstants.SECURITY_CONTEXT_TOKEN);
         if (securityContextCookie == null) {
-            reportError("MISSING_RESPONSE_STATE");
+            // most likely it means that the user has not been offered
+            // a chance to get logged on yet, though it might be that the browser
+            // has removed an expired cookie from its cache; warning is too noisy in the
+            // former case
+            reportTrace("MISSING_RESPONSE_STATE");
             return false;
         }
         String contextKey = securityContextCookie.getValue();
@@ -156,7 +160,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         
         String httpBasePath = (String)m.get("http.base.path");
         String webAppContext = URI.create(httpBasePath).getRawPath();
-        String originalRequestURI = (String)m.get(Message.REQUEST_URI);
+        String originalRequestURI = new UriInfoImpl(m).getRequestUri().toString();
         
         RequestState requestState = new RequestState(originalRequestURI,
                                                      getIdpServiceAddress(),
@@ -197,6 +201,14 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
+    }
+    
+    protected void reportTrace(String code) {
+        if (LOG.isLoggable(Level.FINE)) {
+            org.apache.cxf.common.i18n.Message errorMsg = 
+                new org.apache.cxf.common.i18n.Message(code, BUNDLE);
+            LOG.fine(errorMsg.toString());
+        }
     }
 
     public String getWebAppDomain() {
