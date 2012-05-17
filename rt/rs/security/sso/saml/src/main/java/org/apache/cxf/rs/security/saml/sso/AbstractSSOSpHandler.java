@@ -24,11 +24,16 @@ import javax.ws.rs.Path;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
+import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 
 @Path("sso")
 public class AbstractSSOSpHandler {
     private SPStateManager stateProvider;
     private long stateTimeToLive = SSOConstants.DEFAULT_STATE_TIME;
+    
+    static {
+        OpenSAMLUtil.initSamlEngine();
+    }
     
     //TODO: support attaching a signature to the cookie value
     protected String createCookie(String name, 
