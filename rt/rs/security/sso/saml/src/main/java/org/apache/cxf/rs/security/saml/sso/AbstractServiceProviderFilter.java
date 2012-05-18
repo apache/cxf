@@ -176,7 +176,9 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             return null;
         }
         String webAppContext = getWebAppContext(m);
-        if (webAppDomain != null && !webAppDomain.equals(responseState.getWebAppDomain())
+        if (webAppDomain != null 
+            && (responseState.getWebAppDomain() == null 
+                || !webAppDomain.equals(responseState.getWebAppDomain()))
             || responseState.getWebAppContext() == null
             || !webAppContext.equals(responseState.getWebAppContext())) {
             getStateProvider().removeResponseState(contextKey);
