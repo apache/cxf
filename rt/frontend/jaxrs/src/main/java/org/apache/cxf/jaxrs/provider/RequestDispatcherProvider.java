@@ -47,6 +47,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -67,10 +68,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private static final String REQUEST_SCOPE = "request";
     private static final String SESSION_SCOPE = "session";
     
+    private static final String DEFAULT_RESOURCE_EXTENSION = ".jsp";
+    private static final String DEFAULT_LOCATION_PREFIX = "/WEB-INF/";
+    
     private String servletContextPath; 
     private String resourcePath;
     private Map<String, String> resourcePaths = Collections.emptyMap();
     private Map<String, String> classResources = Collections.emptyMap();
+    private boolean useClassNames;
     
     private String scope = REQUEST_SCOPE;
     private Map<String, String> beanNames = Collections.emptyMap();
@@ -80,14 +85,39 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private boolean saveParametersAsAttributes;
     private boolean logRedirects;
     
-    @Context
     private MessageContext mc; 
 
+    @Context
+    public void setMessageContext(MessageContext context) {
+        this.mc = context;
+    }
+    
+    public void setUseClassNames(boolean use) {
+        useClassNames = use;
+    }
+    
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
+    private String getClassResourceName(Class<?> type) {
+        String simpleName = type.getSimpleName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(Character.toLowerCase(simpleName.charAt(0)));
+        if (simpleName.length() > 1) {
+            sb.append(simpleName.substring(1));
+        }
+        return DEFAULT_LOCATION_PREFIX + sb.toString() + DEFAULT_RESOURCE_EXTENSION;  
+    }
+    
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+        
+        if (useClassNames 
+            && ResourceUtils.getClasspathResourceURL(getClassResourceName(type),
+                                                     RequestDispatcherProvider.class,
+                                                     getBus()) != null) {
+            return true;
+        }
         if (resourcePath != null || classResources.containsKey(type.getName())) {
             return true;
         }
@@ -107,7 +137,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         throws IOException {
         
         ServletContext sc = getServletContext();
-        String path = getResourcePath(clazz.getName());
+        String path = getResourcePath(clazz);
         RequestDispatcher rd = getRequestDispatcher(sc, clazz, path);
         
         try {
@@ -143,8 +173,11 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
     }
     
-    private String getResourcePath(String clsName) {
-        String clsResourcePath = classResources.get(clsName);
+    private String getResourcePath(Class<?> cls) {
+        if (useClassNames) {
+            return getClassResourceName(cls);     
+        }
+        String clsResourcePath = classResources.get(cls.getName());
         if (clsResourcePath != null) {
             return clsResourcePath;
         }
