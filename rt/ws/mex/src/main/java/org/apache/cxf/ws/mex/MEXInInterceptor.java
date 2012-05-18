@@ -60,7 +60,7 @@ public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (action == null) {
             AddressingProperties inProps = (AddressingProperties)message
                 .getContextualProperty(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
-            if (inProps != null) {
+            if (inProps != null && inProps.getAction() != null) {
                 action = inProps.getAction().getValue();
             }
         }
