@@ -26,6 +26,15 @@ import java.util.Date;
 public class SSOValidatorResponse {
     private Date sessionNotOnOrAfter;
     private String responseId;
+    private String assertion;
+
+    public String getAssertion() {
+        return assertion;
+    }
+
+    public void setAssertion(String assertion) {
+        this.assertion = assertion;
+    }
     
     public Date getSessionNotOnOrAfter() {
         return sessionNotOnOrAfter;

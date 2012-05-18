@@ -131,9 +131,13 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         long expiresAt = 0;
         if (notOnOrAfter != null) {
             expiresAt = notOnOrAfter.getTime();
+        } else {
+            expiresAt = currentTime + getStateTimeToLive(); 
         }
+        
         ResponseState responseState = 
-            new ResponseState(relayState, 
+            new ResponseState(validatorResponse.getAssertion(),
+                              relayState, 
                               requestState.getWebAppContext(),
                               requestState.getWebAppDomain(),
                               currentTime, 

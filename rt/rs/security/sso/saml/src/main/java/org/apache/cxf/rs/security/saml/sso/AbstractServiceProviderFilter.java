@@ -19,8 +19,10 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.security.Principal;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -37,6 +39,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
@@ -44,8 +47,12 @@ import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
+import org.apache.cxf.rs.security.saml.SAMLUtils;
+import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
+import org.apache.cxf.security.SecurityContext;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.saml2.core.AuthnRequest;
@@ -147,9 +154,37 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             reportError("INVALID_RELAY_STATE");
             return false;
         }
-        //TODO: use ResponseState to set up a proper SecurityContext 
-        //      on the current message
+        try {
+            String assertion = responseState.getAssertion();
+            AssertionWrapper assertionWrapper = 
+                new AssertionWrapper(
+                    DOMUtils.readXml(new StringReader(assertion)).getDocumentElement());
+            setSecurityContext(m, assertionWrapper);
+        } catch (Exception ex) {
+            reportError("INVALID_RESPONSE_STATE");
+            return false;
+        }
         return true;
+    }
+    
+    protected void setSecurityContext(Message m, AssertionWrapper assertionWrapper) {
+        // don't worry about roles/claims for now, just set a basic SecurityContext
+        Subject subject = SAMLUtils.getSubject(m, assertionWrapper);
+        final String name = subject.getName();
+        
+        if (name != null) {
+            final SecurityContext sc = new SecurityContext() {
+
+                public Principal getUserPrincipal() {
+                    return new SimplePrincipal(name);
+                }
+
+                public boolean isUserInRole(String role) {
+                    return false;
+                }
+            };
+            m.put(SecurityContext.class, sc);
+        }
     }
     
     protected ResponseState getValidResponseState(Cookie securityContextCookie, 
@@ -182,6 +217,10 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             || responseState.getWebAppContext() == null
             || !webAppContext.equals(responseState.getWebAppContext())) {
             getStateProvider().removeResponseState(contextKey);
+            reportError("INVALID_RESPONSE_STATE");
+            return null;
+        }
+        if (responseState.getAssertion() == null) {
             reportError("INVALID_RESPONSE_STATE");
             return null;
         }

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.opensaml.saml2.core.AudienceRestriction;
 import org.opensaml.saml2.core.AuthnStatement;
@@ -127,7 +128,9 @@ public class SAMLSSOResponseValidator {
         SSOValidatorResponse validatorResponse = new SSOValidatorResponse();
         validatorResponse.setResponseId(samlResponse.getID());
         validatorResponse.setSessionNotOnOrAfter(sessionNotOnOrAfter);
-        
+        // the assumption for now is that SAMLResponse will contain only a single assertion
+        validatorResponse.setAssertion(
+            new AssertionWrapper(samlResponse.getAssertions().get(0)).assertionToString());
         return validatorResponse;
     }
     
