@@ -19,25 +19,52 @@
 
 package org.apache.cxf.transport.http_jetty.continuations;
 
+import java.lang.reflect.Method;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.ContinuationProviderFactory;
-import org.eclipse.jetty.server.Request;
 
 /**
  * 
  */
 public class JettyContinuationProviderFactory implements ContinuationProviderFactory {
 
+    final boolean disableJettyContinuations 
+        = Boolean.getBoolean("org.apache.cxf.transport.http_jetty.continuations.disable"); 
+    
+    public JettyContinuationProviderFactory() {
+    }
+    
     public ContinuationProvider createContinuationProvider(Message inMessage, 
                                                            HttpServletRequest req,
                                                            HttpServletResponse resp) {
-        if (req instanceof Request && ((Request)req).isAsyncSupported()) {
-            return new JettyContinuationProvider(req, resp, inMessage);
+        if (!disableJettyContinuations) {
+            ServletRequest r2 = req;
+            while (r2 instanceof ServletRequestWrapper) {
+                r2 = ((ServletRequestWrapper)r2).getRequest();
+            }
+            if (!r2.getClass().getName().contains("jetty")) {
+                return null;
+            }
+    
+            try {
+                Method m = r2.getClass().getMethod("isAsyncSupported");
+                Object o = ReflectionUtil.setAccessible(m).invoke(r2);
+                if (((Boolean)o).booleanValue()) {
+                    return new JettyContinuationProvider(req, resp, inMessage);
+                }
+            } catch (Throwable t) {
+                //ignore - either not a proper Jetty request object or classloader issue
+                //or similar.
+            }
         }
         return null;
     }

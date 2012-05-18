@@ -26,8 +26,7 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.eclipse.jetty.continuation.ContinuationListener;
-import org.eclipse.jetty.server.AsyncContext;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.continuation.ContinuationSupport;
 
 public class JettyContinuationWrapper implements Continuation, ContinuationListener {
     volatile boolean isNew;
@@ -36,23 +35,19 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     volatile Object obj;
     
     private Message message;
-    private final AsyncContext context;
-    private final Request req;
+    private org.eclipse.jetty.continuation.Continuation continuation;
     
     public JettyContinuationWrapper(HttpServletRequest request, 
                                     HttpServletResponse resp, 
                                     Message m) {
-        req = (Request)request;
+        continuation = ContinuationSupport.getContinuation(request);
+        
         message = m;
-        isNew = req.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
+        isNew = request.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
         if (isNew) {
-            req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
-                             message.getExchange().getInMessage());
-            context = req.startAsync(req, resp);
-            context.addContinuationListener(this);
-            req.setAttribute(AbstractHTTPDestination.CXF_ASYNC_CONTEXT, context);
-        } else {
-            context = (AsyncContext)req.getAttribute(AbstractHTTPDestination.CXF_ASYNC_CONTEXT);
+            request.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
+                                 message.getExchange().getInMessage());
+            continuation.addContinuationListener(this);
         }
     }
 
@@ -65,7 +60,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
 
     public void resume() {
         isResumed = true;
-        context.dispatch();
+        continuation.resume();
     }
 
     public boolean isNew() {
@@ -81,7 +76,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     }
 
     public void reset() {
-        context.complete();
+        continuation.complete();
         obj = null;
     }
 
@@ -90,11 +85,12 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         if (isPending) {
             return false;
         }
-        context.setTimeout(timeout);
         isNew = false;
         // Need to get the right message which is handled in the interceptor chain
         message.getExchange().getInMessage().getInterceptorChain().suspend();
         isPending = true;
+        continuation.setTimeout(timeout);
+        continuation.suspend();
         return true;
     }
     
@@ -107,14 +103,13 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     }
     
 
-    public void onComplete(org.eclipse.jetty.continuation.Continuation continuation) {
+    public void onComplete(org.eclipse.jetty.continuation.Continuation cont) {
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
         isPending = false;
     }
 
-    public void onTimeout(org.eclipse.jetty.continuation.Continuation continuation) {
+    public void onTimeout(org.eclipse.jetty.continuation.Continuation cont) {
         isPending = false;
-        context.dispatch();
     }
     
 }
