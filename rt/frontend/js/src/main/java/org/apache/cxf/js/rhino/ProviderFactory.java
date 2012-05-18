@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +46,7 @@ public class ProviderFactory {
 
     private String epAddress;
     private boolean isBaseAddr;
+    private List<AbstractDOMProvider> providers = new CopyOnWriteArrayList<AbstractDOMProvider>();
 
     static {
         ContextFactory.initGlobal(new RhinoContextFactory());
@@ -124,6 +127,7 @@ public class ProviderFactory {
                                          epAddr, isBase, isE4X);
                     try {
                         provider.publish();
+                        providers.add(provider);
                     } catch (AbstractDOMProvider.JSDOMProviderException ex) {
                         StringBuilder msg = new StringBuilder(f.getPath());
                         msg.append(": ").append(ex.getMessage());
@@ -136,6 +140,13 @@ public class ProviderFactory {
         }
         if (!providerFound) {
             throw new Exception(f.getPath() + NO_PROVIDER);
+        }
+    }
+    
+    public void stop() {
+        while (!providers.isEmpty()) {
+            AbstractDOMProvider p = providers.remove(0);
+            p.stop();
         }
     }
 

@@ -26,12 +26,15 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
 
+    Endpoint ep;
     protected void run() {
-
         GreeterImpl implementor = new GreeterImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
-
+        ep = Endpoint.publish(address, implementor);
+    }
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
 
     public static void main(String[] args) {

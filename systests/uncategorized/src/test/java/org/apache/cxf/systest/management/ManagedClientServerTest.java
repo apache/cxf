@@ -29,7 +29,6 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
@@ -38,14 +37,13 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String JMX_PORT = allocatePort(Server.class, 1);
+    public static final String PORT = allocatePort(ManagedClientServerTest.class);
+    public static final String JMX_PORT = allocatePort(ManagedClientServerTest.class, 1);
     
     
     private final QName portName =
@@ -53,42 +51,28 @@ public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
                   "SoapPort");
 
     public static class Server extends AbstractBusTestServerBase {
-
+        Endpoint ep;
         protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("org/apache/cxf/systest/management/managed-spring.xml", true);
-            BusFactory.setDefaultBus(bus);
             Object implementor = new GreeterImpl();
-            Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
+            ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                 implementor);
         }
-
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public void tearDown() {
+            ep.stop();
         }
+
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus("org/apache/cxf/systest/management/managed-spring.xml");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-    }
-
-    @AfterClass
-    public static void shutdownBus() throws Exception {
-        BusFactory.getDefaultBus().shutdown(false);
     }
 
     @Test
     public void testManagedEndpoint() throws Exception {
-        Bus bus = SpringBusFactory.getDefaultBus();
+        Bus bus = getStaticBus();
+        BusFactory.setDefaultBus(bus);
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull(im);
         InstrumentationManagerImpl impl = (InstrumentationManagerImpl)im;

@@ -38,10 +38,8 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.BusFactory;
 
 import org.apache.cxf.binding.soap.SoapHeader;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 
@@ -74,10 +72,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         System.setProperty("org.apache.cxf.bus.factory", "org.apache.cxf.bus.CXFBusFactory");
         System.setProperty("cxf.config.file", "org/apache/cxf/systest/outofband/header/cxf.xml");
         
-        defaultConfigFileName = CONFIG_FILE;
-        SpringBusFactory bf = new SpringBusFactory();
-        staticBus = bf.createBus(defaultConfigFileName);
-        BusFactory.setDefaultBus(staticBus);
+        createStaticBus(CONFIG_FILE);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     

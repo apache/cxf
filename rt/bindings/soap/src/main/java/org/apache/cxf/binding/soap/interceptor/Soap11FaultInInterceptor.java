@@ -48,7 +48,7 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
 
     public static SoapFault unmarshalFault(SoapMessage message, 
                                            XMLStreamReader reader) {
-        String exMessage = null;
+        String exMessage = "";
         QName faultCode = null;
         String role = null;
         Element detail = null;

@@ -28,10 +28,10 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     public static final String JS_PORT = allocatePort(Server.class);
     public static final String JSX_PORT = allocatePort(Server.class, 1);
+    
+    ProviderFactory pf = new ProviderFactory();            
     protected void run()  {
-        
         try {            
-            ProviderFactory pf = new ProviderFactory();            
             String f = getClass().getResource("resources/hello_world.js").toURI().getPath();
             f = URLDecoder.decode(f, "UTF-8");
             pf.createAndPublish(new File(f), "http://localhost:" + JS_PORT 
@@ -43,7 +43,10 @@ public class Server extends AbstractBusTestServerBase {
             ex.printStackTrace();
         }
     }
-
+    public void tearDown() {
+        pf.stop();
+        pf = null;
+    }
     public static void main(String[] args) {
         try {
             System.err.println("Server main");

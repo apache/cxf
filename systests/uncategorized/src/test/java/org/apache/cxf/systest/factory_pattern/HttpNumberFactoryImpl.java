@@ -35,8 +35,8 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class HttpNumberFactoryImpl extends NumberFactoryImpl {
 
-    public HttpNumberFactoryImpl(Bus bus) {
-        super(bus);
+    public HttpNumberFactoryImpl(Bus bus, String p) {
+        super(bus, p);
         // do servant creation up front so manual epr creation test has endpoint to talk to.
         // the manual epr will not come from create()
         //
@@ -63,7 +63,7 @@ public class HttpNumberFactoryImpl extends NumberFactoryImpl {
         EndpointImpl ep = 
             new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
-        ep.publish(NUMBER_SERVANT_ADDRESS_ROOT);
+        ep.publish(getServantAddressRoot());
         templateEpr = ep.getServer().getDestination().getAddress();        
     }
 }

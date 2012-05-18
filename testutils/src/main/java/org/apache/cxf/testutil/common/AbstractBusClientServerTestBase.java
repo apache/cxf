@@ -30,45 +30,43 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+
 import org.junit.After;
 import org.junit.AfterClass;
 
 public abstract class AbstractBusClientServerTestBase extends AbstractClientServerTestBase {
 
-    protected static String defaultConfigFileName;
     protected static Bus staticBus; 
-    
-    protected String configFileName = defaultConfigFileName;
     protected Bus bus; 
 
     public void createBus(String config) throws Exception {
-        configFileName = config;
-        createBus();
+        if (config != null) {
+            bus = new SpringBusFactory().createBus(config);
+        } else {
+            bus = BusFactory.newInstance().createBus();
+        }
+        BusFactory.setDefaultBus(bus);
     }
     
     public void createBus() throws Exception {
-        if (configFileName != null) {
-            System.setProperty("cxf.config.file", configFileName);
-        }
-        BusFactory bf = BusFactory.newInstance();
-        bus = bf.createBus();
-        BusFactory.setDefaultBus(bus);
+        createBus(null);
     }
+    
     public static Bus getStaticBus() {
         return staticBus;
     }
     public static Bus createStaticBus(String config) throws Exception {
-        defaultConfigFileName = config;
-        return createStaticBus();
-    }
-    public static Bus createStaticBus() throws Exception {
-        if (defaultConfigFileName != null) {
-            System.setProperty("cxf.config.file", defaultConfigFileName);
+        if (config != null) {
+            staticBus = new SpringBusFactory().createBus(config);
+        } else {
+            staticBus = BusFactory.newInstance().createBus();
         }
-        BusFactory bf = BusFactory.newInstance();
-        staticBus = bf.createBus();
         BusFactory.setDefaultBus(staticBus);
         return staticBus;
+    }
+    public static Bus createStaticBus() throws Exception {
+        return createStaticBus(null);
     }
     
     @After
@@ -77,18 +75,12 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
             bus.shutdown(true);
             bus = null;
         }
-        if (configFileName != null) {
-            System.clearProperty("cxf.config.file");
-        }
     } 
     @AfterClass
     public static void deleteStaticBus() throws Exception {
         if (null != staticBus) {
             staticBus.shutdown(true);
             staticBus = null;
-        }
-        if (defaultConfigFileName != null) {
-            System.clearProperty("cxf.config.file");
         }
     } 
 

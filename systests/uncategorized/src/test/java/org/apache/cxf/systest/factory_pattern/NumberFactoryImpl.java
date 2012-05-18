@@ -30,7 +30,6 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
@@ -39,13 +38,6 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
             endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory", 
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class NumberFactoryImpl implements NumberFactory {
-    public static final String PORT = TestUtil.getPortNumber(NumberFactoryImpl.class);
-    
-    
-    public static final String FACTORY_ADDRESS = 
-        "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
-    public static final String NUMBER_SERVANT_ADDRESS_ROOT = 
-        "http://localhost:" + PORT + "/NumberService/NumberPort/";
     public static final String FACTORY_NS = "http://cxf.apache.org/factory_pattern";
     public static final String NUMBER_SERVICE_NAME = "NumberService";
     public static final String NUMBER_PORT_NAME = "NumberPort";
@@ -56,9 +48,11 @@ public class NumberFactoryImpl implements NumberFactory {
     protected EndpointReferenceType templateEpr;
     protected NumberImpl servant;
     protected Bus bus;
+    protected String port;
 
-    public NumberFactoryImpl(Bus b) {
+    public NumberFactoryImpl(Bus b, String p) {
         bus = b;
+        port = p;
     }
 
     public W3CEndpointReference create(String id) {
@@ -85,7 +79,9 @@ public class NumberFactoryImpl implements NumberFactory {
         }
         return templateEpr;
     }
-    
+    protected String getServantAddressRoot() {
+        return "http://localhost:" + port + "/NumberService/NumberPort/";
+    }
     protected void initDefaultServant() {
 
         servant = new NumberImpl();
@@ -95,7 +91,7 @@ public class NumberFactoryImpl implements NumberFactory {
         EndpointImpl ep = new EndpointImpl(bus, 
                                            servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
-        ep.publish(NUMBER_SERVANT_ADDRESS_ROOT);
+        ep.publish(getServantAddressRoot());
         templateEpr = ep.getServer().getDestination().getAddress();
 
         // jms port

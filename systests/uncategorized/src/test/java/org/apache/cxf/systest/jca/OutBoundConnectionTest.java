@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.connector.Connection;
 import org.apache.cxf.jca.cxf.CXFConnectionRequestInfo;
 import org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl;
@@ -49,11 +50,17 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
 
     public static class Server extends AbstractBusTestServerBase {        
         public static final String PORT = allocatePort(Server.class);
+        
+        Endpoint ep;
         protected void run() {
+            setBus(BusFactory.getDefaultBus());
             Object implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-            Endpoint.publish(address, implementor);
-            
+            ep = Endpoint.publish(address, implementor);
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
         
         public static void main(String[] args) {
@@ -72,6 +79,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus();
     }
     
     @Test
@@ -130,5 +138,6 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
             assertNotNull("no response received from service", reply);
             assertEquals(response, reply);
         }
+        ((Connection)o).close();
     }
 }

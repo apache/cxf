@@ -106,9 +106,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         // set up configuration to enable schema validation
         URL url = ClientServerTest.class.getResource("fault-stack-trace.xml");
         assertNotNull("cannot find test resource", url);
-        defaultConfigFileName = url.toString();
-
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus(url.toString());
     }
     @Test
     public void testCXF2419() throws Exception {

@@ -29,7 +29,6 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.counters.CounterRepository;
@@ -40,56 +39,40 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 public class CountersClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-    public static final String JMX_PORT = allocatePort(Server.class, 1);
+    public static final String PORT = allocatePort(CountersClientServerTest.class);
+    public static final String JMX_PORT = allocatePort(CountersClientServerTest.class, 1);
 
     private final QName portName = 
         new QName("http://apache.org/hello_world_soap_http",
                   "SoapPort"); 
          
     public static class Server extends AbstractBusTestServerBase {        
-        
+        Endpoint ep;
         protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus bus = bf.createBus("org/apache/cxf/systest/management/counter-spring.xml", true);
-            BusFactory.setDefaultBus(bus);
             Object implementor = new GreeterImpl();
-            Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort", implementor);
+            ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort", implementor);
         }
-
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public void tearDown() {
+            ep.stop();
         }
     }
     
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus("org/apache/cxf/systest/management/counter-spring.xml");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-    }
-    
-    @AfterClass
-    public static void shutdownBus() throws Exception {
-        BusFactory.getDefaultBus().shutdown(true);
     }
     
     @Test
     public void testCountersWithInstrumentationManager() throws Exception {
         // create Client with other bus
-        Bus bus = BusFactory.getDefaultBus();
+        Bus bus = getStaticBus();
+        BusFactory.setDefaultBus(bus);
         bus.getExtension(WorkQueueManager.class);
                                 
         CounterRepository cr = bus.getExtension(CounterRepository.class);
