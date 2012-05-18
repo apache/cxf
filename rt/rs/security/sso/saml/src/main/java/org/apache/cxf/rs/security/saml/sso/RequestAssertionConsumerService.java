@@ -38,7 +38,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -101,6 +100,18 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response processSamlResponse(@FormParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                         @FormParam(SSOConstants.RELAY_STATE) String relayState) {
+        return doProcessSamlResponse(encodedSamlResponse, relayState);
+        
+    }
+    
+    @GET
+    public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
+                                    @QueryParam(SSOConstants.RELAY_STATE) String relayState) {
+        return doProcessSamlResponse(encodedSamlResponse, relayState);
+    }
+    
+    protected Response doProcessSamlResponse(String encodedSamlResponse,
+                                          String relayState) {
         RequestState requestState = processRelayState(relayState);
         URI targetURI = getTargetURI(requestState.getTargetAddress());
         
@@ -122,7 +133,11 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             expiresAt = notOnOrAfter.getTime();
         }
         ResponseState responseState = 
-            new ResponseState(relayState, currentTime, expiresAt);
+            new ResponseState(relayState, 
+                              requestState.getWebAppContext(),
+                              requestState.getWebAppDomain(),
+                              currentTime, 
+                              expiresAt);
         getStateProvider().setResponseState(securityContextKey, responseState);
         
         String contextCookie = createCookie(SSOConstants.SECURITY_CONTEXT_TOKEN,
@@ -133,43 +148,6 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         // Finally, redirect to the service provider endpoint
         return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();
         
-    }
-    
-    @GET
-    public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
-                                    @QueryParam(SSOConstants.RELAY_STATE) String relayState) {
-        RequestState requestState = processRelayState(relayState);
-        URI targetURI = getTargetURI(requestState.getTargetAddress());
-        
-        org.opensaml.saml2.core.Response samlResponse = 
-            readSAMLResponse(false, encodedSamlResponse);
-
-        // Validate the Response
-        validateSamlResponseProtocol(samlResponse);
-        SSOValidatorResponse validatorResponse = 
-            validateSamlSSOResponse(false, samlResponse, requestState);
-        
-        // Set the security context
-        String securityContextKey = UUID.randomUUID().toString();
-        
-        long currentTime = System.currentTimeMillis();
-        Date notOnOrAfter = validatorResponse.getSessionNotOnOrAfter();
-        long expiresAt = 0;
-        if (notOnOrAfter != null) {
-            expiresAt = notOnOrAfter.getTime();
-        }
-        ResponseState responseState = 
-            new ResponseState(relayState, currentTime, expiresAt);
-        getStateProvider().setResponseState(securityContextKey, responseState);
-        
-        String contextCookie = createCookie(SSOConstants.SECURITY_CONTEXT_TOKEN,
-                                            securityContextKey,
-                                            requestState.getWebAppContext(),
-                                            requestState.getWebAppDomain());
-        
-        // Finally, redirect to the service provider endpoint
-        return Response.seeOther(targetURI).header(HttpHeaders.SET_COOKIE,
-                                                   contextCookie).build();
     }
     
     private RequestState processRelayState(String relayState) {

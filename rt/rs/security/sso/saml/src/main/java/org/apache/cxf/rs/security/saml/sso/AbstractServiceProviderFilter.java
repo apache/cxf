@@ -130,25 +130,12 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         Map<String, Cookie> cookies = headers.getCookies();
         
         Cookie securityContextCookie = cookies.get(SSOConstants.SECURITY_CONTEXT_TOKEN);
-        if (securityContextCookie == null) {
-            // most likely it means that the user has not been offered
-            // a chance to get logged on yet, though it might be that the browser
-            // has removed an expired cookie from its cache; warning is too noisy in the
-            // former case
-            reportTrace("MISSING_RESPONSE_STATE");
-            return false;
-        }
-        String contextKey = securityContextCookie.getValue();
-        ResponseState responseState = getStateProvider().getResponseState(contextKey);
+        
+        ResponseState responseState = getValidResponseState(securityContextCookie, m);
         if (responseState == null) {
-            reportError("MISSING_RESPONSE_STATE");
-            return false;
+            return false;    
         }
-        if (isStateExpired(responseState.getCreatedAt(), responseState.getExpiresAt())) {
-            reportError("EXPIRED_RESPONSE_STATE");
-            getStateProvider().removeResponseState(contextKey);
-            return false;
-        }
+        
         Cookie relayStateCookie = cookies.get(SSOConstants.RELAY_STATE);
         if (relayStateCookie == null) {
             reportError("MISSING_RELAY_COOKIE");
@@ -156,12 +143,47 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         }
         String originalRelayState = responseState.getRelayState();
         if (!originalRelayState.equals(relayStateCookie.getValue())) {
+            // perhaps the response state should also be removed
             reportError("INVALID_RELAY_STATE");
             return false;
         }
         //TODO: use ResponseState to set up a proper SecurityContext 
         //      on the current message
         return true;
+    }
+    
+    protected ResponseState getValidResponseState(Cookie securityContextCookie, 
+                                                  Message m) {
+        if (securityContextCookie == null) {
+            // most likely it means that the user has not been offered
+            // a chance to get logged on yet, though it might be that the browser
+            // has removed an expired cookie from its cache; warning is too noisy in the
+            // former case
+            reportTrace("MISSING_RESPONSE_STATE");
+            return null;
+        }
+        String contextKey = securityContextCookie.getValue();
+        
+        ResponseState responseState = getStateProvider().getResponseState(contextKey);
+        
+        if (responseState == null) {
+            reportError("MISSING_RESPONSE_STATE");
+            return null;
+        }
+        if (isStateExpired(responseState.getCreatedAt(), responseState.getExpiresAt())) {
+            reportError("EXPIRED_RESPONSE_STATE");
+            getStateProvider().removeResponseState(contextKey);
+            return null;
+        }
+        String webAppContext = getWebAppContext(m);
+        if (webAppDomain != null && !webAppDomain.equals(responseState.getWebAppDomain())
+            || responseState.getWebAppContext() == null
+            || !webAppContext.equals(responseState.getWebAppContext())) {
+            getStateProvider().removeResponseState(contextKey);
+            reportError("INVALID_RESPONSE_STATE");
+            return null;
+        }
+        return responseState;
     }
     
     protected String deflateEncodeAuthnRequest(Element authnRequestElement)
@@ -189,13 +211,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         SamlRequestInfo info = new SamlRequestInfo();
         info.setSamlRequest(authnRequestEncoded);
         
-        String webAppContext = null;
-        if (addEndpointAddressToContext) {
-            webAppContext = new UriInfoImpl(m).getBaseUri().getRawPath();
-        } else {
-            String httpBasePath = (String)m.get("http.base.path");
-            webAppContext = URI.create(httpBasePath).getRawPath();
-        }
+        String webAppContext = getWebAppContext(m);
         String originalRequestURI = new UriInfoImpl(m).getRequestUri().toString();
         
         RequestState requestState = new RequestState(originalRequestURI,
@@ -247,6 +263,15 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         }
     }
 
+    private String getWebAppContext(Message m) {
+        if (addEndpointAddressToContext) {
+            return new UriInfoImpl(m).getBaseUri().getRawPath();
+        } else {
+            String httpBasePath = (String)m.get("http.base.path");
+            return URI.create(httpBasePath).getRawPath();
+        }
+    }
+    
     public String getWebAppDomain() {
         return webAppDomain;
     }
