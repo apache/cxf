@@ -83,6 +83,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    @org.junit.Ignore
     public void testBasicConnection() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
@@ -113,6 +114,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     
     
     @Test
+    @org.junit.Ignore
     public void testGetConnectionFromSEI() throws Exception {
         CXFConnectionRequestInfo requestInfo = new CXFConnectionRequestInfo();
         requestInfo.setInterface(Greeter.class);

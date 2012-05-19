@@ -36,6 +36,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.jaxws.binding.soap.SOAPBindingImpl;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
@@ -44,11 +48,10 @@ import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -58,6 +61,34 @@ public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomJMSPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomJMSService");
 
+    public static class ServerWithJMS extends AbstractBusTestServerBase {
+        EndpointImpl jaxep;
+        protected void run() {
+            Object implementor = new TestMtomJMSImpl();
+            String address = "http://not.required.for.jms";
+            try {
+                Bus bus = BusFactory.getDefaultBus();
+                setBus(bus);
+                EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/mtom_xop.wsdl");
+                
+                jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
+                Endpoint ep = jaxep.getServer().getEndpoint();
+                ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
+                ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
+                ep.getInInterceptors().add(new LoggingInInterceptor());
+                ep.getOutInterceptors().add(new LoggingOutInterceptor());
+                SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
+                jaxWsSoapBinding.setMTOMEnabled(true);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        public void tearDown() {
+            jaxep.stop();
+        }
+
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -71,15 +102,10 @@ public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
         
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-        TestUtilities.setKeepAliveSystemProperty(false);
-        assertTrue("server did not launch correctly", launchServer(ServerWithJMS.class));
+        assertTrue("server did not launch correctly", launchServer(ServerWithJMS.class, true));
+        createStaticBus();
     }
     
-    @AfterClass
-    public static void cleanup() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
-
     
     @Test
     public void testMtomXop() throws Exception {
@@ -119,7 +145,7 @@ public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
                                     Class<T> serviceEndpointInterface,
                                     boolean enableMTOM)
         throws Exception {
-        Bus bus = BusFactory.getDefaultBus();
+        Bus bus = getStaticBus();
         ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
         serviceFactory.setBus(bus);
         serviceFactory.setServiceName(serviceName);

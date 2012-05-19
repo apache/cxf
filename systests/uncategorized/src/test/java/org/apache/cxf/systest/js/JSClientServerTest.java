@@ -32,7 +32,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 
-
 public class JSClientServerTest extends AbstractBusClientServerTestBase {
     
     public static final String JS_PORT = Server.JS_PORT;

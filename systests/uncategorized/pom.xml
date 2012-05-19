@@ -417,8 +417,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-    </properties>
-
 </project>
