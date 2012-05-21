@@ -43,7 +43,6 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
         return Collections.singletonList(OAuthConstants.REFRESH_TOKEN_GRANT);
     }
 
-    @Override
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
         if (!OAuthUtils.isGrantSupportedForClient(client, true, OAuthConstants.REFRESH_TOKEN_GRANT)) {
