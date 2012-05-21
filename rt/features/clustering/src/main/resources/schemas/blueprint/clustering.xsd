@@ -1,0 +1,57 @@
+<xsd:schema xmlns="http://cxf.apache.org/blueprint/clustering"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:beans="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="http://cxf.apache.org/blueprint/clustering" 
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"  >
+
+  <xsd:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
+  
+  <xsd:element name="failover">
+    <xsd:annotation>
+      <xsd:documentation>Configures the failover feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="beans:Tcomponent">
+          <xsd:all>
+            <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the strategy that the failover feature will be used. The Strategy object instance need to be implemented the org.apache.cxf.clustering.FailoverStrategy.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="targetSelector" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the the targetSelector which will be used in the failover feature.</xsd:documentation>
+              </xsd:annotation>
+          </xsd:all>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="loadDistributor">
+    <xsd:annotation>
+      <xsd:documentation>Configures the loadDistributor feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="beans:Tcomponent">
+          <xsd:all>
+            <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the strategy that the loadDistributor feature will be used. The Strategy object instance need to be implemented the org.apache.cxf.clustering.FailoverStrategy.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="targetSelector" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the the targetSelector which will be used in the loadDistributor feature.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:all>  
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+   
+</xsd:schema>
