@@ -65,20 +65,30 @@ public class Destination extends AbstractEndpoint {
 
     public void addSequence(DestinationSequence seq, boolean persist) {
         seq.setDestination(this);
-        map.put(seq.getIdentifier().getValue(), seq);
+        synchronized (map) {
+            map.put(seq.getIdentifier().getValue(), seq);
+        }
         if (persist) {
             RMStore store = getReliableEndpoint().getManager().getStore();
             if (null != store) {
                 store.createDestinationSequence(seq);
             }
         }
+        processingSequenceCount.incrementAndGet();
     }
 
     public void removeSequence(DestinationSequence seq) {
-        map.remove(seq.getIdentifier().getValue());
+        DestinationSequence o;
+        synchronized (map) {
+            o = map.remove(seq.getIdentifier().getValue());
+        }
         RMStore store = getReliableEndpoint().getManager().getStore();
         if (null != store) {
             store.removeDestinationSequence(seq.getIdentifier());
+        }
+        if (o != null) {
+            processingSequenceCount.decrementAndGet();
+            completedSequenceCount.incrementAndGet();
         }
     }
 

@@ -472,6 +472,10 @@ public class ManagedRMManagerTest extends Assert {
         RetryStatus getRetransmissionStatus() {
             return status;
         }
+
+        public int countUnacknowledged() {
+            return 3;
+        }
     }
     
     private static class TestRetransmissionStatus implements RetryStatus {

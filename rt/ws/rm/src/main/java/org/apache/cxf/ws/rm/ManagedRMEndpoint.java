@@ -70,11 +70,13 @@ public class ManagedRMEndpoint implements ManagedComponent {
      SimpleType.STRING, SimpleType.STRING, SimpleType.STRING};
 
     private static final String[] RETRY_STATUS_NAMES = 
-    {"messageNumber", "retries", "previous", "next", "nextInterval", "backOff", "pending", "suspended"};
+    {"messageNumber", "retries", "maxRetries", "previous", "next", "nextInterval", 
+     "backOff", "pending", "suspended"};
     private static final String[] RETRY_STATUS_DESCRIPTIONS = RETRY_STATUS_NAMES;
     @SuppressWarnings("rawtypes") // needed as OpenType isn't generic on Java5
     private static final OpenType[] RETRY_STATUS_TYPES =  
-    {SimpleType.LONG, SimpleType.INTEGER, SimpleType.DATE, SimpleType.DATE, SimpleType.LONG, SimpleType.LONG, 
+    {SimpleType.LONG, SimpleType.INTEGER, SimpleType.INTEGER, SimpleType.DATE, 
+     SimpleType.DATE, SimpleType.LONG, SimpleType.LONG, 
      SimpleType.BOOLEAN, SimpleType.BOOLEAN};
 
     private static CompositeType sourceSequenceType;
@@ -126,22 +128,12 @@ public class ManagedRMEndpoint implements ManagedComponent {
         @ManagedOperationParameter(name = "outbound", description = "The outbound direction") 
     })
     public int getQueuedMessageTotalCount(boolean outbound) {
-        int count = 0;
         if (outbound) {
-            Source source = endpoint.getSource();
-            RetransmissionQueue queue = endpoint.getManager().getRetransmissionQueue();
-            for (SourceSequence ss : source.getAllSequences()) {
-                count += queue.countUnacknowledged(ss);
-            }
+            return endpoint.getManager().getRetransmissionQueue().countUnacknowledged(); 
         } else {
-//            Destination destination = endpoint.getDestination();
-//            RedeliveryQueue queue = endpoint.getManager().getRedeliveryQueue();
-//            for (DestinationSequence ds : destination.getAllSequences()) {
-//                count += queue.countUndelivered(ds);
-//            }
+//            return endpoint.getManager().getRedeliveryQueue().countUndelivered();
+            return 0;
         }
-
-        return count;
     }
 
     @ManagedOperation(description = "Number of Queued Messages")
@@ -151,21 +143,20 @@ public class ManagedRMEndpoint implements ManagedComponent {
     })
     public int getQueuedMessageCount(String sid, boolean outbound) {
         RMManager manager = endpoint.getManager();
-        int count = 0;
         if (outbound) {
             SourceSequence ss = getSourceSeq(sid);
             if (null == ss) {
                 throw new IllegalArgumentException("no sequence");
             }
-            count = manager.getRetransmissionQueue().countUnacknowledged(ss);
+            return manager.getRetransmissionQueue().countUnacknowledged(ss);
         } else {
 //            DestinationSequence ds = getDestinationSeq(sid);
 //            if (null == ds) {
 //                throw new IllegalArgumentException("no sequence");
 //            }
-//            count = manager.getRedeliveryQueue().countUndelivered(ds);
+//            return manager.getRedeliveryQueue().countUndelivered(ds);
+            return 0;
         }
-        return count;
     }
 
     @ManagedOperation(description = "List of UnAcknowledged Message Numbers")
@@ -568,7 +559,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
     private CompositeData getRetryStatusProperties(long num, RetryStatus rs) throws JMException {
         CompositeData rsps = null;
         if (null != rs) {
-            Object[] rsv = new Object[] {num, rs.getRetries(), rs.getPrevious(), 
+            Object[] rsv = new Object[] {num, rs.getRetries(), rs.getMaxRetries(), rs.getPrevious(), 
                                          rs.getNext(), rs.getNextInterval(),
                                          rs.getBackoff(), rs.isPending(), rs.isSuspended()};
             rsps = new CompositeDataSupport(retryStatusType, RETRY_STATUS_NAMES, rsv);
@@ -598,5 +589,44 @@ public class ManagedRMEndpoint implements ManagedComponent {
         return endpoint.getLastControlMessage() == 0L ? null 
             : new Date(endpoint.getLastControlMessage());
     }
+
+    @ManagedAttribute(description = "Number of Outbound Queued Messages", currencyTimeLimit = 10)
+    public int getQueuedMessagesOutboundCount() {
+        return endpoint.getManager().getRetransmissionQueue().countUnacknowledged();
+    }
+
+//    @ManagedAttribute(description = "Number of Outbound Completed Messages", currencyTimeLimit = 10)
+//    public int getCompletedMessagesOutboundCount() {
+//        return endpoint.getManager().countCompleted();
+//    }
+
+//    @ManagedAttribute(description = "Number of Inbound Queued Messages", currencyTimeLimit = 10)
+//    public int getQueuedMessagesInboundCount() {
+//        return endpoint.getManager().getRedeliveryQueue().countUndelivered();
+//    }
+
+//    @ManagedAttribute(description = "Number of Inbound Completed Messages", currencyTimeLimit = 10)
+//    public int getCompletedMessagesInboundCount() {
+//        return endpoint.getManager().countCompleted();
+//    }
+
+    @ManagedAttribute(description = "Number of Processing Source Sequences", currencyTimeLimit = 10)
+    public int getProcessingSourceSequenceCount() {
+        return endpoint.getProcessingSourceSequenceCount();
+    }
+     
+    @ManagedAttribute(description = "Number of Completed Source Sequences", currencyTimeLimit = 10)
+    public int getCompletedSourceSequenceCount() {
+        return endpoint.getCompletedSourceSequenceCount();
+    }
+
+    @ManagedAttribute(description = "Number of Processing Destination Sequences", currencyTimeLimit = 10)
+    public int getProcessingDestinationSequenceCount() {
+        return endpoint.getProcessingDestinationSequenceCount();
+    }
     
+    @ManagedAttribute(description = "Number of Completed Destination Sequences", currencyTimeLimit = 10)
+    public int getCompletedDestinationSequenceCount() {
+        return endpoint.getCompletedDestinationSequenceCount();
+    }
 }

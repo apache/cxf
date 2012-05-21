@@ -66,6 +66,7 @@ import org.apache.cxf.ws.rm.RetransmissionCallback;
 import org.apache.cxf.ws.rm.RetransmissionQueue;
 import org.apache.cxf.ws.rm.RetryStatus;
 import org.apache.cxf.ws.rm.SourceSequence;
+import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.policy.RM10PolicyUtils;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -86,6 +87,8 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     private Resender resender;
     private RMManager manager;
 
+    private int unacknowledgedCount;
+    
     public RetransmissionQueueImpl(RMManager m) {
         manager = m;
     }
@@ -111,6 +114,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         return sequenceCandidates == null ? 0 : sequenceCandidates.size();
     }
 
+    public int countUnacknowledged() {
+        return unacknowledgedCount;
+    }
+
     /**
      * @return true if there are no unacknowledged messages in the queue
      */
@@ -131,13 +138,11 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             if (null != sequenceCandidates) {
                 for (int i = sequenceCandidates.size() - 1; i >= 0; i--) {
                     ResendCandidate candidate = sequenceCandidates.get(i);
-                    RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
-                                                                                  true);
-                    SequenceType st = properties.getSequence();
-                    long m = st.getMessageNumber().longValue();
+                    long m = candidate.getNumber();
                     if (seq.isAcknowledged(m)) {
                         sequenceCandidates.remove(i);
                         candidate.resolved();
+                        unacknowledgedCount--;
                         purged.add(m);
                     }
                 }
@@ -161,10 +166,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
                 ResendCandidate candidate = sequenceCandidates.get(i);
-                RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
-                                                                              true);
-                SequenceType st = properties.getSequence();
-                unacknowledged.add(st.getMessageNumber());
+                unacknowledged.add(candidate.getNumber());
             }
         }
         return unacknowledged;
@@ -175,10 +177,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
                 ResendCandidate candidate = sequenceCandidates.get(i);
-                RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
-                                                                              true);
-                SequenceType st = properties.getSequence();
-                if (num == st.getMessageNumber()) {
+                if (num == candidate.getNumber()) {
                     return candidate;
                 }
             }
@@ -192,10 +191,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
                 ResendCandidate candidate = sequenceCandidates.get(i);
-                RMProperties properties = RMContextUtils.retrieveRMProperties(candidate.getMessage(),
-                                                                              true);
-                SequenceType st = properties.getSequence();
-                cp.put(st.getMessageNumber(), candidate);
+                cp.put(candidate.getNumber(), candidate);
             }
         }
         return cp;
@@ -305,6 +301,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 candidate.suspend();
             }
             sequenceCandidates.add(candidate);
+            unacknowledgedCount++;
         }
         LOG.fine("Cached unacknowledged message.");
         return candidate;
@@ -473,10 +470,12 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      */
     protected class ResendCandidate implements Runnable, RetryStatus {
         private Message message;
+        private long number;
         private OutputStream out;
         private Date next;
         private TimerTask nextTask;
         private int retries;
+        private int maxRetries;
         private long nextInterval;
         private long backoff;
         private boolean pending;
@@ -498,7 +497,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 ? RetransmissionQueue.DEFAULT_EXPONENTIAL_BACKOFF : 1;
             next = new Date(System.currentTimeMillis() + baseRetransmissionInterval);
             nextInterval = baseRetransmissionInterval * backoff;
-            
+            RetryPolicyType rmrp = null != manager.getSourcePolicy() 
+                ? manager.getSourcePolicy().getRetryPolicy() : null; 
+            maxRetries = null != rmrp ? rmrp.getMaxRetries() : 0;
             
             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
             AttributedURIType to = null;
@@ -509,6 +510,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 && RMUtils.getAddressingConstants().getAnonymousURI().equals(to.getValue())) {
                 LOG.log(Level.INFO, "Cannot resend to anonymous target.  Not scheduling a resend.");
                 return;
+            }
+            RMProperties rmprops = RMContextUtils.retrieveRMProperties(message, true);
+            if (null != rmprops) {
+                number = rmprops.getSequence().getMessageNumber();
             }
             if (null != manager.getTimer()) {
                 schedule();
@@ -558,6 +563,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
         }
 
+        public long getNumber() {
+            return number;
+        }
+        
         /**
          * @return number of resend attempts
          */
@@ -569,7 +578,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
          * @return number of max resend attempts
          */
         public int getMaxRetries() {
-            return 0;
+            return maxRetries;
         }
         
         /**
@@ -666,7 +675,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         protected synchronized void attempted() {
             pending = false;
             retries++;
-            if (null != next) {
+            if (null != next && maxRetries != retries) {
                 next = new Date(next.getTime() + nextInterval);
                 nextInterval *= backoff;
                 schedule();

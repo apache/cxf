@@ -37,6 +37,11 @@ public interface RetransmissionQueue {
     int countUnacknowledged(SourceSequence seq);
     
     /**
+     * @return the total number of unacknowledged messages in this queue
+     */
+    int countUnacknowledged();
+
+    /**
      * @return true if there are no unacknowledged messages in the queue
      */
     boolean isEmpty();

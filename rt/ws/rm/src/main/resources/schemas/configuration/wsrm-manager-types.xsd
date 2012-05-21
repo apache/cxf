@@ -42,6 +42,7 @@
         
        <xs:sequence>  
             <xs:element name="sequenceTerminationPolicy" type="tns:SequenceTerminationPolicyType" minOccurs="0"/>
+            <xs:element name="retryPolicy" type="tns:RetryPolicyType" minOccurs="0"/>
        </xs:sequence>
         
         <xs:attribute name="sequenceExpiration" type="xs:duration" use="optional" default="PT0S">
@@ -88,6 +89,7 @@
 
         <xs:sequence>  
             <xs:element name="acksPolicy" type="tns:AcksPolicyType" minOccurs="0"/>
+            <xs:element name="retryPolicy" type="tns:RetryPolicyType" minOccurs="0"/>
         </xs:sequence>
         
         <xs:attribute name="sequenceExpiration" type="xs:duration" use="optional" default="PT0S">
@@ -176,6 +178,17 @@
             </xs:annotation>
         </xs:attribute>
 
+    </xs:complexType>
+     
+    <xs:complexType name="RetryPolicyType">
+        <xs:attribute name="maxRetries" type="xs:int" use="optional" default="0">
+            <xs:annotation>
+                <xs:documentation>
+                    The maximum number of retries of a message.
+                    A value of 0 means the number is unbound.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute> 
     </xs:complexType>
     
     <xs:complexType name="DeliveryAssuranceType">

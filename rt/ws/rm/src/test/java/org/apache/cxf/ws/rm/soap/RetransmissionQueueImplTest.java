@@ -31,6 +31,8 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.SourceSequence;
+import org.apache.cxf.ws.rm.manager.RetryPolicyType;
+import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
@@ -127,7 +129,33 @@ public class RetransmissionQueueImplTest extends Assert {
         assertTrue(!candidate.getNext().before(refDate));
         refDate = new Date(now + 17000);
         assertTrue(!candidate.getNext().after(refDate));
-        assertTrue(!candidate.isPending());        
+        assertTrue(!candidate.isPending());
+    }
+
+    @Test
+    public void testResendCandidateMaxRetries() {
+        Message message = createMock(Message.class);
+        setupMessagePolicies(message);
+        setupRetryPolicy(message);
+        
+        ready(true);
+        RetransmissionQueueImpl.ResendCandidate candidate = queue.createResendCandidate(message);
+        
+        assertEquals(3, candidate.getMaxRetries());
+        Date next = null;
+        for (int i = 1; i < 3; i++) {
+            next = candidate.getNext();
+            candidate.attempted();
+            assertEquals(i, candidate.getRetries());
+            // the next time must advance
+            assertTrue(candidate.getNext().after(next));
+        }
+        next = candidate.getNext();
+        candidate.attempted();
+        // reaches the max retries
+        assertEquals(3, candidate.getRetries());
+        // the next time must not advance
+        assertFalse(candidate.getNext().after(next));
     }
     
     @Test
@@ -349,7 +377,15 @@ public class RetransmissionQueueImplTest extends Assert {
         EasyMock.expect(rma.getExponentialBackoff()).andReturn(eb);        
     }
     
+    private void setupRetryPolicy(Message message) {
 
+        SourcePolicyType spt = control.createMock(SourcePolicyType.class);
+        EasyMock.expect(manager.getSourcePolicy()).andReturn(spt).anyTimes();
+        RetryPolicyType rpt = control.createMock(RetryPolicyType.class);
+        EasyMock.expect(spt.getRetryPolicy()).andReturn(rpt);
+        EasyMock.expect(rpt.getMaxRetries()).andReturn(3);
+    }
+    
     private void ready(boolean doStart) {
         control.replay();
         if (doStart) {

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,6 +98,8 @@ public class RMEndpoint {
     private Servant servant;
     private long lastApplicationMessage;
     private long lastControlMessage;
+    private AtomicInteger applicationMessageCount;
+    private AtomicInteger controlMessageCount;
     private InstrumentationManager instrumentationManager;
     private ManagedRMEndpoint managedEndpoint;
     
@@ -116,6 +119,8 @@ public class RMEndpoint {
         servant = new Servant(this);
         services = new HashMap<ProtocolVariation, WrappedService>();
         endpoints = new HashMap<ProtocolVariation, Endpoint>();
+        applicationMessageCount = new AtomicInteger();
+        controlMessageCount = new AtomicInteger();
     }
 
     /**
@@ -204,10 +209,18 @@ public class RMEndpoint {
     }
 
     /**
+     * @return The number of times when last application message was received.
+     */
+    public int getApplicationMessageCount() {
+        return applicationMessageCount.get();
+    }
+
+    /**
      * Indicates that an application message has been received.
      */
     public void receivedApplicationMessage() {
         lastApplicationMessage = System.currentTimeMillis();
+        applicationMessageCount.incrementAndGet();
     }
 
     /**
@@ -218,10 +231,18 @@ public class RMEndpoint {
     }
 
     /**
+     * @return The number of times when RM protocol message was received.
+     */
+    public int getControlMessageCount() {
+        return controlMessageCount.get();
+    }
+
+    /**
      * Indicates that an RM protocol message has been received.
      */
     public void receivedControlMessage() {
         lastControlMessage = System.currentTimeMillis();
+        controlMessageCount.incrementAndGet();
     }
 
     /**
@@ -685,6 +706,22 @@ public class RMEndpoint {
         }
 
         // unregistering of this managed bean from the server is done by the bus itself
+    }
+
+    int getProcessingSourceSequenceCount() {
+        return source != null ? source.getProcessingSequenceCount() : 0;
+    }
+
+    int getCompletedSourceSequenceCount() {
+        return source != null ? source.getCompletedSequenceCount() : 0;
+    }
+
+    int getProcessingDestinationSequenceCount() {
+        return destination != null ? destination.getProcessingSequenceCount() : 0;
+    }
+
+    int getCompletedDestinationSequenceCount() {
+        return destination != null ? destination.getCompletedSequenceCount() : 0;
     }
 
     class EffectivePolicyImpl implements EffectivePolicy {

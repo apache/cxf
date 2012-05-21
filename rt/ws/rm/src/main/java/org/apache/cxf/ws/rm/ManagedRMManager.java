@@ -72,4 +72,15 @@ public class ManagedRMManager implements ManagedComponent {
     public boolean isUsingStore() {
         return manager.getStore() != null;
     }
+
+    @ManagedAttribute(description = "Total Number of Outbound Queued Messages", currencyTimeLimit = 10)
+    public int getQueuedMessagesOutboundCount() {
+        return manager.getRetransmissionQueue().countUnacknowledged();
+    }
+
+
+//    @ManagedAttribute(description = "Total Number of Inbound Queued Messages", currencyTimeLimit = 10)
+//    public int getQueuedMessagesInboundCount() {
+//        return manager.getRedeliveryQueue().countUndelivered();
+//    }
 }

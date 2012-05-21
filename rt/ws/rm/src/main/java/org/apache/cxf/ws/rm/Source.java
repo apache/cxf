@@ -64,20 +64,30 @@ public class Source extends AbstractEndpoint {
     
     public void addSequence(SourceSequence seq, boolean persist) {
         seq.setSource(this);
-        map.put(seq.getIdentifier().getValue(), seq);
+        synchronized (map) {
+            map.put(seq.getIdentifier().getValue(), seq);
+        }
         if (persist) {
             RMStore store = getReliableEndpoint().getManager().getStore();
             if (null != store) {
                 store.createSourceSequence(seq);
             }
         }
+        processingSequenceCount.incrementAndGet();
     }
     
-    public void removeSequence(SourceSequence seq) {        
-        map.remove(seq.getIdentifier().getValue());
+    public void removeSequence(SourceSequence seq) {
+        SourceSequence o;
+        synchronized (map) {
+            o = map.remove(seq.getIdentifier().getValue());
+        }
         RMStore store = getReliableEndpoint().getManager().getStore();
         if (null != store) {
             store.removeSourceSequence(seq.getIdentifier());
+        }
+        if (o != null) {
+            processingSequenceCount.decrementAndGet();
+            completedSequenceCount.incrementAndGet();
         }
     }
     

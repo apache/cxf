@@ -522,72 +522,81 @@ public class RMManager {
         RMEndpoint rme = createReliableEndpoint(endpoint);
         rme.initialise(conduit, null, null);
         reliableEndpoints.put(endpoint, rme);
-        SourceSequence css = null;
         for (SourceSequence ss : sss) {            
- 
-            Collection<RMMessage> ms = store.getMessages(ss.getIdentifier(), true);
-            if (null == ms || 0 == ms.size()) {
-                continue;
-            }
-            LOG.log(Level.FINE, "Number of messages in sequence: {0}", ms.size());
-            
-            rme.getSource().addSequence(ss, false);
-            // choosing an arbitrary valid source sequence as the current source sequence
-            if (css == null && !ss.isExpired() && !ss.isLastMessage()) {
-                css = ss;
-                rme.getSource().setCurrent(css);
-            }
-            for (RMMessage m : ms) {                
-                
-                Message message = new MessageImpl();
-                Exchange exchange = new ExchangeImpl();
-                message.setExchange(exchange);
-                if (null != conduit) {
-                    exchange.setConduit(conduit);
-                    message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
-                }
-                exchange.put(Endpoint.class, endpoint);
-                exchange.put(Service.class, endpoint.getService());
-                if (endpoint.getEndpointInfo().getService() != null) {
-                    exchange.put(ServiceInfo.class, endpoint.getEndpointInfo().getService());
-                    exchange.put(InterfaceInfo.class, endpoint.getEndpointInfo().getService().getInterface());
-                }
-                exchange.put(Binding.class, endpoint.getBinding());
-                exchange.put(BindingInfo.class, endpoint.getEndpointInfo().getBinding());
-                exchange.put(Bus.class, bus);
-                
-                SequenceType st = new SequenceType();
-                st.setIdentifier(ss.getIdentifier());
-                st.setMessageNumber(m.getMessageNumber());
-                RMProperties rmps = new RMProperties();
-                rmps.setSequence(st);
-                if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
-                    CloseSequenceType close = new CloseSequenceType();
-                    close.setIdentifier(ss.getIdentifier());
-                    rmps.setCloseSequence(close);
-                }
-                RMContextUtils.storeRMProperties(message, rmps, true);                
-                if (null == conduit) {
-                    String to = m.getTo();
-                    AddressingProperties maps = new AddressingPropertiesImpl();
-                    maps.setTo(RMUtils.createReference(to));
-                    RMContextUtils.storeMAPs(maps, message, true, false);
-                }
-                                    
-                message.put(RMMessageConstants.SAVED_CONTENT, m.getCachedOutputStream());
-                RMContextUtils.setProtocolVariation(message, ss.getProtocol());
-                
-                retransmissionQueue.addUnacknowledged(message);
-            }            
+            recoverSourceSequence(endpoint, conduit, rme.getSource(), ss);
         }
         
         for (DestinationSequence ds : dss) {
-            rme.getDestination().addSequence(ds, false);        
+            reconverDestinationSequence(endpoint, conduit, rme.getDestination(), ds);
         }
         retransmissionQueue.start();
         
     }
     
+    private void recoverSourceSequence(Endpoint endpoint, Conduit conduit, Source s, 
+                                       SourceSequence ss) {
+        Collection<RMMessage> ms = store.getMessages(ss.getIdentifier(), true);
+        if (null == ms || 0 == ms.size()) {
+            store.removeSourceSequence(ss.getIdentifier());
+            return;
+        }
+        LOG.log(Level.FINE, "Number of messages in sequence: {0}", ms.size());
+            
+        s.addSequence(ss, false);
+        // choosing an arbitrary valid source sequence as the current source sequence
+        if (s.getAssociatedSequence(null) == null && !ss.isExpired() && !ss.isLastMessage()) {
+            s.setCurrent(ss);
+        }
+        for (RMMessage m : ms) {                
+            
+            Message message = new MessageImpl();
+            Exchange exchange = new ExchangeImpl();
+            message.setExchange(exchange);
+            if (null != conduit) {
+                exchange.setConduit(conduit);
+                message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
+            }
+            exchange.put(Endpoint.class, endpoint);
+            exchange.put(Service.class, endpoint.getService());
+            if (endpoint.getEndpointInfo().getService() != null) {
+                exchange.put(ServiceInfo.class, endpoint.getEndpointInfo().getService());
+                exchange.put(InterfaceInfo.class, endpoint.getEndpointInfo().getService().getInterface());
+            }
+            exchange.put(Binding.class, endpoint.getBinding());
+            exchange.put(BindingInfo.class, endpoint.getEndpointInfo().getBinding());
+            exchange.put(Bus.class, bus);
+            
+            SequenceType st = new SequenceType();
+            st.setIdentifier(ss.getIdentifier());
+            st.setMessageNumber(m.getMessageNumber());
+            RMProperties rmps = new RMProperties();
+            rmps.setSequence(st);
+            if (ss.isLastMessage() && ss.getCurrentMessageNr() == m.getMessageNumber()) {
+                CloseSequenceType close = new CloseSequenceType();
+                close.setIdentifier(ss.getIdentifier());
+                rmps.setCloseSequence(close);
+            }
+            RMContextUtils.storeRMProperties(message, rmps, true);                
+            if (null == conduit) {
+                String to = m.getTo();
+                AddressingProperties maps = new AddressingPropertiesImpl();
+                maps.setTo(RMUtils.createReference(to));
+                RMContextUtils.storeMAPs(maps, message, true, false);
+            }
+                                    
+            message.put(RMMessageConstants.SAVED_CONTENT, m.getCachedOutputStream());
+            RMContextUtils.setProtocolVariation(message, ss.getProtocol());
+            
+            retransmissionQueue.addUnacknowledged(message);
+        }            
+    }
+
+    private void reconverDestinationSequence(Endpoint endpoint, Conduit conduit, Destination d, 
+                                             DestinationSequence ds) {
+        d.addSequence(ds, false);
+        //TODO add the redelivery code
+    }
+
     RMEndpoint createReliableEndpoint(Endpoint endpoint) {
         return new RMEndpoint(this, endpoint);
     }  

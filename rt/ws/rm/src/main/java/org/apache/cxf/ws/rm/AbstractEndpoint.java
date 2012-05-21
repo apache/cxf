@@ -19,16 +19,25 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 public class AbstractEndpoint {
     
+    /* the number of currently processing sequences */
+    protected AtomicInteger processingSequenceCount;
+    /* the number of completed sequences since last started */
+    protected AtomicInteger completedSequenceCount;
+    
     private final RMEndpoint reliableEndpoint;
     
     protected AbstractEndpoint(RMEndpoint rme) {
         reliableEndpoint = rme;
+        processingSequenceCount = new AtomicInteger();
+        completedSequenceCount = new AtomicInteger();
     }
     
     public String getName() {
@@ -63,6 +72,14 @@ public class AbstractEndpoint {
      */
     public Identifier generateSequenceIdentifier() {
         return reliableEndpoint.getManager().getIdGenerator().generateSequenceIdentifier();
+    }
+
+    int getProcessingSequenceCount() {
+        return processingSequenceCount.get();
+    }
+
+    int getCompletedSequenceCount() {
+        return completedSequenceCount.get();
     }
     
     private Bus getBus() {
