@@ -59,29 +59,34 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     Object bundleContext;
     boolean osgi = true;
     
+    public SpringBeanLocator(ApplicationContext ctx) {
+        this(ctx, null);
+    }
     public SpringBeanLocator(ApplicationContext ctx, Bus bus) {
         context = ctx;
-        orig = bus.getExtension(ConfiguredBeanLocator.class);
-        if (orig instanceof ExtensionManagerImpl) {
-            List<String> names = new ArrayList<String>();
-            for (String s : ctx.getBeanDefinitionNames()) {
-                ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
-                BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(s);
-                String cn =  def.getBeanClassName();
-                if (OldSpringSupport.class.getName().equals(cn)) {
-                    passThroughs.add(s);
-                    for (String s2 : ctx.getAliases(s)) {
-                        passThroughs.add(s2);
-                    }
-                } else {
-                    names.add(s);
-                    for (String s2 : ctx.getAliases(s)) {
-                        names.add(s2);
+        if (bus != null) {
+            orig = bus.getExtension(ConfiguredBeanLocator.class);
+            if (orig instanceof ExtensionManagerImpl) {
+                List<String> names = new ArrayList<String>();
+                for (String s : ctx.getBeanDefinitionNames()) {
+                    ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
+                    BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(s);
+                    String cn =  def.getBeanClassName();
+                    if (OldSpringSupport.class.getName().equals(cn)) {
+                        passThroughs.add(s);
+                        for (String s2 : ctx.getAliases(s)) {
+                            passThroughs.add(s2);
+                        }
+                    } else {
+                        names.add(s);
+                        for (String s2 : ctx.getAliases(s)) {
+                            names.add(s2);
+                        }
                     }
                 }
+                
+                ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
             }
-            
-            ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
         }
         
         loadOSGIContext(bus);
@@ -93,9 +98,11 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             //for the non-osgi cases
             Method m = context.getClass().getMethod("getBundleContext");
             bundleContext = m.invoke(context);
-            @SuppressWarnings("unchecked")
-            Class<Object> cls = (Class<Object>)m.getReturnType();
-            b.setExtension(bundleContext, cls);
+            if (b != null) {
+                @SuppressWarnings("unchecked")
+                Class<Object> cls = (Class<Object>)m.getReturnType();
+                b.setExtension(bundleContext, cls);
+            }
         } catch (Throwable t) {
             //ignore
             osgi = false;

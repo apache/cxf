@@ -46,6 +46,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
+import org.springframework.beans.factory.xml.NamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.PluggableSchemaResolver;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -65,7 +66,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusApplicationContext.class);
     
-    private DefaultNamespaceHandlerResolver nsHandlerResolver;
+    private NamespaceHandlerResolver nsHandlerResolver;
     private boolean includeDefaults;
     private String[] cfgFiles;
     private URL[] cfgFileURLs;
@@ -89,12 +90,17 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
     }
     
     public BusApplicationContext(URL url, boolean include, ApplicationContext parent) {
-        this(new URL[] {url}, include, parent);
+        this(new URL[] {url}, include, parent, null);
     } 
     public BusApplicationContext(String[] cf, boolean include, ApplicationContext parent) {
+        this(cf, include, parent, null);
+    }
+    public BusApplicationContext(String[] cf, boolean include, 
+                                 ApplicationContext parent, NamespaceHandlerResolver res) {
         super(new String[0], false, parent);
         cfgFiles = cf;
         includeDefaults = include;
+        nsHandlerResolver = res;
         try {
             AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
                 public Boolean run() throws Exception {
@@ -110,11 +116,17 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             throw new Fault(e);
         }
     }
-    
-    public BusApplicationContext(URL[] url, boolean include, ApplicationContext parent) {
+    public BusApplicationContext(URL[] url, boolean include,
+                                 ApplicationContext parent) {
+        this(url, include, parent, null);
+    }
+    public BusApplicationContext(URL[] url, boolean include,
+                                 ApplicationContext parent,
+                                 NamespaceHandlerResolver res) {
         super(new String[0], false, parent);
         cfgFileURLs = url;
         includeDefaults = include;
+        nsHandlerResolver = res;
         try {
             AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
                 public Boolean run() throws Exception {
@@ -297,6 +309,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             // Create a new XmlBeanDefinitionReader for the given BeanFactory.
         XmlBeanDefinitionReader beanDefinitionReader = 
             new ControlledValidationXmlBeanDefinitionReader(beanFactory);
+        beanDefinitionReader.setNamespaceHandlerResolver(nsHandlerResolver);
         
         // Configure the bean definition reader with this context's
         // resource loading environment.
