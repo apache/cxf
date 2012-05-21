@@ -35,10 +35,13 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 
 
 public class XPathUtils {
-    private XPath xpath;
+    
+    private static XPathFactory xpathFactory =  XPathFactory.newInstance();
 
+    private XPath xpath;
+    
     public XPathUtils() {
-        xpath = XPathFactory.newInstance().newXPath();
+        xpath = xpathFactory.newXPath();
     }
 
     public XPathUtils(final Map<String, String> ns) {
@@ -82,3 +85,4 @@ public class XPathUtils {
     }
 
 }
+
