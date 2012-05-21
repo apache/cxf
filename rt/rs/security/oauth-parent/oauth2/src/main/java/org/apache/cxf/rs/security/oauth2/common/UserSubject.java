@@ -21,14 +21,21 @@ package org.apache.cxf.rs.security.oauth2.common;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Represents a login name which AuthorizationService
  * may capture after the end user approved a given third party request
  */
+@XmlRootElement
 public class UserSubject {
     
     private String login;
     private List<String> roles = Collections.emptyList();
+    
+    public UserSubject() {
+        
+    }
     
     public UserSubject(String login) {
         this.login = login;
@@ -40,20 +47,37 @@ public class UserSubject {
     }
     
     /**
-     * Returns the user login name
+     * Return the user login name
      * @return the login name
      */
     public String getLogin() {
         return login;
     }
+    
+    /**
+     * Set the user login name
+     * @param login the login name
+     */
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
     /**
-     * Returns the optional list of user roles which may have 
+     * Return the optional list of user roles which may have 
      * been captured during the authentication process 
      * @return the list of roles
      */
     public List<String> getRoles() {
-        return Collections.unmodifiableList(roles);
+        return roles;
+    }
+    
+    /**
+     * Set the optional list of user roles which may have 
+     * been captured during the authentication process 
+     * @param roles the list of roles
+     */
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
     
 

@@ -16,15 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.rs.security.oauth2.services;
 
-package org.apache.cxf.rs.security.oauth2.provider;
-
-import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 
-public interface AccessTokenValidator {
-    List<String> getSupportedAuthorizationSchemes();
-    AccessTokenValidation validateAccessToken(String authScheme, String authSchemeData)
-        throws OAuthServiceException;
+@Path("validate")
+public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public AccessTokenValidation getTokenValidationInfo() {
+        return super.getAccessTokenValidation();
+    }
 }

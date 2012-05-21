@@ -79,7 +79,7 @@ public interface OAuthDataProvider {
 
     /**
      * Removes the token
-     * @param token the token
+     * @param accessToken the token
      * @throws OAuthServiceException
      */
     void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;

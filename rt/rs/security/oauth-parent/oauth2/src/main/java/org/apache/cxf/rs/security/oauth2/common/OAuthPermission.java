@@ -21,6 +21,8 @@ package org.apache.cxf.rs.security.oauth2.common;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Provides the complete information about a given opaque permission.
  * For example, a scope parameter such as "read_calendar" will be
@@ -28,9 +30,14 @@ import java.util.List;
  * the human readable description and optionally restrict it to
  * a limited set of HTTP verbs and request URIs
  */
+@XmlRootElement
 public class OAuthPermission extends Permission {
     private List<String> httpVerbs = Collections.emptyList();
     private List<String> uris = Collections.emptyList();
+    
+    public OAuthPermission() {
+        
+    }
     
     public OAuthPermission(String permission, String description) {
         super(permission, description);

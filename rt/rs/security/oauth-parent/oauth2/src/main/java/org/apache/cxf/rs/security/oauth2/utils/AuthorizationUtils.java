@@ -70,14 +70,18 @@ public final class AuthorizationUtils {
     }
     
     public static void throwAuthorizationFailure(Set<String> challenges) {
+        ResponseBuilder rb = Response.status(401);
+        
         StringBuilder sb = new StringBuilder();
         for (String challenge : challenges) {
+            if ("*".equals(challenge)) {
+                continue;
+            }
             if (sb.length() > 0) {
                 sb.append(",");
             }
             sb.append(challenge);
         }
-        ResponseBuilder rb = Response.status(401);
         if (sb.length() > 0) {
             rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
         }

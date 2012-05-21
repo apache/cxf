@@ -50,7 +50,8 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
         }
         String refreshToken = params.getFirst(OAuthConstants.REFRESH_TOKEN);
         
-        ServerAccessToken token = dataProvider.refreshAccessToken(client.getClientId(), refreshToken);
+        ServerAccessToken token = dataProvider.refreshAccessToken(client.getClientId(), 
+                                                                  refreshToken);
         if (token == null) {
             return null;
         }
