@@ -58,7 +58,7 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
         String scope = params.getFirst(OAuthConstants.SCOPE);
         if (scope != null) {
             List<String> tokenScopes = OAuthUtils.convertPermissionsToScopeList(token.getScopes());
-            if (tokenScopes.containsAll(OAuthUtils.parseScope(scope))) {            
+            if (!tokenScopes.containsAll(OAuthUtils.parseScope(scope))) {            
                 throw new OAuthServiceException(OAuthConstants.INVALID_SCOPE);
             }
         }
