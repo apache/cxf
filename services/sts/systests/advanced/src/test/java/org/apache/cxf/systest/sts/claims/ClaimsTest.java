@@ -92,6 +92,33 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml1WrongClaims() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleItWrongClaims.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1ClaimsPort");
+        DoubleItPortType transportClaimsPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportClaimsPort, PORT);
+        
+        try {
+            doubleIt(transportClaimsPort, 25);
+            fail("Expected Exception");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml1ClaimsWrongRole() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -136,6 +163,34 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         updateAddressPort(transportClaimsPort, PORT);
         
         doubleIt(transportClaimsPort, 25);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml2WrongClaims() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleItWrongClaims.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ClaimsPort");
+        DoubleItPortType transportClaimsPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportClaimsPort, PORT);
+        
+        try {
+            doubleIt(transportClaimsPort, 25);
+            fail("Expected Exception");
+        } catch (Exception ex) {
+            // expected
+        }
+        
         
         bus.shutdown(true);
     }

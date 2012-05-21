@@ -46,6 +46,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     
     private List<WSSecurityEngineResult> signedResults;
     private Message message;
+    private ClaimsPolicyValidator claimsValidator = new DefaultClaimsPolicyValidator();
 
     public IssuedTokenPolicyValidator(
         List<WSSecurityEngineResult> signedResults,
@@ -157,6 +158,12 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                         return false;
                     }
                 }
+            } else if ("Claims".equals(child.getLocalName())) {
+                String dialect = child.getAttributeNS(null, "Dialect");
+                if (claimsValidator.getDialect().equals(dialect)
+                    && !claimsValidator.validatePolicy(child, assertionWrapper)) {
+                    return false;
+                }
             }
             child = DOMUtils.getNextElement(child);
         }
@@ -180,5 +187,6 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         }
         return true;
     }
+    
    
 }

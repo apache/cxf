@@ -31,7 +31,9 @@ import org.opensaml.xml.XMLObject;
 
 /**
  * This class validates a SAML Assertion and checks that it has an "AuthenticatedRole" attribute
- * corresponding to "admin-user".
+ * corresponding to "admin-user". Note that it only throws an error if the role has the wrong
+ * value, not if the role doesn't exist. This is because the WS-SecurityPolicy validation will
+ * check to make sure that the correct defined Claims have been met in the token.
  */
 public class ClaimsValidator extends SamlAssertionValidator {
     
@@ -72,13 +74,13 @@ public class ClaimsValidator extends SamlAssertionValidator {
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();
-                    if ("admin-user".equals(text)) {
-                        return true;
+                    if (!"admin-user".equals(text)) {
+                        return false;
                     }
                 }
             }
         }
-        return false;
+        return true;
     }
     
     private boolean handleSAML2Assertion(
@@ -99,13 +101,13 @@ public class ClaimsValidator extends SamlAssertionValidator {
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();
-                    if ("admin-user".equals(text)) {
-                        return true;
+                    if (!"admin-user".equals(text)) {
+                        return false;
                     }
                 }
             }
         }
-        return false;
+        return true;
     }
 
 }
