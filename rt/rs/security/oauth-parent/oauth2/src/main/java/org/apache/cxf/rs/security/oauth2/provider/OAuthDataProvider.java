@@ -59,10 +59,10 @@ public interface OAuthDataProvider {
     ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException;
     
     /**
-     * TODO: Consider introducing a dedicated entity representing a user pre authorization
      * Get preauthorized access token 
-     * @param accessToken the token key 
-     * @return AccessToken
+     * @param client Client
+     * @param subject End User subject 
+     * @return AccessToken access token
      * @throws OAuthServiceException
      */
     ServerAccessToken getPreauthorizedToken(Client client, UserSubject subject, String grantType) 
@@ -71,7 +71,7 @@ public interface OAuthDataProvider {
     /**
      * Refresh access token 
      * @param clientId the client id
-     * @param refreshToken the token key 
+     * @param refreshToken refresh token key 
      * @return AccessToken
      * @throws OAuthServiceException
      */

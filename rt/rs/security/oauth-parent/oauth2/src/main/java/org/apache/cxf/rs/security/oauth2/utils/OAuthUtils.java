@@ -50,6 +50,14 @@ public final class OAuthUtils {
         return sb.toString();
     }
     
+    public static List<String> convertPermissionsToScopeList(List<OAuthPermission> perms) {
+        List<String> list = new LinkedList<String>();
+        for (OAuthPermission perm : perms) {
+            list.add(perm.getPermission());
+        }
+        return list;
+    }
+    
     public static boolean isGrantSupportedForClient(Client client, 
                                                     boolean isConfidential, 
                                                     String grantType) {
