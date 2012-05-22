@@ -248,6 +248,9 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             authnRequestBuilder.createAuthnRequest(
                 m, getIssuerId(m), getAbsoluteAssertionServiceAddress(m)
             );
+        if (isSignRequest()) {
+            signAuthnRequest(authnRequest);
+        }
         Element authnRequestElement = OpenSAMLUtil.toDom(authnRequest, doc);
         String authnRequestEncoded = deflateEncodeAuthnRequest(authnRequestElement);
         
@@ -273,6 +276,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         
         return info;
     }
+    
+    protected abstract void signAuthnRequest(AuthnRequest authnRequest) throws Exception;
     
     private String getAbsoluteAssertionServiceAddress(Message m) {
         if (assertionConsumerServiceAddress == null) {    

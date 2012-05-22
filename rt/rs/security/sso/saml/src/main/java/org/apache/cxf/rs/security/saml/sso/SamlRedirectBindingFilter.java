@@ -35,6 +35,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.util.Base64;
+import org.opensaml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     
@@ -70,6 +71,10 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                 throw new WebApplicationException(ex);
             }
         }
+    }
+    
+    protected void signAuthnRequest(AuthnRequest authnRequest) throws Exception {
+        // Do nothing as we sign the request in a different way for the redirect binding
     }
     
     /**

@@ -27,9 +27,12 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rs.security.saml.sso.state.SPStateManager;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -150,8 +153,13 @@ public class AbstractSSOSpHandler {
             properties = (Properties)o;
         } else if (o instanceof String) {
             URL url = null;
+            Bus bus = PhaseInterceptorChain.getCurrentMessage().getExchange().getBus();
+            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            url = rm.resolveResource((String)o, URL.class);
             try {
-                url = ClassLoaderUtils.getResource((String)o, AbstractSSOSpHandler.class);
+                if (url == null) {
+                    url = ClassLoaderUtils.getResource((String)o, AbstractSSOSpHandler.class);
+                }
                 if (url == null) {
                     url = new URL((String)o);
                 }
