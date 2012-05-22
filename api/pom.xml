@@ -51,7 +51,7 @@
             com.sun.xml.internal.bind.api.impl;resolution:=optional,
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
-            org.apache.cxf.bus
+            org.apache.cxf.bus,org.apache.cxf.*
         </cxf.osgi.dynamic.import>
     </properties>
 
