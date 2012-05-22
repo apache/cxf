@@ -55,6 +55,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
@@ -89,6 +90,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
     public static class Server extends AbstractBusTestServerBase {        
 
         protected void run() {
+            setBus(BusFactory.getDefaultBus());
             Object implementor = new GreeterImpl();
             String address = "http://localhost:"
                 + TestUtil.getPortNumber(DispatchClientServerTest.class)
@@ -103,6 +105,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             
             ep.setProperties(properties);
             ep.publish(address);
+            BusFactory.setDefaultBus(null);
+            BusFactory.setThreadDefaultBus(null);
         }
 
         public static void main(String[] args) {
@@ -120,7 +124,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus();
     }
     
     @org.junit.Before
@@ -586,7 +591,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         
         this.configFileName = "org/apache/cxf/systest/dispatch/client-config.xml";
         SpringBusFactory bf = (SpringBusFactory)SpringBusFactory.newInstance();
-        bus = bf.createBus(configFileName, false);
+        Bus bus = bf.createBus(configFileName, false);
         
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);

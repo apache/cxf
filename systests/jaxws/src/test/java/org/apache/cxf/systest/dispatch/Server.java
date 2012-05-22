@@ -22,6 +22,7 @@ package org.apache.cxf.systest.dispatch;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_xml_http.wrapped.GreeterImpl;
@@ -30,6 +31,7 @@ import org.apache.hello_world_xml_http.wrapped.GreeterImpl;
 public class Server extends AbstractBusTestServerBase {        
 
     protected void run() {
+        setBus(BusFactory.getDefaultBus());
         Object implementor = new GreeterImpl();
         String address = "http://localhost:"
             + TestUtil.getPortNumber(DispatchXMLClientServerTest.class)

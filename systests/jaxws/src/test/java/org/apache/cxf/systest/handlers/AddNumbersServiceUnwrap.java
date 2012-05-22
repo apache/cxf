@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.handlers;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -31,22 +30,12 @@ import javax.xml.ws.WebServiceFeature;
                   targetNamespace = "http://apache.org/handlers") 
 public class AddNumbersServiceUnwrap extends Service {
 
-    public static final URL WSDL_LOCATION;
+    public static final URL WSDL_LOCATION = null;
     public static final QName SERVICE = new QName("http://apache.org/handlers",
                                                   "AddNumbersService");
     public static final QName ADD_NUMBERS_PORT = new QName("http://apache.org/handlers",
                                                          "AddNumbersPort");
-    static {
-        URL url = null;
-        try {
-            url = new URL("/wsdl/addNumbers.wsdl");
-        } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl "
-                               + "from file:testutils/src/main/resources/wsdl/addNumbers.wsdl");
-            // e.printStackTrace();
-        }
-        WSDL_LOCATION = url;
-    }
+
 
     public AddNumbersServiceUnwrap(URL wsdlLocation) {
         super(wsdlLocation, SERVICE);

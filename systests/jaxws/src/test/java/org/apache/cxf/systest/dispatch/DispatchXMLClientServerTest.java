@@ -54,7 +54,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
     private static String port = TestUtil.getPortNumber(DispatchXMLClientServerTest.class);
     @BeforeClass
     public static void startServers() throws Exception {
-        
+        createStaticBus();
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
 
