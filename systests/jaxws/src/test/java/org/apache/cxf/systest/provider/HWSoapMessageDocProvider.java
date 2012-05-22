@@ -88,7 +88,6 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         try {
             body = request.getSOAPBody();
         } catch (SOAPException e) {
-            e.printStackTrace();
             return null;
         }
         Node n = body.getFirstChild();
@@ -101,7 +100,6 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
             Element el = DOMUtils.getFirstElement(n);
             String v = DOMUtils.getContent(el);
-            System.out.println(v);
             if (v.contains("Return sayHi")) {
                 response = sayHiResponse;
             } else if (v.contains("throwFault")) {
