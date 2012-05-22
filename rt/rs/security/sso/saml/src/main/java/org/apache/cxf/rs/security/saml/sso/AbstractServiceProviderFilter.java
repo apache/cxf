@@ -68,10 +68,12 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     private String idpServiceAddress;
     private String issuerId;
     private String assertionConsumerServiceAddress;
-    private String webAppDomain;
     private AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
     private boolean signRequest;
     private String signatureUsername;
+    
+    private String webAppDomain;
+    private boolean addWebAppContext = true;
     private boolean addEndpointAddressToContext;
     
     public void setAddEndpointAddressToContext(boolean add) {
@@ -305,11 +307,15 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
     }
 
     private String getWebAppContext(Message m) {
-        if (addEndpointAddressToContext) {
-            return new UriInfoImpl(m).getBaseUri().getRawPath();
+        if (addWebAppContext) {
+            if (addEndpointAddressToContext) {
+                return new UriInfoImpl(m).getBaseUri().getRawPath();
+            } else {
+                String httpBasePath = (String)m.get("http.base.path");
+                return URI.create(httpBasePath).getRawPath();
+            }
         } else {
-            String httpBasePath = (String)m.get("http.base.path");
-            return URI.create(httpBasePath).getRawPath();
+            return "/";
         }
     }
     
@@ -319,6 +325,10 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
 
     public void setWebAppDomain(String webAppDomain) {
         this.webAppDomain = webAppDomain;
+    }
+
+    public void setAddWebAppContext(boolean addWebAppContext) {
+        this.addWebAppContext = addWebAppContext;
     }
         
 }
