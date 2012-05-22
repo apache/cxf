@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<xsd:schema xmlns="http://cxf.apache.org/clustering"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:tns="http://cxf.apache.org/clustering"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="http://cxf.apache.org/clustering" 
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"  >
+
+ <xsd:complexType name="identifiedType" abstract="true">
+    <xsd:attribute name="id" type="xsd:ID"/>
+  </xsd:complexType>
+  
+  <xsd:element name="failover">
+    <xsd:annotation>
+      <xsd:documentation>Configures the failover feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="tns:identifiedType">
+          <xsd:all>
+            <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the strategy that the failover feature will be used. The Strategy object instance need to be implemented the org.apache.cxf.clustering.FailoverStrategy.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="targetSelector" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the targetSelector which will be used in the failover feature.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:all>
+        </xsd:extension>   
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+  
+  <xsd:element name="loadDistributor">
+    <xsd:annotation>
+      <xsd:documentation>Configures the loadDistributor feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:complexContent>
+        <xsd:extension base="tns:identifiedType">
+          <xsd:all>
+            <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the strategy that the loadDistributor feature will be used. The Strategy object instance need to be implemented the org.apache.cxf.clustering.FailoverStrategy.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="targetSelector" type="xsd:anyType" minOccurs="0">
+              <xsd:annotation>
+                <xsd:documentation>Configures the the targetSelector which will be used in the loadDistributor feature.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:all>   
+        </xsd:extension>
+      </xsd:complexContent>
+    </xsd:complexType>
+  </xsd:element>
+ 
+</xsd:schema>

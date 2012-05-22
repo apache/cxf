@@ -19,3 +19,4 @@
 #
 #
 http\://cxf.apache.org/schemas/core.xsd=schemas/core.xsd
+http\://cxf.apache.org/schemas/clustering.xsd=schemas/clustering.xsd
