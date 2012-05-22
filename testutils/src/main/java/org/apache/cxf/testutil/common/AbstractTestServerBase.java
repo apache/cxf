@@ -118,6 +118,9 @@ public abstract class AbstractTestServerBase extends Assert {
         return true;
     }
     
+    protected static int allocatePortAsInt(Class<?> cls) {
+        return Integer.parseInt(TestUtil.getPortNumber(cls));
+    }
     protected static String allocatePort(Class<?> cls) {
         return TestUtil.getPortNumber(cls);
     }
