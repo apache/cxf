@@ -25,7 +25,9 @@
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
-  <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+ <xsd:complexType name="identifiedType" abstract="true">
+    <xsd:attribute name="id" type="xs:ID"/>
+  </xsd:complexType>
   
   <xsd:element name="failover">
     <xsd:annotation>
@@ -33,7 +35,7 @@
     </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
-        <xsd:extension base="beans:identifiedType">
+        <xsd:extension base="tns:identifiedType">
           <xsd:all>
             <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
@@ -56,7 +58,7 @@
     </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
-        <xsd:extension base="beans:identifiedType">
+        <xsd:extension base="tns:identifiedType">
           <xsd:all>
             <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
