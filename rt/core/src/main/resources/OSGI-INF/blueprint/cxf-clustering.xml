@@ -24,7 +24,7 @@
 
   <service interface="org.apache.aries.blueprint.NamespaceHandler">
     <service-properties>
-      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/blueprint/clustering"/>
+      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/clustering"/>
     </service-properties>
     <bean class="org.apache.cxf.clustering.blueprint.ClusteringBPNamespaceHandler"/>
   </service>
