@@ -19,14 +19,14 @@
 -->
 <xsd:schema xmlns="http://cxf.apache.org/clustering"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:tns="http://cxf.apache.org/clustering"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="http://cxf.apache.org/clustering" 
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
  <xsd:complexType name="identifiedType" abstract="true">
-    <xsd:attribute name="id" type="xs:ID"/>
+    <xsd:attribute name="id" type="xsd:ID"/>
   </xsd:complexType>
   
   <xsd:element name="failover">
@@ -47,7 +47,8 @@
                 <xsd:documentation>Configures the targetSelector which will be used in the failover feature.</xsd:documentation>
               </xsd:annotation>
             </xsd:element>
-         </xsd:all>   
+          </xsd:all>
+        </xsd:extension>   
       </xsd:complexContent>
     </xsd:complexType>
   </xsd:element>
