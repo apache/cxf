@@ -87,6 +87,9 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
                     processAlternative(iterator.next(), issuedToken);
                     break; // since there should be only one alternative ..
                 }                
+            } else if (SPConstants.ISSUER_NAME.equals(ln)) {
+                String issuerName = child.getNodeValue();
+                issuedToken.setIssuerName(issuerName);
             }
             
             child = DOMUtils.getNextElement(child);
