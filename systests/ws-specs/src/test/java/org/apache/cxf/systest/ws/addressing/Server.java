@@ -37,6 +37,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
 
     private String verified;
     private String address;
+    private Endpoint ep;
     private Class<?> cls;
  
     public Server(String[] args) throws Exception {
@@ -55,10 +56,15 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
         try {
             AbstractGreeterImpl implementor = (AbstractGreeterImpl)cls.newInstance();
             implementor.verificationCache = this;
-            Endpoint.publish(address, implementor);
+            ep = Endpoint.publish(address, implementor);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+     
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
 
     protected void addVerifiers() {

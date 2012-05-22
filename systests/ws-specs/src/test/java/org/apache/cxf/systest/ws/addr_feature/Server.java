@@ -21,21 +21,27 @@ package org.apache.cxf.systest.ws.addr_feature;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
-
-    protected void run()  {    
+    EndpointImpl ep;
+    protected void run()  { 
+        setBus(BusFactory.getDefaultBus());
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/jaxws/add";
         //Endpoint.publish(address, implementor);
 
-        EndpointImpl ep = (EndpointImpl) Endpoint.create(implementor);
+        ep = (EndpointImpl) Endpoint.create(implementor);
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
+    }
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
 
     public static void main(String[] args) {

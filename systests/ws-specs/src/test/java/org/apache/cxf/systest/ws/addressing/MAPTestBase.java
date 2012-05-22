@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.ws.addressing;
 
 
+import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.HashMap;
@@ -64,7 +65,6 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PRO
  * Tests the addition of WS-Addressing Message Addressing Properties.
  */
 public abstract class MAPTestBase extends AbstractClientServerTestBase implements VerificationCache {
-    protected static final String PORT = allocatePort(MAPTestBase.class);
     protected static final String DECOUPLE_PORT = allocatePort(MAPTestBase.class, 1);
     
     protected static Bus staticBus;
@@ -92,7 +92,13 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     @AfterClass
     public static void shutdownBus() throws Exception {
         staticBus.shutdown(true);
+        staticBus = null;
+        messageIDs.clear();
+        mapVerifier = null;
+        headerVerifier = null;
     }
+    
+    public abstract String getPort();
     
     private void addInterceptors(List<Interceptor<? extends Message>> chain,
                                  Interceptor<? extends Message>[] interceptors) {
@@ -148,7 +154,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         ServiceImpl serviceImpl = 
             ServiceDelegateAccessor.get(new SOAPService(getWSDLURL(), SERVICE_NAME));
         Greeter g = serviceImpl.getPort(target, Greeter.class);
-        updateAddressPort(g, PORT);
+        updateAddressPort(g, getPort());
         return g;
     }
     
@@ -159,7 +165,12 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         removeInterceptors(staticBus.getOutInterceptors(), interceptors);
         removeInterceptors(staticBus.getOutFaultInterceptors(), interceptors);
         removeInterceptors(staticBus.getInFaultInterceptors(), interceptors);
-        
+
+        if (greeter instanceof Closeable) {
+            ((Closeable)greeter).close();
+        }
+        greeter = null;
+
         mapVerifier = null;
         headerVerifier = null;
         verified = null;

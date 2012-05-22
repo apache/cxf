@@ -30,6 +30,7 @@ import org.junit.Test;
  * in the non-decoupled case.
  */
 public class NonDecoupledTest extends MAPTestBase {
+    static final String PORT = allocatePort(NonDecoupledTest.class);
     static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     private static final String CONFIG =
@@ -37,6 +38,10 @@ public class NonDecoupledTest extends MAPTestBase {
 
     public String getConfigFileName() {
         return CONFIG;
+    }
+    
+    public String getPort() {
+        return PORT;
     }
     
     @BeforeClass

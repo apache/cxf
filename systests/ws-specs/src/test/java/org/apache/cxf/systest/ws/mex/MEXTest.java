@@ -37,12 +37,14 @@ public class MEXTest extends AbstractWSATestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus();
     }
 
     @Test
     public void testGet() {
         // Create the client
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
+        proxyFac.setBus(getStaticBus());
         proxyFac.setAddress("http://localhost:" + PORT + "/jaxws/addmex");
         proxyFac.getFeatures().add(new LoggingFeature());
         MetadataExchange exc = proxyFac.create(MetadataExchange.class);

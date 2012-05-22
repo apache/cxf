@@ -37,7 +37,8 @@ import org.junit.Test;
  * in the non-decoupled case.
  */
 public class NonDecoupledJMSTest extends MAPTestBase {
-    private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0001?"
+    static final String PORT = allocatePort(NonDecoupledJMSTest.class);
+    private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0002?"
         + "jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:" 
         + EmbeddedJMSBrokerLauncher.PORT;
@@ -49,7 +50,10 @@ public class NonDecoupledJMSTest extends MAPTestBase {
     public String getConfigFileName() {
         return CONFIG;
     }
-    
+    public String getPort() {
+        return PORT;
+    }
+
     @Test
     @Override
     public void testImplicitMAPs() throws Exception {

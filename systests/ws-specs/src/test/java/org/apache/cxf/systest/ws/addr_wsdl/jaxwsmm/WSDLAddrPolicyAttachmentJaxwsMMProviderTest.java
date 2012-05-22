@@ -60,7 +60,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/addr_wsdl/jaxwsmm/server.xml");
-
+            setBus(bus);
             JaxWsServerFactoryBean serviceFactory = new JaxWsServerFactoryBean();
             serviceFactory.setBus(bus);
             serviceFactory.setServiceClass(MessageProviderWithAddressingPolicy.class);
@@ -114,7 +114,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
     public void testUsingAddressing() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
 
-        bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy-old.xml");
+        Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy-old.xml");
 
         BusFactory.setDefaultBus(bus);
 
@@ -129,5 +129,6 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
         // oneway
         am.deliver("This is a test");
         am.deliver("This is another test");
+        bus.shutdown(true);
     }
 }
