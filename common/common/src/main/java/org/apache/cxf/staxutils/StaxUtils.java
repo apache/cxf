@@ -143,6 +143,13 @@ public final class StaxUtils {
     
     private StaxUtils() {
     }
+    
+    public static void setInnerElementLevelThreshold(int i) {
+        innerElementLevelThreshold = i;
+    }
+    public static void setInnerElementCountThreshold(int i) {
+        innerElementCountThreshold = i;
+    }
 
     /**
      * CXF works with multiple STaX parsers. When we can't find any other way to work 
