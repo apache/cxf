@@ -34,6 +34,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.factory_pattern.IsEvenResponse;
 import org.apache.cxf.factory_pattern.Number;
 import org.apache.cxf.factory_pattern.NumberFactory;
@@ -54,10 +55,15 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
     static final String FACTORY_ADDRESS = NumberFactoryImpl.FACTORY_ADDRESS;
     
     public static class Server extends AbstractBusTestServerBase {        
-
+        Endpoint ep;
         protected void run() {
-            Object implementor = new HttpNumberFactoryImpl();
-            Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);
+            setBus(BusFactory.getDefaultBus());
+            Object implementor = new HttpNumberFactoryImpl(getBus());
+            ep = Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
 
         public static void main(String[] args) {

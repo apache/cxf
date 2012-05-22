@@ -28,33 +28,22 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.ConnectionType;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class BusShutdownTest extends Assert {
     public static final String PORT = TestUtil.getPortNumber(BusShutdownTest.class);
-
-    
-    @BeforeClass
-    public static void setKeepAliveProperty() {
-        TestUtilities.setKeepAliveSystemProperty(false);
-    }
-    
-    @AfterClass
-    public static void cleanKeepAliveProperty() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
-    
-    
     
     @Test
     public void testStartWorkShutdownWork() throws Exception {
@@ -84,10 +73,11 @@ public class BusShutdownTest extends Assert {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus();
         SpringBusFactory.setDefaultBus(bus);
-        createService(address);
+        Endpoint ep = createService(address);
         doWork(wsdlUrl, address);
         // this should revert the JVM to its original state pending gc
-        bus.shutdown(false);
+        ep.stop();
+        bus.shutdown(true);
     }
 
     private void doWork(URL wsdlUrl, String address) {
@@ -100,13 +90,17 @@ public class BusShutdownTest extends Assert {
         BindingProvider bp = (BindingProvider)handler;    
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    address);
-        // invoke twoway call
-        greeter.sayHi();
+        Client client = ClientProxy.getClient(greeter);
+        HTTPConduit c = (HTTPConduit)client.getConduit();
+        c.setClient(new HTTPClientPolicy());
+        c.getClient().setConnection(ConnectionType.CLOSE);
         
+        // invoke twoway call
+        greeter.sayHi();        
     }
 
-    private void createService(String address) {        
+    private Endpoint createService(String address) {        
         Object impl = new GreeterImpl();
-        Endpoint.publish(address, impl);
+        return Endpoint.publish(address, impl);
     }
 }

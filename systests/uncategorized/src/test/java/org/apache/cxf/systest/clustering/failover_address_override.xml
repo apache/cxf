@@ -22,10 +22,12 @@
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xmlns:clustering="http://cxf.apache.org/clustering"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
        xsi:schemaLocation="
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/clustering http://cxf.apache.org/schemas/clustering.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
@@ -89,5 +91,7 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
             </clustering:failover>
         </jaxws:features>
     </jaxws:client>
-    
+    <http:conduit name="http://localhost:.*">
+        <http:client Connection="close"/>
+    </http:conduit>
 </beans>

@@ -22,16 +22,23 @@ package org.apache.cxf.systest.callback;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
 
+    Endpoint ep;
+    
     protected void run() {
+        setBus(BusFactory.getDefaultBus());
         Object implementor = new ServerImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
-        
+        ep = Endpoint.publish(address, implementor);
+    }
+    public void tearDown() {
+        ep.stop();
+        ep = null;
     }
 
     public static void main(String[] args) {

@@ -123,6 +123,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         targets = null;
         if (bus != null) {
             bus.shutdown(true);
+            bus = null;
         }
     }
 
@@ -162,6 +163,9 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             // java.net.ConnectionException on the unavailable 
             // replica A
             //
+            if (!(cause instanceof ConnectException)) {
+                cause.printStackTrace();
+            }
             assertTrue("should revert to original exception when no failover: " 
                        + cause,
                        cause instanceof ConnectException);

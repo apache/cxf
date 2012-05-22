@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -35,6 +35,10 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class ManualNumberFactoryImpl extends NumberFactoryImpl {
 
+    public ManualNumberFactoryImpl(Bus b) {
+        super(b);
+    }
+    
     public W3CEndpointReference create(String id) {
         manageNumberServantInitialisation();
         
@@ -51,7 +55,7 @@ public class ManualNumberFactoryImpl extends NumberFactoryImpl {
         String wsdlLocation = "testutils/factory_pattern.wsdl";
         String bindingId = null;
         EndpointImpl ep = 
-            new EndpointImpl(BusFactory.getDefaultBus(), servant, bindingId, wsdlLocation);
+            new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(NUMBER_SERVANT_ADDRESS_ROOT);
         templateEpr = ep.getServer().getDestination().getAddress();

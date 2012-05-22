@@ -40,7 +40,7 @@ public class GreeterImpl implements Greeter {
      */
     public String sayHi() {
         LOG.info("Executing operation sayHi");
-        System.out.println("Executing operation sayHi\n");
+        //System.out.println("Executing operation sayHi\n");
         return "Bonjour";
     }
     
@@ -49,7 +49,7 @@ public class GreeterImpl implements Greeter {
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
         LOG.info("Executing operation pingMe, throwing PingMeFault exception");
-        System.out.println("Executing operation pingMe, throwing PingMeFault exception\n");
+        //System.out.println("Executing operation pingMe, throwing PingMeFault exception\n");
         throw new PingMeFault("PingMeFault raised by server", faultDetail);        
     }
 }

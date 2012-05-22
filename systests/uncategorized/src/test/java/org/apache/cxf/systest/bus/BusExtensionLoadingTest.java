@@ -57,6 +57,7 @@ public class BusExtensionLoadingTest extends Assert {
             };
             Bus bus = factory.createBus();
             assertNotNullExtensions(bus);
+            bus.shutdown(true);
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
@@ -72,6 +73,7 @@ public class BusExtensionLoadingTest extends Assert {
         BusFactory factory = new CXFBusFactory();
         Bus bus = factory.createBus();
         assertNotNullExtensions(bus);
+        bus.shutdown(true);
     }
 
 

@@ -37,7 +37,7 @@ public class XMLClientTypeTest extends AbstractTypeTestClient5 {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        boolean ok = launchServer(XMLServerImpl.class); 
+        boolean ok = launchServer(XMLServerImpl.class, true); 
         assertTrue("failed to launch server", ok);
         initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
     }  

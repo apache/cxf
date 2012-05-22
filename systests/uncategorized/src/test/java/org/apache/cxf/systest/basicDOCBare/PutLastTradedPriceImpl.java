@@ -38,8 +38,8 @@ public class PutLastTradedPriceImpl implements PutLastTradedPricePortType {
         inout.value.setTickerSymbol("APACHE");
     }   
     public void putLastTradedPrice(TradePriceData body) {
-        System.out.println("-----TradePriceData TickerPrice : ----- " + body.getTickerPrice());
-        System.out.println("-----TradePriceData TickerSymbol : ----- " + body.getTickerSymbol());
+        //System.out.println("-----TradePriceData TickerPrice : ----- " + body.getTickerPrice());
+        //System.out.println("-----TradePriceData TickerSymbol : ----- " + body.getTickerSymbol());
 
     }
     

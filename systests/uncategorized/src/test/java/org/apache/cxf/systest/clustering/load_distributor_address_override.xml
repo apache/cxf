@@ -21,10 +21,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jaxws="http://cxf.apache.org/jaxws"
        xmlns:clustering="http://cxf.apache.org/clustering"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/clustering http://cxf.apache.org/schemas/clustering.xsd
+http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
@@ -91,5 +93,7 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
             </clustering:loadDistributor>
         </jaxws:features>
     </jaxws:client>
-    
+    <http:conduit name="http://localhost:.*">
+        <http:client Connection="close"/>
+    </http:conduit>
 </beans>

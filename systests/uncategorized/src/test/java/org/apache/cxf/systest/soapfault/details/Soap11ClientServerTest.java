@@ -39,7 +39,7 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(Server11.class, false));
+                   launchServer(Server11.class, true));
     }
     
     @Test

@@ -50,7 +50,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        boolean ok = launchServer(SOAPDocLitServerImpl.class);
+        boolean ok = launchServer(SOAPDocLitServerImpl.class, true);
         assertTrue("failed to launch server", ok);
         initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
     }
