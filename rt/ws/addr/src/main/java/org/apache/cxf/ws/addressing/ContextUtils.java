@@ -465,35 +465,34 @@ public final class ContextUtils {
                         if (in != null) {
                             in.cacheInput();
                         }
-                        
-                        if (!robust) {
-                            // async service invocation required *after* a response
-                            // has been sent (i.e. to a oneway, or a partial response
-                            // to a decoupled twoway)
+                        try {
+                            if (!robust) {
+                                // async service invocation required *after* a response
+                                // has been sent (i.e. to a oneway, or a partial response
+                                // to a decoupled twoway)
                         
         
-                            // pause dispatch on current thread ...
-                            inMessage.getInterceptorChain().pause();
+                                // pause dispatch on current thread ...
+                                inMessage.getInterceptorChain().pause();
 
 
-                            try {
                                 // ... and resume on executor thread
                                 getExecutor(inMessage).execute(new Runnable() {
-                                        public void run() {
-                                            inMessage.getInterceptorChain().resume();
-                                        }
-                                    });
-                            } catch (RejectedExecutionException e) {
-                                LOG.warning(
-                                            "Executor queue is full, use the caller thread." 
-                                            + "  Users can specify a larger executor queue to avoid this.");
-                                // only block the thread if the prop is unset or set to false, otherwise let it go
-                                if (!MessageUtils.isTrue(
-                                    inMessage.getContextualProperty(
-                                        "org.apache.cxf.oneway.rejected_execution_exception"))) {
-                                    //the executor queue is full, so run the task in the caller thread
-                                    inMessage.getInterceptorChain().resume();
-                                }
+                                    public void run() {
+                                        inMessage.getInterceptorChain().resume();
+                                    }
+                                });
+                            } 
+                        } catch (RejectedExecutionException e) {
+                            LOG.warning(
+                                        "Executor queue is full, use the caller thread." 
+                                        + "  Users can specify a larger executor queue to avoid this.");
+                            // only block the thread if the prop is unset or set to false, otherwise let it go
+                            if (!MessageUtils.isTrue(
+                                inMessage.getContextualProperty(
+                                    "org.apache.cxf.oneway.rejected_execution_exception"))) {
+                                //the executor queue is full, so run the task in the caller thread
+                                inMessage.getInterceptorChain().resume();
                             }
                         }
                     }
