@@ -71,7 +71,7 @@ http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean id="webClient" class="org.apache.cxf.jaxrs.client.WebClient"
 factory-method="create">
-        <constructor-arg type="java.lang.String" value="http://localhost:${testutil.ports.AbstractSpringServer}/root/feeds" />
+        <constructor-arg type="java.lang.String" value="http://localhost:${testutil.ports.SpringServer}/root/feeds" />
         <constructor-arg ref="feedProvider" />
     </bean> 
 
@@ -82,7 +82,7 @@ factory-method="create">
 			value="
 			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource2:ALL,
 			namedLogger:WARN" />
-		<property name="url" value="http://localhost:${testutil.ports.AbstractSpringServer}/batch/feeds"/>	
+		<property name="url" value="http://localhost:${testutil.ports.SpringServer}/batch/feeds"/>	
 	</bean>
 
     <bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
@@ -103,7 +103,7 @@ factory-method="create">
 
     <bean id="webClient3" class="org.apache.cxf.jaxrs.client.WebClient"
 factory-method="create">
-        <constructor-arg type="java.lang.String" value="http://localhost:${testutil.ports.AbstractSpringServer}/entries/entries" />
+        <constructor-arg type="java.lang.String" value="http://localhost:${testutil.ports.SpringServer}/entries/entries" />
         <constructor-arg ref="entryProvider" />
     </bean> 
 
@@ -116,7 +116,7 @@ factory-method="create">
 			value="
 			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource4:ALL,
 			namedLogger:WARN" />
-		<property name="url" value="http://localhost:${testutil.ports.AbstractSpringServer}/entriesMany/entries"/>
+		<property name="url" value="http://localhost:${testutil.ports.SpringServer}/entriesMany/entries"/>
 	</bean>
 
     <bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
@@ -127,7 +127,7 @@ factory-method="create">
 			value="
 			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource5:ALL,
 			namedLogger:WARN" />
-		<property name="url" value="http://localhost:${testutil.ports.AbstractSpringServer}/extensions/feeds"/>
+		<property name="url" value="http://localhost:${testutil.ports.SpringServer}/extensions/feeds"/>
 	</bean>
 
     <util:list id="feedProvider">
@@ -153,7 +153,7 @@ factory-method="create">
 	<bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 
-		<property name="url" value="http://localhost:${testutil.ports.AbstractSpringServer}/feed" />
+		<property name="url" value="http://localhost:${testutil.ports.SpringServer}/feed" />
 		<property name="level" value="ALL" />
 	</bean>
 

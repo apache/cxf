@@ -33,12 +33,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
-    public static final String PORT = BookServerSecuritySpringClass.PORT;
+    public static final int PORT = BookServerSecuritySpringClass.PORT;
     
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSecuritySpringClass.class));
+                   launchServer(BookServerSecuritySpringClass.class, true));
     }
     
     @Test

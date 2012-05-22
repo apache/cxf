@@ -24,13 +24,14 @@ import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 
 
 public class BookServerJaasSecurity extends AbstractSpringServer {
+    public static final int PORT = allocatePortAsInt(BookServerJaasSecurity.class);
 
     public BookServerJaasSecurity() {
-        super("/jaxrs_jaas_security");
+        super("/jaxrs_jaas_security", PORT);
     }
     
     public BookServerJaasSecurity(String[] args) {
-        super("/jaxrs_jaas_security");
+        super("/jaxrs_jaas_security", PORT);
     }
     
     public static void main(String args[]) {

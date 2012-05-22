@@ -38,12 +38,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = BookNonSpringServer.PORT;
+    public static final int PORT = BookNonSpringServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookNonSpringServer.class, true));
+        createStaticBus();
     }
     
     

@@ -33,7 +33,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
-    public static final String PORT = SpringServer.PORT;
+    public static final int PORT = SpringServer.PORT;
     @BeforeClass
     public static void beforeClass() throws Exception {
         // must be 'in-process' to communicate with inner class in single JVM
@@ -43,8 +43,9 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
 
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
+        public static final int PORT = allocatePortAsInt(SpringServer.class);
         public SpringServer() {
-            super("/jaxrs_uriinfo", "/app");
+            super("/jaxrs_uriinfo", "/app", PORT);
         }
     }
 

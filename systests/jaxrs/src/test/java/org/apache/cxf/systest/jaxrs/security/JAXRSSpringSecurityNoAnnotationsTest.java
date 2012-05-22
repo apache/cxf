@@ -23,12 +23,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurityTest {
-    public static final String PORT = BookServerSecuritySpringNoAnnotations.PORT;
+    public static final int PORT = BookServerSecuritySpringNoAnnotations.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSecuritySpringNoAnnotations.class));
+                   launchServer(BookServerSecuritySpringNoAnnotations.class, true));
     }
     
     @Test

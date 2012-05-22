@@ -36,7 +36,7 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRequestDispatch.class));
+                   launchServer(BookServerRequestDispatch.class, true));
     }
     
     @Test

@@ -19,14 +19,18 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class SimpleLoggingAspect {
+    PrintWriter writer = new PrintWriter(new StringWriter());
     
     public void logBefore() {
-        System.out.println("AOP in before action");
+        writer.println("AOP in before action");
     }
     
     public void logAfter() {
-        System.out.println("AOP in after action");
+        writer.println("AOP in after action");
     }
     
 }

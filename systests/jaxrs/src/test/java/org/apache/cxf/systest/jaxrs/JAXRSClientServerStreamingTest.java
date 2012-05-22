@@ -96,6 +96,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     
     @BeforeClass
     public static void startServers() throws Exception {
+        //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
     }

@@ -60,7 +60,7 @@ public class BookStoreSpring {
     
     public BookStoreSpring() {
         init();
-        System.out.println("----books: " + books.size());
+        //System.out.println("----books: " + books.size());
     }
     
     
@@ -71,7 +71,7 @@ public class BookStoreSpring {
     
     @PreDestroy
     public void preDestroy() {
-        System.out.println("PreDestroy called");
+        //System.out.println("PreDestroy called");
     }
     
     @GET

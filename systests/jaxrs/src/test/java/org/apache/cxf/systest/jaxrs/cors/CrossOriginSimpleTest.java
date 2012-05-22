@@ -57,7 +57,7 @@ import org.junit.Test;
  * 
  */
 public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = SpringServer.PORT;
+    public static final int PORT = SpringServer.PORT;
     private WebClient configClient;
 
     @BeforeClass
@@ -404,10 +404,10 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
 
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
-        public static final String PORT = AbstractSpringServer.PORT;
+        public static final int PORT = allocatePortAsInt(SpringServer.class);
 
         public SpringServer() {
-            super("/jaxrs_cors");
+            super("/jaxrs_cors", PORT);
         }
     }
 }

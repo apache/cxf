@@ -74,7 +74,6 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.common.util.ProxyHelper;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -852,7 +851,7 @@ public class BookStore {
     @PUT
     @Path("/bookswithdom/")
     public DOMSource updateBook(DOMSource ds) {
-        XMLUtils.printDOM(ds.getNode());
+        //XMLUtils.printDOM(ds.getNode());
         return ds;
     }
     

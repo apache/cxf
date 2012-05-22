@@ -65,7 +65,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
     }
     
     @Test
