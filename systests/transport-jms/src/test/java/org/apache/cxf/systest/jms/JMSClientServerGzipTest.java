@@ -136,5 +136,6 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
+        bus.shutdown(true);
     }
 }

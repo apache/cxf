@@ -95,6 +95,7 @@ public class HelloWorldContinuationsClientServerTest extends AbstractBusClientSe
         helloDoneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());
+        bus.shutdown(true);
     }
         
 }

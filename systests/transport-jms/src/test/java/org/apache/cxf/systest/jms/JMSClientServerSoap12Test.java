@@ -64,7 +64,6 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
 
         assertTrue("server did not launch correctly", 
                    launchServer(Soap12Server.class));
-        
     }
     
     public URL getWSDLURL(String s) throws Exception {
@@ -136,5 +135,6 @@ public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
+        bus.shutdown(true);
     }
 }

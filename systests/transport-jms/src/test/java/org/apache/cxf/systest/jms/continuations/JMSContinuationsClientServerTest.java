@@ -57,6 +57,7 @@ public class JMSContinuationsClientServerTest extends AbstractBusClientServerTes
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, false));
         serversStarted = true;
+        createStaticBus();
     }
     
     public URL getWSDLURL(String s) throws Exception {

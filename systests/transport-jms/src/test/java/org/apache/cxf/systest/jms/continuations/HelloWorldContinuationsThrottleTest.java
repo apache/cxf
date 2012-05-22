@@ -100,6 +100,7 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
         executor.shutdownNow();
         System.out.println("Completed : " + (5 - helloDoneSignal.getCount()));
         assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());
+        bus.shutdown(true);
     }
         
 }
