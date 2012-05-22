@@ -50,9 +50,9 @@ public class GreeterImpl implements Greeter {
     }
 
     public String greetMeLater(long delay) {
-        System.out.println("\n\n*** GreetMeLater called with: " + delay
-                           + " at: " + new Date().toString()
-                           + "***\n\n");
+        //System.out.println("\n\n*** GreetMeLater called with: " + delay
+        //                   + " at: " + new Date().toString()
+        //                   + "***\n\n");
         if (delay > 0) {
             try {
                 Thread.sleep(delay);

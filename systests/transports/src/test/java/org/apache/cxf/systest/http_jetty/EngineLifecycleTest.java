@@ -46,9 +46,7 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -64,28 +62,11 @@ import org.springframework.core.io.Resource;
 public class EngineLifecycleTest extends Assert {
     private static final String PORT1 = TestUtil.getPortNumber(EngineLifecycleTest.class, 1);
     private static final String PORT2 = TestUtil.getPortNumber(EngineLifecycleTest.class, 2);
-    private String close;
-    private GenericApplicationContext applicationContext;
-    
-    
+    private GenericApplicationContext applicationContext;    
         
     private void readBeans(Resource beanResource) {
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
         reader.loadBeanDefinitions(beanResource);
-    }
-    
-    @Before 
-    public void setSystemProperties() {
-        close = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");        
-        System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort", "false");
-        
-    }
-    
-    @After
-    public void resetSystemProperties() {
-        if (close != null) {
-            System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort", close);
-        }
     }
     
     public void setUpBus(boolean includeService) throws Exception {

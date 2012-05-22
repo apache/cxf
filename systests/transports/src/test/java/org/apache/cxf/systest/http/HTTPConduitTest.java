@@ -69,7 +69,7 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 import org.springframework.context.ApplicationContext;
@@ -200,6 +200,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         if (servers.contains(name)) {
             return true;
         }
+        Bus bus = BusFactory.getThreadDefaultBus(false);
         URL serverC =
             Server.class.getResource("resources/" + name + ".cxf");
         boolean server = launchServer(Server.class, null,
@@ -211,14 +212,21 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         if (server) {
             servers.add(name);
         }
+        BusFactory.setDefaultBus(null);
+        BusFactory.setThreadDefaultBus(bus);
         return server;
     }
     
-    @BeforeClass
-    public static void setProps() {
-        // TODO: Do I need this?
-        System.setProperty("org.apache.cxf.bus.factory", 
-            "org.apache.cxf.bus.CXFBusFactory");
+    @AfterClass
+    public static void cleanUp() {
+        Bus b = BusFactory.getDefaultBus(false);
+        if (b != null) {
+            b.shutdown(true);
+        }
+        b = BusFactory.getThreadDefaultBus(false);
+        if (b != null) {
+            b.shutdown(true);
+        }
     }
 
     public static KeyStore getKeyStore(String ksType, String file, String ksPassword)

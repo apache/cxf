@@ -352,10 +352,6 @@
                             <derby.system.home>${basedir}/target/derby</derby.system.home>
                             <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
-                            <!-- If we close the port after a client in the same JVM has opened a keep-alive
-                            connection, on some Linux's, the socket remains consumed until
-                            some timeout occurs.   That may cause some tests to timeout/hang. -->
-                            <org.apache.cxf.transports.http_jetty.DontClosePort>false</org.apache.cxf.transports.http_jetty.DontClosePort>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

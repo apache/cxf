@@ -49,10 +49,11 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
     }
     
     @BeforeClass
-    public static void startServer() {
+    public static void startServer() throws Exception {
         launchServer(DigestServer.class);
+        createStaticBus();
     }
-
+    
     @Test    
     public void testDigestAuth() throws Exception {
         URL wsdl = getClass().getResource("../resources/greeting.wsdl");
