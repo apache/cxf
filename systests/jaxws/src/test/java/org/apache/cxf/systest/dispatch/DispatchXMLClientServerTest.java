@@ -55,7 +55,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus();
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
     @Test

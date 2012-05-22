@@ -68,7 +68,7 @@ public class JavaFirstHttpGetTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     
     @Test

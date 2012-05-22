@@ -42,7 +42,7 @@ public class AddNumbersImpl implements AddNumbers {
      *             if any of the numbers to be added is negative.
      */
     public int addNumbers(int number1, int number2) throws AddNumbersFault {
-        System.out.println("addNumbers called....., number1: " + number1 + " number2: " + number2);
+        //System.out.println("addNumbers called....., number1: " + number1 + " number2: " + number2);
         return number1 * number2;
     }
 

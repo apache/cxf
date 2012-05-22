@@ -35,7 +35,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.helpers.DOMUtils;
 
 //The following wsdl file is used.
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
@@ -74,7 +73,6 @@ public class HWDOMSourcePayloadXMLBindingProvider implements
                     "resources/XML_GreetMeDocLiteralResp.xml");
 
             document = builder.parse(greetMeResponse);
-            DOMUtils.writeXml(document, System.out);
             response = new DOMSource(document.getDocumentElement());
         } catch (Exception e) {
             e.printStackTrace();

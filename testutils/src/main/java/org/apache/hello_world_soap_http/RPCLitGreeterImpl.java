@@ -35,20 +35,20 @@ public class RPCLitGreeterImpl implements GreeterRPCLit {
     
 
     public String greetMe(String me) {
-        System.out.println("Executing operation greetMe");
-        System.out.println("Message received: " + me + "\n");
+        //System.out.println("Executing operation greetMe");
+        //System.out.println("Message received: " + me + "\n");
         return "Hello " + me;
     }
 
     public String sayHi() {
-        System.out.println("Executing operation sayHi" + "\n");
+        //System.out.println("Executing operation sayHi" + "\n");
         return "Bonjour";
     }
 
     public MyComplexStruct sendReceiveData(MyComplexStruct in) {
-        System.out.println("Executing operation sendReceiveData");
-        System.out.println("Received struct with values :\nElement-1 : " + in.getElem1() + "\nElement-2 : "
-                           + in.getElem2() + "\nElement-3 : " + in.getElem3() + "\n");
+        //System.out.println("Executing operation sendReceiveData");
+        //System.out.println("Received struct with values :\nElement-1 : " + in.getElem1() + "\nElement-2 : "
+        //                   + in.getElem2() + "\nElement-3 : " + in.getElem3() + "\n");
         if ("invalid".equals(in.getElem2())) {
             in.setElem2(null);
         }
@@ -56,8 +56,8 @@ public class RPCLitGreeterImpl implements GreeterRPCLit {
     }
 
     public String greetUs(String you, String me) {
-        System.out.println("Executing operation greetUs");
-        System.out.println("Message received: you are " + you + " I'm " + me + "\n");
+        //System.out.println("Executing operation greetUs");
+        //System.out.println("Message received: you are " + you + " I'm " + me + "\n");
         return "Hello " + you + " and " + me;
     }
 

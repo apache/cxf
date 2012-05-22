@@ -40,10 +40,6 @@ public class SpringConfiguredNoAutoRewriteSoapAddressTest
 
     @Test
     public void testWsdlAddress() throws Exception {
-        System.err.println("portNumber: " + port);
-        System.err.println(getApplicationContext().getBean("cxfHandlerTestEndpoint").
-                                                                   getClass().toString());
-
         AddNumbers addNumbers = (AddNumbers)getApplicationContext().getBean("cxfHandlerTestClientEndpoint",
                                                                    AddNumbers.class);
 

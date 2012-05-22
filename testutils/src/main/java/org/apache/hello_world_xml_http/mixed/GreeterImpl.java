@@ -34,17 +34,13 @@ import org.apache.hello_world_xml_http.mixed.types.SayHiResponse;
 public class GreeterImpl implements Greeter {
 
     public String greetMe(String me) {
-        System.out.println("Executing operation greetMe\n");
         return "Hello " + me;
     }
 
     public void greetMeOneWay(String me) {
-        System.out.println("Executing operation greetMeOneWay\n");
-        System.out.println("Hello there " + me);
     }
 
     public SayHiResponse sayHi1(SayHi in) {
-        System.out.println("Executing operation sayHi1\n");
         SayHiResponse response = new SayHiResponse();
         response.setResponseType("Bonjour");
         return response;

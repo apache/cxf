@@ -162,8 +162,8 @@ public class  TestSOAPHandler extends TestHandlerBase
 
             try {
                 SOAPMessage msg = ctx.getMessage();
-                if ("soapHandler4HandleFaultThrowsRunException".equals(msg.getSOAPBody().getFault()
-                    .getFaultString())) {
+                String fs = msg.getSOAPPart().getEnvelope().getBody().getFault().getFaultString();
+                if ("soapHandler4HandleFaultThrowsRunException".equals(fs)) {
                     throw new RuntimeException("soapHandler4 HandleFault throws RuntimeException");
                 } else if ("soapHandler4HandleFaultThrowsSOAPFaultException".equals(msg.getSOAPBody()
                     .getFault().getFaultString())) {
