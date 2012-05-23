@@ -67,7 +67,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
        
-        AddressingProperties maps = RMContextUtils.retrieveMAPs(msg, false, true);
+        AddressingProperties maps = ContextUtils.retrieveMAPs(msg, false, true,  false);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;

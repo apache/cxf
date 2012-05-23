@@ -48,7 +48,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
@@ -349,8 +348,7 @@ public class RMManager {
     public String getAddressingNamespace(Message message) {
         String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
         if (addrUri == null) {
-            boolean out = MessageUtils.isOutbound(message);
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, out);
+            AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
             if (maps != null) {
                 addrUri = maps.getNamespaceURI();
             }

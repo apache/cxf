@@ -61,6 +61,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.ws.rm.AbstractRMInterceptor;
 import org.apache.cxf.ws.rm.EncoderDecoder;
@@ -275,7 +276,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                     if (rmUri != null && rmUri.equals(ns)) {
                         if (codec == null) {
                             String wsauri = null;
-                            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+                            AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
                             if (maps == null) {
                                 wsauri = getManager(message).getAddressingNamespace(message);
                             } else {
@@ -342,7 +343,7 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
      */
     private void updateServiceModelInfo(SoapMessage message) throws Fault {
 
-        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+        AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         AttributedURIType actionURI = null == maps ? null : maps.getAction();
         String action = null == actionURI ? null : actionURI.getValue().trim();
         

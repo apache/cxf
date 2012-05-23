@@ -65,7 +65,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         // message addressing properties may be null, e.g. in case of a runtime fault 
         // on the server side
-        final AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+        final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         if (null == maps) {
             return;
         }
