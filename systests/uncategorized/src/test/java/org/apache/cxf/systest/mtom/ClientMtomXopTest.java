@@ -31,45 +31,68 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.jaxws.binding.soap.SOAPBindingImpl;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
+import org.apache.cxf.mtom_xop.TestMtomImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.junit.AfterClass;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = allocatePort(ClientMtomXopTest.class);
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomService");
 
+    
+    public static class Server extends AbstractBusTestServerBase {
+        EndpointImpl jaxep;
+        protected void run() {
+            Object implementor = new TestMtomImpl();
+            String address = "http://localhost:" + PORT + "/mime-test";
+            try {
+                jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
+                Endpoint ep = jaxep.getServer().getEndpoint();
+                ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
+                ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
+                
+                SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
+                jaxWsSoapBinding.setMTOMEnabled(true);
+
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        public void tearDown() {
+            jaxep.stop();
+            jaxep = null;
+        }
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
-        TestUtilities.setKeepAliveSystemProperty(false);
+        createStaticBus();
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
-    @AfterClass
-    public static void cleanup() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
 
     @Test
     public void testMtomXop() throws Exception {
@@ -184,8 +207,8 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
 
     private <T> T createPort(QName serviceName, QName portName, Class<T> serviceEndpointInterface,
                                     boolean enableMTOM, boolean installInterceptors) throws Exception {
-        Bus bus = BusFactory.getDefaultBus();
         ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
+        Bus bus = getStaticBus();
         serviceFactory.setBus(bus);
         serviceFactory.setServiceName(serviceName);
         serviceFactory.setServiceClass(serviceEndpointInterface);

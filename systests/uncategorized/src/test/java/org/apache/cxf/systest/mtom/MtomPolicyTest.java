@@ -30,9 +30,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -42,8 +39,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
@@ -51,33 +48,33 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.WSPolicyFeature;
 import org.apache.cxf.ws.policy.selector.FirstAlternativeSelector;
-import org.junit.AfterClass;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class MtomPolicyTest extends AbstractCXFTest {
+public class MtomPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(MtomPolicyTest.class);
-    String address = "http://localhost:" + PORT + "/EchoService";
+    public static final String PORT2 = TestUtil.getPortNumber(MtomPolicyTest.class, 2);
     
+    static TestUtilities testUtilities = new TestUtilities(MtomPolicyTest.class);
+
     @BeforeClass
-    public static void setKeepAliveProperty() {
-        TestUtilities.setKeepAliveSystemProperty(false);
+    public static void createTheBus() throws Exception {
+        createStaticBus();
+        testUtilities.setBus(getStaticBus());
     }
     
-    @AfterClass
-    public static void cleanKeepAliveProperty() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
     
     @Test
     public void testRequiredMtom() throws Exception {
-        setupServer(true);
+        String address = "http://localhost:" + PORT + "/EchoService";
+        setupServer(true, address);
         
         sendMtomMessage(address);
         
-        Node res = invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
+        Node res = testUtilities.invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
         
-        NodeList list = assertValid("//faultstring", res);
+        NodeList list = testUtilities.assertValid("//faultstring", res);
         String text = list.item(0).getTextContent();
         assertTrue(text.contains("These policy alternatives can not be satisfied: "));
         assertTrue(text.contains("{http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization}"
@@ -86,21 +83,22 @@ public class MtomPolicyTest extends AbstractCXFTest {
     
     @Test
     public void testOptionalMtom() throws Exception {
-        setupServer(false);
+        String address = "http://localhost:" + PORT2 + "/EchoService";
+        setupServer(false, address);
         
         sendMtomMessage(address);
         
-        Node res = invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
+        Node res = testUtilities.invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
         
-        assertNoFault(res);
+        testUtilities.assertNoFault(res);
     }
     
-    public void setupServer(boolean mtomRequired) throws Exception {
-        getBus().getExtension(PolicyEngine.class).setAlternativeSelector(
+    public void setupServer(boolean mtomRequired, String address) throws Exception {
+        getStaticBus().getExtension(PolicyEngine.class).setAlternativeSelector(
             new FirstAlternativeSelector());
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new EchoService());
-        sf.setBus(getBus());
+        sf.setBus(getStaticBus());
         sf.setAddress(address);
         
         WSPolicyFeature policyFeature = new WSPolicyFeature();
@@ -125,11 +123,11 @@ public class MtomPolicyTest extends AbstractCXFTest {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/wsdl/http");
         ei.setAddress(a);
 
-        ConduitInitiatorManager conduitMgr = getBus().getExtension(ConduitInitiatorManager.class);
+        ConduitInitiatorManager conduitMgr = getStaticBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
         Conduit conduit = conduitInit.getConduit(ei);
 
-        TestMessageObserver obs = new TestMessageObserver();
+        TestUtilities.TestMessageObserver obs = new TestUtilities.TestMessageObserver();
         conduit.setMessageObserver(obs);
 
         Message m = new MessageImpl();
@@ -142,7 +140,7 @@ public class MtomPolicyTest extends AbstractCXFTest {
         conduit.prepare(m);
 
         OutputStream os = m.getContent(OutputStream.class);
-        InputStream is = getResourceAsStream("request");
+        InputStream is = testUtilities.getResourceAsStream("request");
         if (is == null) {
             throw new RuntimeException("Could not find resource " + "request");
         }
@@ -172,9 +170,5 @@ public class MtomPolicyTest extends AbstractCXFTest {
         assertEquals(37448, out.size());
     }
 
-    @Override
-    protected Bus createBus() throws BusException {
-        return BusFactory.getDefaultBus();
-    }
 
 }

@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusException;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.IOUtils;
@@ -39,8 +37,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
@@ -49,31 +47,30 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
-import org.junit.AfterClass;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class MtomServerTest extends AbstractCXFTest {
-    public static final String PORT = TestUtil.getPortNumber(MtomServerTest.class);
+public class MtomServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT1 = TestUtil.getPortNumber(MtomServerTest.class);
+    public static final String PORT2 = TestUtil.getPortNumber(MtomServerTest.class, 2);
 
     private static final String HTTP_ID = "http://schemas.xmlsoap.org/wsdl/http/";
 
+    private static TestUtilities testUtilities = new TestUtilities(MtomPolicyTest.class);
+
     @BeforeClass
-    public static void setKeepAliveProperty() {
-        TestUtilities.setKeepAliveSystemProperty(false);
+    public static void createTheBus() throws Exception {
+        createStaticBus();
+        testUtilities.setBus(getStaticBus());
     }
-
-    @AfterClass
-    public static void cleanKeepAliveProperty() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
-
+    
     @Test
     public void testMtomRequest() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new EchoService());
-        sf.setBus(getBus());
-        String address = "http://localhost:" + PORT + "/EchoService";
+        sf.setBus(getStaticBus());
+        String address = "http://localhost:" + PORT1 + "/EchoService";
         sf.setAddress(address);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Message.MTOM_ENABLED, "true");
@@ -83,11 +80,11 @@ public class MtomServerTest extends AbstractCXFTest {
         EndpointInfo ei = new EndpointInfo(null, HTTP_ID);
         ei.setAddress(address);
 
-        ConduitInitiatorManager conduitMgr = getBus().getExtension(ConduitInitiatorManager.class);
+        ConduitInitiatorManager conduitMgr = getStaticBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
         Conduit conduit = conduitInit.getConduit(ei);
 
-        TestMessageObserver obs = new TestMessageObserver();
+        TestUtilities.TestMessageObserver obs = new TestUtilities.TestMessageObserver();
         conduit.setMessageObserver(obs);
 
         Message m = new MessageImpl();
@@ -100,7 +97,7 @@ public class MtomServerTest extends AbstractCXFTest {
         conduit.prepare(m);
 
         OutputStream os = m.getContent(OutputStream.class);
-        InputStream is = getResourceAsStream("request");
+        InputStream is = testUtilities.getResourceAsStream("request");
         if (is == null) {
             throw new RuntimeException("Could not find resource " + "request");
         }
@@ -134,8 +131,8 @@ public class MtomServerTest extends AbstractCXFTest {
     public void testURLBasedAttachment() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new EchoService());
-        sf.setBus(getBus());
-        String address = "http://localhost:" + PORT + "/EchoService";
+        sf.setBus(getStaticBus());
+        String address = "http://localhost:" + PORT2 + "/EchoService";
         sf.setAddress(address);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Message.MTOM_ENABLED, "true");
@@ -144,16 +141,16 @@ public class MtomServerTest extends AbstractCXFTest {
         server.getEndpoint().getService().getDataBinding().setMtomThreshold(0);
 
         servStatic(getClass().getResource("mtom-policy.xml"),
-                   "http://localhost:" + PORT + "/policy.xsd");
+                   "http://localhost:" + PORT2 + "/policy.xsd");
 
         EndpointInfo ei = new EndpointInfo(null, HTTP_ID);
         ei.setAddress(address);
 
-        ConduitInitiatorManager conduitMgr = getBus().getExtension(ConduitInitiatorManager.class);
+        ConduitInitiatorManager conduitMgr = getStaticBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator conduitInit = conduitMgr.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
         Conduit conduit = conduitInit.getConduit(ei);
 
-        TestMessageObserver obs = new TestMessageObserver();
+        TestUtilities.TestMessageObserver obs = new TestUtilities.TestMessageObserver();
         conduit.setMessageObserver(obs);
 
         Message m = new MessageImpl();
@@ -166,14 +163,14 @@ public class MtomServerTest extends AbstractCXFTest {
         conduit.prepare(m);
 
         OutputStream os = m.getContent(OutputStream.class);
-        InputStream is = getResourceAsStream("request-url-attachment");
+        InputStream is = testUtilities.getResourceAsStream("request-url-attachment");
         if (is == null) {
             throw new RuntimeException("Could not find resource " + "request");
         }
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         IOUtils.copy(is, bout);
         String s = bout.toString("UTF-8");
-        s = s.replaceAll(":9036/", ":" + PORT + "/");
+        s = s.replaceAll(":9036/", ":" + PORT2 + "/");
 
         os.write(s.getBytes("UTF-8"));
         os.flush();
@@ -199,12 +196,12 @@ public class MtomServerTest extends AbstractCXFTest {
         assertTrue("Wrong size: " + out.size()
                    + "\n" + out.toString(),
                    out.size() > 970 && out.size() < 1020);
-        unregisterServStatic("http://localhost:" + PORT + "/policy.xsd");
+        unregisterServStatic("http://localhost:" + PORT2 + "/policy.xsd");
 
     }
 
     private void unregisterServStatic(String add) throws Exception {
-        Bus bus = getBus();
+        Bus bus = getStaticBus();
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         DestinationFactory df = dfm
             .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
@@ -217,17 +214,12 @@ public class MtomServerTest extends AbstractCXFTest {
 
     }
 
-    @Override
-    protected Bus createBus() throws BusException {
-        return BusFactory.getDefaultBus();
-    }
-
     /**
      * Serve static file
      */
     private void servStatic(final URL resource,
                                    final String add) throws Exception {
-        Bus bus = getBus();
+        Bus bus = getStaticBus();
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         DestinationFactory df = dfm
             .getDestinationFactory("http://cxf.apache.org/transports/http/configuration");
