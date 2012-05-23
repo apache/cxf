@@ -39,7 +39,7 @@ public class GreeterImpl {
     protected WebServiceContext context;
     
     public BareDocumentResponse testDocLitFault(String in) throws BadRecordLitFault {
-        System.out.println("Executing testDocLitFault sayHi\n");
+        //System.out.println("Executing testDocLitFault sayHi\n");
         List<Header> headers = new ArrayList<Header>();
         Header header = null;
         try {

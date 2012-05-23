@@ -28,7 +28,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <property name="bus" ref="cxf" />
         <property name="enabled" value="true" />
         <property name="JMXServiceURL" 
-        	value="service:jmx:rmi:///jndi/rmi://localhost:${testutil.ports.ManagedClientServerTest.1}/jmxrmi" />
+        	value="service:jmx:rmi:///jndi/rmi://localhost:${testutil.ports.ManagedBusTest.1}/jmxrmi" />
     </bean> 
  
     <bean id="wq" class="org.apache.cxf.workqueue.AutomaticWorkQueueImpl">

@@ -40,6 +40,7 @@ import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.jaxws.support.ServiceDelegateAccessor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -48,14 +49,16 @@ import org.junit.Test;
 
 
 public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServerTestBase {
-    static final String FACTORY_ADDRESS = NumberFactoryImpl.FACTORY_ADDRESS;
-    
+    public static final String PORT = TestUtil.getPortNumber(ManualHttpMulitplexClientServerTest.class);
+    public static final String FACTORY_ADDRESS = 
+        "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
+
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
         protected void run() {
             setBus(BusFactory.getDefaultBus());
-            Object implementor = new ManualNumberFactoryImpl(getBus());
-            ep = Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);            
+            Object implementor = new ManualNumberFactoryImpl(getBus(), PORT);
+            ep = Endpoint.publish(FACTORY_ADDRESS, implementor);            
         }
         public void tearDown() {
             ep.stop();
@@ -88,7 +91,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
     
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory nfact = service.getNumberFactoryPort();
-        updateAddressPort(nfact, NumberFactoryImpl.PORT);
+        updateAddressPort(nfact, PORT);
         
         W3CEndpointReference w3cEpr = nfact.create("2");        
         assertNotNull("reference", w3cEpr);
@@ -130,7 +133,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
-        updateAddressPort(factory, NumberFactoryImpl.PORT);
+        updateAddressPort(factory, PORT);
 
         
         W3CEndpointReference w3cEpr = factory.create("20");

@@ -59,6 +59,7 @@ public abstract class AbstractDOMProvider {
     private boolean isBaseAddr;
     private boolean isE4X;
     private Function invokeFunc;
+    private Endpoint ep;
 
     protected AbstractDOMProvider(Scriptable scope,
                                   Scriptable wspVar, String epAddr,
@@ -142,8 +143,15 @@ public abstract class AbstractDOMProvider {
         factory.setBindingId(binding); 
         factory.setServiceName(new QName(tgtNmspc, svcNm));
         factory.setEndpointName(new QName(tgtNmspc, portNm));
-        Endpoint ep = new EndpointImpl(bus, this, factory);
+        ep = new EndpointImpl(bus, this, factory);
         ep.publish(addr);
+    }
+    
+    public void stop() {
+        if (ep != null) {
+            ep.stop();
+            ep = null;
+        }
     }
 
     public DOMSource invoke(DOMSource request) {

@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.factory_pattern;
 
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +39,7 @@ import org.apache.cxf.jaxws.support.ServiceDelegateAccessor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,15 +47,16 @@ import org.junit.Test;
 
 
 public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
-    static final String PORT = NumberFactoryImpl.PORT;
+    public static final String PORT = TestUtil.getPortNumber(MultiplexClientServerTest.class);
+    public static final String FACTORY_ADDRESS = 
+        "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
         protected void run() {
-            setBus(BusFactory.getDefaultBus());
-            Object implementor = new NumberFactoryImpl(getBus());
-            ep = Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);
+            Object implementor = new NumberFactoryImpl(BusFactory.getDefaultBus(), PORT);
+            ep = Endpoint.publish(FACTORY_ADDRESS, implementor);
         }
         public void tearDown() {
             ep.stop();
@@ -74,8 +78,8 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        // requires ws-a support to propagate reference parameters
         createStaticBus("org/apache/cxf/systest/factory_pattern/cxf_multiplex.xml");
+        // requires ws-a support to propagate reference parameters
         Map<String, String> props = new HashMap<String, String>();    
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
             props.put("org.apache.activemq.default.directory.prefix", 
@@ -88,11 +92,15 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null, true));
         
-        props.put("cxf.config.file", defaultConfigFileName);
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, props, null, true));
+                   launchServer(Server.class, true));
     }
 
+    private void close(Object o) throws IOException {
+        if (o instanceof Closeable) {
+            ((Closeable)o).close();
+        }
+    }
     
     @Test
     public void testWithGetPortExtensionHttp() throws Exception {
@@ -110,14 +118,14 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         Number num =  (Number)serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
         
-        ClientProxy.getClient(num).getConduit().close();
+        close(num);
         
         W3CEndpointReference numberTwentyThreeRef = factory.create("23");
         num =  (Number)serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
         
-        ClientProxy.getClient(num).getConduit().close();
-        ClientProxy.getClient(factory).getConduit().close();
+        close(num);
+        close(factory);
     }
     
     @Test

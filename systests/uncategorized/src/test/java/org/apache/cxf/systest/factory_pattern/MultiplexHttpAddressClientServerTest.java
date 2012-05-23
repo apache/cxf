@@ -26,15 +26,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.factory_pattern.IsEvenResponse;
 import org.apache.cxf.factory_pattern.Number;
 import org.apache.cxf.factory_pattern.NumberFactory;
@@ -44,6 +42,7 @@ import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.jaxws.support.ServiceDelegateAccessor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,14 +51,18 @@ import org.junit.Test;
  * exercise with multiplexWithAddress config rather than ws-a headers
  */
 public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServerTestBase {
-    static final String FACTORY_ADDRESS = NumberFactoryImpl.FACTORY_ADDRESS;
+    public static final String PORT = TestUtil.getPortNumber(MultiplexHttpAddressClientServerTest.class);
+    public static final String FACTORY_ADDRESS = 
+        "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
+    public static final String NUMBER_SERVANT_ADDRESS_ROOT =
+        "http://localhost:" + PORT + "/NumberService/NumberPort/";
     
     public static class Server extends AbstractBusTestServerBase {        
         Endpoint ep;
         protected void run() {
-            setBus(BusFactory.getDefaultBus());
-            Object implementor = new HttpNumberFactoryImpl(getBus());
-            ep = Endpoint.publish(NumberFactoryImpl.FACTORY_ADDRESS, implementor);
+            setBus(new SpringBusFactory().createBus("org/apache/cxf/systest/factory_pattern/cxf.xml"));
+            Object implementor = new HttpNumberFactoryImpl(getBus(), PORT);
+            ep = Endpoint.publish(FACTORY_ADDRESS, implementor);
         }
         public void tearDown() {
             ep.stop();
@@ -82,10 +85,9 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
     @BeforeClass
     public static void startServers() throws Exception {
         // no need for ws-a, just enable multiplexWithAddress on server
-        Map<String, String> props = new HashMap<String, String>();    
-        props.put("cxf.config.file", "org/apache/cxf/systest/factory_pattern/cxf.xml");
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, props, null, false));
+                   launchServer(Server.class, true));
+        createStaticBus();
     }
 
     
@@ -94,7 +96,7 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
         
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
-        updateAddressPort(factory, NumberFactoryImpl.PORT);
+        updateAddressPort(factory, PORT);
         
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
@@ -118,8 +120,8 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
         
         InvocationHandler handler  = Proxy.getInvocationHandler(num);
         BindingProvider bp = (BindingProvider)handler;    
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                   NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "103");
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                   NUMBER_SERVANT_ADDRESS_ROOT + "103");
             
         IsEvenResponse numResp = num.isEven();
         assertTrue("103 is not even", Boolean.FALSE.equals(numResp.isEven()));
@@ -128,11 +130,11 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
     @Test
     public void testWithGetWsdlOnServant() throws Exception {
         
-        int firstChar = new URL(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT 
+        int firstChar = new URL(NUMBER_SERVANT_ADDRESS_ROOT 
                 + "?wsdl").openStream().read();        
         assertTrue("firstChar :" + String.valueOf(firstChar), firstChar == '<');
         
-        firstChar = new URL(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT 
+        firstChar = new URL(NUMBER_SERVANT_ADDRESS_ROOT 
                                 + "103?wsdl").openStream().read();
         assertTrue("firstChar :" + String.valueOf(firstChar), firstChar == '<');
     }
@@ -141,20 +143,20 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
     public void testSoapAddressLocation() throws Exception {
         
         assertTrue("Should have received the soap:address location " 
-                   + NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT, 
-                   checkSoapAddressLocation(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT));
+                   + NUMBER_SERVANT_ADDRESS_ROOT, 
+                   checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT));
         assertTrue("Should have received the soap:address location " 
-                   + NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "20", 
-                   checkSoapAddressLocation(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "20"));
+                   + NUMBER_SERVANT_ADDRESS_ROOT + "20", 
+                   checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT + "20"));
         assertTrue("Should have received the soap:address location " 
-                   + NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "22", 
-                   checkSoapAddressLocation(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "22"));
+                   + NUMBER_SERVANT_ADDRESS_ROOT + "22", 
+                   checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT + "22"));
         assertTrue("Should have received the soap:address location " 
-                   + NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "20", 
-                   checkSoapAddressLocation(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT + "20"));
+                   + NUMBER_SERVANT_ADDRESS_ROOT + "20", 
+                   checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT + "20"));
         assertTrue("Should have received the soap:address location " 
-                   + NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT, 
-                   checkSoapAddressLocation(NumberFactoryImpl.NUMBER_SERVANT_ADDRESS_ROOT));
+                   + NUMBER_SERVANT_ADDRESS_ROOT, 
+                   checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT));
     }
     
     private boolean checkSoapAddressLocation(String address) 

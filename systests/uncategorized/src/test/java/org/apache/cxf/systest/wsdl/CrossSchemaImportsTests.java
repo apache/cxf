@@ -44,6 +44,7 @@ public class CrossSchemaImportsTests extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void testJaxbCrossSchemaImport() throws Exception {
+        Thread.sleep(100000);
         testUtilities.setBus((Bus)applicationContext.getBean("cxf"));
         testUtilities.addDefaultNamespaces();
         Server s = testUtilities.getServerForService(new QName("http://apache.org/type_test/doc", 

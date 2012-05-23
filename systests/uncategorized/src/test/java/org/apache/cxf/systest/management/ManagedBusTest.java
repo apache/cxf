@@ -42,7 +42,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ManagedBusTest extends Assert {
-    public static final String JMX_PORT1 = TestUtil.getPortNumber("Server.1");
+    public static final String JMX_PORT1 = TestUtil.getPortNumber(ManagedBusTest.class, 1);
     public static final String JMX_PORT2 = TestUtil.getPortNumber(ManagedBusTest.class, 3);
     public static final String SERVICE_PORT = TestUtil.getPortNumber(ManagedBusTest.class, 4);
 
@@ -107,7 +107,7 @@ public class ManagedBusTest extends Assert {
     @Test
     public void testManagedBusWithTransientId() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
-        Bus bus = factory.createBus("org/apache/cxf/systest/management/managed-spring.xml", true);
+        Bus bus = factory.createBus("org/apache/cxf/systest/management/managed-bus.xml", true);
         doManagedBusTest(bus, bus.getId(), "cxf_managed_bus_test", Integer.parseInt(JMX_PORT1));
     }
     

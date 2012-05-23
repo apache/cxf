@@ -47,7 +47,6 @@ import org.apache.cxf.greeter_control.types.FaultLocation;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseComparator;
 import org.apache.cxf.phase.PhaseManager;
-import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -88,6 +87,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
      */
     public static class Server extends AbstractBusTestServerBase {
 
+        Endpoint ep;
         protected void run() {
             SpringBusFactory factory = new SpringBusFactory();
             Bus bus = factory.createBus();
@@ -100,8 +100,12 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             greeterImplementor.setThrowAlways(true);
             greeterImplementor.useLastOnewayArg(true);
             implementor.setImplementor(greeterImplementor);
-            Endpoint.publish(CONTROL_PORT_ADDRESS, implementor);
+            ep = Endpoint.publish(CONTROL_PORT_ADDRESS, implementor);
             LOG.fine("Published control endpoint.");
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
 
         public static void main(String[] args) {
@@ -129,24 +133,34 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        TestUtilities.setKeepAliveSystemProperty(false);
+        System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + PORT, "true");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        createStaticBus();
     }
-    
     @AfterClass
-    public static void cleanup() {
-        TestUtilities.recoverKeepAliveSystemProperty();
+    public static void reset() {
+        System.clearProperty("org.apache.cxf.transports.http_jetty.DontClosePort." + PORT);
+        Bus b = BusFactory.getDefaultBus(false);
+        if (b == null) {
+            b = BusFactory.getThreadDefaultBus(false);
+        }
+        if (b == null) {
+            b = BusFactory.getDefaultBus();
+        }
+        b.shutdown(true);
     }
     
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         if (null != greeter) {
+            ((java.io.Closeable)greeter).close();
             assertTrue("Failed to stop greeter.", control.stopGreeter(null));
             greeterBus.shutdown(true);
             greeterBus = null;
         }
         if (null != control) {  
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
+            ((java.io.Closeable)control).close();
             controlBus.shutdown(true);
         }
     }
