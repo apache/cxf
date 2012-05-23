@@ -132,11 +132,20 @@ public class ConfigurerImpl implements Configurer {
                 m = ReflectionUtil.findMethod(container.getClass(), "getRepository");
                 Object o = ReflectionUtil.setAccessible(m).invoke(container);
                 m = ReflectionUtil.findMethod(o.getClass(), "getRecipe", String.class);
+                Object xc = o;
                 o = ReflectionUtil.setAccessible(m).invoke(o, bn);  //returns the recipe
                 if (o != null) {
                     m = ReflectionUtil.findMethod(o.getClass(), "setProperties", Object.class);
                     if (m != null) {
-                        ReflectionUtil.setAccessible(m).invoke(o, beanInstance);
+                        Method xcm = findSetExecutionContextMethod(o.getClass().getClassLoader());
+                        if (xcm != null) {
+                            Object oxc = xcm.invoke(null, xc);
+                            try {
+                                ReflectionUtil.setAccessible(m).invoke(o, beanInstance);
+                            } finally {
+                                xcm.invoke(null, oxc);
+                            }
+                        }
                     }
                 }
             }
@@ -151,6 +160,20 @@ public class ConfigurerImpl implements Configurer {
             LOG.log(Level.FINE, "Could not configure object " + bn, ex);
         }
     }
+    
+    // for Aries blueprint 0.3.1
+    private Method findSetExecutionContextMethod(ClassLoader cl) {
+        Method m = null;
+        try {
+            m = Class.forName("org.apache.aries.blueprint.di.ExecutionContext$Holder", false, cl).
+                getDeclaredMethod("setContext", 
+                                  Class.forName("org.apache.aries.blueprint.di.ExecutionContext", false, cl));
+        } catch (Exception e) {
+            LOG.log(Level.FINE, "Could not find the ExecutionContext$Holder.setContext method", e);
+        }
+        return m;
+    }
+    
     private void configureWithWildCard(String bn, Object beanInstance) {
         if (!wildCardBeanDefinitions.isEmpty()) {
             Class<?> clazz = beanInstance.getClass();            
