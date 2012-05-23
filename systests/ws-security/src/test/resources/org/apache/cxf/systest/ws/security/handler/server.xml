@@ -34,12 +34,10 @@
 			<map>
 				<entry key="action" value="UsernameToken Timestamp Signature" />
 				<entry key="passwordType" value="PasswordDigest" />
-				<entry key="user" value="serverx509v1" />
 				<entry key="passwordCallbackClass"
 					value="org.apache.cxf.systest.ws.security.handler.UsernamePasswordCallback" />
 				<entry key="signaturePropFile"
 					value="org/apache/cxf/systest/ws/security/handler/Server_SignVerf.properties" />
-				<entry key="signatureKeyIdentifier" value="DirectReference" />
 			</map>
 		</constructor-arg>
 	</bean>
