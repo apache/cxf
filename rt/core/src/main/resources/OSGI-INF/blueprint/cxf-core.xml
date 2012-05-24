@@ -39,4 +39,9 @@
       <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/configuration/parameterized-types"/>
     </service-properties>
   </service>
+  <service ref="CXFCoreNamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/configuration/security"/>
+    </service-properties>
+  </service>
 </blueprint>

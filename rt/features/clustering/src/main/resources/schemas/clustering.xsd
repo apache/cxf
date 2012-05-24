@@ -21,21 +21,21 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:tns="http://cxf.apache.org/clustering"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cxf-beans="http://cxf.apache.org/configuration/beans"
   targetNamespace="http://cxf.apache.org/clustering" 
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
- <xsd:complexType name="identifiedType" abstract="true">
-    <xsd:attribute name="id" type="xsd:ID"/>
-  </xsd:complexType>
-  
+  <xsd:import namespace="http://cxf.apache.org/configuration/beans" 
+    schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
+
   <xsd:element name="failover">
     <xsd:annotation>
       <xsd:documentation>Configures the failover feature. This element is associated with the org.apache.cxf.clustering.FailoverFeature object.</xsd:documentation>
     </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
-        <xsd:extension base="tns:identifiedType">
+        <xsd:extension base="cxf-beans:identifiedType">
           <xsd:all>
             <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
@@ -59,7 +59,7 @@
     </xsd:annotation>
     <xsd:complexType>
       <xsd:complexContent>
-        <xsd:extension base="tns:identifiedType">
+        <xsd:extension base="cxf-beans:identifiedType">
           <xsd:all>
             <xsd:element name="strategy" type="xsd:anyType" minOccurs="0">
               <xsd:annotation>
