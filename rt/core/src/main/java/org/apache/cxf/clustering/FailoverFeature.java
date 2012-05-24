@@ -44,7 +44,9 @@ public class FailoverFeature extends AbstractFeature {
     protected ConduitSelector initTargetSelector(Endpoint endpoint) {
         FailoverTargetSelector selector = getTargetSelector();
         selector.setEndpoint(endpoint);
-        selector.setStrategy(getStrategy());
+        if (getStrategy() != null) {
+            selector.setStrategy(getStrategy());
+        }
         return selector;
     }
     

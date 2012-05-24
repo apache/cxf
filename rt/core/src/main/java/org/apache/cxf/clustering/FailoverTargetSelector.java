@@ -167,8 +167,10 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param strategy the FailoverStrategy to use
      */
     public synchronized void setStrategy(FailoverStrategy strategy) {
-        getLogger().log(Level.INFO, "USING_STRATEGY", new Object[] {strategy});
-        failoverStrategy = strategy;
+        if (strategy != null) {
+            getLogger().log(Level.INFO, "USING_STRATEGY", new Object[] {strategy});
+            failoverStrategy = strategy;
+        }
     }
     
     /**
