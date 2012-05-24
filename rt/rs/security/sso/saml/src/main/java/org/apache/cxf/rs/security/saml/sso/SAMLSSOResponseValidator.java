@@ -32,10 +32,6 @@ import org.opensaml.saml2.core.AuthnStatement;
 /**
  * Validate a SAML 2.0 Protocol Response according to the Web SSO profile. The Response
  * should be validated by the SAMLProtocolResponseValidator first.
- * 
-TODO The service provider MUST ensure that bearer assertions are not replayed, by maintaining the set of used
-ID values for the length of time for which the assertion would be considered valid based on the
-NotOnOrAfter attribute in the <SubjectConfirmationData>.
  */
 public class SAMLSSOResponseValidator {
     
@@ -47,6 +43,7 @@ public class SAMLSSOResponseValidator {
     private String requestId;
     private String spIdentifier;
     private boolean enforceAssertionsSigned = true;
+    private TokenReplayCache<String> replayCache;
     
     /**
      * Enforce that Assertions must be signed if the POST binding was used. The default is true.
@@ -105,7 +102,7 @@ public class SAMLSSOResponseValidator {
             if (assertion.getAuthnStatements() != null
                 && !assertion.getAuthnStatements().isEmpty()) {
                 org.opensaml.saml2.core.Subject subject = assertion.getSubject();
-                if (validateAuthenticationSubject(subject)) {
+                if (validateAuthenticationSubject(subject, assertion.getID(), postBinding)) {
                     validateAudienceRestrictionCondition(assertion.getConditions());
                     foundValidSubject = true;
                     // Store Session NotOnOrAfter
@@ -162,7 +159,7 @@ public class SAMLSSOResponseValidator {
      * Validate the Subject (of an Authentication Statement).
      */
     private boolean validateAuthenticationSubject(
-        org.opensaml.saml2.core.Subject subject
+        org.opensaml.saml2.core.Subject subject, String id, boolean postBinding
     ) throws WSSecurityException {
         if (subject.getSubjectConfirmations() == null) {
             return false;
@@ -171,7 +168,7 @@ public class SAMLSSOResponseValidator {
         for (org.opensaml.saml2.core.SubjectConfirmation subjectConf 
             : subject.getSubjectConfirmations()) {
             if (SAML2Constants.CONF_BEARER.equals(subjectConf.getMethod())) {
-                validateSubjectConfirmation(subjectConf.getSubjectConfirmationData());
+                validateSubjectConfirmation(subjectConf.getSubjectConfirmationData(), id, postBinding);
             }
         }
         
@@ -182,7 +179,7 @@ public class SAMLSSOResponseValidator {
      * Validate a (Bearer) Subject Confirmation
      */
     private void validateSubjectConfirmation(
-        org.opensaml.saml2.core.SubjectConfirmationData subjectConfData
+        org.opensaml.saml2.core.SubjectConfirmationData subjectConfData, String id, boolean postBinding
     ) throws WSSecurityException {
         if (subjectConfData == null) {
             LOG.fine("Subject Confirmation Data of a Bearer Subject Confirmation is null");
@@ -202,6 +199,19 @@ public class SAMLSSOResponseValidator {
             || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
             LOG.fine("Subject Conf Data does not contain NotOnOrAfter or it has expired");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks
+        if (postBinding && replayCache != null) {
+            if (replayCache.getId(id) == null) {
+                Date expires = subjectConfData.getNotOnOrAfter().toDate();
+                Date currentTime = new Date();
+                long ttl = expires.getTime() - currentTime.getTime();
+                replayCache.putId(id, ttl / 1000L);
+            } else {
+                LOG.fine("Replay attack with token id: " + id);
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
         }
         
         // Check address
@@ -301,5 +311,8 @@ public class SAMLSSOResponseValidator {
         this.spIdentifier = spIdentifier;
     }
     
-
+    public void setReplayCache(TokenReplayCache<String> replayCache) {
+        this.replayCache = replayCache;
+    }
+    
 }

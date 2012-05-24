@@ -67,6 +67,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     private boolean supportDeflateEncoding = true;
     private boolean supportBase64Encoding = true;
     private boolean enforceAssertionsSigned = true;
+    private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
     
@@ -80,6 +81,17 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     }
     public boolean isSupportDeflateEncoding() {
         return supportDeflateEncoding;
+    }
+    
+    public void setReplayCache(TokenReplayCache<String> replayCache) {
+        this.replayCache = replayCache;
+    }
+    
+    public TokenReplayCache<String> getReplayCache() {
+        if (replayCache == null) {
+            replayCache = new EHCacheTokenReplayCache();
+        }
+        return replayCache;
     }
     
     /**
@@ -267,6 +279,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
             ssoResponseValidator.setSpIdentifier(requestState.getIssuerId());
             ssoResponseValidator.setEnforceAssertionsSigned(enforceAssertionsSigned);
+            ssoResponseValidator.setReplayCache(getReplayCache());
 
             return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);
         } catch (WSSecurityException ex) {
