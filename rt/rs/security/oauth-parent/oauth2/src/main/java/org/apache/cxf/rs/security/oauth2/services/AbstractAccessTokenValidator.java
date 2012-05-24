@@ -114,11 +114,14 @@ public abstract class AbstractAccessTokenValidator {
         if (accessTokenV == null && dataProvider != null && authScheme.equals(DEFAULT_AUTH_SCHEME)) {
             try {
                 localAccessToken = dataProvider.getAccessToken(authSchemeData);
-                accessTokenV = new AccessTokenValidation(localAccessToken);
             } catch (OAuthServiceException ex) {
+                // to be handled next
+            }
+            if (localAccessToken == null) {
                 AuthorizationUtils.throwAuthorizationFailure(
                     Collections.singleton(authScheme));
             }
+            accessTokenV = new AccessTokenValidation(localAccessToken);
         }
         if (accessTokenV == null) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes);
