@@ -96,18 +96,76 @@ final class JDKBugHacks {
                 
                 try {
                     //Trigger a call to sun.awt.AppContext.getAppContext()
-                    ImageIO.getCacheDirectory();
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.imageIO")) {
+                        ImageIO.getCacheDirectory();
+                    }
                 } catch (Throwable t) {
                     //ignore
                 }
+                try {
+                    //DocumentBuilderFactory seems to SOMETIMES pin the classloader
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.documentBuilderFactory")) {
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        factory.newDocumentBuilder();
+                    }
+                } catch (Throwable e) {
+                    //ignore
+                }
+                // Several components end up calling:
+                // sun.misc.GC.requestLatency(long)
+                //
+                // Those libraries / components known to trigger memory leaks due to
+                // eventual calls to requestLatency(long) are:
+                // - javax.management.remote.rmi.RMIConnectorServer.start()
+                try {
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.gcRequestLatency")) {
+                        Class<?> clazz = Class.forName("sun.misc.GC");
+                        Method method = clazz.getDeclaredMethod("requestLatency",
+                                new Class[] {Long.TYPE});
+                        method.invoke(null, Long.valueOf(36000000));
+                    }                    
+                } catch (Throwable e) {
+                    //ignore
+                }
+                
+                // Calling getPolicy retains a static reference to the context 
+                // class loader.
+                try {
+                    // Policy.getPolicy();
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.policy")) {
+                        Class<?> policyClass = Class
+                            .forName("javax.security.auth.Policy");
+                        Method method = policyClass.getMethod("getPolicy");
+                        method.invoke(null);
+                    }
+                } catch (Throwable e) {
+                    // ignore
+                }
+                try {
+                    // Initializing javax.security.auth.login.Configuration retains a static reference 
+                    // to the context class loader.
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.authConfiguration")) {
+                        Class.forName("javax.security.auth.login.Configuration", true, 
+                                      ClassLoader.getSystemClassLoader());
+                    }
+                } catch (Throwable e) {
+                    // Ignore
+                }
+                // Creating a MessageDigest during web application startup
+                // initializes the Java Cryptography Architecture. Under certain
+                // conditions this starts a Token poller thread with TCCL equal
+                // to the web application class loader.
+                if (!skipHack("org.apache.cxf.JDKBugHacks.securityProviders")) {
+                    java.security.Security.getProviders();
+                }
+                
                 try {
                     // Several components end up opening JarURLConnections without first
                     // disabling caching. This effectively locks the file.
                     // JAXB does this and thus affects us pretty badly.
                     // Doesn't matter that this JAR doesn't exist - just as long as
                     // the URL is well-formed
-                    boolean skip = skipHack("org.apache.cxf.JDKBugHacks.defaultUsesCaches");
-                    if (!skip) {
+                    if (!skipHack("org.apache.cxf.JDKBugHacks.defaultUsesCaches")) {
                         URL url = new URL("jar:file://dummy.jar!/");
                         URLConnection uConn = new URLConnection(url) {
                             @Override
@@ -119,53 +177,7 @@ final class JDKBugHacks {
                     }
                 } catch (Throwable e) {
                     //ignore
-                }
-                try {
-                    //DocumentBuilderFactory seems to SOMETIMES pin the classloader
-                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    factory.newDocumentBuilder();
-                } catch (Throwable e) {
-                    //ignore
-                }
-                // Several components end up calling:
-                // sun.misc.GC.requestLatency(long)
-                //
-                // Those libraries / components known to trigger memory leaks due to
-                // eventual calls to requestLatency(long) are:
-                // - javax.management.remote.rmi.RMIConnectorServer.start()
-                try {
-                    Class<?> clazz = Class.forName("sun.misc.GC");
-                    Method method = clazz.getDeclaredMethod("requestLatency",
-                            new Class[] {Long.TYPE});
-                    method.invoke(null, Long.valueOf(3600000));
-                } catch (Throwable e) {
-                    //ignore
-                }
-                
-                // Calling getPolicy retains a static reference to the context 
-                // class loader.
-                try {
-                    // Policy.getPolicy();
-                    Class<?> policyClass = Class
-                        .forName("javax.security.auth.Policy");
-                    Method method = policyClass.getMethod("getPolicy");
-                    method.invoke(null);
-                } catch (Throwable e) {
-                    // ignore
-                }
-                try {
-                    // Initializing javax.security.auth.login.Configuration retains a static reference 
-                    // to the context class loader.
-                    Class.forName("javax.security.auth.login.Configuration", true, 
-                                  ClassLoader.getSystemClassLoader());
-                } catch (Throwable e) {
-                    // Ignore
-                }
-                // Creating a MessageDigest during web application startup
-                // initializes the Java Cryptography Architecture. Under certain
-                // conditions this starts a Token poller thread with TCCL equal
-                // to the web application class loader.
-                java.security.Security.getProviders();
+                }                
             } finally {
                 Thread.currentThread().setContextClassLoader(orig);
             }
