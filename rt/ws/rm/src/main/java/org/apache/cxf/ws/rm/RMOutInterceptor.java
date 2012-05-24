@@ -39,6 +39,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -67,7 +68,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             return;
         }
        
-        AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(msg, false, true);
+        AddressingPropertiesImpl maps = (AddressingPropertiesImpl)ContextUtils.retrieveMAPs(msg, false, true,  false);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
@@ -291,7 +292,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         newex.setOutMessage(msg);
     }
 
-    private static void setAction(AddressingPropertiesImpl maps, String action) {
+    private static void setAction(AddressingProperties maps, String action) {
         AttributedURIType actionURI = new AttributedURIType();
         actionURI.setValue(action);
         maps.setAction(actionURI);

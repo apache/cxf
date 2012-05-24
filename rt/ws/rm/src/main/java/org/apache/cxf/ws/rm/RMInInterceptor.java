@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.rm.v200702.Identifier;
@@ -65,7 +65,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         
         // message addressing properties may be null, e.g. in case of a runtime fault 
         // on the server side
-        final AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
+        final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         if (null == maps) {
             return;
         }

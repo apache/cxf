@@ -356,7 +356,7 @@ public class RMManager {
     public String getAddressingNamespace(Message message) {
         String addrUri = (String)message.getContextualProperty(WSRM_WSA_VERSION_PROPERTY);
         if (addrUri == null) {
-            AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
+            AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
             if (maps != null) {
                 addrUri = maps.getNamespaceURI();
             }
