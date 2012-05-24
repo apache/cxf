@@ -67,17 +67,13 @@
         <feature version="${project.version}">cxf-specs</feature>
         <bundle start-level='25'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.saaj-impl/${cxf.saaj-impl.bundle.version}</bundle>
     </feature>
-    <feature name="cxf-war-java5" version="${project.version}" resolver="(obr)">
-        <!-- This is to work around an issue in Karaf 2.2.4 where the "war" feature cannot be installed on Java 5 -->
+
+    <feature name="http-whiteboard" version="2.2.5" resolver='(obr)'>
+        <!-- This is to work around an issue in Karaf 2.2.5 where the "war" feature cannot be installed on Java 5 -->
         <!-- This gives us what we need and doesn't pull in the stuff that doesn't work (the jsp bundle) -->
-        <config name="org.ops4j.pax.url.war">
-            org.ops4j.pax.url.war.importPaxLoggingPackages=true
-        </config>
+        <!-- Karaf >=2.2.6 has a newer version of this that will be picked up instead -->
         <feature>http</feature>
-        <bundle>mvn:org.ops4j.pax.web/pax-web-extender-war/1.0.7</bundle>
-        <bundle>mvn:org.ops4j.pax.web/pax-web-extender-whiteboard/1.0.7</bundle>
-        <bundle>mvn:org.ops4j.pax.web/pax-web-deployer/1.0.7</bundle>
-        <bundle>mvn:org.ops4j.pax.url/pax-url-war/1.2.8</bundle>
+        <bundle start-level="30">mvn:org.ops4j.pax.web/pax-web-extender-whiteboard/1.0.8</bundle>
     </feature>
 
     <feature name="cxf" version="${project.version}" resolver='(obr)'>
@@ -92,7 +88,7 @@
 
         <feature version='${project.version}'>cxf-jaxb</feature>
         <feature version="[2,3)">http</feature>
-        <feature version="[2,3)">cxf-war-java5</feature>
+        <feature version="[2,4)">http-whiteboard</feature>
         <feature version="[3,4)">spring</feature>
         <feature version="[1.2,2)">spring-dm</feature>
         <feature version="[3,4)">spring-jms</feature>
