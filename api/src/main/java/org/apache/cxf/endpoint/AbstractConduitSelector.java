@@ -102,6 +102,8 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
             } catch (IOException ex) {
                 throw new Fault(ex);
             }
+            //the search for the conduit could cause extra properties to be reset/loaded. 
+            message.resetContextCache();
         }
         return selectedConduit;
     }
