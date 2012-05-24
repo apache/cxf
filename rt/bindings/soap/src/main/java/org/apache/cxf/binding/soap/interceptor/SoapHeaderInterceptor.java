@@ -19,17 +19,24 @@
 
 package org.apache.cxf.binding.soap.interceptor;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.xml.sax.SAXException;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.BareInInterceptor;
@@ -38,17 +45,23 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 /**
  * Perform databinding of the SOAP headers.
  */
 public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(SoapHeaderInterceptor.class);
+    
     public SoapHeaderInterceptor() {
         super(Phase.UNMARSHAL);
         addAfter(BareInInterceptor.class.getName());
@@ -89,8 +102,23 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         }
         
         boolean supportsNode = this.supportsDataReader(message, Node.class);
+        Service service = ServiceModelUtil.getService(message.getExchange());
+        Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0), message
+                                                         .getExchange().getBus());
         for (SoapHeaderInfo header : headers) {
             MessagePartInfo mpi = header.getPart();
+            try {
+                if (MessageUtils.getContextualBoolean(message,
+                                                 org.apache.cxf.message.Message.SCHEMA_VALIDATION_ENABLED,
+                                                 Boolean.FALSE)) {
+                    validateHeader(message, mpi, schema);
+                }
+            } catch (Fault f) {
+                if (!isRequestor(message)) {
+                    f.setFaultCode(Fault.FAULT_CODE_CLIENT);
+                }
+                throw f;
+            }
             if (mpi.getTypeClass() != null) {
 
                 Header param = findHeader(message, mpi);
@@ -132,6 +160,32 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         }
         if (parameters.size() > 0) {
             message.setContent(List.class, parameters);
+        }
+    }
+
+    private void validateHeader(SoapMessage message, MessagePartInfo mpi, Schema schema) {
+        Header param = findHeader(message, mpi);
+        Element el = null;
+        if (param != null
+            && param.getDataBinding() == null) {
+            Node source = (Node)param.getObject();
+            if (source instanceof Element) {
+                el = (Element)source;
+            } else {
+                return;
+            }
+            if (schema != null) {
+                DOMSource ds = new DOMSource(el);
+                try {
+                    schema.newValidator().validate(ds);
+                } catch (SAXException e) {
+                    throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
+                        .getCanonicalName(), e.getMessage());
+                } catch (IOException e) {
+                    throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
+                        .getCanonicalName(), e.getMessage());
+                }
+            }
         }
     }
 
