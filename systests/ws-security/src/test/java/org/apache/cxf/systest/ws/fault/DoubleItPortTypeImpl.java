@@ -16,9 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.common;
+package org.apache.cxf.systest.ws.fault;
 
+import java.security.Principal;
+
+import javax.annotation.Resource;
 import javax.jws.WebService;
+import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
@@ -28,10 +32,23 @@ import org.example.contract.doubleit.DoubleItPortType;
             serviceName = "DoubleItService", 
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")              
-public class DoubleItImpl implements DoubleItPortType {
+public class DoubleItPortTypeImpl implements DoubleItPortType {
     
+    @Resource
+    WebServiceContext wsContext;
+
     public int doubleIt(int numberToDouble) throws DoubleItFault {
-        return numberToDouble * 2;
+        
+        Principal pr = wsContext.getUserPrincipal();
+        if ("alice".equals(pr.getName())) {
+            return numberToDouble * 2;
+        }
+        
+        org.example.schema.doubleit.DoubleItFault internalFault = 
+            new org.example.schema.doubleit.DoubleItFault();
+        internalFault.setMajor((short)124);
+        internalFault.setMinor((short)1256);
+        throw new DoubleItFault("This is a fault", internalFault);
     }
     
 }

@@ -25,6 +25,7 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
+import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
 
@@ -37,7 +38,7 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;
 
-    public int doubleIt(int numberToDouble) {
+    public int doubleIt(int numberToDouble) throws DoubleItFault  {
         Principal pr = wsContext.getUserPrincipal();
         
         Assert.assertNotNull("Principal must not be null", pr);
