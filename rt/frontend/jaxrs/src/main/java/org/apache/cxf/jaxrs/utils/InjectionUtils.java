@@ -918,11 +918,6 @@ public final class InjectionUtils {
             Object value = f.getType() == Application.class ? app : cri.getContextFieldProxy(f);
             InjectionUtils.injectFieldValue(f, instance, value);
         }
-        
-        for (Field f : cri.getResourceFields()) {
-            ThreadLocalProxy<?> proxy = cri.getResourceFieldProxy(f);
-            InjectionUtils.injectFieldValue(f, instance, proxy);
-        }
     }
     
     public static void injectContextProxies(AbstractResourceInfo cri, Object instance) {
@@ -931,14 +926,11 @@ public final class InjectionUtils {
     
     @SuppressWarnings("unchecked")
     public static void injectContextField(AbstractResourceInfo cri, 
-                                          Field f, Object o, Object value,
-                                          boolean resource) {
+                                          Field f, Object o, Object value) {
         if (!cri.isSingleton()) {
             InjectionUtils.injectFieldValue(f, o, value);
         } else {
-            ThreadLocalProxy<Object> proxy =  (ThreadLocalProxy<Object>)(
-                    resource ? cri.getResourceFieldProxy(f)
-                        : cri.getContextFieldProxy(f));
+            ThreadLocalProxy<Object> proxy = (ThreadLocalProxy<Object>)cri.getContextFieldProxy(f);
             if (proxy != null) {
                 proxy.set(value);
             }
@@ -950,7 +942,6 @@ public final class InjectionUtils {
                                  Message message) {
         injectContextMethods(requestObject, resource, message);
         injectContextFields(requestObject, resource, message);
-        injectResourceFields(requestObject, resource, message);
     }
     
     @SuppressWarnings("unchecked")
@@ -993,17 +984,7 @@ public final class InjectionUtils {
                 continue;
             }
             Object value = JAXRSUtils.createContextValue(m, f.getGenericType(), f.getType());
-            InjectionUtils.injectContextField(cri, f, o, value, false);
-        }
-    }
-    
-    public static void injectResourceFields(Object o,
-                                            AbstractResourceInfo cri,
-                                            Message m) {
-        
-        for (Field f : cri.getResourceFields()) {
-            Object value = JAXRSUtils.createResourceValue(m, f.getGenericType(), f.getType());
-            InjectionUtils.injectContextField(cri, f, o, value, true);
+            InjectionUtils.injectContextField(cri, f, o, value);
         }
     }
     

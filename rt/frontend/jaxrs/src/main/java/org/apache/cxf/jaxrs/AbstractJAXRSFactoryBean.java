@@ -73,10 +73,6 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     protected JAXRSServiceFactoryBean serviceFactory;
     protected List<?> entityProviders;
     
-    protected AbstractJAXRSFactoryBean() {
-        this(new JAXRSServiceFactoryBean());
-    }
-    
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
         setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
@@ -116,6 +112,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     public void setBus(Bus bus) {
         super.setBus(bus);
         checkBindingFactory(bus);
+        serviceFactory.setBus(bus);
     }
     
     /*
@@ -314,7 +311,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
     
     protected ProviderFactory setupFactory(Endpoint ep) { 
-        ProviderFactory factory = ProviderFactory.getInstance(); 
+        ProviderFactory factory = ProviderFactory.getInstance(getBus()); 
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
         }

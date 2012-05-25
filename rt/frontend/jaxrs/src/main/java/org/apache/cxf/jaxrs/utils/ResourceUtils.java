@@ -143,22 +143,29 @@ public final class ResourceUtils {
         return null;
     }
     
+    public static ClassResourceInfo createClassResourceInfo(Map<String, UserResource> resources, 
+                                                            UserResource model, boolean isRoot, boolean enableStatic) {
+        return createClassResourceInfo(resources, model, isRoot, enableStatic, 
+                                       BusFactory.getThreadDefaultBus());
+    }
+    
     public static ClassResourceInfo createClassResourceInfo(
-        Map<String, UserResource> resources, UserResource model, boolean isRoot, boolean enableStatic) {
+        Map<String, UserResource> resources, UserResource model, boolean isRoot, boolean enableStatic,
+        Bus bus) {
         
         Class<?> sClass = loadClass(model.getName());
-        return createServiceClassResourceInfo(resources, model, sClass, isRoot, enableStatic);
+        return createServiceClassResourceInfo(resources, model, sClass, isRoot, enableStatic, bus);
     }
     
     public static ClassResourceInfo createServiceClassResourceInfo(
         Map<String, UserResource> resources, UserResource model, 
-        Class<?> sClass, boolean isRoot, boolean enableStatic) {
+        Class<?> sClass, boolean isRoot, boolean enableStatic, Bus bus) {
         if (model == null) {
             throw new RuntimeException("Resource class " + sClass.getName() + " has no model info");
         }
         ClassResourceInfo cri = 
             new ClassResourceInfo(sClass, sClass, isRoot, enableStatic, true,
-                                  model.getConsumes(), model.getProduces());
+                                  model.getConsumes(), model.getProduces(), bus);
         URITemplate t = URITemplate.createTemplate(model.getPath());
         cri.setURITemplate(t);
         MethodDispatcher md = new MethodDispatcher();
@@ -178,7 +185,7 @@ public final class ResourceUtils {
                 if (resources.containsKey(rClassName)) {
                     ClassResourceInfo subCri = rClassName.equals(model.getName()) ? cri 
                         : createServiceClassResourceInfo(resources, resources.get(rClassName),
-                                                         m.getReturnType(), false, enableStatic);
+                                                         m.getReturnType(), false, enableStatic, bus);
                     if (subCri != null) {
                         cri.addSubClassResourceInfo(subCri);
                         md.bind(ori, m);
@@ -193,10 +200,20 @@ public final class ResourceUtils {
 
     }
     
+    public static ClassResourceInfo createClassResourceInfo(final Class<?> rClass, 
+                                                            final Class<?> sClass,
+                                                            boolean root, 
+                                                            boolean enableStatic) {
+        return createClassResourceInfo(rClass, sClass, root, enableStatic, BusFactory.getThreadDefaultBus());
+        
+    }
     
-    public static ClassResourceInfo createClassResourceInfo(
-        final Class<?> rClass, final Class<?> sClass, boolean root, boolean enableStatic) {
-        ClassResourceInfo cri  = new ClassResourceInfo(rClass, sClass, root, enableStatic);
+    public static ClassResourceInfo createClassResourceInfo(final Class<?> rClass, 
+                                                            final Class<?> sClass,
+                                                            boolean root, 
+                                                            boolean enableStatic,
+                                                            Bus bus) {
+        ClassResourceInfo cri = new ClassResourceInfo(rClass, sClass, root, enableStatic, bus);
 
         if (root) {
             URITemplate t = URITemplate.createTemplate(cri.getPath());
@@ -225,7 +242,8 @@ public final class ResourceUtils {
                         ClassResourceInfo subCri = cri.findResource(subClass, subClass);
                         if (subCri == null) {
                             subCri = subClass == cri.getServiceClass() ? cri
-                                     : createClassResourceInfo(subClass, subClass, false, enableStatic);
+                                     : createClassResourceInfo(subClass, subClass, false, enableStatic,
+                                                               cri.getBus());
                         }
                         
                         if (subCri != null) {

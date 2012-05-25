@@ -35,6 +35,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -56,12 +58,8 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     private String consumesTypes;
     private String producesTypes;
     
-    public ClassResourceInfo(Class<?> theResourceClass) {
-        this(theResourceClass, false);
-    }
-    
     public ClassResourceInfo(ClassResourceInfo cri) {
-        
+        super(cri.getBus());       
         if (cri.isCreatedFromModel() && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
             this.root = cri.root;
             this.serviceClass = cri.serviceClass;
@@ -77,21 +75,9 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         
     }
     
-    public ClassResourceInfo(Class<?> theResourceClass, boolean theRoot) {
-        this(theResourceClass, theResourceClass, theRoot);
-    }
-    
-    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass) {
-        this(theResourceClass, theServiceClass, false);
-    }
-    
-    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, boolean theRoot) {
-        this(theResourceClass, theServiceClass, theRoot, false);
-    }
-    
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
-                             boolean theRoot, boolean enableStatic) {
-        super(theResourceClass, theServiceClass, theRoot);
+                             boolean theRoot, boolean enableStatic, Bus bus) {
+        super(theResourceClass, theServiceClass, theRoot, bus);
         this.enableStatic = enableStatic;
         if (root && resourceClass != null) {
             setParamField(serviceClass);
@@ -100,17 +86,35 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
-                             boolean theRoot, boolean enableStatic, boolean createdFromModel) {
-        this(theResourceClass, theServiceClass, theRoot, enableStatic);
+                             boolean theRoot, boolean enableStatic, boolean createdFromModel, Bus bus) {
+        this(theResourceClass, theServiceClass, theRoot, enableStatic, bus);
         this.createdFromModel = createdFromModel;
     }
-    
+    //CHECKSTYLE:OFF
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> c, 
-                             boolean theRoot, boolean enableStatic,  boolean createdFromModel,
-                             String consumesTypes, String producesTypes) {
-        this(theResourceClass, theResourceClass, theRoot, enableStatic, createdFromModel);
+                             boolean theRoot, boolean enableStatic, boolean createdFromModel,
+                             String consumesTypes, String producesTypes, Bus bus) {
+    //CHECKSTYLE:ON    
+        this(theResourceClass, theResourceClass, theRoot, enableStatic, createdFromModel, bus);
         this.consumesTypes = consumesTypes;
         this.producesTypes = producesTypes;
+    }
+    
+    // The following constructors are used by tests only
+    public ClassResourceInfo(Class<?> theResourceClass) {
+        this(theResourceClass, false);
+    }
+    
+    public ClassResourceInfo(Class<?> theResourceClass, boolean theRoot) {
+        this(theResourceClass, theResourceClass, theRoot);
+    }
+    
+    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass) {
+        this(theResourceClass, theServiceClass, false);
+    }
+
+    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, boolean theRoot) {
+        this(theResourceClass, theServiceClass, theRoot, false, BusFactory.getDefaultBus(true));
     }
     
     public ClassResourceInfo findResource(Class<?> typedClass, Class<?> instanceClass) {
@@ -126,7 +130,8 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         SubresourceKey key = new SubresourceKey(typedClass, instanceClass);
         ClassResourceInfo cri = subResources.get(key);
         if (cri == null && !enableStatic) {
-            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, enableStatic);
+            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, enableStatic,
+                                                        getBus());
             if (cri != null) {
                 subResources.putIfAbsent(key, cri);
             }

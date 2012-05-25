@@ -93,7 +93,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param app
      */
     public void setApplication(Application app) {
-        appProvider = new ProviderInfo<Application>(app);    
+        appProvider = new ProviderInfo<Application>(app, getBus());    
     }
     
     /**

@@ -80,6 +80,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -93,6 +94,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.easymock.EasyMock;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,6 +103,10 @@ public class JAXRSUtilsTest extends Assert {
     
     @Before
     public void setUp() {
+    }
+    @After
+    public void tearDown() {
+        AbstractResourceInfo.clearAllMaps();
     }
     
     @Test
@@ -1589,7 +1595,7 @@ public class JAXRSUtilsTest extends Assert {
         Customer c = new Customer();
         cri.setResourceProvider(new SingletonResourceProvider(c));
                 
-        Message m = new MessageImpl();
+        Message m = createMessage();
         ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
         HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
@@ -1597,7 +1603,7 @@ public class JAXRSUtilsTest extends Assert {
         HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
-        InjectionUtils.injectResourceFields(c, cri, m);
+        InjectionUtils.injectContextFields(c, cri, m);
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy<ServletContext>)c.getServletContextResource()).get());
         assertSame(httpRequest, 
@@ -1727,20 +1733,17 @@ public class JAXRSUtilsTest extends Assert {
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, context);
         
-        InjectionUtils.injectResourceFields(c, ori.getClassResourceInfo(), m);
+        InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
         assertSame(request.getClass(), c.getServletRequestResource().getClass());
         HttpServletResponseFilter filter = (HttpServletResponseFilter)c.getServletResponseResource();
         assertSame(response.getClass(), filter.getResponse().getClass());
         assertSame(context.getClass(), c.getServletContextResource().getClass());
-        assertNull(c.getServletRequest());
-        assertNull(c.getServletResponse());
-        assertNull(c.getServletContext());
-        
-        c = new Customer();
-        InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
-        assertNull(c.getServletRequestResource());
-        assertNull(c.getServletResponseResource());
-        assertNull(c.getServletContextResource());
+        assertNotNull(c.getServletRequest());
+        assertNotNull(c.getServletResponse());
+        assertNotNull(c.getServletContext());
+        assertNotNull(c.getServletRequestResource());
+        assertNotNull(c.getServletResponseResource());
+        assertNotNull(c.getServletContextResource());
         assertSame(request.getClass(), c.getServletRequest().getClass());
         filter = (HttpServletResponseFilter)c.getServletResponse();
         assertSame(response.getClass(), filter.getResponse().getClass());

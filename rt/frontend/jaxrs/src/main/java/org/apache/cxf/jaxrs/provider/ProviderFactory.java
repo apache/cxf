@@ -43,6 +43,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
@@ -66,7 +67,7 @@ import org.apache.cxf.message.MessageUtils;
 
 public final class ProviderFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
-    private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
+    private static final ProviderFactory SHARED_FACTORY = getInstance();
     
     private static final String JAXB_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JAXBElementProvider";
     private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.json.JSONProvider";
@@ -108,7 +109,10 @@ public final class ProviderFactory {
     private List<ProviderInfo<MessageBodyWriter<?>>> jaxbWriters = 
         new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
     
-    private ProviderFactory() {
+    private Bus bus;
+    
+    private ProviderFactory(Bus bus) {
+        this.bus = bus;
         initJaxbProviders();
     }
     
@@ -119,13 +123,13 @@ public final class ProviderFactory {
     private void initJaxbProviders() {
         Object jaxbProvider = createProvider(JAXB_PROVIDER_NAME);
         if (jaxbProvider != null) {
-            jaxbReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)jaxbProvider));
-            jaxbWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)jaxbProvider));
+            jaxbReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)jaxbProvider, bus));
+            jaxbWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)jaxbProvider, bus));
         }
         Object jsonProvider = createProvider(JSON_PROVIDER_NAME);
         if (jsonProvider != null) {
-            jaxbReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)jsonProvider));
-            jaxbWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)jsonProvider));
+            jaxbReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)jsonProvider, bus));
+            jaxbWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)jsonProvider, bus));
         }
         injectContextProxies(jaxbReaders, jaxbWriters);
     }
@@ -149,7 +153,11 @@ public final class ProviderFactory {
     }
     
     public static ProviderFactory getInstance() {
-        return new ProviderFactory();
+        return new ProviderFactory(BusFactory.getThreadDefaultBus());
+    }
+    
+    public static ProviderFactory getInstance(Bus bus) {
+        return new ProviderFactory(bus);
     }
     
     public static ProviderFactory getInstance(Message m) {
@@ -480,39 +488,39 @@ public final class ProviderFactory {
             Class<?> oClass = ClassHelper.getRealClass(o);
             
             if (MessageBodyReader.class.isAssignableFrom(oClass)) {
-                messageReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)o)); 
+                messageReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)o, bus)); 
             }
             
             if (MessageBodyWriter.class.isAssignableFrom(oClass)) {
-                messageWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)o)); 
+                messageWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)o, bus)); 
             }
             
             if (ContextResolver.class.isAssignableFrom(oClass)) {
-                contextResolvers.add(new ProviderInfo<ContextResolver<?>>((ContextResolver<?>)o)); 
+                contextResolvers.add(new ProviderInfo<ContextResolver<?>>((ContextResolver<?>)o, bus)); 
             }
             
             if (ContextProvider.class.isAssignableFrom(oClass)) {
-                contextProviders.add(new ProviderInfo<ContextProvider<?>>((ContextProvider<?>)o)); 
+                contextProviders.add(new ProviderInfo<ContextProvider<?>>((ContextProvider<?>)o, bus)); 
             }
             
             if (RequestHandler.class.isAssignableFrom(oClass)) {
-                requestHandlers.add(new ProviderInfo<RequestHandler>((RequestHandler)o)); 
+                requestHandlers.add(new ProviderInfo<RequestHandler>((RequestHandler)o, bus)); 
             }
             
             if (ResponseHandler.class.isAssignableFrom(oClass)) {
-                responseHandlers.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o)); 
+                responseHandlers.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o, bus)); 
             }
             
             if (ExceptionMapper.class.isAssignableFrom(oClass)) {
-                exceptionMappers.add(new ProviderInfo<ExceptionMapper<?>>((ExceptionMapper<?>)o)); 
+                exceptionMappers.add(new ProviderInfo<ExceptionMapper<?>>((ExceptionMapper<?>)o, bus)); 
             }
             
             if (ResponseExceptionMapper.class.isAssignableFrom(oClass)) {
-                responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper<?>>((ResponseExceptionMapper<?>)o)); 
+                responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper<?>>((ResponseExceptionMapper<?>)o, bus)); 
             }
             
             if (ParameterHandler.class.isAssignableFrom(oClass)) {
-                paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o)); 
+                paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o, bus)); 
             }
         }
         sortReaders();

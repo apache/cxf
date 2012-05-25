@@ -62,6 +62,7 @@ import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
@@ -84,6 +85,7 @@ public class ProviderFactoryTest extends Assert {
     @Before
     public void setUp() {
         ProviderFactory.getInstance().clearProviders();
+        AbstractResourceInfo.clearAllMaps();
     }
     
     @Test

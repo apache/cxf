@@ -30,6 +30,8 @@ import java.util.concurrent.Executor;
 import javax.ws.rs.Path;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -60,6 +62,17 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     public JAXRSServiceFactoryBean() {
     }
 
+    public Bus getBus() {
+        Bus bus = super.getBus();
+        return bus == null ? BusFactory.getThreadDefaultBus() : bus;
+    }
+
+    public void setBus(Bus bus) {
+        if (super.getBus() == null) {
+            super.setBus(bus);
+        }
+    }
+    
     public void setServiceName(QName name) {
         this.serviceName = name;
     }
@@ -159,7 +172,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (UserResource ur : resources) {
             if (ur.getPath() != null) {
-                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true, enableStatic);
+                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true, enableStatic,
+                                                                              getBus());
                 if (cri != null) {
                     classResourceInfos.add(cri);
                 }
@@ -171,7 +185,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (Class<?> sClass : sClasses) {
             ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(
-                map, map.get(sClass.getName()), sClass, true, enableStatic);
+                map, map.get(sClass.getName()), sClass, true, enableStatic, getBus());
             if (cri != null) {
                 classResourceInfos.add(cri);
             }
@@ -188,7 +202,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     protected ClassResourceInfo createResourceInfo(Class<?> cls, boolean isRoot) {
         ClassResourceInfo classResourceInfo = 
-            ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic);
+            ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic, getBus());
         if (classResourceInfo != null) {
             classResourceInfos.add(classResourceInfo);
         }
@@ -215,7 +229,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
                 continue;
             }
             
-            cri = ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic);
+            cri = ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic,
+                                                        getBus());
             if (cri != null) {
                 classResourceInfos.add(cri);
                 cri.setResourceProvider(

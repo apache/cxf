@@ -39,6 +39,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -91,6 +92,11 @@ public class ClassResourceInfoTest extends Assert {
         }
     }
     
+    @After
+    public void tearDown() {
+        AbstractResourceInfo.clearAllMaps();
+    }
+    
     @Test
     public void testGetHttpContexts() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
@@ -99,33 +105,19 @@ public class ClassResourceInfoTest extends Assert {
         
         c = new ClassResourceInfo(TestClass.class, true);
         fields = c.getContextFields();
-        assertEquals("2 http context fields available", 2, fields.size());
-        assertTrue("Wrong fields selected", 
-                   (fields.get(0).getType() == UriInfo.class
-                   || fields.get(1).getType() == UriInfo.class)
-                   && (fields.get(0).getType() == HttpHeaders.class
-                   || fields.get(1).getType() == HttpHeaders.class));
-    }
-
-    @Test
-    public void testGetResources() {
-        ClassResourceInfo c = new ClassResourceInfo(TestClass3.class);
-        List<Field> fields = c.getResourceFields();
-        assertEquals("Only root classes should check these fields", 0, fields.size());
-        c = new ClassResourceInfo(TestClass3.class, true);
-        fields = c.getResourceFields();
-        
         Set<Class<?>> clses = new HashSet<Class<?>>(); 
         for (Field f : fields) {
             clses.add(f.getType());
         }
-        assertEquals("3 resources fields available", 3, fields.size());
+        assertEquals("5 http context fields available", 5, clses.size());
         assertTrue("Wrong fields selected",
                    clses.contains(HttpServletRequest.class)
                    && clses.contains(HttpServletResponse.class)
-                   && clses.contains(ServletContext.class)); 
+                   && clses.contains(ServletContext.class)
+                   && clses.contains(UriInfo.class)
+                   && clses.contains(HttpHeaders.class));
     }
-    
+
     @Test
     public void testGetPath() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);

@@ -19,12 +19,14 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import org.apache.cxf.Bus;
+
 public class ProviderInfo<T> extends AbstractResourceInfo {
 
     private T provider;
     
-    public ProviderInfo(T provider) {
-        super(provider.getClass(), provider.getClass(), true);
+    public ProviderInfo(T provider, Bus bus) {
+        super(provider.getClass(), provider.getClass(), true, bus);
         this.provider = provider;
     }
     
