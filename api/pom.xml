@@ -34,6 +34,10 @@
     </parent>
 
     <properties>
+        <cxf.osgi.export>
+            !org.apache.cxf.internal,
+            org.apache.cxf.*,
+        </cxf.osgi.export>
         <cxf.osgi.import>
             com.sun*;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
@@ -49,6 +53,7 @@
             com.sun.xml.bind.api.impl;resolution:=optional,
             com.sun.xml.internal.bind.api;resolution:=optional,
             com.sun.xml.internal.bind.api.impl;resolution:=optional,
+            org.apache.aries*;version="${cxf.aries.version.range}"
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
             org.apache.cxf.bus,org.apache.cxf.*
@@ -125,7 +130,12 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint.core</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.apache.ws.xmlschema</groupId>
             <artifactId>xmlschema-core</artifactId>
