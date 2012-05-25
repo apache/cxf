@@ -132,14 +132,14 @@ public class AccessTokenService extends AbstractOAuthService {
             // client has already authenticated
             Principal p = sc.getUserPrincipal();
             String scheme = sc.getAuthenticationScheme();
-            if ("Basic".equals(scheme)) {
+            if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(scheme)) {
                 // section 2.3.1
                 client = getClient(p.getName());
             } else {
                 // section 2.3.2
                 // the client has authenticated itself using some other scheme
                 // in which case the mapping between the scheme and the client_id
-                // should've been done, in which case the client_id is expected
+                // should've been done and the client_id is expected
                 // on the current message
                 Object clientIdProp = getMessageContext().get(OAuthConstants.CLIENT_ID);
                 if (clientIdProp != null) {
@@ -152,7 +152,7 @@ public class AccessTokenService extends AbstractOAuthService {
             // the client id and secret are expected to be in the Basic scheme data
             String[] parts = 
                 AuthorizationUtils.getAuthorizationParts(getMessageContext());
-            if ("Basic".equals(parts[0])) {
+            if (OAuthConstants.BASIC_SCHEME.equalsIgnoreCase(parts[0])) {
                 String[] authInfo = AuthorizationUtils.getBasicAuthParts(parts[1]);
                 client = getAndValidateClient(authInfo[0], authInfo[1]);
             }

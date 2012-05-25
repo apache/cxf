@@ -53,6 +53,8 @@ public final class OAuthConstants {
     public static final String MAC_AUTHORIZATION_SCHEME = "Mac";
     public static final String ALL_AUTH_SCHEMES = "*";
 
+    // Default Client Authentication Scheme
+    public static final String BASIC_SCHEME = "Basic";
     
     // Authorization Code grant constants
     public static final String AUTHORIZATION_CODE_VALUE = "code";
