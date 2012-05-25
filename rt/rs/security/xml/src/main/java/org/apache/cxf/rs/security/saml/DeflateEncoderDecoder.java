@@ -28,11 +28,10 @@ import java.util.zip.Inflater;
 public class DeflateEncoderDecoder {
     public InputStream inflateToken(byte[] deflatedToken) 
         throws DataFormatException {
-        Inflater inflater = new Inflater();
+        Inflater inflater = new Inflater(true);
         inflater.setInput(deflatedToken);
         
         byte[] input = new byte[deflatedToken.length * 2];
-        
         int inflatedLen = 0;
         int inputLen = 0;
         byte[] inflatedToken = input;
@@ -53,7 +52,7 @@ public class DeflateEncoderDecoder {
     }
     
     public byte[] deflateToken(byte[] tokenBytes) {
-        Deflater compresser = new Deflater();
+        Deflater compresser = new Deflater(Deflater.DEFLATED, true);
         
         compresser.setInput(tokenBytes);
         compresser.finish();

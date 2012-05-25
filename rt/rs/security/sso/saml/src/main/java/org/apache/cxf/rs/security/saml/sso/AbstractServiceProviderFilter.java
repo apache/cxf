@@ -40,13 +40,11 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
@@ -54,7 +52,6 @@ import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.saml2.core.AuthnRequest;
 
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
@@ -229,16 +226,6 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         return responseState;
     }
     
-    protected String deflateEncodeAuthnRequest(Element authnRequestElement)
-        throws IOException {
-        String requestMessage = DOM2Writer.nodeToString(authnRequestElement);
-        
-        DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
-        byte[] deflatedBytes = encoder.deflateToken(requestMessage.getBytes("UTF-8"));
-        
-        return Base64Utility.encode(deflatedBytes);
-    }
-
     protected SamlRequestInfo createSamlRequestInfo(Message m) throws Exception {
         Document doc = DOMUtils.createDocument();
         doc.appendChild(doc.createElement("root"));
@@ -252,7 +239,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             signAuthnRequest(authnRequest);
         }
         Element authnRequestElement = OpenSAMLUtil.toDom(authnRequest, doc);
-        String authnRequestEncoded = deflateEncodeAuthnRequest(authnRequestElement);
+        String authnRequestEncoded = encodeAuthnRequest(authnRequestElement);
         
         SamlRequestInfo info = new SamlRequestInfo();
         info.setSamlRequest(authnRequestEncoded);
@@ -276,6 +263,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         
         return info;
     }
+    
+    protected abstract String encodeAuthnRequest(Element authnRequest) throws IOException;
     
     protected abstract void signAuthnRequest(AuthnRequest authnRequest) throws Exception;
     

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
@@ -26,14 +27,19 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.xml.security.x509.BasicX509Credential;
@@ -43,6 +49,12 @@ import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
 
 public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
+    
+    private boolean useDeflateEncoding;
+    
+    public void setUseDeflateEncoding(boolean useDeflateEncoding) {
+        this.useDeflateEncoding = useDeflateEncoding;
+    }
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         if (checkSecurityContext(m)) {
@@ -74,6 +86,21 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                 throw new WebApplicationException(ex);
             }
         }
+    }
+    
+    protected String encodeAuthnRequest(Element authnRequest) throws IOException {
+        String requestMessage = DOM2Writer.nodeToString(authnRequest);
+        
+        byte[] deflatedBytes = null;
+        // Not correct according to the spec but required by some IDPs.
+        if (useDeflateEncoding) {
+            DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
+            deflatedBytes = encoder.deflateToken(requestMessage.getBytes("UTF-8"));
+        } else {
+            deflatedBytes = requestMessage.getBytes("UTF-8");
+        }
+
+        return Base64Utility.encode(deflatedBytes);
     }
     
     protected void signAuthnRequest(AuthnRequest authnRequest) throws Exception {

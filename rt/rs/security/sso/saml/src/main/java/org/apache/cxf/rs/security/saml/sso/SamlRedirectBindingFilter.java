@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.PrivateKey;
 import java.security.Signature;
@@ -28,13 +29,18 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.util.Base64;
+import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
@@ -75,6 +81,15 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     
     protected void signAuthnRequest(AuthnRequest authnRequest) throws Exception {
         // Do nothing as we sign the request in a different way for the redirect binding
+    }
+    
+    protected String encodeAuthnRequest(Element authnRequest) throws IOException {
+        String requestMessage = DOM2Writer.nodeToString(authnRequest);
+
+        DeflateEncoderDecoder encoder = new DeflateEncoderDecoder();
+        byte[] deflatedBytes = encoder.deflateToken(requestMessage.getBytes("UTF-8"));
+
+        return Base64Utility.encode(deflatedBytes);
     }
     
     /**

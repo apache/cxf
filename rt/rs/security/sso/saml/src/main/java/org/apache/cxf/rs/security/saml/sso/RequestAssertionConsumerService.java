@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -112,28 +111,29 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response processSamlResponse(@FormParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                         @FormParam(SSOConstants.RELAY_STATE) String relayState) {
-        return doProcessSamlResponse(encodedSamlResponse, relayState);
+        return doProcessSamlResponse(encodedSamlResponse, relayState, true);
         
     }
     
     @GET
     public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                     @QueryParam(SSOConstants.RELAY_STATE) String relayState) {
-        return doProcessSamlResponse(encodedSamlResponse, relayState);
+        return doProcessSamlResponse(encodedSamlResponse, relayState, false);
     }
     
     protected Response doProcessSamlResponse(String encodedSamlResponse,
-                                          String relayState) {
+                                          String relayState,
+                                          boolean postBinding) {
         RequestState requestState = processRelayState(relayState);
         URI targetURI = getTargetURI(requestState.getTargetAddress());
         
         org.opensaml.saml2.core.Response samlResponse = 
-            readSAMLResponse(true, encodedSamlResponse);
+            readSAMLResponse(postBinding, encodedSamlResponse);
 
         // Validate the Response
         validateSamlResponseProtocol(samlResponse);
         SSOValidatorResponse validatorResponse = 
-            validateSamlSSOResponse(true, samlResponse, requestState);
+            validateSamlSSOResponse(postBinding, samlResponse, requestState);
         
         // Set the security context
         String securityContextKey = UUID.randomUUID().toString();
@@ -197,6 +197,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         }
         
         String samlResponseDecoded = samlResponse;
+        /*
         // URL Decoding only applies for the re-direct binding
         if (!postBinding) {
             try {
@@ -205,11 +206,12 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
                 throw new WebApplicationException(400);
             }
         }
+        */
         InputStream tokenStream = null;
         if (isSupportBase64Encoding()) {
             try {
                 byte[] deflatedToken = Base64Utility.decode(samlResponseDecoded);
-                tokenStream = isSupportDeflateEncoding() 
+                tokenStream = !postBinding && isSupportDeflateEncoding() 
                     ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
                     : new ByteArrayInputStream(deflatedToken); 
             } catch (Base64Exception ex) {
