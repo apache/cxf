@@ -42,7 +42,8 @@
             javax.mail;version="${cxf.osgi.javax.mail.version}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
-            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}"
+            javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
+            org.apache.aries*;version="${cxf.aries.version.range}"
         </cxf.osgi.import>
         <cxf.osgi.export>
             META-INF.cxf, *

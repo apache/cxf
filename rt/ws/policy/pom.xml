@@ -30,6 +30,12 @@
         <version>2.6.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+  
+    <properties>
+        <cxf.osgi.import>
+            org.apache.aries*;version="${cxf.aries.version.range}"
+        </cxf.osgi.import>
+    </properties>
 
     <dependencies>
         <dependency>

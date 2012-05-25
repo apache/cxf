@@ -33,6 +33,11 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <cxf.osgi.import>
+            org.apache.aries*;version="${cxf.aries.version.range}"
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
