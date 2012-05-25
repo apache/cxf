@@ -246,8 +246,7 @@ public class CachedOutputStream extends OutputStream {
                     IOUtils.copyAndCloseInput(fin, out);
                 }
                 streamList.remove(currentStream);
-                tempFile.delete();
-                tempFile = null;
+                deleteTempFile();
                 inmem = true;
             }
         }
@@ -445,7 +444,10 @@ public class CachedOutputStream extends OutputStream {
             //Could be IOException or SecurityException or other issues.
             //Don't care what, just keep it in memory.
             tempFileFailed = true;
-            tempFile = null;
+            if (currentStream != bout) {
+                currentStream.close();
+            }
+            deleteTempFile();
             inmem = true;
             currentStream = bout;
         }
@@ -483,6 +485,13 @@ public class CachedOutputStream extends OutputStream {
         }
     }
     
+    private synchronized void deleteTempFile() {
+        if (tempFile != null) {
+            File file = tempFile;
+            tempFile = null;
+            FileUtils.delete(file);
+        }
+    }
     private void maybeDeleteTempFile(Object stream) {
         streamList.remove(stream);
         if (!inmem && tempFile != null && streamList.isEmpty() && allowDeleteOfFile) {
@@ -494,8 +503,7 @@ public class CachedOutputStream extends OutputStream {
                     //ignore
                 }
             }
-            tempFile.delete();
-            tempFile = null;
+            deleteTempFile();
             currentStream = new LoadingByteArrayOutputStream(1024);
             inmem = true;
         }
