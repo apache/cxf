@@ -101,8 +101,8 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         
         // Activate process response for oneWay
-        if (msg.getExchange().isOneWay()) {
-            msg.getExchange().put(Message.PROCESS_ONEWAY_REPONSE, true);
+        if (message.getExchange().isOneWay()) {
+            message.getExchange().put(Message.PROCESS_ONEWAY_REPONSE, true);
         }
         
         RMProperties rmpsIn = null;
