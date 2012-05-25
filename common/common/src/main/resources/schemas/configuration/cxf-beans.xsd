@@ -78,4 +78,8 @@
        <xsd:attribute name="bean"  type="xsd:string"/>
     </xsd:complexType>
 
+    <xsd:complexType name="identifiedType" abstract="true">
+      <xsd:attribute name="id" type="xsd:ID"/>
+    </xsd:complexType>
+
 </xsd:schema>

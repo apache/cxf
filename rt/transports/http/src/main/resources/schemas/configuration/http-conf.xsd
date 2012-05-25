@@ -39,10 +39,6 @@
     <xs:import namespace="http://cxf.apache.org/configuration/beans" 
                schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
 
-    <xs:complexType name="identifiedType" abstract="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-
     <!-- Conduit Specific Items -->
 
     <xs:element name="authorization"       type="sec:AuthorizationPolicy"/>
@@ -54,7 +50,7 @@
     <xs:element name="conduit">
       <xs:complexType>
         <xs:complexContent>
-          <xs:extension base="http-conf:identifiedType">
+          <xs:extension base="cxf-beans:identifiedType">
             <xs:all>
                 <xs:element ref="http-conf:client" minOccurs="0">
                    <xs:annotation>
@@ -128,7 +124,7 @@
     <xs:element name="destination">
       <xs:complexType>
         <xs:complexContent>
-          <xs:extension base="http-conf:identifiedType">
+          <xs:extension base="cxf-beans:identifiedType">
             <xs:all>
 	            <xs:element ref="http-conf:server" minOccurs="0">
 	               <xs:annotation>

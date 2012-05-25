@@ -37,10 +37,6 @@
   <xs:import namespace="http://schemas.xmlsoap.org/ws/2005/02/rm/policy" schemaLocation="http://schemas.xmlsoap.org/ws/2005/02/rm/wsrm-policy.xsd"/>
 
 
-  <xs:complexType name="identifiedType" abstract="true">
-    <xs:attribute name="id" type="xs:ID"/>
-  </xs:complexType>
-
   <xs:element name="reliableMessaging">
     <xs:annotation>
       <xs:documentation>
@@ -61,7 +57,7 @@
   <xs:element name="rmManager">   
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="tns:identifiedType">
+        <xs:extension base="cxf-beans:identifiedType">
           <xs:group ref="tns:rmElements"/>
           <xs:attribute name="activation" type="tns:activationType"/>
           <xs:attributeGroup ref="cxf-beans:beanAttributes"></xs:attributeGroup>
@@ -137,7 +133,7 @@
   <xs:element name="jdbcStore">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="tns:identifiedType">
+        <xs:extension base="cxf-beans:identifiedType">
           <xs:attributeGroup ref="cxf-beans:beanAttributes"/>        
           <xs:attribute name="activation" type="tns:activationType"/>
           <xs:attribute name="driverClassName" type="xs:string" default="org.apache.derby.jdbc.EmbeddedDriver">
