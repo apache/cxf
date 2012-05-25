@@ -16,22 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.common;
 
-import javax.jws.WebService;
+package org.apache.cxf.systest.ws.fault.server;
 
-import org.apache.cxf.feature.Features;
-import org.example.contract.doubleit.DoubleItFault;
-import org.example.contract.doubleit.DoubleItPortType;
+import java.net.URL;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
-            endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
-public class DoubleItImpl implements DoubleItPortType {
-    
-    public int doubleIt(int numberToDouble) throws DoubleItFault {
-        return numberToDouble * 2;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
+public class Server extends AbstractBusTestServerBase {
+
+    public Server() {
+
     }
-    
+
+    protected void run()  {
+        URL busFile = Server.class.getResource("server.xml");
+        Bus busLocal = new SpringBusFactory().createBus(busFile);
+        BusFactory.setDefaultBus(busLocal);
+        setBus(busLocal);
+
+        try {
+            new Server();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
