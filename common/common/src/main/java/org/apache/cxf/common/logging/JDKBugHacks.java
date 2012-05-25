@@ -87,13 +87,15 @@ final class JDKBugHacks {
     }
     
     public static void doHacks() {
+        if (skipHack("org.apache.cxf.JDKBugHacks.all")) {
+            return;
+        }                
         try {
             ClassLoader orig = Thread.currentThread().getContextClassLoader();
             try {
                 // Use the system classloader as the victim for all this
                 // ClassLoader pinning we're about to do.
                 Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
-                
                 try {
                     //Trigger a call to sun.awt.AppContext.getAppContext()
                     if (!skipHack("org.apache.cxf.JDKBugHacks.imageIO")) {
@@ -120,9 +122,14 @@ final class JDKBugHacks {
                 try {
                     if (!skipHack("org.apache.cxf.JDKBugHacks.gcRequestLatency")) {
                         Class<?> clazz = Class.forName("sun.misc.GC");
-                        Method method = clazz.getDeclaredMethod("requestLatency",
+                        Method method = clazz.getDeclaredMethod("currentLatencyTarget");
+                        Long l = (Long)method.invoke(null);
+                        if (l != null && l.longValue() == 0) {
+                            //something already set it, move on
+                            method = clazz.getDeclaredMethod("requestLatency",
                                 new Class[] {Long.TYPE});
-                        method.invoke(null, Long.valueOf(36000000));
+                            method.invoke(null, Long.valueOf(36000000));
+                        }
                     }                    
                 } catch (Throwable e) {
                     //ignore

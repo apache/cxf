@@ -282,6 +282,7 @@
                         <argLine>${cxf.surefire.fork.vmargs}</argLine>
                         <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
+                            <org.apache.cxf.JDKBugHacks.all>true</org.apache.cxf.JDKBugHacks.all>
                             <org.apache.ws.commons.schema.protectReadOnlyCollections>${cxf.protect-xmlschema-collections}</org.apache.ws.commons.schema.protectReadOnlyCollections>
                             <useRandomPorts>true</useRandomPorts>
                             <cxf.validateServiceSchemas>${cxf.validateServices}</cxf.validateServiceSchemas>
