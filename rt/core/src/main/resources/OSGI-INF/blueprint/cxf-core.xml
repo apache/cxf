@@ -44,4 +44,10 @@
       <entry key="osgi.service.blueprint.namespace" value="http://cxf.apache.org/configuration/security"/>
     </service-properties>
   </service>
+  <!-- additional namespaces that are referenced by cxf configuration schemas -->
+  <service ref="CXFCoreNamespaceHandler" interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace" value="http://schemas.xmlsoap.org/wsdl/"/>
+    </service-properties>
+  </service>
 </blueprint>
