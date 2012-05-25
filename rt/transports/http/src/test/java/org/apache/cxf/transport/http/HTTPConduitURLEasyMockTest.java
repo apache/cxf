@@ -48,7 +48,6 @@ import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -61,7 +60,7 @@ import org.junit.Test;
 public class HTTPConduitURLEasyMockTest extends Assert {
     private static String oldHttpProxyHost;
 
-    private enum ResponseStyle { NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED };
+    private enum ResponseStyle { NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED, ONEWAY_NONE };
     private enum ResponseDelimiter { LENGTH, CHUNKED, EOF };
 
     private static final String NOWHERE = "http://nada.nothing.nowhere.null/";
@@ -212,12 +211,13 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     }
 
     @Test
-    public void testSendOnewayChunkedEmptyPartialResponse() 
+    public void testSendOnewayChunkedEmptyPartialResponseProcessResponse() 
         throws Exception {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false);
         Message message = new MessageImpl();
         conduit.prepare(message);
+        message.put(Message.PROCESS_ONEWAY_REPONSE, Boolean.TRUE);
         verifySentMessage(conduit, 
                           message, 
                           ResponseStyle.NONE,
@@ -226,7 +226,23 @@ public class HTTPConduitURLEasyMockTest extends Assert {
                           "POST");
         finalVerify();
     }
-    
+
+    @Test
+    public void testSendOnewayDoNotProcessResponse() 
+        throws Exception {
+        control = EasyMock.createNiceControl();
+        HTTPConduit conduit = setUpConduit(true, false);
+        Message message = new MessageImpl();
+        conduit.prepare(message);
+        verifySentMessage(conduit, 
+                          message, 
+                          ResponseStyle.ONEWAY_NONE,
+                          ResponseDelimiter.CHUNKED,
+                          true,  // empty response
+                          "POST");
+        finalVerify();
+    }
+
     @Test
     public void testSendTwowayDecoupledEmptyPartialResponse() 
         throws Exception {
@@ -266,9 +282,9 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         Exchange exchange = control.createMock(Exchange.class);
         message.setExchange(exchange);
         exchange.isOneWay();
-        EasyMock.expectLastCall().andReturn(true);
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
         exchange.isSynchronous();
-        EasyMock.expectLastCall().andReturn(true);
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
         exchange.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
     }
@@ -425,13 +441,13 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             EasyMock.expectLastCall();
         }
         
-        if (style == ResponseStyle.NONE) {
+        if ((style == ResponseStyle.NONE) || (style == ResponseStyle.ONEWAY_NONE)) {
             setUpOneway(message);
         }
         
         connection.getRequestMethod();
         EasyMock.expectLastCall().andReturn(method).anyTimes();
-        verifyHandleResponse(style, delimiter, conduit);
+        verifyHandleResponse(style, delimiter, emptyResponse, conduit);
 
         control.replay();
         
@@ -439,19 +455,21 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         wrappedOS.flush();
         wrappedOS.close();
 
-        assertNotNull("expected in message", inMessage);
-        Map<?, ?> headerMap = (Map<?, ?>) inMessage.get(Message.PROTOCOL_HEADERS);
-        assertEquals("unexpected response headers", headerMap.size(), 0);
-        Integer expectedResponseCode = getResponseCode(style);
-        assertEquals("unexpected response code",
-                     expectedResponseCode,
-                     inMessage.get(Message.RESPONSE_CODE));
-        if (!emptyResponse) {
-            assertTrue("unexpected content formats",
-                       inMessage.getContentFormats().contains(InputStream.class));
-            InputStream content = inMessage.getContent(InputStream.class);
-            if (!(content instanceof PushbackInputStream)) {
-                assertSame("unexpected content", is, content);            
+        if (style != ResponseStyle.ONEWAY_NONE) {
+            assertNotNull("expected in message", inMessage);
+            Map<?, ?> headerMap = (Map<?, ?>) inMessage.get(Message.PROTOCOL_HEADERS);
+            assertEquals("unexpected response headers", headerMap.size(), 0);
+            Integer expectedResponseCode = getResponseCode(style);
+            assertEquals("unexpected response code",
+                         expectedResponseCode,
+                         inMessage.get(Message.RESPONSE_CODE));
+            if (!emptyResponse) {
+                assertTrue("unexpected content formats",
+                           inMessage.getContentFormats().contains(InputStream.class));
+                InputStream content = inMessage.getContent(InputStream.class);
+                if (!(content instanceof PushbackInputStream)) {
+                    assertSame("unexpected content", is, content);            
+                }
             }
         }
         
@@ -505,11 +523,6 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         return wrappedOS;
     }
     
-    private void verifyHandleResponse(ResponseStyle style, ResponseDelimiter delimiter, HTTPConduit conduit) 
-        throws IOException {
-        verifyHandleResponse(style, delimiter, false, conduit);
-    }
-    
     private void verifyHandleResponse(ResponseStyle style, 
                                       ResponseDelimiter delimiter,
                                       boolean emptyResponse,
@@ -560,7 +573,12 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         case BACK_CHANNEL_ERROR:
             connection.getErrorStream();
             EasyMock.expectLastCall().andReturn(null);
-            break;    
+            break; 
+            
+        case ONEWAY_NONE:
+            is.close();
+            EasyMock.expectLastCall();
+            break;
             
         default:
             break;
