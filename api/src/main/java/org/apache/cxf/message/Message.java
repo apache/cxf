@@ -69,6 +69,12 @@ public interface Message extends StringMap {
     String PARTIAL_RESPONSE_MESSAGE = "org.apache.cxf.partial.response";
     String EMPTY_PARTIAL_RESPONSE_MESSAGE = "org.apache.cxf.partial.response.empty";
     String ONE_WAY_REQUEST = "OnewayRequest";
+
+    /**
+     * Boolean property specifying if oneWay response must be processed.
+     */
+    String PROCESS_ONEWAY_REPONSE = "org.apache.cxf.transport.processOneWayResponse";
+    
     
     String ROBUST_ONEWAY = "org.apache.cxf.oneway.robust";
     

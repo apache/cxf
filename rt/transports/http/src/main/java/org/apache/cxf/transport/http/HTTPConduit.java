@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http;
 
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
@@ -1545,6 +1544,15 @@ public class HTTPConduit
             return exchange != null && exchange.isOneWay();
         }
         
+        private boolean doProcessResponse(Message message) {
+            // 1. Not oneWay
+            if (!isOneway(message.getExchange())) {
+                return true;
+            }
+            // 2. Context property
+            return MessageUtils.getContextualBoolean(message, Message.PROCESS_ONEWAY_REPONSE, false);
+        }
+
         protected void handleResponseInternal() throws IOException {
             Exchange exchange = outMessage.getExchange();
             int responseCode = connection.getResponseCode();
@@ -1569,7 +1577,7 @@ public class HTTPConduit
             if (isOneway(exchange) 
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
                 in = ChunkedUtil.getPartialResponse(connection, responseCode);
-                if (in == null) {
+                if ((in == null) || (!doProcessResponse(outMessage))) {
                     // oneway operation or decoupled MEP without 
                     // partial response
                     connection.getInputStream().close();
@@ -1581,6 +1589,9 @@ public class HTTPConduit
                             getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
                             cc.handleResponse(null, null);
                         }
+                    }
+                    if (in != null) {
+                        in.close();
                     }
                     return;
                 }
