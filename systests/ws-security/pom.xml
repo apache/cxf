@@ -59,6 +59,10 @@
                         <configuration>
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <sourceRoot>${basedir}/target/generated-sources</sourceRoot>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                                <faultSerialVersionUID>1</faultSerialVersionUID>
+                            </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/DoubleItLogical.wsdl</wsdl>
