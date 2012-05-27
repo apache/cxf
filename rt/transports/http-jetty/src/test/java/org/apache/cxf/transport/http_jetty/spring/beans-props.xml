@@ -80,7 +80,7 @@
 	      <hj:threadingParameters minThreads="${engine.port.zero.minThreads}" maxThreads="${engine.port.zero.maxThreads}"/>
 	   </hj:engine>
 	   
-	   <hj:engine port="$(engine.port.nine.one)" maxIdleTime="$(engine.port.nine.one.maxIdle)">
+	   <hj:engine port="$(engine.port.nine.one)" maxIdleTime="$(engine.port.nine.one.maxIdle)" sendServerVersion="$(engine.port.nine.one.sendServerVersion)">
 	       <hj:threadingParameters minThreads="${engine.port.nine.one.minThreads}"
 	        maxThreads="${engine.port.nine.one.maxThreads}"/>	      
 	     <hj:connector>

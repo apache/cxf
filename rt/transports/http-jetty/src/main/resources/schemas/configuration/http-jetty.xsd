@@ -152,6 +152,12 @@
                 <xs:documentation>Specifies the maximum idle time for a jetty connection. The timer is reset whenever there are any read or write actions on the underlying stream.</xs:documentation> 
            </xs:annotation>
        </xs:attribute>
+       <xs:attribute name="sendServerVersion" type="ptp:ParameterizedBoolean">
+           <xs:annotation>
+                <xs:documentation>Specifies if Jetty Server prevent the Server: http header being sent. Server: http header will be sent if this attribute is set to true or omitted, won't be sent otherwise.</xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
+
     </xs:complexType>
     
     <xs:complexType name="JettyHTTPServerEngineFactoryConfigType">

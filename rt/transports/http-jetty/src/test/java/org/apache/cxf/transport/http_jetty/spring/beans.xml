@@ -65,7 +65,7 @@
 	      <hj:threadingParameters minThreads="21" maxThreads="389"/>
 	   </hj:engine>
 	   
-	   <hj:engine port="9001" maxIdleTime="40000">
+	   <hj:engine port="9001" maxIdleTime="40000" sendServerVersion="false">
 	       <hj:threadingParameters minThreads="99" maxThreads="777"/>	      
 	     <hj:connector>
            <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
