@@ -41,7 +41,7 @@
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="id" type="xs:int"/>
-            <xs:element name="chapter" ref="ch:thechapter"/>
+            <xs:element ref="ch:thechapter"/>
         </xs:sequence>
       </xs:complexType>
     </xs:schema>

@@ -31,7 +31,7 @@
 	     <xs:complexType>
 	       <xs:sequence>
 	         <xs:element name="name" type="xs:string"/>
-	         <xs:element name="ref" ref="wsa:EndpointReference"/>
+	         <xs:element ref="wsa:EndpointReference"/>
 	       </xs:sequence>  
 	     </xs:complexType>    
 	 </xs:element>		
