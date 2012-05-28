@@ -76,6 +76,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.SystemPropertyAction;
+import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -88,6 +89,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.ws.commons.schema.XmlSchema;
 
 /**
  * TODO: This will need to be moved into a separate module
@@ -168,6 +170,8 @@ public class SourceGenerator {
     private Map<String, String> schemaTypesMap = Collections.emptyMap();
     private Bus bus;
     private boolean supportMultipleXmlReps;
+
+    private SchemaCollection schemaCollection = new SchemaCollection();
     
     public SourceGenerator() {
         this(Collections.<String, String>emptyMap());
@@ -1224,8 +1228,21 @@ public class SourceGenerator {
     
     private SchemaInfo createSchemaInfo(Element schemaEl, String systemId) { 
         SchemaInfo info = new SchemaInfo(schemaEl.getAttribute("targetNamespace"));
+
         info.setElement(schemaEl);
         info.setSystemId(systemId);
+
+        // Lets try to read the schema to deal with the possible
+        // eviction of the DOM element from the memory 
+        try {
+            XmlSchema xmlSchema = schemaCollection.read(schemaEl, systemId);
+            info.setSchema(xmlSchema);
+        } catch (Exception ex) {
+            // may be due to unsupported resolvers for protocols like
+            // classpath: or not the valid schema definition, may not be critical
+            // for the purpose of the schema compilation.
+        } 
+
         return info;
     }
     
@@ -1303,7 +1320,9 @@ public class SourceGenerator {
                 // when addressing the issue of retrieving WADLs with included schemas  
                 if (key.startsWith("classpath:")) {
                     String resource = key.substring(10);
-                    URL url = getClass().getResource(resource);
+                    URL url = ResourceUtils.getClasspathResourceURL(resource,
+                                                                    SourceGenerator.class,
+                                                                    bus);
                     if (url != null) {
                         try {
                             key = url.toURI().toString();
