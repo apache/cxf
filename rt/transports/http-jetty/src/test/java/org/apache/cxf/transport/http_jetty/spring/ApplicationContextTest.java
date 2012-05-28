@@ -132,6 +132,7 @@ public class ApplicationContextTest extends Assert {
         
         engine = (JettyHTTPServerEngine)jd2.getEngine();
         assertEquals(40000, engine.getMaxIdleTime());
+        assertFalse(engine.getSendServerVersion());
         assertEquals(99, engine.getThreadingParameters().getMinThreads());
         assertEquals(777, engine.getThreadingParameters().getMaxThreads());
         assertTrue("The engine should support session manager", engine.isSessionSupport());
