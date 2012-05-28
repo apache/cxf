@@ -96,6 +96,7 @@ public class JettyHTTPServerEngine
     private Boolean isReuseAddress = true;
     private Boolean continuationsEnabled = true;
     private int maxIdleTime = 200000;
+    private Boolean sendServerVersion = true;
     private int servantCount;
     private Server server;
     private Connector connector;
@@ -301,6 +302,8 @@ public class JettyHTTPServerEngine
             server = new Server();
             
             Container.Listener mBeanContainer = factory.getMBeanContainer();
+            server.setSendServerVersion(getSendServerVersion());
+            
             if (mBeanContainer != null) {
                 server.getContainer().addEventListener(mBeanContainer);
             }
@@ -752,6 +755,14 @@ public class JettyHTTPServerEngine
      */
     public ThreadingParameters getThreadingParameters() {
         return threadingParameters;
+    }
+
+    public void setSendServerVersion(Boolean sendServerVersion) {
+        this.sendServerVersion = sendServerVersion;
+    }
+
+    public Boolean getSendServerVersion() {
+        return sendServerVersion;
     }
     
 }

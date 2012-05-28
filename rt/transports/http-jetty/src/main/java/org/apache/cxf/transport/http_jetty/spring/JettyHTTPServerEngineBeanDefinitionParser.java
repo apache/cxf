@@ -75,6 +75,12 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         if (maxIdleTimeStr != null && !"".equals(maxIdleTimeStr.trim())) {
             bean.addPropertyValue("maxIdleTime", maxIdleTimeStr);
         }
+        
+        String sendServerVersionStr = element.getAttribute("sendServerVersion");
+        if (sendServerVersionStr != null && sendServerVersionStr.length() > 0) {
+            bean.addPropertyValue("sendServerVersion", sendServerVersionStr);
+        }
+        
         ValueHolder busValue = ctx.getContainingBeanDefinition()
             .getConstructorArgumentValues().getArgumentValue(0, Bus.class);
         bean.addPropertyValue("bus", busValue.getValue());
