@@ -1,10 +1,15 @@
 
-Apache CXF 2.3.10 Release Notes
+Apache CXF 2.3.11 Release Notes
 
 1. Overview
 
 The 2.3.x versions of Apache CXF are significant new versions of CXF 
 that provides several new features and enhancements.  
+
+Important note:  2.3.11 is the last planned release on the 2.3.x branch
+at Apache.   Users are STRONGLY encouraged to upgrade to newer versions
+of CXF. 
+
 
 New features include: 
  * JAX-WS 2.2 Support
@@ -33,8 +38,7 @@ New features include:
  * Schema Validation support for Aegis Databinding if Woodstox 4 is used 
    for the Stax parser
 
-
-2.3.10 fixes over 30 JIRA issues reported by users and the community.
+2.3.11 fixes over 20 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -106,37 +110,30 @@ for caveats when upgrading from CXF 2.2.x to 2.3.x.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-3916] - partial response problem with SOAP 1.1 use of WS-Addressing
-    * [CXF-4055] - Parameter Handler not Invoked if Constructor or Static Methods Succeed
-    * [CXF-4056] - Faults on server are echoing headers back to the client
-    * [CXF-4057] - Echoed Addressing headers can cause client hangs and timeouts
-    * [CXF-4067] - JAX-RS WebClient proxy sometimes fails to set Content-Type from @Consumes
-    * [CXF-4086] - Providers.getContextResolvers is only partially implemented 
-    * [CXF-4088] - Class.getGenericSuperclass also needs to be checked by ProviderFactory
-    * [CXF-4105] - Slf4jLogger doesn't mapping the level as the SLF4JBridgeHandler does
-    * [CXF-4110] - Java first @Policy annotations aren't working
-    * [CXF-4115] - The operation property of the MessageContext may return wrong value if erroneous request is sent
-    * [CXF-4117] - Argument type mismatch when using Implicit Headers and @RequestWrapper with Service from WSDL
-    * [CXF-4121] - Default WebApplicationException mapper dramatically increases the response time
-    * [CXF-4125] - StackOverflowError when requesting WADL
-    * [CXF-4128] - Code Gen plugin fails silently when generated classes have name collisions
-    * [CXF-4130] - Server using Provider implementation writes contents of SOAP body in SOAP header
-    * [CXF-4133] - CachedOutputStream lost charsetName param
-    * [CXF-4141] - response_code 500 ignored when set in JAXRSOutInterceptor.handleWriteException 
-    * [CXF-4149] - org.apache.cxf.endpoint.ClientImpl raises 
-    * [CXF-4171] - Static resource resolution not possible with CXFNonSpringJaxrsServlet
-    * [CXF-4172] - Default JAX-RS XML, JSON and Form providers are open to the hash collision attacks
-    * [CXF-4177] - ClientProxyImpl does not order Path parameter values according to the template order
-    * [CXF-4192] - WSDLValidator doesn't pass the test for WSI-BP-1.0 R2726
-    * [CXF-4195] - http-config conduit doesn't work on the http conduit for WsdlUrl
-    * [CXF-4200] - UriInfoImpl.getPathSegments(decode) does not pass 'decode' flag to getPath()
-    * [CXF-4227] - AttachmentDeserializerTest contains buggy code for reading an InputStream.
-    * [CXF-4231] - Incorrect handling of "If-None-Match" and "If-Modified-Since" request header combination
+    * [CXF-4238] - Spring JAXRSClientFactoryBeanDefinitionParser reports a wrong factory bean class
+    * [CXF-4243] - RequestImpl.selectVariant() using wrong headers
+    * [CXF-4259] - JAX-RS Set-Cookie handler needs to ignore Expires property
+    * [CXF-4265] - Potential NPE when Soap fault has no role
+    * [CXF-4267] - A NPE in AttatchmentDataSource could be guarded.
+    * [CXF-4269] - In some cases, the javascript client will not output the ns declaration for wrapper element of an rpc/lit method
+    * [CXF-4277] - STSClient does not use returned KeyInfo size when creating a secret key
+    * [CXF-4280] - case insensitive MetadataMap keyset
+    * [CXF-4284] - Fix JAXB-based providers to report 400 for all read-related exceptions
+    * [CXF-4288] - SecureAnnotationsInterceptor maps roles only based on method name
+    * [CXF-4310] - WADLGenerator can not create QName when XMLRootElement has no name attribute and correctly manage schemas with empty namespaces
+    * [CXF-4312] - JAX-WS clients set executor to a "thread per async request" version
+    * [CXF-4313] - Hourly GC Caused by Framework - Unable to GC tune application if using framework.
+    * [CXF-4334] - Schema validation does not validate elements in soap header
+    * [CXF-4342] - NullPointerException in CachedOutputStream
 
 ** Improvement
-    * [CXF-4085] - introduce org.apache.cxf.jaxws.checkPublishEndpointPermissionWithSecurityManager for EndpointImpl so that get chance to bypass SecurityManager Check in some cases
-    * [CXF-4120] - JMS Transport content-type should be consistent with the HTTP transport
-    * [CXF-4134] - GZIPOutInterceptor compiles Patterns constantly; they should be compiled once and reused
-    * [CXF-4217] - Introduce Nullable annotations to override the default handling of empty payloads by JAXB providers
+    * [CXF-4257] - Should catch RejectedExecutionException in WS-Addr's rebaseReponse as done in OneWayProcessorInterceptor
+    * [CXF-4326] - Remove the XPathFactory.newInstance from XPathUtils' constructor to improve the performance a bit
+    * [CXF-4338] - config option to allow suppression of server version display in http response headers
+
+** Test
+    * [CXF-4126] - Can override built-in action  on WSS4JOutInterceptor but seems impossible to add a new custom action on WSS4JOutInterceptor 
+    * [CXF-4335] - WSSecTest  use some unecessary properties for WSS4JInterceptor configuration
+
 
 
