@@ -59,7 +59,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                 ub.queryParam(SSOConstants.SAML_REQUEST, urlEncodedRequest);
                 ub.queryParam(SSOConstants.RELAY_STATE, info.getRelayState());
                 if (isSignRequest()) {
-                    signRequest(ub);
+                    signRequest(urlEncodedRequest, info.getRelayState(), ub);
                 }
                 
                 String contextCookie = createCookie(SSOConstants.RELAY_STATE,
@@ -95,7 +95,11 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     /**
      * Sign a request according to the redirect binding spec for Web SSO
      */
-    private void signRequest(UriBuilder ub) throws Exception {
+    private void signRequest(
+        String authnRequest,
+        String relayState,
+        UriBuilder ub
+    ) throws Exception {
         Crypto crypto = getSignatureCrypto();
         if (crypto == null) {
             LOG.fine("No crypto instance of properties file configured for signature");
@@ -148,7 +152,13 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         // Sign the request
         Signature signature = Signature.getInstance(jceSigAlgo);
         signature.initSign(privateKey);
-        signature.update(ub.toString().getBytes("UTF-8"));
+       
+        String requestToSign = 
+            SSOConstants.SAML_REQUEST + "=" + authnRequest + "&"
+            + SSOConstants.RELAY_STATE + "=" + relayState + "&"
+            + SSOConstants.SIG_ALG + "=" + URLEncoder.encode(sigAlgo, "UTF-8");
+
+        signature.update(requestToSign.getBytes("UTF-8"));
         byte[] signBytes = signature.sign();
         
         String encodedSignature = Base64.encode(signBytes);

@@ -18,9 +18,16 @@
  */
 package org.apache.cxf.rs.security.saml.sso.state;
 
+import java.io.Serializable;
 
-public class ResponseState {
 
+public class ResponseState implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3247188797004342462L;
+    
     private String assertion;
     private String relayState;
     private String webAppContext;
