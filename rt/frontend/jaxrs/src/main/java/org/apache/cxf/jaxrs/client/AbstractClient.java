@@ -384,8 +384,10 @@ public abstract class AbstractClient implements Client, Retryable {
     }
 
     @SuppressWarnings("unchecked")
-    protected void writeBody(Object o, Message outMessage, Class<?> cls, Type type, Annotation[] anns, 
-        MultivaluedMap<String, String> headers, OutputStream os) {
+    protected void writeBody(Object o, Message outMessage, Class<?> cls, Type type, 
+                            Annotation[] anns, 
+                            MultivaluedMap<String, String> headers, 
+                            OutputStream os) {
         
         if (o == null) {
             return;
