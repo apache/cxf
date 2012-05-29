@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso.state;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,8 +50,9 @@ public class MemorySPStateManager implements SPStateManager {
         return requestStateMap.remove(relayState);
     }
     
-    public void close() {
-        // complete
+    public void close() throws IOException {
+        requestStateMap.clear();
+        responseStateMap.clear();
     }
 
 }

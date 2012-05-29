@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
+import javax.annotation.PreDestroy;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -119,6 +121,16 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                     @QueryParam(SSOConstants.RELAY_STATE) String relayState) {
         return doProcessSamlResponse(encodedSamlResponse, relayState, false);
+    }
+    
+    @PreDestroy
+    public void close() throws IOException {
+        if (replayCache != null) {
+            replayCache.close();
+        }
+        if (getStateProvider() != null) {
+            getStateProvider().close();
+        }
     }
     
     protected Response doProcessSamlResponse(String encodedSamlResponse,

@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.saml.sso.state;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  * SSO Service Provider State Manager.
  * 
@@ -28,7 +31,7 @@ package org.apache.cxf.rs.security.saml.sso.state;
  * needs to be run in its own war file instead of having every application 
  * war on the SP side have a dedicated RequestAssertionConsumerService endpoint   
  */
-public interface SPStateManager {
+public interface SPStateManager extends Closeable {
     
     void setRequestState(String relayState, RequestState state);
     RequestState removeRequestState(String relayState);
@@ -37,5 +40,5 @@ public interface SPStateManager {
     ResponseState getResponseState(String contextKey);
     ResponseState removeResponseState(String contextKey);
     
-    void close();
+    void close() throws IOException;
 }

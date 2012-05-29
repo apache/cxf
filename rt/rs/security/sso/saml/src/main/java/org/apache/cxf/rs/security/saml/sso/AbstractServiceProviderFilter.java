@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PreDestroy;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -121,6 +122,13 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
      */
     public String getSignatureUsername() {
         return signatureUsername;
+    }
+    
+    @PreDestroy
+    public void close() throws IOException {
+        if (getStateProvider() != null) {
+            getStateProvider().close();
+        }
     }
     
     private String getIssuerId(Message m) {

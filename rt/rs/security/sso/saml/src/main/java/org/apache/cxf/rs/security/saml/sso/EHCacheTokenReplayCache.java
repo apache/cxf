@@ -19,7 +19,6 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 
@@ -34,7 +33,7 @@ import org.apache.ws.security.util.Loader;
  * An in-memory EHCache implementation of the TokenReplayCache interface. 
  * The default TTL is 60 minutes and the max TTL is 12 hours.
  */
-public class EHCacheTokenReplayCache implements TokenReplayCache<String>, Closeable {
+public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
