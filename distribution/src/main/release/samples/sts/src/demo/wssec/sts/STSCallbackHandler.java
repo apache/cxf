@@ -31,14 +31,18 @@ public class STSCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if ("mystskey".equals(pc.getIdentifier())) {
-                    pc.setPassword("stskpass");
-                    break;
-                } else if ("alice".equals(pc.getIdentifier())) {
-                    pc.setPassword("clarinet");
-                    break;
+                if (pc.getUsage() == WSPasswordCallback.DECRYPT || 
+                    pc.getUsage() == WSPasswordCallback.SIGNATURE) {
+                    if ("mystskey".equals(pc.getIdentifier())) {
+                        pc.setPassword("stskpass");
+                    }
+                } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
+                    if ("alice".equals(pc.getIdentifier())) {
+                        pc.setPassword("clarinet");
+                    }
                 }
             }
         }
     }
 }
+
