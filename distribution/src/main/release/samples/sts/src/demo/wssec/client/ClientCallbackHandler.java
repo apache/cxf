@@ -31,18 +31,19 @@ public class ClientCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if ("myclientkey".equals(pc.getIdentifier())) {
-                    pc.setPassword("ckpass");
-                    break;
-                } else if ("alice".equals(pc.getIdentifier())) {
-                    pc.setPassword("clarinet");
-                    break;
-                } else if ("bob".equals(pc.getIdentifier())) {
-                    pc.setPassword("trombone");
-                    break;
-                } else if ("eve".equals(pc.getIdentifier())) {
-                    pc.setPassword("evekpass");
-                    break;
+                if (pc.getUsage() == WSPasswordCallback.DECRYPT || 
+                    pc.getUsage() == WSPasswordCallback.SIGNATURE) {
+                    if ("myclientkey".equals(pc.getIdentifier())) {
+                        pc.setPassword("ckpass");
+                    }
+                } else if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
+                    if ("alice".equals(pc.getIdentifier())) {
+                        pc.setPassword("clarinet");
+                        break;
+                    } else if ("bob".equals(pc.getIdentifier())) {
+                        pc.setPassword("trombone");
+                        break;
+                    }
                 }
             }
         }

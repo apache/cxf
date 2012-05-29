@@ -66,8 +66,14 @@
                                   value="demo.wssec.client.ClientCallbackHandler"/>
                            <entry key="ws-security.encryption.properties" value="keys/clientKeystore.properties"/> 
                            <entry key="ws-security.encryption.username" value="mystskey"/>
+                           <!-- Because of the PublicKey requirement in the InitiatorToken element
+                                in the WSP WSDL, the client needs to have the STS add its public
+                                key to the SAML assertion, as configured in the three lines below.  
+                           -->                        
                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
                            <entry key="ws-security.sts.token.properties" value="keys/clientKeystore.properties"/> 
+                           <!-- If usecert = true, sends entire certificate in an X509Certificate element, else
+                                sends cert ID in a KeyValue element -->
                            <entry key="ws-security.sts.token.usecert" value="true"/> 
                        </map>
                    </property>
