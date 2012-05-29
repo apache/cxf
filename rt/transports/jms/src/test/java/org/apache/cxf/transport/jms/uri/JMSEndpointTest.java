@@ -21,7 +21,6 @@ package org.apache.cxf.transport.jms.uri;
 
 import java.util.Map;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -131,8 +130,8 @@ public class JMSEndpointTest extends Assert {
                                                + "&timeToLive=100" + "&priority=5" + "&replyToName=foo.bar2");
         assertTrue(endpoint instanceof JMSQueueEndpoint);
         assertEquals(endpoint.getParameters().size(), 0);
-        assertEquals(endpoint.getDeliveryMode(),
-                     JMSURIConstants.DELIVERYMODE_NON_PERSISTENT);
+        assertEquals(endpoint.getDeliveryMode().toString(),
+                     JMSURIConstants.DELIVERYMODE_NON_PERSISTENT.toString());
         assertEquals(endpoint.getTimeToLive(), 100);
         assertEquals(endpoint.getPriority(), 5);
         assertEquals(endpoint.getReplyToName(), "foo.bar2");
@@ -155,11 +154,27 @@ public class JMSEndpointTest extends Assert {
         assertTrue(requestUri.startsWith("jms:jndi:Foo.Bar?"));
         assertTrue(requestUri.contains("foo=bar"));
         assertTrue(requestUri.contains("foo2=bar2"));
-        // Cheching what's the request uri should not have
+        // Checking what's the request uri should not have
         assertFalse(requestUri.contains("jndiInitialContextFactory"));
         assertFalse(requestUri.contains("targetService"));
         assertFalse(requestUri.contains("replyToName"));
         assertFalse(requestUri.contains("priority=3"));
+    }
+    
+    @Test
+    public void testRequestUriWithMessageType() throws Exception {
+        JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?messageType=text");
+        assertTrue(endpoint instanceof JMSQueueEndpoint);
+        assertEquals("text", endpoint.getMessageType().value());
+        
+        endpoint = resolveEndpoint("jms:queue:Foo.Bar");
+        assertTrue(endpoint instanceof JMSQueueEndpoint);
+        assertEquals("byte", endpoint.getMessageType().value());
+        
+        endpoint = resolveEndpoint("jms:queue:Foo.Bar?messageType=binary");
+        assertTrue(endpoint instanceof JMSQueueEndpoint);
+        assertEquals("binary", endpoint.getMessageType().value());
+        
     }
     
     private JMSEndpoint resolveEndpoint(String uri) throws Exception {
