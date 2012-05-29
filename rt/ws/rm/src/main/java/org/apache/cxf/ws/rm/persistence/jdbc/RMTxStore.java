@@ -119,8 +119,12 @@ public class RMTxStore implements RMStore {
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
     
+    // create_schema may not work for several reasons, if so, create one manually
     private static final String CREATE_SCHEMA_STMT_STR = "CREATE SCHEMA {0}";
-    private static final String SET_CURRENT_SCHEMA_STMT_STR = "SET CURRENT SCHEMA {0}";
+    // given the schema, try these standard statements to switch to the schema
+    private static final String[] SET_SCHEMA_STMT_STRS = {"SET SCHEMA {0}",
+                                                          "SET CURRENT_SCHEMA = {0}",
+                                                          "ALTER SESSION SET CURRENT_SCHEMA = {0}"};
     
     private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
     private static final int ORACLE_TABLE_EXISTS_CODE = 955;
@@ -655,15 +659,23 @@ public class RMTxStore implements RMStore {
             stmt.executeUpdate(MessageFormat.format(CREATE_SCHEMA_STMT_STR, 
                                                     schemaName));
         } catch (SQLException ex) {
-            // pass through to assume it is already created
+            // assume it is already created or no authorization is provided (create one manually)
         }
         stmt.close();
         stmt = connection.createStatement();
-        try {
-            stmt.executeUpdate(MessageFormat.format(SET_CURRENT_SCHEMA_STMT_STR, 
-                                                    schemaName));
-        } catch (SQLException ex) {
-            throw ex;
+        SQLException ex0 = null;
+        for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
+            try {
+                stmt.executeUpdate(MessageFormat.format(SET_SCHEMA_STMT_STRS[i], schemaName));
+                break;
+            } catch (SQLException ex) {
+                ex.setNextException(ex0);
+                ex0 = ex;
+                if (i == SET_SCHEMA_STMT_STRS.length - 1) {
+                    throw ex0;
+                }
+                // continue
+            }
         }
         stmt.close();
     }
