@@ -73,12 +73,35 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItSoap12DispatchBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItPlaintextPolicy" />
+        <soap12:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap12:operation soapAction="" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+                <soap12:fault use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItSoap11Port" binding="tns:DoubleItSoap11Binding">
             <soap:address location="http://localhost:9009/DoubleItSoap11" />
         </wsdl:port>
         <wsdl:port name="DoubleItSoap12Port" binding="tns:DoubleItSoap12Binding">
             <soap12:address location="http://localhost:9009/DoubleItSoap12" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSoap12DispatchPort" binding="tns:DoubleItSoap12DispatchBinding">
+            <soap12:address location="http://localhost:9009/DoubleItSoap12Dispatch" />
         </wsdl:port>
     </wsdl:service>
 
