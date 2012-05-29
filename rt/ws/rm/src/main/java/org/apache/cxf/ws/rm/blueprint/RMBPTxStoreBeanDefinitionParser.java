@@ -38,6 +38,13 @@ public class RMBPTxStoreBeanDefinitionParser extends SimpleBPBeanDefinitionParse
     }
     
     @Override
+    protected void parseChildElements(Element element, ParserContext ctx, MutableBeanMetadata bean) {
+        super.parseChildElements(element, ctx, bean);
+        
+        bean.setInitMethod("init");
+    }
+
+    @Override
     protected void mapAttribute(MutableBeanMetadata bean, Element e, String name, String val,
                                 ParserContext context) {
         if ("dataSource".equals(name)) {
