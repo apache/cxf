@@ -88,6 +88,8 @@ public final class JMSEndpointParser {
                                                 JMSURIConstants.JNDIINITIALCONTEXTFACTORY_PARAMETER_NAME);
         String jndiUrl = getAndRemoveParameter(parameters, JMSURIConstants.JNDIURL_PARAMETER_NAME);
 
+        String messageType = getAndRemoveParameter(parameters, JMSURIConstants.MESSAGE_TYPE_PARAMETER_NAME);
+        
         if (deliveryMode != null) {
             endpoint.setDeliveryMode(DeliveryModeType.valueOf(deliveryMode));
         }
@@ -115,6 +117,9 @@ public final class JMSEndpointParser {
         }
         if (jndiUrl != null) {
             endpoint.setJndiURL(jndiUrl);
+        }
+        if (messageType != null) {
+            endpoint.setMessageType(MessageType.fromValue(messageType));
         }
 
         for (String key : parameters.keySet()) {

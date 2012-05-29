@@ -22,6 +22,8 @@ package org.apache.cxf.transport.jms.uri;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 /**
  * 
  */
@@ -47,7 +49,10 @@ public class JMSEndpoint extends JMSEndpointType {
             + ":" + destinationName;
         boolean first = true;
         for (String key : parameters.keySet()) {
-            if ("targetService".equals(key)) {
+            // now we just skip the MESSAGE_TYPE_PARAMETER_NAME 
+            // and TARGETSERVICE_PARAMETER_NAME
+            if (JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME.equals(key) 
+                || JMSURIConstants.MESSAGE_TYPE_PARAMETER_NAME.equals(key)) {
                 continue;
             }
             String value = (String)parameters.get(key);

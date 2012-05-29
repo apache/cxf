@@ -36,6 +36,14 @@
 			<xs:enumeration value="NON_PERSISTENT" />
 		</xs:restriction>
 	</xs:simpleType>
+	
+	<xs:simpleType name="messageType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="byte" />
+		    <xs:enumeration value="binary" />
+			<xs:enumeration value="text" />
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:simpleType name="priorityType">
 		<xs:restriction base="xs:int">
@@ -61,6 +69,7 @@
 		<xs:attribute name="jmsVariant" type="xs:string" />
 		<xs:attribute name="destinationName" type="xs:string" />
 		<xs:attribute name="deliveryMode" type="jms:deliveryModeType" />
+		<xs:attribute name="messageType" type="jms:messageType" default="byte"/>
 		<xs:attribute name="timeToLive" type="xs:long" />
 		<xs:attribute name="priority" type="jms:priorityType" />
 		<xs:attribute name="replyToName" type="xs:string" />
