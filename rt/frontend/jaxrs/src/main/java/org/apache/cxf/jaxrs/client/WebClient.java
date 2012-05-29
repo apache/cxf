@@ -42,6 +42,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -129,10 +130,10 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Creates a Spring-configuration aware WebClient
+     * Creates WebClient
      * @param baseAddress baseAddress
      * @param providers list of providers
-     * @param configLocation classpath location of Spring configuration resource, can be null  
+     * @param configLocation classpath location of the configuration resource, can be null  
      * @return WebClient instance
      */
     public static WebClient create(String baseAddress, List<?> providers, String configLocation) {
@@ -142,9 +143,27 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Creates a Spring-configuration aware WebClient
+     * Creates WebClient with a list of custom features
      * @param baseAddress baseAddress
-     * @param configLocation classpath location of Spring configuration resource, can be null  
+     * @param providers list of providers
+     * @param features the features which will be applied to the client
+     * @param configLocation classpath location of the configuration resource, can be null
+     * @return WebClient instance
+     */
+    public static WebClient create(String baseAddress, 
+                                   List<?> providers, 
+                                   List<AbstractFeature> features,
+                                   String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
+        bean.setProviders(providers);
+        bean.setFeatures(features);
+        return bean.createWebClient();
+    }
+    
+    /**
+     * Creates WebClient
+     * @param baseAddress baseAddress
+     * @param configLocation classpath location of the configuration resource, can be null  
      * @return WebClient instance
      */
     public static WebClient create(String baseAddress, String configLocation) {
@@ -154,11 +173,11 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Creates a Spring-configuration aware WebClient which will do basic authentication
+     * Creates WebClient which will do basic authentication
      * @param baseAddress baseAddress
      * @param username username
      * @param password password
-     * @param configLocation classpath location of Spring configuration resource, can be null  
+     * @param configLocation classpath location of the configuration resource, can be null  
      * @return WebClient instance
      */
     public static WebClient create(String baseAddress, String username, String password, 
