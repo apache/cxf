@@ -79,4 +79,22 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="Soap12Dispatch"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSoap12Dispatch" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSoap12DispatchPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.fault.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/fault/DoubleItFault.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>
