@@ -382,23 +382,20 @@ public abstract class AbstractClient implements Client, Retryable {
         state.setResponseBuilder(currentResponseBuilder);
         return rb;
     }
-    protected <T> void writeBody(T o, Message outMessage, Type type, Annotation[] anns,
-                                 MultivaluedMap<String, Object> headers, OutputStream os) {
-        @SuppressWarnings("unchecked")
-        Class<T> cls = (Class<T>)o.getClass();
-        writeBody(o, outMessage, cls, type, anns, headers, os);
-    }       
-    protected <T> void writeBody(T o, Message outMessage, Class<T> cls, Type type, Annotation[] anns, 
+    
+    protected <T> void writeBody(T o, Message outMessage, Class<?> cls, Type type, Annotation[] anns, 
         MultivaluedMap<String, Object> headers, OutputStream os) {
         
         if (o == null) {
             return;
         }
+        @SuppressWarnings("unchecked")
+        Class<T> theClass = (Class<T>)cls;
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type").toString()); 
         
         MessageBodyWriter<T> mbw = ProviderFactory.getInstance(outMessage)
-            .createMessageBodyWriter(cls, type, anns, contentType, outMessage);
+            .createMessageBodyWriter(theClass, type, anns, contentType, outMessage);
         if (mbw != null) {
             try {
                 mbw.writeTo(o, cls, type, anns, contentType, headers, os);

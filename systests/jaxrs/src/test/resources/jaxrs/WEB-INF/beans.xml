@@ -88,6 +88,19 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:features>    
   </jaxrs:server>
   
+  <jaxrs:server id="booksxsi"
+		        address="/thebooksxsi/bookstore">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean" />
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="jaxbProviderXsi"/>
+    </jaxrs:providers> 
+    <jaxrs:features>
+       <cxf:logging/>
+    </jaxrs:features>    
+  </jaxrs:server>
+  
   <jaxrs:server id="bookservice4"
 		        address="/thebooks4/bookstore">
     <jaxrs:serviceBeans>
@@ -237,6 +250,18 @@ http://cxf.apache.org/schemas/core.xsd">
 
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>
+  </bean>
+  
+  <util:list id="jaxbClasses">
+    <value>org.apache.cxf.systest.jaxrs.Book</value>
+  </util:list>
+  <bean id="jaxbProviderXsi" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+      <property name="jaxbElementClassNames" ref="jaxbClasses"/>
+      <property name="extraClass">
+         <list>
+           <value>org.apache.cxf.systest.jaxrs.SuperBook</value>
+         </list>
+      </property>
   </bean>
   
   <bean id="schemaHolder" class="org.apache.cxf.jaxrs.utils.schemas.SchemaHandler">

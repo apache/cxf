@@ -81,6 +81,21 @@ public class BookStoreSpring {
     }
     
     @GET
+    @Path("/books/xsitype")
+    @Produces("application/xml")
+    public Book getBookXsiType() {
+        return new SuperBook("SuperBook", 999L);
+    }
+    
+    @POST
+    @Path("/books/xsitype")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book postGetBookXsiType(Book book) {
+        return book;
+    }
+    
+    @GET
     @Path("/books/{id}")
     @Produces({"application/json", "application/vnd.example-com.foo+json" })
     public Book getBookById(@PathParam("id") Long id) {

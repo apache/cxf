@@ -633,10 +633,11 @@ public class ClientProxyImpl extends AbstractClient implements
             try {
                 if (bodyIndex != -1) {
                     writeBody(body, outMessage,
+                              method.getParameterTypes()[bodyIndex],
                               method.getGenericParameterTypes()[bodyIndex],
                               anns, headers, os);
                 } else {
-                    writeBody(body, outMessage, body.getClass(), 
+                    writeBody(body, outMessage, body.getClass(), body.getClass(), 
                               anns, headers, os);
                 }
             } catch (Exception ex) {
