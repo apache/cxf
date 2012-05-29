@@ -873,10 +873,11 @@ public class WebClient extends AbstractClient {
                 requestClass = (Class<?>)requestContext.get(REQUEST_CLASS);
                 requestType = (Type)requestContext.get(REQUEST_TYPE);
             }
+            boolean isAssignable = requestClass != null && requestClass.isAssignableFrom(body.getClass());
             try {
                 writeBody(body, outMessage, 
-                          requestClass == null ? body.getClass() : requestClass,
-                          requestType == null ? body.getClass() : requestType, 
+                          requestClass == null || !isAssignable ? body.getClass() : requestClass,
+                          requestType == null || !isAssignable ? body.getClass() : requestType, 
                           new Annotation[]{}, headers, os);
                 if (os != null) {
                     os.flush();
