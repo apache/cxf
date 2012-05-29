@@ -398,7 +398,7 @@ public abstract class AbstractClient implements Client, Retryable {
             .createMessageBodyWriter(theClass, type, anns, contentType, outMessage);
         if (mbw != null) {
             try {
-                mbw.writeTo(o, cls, type, anns, contentType, headers, os);
+                mbw.writeTo(o, theClass, type, anns, contentType, headers, os);
                 if (os != null) {
                     os.flush();
                 }
