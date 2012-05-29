@@ -310,6 +310,45 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
+    public void testGetBookXsiType() throws Exception {
+        String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals("SuperBook", book.getName());
+        
+    }
+    
+    @Test
+    public void testPostBookXsiType() throws Exception {
+        String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setExtraClass(new Class[]{SuperBook.class});
+        provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
+        WebClient wc = WebClient.create(address, Collections.singletonList(provider));
+        wc.accept("application/xml");
+        wc.type("application/xml");
+        SuperBook book = new SuperBook("SuperBook2", 999L);
+        Book book2 = wc.invoke("POST", book, Book.class, Book.class);
+        assertEquals("SuperBook2", book2.getName());
+        
+    }
+    
+    @Test
+    public void testPostBookXsiTypeProxy() throws Exception {
+        String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setExtraClass(new Class[]{SuperBook.class});
+        provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
+        BookStoreSpring bookStore = JAXRSClientFactory.create(address, BookStoreSpring.class, 
+                                                              Collections.singletonList(provider));
+        SuperBook book = new SuperBook("SuperBook2", 999L);
+        Book book2 = bookStore.postGetBookXsiType(book);
+        assertEquals("SuperBook2", book2.getName());
+        
+    }
+    
+    @Test
     public void testGetBookWithEncodedQueryValue() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/bookstore/booksquery?id=12%2B3"; 
