@@ -22,13 +22,23 @@ package org.apache.cxf.systest.ws.fault;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.fault.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.ws.security.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -122,6 +132,58 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         }
         
         bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSoap12Dispatch() throws Exception {
+        
+        URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSoap12DispatchPort");
+
+        Dispatch<DOMSource> dispatch = 
+            service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
+        
+        // Creating a DOMSource Object for the request
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document requestDoc = db.newDocument();
+        Element root = requestDoc.createElementNS("http://www.example.org/schema/DoubleIt", "ns2:DoubleIt");
+        root.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:ns2", "http://www.example.org/schema/DoubleIt");
+        Element number = requestDoc.createElementNS(null, "numberToDouble");
+        number.setTextContent("25");
+        root.appendChild(number);
+        requestDoc.appendChild(root);
+        DOMSource request = new DOMSource(requestDoc);
+
+        // Add WS-Security configuration
+        Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
+        client.getRequestContext().put(
+            "ws-security.callback-handler",
+            "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"
+        );
+        client.getRequestContext().put(
+            "ws-security.encryption.properties", 
+            "org/apache/cxf/systest/ws/wssec10/client/bob.properties"
+        );
+        client.getRequestContext().put("ws-security.encryption.username", "bob");
+
+        updateAddressPort(dispatch, PORT);
+        
+        // Make a successful request
+        client.getRequestContext().put("ws-security.username", "alice");
+        DOMSource response = dispatch.invoke(request);
+        assertNotNull(response);
+        
+        // Now make an invocation using another username
+        client.getRequestContext().put("ws-security.username", "bob");
+        client.getRequestContext().put("ws-security.password", "password");
+        try {
+            dispatch.invoke(request);
+            fail("Expected failure on bob");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("This is a fault"));
+        }
     }
     
     
