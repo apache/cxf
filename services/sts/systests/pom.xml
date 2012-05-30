@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf.services.sts</groupId>
     <artifactId>cxf-services-sts-systests</artifactId>
     <packaging>pom</packaging>
-    <version>2.5.4-SNAPSHOT</version>
+    <version>2.5.4</version>
     <name>Apache CXF STS systests</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf.services.sts</groupId>
         <artifactId>cxf-services-sts</artifactId>
-        <version>2.5.4-SNAPSHOT</version>
+        <version>2.5.4</version>
     </parent>
 
     <modules>

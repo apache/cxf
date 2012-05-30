@@ -24,12 +24,12 @@
 
     <name>Bank sample using JAX-WS API's to talk via CORBA/IIOP</name>
     <description>Bank sample using JAX-WS API's to talk via CORBA/IIOP</description>
-    <version>2.5.4-SNAPSHOT</version>
+    <version>2.5.4</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.5.4-SNAPSHOT</version>
+        <version>2.5.4</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -208,17 +208,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.5.4-SNAPSHOT</version>
+            <version>2.5.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-corba</artifactId>
-            <version>2.5.4-SNAPSHOT</version>
+            <version>2.5.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-common</artifactId>
-            <version>2.5.4-SNAPSHOT</version>
+            <version>2.5.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
