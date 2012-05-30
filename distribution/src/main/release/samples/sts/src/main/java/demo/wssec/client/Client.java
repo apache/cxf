@@ -28,6 +28,7 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.hello_world_soap_http.Greeter;
+import org.springframework.core.io.ClassPathResource;
 
 public final class Client {
 
@@ -57,7 +58,7 @@ public final class Client {
         }
         
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Client.class.getResource("wssec-client.xml");
+        URL busFile = new ClassPathResource("wssec-client.xml").getURL();
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
