@@ -231,7 +231,12 @@ public class JMSOldConfigHolder {
                 if (runtimePolicy.isSetMessageType()) {
                     jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
                 } else if (address == null) {
-                    jmsConfig.setMessageType(JMSConstants.BYTE_MESSAGE_TYPE);
+                    if (endpoint.getMessageType() == null) {
+                        // Using the byte message type by default
+                        jmsConfig.setMessageType(JMSConstants.BYTE_MESSAGE_TYPE);
+                    } else {
+                        jmsConfig.setMessageType(endpoint.getMessageType().value());
+                    }
                 }
             }
             jmsConfig.setPubSubDomain(pubSubDomain);

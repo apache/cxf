@@ -1189,11 +1189,25 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test 
     public void testSpecNoWsdlService() throws Exception {
+        specNoWsdlService(null);
+    }
+    
+    @Test
+    public void testSpecNoWsdlServiceWithDifferentMessageType() throws Exception {
+        specNoWsdlService("text");
+        specNoWsdlService("byte");
+        specNoWsdlService("binary");
+    }
+    
+    private void specNoWsdlService(String messageType) throws Exception {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
             + JMS_PORT;
+        if (messageType != null) {
+            address = address + "&messageType=" + messageType;
+        }
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
