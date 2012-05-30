@@ -44,6 +44,8 @@ public final class JMSURIConstants {
     public static final String TIMETOLIVE_PARAMETER_NAME = "timeToLive";
     public static final String PRIORITY_PARAMETER_NAME = "priority";
     public static final String REPLYTONAME_PARAMETER_NAME = "replyToName";
+    // The new configuration to set the message type of jms message body
+    public static final String MESSAGE_TYPE_PARAMETER_NAME = "messageType";
 
     // default parameters
     public static final DeliveryModeType DELIVERYMODE_DEFAULT = DELIVERYMODE_PERSISTENT;

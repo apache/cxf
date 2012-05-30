@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 /**
  * 
  */
@@ -50,9 +52,13 @@ public class JMSEndpoint extends JMSEndpointType {
         Iterator iter = parameters.keySet().iterator();
         while (iter.hasNext()) {
             String key = (String)iter.next();
-            if ("targetService".equals(key)) {
+            // now we just skip the MESSAGE_TYPE_PARAMETER_NAME
+            // and TARGETSERVICE_PARAMETER_NAME
+            if (JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME.equals(key)
+                || JMSURIConstants.MESSAGE_TYPE_PARAMETER_NAME.equals(key)) {
                 continue;
             }
+
             String value = (String)parameters.get(key);
             if (first) {
                 requestUri += "?" + key + "=" + value;
