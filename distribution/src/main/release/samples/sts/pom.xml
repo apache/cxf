@@ -35,7 +35,6 @@
         <cxf.version>${project.version}</cxf.version>
     </properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -57,36 +56,11 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
                                 </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/ws-trust-1.4-service.wsdl</wsdl>
-                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/demo/wssec/sts/wssec-sts.xml" todir="${basedir}/target/classes/demo/wssec/sts" />
-                                <copy file="${basedir}/src/demo/wssec/server/wssec-server.xml" todir="${basedir}/target/classes/demo/wssec/server" />
-                                <copy file="${basedir}/src/demo/wssec/client/wssec-client.xml" todir="${basedir}/target/classes/demo/wssec/client" />
-                                <copy todir="${basedir}/target/classes/keys">
-                                    <fileset dir="${basedir}/keys" />
-                                </copy>
-                            </tasks>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -25,6 +25,7 @@ import java.net.URL;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.springframework.core.io.ClassPathResource;
 
 public class Server {
 
@@ -32,7 +33,7 @@ public class Server {
         System.out.println("Starting Server");
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Server.class.getResource("wssec-server.xml");
+        URL busFile = new ClassPathResource("wssec-server.xml").getURL();
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
     }

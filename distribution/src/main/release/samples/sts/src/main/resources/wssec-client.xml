@@ -44,11 +44,11 @@
 
     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.signature.properties" value="keys/clientKeystore.properties"/>
+           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
            <entry key="ws-security.signature.username" value="myclientkey"/>
            <entry key="ws-security.callback-handler" 
                   value="demo.wssec.client.ClientCallbackHandler"/>
-           <entry key="ws-security.encryption.properties" value="keys/clientKeystore.properties"/> 
+           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
            <entry key="ws-security.encryption.username" value="myservicekey"/>
            <entry key="ws-security.sts.client">
                <bean class="org.apache.cxf.ws.security.trust.STSClient">
@@ -64,14 +64,14 @@
                            <entry key="ws-security.username" value="alice"/>
                            <entry key="ws-security.callback-handler" 
                                   value="demo.wssec.client.ClientCallbackHandler"/>
-                           <entry key="ws-security.encryption.properties" value="keys/clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
                            <entry key="ws-security.encryption.username" value="mystskey"/>
                            <!-- Because of the PublicKey requirement in the InitiatorToken element
                                 in the WSP WSDL, the client needs to have the STS add its public
                                 key to the SAML assertion, as configured in the three lines below.  
                            -->                        
                            <entry key="ws-security.sts.token.username" value="myclientkey"/>
-                           <entry key="ws-security.sts.token.properties" value="keys/clientKeystore.properties"/> 
+                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
                            <!-- If usecert = true, sends entire certificate in an X509Certificate element, else
                                 sends cert ID in a KeyValue element -->
                            <entry key="ws-security.sts.token.usecert" value="true"/> 

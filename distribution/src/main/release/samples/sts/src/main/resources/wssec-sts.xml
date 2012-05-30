@@ -67,7 +67,7 @@
     </util:list>
 
     <bean id="utSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="keys/stsKeystore.properties" />
+        <property name="signaturePropertiesFile" value="stsKeystore.properties" />
         <property name="signatureUsername" value="mystskey" />
         <property name="callbackHandlerClass" value="demo.wssec.sts.STSCallbackHandler" />
         <property name="issuer" value="DoubleItSTSIssuer" />
@@ -79,7 +79,7 @@
         serviceName="ns1:SecurityTokenService" endpointName="ns1:UT_Port">
         <jaxws:properties>
             <entry key="ws-security.callback-handler" value="demo.wssec.sts.STSCallbackHandler" />
-            <entry key="ws-security.signature.properties" value="keys/stsKeystore.properties" />
+            <entry key="ws-security.signature.properties" value="stsKeystore.properties" />
             <entry key="ws-security.signature.username" value="mystskey" />
         </jaxws:properties>
     </jaxws:endpoint>
