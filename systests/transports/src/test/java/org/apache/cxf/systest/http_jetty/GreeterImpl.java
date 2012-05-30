@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.http_jetty;
 
-import java.util.Date;
 import java.util.concurrent.Future;
 
 import javax.jws.WebService;
