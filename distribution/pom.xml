@@ -22,14 +22,14 @@
     <artifactId>apache-cxf</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF Distribution</name>
-    <version>2.4.9-SNAPSHOT</version>
+    <version>2.4.8</version>
     <description>Apache CXF Distribution</description>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.4.9-SNAPSHOT</version>
+        <version>2.4.8</version>
         <relativePath>../parent</relativePath>
     </parent>
 

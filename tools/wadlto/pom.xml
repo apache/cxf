@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-tools-wadlto</artifactId>
     <packaging>pom</packaging>
-    <version>2.4.9-SNAPSHOT</version>
+    <version>2.4.8</version>
     <name>Apache CXF Command Line Tools WADLTo</name>
     <description>Apache CXF Command Line Tools WADLTo</description>
     <url>http://cxf.apache.org</url>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-tools</artifactId>
-        <version>2.4.9-SNAPSHOT</version>
+        <version>2.4.8</version>
     </parent>
 
     <modules>
