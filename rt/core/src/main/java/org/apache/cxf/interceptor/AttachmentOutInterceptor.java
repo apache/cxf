@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.cxf.attachment.AttachmentSerializer;
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -49,8 +50,7 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         
         // Make it possible to step into this process in spite of Eclipse
         // by declaring the Object.
-        Object prop = message.getContextualProperty(org.apache.cxf.message.Message.MTOM_ENABLED); 
-        boolean mtomEnabled = MessageUtils.isTrue(prop);
+        boolean mtomEnabled = AttachmentUtil.isMtomEnabled(message);
         boolean writeAtts = MessageUtils.isTrue(message.getContextualProperty(WRITE_ATTACHMENTS))
             || (message.getAttachments() != null && !message.getAttachments().isEmpty());
         
