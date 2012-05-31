@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -49,6 +50,7 @@ import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.interceptor.AttachmentInputInterceptor;
 import org.apache.cxf.jaxrs.interceptor.AttachmentOutputInterceptor;
@@ -185,11 +187,22 @@ public class MessageContextImpl implements MessageContext {
         outMessage.setAttachments(atts);
         outMessage.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, "true");
         Attachment root = (Attachment)handlers.get(0);
-        AttachmentOutputInterceptor attInterceptor =          
-            new AttachmentOutputInterceptor(outMessage.get(Message.CONTENT_TYPE).toString(),
-                                            root.getHeaders());
         
-        outMessage.put(Message.CONTENT_TYPE, root.getContentType().toString());
+        String rootContentType = root.getContentType().toString();
+        MultivaluedMap<String, String> rootHeaders = new MetadataMap<String, String>(root.getHeaders());
+        if (!AttachmentUtil.isMtomEnabled(outMessage)) {
+            rootHeaders.putSingle(Message.CONTENT_TYPE, rootContentType);
+        }
+        
+        String messageContentType = outMessage.get(Message.CONTENT_TYPE).toString();
+        int index = messageContentType.indexOf(";type");
+        if (index > 0) {
+            messageContentType = messageContentType.substring(0, index).trim();
+        }
+        AttachmentOutputInterceptor attInterceptor =          
+            new AttachmentOutputInterceptor(messageContentType, rootHeaders);
+        
+        outMessage.put(Message.CONTENT_TYPE, rootContentType);
         attInterceptor.handleMessage(outMessage);
     }
     

@@ -208,6 +208,17 @@ public class MultipartStore {
     }
     
     @GET
+    @Path("/books/jaxbjsonimage/read2")
+    @Produces("multipart/mixed")
+    public Map<String, Book> getBookJson() throws Exception {
+        Book json = new Book("json", 1L);
+        Map<String, Book> objects = new LinkedHashMap<String, Book>();
+        objects.put(MediaType.APPLICATION_JSON, json);
+        return objects;
+        
+    }
+    
+    @GET
     @Path("/books/jaxbjsonimage/read-object")
     @Produces("multipart/mixed")
     public Map<String, Object> getBookJaxbJsonObject() throws Exception {
