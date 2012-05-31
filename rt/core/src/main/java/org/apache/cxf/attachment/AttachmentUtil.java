@@ -50,6 +50,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public final class AttachmentUtil {
     
@@ -73,6 +74,11 @@ public final class AttachmentUtil {
 
     public static CommandMap getCommandMap() {
         return COMMAND_MAP;
+    }
+
+    public static boolean isMtomEnabled(Message message) {
+        Object prop = message.getContextualProperty(org.apache.cxf.message.Message.MTOM_ENABLED); 
+        return MessageUtils.isTrue(prop);
     }
     
     public static void setStreamedAttachmentProperties(Message message, CachedOutputStream bos) 

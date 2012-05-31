@@ -333,6 +333,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         conduit.getClient().setConnectionTimeout(1000000);
         
         client.type("multipart/related").accept("multipart/related");
+        
         XopType xop = new XopType();
         xop.setName("xopName");
         InputStream is = 
@@ -419,7 +420,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT;
         MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
         
-        
         Map<String, Book> map = client.getBookJaxbJson();
         List<Book> result = new ArrayList<Book>(map.values());
         Book jaxb = result.get(0);
@@ -428,6 +428,31 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         Book json = result.get(1);
         assertEquals("json", json.getName());
         assertEquals(2L, json.getId());
+        
+        String contentType = 
+            WebClient.client(client).getResponse().getMetadata().getFirst("Content-Type").toString();
+        MediaType mt = MediaType.valueOf(contentType);
+        assertEquals("multipart", mt.getType());
+        assertEquals("mixed", mt.getSubtype());
+    }
+    
+    @Test
+    public void testGetBookJsonProxy() throws Exception {
+        String address = "http://localhost:" + PORT;
+        MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
+        
+        Map<String, Book> map = client.getBookJson();
+        List<Book> result = new ArrayList<Book>(map.values());
+        assertEquals(1, result.size());
+        Book json = result.get(0);
+        assertEquals("json", json.getName());
+        assertEquals(1L, json.getId());
+        
+        String contentType = 
+            WebClient.client(client).getResponse().getMetadata().getFirst("Content-Type").toString();
+        MediaType mt = MediaType.valueOf(contentType);
+        assertEquals("multipart", mt.getType());
+        assertEquals("mixed", mt.getSubtype());
     }
     
     @Test
