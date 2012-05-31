@@ -48,6 +48,7 @@ import javax.mail.internet.InternetHeaders;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class AttachmentUtil {
