@@ -41,23 +41,11 @@
         </cxf:features>
     </cxf:bus>
 
-	<bean id="encryptedUtSTSProviderBean"
-		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-		<property name="issueOperation" ref="encryptedUtIssueDelegate" />
-		<property name="validateOperation" ref="encryptedUtValidateDelegate" />
-	</bean>
-
-	<bean id="encryptedUtIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
-		<property name="tokenProviders" ref="encryptedUtSamlTokenProvider" />
-		<property name="services" ref="encryptedUtService" />
+    <bean id="encryptedUtSTSProviderBean"
+	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
+	    <property name="services" ref="encryptedUtService" />
 		<property name="stsProperties" ref="encryptedUtSTSProperties" />
-	</bean>
-
-	<bean id="encryptedUtValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
-	</bean>
-
-	<bean id="encryptedUtSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-	</bean>
+    </bean>
 
 	<bean id="encryptedUtService" class="org.apache.cxf.sts.service.StaticService">
 		<property name="endpoints" ref="encryptedUtEndpoints" />

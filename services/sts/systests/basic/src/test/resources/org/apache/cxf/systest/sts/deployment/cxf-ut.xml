@@ -42,27 +42,10 @@
     </cxf:bus>
 
     <bean id="utSTSProviderBean"
-	    class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
-	    <property name="issueOperation" ref="utIssueDelegate" />
-	    <property name="validateOperation" ref="utValidateDelegate" />
+	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
+	    <property name="services" ref="utService" />
+		<property name="stsProperties" ref="utSTSProperties" />
     </bean>
-
-	<bean id="utIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
-		<property name="tokenProviders" ref="utSamlTokenProvider" />
-		<property name="services" ref="utService" />
-		<property name="stsProperties" ref="utSTSProperties" />
-	</bean>
-
-	<bean id="utValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
-		<property name="tokenValidators" ref="utSamlTokenValidator" />
-		<property name="stsProperties" ref="utSTSProperties" />
-	</bean>
-
-	<bean id="utSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
-	</bean>
-
-	<bean id="utSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
-	</bean>
 
 	<bean id="utService" class="org.apache.cxf.sts.service.StaticService">
 		<property name="endpoints" ref="utEndpoints" />
