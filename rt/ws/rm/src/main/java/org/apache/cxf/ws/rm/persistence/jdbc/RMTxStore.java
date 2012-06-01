@@ -293,10 +293,11 @@ public class RMTxStore implements RMStore {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting destination sequence for id: " + sid);
         }
+        ResultSet res = null;
         try {
             synchronized (selectDestSequenceStmt) {
                 selectDestSequenceStmt.setString(1, sid.getValue());
-                ResultSet res = selectDestSequenceStmt.executeQuery();
+                res = selectDestSequenceStmt.executeQuery();
             
                 if (res.next()) {
                     EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));  
@@ -312,6 +313,14 @@ public class RMTxStore implements RMStore {
             }
         } catch (SQLException ex) {
             LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
+        } finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    // ignore
+                }
+            }
         }
         return null;
     }
@@ -320,10 +329,11 @@ public class RMTxStore implements RMStore {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting source sequences for id: " + sid);
         }
+        ResultSet res = null;
         try {
             synchronized (selectSrcSequenceStmt) {
                 selectSrcSequenceStmt.setString(1, sid.getValue());
-                ResultSet res = selectSrcSequenceStmt.executeQuery();
+                res = selectSrcSequenceStmt.executeQuery();
             
                 if (res.next()) {
                     long cmn = res.getLong(1);
@@ -342,7 +352,15 @@ public class RMTxStore implements RMStore {
         } catch (SQLException ex) {
             // ignore
             LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
-        }
+        } finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    // ignore
+                }
+            }
+        } 
         return null;
     }
 
@@ -383,10 +401,11 @@ public class RMTxStore implements RMStore {
             LOG.info("Getting destination sequences for endpoint: " + endpointIdentifier);
         }
         Collection<DestinationSequence> seqs = new ArrayList<DestinationSequence>();
+        ResultSet res = null;
         try {
             synchronized (selectDestSequencesStmt) {
                 selectDestSequencesStmt.setString(1, endpointIdentifier);
-                ResultSet res = selectDestSequencesStmt.executeQuery(); 
+                res = selectDestSequencesStmt.executeQuery(); 
                 while (res.next()) {
                     Identifier sid = new Identifier();                
                     sid.setValue(res.getString(1));
@@ -404,7 +423,15 @@ public class RMTxStore implements RMStore {
             }
         } catch (SQLException ex) {
             LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
-        }
+        } finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    // ignore
+                }
+            }
+        } 
         return seqs;
     }
     
@@ -414,10 +441,11 @@ public class RMTxStore implements RMStore {
             LOG.info("Getting source sequences for endpoint: " + endpointIdentifier);
         }
         Collection<SourceSequence> seqs = new ArrayList<SourceSequence>();
+        ResultSet res = null;
         try {
             synchronized (selectSrcSequencesStmt) {
                 selectSrcSequencesStmt.setString(1, endpointIdentifier);
-                ResultSet res = selectSrcSequencesStmt.executeQuery();
+                res = selectSrcSequencesStmt.executeQuery();
                 while (res.next()) {
                     Identifier sid = new Identifier();
                     sid.setValue(res.getString(1));
@@ -438,17 +466,26 @@ public class RMTxStore implements RMStore {
         } catch (SQLException ex) {
             // ignore
             LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
-        }
+        } finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    // ignore
+                }
+            }
+        } 
         return seqs;
     }
     
     public Collection<RMMessage> getMessages(Identifier sid, boolean outbound) {
         Collection<RMMessage> msgs = new ArrayList<RMMessage>();
+        ResultSet res = null;
         try {
             PreparedStatement stmt = outbound ? selectOutboundMessagesStmt : selectInboundMessagesStmt;
             synchronized (stmt) {
                 stmt.setString(1, sid.getValue());
-                ResultSet res = stmt.executeQuery();
+                res = stmt.executeQuery();
                 while (res.next()) {
                     long mn = res.getLong(1);
                     String to = res.getString(2);
@@ -463,6 +500,14 @@ public class RMTxStore implements RMStore {
         } catch (Exception ex) {
             LOG.log(Level.WARNING, new Message(outbound ? "SELECT_OUTBOUND_MSGS_FAILED_MSG"
                 : "SELECT_INBOUND_MSGS_FAILED_MSG", LOG).toString(), ex);
+        } finally {
+            if (res != null) {
+                try {
+                    res.close();
+                } catch (SQLException e) {
+                    // ignore
+                }
+            }
         }
         return msgs;
     }
@@ -581,29 +626,26 @@ public class RMTxStore implements RMStore {
     
     protected void updateSourceSequence(SourceSequence seq) 
         throws SQLException {
-        if (null == updateSrcSequenceStmt) {
-            updateSrcSequenceStmt = connection.prepareStatement(UPDATE_SRC_SEQUENCE_STMT_STR);
+        synchronized (updateSrcSequenceStmt) {
+            updateSrcSequenceStmt.setLong(1, seq.getCurrentMessageNr()); 
+            updateSrcSequenceStmt.setString(2, seq.isLastMessage() ? "1" : "0"); 
+            updateSrcSequenceStmt.setString(3, seq.getIdentifier().getValue());
+            updateSrcSequenceStmt.execute();
         }
-        updateSrcSequenceStmt.setLong(1, seq.getCurrentMessageNr()); 
-        updateSrcSequenceStmt.setString(2, seq.isLastMessage() ? "1" : "0"); 
-        updateSrcSequenceStmt.setString(3, seq.getIdentifier().getValue());
-        updateSrcSequenceStmt.execute();
     }
     
     protected void updateDestinationSequence(DestinationSequence seq) 
         throws SQLException, IOException {
-        if (null == updateDestSequenceStmt) {
-            updateDestSequenceStmt = connection.prepareStatement(UPDATE_DEST_SEQUENCE_STMT_STR);
+        synchronized (updateDestSequenceStmt) {
+            long lastMessageNr = seq.getLastMessageNumber();
+            updateDestSequenceStmt.setLong(1, lastMessageNr); 
+            InputStream is = PersistenceUtils.getInstance()
+                .serialiseAcknowledgment(seq.getAcknowledgment());
+            updateDestSequenceStmt.setBinaryStream(2, is, is.available()); 
+            updateDestSequenceStmt.setString(3, seq.getIdentifier() .getValue());
+            updateDestSequenceStmt.execute();
         }
-        long lastMessageNr = seq.getLastMessageNumber();
-        updateDestSequenceStmt.setLong(1, lastMessageNr); 
-        InputStream is = PersistenceUtils.getInstance()
-            .serialiseAcknowledgment(seq.getAcknowledgment());
-        updateDestSequenceStmt.setBinaryStream(2, is, is.available()); 
-        updateDestSequenceStmt.setString(3, seq.getIdentifier() .getValue());
-        updateDestSequenceStmt.execute();
     }
-    
     protected void createTables() throws SQLException {
         
         Statement stmt = null;
@@ -616,8 +658,9 @@ public class RMTxStore implements RMStore {
             } else {
                 LOG.fine("Table CXF_RM_SRC_SEQUENCES already exists.");
             }
+        } finally {
+            stmt.close();
         }
-        stmt.close();
         
         stmt = connection.createStatement();
         try {
@@ -628,8 +671,9 @@ public class RMTxStore implements RMStore {
             } else {
                 LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
             }
+        } finally {
+            stmt.close();
         }
-        stmt.close();
         
         for (String tableName : new String[] {OUTBOUND_MSGS_TABLE_NAME, INBOUND_MSGS_TABLE_NAME}) {
             stmt = connection.createStatement();
@@ -643,8 +687,9 @@ public class RMTxStore implements RMStore {
                         LOG.fine("Table " + tableName + " already exists.");
                     }
                 }
+            } finally {
+                stmt.close();
             }
-            stmt.close();
         }
     }
     
@@ -660,8 +705,9 @@ public class RMTxStore implements RMStore {
                                                     schemaName));
         } catch (SQLException ex) {
             // assume it is already created or no authorization is provided (create one manually)
+        } finally {
+            stmt.close();
         }
-        stmt.close();
         stmt = connection.createStatement();
         SQLException ex0 = null;
         for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
@@ -675,9 +721,13 @@ public class RMTxStore implements RMStore {
                     throw ex0;
                 }
                 // continue
+            } finally {
+                // close the statement after its last use
+                if (ex0 == null || i == SET_SCHEMA_STMT_STRS.length - 1) {
+                    stmt.close();
+                }
             }
         }
-        stmt.close();
     }
 
     private void createStatements() throws SQLException {
