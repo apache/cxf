@@ -61,10 +61,13 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
         return true;
     }
 
-    public String getAuthorization(AuthorizationPolicy  authPolicy,
+    public String getAuthorization(AuthorizationPolicy authPolicy,
                                    URL currentURL,
                                    Message message,
                                    String fullHeader) {
+        if (authPolicy.getUserName() == null && authPolicy.getPassword() == null) {
+            return null;
+        }
         URI currentURI = URI.create(currentURL.toString());
         if (fullHeader == null) {
             DigestInfo di = authInfo.get(currentURI);

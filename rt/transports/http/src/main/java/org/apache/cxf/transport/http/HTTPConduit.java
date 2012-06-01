@@ -1068,9 +1068,21 @@ public class HTTPConduit
             // authentication not possible => we give up
             return connection;
         }
+        try {
+            //try and consume any content so that the connection might be reusable
+            InputStream ins = connection.getErrorStream();
+            if (ins == null) {
+                ins = connection.getInputStream();
+            }
+            if (ins != null) {
+                IOUtils.consume(ins);
+                ins.close();
+            }
+        } catch (Throwable t) {
+            //ignore
+        }
         new Headers(message).setAuthorization(authorizationToken);
         cookies.writeToMessageHeaders(message);
-        connection.disconnect();
         return retransmit(currentURL, message, cachedStream);
     }
 
