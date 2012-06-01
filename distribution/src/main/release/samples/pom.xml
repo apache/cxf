@@ -97,6 +97,8 @@
         <module>oauth/server</module>
         <module>oauth/client</module>
 
+        <module>jax_rs/minimal_osgi</module>
+
         <!--
         these are a bit fragile as they need to go off to external sites to get stuff like
         wsdl's and certs and such
