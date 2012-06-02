@@ -20,6 +20,7 @@ package org.apache.cxf.systest.ws.rm;
 
 import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
@@ -27,24 +28,19 @@ import org.junit.BeforeClass;
  * error at the provider side and how its behavior is affected by the robust in-only mode setting.
  */
 public class ServiceInvocationAckPersistenceTest extends ServiceInvocationAckBase {
+    static final String PORT = allocatePort(ServiceInvocationAckPersistenceTest.class);
+    
     @BeforeClass
+    public static void startServers() throws Exception {
+        RMTxStore.deleteDatabaseFiles("synack", true);
+        startServer(PORT);
+    }
+    public String getPort() {
+        return PORT;
+    }
+    @AfterClass
     public static void cleanUpDerby() throws Exception {
-        String derbyHome = System.getProperty("derby.system.home");
-        if (derbyHome == null) {
-            System.setProperty("derby.system.home", "target/derby");
-        }
-        RMTxStore.deleteDatabaseFiles();
-        derbyHome = System.getProperty("derby.system.home"); 
-        try {
-            System.setProperty("derby.system.home", derbyHome + "-server");
-            RMTxStore.deleteDatabaseFiles();
-        } finally {
-            if (derbyHome != null) {
-                System.setProperty("derby.system.home", derbyHome);
-            } else {
-                System.clearProperty("derby.system.home");
-            }
-        }
+        RMTxStore.deleteDatabaseFiles("synack", true);
     }
 
     protected void setupGreeter() throws Exception {

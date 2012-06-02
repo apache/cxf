@@ -47,17 +47,18 @@ import org.junit.Test;
  */
 public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
+    public static final String DECOUPLE_PORT = allocatePort(DecoupledClientServerTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(DecoupledClientServerTest.class);
     private Bus bus;
 
     public static class Server extends AbstractBusTestServerBase {
-        
+        Endpoint ep;
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/decoupled.xml");
             BusFactory.setDefaultBus(bus);
+            setBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
             bus.getInInterceptors().add(in);
             bus.getInFaultInterceptors().add(in);
@@ -70,7 +71,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
             implementor.setDelay(5000);
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             
-            Endpoint ep = Endpoint.create(implementor);
+            ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("schema-validation-enabled",
                            shouldValidate());
@@ -79,25 +80,16 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
 
             LOG.info("Published greeter endpoint.");
         }
-        
-
-        public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally { 
-                System.out.println("done!");
-            }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
     }    
     
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(Server.class));
+                   launchServer(Server.class, true));
     }
             
     public static Boolean shouldValidate() {

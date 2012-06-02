@@ -53,37 +53,34 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
     
     private static final Logger LOG = LogUtils.getLogger(ControlImpl.class);
+    
+    String dbName = "rmdb";
+    public void setDbName(String s) {
+        dbName = s;
+    }
 
     @Override
     public boolean startGreeter(String cfgResource) {
-        String derbyHome = System.getProperty("derby.system.home"); 
-        try {
-            System.setProperty("derby.system.home", derbyHome + "-server");   
-            SpringBusFactory bf = new SpringBusFactory();
-            greeterBus = bf.createBus(cfgResource);
-            BusFactory.setDefaultBus(greeterBus);
-            LOG.info("Initialised bus " + greeterBus + " with cfg file resource: " + cfgResource);
-            LOG.fine("greeterBus inInterceptors: " + greeterBus.getInInterceptors());
+        SpringBusFactory bf = new SpringBusFactory();
+        System.setProperty("db.name", dbName);
+        greeterBus = bf.createBus(cfgResource);
+        System.clearProperty("db.name");
+        BusFactory.setDefaultBus(greeterBus);
+        LOG.info("Initialised bus " + greeterBus + " with cfg file resource: " + cfgResource);
+        LOG.fine("greeterBus inInterceptors: " + greeterBus.getInInterceptors());
 
-            LoggingInInterceptor logIn = new LoggingInInterceptor();
-            LoggingOutInterceptor logOut = new LoggingOutInterceptor();
-            greeterBus.getInInterceptors().add(logIn);
-            greeterBus.getOutInterceptors().add(logOut);
-            greeterBus.getOutFaultInterceptors().add(logOut);
+        LoggingInInterceptor logIn = new LoggingInInterceptor();
+        LoggingOutInterceptor logOut = new LoggingOutInterceptor();
+        greeterBus.getInInterceptors().add(logIn);
+        greeterBus.getOutInterceptors().add(logOut);
+        greeterBus.getOutFaultInterceptors().add(logOut);
 
-            if (cfgResource.indexOf("provider") == -1) {
-                endpoint = Endpoint.publish(address, implementor);
-                LOG.info("Published greeter endpoint.");
-            } else {
-                endpoint = Endpoint.publish(address, new GreeterProvider());
-                LOG.info("Published greeter provider.");
-            }
-        } finally {
-            if (derbyHome != null) {
-                System.setProperty("derby.system.home", derbyHome);
-            } else {
-                System.clearProperty("derby.system.home");
-            }
+        if (cfgResource.indexOf("provider") == -1) {
+            endpoint = Endpoint.publish(address, implementor);
+            LOG.info("Published greeter endpoint.");
+        } else {
+            endpoint = Endpoint.publish(address, new GreeterProvider());
+            LOG.info("Published greeter provider.");
         }
         
         return true;        

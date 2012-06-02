@@ -44,7 +44,7 @@ import org.junit.Test;
  */
 public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
+    public static final String DECOUPLE_PORT = allocatePort(RetransmissionQueueTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(RetransmissionQueueTest.class);
     private Bus bus;

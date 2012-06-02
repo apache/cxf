@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Dispatch;
+import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -38,8 +39,8 @@ import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
-import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.recorders.InMessageRecorder;
 import org.apache.cxf.testutil.recorders.MessageRecorder;
 import org.apache.cxf.testutil.recorders.OutMessageRecorder;
@@ -54,7 +55,6 @@ import org.apache.cxf.ws.rm.RMException;
 import org.apache.cxf.ws.rm.RMManager;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -63,7 +63,7 @@ import org.junit.Test;
  * variation is used by the client.
  */
 public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = Server.PORT;
+    public static final String PORT = allocatePort(ProtocolVariationsTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(ProtocolVariationsTest.class);
     private static final String GREETME_ACTION
@@ -81,17 +81,36 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     private InMessageRecorder inRecorder;
     private Dispatch<DOMSource> dispatch;
 
+    public static class Server extends AbstractBusTestServerBase {
+        Endpoint ep;
+        
+        protected void run() {
+            SpringBusFactory factory = new SpringBusFactory();
+            Bus bus = factory.createBus();
+            BusFactory.setDefaultBus(bus);
+            setBus(bus);
+
+            //System.out.println("Created control bus " + bus);
+            ControlImpl implementor = new ControlImpl();
+            implementor.setDbName("pvt-server");
+            implementor.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
+            GreeterImpl greeterImplementor = new GreeterImpl();
+            implementor.setImplementor(greeterImplementor);
+            ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/ControlPort", implementor);
+            BusFactory.setDefaultBus(null);
+            BusFactory.setThreadDefaultBus(null); 
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
+        }
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
-        TestUtilities.setKeepAliveSystemProperty(false);
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
-    @AfterClass
-    public static void cleanup() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
+
             
     
     @After
