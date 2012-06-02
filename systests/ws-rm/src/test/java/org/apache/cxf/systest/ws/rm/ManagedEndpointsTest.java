@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.ws.rm;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Logger;
 
