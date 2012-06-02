@@ -68,7 +68,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
-import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.recorders.InMessageRecorder;
 import org.apache.cxf.testutil.recorders.MessageRecorder;
@@ -82,7 +81,6 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMProperties;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -119,15 +117,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        TestUtilities.setKeepAliveSystemProperty(false);
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
     
-    @AfterClass
-    public static void cleanup() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
-            
     
     @After
     public void tearDown() throws Exception {
