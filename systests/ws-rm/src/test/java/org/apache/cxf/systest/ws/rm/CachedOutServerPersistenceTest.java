@@ -30,7 +30,8 @@ import org.junit.Test;
  * A simulated-large message version of ServerPersistenceTest.
  */
 public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTest {
-    public static final String PORT = allocatePort(CachedOutServerPersistenceTest.PORT);
+    public static final String PORT = allocatePort(CachedOutServerPersistenceTest.class);
+    public static final String DECOUPLED_PORT = allocatePort(CachedOutServerPersistenceTest.class, 1);
    
     @BeforeClass
     public static void setProperties() throws Exception {
@@ -56,6 +57,11 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
 
     public String getPrefix() {
         return "cospt";
+    }
+
+    @Override
+    public String getDecoupledPort() {
+        return DECOUPLED_PORT;
     }
 
 }
