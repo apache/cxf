@@ -68,6 +68,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     private boolean supportDeflateEncoding = true;
     private boolean supportBase64Encoding = true;
     private boolean enforceAssertionsSigned = true;
+    private boolean enforceKnownIssuer = true;
     private TokenReplayCache<String> replayCache;
 
     private MessageContext messageContext;
@@ -100,6 +101,14 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
      */
     public void setEnforceAssertionsSigned(boolean enforceAssertionsSigned) {
         this.enforceAssertionsSigned = enforceAssertionsSigned;
+    }
+    
+    /**
+     * Enforce that the Issuer of the received Response/Assertion is known to this RACS. The
+     * default is true.
+     */
+    public void setEnforceKnownIssuer(boolean enforceKnownIssuer) {
+        this.enforceKnownIssuer = enforceKnownIssuer;
     }
     
     public void setSupportBase64Encoding(boolean supportBase64Encoding) {
@@ -293,6 +302,7 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
             ssoResponseValidator.setSpIdentifier(requestState.getIssuerId());
             ssoResponseValidator.setEnforceAssertionsSigned(enforceAssertionsSigned);
+            ssoResponseValidator.setEnforceKnownIssuer(enforceKnownIssuer);
             ssoResponseValidator.setReplayCache(getReplayCache());
 
             return ssoResponseValidator.validateSamlResponse(samlResponse, postBinding);

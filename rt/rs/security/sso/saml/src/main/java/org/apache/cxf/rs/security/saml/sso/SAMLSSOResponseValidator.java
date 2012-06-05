@@ -45,6 +45,7 @@ public class SAMLSSOResponseValidator {
     private String requestId;
     private String spIdentifier;
     private boolean enforceAssertionsSigned = true;
+    private boolean enforceKnownIssuer = true;
     private TokenReplayCache<String> replayCache;
     
     /**
@@ -52,6 +53,13 @@ public class SAMLSSOResponseValidator {
      */
     public void setEnforceAssertionsSigned(boolean enforceAssertionsSigned) {
         this.enforceAssertionsSigned = enforceAssertionsSigned;
+    }
+    
+    /**
+     * Enforce that the Issuer of the received Response/Assertion is known. The default is true.
+     */
+    public void setEnforceKnownIssuer(boolean enforceKnownIssuer) {
+        this.enforceKnownIssuer = enforceKnownIssuer;
     }
     
     /**
@@ -142,7 +150,7 @@ public class SAMLSSOResponseValidator {
         }
         
         // Issuer value must match (be contained in) Issuer IDP
-        if (!issuerIDP.startsWith(issuer.getValue())) {
+        if (enforceKnownIssuer && !issuerIDP.startsWith(issuer.getValue())) {
             LOG.fine("Issuer value: " + issuer.getValue() + " does not match issuer IDP: " 
                 + issuerIDP);
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
