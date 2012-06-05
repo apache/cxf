@@ -365,4 +365,22 @@
      
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="TransportKVT"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportKVT" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportKVTPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.encryption.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.is-bsp-compliant" value="false"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
 </beans>

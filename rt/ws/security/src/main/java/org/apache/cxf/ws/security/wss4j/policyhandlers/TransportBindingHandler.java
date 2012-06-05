@@ -62,6 +62,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.conversation.ConversationConstants;
 import org.apache.ws.security.message.WSSecDKSign;
@@ -280,7 +281,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
-            || token instanceof KeyValueToken
             || token instanceof KerberosToken) {
             addSig(
                 signatureValues, 
@@ -386,6 +386,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         boolean tokenIncluded = false;
         // Get the issued token
         SecurityToken secTok = getSecurityToken();
+        if (secTok == null) {
+            LOG.fine("The retrieved SecurityToken was null");
+            throw new WSSecurityException("The retrieved SecurityToken was null");
+        }
         
         if (includeToken(token.getInclusion())) {
             //Add the token
