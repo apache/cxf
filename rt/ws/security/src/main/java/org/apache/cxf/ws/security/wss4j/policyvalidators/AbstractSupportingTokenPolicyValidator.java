@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -300,6 +301,40 @@ public abstract class AbstractSupportingTokenPolicyValidator
     }
     
     /**
+     * Process KeyValue Tokens.
+     */
+    protected boolean processKeyValueTokens() {
+        List<WSSecurityEngineResult> tokenResults = new ArrayList<WSSecurityEngineResult>();
+        for (WSSecurityEngineResult wser : signedResults) {
+            PublicKey publicKey = 
+                (PublicKey)wser.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+            if (publicKey != null) {
+                tokenResults.add(wser);
+            }
+        }
+        
+        if (tokenResults.isEmpty()) {
+            return false;
+        }
+        
+        if (signed && !areTokensSigned(tokenResults)) {
+            return false;
+        }
+        if (encrypted && !areTokensEncrypted(tokenResults)) {
+            return false;
+        }
+        if (endorsed && !checkEndorsed(tokenResults)) {
+            return false;
+        }
+        
+        if (!validateSignedEncryptedPolicies(tokenResults)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
      * Validate (SignedParts|SignedElements|EncryptedParts|EncryptedElements) policies of this
      * SupportingToken.
      */
@@ -447,7 +482,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
         if (!isTLSInUse()) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                if (!isTokenSigned(tokenElement)) {
+                if (tokenElement == null || !isTokenSigned(tokenElement)) {
                     return false;
                 }
             }
@@ -462,7 +497,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
         if (!isTLSInUse()) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                if (!isTokenEncrypted(tokenElement)) {
+                if (tokenElement == null || !isTokenEncrypted(tokenElement)) {
                     return false;
                 }
             }
@@ -538,6 +573,8 @@ public abstract class AbstractSupportingTokenPolicyValidator
             Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
             BinarySecurity binarySecurity = 
                 (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+            PublicKey publicKey = 
+                (PublicKey)token.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
             if (binarySecurity instanceof X509Security
                 || binarySecurity instanceof PKIPathSecurity) {
                 X509Certificate foundCert = 
@@ -560,14 +597,18 @@ public abstract class AbstractSupportingTokenPolicyValidator
                         return true;
                     }
                 }
-            } else {
-                byte[] foundSecret = (byte[])token.get(WSSecurityEngineResult.TAG_SECRET);
-                if (foundSecret != null && Arrays.equals(foundSecret, secret)) {
+            } else if (publicKey != null) {
+                PublicKey foundPublicKey = 
+                    (PublicKey)token.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+                if (publicKey.equals(foundPublicKey)) {
                     return true;
                 }
+            } else {
+                byte[] foundSecret = (byte[])token.get(WSSecurityEngineResult.TAG_SECRET);
                 byte[] derivedKey = 
                     (byte[])token.get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY);
-                if (derivedKey != null && Arrays.equals(derivedKey, secret)) {
+                if ((foundSecret != null && Arrays.equals(foundSecret, secret))
+                    || (derivedKey != null && Arrays.equals(derivedKey, secret))) {
                     return true;
                 }
             }
