@@ -129,7 +129,7 @@ public class SAMLSSOResponseValidator {
         validatorResponse.setSessionNotOnOrAfter(sessionNotOnOrAfter);
         // the assumption for now is that SAMLResponse will contain only a single assertion
         Element assertionElement = samlResponse.getAssertions().get(0).getDOM();
-        validatorResponse.setAssertion(DOM2Writer.nodeToString(assertionElement));
+        validatorResponse.setAssertion(DOM2Writer.nodeToString(assertionElement.cloneNode(true)));
         return validatorResponse;
     }
     
