@@ -112,6 +112,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
+        createStaticBus();
     }
     
     @Test

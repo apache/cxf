@@ -50,6 +50,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", 
                    launchServer(BookDataBindingServer.class, true));
+        createStaticBus();
     }
     
     
