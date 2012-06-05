@@ -34,7 +34,6 @@
     
 
     <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
         <oauth.version>20100527</oauth.version>
     </properties>
     
