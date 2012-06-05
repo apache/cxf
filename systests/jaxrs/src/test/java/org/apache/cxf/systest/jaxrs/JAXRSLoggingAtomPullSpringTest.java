@@ -83,8 +83,9 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractBusClientServerTestB
         launchServer(SpringServer.class, true);
         context = JAXBContext.newInstance(org.apache.cxf.management.web.logging.LogRecord.class);
         createStaticBus();
+        System.clearProperty("systemtests.jaxrs.logs.folder");
     }
-
+    
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
         public static final int PORT = allocatePortAsInt(SpringServer.class);
@@ -98,7 +99,6 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractBusClientServerTestB
         Storage.clearRecords();
     }
 
-    
     @Test
     public void testFeed() throws Exception {
         String listing = WebClient.create("http://localhost:" + PORT + "/services").get(String.class);
@@ -136,6 +136,9 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractBusClientServerTestB
     
     @Test
     public void testPagedFeed() throws Exception {
+        WebClient wcReset = WebClient.create("http://localhost:" + PORT + "/reset");
+        wcReset.post(null);
+        
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/resource2/paged");
         wc.path("/log").get();
         Thread.sleep(3000);
@@ -325,6 +328,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractBusClientServerTestB
     private String fillPagedEntries(List<Entry> entries, String href, int expected, 
                                     String rel, boolean relExpected) {
         Feed feed = getFeed(href);
+
         assertEquals(expected, feed.getEntries().size());
         entries.addAll(feed.getEntries());
         
