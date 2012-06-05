@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.abdera.model.Element;
 import org.apache.commons.lang.Validate;
@@ -96,6 +97,15 @@ final class AtomPushEngine {
             publishAndReset();
         }
         executor.shutdown();
+        
+        try {
+            //wait a little to try and flush the batches
+            //it's not critical, but can avoid errors on the 
+            //console and such which could be confusing
+            executor.awaitTermination(20, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            //ignore
+        }
     }
 
     private boolean isValid() {

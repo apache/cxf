@@ -142,6 +142,9 @@ public final class AtomPushHandler extends Handler {
                 lazyConfig = false;
                 configure();
             }
+            if (engine == null) {
+                return;
+            }
             LogRecord rec = LogRecord.fromJUL(record);
             engine.publish(rec);
         } finally {
@@ -151,7 +154,10 @@ public final class AtomPushHandler extends Handler {
 
     @Override
     public synchronized void close() throws SecurityException {
-        engine.shutdown();
+        if (engine != null) {
+            engine.shutdown();
+        }
+        engine = null;
     }
 
     @Override
