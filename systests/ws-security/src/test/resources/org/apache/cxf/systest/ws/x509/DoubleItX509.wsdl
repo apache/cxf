@@ -275,6 +275,23 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItTransportKVTBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItTransportKVTPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     
     <wsdl:service name="DoubleItService">
         <wsdl:port name="DoubleItKeyIdentifierPort" binding="tns:DoubleItKeyIdentifierBinding">
@@ -325,6 +342,10 @@
         <wsdl:port name="DoubleItTransportSupportingSignedPort" 
                    binding="tns:DoubleItTransportSupportingSignedBinding">
             <soap:address location="https://localhost:9002/DoubleItX509TransportSupportingSigned" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItTransportKVTPort" 
+                   binding="tns:DoubleItTransportKVTBinding">
+            <soap:address location="https://localhost:9002/DoubleItX509TransportKVT" />
         </wsdl:port>
     </wsdl:service>
 
@@ -840,6 +861,45 @@
                         <sp:SignedElements>
                             <sp:XPath>//*[local-name()='ReplyTo']</sp:XPath>
                         </sp:SignedElements>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItTransportKVTPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:TransportBinding>
+                    <wsp:Policy>
+                        <sp:TransportToken>
+                            <wsp:Policy>
+                                <sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
+                            </wsp:Policy>
+                        </sp:TransportToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:TransportBinding>
+                <sp:EndorsingSupportingTokens>
+                   <wsp:Policy>
+                        <sp:KeyValueToken
+                           sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                           <wsp:Policy>
+                              <sp:RsaKeyValue />
+                           </wsp:Policy>
+                        </sp:KeyValueToken>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
             </wsp:All>
