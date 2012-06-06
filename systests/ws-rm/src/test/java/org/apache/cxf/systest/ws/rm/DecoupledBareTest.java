@@ -48,44 +48,37 @@ import org.junit.Test;
  */
 public class DecoupledBareTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
+    public static final String DECOUPLE_PORT = allocatePort(DecoupledBareTest.class);
     
     private static final Logger LOG = LogUtils.getLogger(DecoupledBareTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
         
+        Endpoint ep;
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/decoupled_bare.xml");
             BusFactory.setDefaultBus(bus);
+            setBus(bus);
             
             Object implementor = new DocLitBareGreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-            Endpoint ep = Endpoint.create(implementor);
+            ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("schema-validation-enabled", Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
             LOG.info("Published server endpoint.");
         }
-        
-
-        public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally { 
-                System.out.println("done!");
-            }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
     }    
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     
     @Test

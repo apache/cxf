@@ -18,11 +18,22 @@
  */
 package org.apache.cxf.systest.ws.rm;
 
+import org.junit.BeforeClass;
+
 /**
  * Tests the acknowledgement delivery back to the non-decoupled port when there is some
  * error at the provider side and how its behavior is affected by the robust in-only mode setting.
  */
 public class ServiceInvocationAtMostOnceAckTest extends ServiceInvocationAckBase {
+    static final String PORT = allocatePort(ServiceInvocationAtMostOnceAckTest.class);
+    
+    @BeforeClass
+    public static void startServers() throws Exception {
+        startServer(PORT);
+    }
+    public String getPort() {
+        return PORT;
+    }
     protected void setupGreeter() throws Exception {
         setupGreeter("org/apache/cxf/systest/ws/rm/sync-ack-atmostonce-server.xml");
     }

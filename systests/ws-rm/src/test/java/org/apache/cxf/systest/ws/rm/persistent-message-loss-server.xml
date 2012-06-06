@@ -32,6 +32,8 @@ http://cxf.apache.org/ws/rm/manager http://cxf.apache.org/schemas/configuration/
 http://cxf.apache.org/configuration/beans http://cxf.apache.org/schemas/configuration/cxf-beans.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
     <bean id="messageLoss" class="org.apache.cxf.systest.ws.rm.MessageLossSimulator"/>
 
     <cxf:bus>
@@ -42,7 +44,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                     <wsrm-policy:BaseRetransmissionInterval Milliseconds="60000" />
                 </wsrm-policy:RMAssertion>
                 <wsrm-mgr:store>
-                   <wsrm-mgr:jdbcStore/>
+                   <wsrm-mgr:jdbcStore url="jdbc:derby:${db.name};create=true"/>
                 </wsrm-mgr:store>
             </wsrm-mgr:reliableMessaging>
         </cxf:features>

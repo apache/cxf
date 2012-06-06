@@ -48,8 +48,7 @@ import org.junit.Test;
  * 
  */
 public class ManagedEndpointsTest extends AbstractClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class);
-//    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
+    public static final String PORT = allocatePort(ManagedEndpointsTest.class);
 
     private static final String SERVER_CFG = "/org/apache/cxf/systest/ws/rm/managed-server.xml"; 
     private static final String CLIENT_CFG = "/org/apache/cxf/systest/ws/rm/managed-client.xml"; 

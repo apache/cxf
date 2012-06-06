@@ -52,12 +52,13 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
 
     
     public static class Server extends AbstractBusTestServerBase {
-
+        Endpoint ep;
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
             // use a at-most-once server with sync ack processing
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/atmostonce.xml");
             BusFactory.setDefaultBus(bus);
+            setBus(bus);
             bus.getExtension(RMManager.class).getRMAssertion().getAcknowledgementInterval()
                 .setMilliseconds(0L);
 
@@ -70,23 +71,16 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             
             // publish this robust oneway endpoint
-            Endpoint ep = Endpoint.create(serverGreeter);
+            ep = Endpoint.create(serverGreeter);
             ep.getProperties().put(Message.ROBUST_ONEWAY, Boolean.TRUE);
             ep.publish(address);
             LOG.info("Published greeter endpoint.");
         }
-
-        public static void main(String[] args) {
-            try {
-                Server s = new Server();
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally {
-                System.out.println("done!");
-            }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
+
     }
 
     @BeforeClass

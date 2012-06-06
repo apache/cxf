@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.ws.rm;
 
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,29 +29,33 @@ import org.junit.Test;
 /**
  * A simulated-large message version of ServerPersistenceTest.
  */
-public class CachedOutServerPersistenceTest extends ServerPersistenceTest {
-
-    private static String oldThreshold;
-    
+public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTest {
+    public static final String PORT = allocatePort(CachedOutServerPersistenceTest.PORT);
+   
     @BeforeClass
     public static void setProperties() throws Exception {
-        oldThreshold = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
-        // forces the CacheOutputStream to use temporary file caching
-        System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "16");
+        startServers(PORT, "cospt");
+        CachedOutputStream.setDefaultThreshold(16);
     }
     
     @AfterClass
     public static void cleanup() throws Exception {
-        if (oldThreshold == null) {
-            System.clearProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
-        } else {
-            System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", oldThreshold);
-        }
+        CachedOutputStream.setDefaultThreshold(-1);
+        RMTxStore.deleteDatabaseFiles("cospt-recovery", true);
+        RMTxStore.deleteDatabaseFiles("cospt-server", true);
     }
 
     @Test 
     public void testRecovery() throws Exception {
         super.testRecovery();
+    }
+
+    public String getPort() {
+        return PORT;
+    }
+
+    public String getPrefix() {
+        return "cospt";
     }
 
 }

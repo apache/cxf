@@ -50,6 +50,6 @@
         </cxf:features>
     </cxf:bus>
 
-    <wsrm-mgr:jdbcStore id="testStore"/>
+    <wsrm-mgr:jdbcStore id="testStore" url="jdbc:derby:synack;create=true"/>
 
 </beans>

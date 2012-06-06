@@ -31,6 +31,7 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -47,19 +48,18 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
 
-    private static String oldThreshold;
-    
     private static final Logger LOG = LogUtils.getLogger(RetransmissionQueueTest.class);
     private Bus bus;
     
 
     
     public static class Server extends AbstractBusTestServerBase {
-      
+        Endpoint ep;
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/message-loss.xml");
             BusFactory.setDefaultBus(bus);
+            setBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
             bus.getInInterceptors().add(in);
             bus.getInFaultInterceptors().add(in);
@@ -70,42 +70,28 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             
-            Endpoint ep = Endpoint.create(implementor);
+            ep = Endpoint.create(implementor);
             ep.publish(address);
 
             LOG.info("Published greeter endpoint.");
         }
- 
-        public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
-                s.start();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.exit(-1);
-            } finally { 
-                System.out.println("done!");
-            }
+        
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
-        oldThreshold = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
-        // forces the CacheOutputStream to use temporary file caching
-        System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "16");
-
+        CachedOutputStream.setDefaultThreshold(16);
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, true));
     }
 
     @AfterClass
     public static void cleanup() throws Exception {
-        if (oldThreshold == null) {
-            System.clearProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
-        } else {
-            System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", oldThreshold);
-        }
+        CachedOutputStream.setDefaultThreshold(-1);
     }
 
     @Test

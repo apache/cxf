@@ -28,7 +28,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
     <http:conduit name="{http://cxf.apache.org/greeter_control}GreeterPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.decoupled.port}/decoupled_endpoint"/>
+      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.DecoupledClientServerTest}/decoupled_endpoint"/>
     </http:conduit>
     
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>
