@@ -727,7 +727,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 }
                 if (replayCache == null) {
                     ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-                    replayCache = replayCacheFactory.newReplayCache(instanceKey, message);
+                    String cacheKey = instanceKey;
+                    if (info.getName() != null) {
+                        cacheKey += "-" + info.getName().toString().hashCode();
+                    }
+                    replayCache = replayCacheFactory.newReplayCache(cacheKey, message);
                     info.setProperty(instanceKey, replayCache);
                 }
                 return replayCache;
