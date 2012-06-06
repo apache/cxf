@@ -36,12 +36,35 @@ import org.apache.cxf.wsdl.WSDLManager;
 
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(EmbeddedJMSBrokerLauncher.class);
-    
+
+    String brokerUrl1;            
     BrokerService broker;
-    final String brokerUrl1 = "tcp://localhost:" + PORT;            
-            
+    String brokerName;
     
-    public static void updateWsdlExtensors(Bus bus, String wsdlLocation) {
+    public EmbeddedJMSBrokerLauncher() {
+        this(null);
+    }
+    public EmbeddedJMSBrokerLauncher(String url) {
+        if (url == null) {
+            url = "tcp://localhost:" + PORT;
+        }
+        brokerUrl1 = url;
+    }
+    
+    public String getBrokerURL() {
+        return brokerUrl1;
+    }
+    public void updateWsdl(Bus b, String wsdlLocation) { 
+        updateWsdlExtensors(b, wsdlLocation, brokerUrl1);
+    }
+    
+    public static void updateWsdlExtensors(Bus bus, 
+                                           String wsdlLocation) {
+        updateWsdlExtensors(bus, wsdlLocation, "tcp://localhost:" + PORT);
+    }
+    public static void updateWsdlExtensors(Bus bus, 
+                                           String wsdlLocation,
+                                           String url) {
         try {
             if (bus == null) {
                 bus = BusFactory.getThreadDefaultBus();
@@ -62,7 +85,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                             if (idx != -1) {
                                 int idx2 = add.indexOf("&", idx);
                                 add = add.substring(0, idx)
-                                    + "jndiURL=tcp://localhost:" + PORT
+                                    + "jndiURL=" + url
                                     + (idx2 == -1 ? "" : add.substring(idx2));
                                 ((SOAPAddress)e).setLocationURI(add);
                             }
@@ -77,7 +100,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                                     if ("java.naming.provider.url".equals(f.get(prop))) {
                                         f = prop.getClass().getDeclaredField("value");
                                         f.setAccessible(true);
-                                        f.set(prop, "tcp://localhost:" + PORT);
+                                        f.set(prop, url);
                                     }
                                 }
                             } catch (Exception ex) {
@@ -92,6 +115,9 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
         }
     }
     
+    public void stop() throws Exception {
+        tearDown();
+    }
     public void tearDown() throws Exception {
         if (broker != null) {
             broker.stop();
@@ -99,13 +125,17 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     }
     
     //START SNIPPET: broker
-    public void run() {
-        try {                
+    public final void run() {
+        try {             
             broker = new BrokerService();
             broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
             broker.setTmpDataDirectory(new File("./target"));
-            broker.addConnector(brokerUrl1);
-            broker.start();            
+            broker.setUseJmx(false);
+            if (brokerName != null) {
+                broker.setBrokerName(brokerName);
+            }
+            broker.addConnector(brokerUrl1 + "?daemon=true");
+            broker.start();  
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,7 +144,11 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
 
     public static void main(String[] args) {
         try {
-            EmbeddedJMSBrokerLauncher s = new EmbeddedJMSBrokerLauncher();
+            String url = null;
+            if (args.length > 0) {
+                url = args[0];
+            }
+            EmbeddedJMSBrokerLauncher s = new EmbeddedJMSBrokerLauncher(url);
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

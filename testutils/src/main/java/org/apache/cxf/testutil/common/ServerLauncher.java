@@ -69,6 +69,12 @@ public class ServerLauncher {
     public ServerLauncher(String theClassName) {
         this(theClassName, DEFAULT_IN_PROCESS);
     }
+    public ServerLauncher(AbstractTestServerBase b) {
+        inProcess = true;
+        inProcessServer = b;
+        javaExe = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        className = null;
+    }
     public ServerLauncher(String theClassName, boolean inprocess) {
         inProcess = inprocess;
         className = theClassName;
@@ -174,16 +180,17 @@ public class ServerLauncher {
                         }
                     }
                 }
-                
-                cls = Class.forName(className);
-                Class<? extends AbstractTestServerBase> svcls = 
-                    cls.asSubclass(AbstractTestServerBase.class);
-                if (null == serverArgs) {
-                    inProcessServer = svcls.newInstance();
-                } else {
-                    Constructor<? extends AbstractTestServerBase> ctor
-                        = svcls.getConstructor(serverArgs.getClass());
-                    inProcessServer = ctor.newInstance(new Object[] {serverArgs});
+                if (inProcessServer == null) {
+                    cls = Class.forName(className);
+                    Class<? extends AbstractTestServerBase> svcls = 
+                        cls.asSubclass(AbstractTestServerBase.class);
+                    if (null == serverArgs) {
+                        inProcessServer = svcls.newInstance();
+                    } else {
+                        Constructor<? extends AbstractTestServerBase> ctor
+                            = svcls.getConstructor(serverArgs.getClass());
+                        inProcessServer = ctor.newInstance(new Object[] {serverArgs});
+                    }
                 }
                 inProcessServer.startInProcess();
                 serverIsReady = true;
