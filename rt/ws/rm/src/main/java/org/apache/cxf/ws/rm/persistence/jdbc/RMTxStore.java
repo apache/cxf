@@ -178,6 +178,14 @@ public class RMTxStore implements RMStore {
     private String userName;
     private String password;
     private String schemaName;
+
+    private long initialReconnectDelay = 60000L;
+    private int useExponentialBackOff = 2;
+    private int maxReconnectAttempts = 10;
+
+    private long reconnectDelay;
+    private int reconnectAttempts;
+    private long nextReconnectAttempt;
     
     private String tableExistsState = DERBY_TABLE_EXISTS_STATE;
     private int tableExistsCode = ORACLE_TABLE_EXISTS_CODE;
@@ -192,6 +200,7 @@ public class RMTxStore implements RMStore {
             } catch (SQLException e) {
                 //ignore
             }
+            connection = null;
         }
     }
     
@@ -265,6 +274,22 @@ public class RMTxStore implements RMStore {
         this.tableExistsCode = tableExistsCode;
     }
 
+    public long getInitialReconnectDelay() {
+        return initialReconnectDelay;
+    }
+
+    public void setInitialReconnectDelay(long initialReconnectDelay) {
+        this.initialReconnectDelay = initialReconnectDelay;
+    }
+
+    public int getMaxReconnectAttempts() {
+        return maxReconnectAttempts;
+    }
+
+    public void setMaxReconnectAttempts(int maxReconnectAttempts) {
+        this.maxReconnectAttempts = maxReconnectAttempts;
+    }
+
     public void setConnection(Connection c) {
         connection = c;
         createdConnection = false; 
@@ -280,6 +305,8 @@ public class RMTxStore implements RMStore {
             LOG.info("Creating destination sequence: " + sequenceIdentifier + ", (endpoint: "
                  + endpointIdentifier + ")");
         }
+        verifyConnection();
+        SQLException conex = null;
         try {
             beginTransaction();
             
@@ -291,10 +318,12 @@ public class RMTxStore implements RMStore {
             createDestSequenceStmt.execute();
             
             commit();
-            
         } catch (SQLException ex) {
             abort();
+            conex = ex;
             throw new RMStoreException(ex);
+        } finally {
+            updateConnectionState(conex);
         }
     }
     
@@ -306,7 +335,8 @@ public class RMTxStore implements RMStore {
             LOG.fine("Creating source sequence: " + sequenceIdentifier + ", (endpoint: "
                      + endpointIdentifier + ")"); 
         }
-        
+        verifyConnection();
+        SQLException conex = null;
         try {
             beginTransaction();
             
@@ -320,10 +350,12 @@ public class RMTxStore implements RMStore {
             createSrcSequenceStmt.execute();    
             
             commit();
-            
         } catch (SQLException ex) {
+            conex = ex;
             abort();
             throw new RMStoreException(ex);
+        } finally {
+            updateConnectionState(conex);
         }
     }
 
@@ -331,6 +363,8 @@ public class RMTxStore implements RMStore {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting destination sequence for id: " + sid);
         }
+        verifyConnection();
+        SQLException conex = null;
         ResultSet res = null;
         try {
             synchronized (selectDestSequenceStmt) {
@@ -351,6 +385,7 @@ public class RMTxStore implements RMStore {
                 }
             }
         } catch (SQLException ex) {
+            conex = ex;
             LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
         } finally {
             if (res != null) {
@@ -360,6 +395,7 @@ public class RMTxStore implements RMStore {
                     // ignore
                 }
             }
+            updateConnectionState(conex);
         }
         return null;
     }
@@ -368,6 +404,8 @@ public class RMTxStore implements RMStore {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting source sequences for id: " + sid);
         }
+        verifyConnection();
+        SQLException conex = null;
         ResultSet res = null;
         try {
             synchronized (selectSrcSequenceStmt) {
@@ -390,6 +428,7 @@ public class RMTxStore implements RMStore {
                 }
             }
         } catch (SQLException ex) {
+            conex = ex;
             // ignore
             LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
         } finally {
@@ -400,11 +439,14 @@ public class RMTxStore implements RMStore {
                     // ignore
                 }
             }
+            updateConnectionState(conex);
         } 
         return null;
     }
 
     public void removeDestinationSequence(Identifier sid) {
+        verifyConnection();
+        SQLException conex = null;
         try {
             beginTransaction();
             
@@ -414,13 +456,18 @@ public class RMTxStore implements RMStore {
             commit();
             
         } catch (SQLException ex) {
+            conex = ex;
             abort();
             throw new RMStoreException(ex);
-        }        
+        } finally {
+            updateConnectionState(conex);
+        }
     }
     
     
     public void removeSourceSequence(Identifier sid) {
+        verifyConnection();
+        SQLException conex = null;
         try {
             beginTransaction();
             
@@ -430,8 +477,11 @@ public class RMTxStore implements RMStore {
             commit();
             
         } catch (SQLException ex) {
+            conex = ex;
             abort();
             throw new RMStoreException(ex);
+        } finally {
+            updateConnectionState(conex);
         }        
     }
     
@@ -439,6 +489,8 @@ public class RMTxStore implements RMStore {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting destination sequences for endpoint: " + endpointIdentifier);
         }
+        verifyConnection();
+        SQLException conex = null;
         Collection<DestinationSequence> seqs = new ArrayList<DestinationSequence>();
         ResultSet res = null;
         try {
@@ -462,6 +514,7 @@ public class RMTxStore implements RMStore {
                 }
             }
         } catch (SQLException ex) {
+            conex = ex;
             LOG.log(Level.WARNING, new Message("SELECT_DEST_SEQ_FAILED_MSG", LOG).toString(), ex);
         } finally {
             if (res != null) {
@@ -471,6 +524,7 @@ public class RMTxStore implements RMStore {
                     // ignore
                 }
             }
+            updateConnectionState(conex);
         } 
         return seqs;
     }
@@ -479,6 +533,8 @@ public class RMTxStore implements RMStore {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting source sequences for endpoint: " + endpointIdentifier);
         }
+        verifyConnection();
+        SQLException conex = null;
         Collection<SourceSequence> seqs = new ArrayList<SourceSequence>();
         ResultSet res = null;
         try {
@@ -504,6 +560,7 @@ public class RMTxStore implements RMStore {
                 }
             }
         } catch (SQLException ex) {
+            conex = ex;
             // ignore
             LOG.log(Level.WARNING, new Message("SELECT_SRC_SEQ_FAILED_MSG", LOG).toString(), ex);
         } finally {
@@ -514,11 +571,14 @@ public class RMTxStore implements RMStore {
                     // ignore
                 }
             }
+            updateConnectionState(conex);
         } 
         return seqs;
     }
     
     public Collection<RMMessage> getMessages(Identifier sid, boolean outbound) {
+        verifyConnection();
+        SQLException conex = null;
         Collection<RMMessage> msgs = new ArrayList<RMMessage>();
         ResultSet res = null;
         try {
@@ -537,7 +597,11 @@ public class RMTxStore implements RMStore {
                     msgs.add(msg);
                 }
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
+            conex = ex;
+            LOG.log(Level.WARNING, new Message(outbound ? "SELECT_OUTBOUND_MSGS_FAILED_MSG"
+                : "SELECT_INBOUND_MSGS_FAILED_MSG", LOG).toString(), ex);
+        } catch (IOException ex) {
             LOG.log(Level.WARNING, new Message(outbound ? "SELECT_OUTBOUND_MSGS_FAILED_MSG"
                 : "SELECT_INBOUND_MSGS_FAILED_MSG", LOG).toString(), ex);
         } finally {
@@ -548,11 +612,14 @@ public class RMTxStore implements RMStore {
                     // ignore
                 }
             }
+            updateConnectionState(conex);
         }
         return msgs;
     }
     
     public void persistIncoming(DestinationSequence seq, RMMessage msg) {        
+        verifyConnection();
+        SQLException conex = null;
         try {
             beginTransaction();
             
@@ -565,14 +632,19 @@ public class RMTxStore implements RMStore {
             commit();
             
         } catch (SQLException ex) {
+            conex = ex;
             abort();
             throw new RMStoreException(ex);
         } catch (IOException ex) {
             abort();
             throw new RMStoreException(ex);        
-        }        
+        } finally {
+            updateConnectionState(conex);
+        }
     }
     public void persistOutgoing(SourceSequence seq, RMMessage msg) {
+        verifyConnection();
+        SQLException conex = null;
         try {
             beginTransaction();
             
@@ -585,15 +657,20 @@ public class RMTxStore implements RMStore {
             commit();
             
         } catch (SQLException ex) {
+            conex = ex;
             abort();
             throw new RMStoreException(ex);
         } catch (IOException ex) {
             abort();
             throw new RMStoreException(ex);        
+        } finally {
+            updateConnectionState(conex);
         }        
     }
     
     public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
+        verifyConnection();
+        SQLException conex = null;
         try {
             PreparedStatement stmt = outbound ? deleteOutboundMessageStmt : deleteInboundMessageStmt;
             beginTransaction();
@@ -608,9 +685,12 @@ public class RMTxStore implements RMStore {
             commit();
             
         } catch (SQLException ex) {
+            conex = ex;
             abort();
             throw new RMStoreException(ex);
-        }        
+        } finally {
+            updateConnectionState(conex);
+        }
     }
     
     // transaction demarcation
@@ -686,6 +766,7 @@ public class RMTxStore implements RMStore {
             updateDestSequenceStmt.execute();
         }
     }
+
     protected void createTables() throws SQLException {
         
         Statement stmt = null;
@@ -902,7 +983,42 @@ public class RMTxStore implements RMStore {
     Connection getConnection() {
         return connection;
     }
-    
+
+    private void verifyConnection() {
+        if (createdConnection && nextReconnectAttempt > 0
+            && (maxReconnectAttempts < 0 || maxReconnectAttempts > reconnectAttempts)) {
+            if (System.currentTimeMillis() > nextReconnectAttempt) {
+                // destroy the broken connection
+                destroy();
+                // try to reconnect
+                reconnectAttempts++;
+                init();
+                // reset the next reconnect attempt time
+                nextReconnectAttempt = 0;
+            } else {
+                LogUtils.log(LOG, Level.INFO, "WAIT_RECONNECT_MSG");
+            }
+        }
+    }
+
+    private synchronized void updateConnectionState(SQLException e) {
+        if (e == null) {
+            // reset the previous error status
+            reconnectDelay = 0;
+            reconnectAttempts = 0;
+            nextReconnectAttempt = 0;
+        } else if (createdConnection && isRecoverableError(e)) {
+            // update the next reconnect schedule 
+            if (reconnectDelay == 0) {
+                reconnectDelay = initialReconnectDelay;
+            }
+            if (nextReconnectAttempt < System.currentTimeMillis()) {
+                nextReconnectAttempt = System.currentTimeMillis() + reconnectDelay;
+                reconnectDelay = reconnectDelay * useExponentialBackOff;
+            }
+        }
+    }
+
     public static void deleteDatabaseFiles() {
         deleteDatabaseFiles(DEFAULT_DATABASE_NAME, true);
     }
@@ -989,5 +1105,10 @@ public class RMTxStore implements RMStore {
         // we could be deriving the state/code from the driver url to avoid explicit setting of them
         return (null != tableExistsState && tableExistsState.equals(ex.getSQLState()))
                 || tableExistsCode == ex.getErrorCode();
+    }
+    
+    protected boolean isRecoverableError(SQLException ex) {
+        // check for a transient or non-transient connection exception
+        return ex.getSQLState() != null && ex.getSQLState().startsWith("08");
     }
 }
