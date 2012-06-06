@@ -20,11 +20,10 @@ package org.apache.cxf.systest.jms;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -33,6 +32,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.JMSNamingPropertyType;
@@ -44,33 +44,40 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSClientServerSoap12Test extends AbstractBusClientServerTestBase {
-    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     static final String PORT = Soap12Server.PORT;
     
+    static EmbeddedJMSBrokerLauncher broker;
+
     private String wsdlString;
+    
+    public static class Soap12Server extends AbstractBusTestServerBase {
+        public static final String PORT = allocatePort(Soap12Server.class);
+       
+        protected void run()  {
+            Object impleDoc = new GreeterImplSoap12();
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus bus = bf.createBus("org/apache/cxf/systest/jms/soap12Bus.xml");
+            BusFactory.setDefaultBus(bus);
+            setBus(bus);
+            broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
+            Endpoint.publish(null, impleDoc);
+        }
+    }
+
+    
     
     @BeforeClass
     public static void startServers() throws Exception {
-        Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix",
-                      System.getProperty("org.apache.activemq.default.directory.prefix"));
-        }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
-        
+        broker = new EmbeddedJMSBrokerLauncher("vm://JMSClientServerSoap12Test");
         assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-
-        assertTrue("server did not launch correctly", 
-                   launchServer(Soap12Server.class));
+                   launchServer(Soap12Server.class, true));
         
     }
     
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
         wsdlString = u.toString().intern();
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
+        broker.updateWsdl(getBus(), wsdlString);
         System.gc();
         System.gc();
         return u;

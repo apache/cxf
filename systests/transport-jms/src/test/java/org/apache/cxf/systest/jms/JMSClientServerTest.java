@@ -23,7 +23,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -102,35 +101,22 @@ import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
-    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     static final String PORT = Server.PORT;
     
+    static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
     @BeforeClass
     public static void startServers() throws Exception {
-        Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix",
-                      System.getProperty("org.apache.activemq.default.directory.prefix"));
-        }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
-        
-        assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-
-        assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, false));
-        
+        broker = new EmbeddedJMSBrokerLauncher("vm://JMSClientServerTest");
+        launchServer(broker);
+        launchServer(new Server(broker));
     }
     
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
         wsdlString = u.toString().intern();
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
-        System.gc();
-        System.gc();
+        broker.updateWsdl(getBus(), wsdlString);
         return u;
     }
     public QName getServiceName(QName q) {
@@ -190,6 +176,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     assertNotNull(ex.getFaultInfo());
                 }
             }
+            
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -233,6 +221,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 }                
               
             }
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -341,11 +330,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals(count, countDone);
         */
         
+        ((java.io.Closeable)greeter).close();
         greeter = null;
         service = null;
         
-        System.gc();
-        System.gc();
         System.gc();
     }
     
@@ -390,6 +378,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 } 
                 
             }
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -419,6 +408,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
             }
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -443,6 +433,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             }
             //Give some time to complete one-way calls.
             Thread.sleep(50L);
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -467,6 +458,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             }
             //Give some time to complete one-way calls.
             Thread.sleep(50L);
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -481,8 +473,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             new ClassPathXmlApplicationContext(
                 new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"});
         String wsdlString2 = "classpath:wsdl/jms_test.wsdl";
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors((Bus)ctx.getBean("cxf"),
-                                                          wsdlString2);
+        broker.updateWsdl((Bus)ctx.getBean("cxf"), wsdlString2);
         HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
         assertNotNull(greeter);
         
@@ -550,6 +541,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             }
             //Give some time to complete one-way calls.
             Thread.sleep(100L);
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -565,8 +557,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(wsdl);
         String wsdlString2 = wsdl.toString();
         String wsdlString3 = "testutils/jms_test.wsdl";
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString2);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString3);
+        broker.updateWsdl(getBus(), wsdlString2);
+        broker.updateWsdl(getBus(), wsdlString3);
         
 
         HelloWorldQueueDecoupledOneWaysService service = 
@@ -616,6 +608,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 }
             }
             assertEquals(expectedReply, reply);
+            ((java.io.Closeable)greeter).close();
         } catch (Exception ex) {
             throw ex;
         } finally {
@@ -637,7 +630,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
         String wsdlString2 = "testutils/jms_test.wsdl";
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString2);
+        broker.updateWsdl(getBus(), wsdlString2);
 
         HelloWorldQueueDecoupledOneWaysService service = 
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
@@ -675,6 +668,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     fail("The decoupled one-way reply was sent");
                 }
             }
+            ((java.io.Closeable)greeter).close();
         } catch (Exception ex) {
             throw ex;
         } finally {
@@ -1203,8 +1197,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
-            + JMS_PORT;
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=" 
+            + broker.getBrokerURL();
         if (messageType != null) {
             address = address + "&messageType=" + messageType;
         }
@@ -1257,7 +1251,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public void testReplyToConfig() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint();
         endpoint.setJndiInitialContextFactory("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        endpoint.setJndiURL("tcp://localhost:" + JMS_PORT);
+        endpoint.setJndiURL(broker.getBrokerURL());
         endpoint.setJndiConnectionFactoryName("ConnectionFactory");
 
         final JMSConfiguration jmsConfig = new JMSConfiguration();        

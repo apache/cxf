@@ -33,6 +33,11 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
     
+    EmbeddedJMSBrokerLauncher broker;
+    public Server(EmbeddedJMSBrokerLauncher b) {
+        broker = b;
+    }
+    
     protected void run()  {
         Object implementor = new GreeterImplTwoWayJMS();
         Object impl2 =  new GreeterImplQueueOneWay();
@@ -53,10 +58,11 @@ public class Server extends AbstractBusTestServerBase {
         Object mtom = new JMSMTOMImpl();
         
         Bus bus = BusFactory.getDefaultBus();
+        setBus(bus);
         
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/hello_world_doc_lit.wsdl");
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test.wsdl");
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test_mtom.wsdl");
+        broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
+        broker.updateWsdl(bus, "testutils/jms_test.wsdl");
+        broker.updateWsdl(bus, "testutils/jms_test_mtom.wsdl");
         
         Endpoint.publish(null, impleDoc);
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
@@ -83,16 +89,16 @@ public class Server extends AbstractBusTestServerBase {
         String address1 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2"
                          + "?jndiInitialContextFactory"
                          + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
-                         + EmbeddedJMSBrokerLauncher.PORT;
+                         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
+                         + broker.getBrokerURL();
         Endpoint.publish(address1, spec1);
         
         Object spec2 = new GreeterSpecWithPortError();
         String address2 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
-            + EmbeddedJMSBrokerLauncher.PORT;
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
+            + broker.getBrokerURL();
         Endpoint.publish(address2, spec2);
         
         initNoWsdlServer();
@@ -106,8 +112,8 @@ public class Server extends AbstractBusTestServerBase {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
-            + EmbeddedJMSBrokerLauncher.PORT;
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
+            +  broker.getBrokerURL();
         Hello implementor = new HelloImpl();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(Hello.class);
@@ -118,15 +124,4 @@ public class Server extends AbstractBusTestServerBase {
     }
 
 
-    public static void main(String[] args) {
-        try {
-            Server s = new Server();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
-    }
 }

@@ -52,18 +52,18 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
         }
         
         MessageContext mc = wsContext.getMessageContext();
-        JMSMessageHeadersType headers =
-            (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-        System.out.println("get the message headers JMSCorrelationID: " + headers.getJMSCorrelationID());
-        System.out.println("Reached here :" + me);
+        //JMSMessageHeadersType headers =
+        //    (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
+        //System.out.println("get the message headers JMSCorrelationID: " + headers.getJMSCorrelationID());
+        //System.out.println("Reached here :" + me);
         
         // set reply header custom property
         JMSPropertyType testProperty = new JMSPropertyType();
         testProperty.setName("Test_Prop");
         testProperty.setValue("some return value "  + me);
         
-        System.out.println("found property in request headers at index: " 
-                           + headers.getProperty().indexOf(testProperty));
+        //System.out.println("found property in request headers at index: " 
+        //                   + headers.getProperty().indexOf(testProperty));
         
         JMSMessageHeadersType responseHeaders =
             (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
@@ -77,7 +77,7 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
     }
     
     public void greetMeOneWay(String requestType) {
-        System.out.println("*********  greetMeOneWay: " + requestType);
+        //System.out.println("*********  greetMeOneWay: " + requestType);
     }
     
     public TestRpcLitFaultResponse testRpcLitFault(String faultType) 

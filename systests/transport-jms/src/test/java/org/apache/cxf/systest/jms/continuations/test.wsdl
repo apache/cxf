@@ -91,7 +91,7 @@
   <service name="HelloContinuationService">
     <port binding="tns:HelloContinuationServiceSoapBinding" name="HelloContinuationPort">
       <jms:clientConfig clientReceiveTimeout="500000" messageTimeToLive="500000"/>
-      <jms:serverConfig messageTimeToLive="500000"/>
+      <jms:serverConfig serverReceiveTimeout="500" messageTimeToLive="500000"/>
                <jms:address
                    jndiConnectionFactoryName="ConnectionFactory" 
                    jndiDestinationName="dynamicQueues/test.jmstransport.text">
