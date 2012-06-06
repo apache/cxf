@@ -41,18 +41,11 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 
 public class CachedOutputStream extends OutputStream {
     private static final File DEFAULT_TEMP_DIR;
-    private static final int DEFAULT_THRESHOLD;
-    private static final long DEFAULT_MAX_SIZE;
+    private static int defaultThreshold;
+    private static long defaultMaxSize;
     static {
-        String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold",
-                                      "-1");
-        int i = Integer.parseInt(s);
-        if (i <= 0) {
-            i = 64 * 1024;
-        }
-        DEFAULT_THRESHOLD = i;
         
-        s = System.getProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
+        String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
         if (s != null) {
             File f = new File(s);
             if (f.exists() && f.isDirectory()) {
@@ -64,16 +57,15 @@ public class CachedOutputStream extends OutputStream {
             DEFAULT_TEMP_DIR = null;
         }
 
-        s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
-                               "-1");
-        DEFAULT_MAX_SIZE = Long.parseLong(s);
+        setDefaultThreshold(-1);
+        setDefaultMaxSize(-1);
     }
 
     protected boolean outputLocked;
     protected OutputStream currentStream;
 
-    private long threshold = DEFAULT_THRESHOLD;
-    private long maxSize = DEFAULT_MAX_SIZE;
+    private long threshold = defaultThreshold;
+    private long maxSize = defaultMaxSize;
 
     private int totalLength;
 
@@ -517,5 +509,24 @@ public class CachedOutputStream extends OutputStream {
 
     public void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
+    }
+    
+    public static void setDefaultMaxSize(long l) {
+        if (l == -1) {
+            String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize", "-1");
+            l = Long.parseLong(s);
+        }
+        defaultMaxSize = l;
+    }
+    public static void setDefaultThreshold(int i) {
+        if (i == -1) {
+            String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "-1");
+            i = Integer.parseInt(s);
+            if (i <= 0) {
+                i = 64 * 1024;
+            }
+        }
+        defaultThreshold = i;
+        
     }
 }
