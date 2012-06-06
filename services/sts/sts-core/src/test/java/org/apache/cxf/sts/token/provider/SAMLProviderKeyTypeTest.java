@@ -493,6 +493,29 @@ public class SAMLProviderKeyTypeTest extends org.junit.Assert {
         assertTrue(tokenString.contains(WSConstants.C14N_EXCL_WITH_COMMENTS));
     }
     
+    /**
+     * Create a default Saml2 Symmetric Key Assertion using EncryptWith Algorithms.
+     */
+    @org.junit.Test
+    public void testDefaultSaml2EncryptWith() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.SYMMETRIC_KEY_KEYTYPE);
+        KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
+
+        keyRequirements.setEncryptWith(WSConstants.AES_128);
+        keyRequirements.setKeySize(92);
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        keyRequirements.setKeySize(128);
+        keyRequirements.setEncryptWith(WSConstants.AES_256);
+        providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+    }
+    
     private TokenProviderParameters createProviderParameters(
         String tokenType, String keyType
     ) throws WSSecurityException {

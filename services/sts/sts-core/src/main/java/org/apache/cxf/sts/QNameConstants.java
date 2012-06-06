@@ -82,6 +82,10 @@ public final class QNameConstants {
         WS_TRUST_FACTORY.createKeyWrapAlgorithm("").getName();
     public static final QName USE_KEY = 
         WS_TRUST_FACTORY.createUseKey(null).getName();
+    public static final QName SIGN_WITH = 
+        WS_TRUST_FACTORY.createSignWith(null).getName();
+    public static final QName ENCRYPT_WITH = 
+        WS_TRUST_FACTORY.createEncryptWith(null).getName();
     
     //
     // WSSE QNames

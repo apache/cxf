@@ -218,6 +218,14 @@ public class RequestParser {
             EntropyType entropyType = (EntropyType)jaxbElement.getValue();
             Entropy entropy = parseEntropy(entropyType, stsProperties);
             keyRequirements.setEntropy(entropy);
+        } else if (QNameConstants.SIGN_WITH.equals(jaxbElement.getName())) {
+            String signWith = (String)jaxbElement.getValue();
+            keyRequirements.setSignWith(signWith);
+            LOG.fine("Found SignWith: " + signWith);
+        } else if (QNameConstants.ENCRYPT_WITH.equals(jaxbElement.getName())) {
+            String encryptWith = (String)jaxbElement.getValue();
+            keyRequirements.setEncryptWith(encryptWith);
+            LOG.fine("Found EncryptWith: " + encryptWith);
         } else if (QNameConstants.REQUEST_TYPE.equals(jaxbElement.getName())) { //NOPMD
             // Skip the request type.
         } else {

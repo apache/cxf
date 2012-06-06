@@ -31,6 +31,7 @@ import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
@@ -52,10 +53,30 @@ public class SymmetricKeyHandler {
     public SymmetricKeyHandler(TokenProviderParameters tokenParameters) {
         KeyRequirements keyRequirements = tokenParameters.getKeyRequirements();
         
-        // Test KeySize
         keySize = Long.valueOf(keyRequirements.getKeySize()).intValue();
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
+        
+        // Test EncryptWith
+        String encryptWith = keyRequirements.getEncryptWith();
+        if (encryptWith != null) {
+            if ((WSConstants.AES_128.equals(encryptWith) || WSConstants.AES_128_GCM.equals(encryptWith))
+                && keySize < 128) {
+                keySize = 128;
+            } else if ((WSConstants.AES_192.equals(encryptWith) 
+                || WSConstants.AES_192_GCM.equals(encryptWith))
+                && keySize < 192) {
+                keySize = 192;
+            } else if ((WSConstants.AES_256.equals(encryptWith) 
+                || WSConstants.AES_256_GCM.equals(encryptWith))
+                && keySize < 256) {
+                keySize = 256;
+            } else if (WSConstants.TRIPLE_DES.equals(encryptWith) && keySize < 192) {
+                keySize = 192;
+            }
+        }
+        
+        // Test KeySize
         if (keySize < signatureProperties.getMinimumKeySize()
             || keySize > signatureProperties.getMaximumKeySize()) {
             keySize = Long.valueOf(signatureProperties.getKeySize()).intValue();
@@ -64,7 +85,7 @@ public class SymmetricKeyHandler {
                 + " not accepted so defaulting to " + signatureProperties.getKeySize()
             );
         }
-        
+
         // Test Entropy
         clientEntropy = keyRequirements.getEntropy();
         if (clientEntropy == null) {

@@ -34,6 +34,8 @@ public class KeyRequirements {
     private String keywrapAlgorithm;
     private ReceivedKey receivedKey;
     private Entropy entropy;
+    private String encryptWith;
+    private String signWith;
     
     public String getAuthenticationType() {
         return authenticationType;
@@ -125,6 +127,22 @@ public class KeyRequirements {
     
     public void setEntropy(Entropy entropy) {
         this.entropy = entropy;
+    }
+
+    public String getEncryptWith() {
+        return encryptWith;
+    }
+
+    public void setEncryptWith(String encryptWith) {
+        this.encryptWith = encryptWith;
+    }
+
+    public String getSignWith() {
+        return signWith;
+    }
+
+    public void setSignWith(String signWith) {
+        this.signWith = signWith;
     }
     
     
