@@ -56,7 +56,6 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public abstract class AbstractServerPersistenceTest extends AbstractBusClientServerTestBase {
-    public static final String DECOUPLE_PORT = allocatePort(AbstractServerPersistenceTest.class);
 
     public static final String GREETMEONEWAY_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
@@ -109,6 +108,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
     }    
     
     public abstract String getPort();
+    public abstract String getDecoupledPort();
     public abstract String getPrefix();
     
     public static void startServers(String port, String pfx) throws Exception {
@@ -152,7 +152,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         Client c = ClientProxy.getClient(greeter);
         HTTPConduit hc = (HTTPConduit)(c.getConduit());
         HTTPClientPolicy cp = hc.getClient();
-        cp.setDecoupledEndpoint("http://localhost:" + DECOUPLE_PORT + "/decoupled_endpoint");
+        cp.setDecoupledEndpoint("http://localhost:" + getDecoupledPort() + "/decoupled_endpoint");
 
         out = new OutMessageRecorder();
         in = new InMessageRecorder();

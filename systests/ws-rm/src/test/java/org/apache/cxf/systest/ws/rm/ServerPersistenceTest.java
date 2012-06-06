@@ -30,7 +30,8 @@ import org.junit.BeforeClass;
  * exchange of WS-RM protocol messages.
  */
 public class ServerPersistenceTest extends AbstractServerPersistenceTest {
-    public static final String PORT = allocatePort(ServerPersistenceTest.PORT);
+    public static final String PORT = allocatePort(ServerPersistenceTest.class);
+    public static final String DECOUPLED_PORT = allocatePort(ServerPersistenceTest.class, 1);
     
     public String getPort() {
         return PORT;
@@ -48,6 +49,10 @@ public class ServerPersistenceTest extends AbstractServerPersistenceTest {
     
     public String getPrefix() {
         return "spt";
+    }
+    @Override
+    public String getDecoupledPort() {
+        return DECOUPLED_PORT;
     }
 
 }
