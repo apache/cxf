@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.rm;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -39,6 +40,7 @@ import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMUtils;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,11 +57,14 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         
     private static final Logger LOG = LogUtils.getLogger(ManagedEndpointsTest.class);
     private static Bus clientBus;
-    private static Bus serverBus;
     private static InProcessServer server;
-    
-    static class InProcessServer implements Runnable {
+    private static Bus serverBus;
+
+    static class InProcessServer {
         private boolean ready;
+        private Endpoint ep;
+        
+        
         public void run() {
             SpringBusFactory bf = new SpringBusFactory();
             serverBus = bf.createBus(SERVER_CFG);
@@ -68,13 +73,16 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             
-            Endpoint ep = Endpoint.create(implementor);
+            ep = Endpoint.create(implementor);
             ep.publish(address);
 
             LOG.info("Published greeter endpoint.");
             ready = true;
         }
-        
+        public void stop() {
+            ep.stop();
+            serverBus.shutdown(true);
+        }
         public boolean isReady() {
             return ready;
         }
@@ -83,15 +91,17 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
     @BeforeClass
     public static void startServer() throws Exception {
         server = new InProcessServer();
-        Thread th = new Thread(server);
-        th.start();
+        server.run();
     }
 
     @AfterClass
     public static void stopServer() throws Exception {
-        if (null != serverBus) {
-            serverBus.shutdown(false);
-        }
+        server.stop();
+    }    
+    
+    @After
+    public void stopBus() throws Exception {
+        clientBus.shutdown(true);
     }
     
     @Test
