@@ -69,6 +69,7 @@
             <xs:extension base="wsdl:tExtensibilityElement">
         		<xs:attribute name="messageTimeToLive" type="pt:ParameterizedLong" default="0" />
         		<xs:attribute name="durableSubscriptionClientId" type="xs:string" />
+    			<xs:attribute name="serverReceiveTimeout" type="pt:ParameterizedLong"/>
 			</xs:extension>
 		</xs:complexContent>        	
     </xs:complexType>

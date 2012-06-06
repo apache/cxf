@@ -60,7 +60,8 @@ public class JMSConfiguration implements InitializingBean {
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
-    private Long receiveTimeout;
+    private Long clientReceiveTimeout;
+    private Long serverReceiveTimeout;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
     private int priority = Message.DEFAULT_PRIORITY;
@@ -180,13 +181,19 @@ public class JMSConfiguration implements InitializingBean {
     }
 
     public Long getReceiveTimeout() {
-        return receiveTimeout;
+        return clientReceiveTimeout;
     }
 
     public void setReceiveTimeout(Long receiveTimeout) {
-        this.receiveTimeout = receiveTimeout;
+        this.clientReceiveTimeout = receiveTimeout;
+    }
+    public Long getServerReceiveTimeout() {
+        return serverReceiveTimeout;
     }
 
+    public void setServerReceiveTimeout(Long receiveTimeout) {
+        this.serverReceiveTimeout = receiveTimeout;
+    }
     public boolean isExplicitQosEnabled() {
         return explicitQosEnabled;
     }
