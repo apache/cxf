@@ -32,13 +32,14 @@ public final class SecurityTestUtil {
     public static void cleanup() {
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir != null) {
-            File nonceFile = new File(tmpDir + File.separator + "ws-security.nonce.cache.instance.data");
-            if (nonceFile.exists()) {
-                nonceFile.delete();
-            }
-            File tsFile = new File(tmpDir + File.separator + "ws-security.timestamp.cache.instance.data");
-            if (tsFile.exists()) {
-                tsFile.delete();
+            File[] tmpFiles = new File(tmpDir).listFiles();
+            if (tmpFiles != null) {
+                for (File tmpFile : tmpFiles) {
+                    if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache.instance")
+                            || tmpFile.getName().startsWith("ws-security.timestamp.cache.instance"))) {
+                        tmpFile.delete();
+                    }
+                }
             }
         }
     }

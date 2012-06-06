@@ -41,9 +41,9 @@
     
    <jaxws:endpoint id="doubleitasymmetricsaml2bearer"
       implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl"
-      endpointName="s:DoubleItAsymmetricSAML2BearerPort"
+      endpointName="s:DoubleItOBOAsymmetricSAML2BearerPort"
       serviceName="s:DoubleItService"
-      address="http://localhost:${testutil.ports.Server}/doubleit/services/doubleitasymmetricsaml2bearer"
+      address="http://localhost:${testutil.ports.Server}/doubleit/services/doubleitasymmetricsaml2bearerobo"
       wsdlLocation="org/apache/cxf/systest/sts/username_onbehalfof/DoubleIt.wsdl"
       xmlns:s="http://www.example.org/contract/DoubleIt">
         
