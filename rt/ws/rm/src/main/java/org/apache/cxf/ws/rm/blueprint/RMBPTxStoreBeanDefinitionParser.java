@@ -42,6 +42,7 @@ public class RMBPTxStoreBeanDefinitionParser extends SimpleBPBeanDefinitionParse
         super.parseChildElements(element, ctx, bean);
         
         bean.setInitMethod("init");
+        bean.setDestroyMethod("destroy");
     }
 
     @Override

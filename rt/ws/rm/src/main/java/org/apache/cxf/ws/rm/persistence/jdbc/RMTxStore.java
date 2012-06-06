@@ -39,10 +39,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -57,6 +57,7 @@ import org.apache.cxf.ws.rm.persistence.RMStoreException;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
+@NoJSR250Annotations
 public class RMTxStore implements RMStore {
     
     public static final String DEFAULT_DATABASE_NAME = "rmdb";
@@ -132,6 +133,7 @@ public class RMTxStore implements RMStore {
     private static final Logger LOG = LogUtils.getL7dLogger(RMTxStore.class);
     
     private Connection connection;
+    private boolean createdConnection = true;
     private Lock writeLock = new ReentrantLock();
     
     private PreparedStatement createDestSequenceStmt;
@@ -160,6 +162,19 @@ public class RMTxStore implements RMStore {
     
     private String tableExistsState = DERBY_TABLE_EXISTS_STATE;
     private int tableExistsCode = ORACLE_TABLE_EXISTS_CODE;
+    
+    public RMTxStore() {
+    }
+    
+    public void destroy() {
+        if (connection != null && createdConnection) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                //ignore
+            }
+        }
+    }
     
     // configuration
     
@@ -233,6 +248,7 @@ public class RMTxStore implements RMStore {
 
     public void setConnection(Connection c) {
         connection = c;
+        createdConnection = false; 
     }
     
     // RMStore interface  
@@ -756,10 +772,7 @@ public class RMTxStore implements RMStore {
             MessageFormat.format(SELECT_MESSAGES_STMT_STR, OUTBOUND_MSGS_TABLE_NAME));
     }
 
-
-    @PostConstruct     
     public synchronized void init() {
-        
         if (null == connection) {
             LOG.log(Level.FINE, "Using derby.system.home: {0}", 
                     SystemPropertyAction.getProperty("derby.system.home"));
@@ -797,6 +810,7 @@ public class RMTxStore implements RMStore {
             createTables();
             createStatements();
         } catch (SQLException ex) {
+            ex.printStackTrace();
             LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
             SQLException se = ex;
             while (se.getNextException() != null) {
@@ -804,6 +818,8 @@ public class RMTxStore implements RMStore {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", se);
             }
             throw new RMStoreException(ex);
+        } catch (Throwable ex) {
+            ex.printStackTrace();
         } finally {
             try {
                 connection.setAutoCommit(false);                
