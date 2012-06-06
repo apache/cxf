@@ -50,7 +50,6 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
     public static final String DECOUPLE_PORT = allocatePort(DecoupledClientServerTest.class);
 
     private static final Logger LOG = LogUtils.getLogger(DecoupledClientServerTest.class);
-    private Bus bus;
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;

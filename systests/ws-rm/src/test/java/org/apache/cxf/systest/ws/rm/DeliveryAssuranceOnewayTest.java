@@ -50,13 +50,10 @@ import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
-import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.rm.RMManager;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -73,18 +70,6 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     private Endpoint endpoint;
     private Bus greeterBus;
     private Greeter greeter;
-
-
-    @BeforeClass
-    public static void setProps() throws Exception {
-        TestUtilities.setKeepAliveSystemProperty(false);
-    }
-    
-    @AfterClass
-    public static void cleanup() {
-        TestUtilities.recoverKeepAliveSystemProperty();
-    }
-            
     
     @After
     public void tearDown() throws Exception {
@@ -364,7 +349,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
         LOG.fine("Created greeter client.");
 
-        ConnectionHelper.setKeepAliveConnection(greeter, true);
+        ConnectionHelper.setKeepAliveConnection(greeter, false);
     }
     
     private void stopClient() {
@@ -403,6 +388,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     private void awaitMessages(int nExpectedIn, int delay, int timeout) {
         int waited = 0;
         int nIn = 0;
+        long start = System.currentTimeMillis();
         while (waited <= timeout) {                
             synchronized (GreeterProvider.CALL_ARGS) {
                 nIn = GreeterProvider.CALL_ARGS.size();
@@ -416,6 +402,12 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 // ignore
             }
             waited += 100;
+        }
+        // we'll use the delay amount or at least double the original amount
+        // of time, which ever is less, to wait for additional messages.
+        long total = System.currentTimeMillis() - start;
+        if (delay > total) {
+            delay = (int)total;
         }
         try {
             Thread.sleep(delay);
