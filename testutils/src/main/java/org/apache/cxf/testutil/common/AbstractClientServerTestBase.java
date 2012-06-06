@@ -63,6 +63,21 @@ public abstract class AbstractClientServerTestBase extends Assert {
         assertTrue("server failed", passed);
     }
     
+    public static boolean launchServer(AbstractTestServerBase base) {
+        boolean ok = false;
+        try { 
+            ServerLauncher sl = new ServerLauncher(base);
+            ok = sl.launchServer();
+            assertTrue("server failed to launch", ok);
+            launchers.add(0, sl);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            fail("failed to launch server " + base);
+        }
+        
+        return ok;
+    }
+    
     public static boolean launchServer(Class<?> clz) {
         boolean ok = false;
         try { 
