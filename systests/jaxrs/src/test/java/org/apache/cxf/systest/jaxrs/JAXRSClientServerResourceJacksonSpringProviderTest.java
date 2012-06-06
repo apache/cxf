@@ -39,6 +39,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerResourceJacksonSpringProviders.class, true));
+        createStaticBus();
     }
     
     @Test

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -62,8 +63,8 @@ import org.junit.Test;
 
 public class JAXRSLoggingAtomPushTest extends Assert {
     public static final String PORT = TestUtil.getPortNumber(JAXRSLoggingAtomPushTest.class);
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class);
+    public static final Logger LOG = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class);
+
     private static Server server;
     
     
@@ -89,6 +90,15 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         ins.close();
         s = s.replaceAll("9080", PORT);
         lm.readConfiguration(new ByteArrayInputStream(s.getBytes("UTF-8")));
+        
+        for (Handler h : LOG.getHandlers()) {
+            LOG.removeHandler(h);
+            h.close();
+        }
+        if (lm.getProperty(JAXRSLoggingAtomPushTest.class.getName() + ".handlers") != null) {
+            LOG.addHandler(new AtomPushHandler());
+        }
+        LOG.setUseParentHandlers(false);
     }
 
     private static void logSixEvents(Logger log) {
@@ -109,15 +119,16 @@ public class JAXRSLoggingAtomPushTest extends Assert {
 
     @AfterClass
     public static void afterClass() throws Exception {
-        if (server != null) {
-            server.destroy();
-        }
         LogManager lm = LogManager.getLogManager();
         try {
+            lm.reset();
             // restoring original configuration to not use tested logging handlers
             lm.readConfiguration();
         } catch (Exception e) {
             // ignore missing config file
+        }
+        if (server != null) {
+            server.destroy();
         }
     }
 
@@ -126,6 +137,17 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         Resource.clear();
     }
 
+    private void waitForFeeds(Collection<?> c, int count) throws Exception {
+        int iter = 0;
+        while (c.size() < count) {
+            Thread.sleep(100);
+            iter++;
+            if (iter > 30) {
+                return;
+            }
+        }
+    }
+    
     @Test
     public void testPrivateLogger() throws Exception {
         configureLogging("resources/logging_atompush_disabled.properties");
@@ -137,7 +159,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         log.setLevel(Level.ALL);
         logSixEvents(log);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        waitForFeeds(Resource.feeds, 3);
         // 6 events / 2 element batch = 3 feeds expected
         assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
@@ -157,7 +179,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         log.setLevel(Level.ALL);
         logSixEvents(log);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        waitForFeeds(Resource.feeds, 3);
         // 6 events / 2 element batch = 3 feeds expected
         assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
@@ -165,18 +187,18 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     @Test
     public void testOneElementBatch() throws Exception {
         configureLogging("resources/logging_atompush.properties");
-        logSixEvents(LOG);
+        logSixEvents(LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class));
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        waitForFeeds(Resource.feeds, 6);
         assertEquals("Different logged events count;", 6, Resource.feeds.size());
     }
 
     @Test
     public void testMultiElementBatch() throws Exception {
         configureLogging("resources/logging_atompush_batch.properties");
-        logSixEvents(LOG);
+        logSixEvents(LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class));
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        waitForFeeds(Resource.feeds, 2);
         // 6 events / 3 element batch = 2 feeds expected
         assertEquals("Different logged events count;", 2, Resource.feeds.size());
     }
@@ -213,9 +235,9 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     @Test
     public void testAtomPubEntries() throws Exception {
         configureLogging("resources/logging_atompush_atompub.properties");
-        logSixEvents(LOG);
+        logSixEvents(LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class));
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        waitForFeeds(Resource.entries, 6);
         // 6 events logged as entries
         assertEquals("Different logged events count;", 6, Resource.entries.size());
     }

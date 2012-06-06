@@ -99,6 +99,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
+        createStaticBus();
     }
     
     @Test

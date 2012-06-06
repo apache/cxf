@@ -39,6 +39,7 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        createStaticBus();
         assertTrue("server did not launch correctly",
                    launchServer(BookContinuationServer.class, true));
     }
