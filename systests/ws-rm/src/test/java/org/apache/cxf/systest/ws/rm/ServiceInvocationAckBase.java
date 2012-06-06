@@ -38,6 +38,7 @@ import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.rm.RMManager;
+import org.apache.cxf.ws.rm.RetransmissionQueue;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -133,16 +134,16 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
 
         // the message is acked and the invocation takes place
         greeter.greetMeOneWay("one");
-        Thread.sleep(6000L);
-        assertTrue("RetransmissionQueue must be empty", manager.getRetransmissionQueue().isEmpty());
+        waitForEmpty(manager.getRetransmissionQueue());
     
         control.setFaultLocation(location);
 
         // the invocation fails but the message is acked because the delivery succeeds
         greeter.greetMeOneWay("two");
-        Thread.sleep(6000L);
-        assertTrue("RetransmissionQueue must be empty", manager.getRetransmissionQueue().isEmpty());
+        waitForEmpty(manager.getRetransmissionQueue());
     }
+    
+    
 
     @Test
     public void testRobustInvocationHandling() throws Exception {
@@ -160,23 +161,48 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
         
         // the message is acked and the invocation takes place
         greeter.greetMeOneWay("one");
-        Thread.sleep(6000L);
-        assertTrue("RetransmissionQueue must be empty", manager.getRetransmissionQueue().isEmpty());
+        waitForEmpty(manager.getRetransmissionQueue());
 
         control.setFaultLocation(location);
 
         // the invocation fails but the message is acked because the delivery succeeds
         greeter.greetMeOneWay("two");
-        Thread.sleep(6000L);
-        assertFalse("RetransmissionQueue must not be empty", manager.getRetransmissionQueue().isEmpty());
-        
+        waitForNotEmpty(manager.getRetransmissionQueue());
+
         location.setPhase(null);
         control.setFaultLocation(location);
 
         // the retransmission succeeds and the invocation succeeds, the message is acked
-        Thread.sleep(6000L);
-        assertTrue("RetransmissionQueue must be empty", manager.getRetransmissionQueue().isEmpty());
+        waitForEmpty(manager.getRetransmissionQueue());
         
+    }
+
+    private void waitForNotEmpty(RetransmissionQueue retransmissionQueue) throws Exception {
+        long start = System.currentTimeMillis();
+        while (true) {
+            Thread.sleep(100);
+            if (!retransmissionQueue.isEmpty()) {
+                return;
+            }
+            long total = System.currentTimeMillis() - start;
+            if (total > 10000L) {
+                fail("RetransmissionQueue must not be empty");
+            }
+        }
+    }
+
+    private void waitForEmpty(RetransmissionQueue retransmissionQueue) throws Exception {
+        long start = System.currentTimeMillis();
+        while (true) {
+            Thread.sleep(100);
+            if (retransmissionQueue.isEmpty()) {
+                return;
+            }
+            long total = System.currentTimeMillis() - start;
+            if (total > 10000L) {
+                fail("RetransmissionQueue must be empty");
+            }
+        }
     }
 
     protected void setupGreeter(String cfgResource) throws NumberFormatException, MalformedURLException {
