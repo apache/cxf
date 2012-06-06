@@ -250,6 +250,9 @@ public class JMSOldConfigHolder {
             if (clientConfig.isSetConduitSelectorPrefix()) {
                 jmsConfig.setConduitSelectorPrefix(clientConfig.getConduitSelectorPrefix());
             }
+            if (serverConfig.isSetServerReceiveTimeout()) {
+                jmsConfig.setServerReceiveTimeout(serverConfig.getServerReceiveTimeout());
+            }
             jmsConfig.setEnforceSpec(clientConfig.isEnforceSpec());
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
