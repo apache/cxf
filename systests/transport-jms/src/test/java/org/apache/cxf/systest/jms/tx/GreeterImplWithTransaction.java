@@ -30,10 +30,10 @@ public class GreeterImplWithTransaction extends GreeterImplDocBase {
     private AtomicBoolean flag = new AtomicBoolean(true);
        
     public String greetMe(String requestType) {
-        System.out.println("Reached here :" + requestType);
+        //System.out.println("Reached here :" + requestType);
         if ("Bad guy".equals(requestType)) {
             if (flag.getAndSet(false)) {
-                System.out.println("Throw exception here :" + requestType);
+                //System.out.println("Throw exception here :" + requestType);
                 throw new RuntimeException("Got a bad guy call for greetMe");
             } else {
                 requestType = "[Bad guy]";

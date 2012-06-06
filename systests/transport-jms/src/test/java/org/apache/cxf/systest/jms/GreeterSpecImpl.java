@@ -27,18 +27,18 @@ import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 public class GreeterSpecImpl implements JMSGreeterPortType {
 
     public String greetMe(String me) {
-        System.out.println("Executing operation greetMe");
-        System.out.println("Message received: " + me + "\n");
+        //System.out.println("Executing operation greetMe");
+        //System.out.println("Message received: " + me + "\n");
         return "Hello " + me;
     }
 
     public String sayHi() {
-        System.out.println("Executing operation sayHi" + "\n");
+        //System.out.println("Executing operation sayHi" + "\n");
         return "Bonjour";
     }
     
     public void greetMeOneWay(String me) {
-        System.out.println("Executing operation greetMeOneWay\n");
-        System.out.println("Hello there " + me);
+        //System.out.println("Executing operation greetMeOneWay\n");
+        //System.out.println("Hello there " + me);
     }
 }

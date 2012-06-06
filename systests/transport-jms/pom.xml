@@ -32,10 +32,6 @@
     <version>2.5.5-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
 
-    <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

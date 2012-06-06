@@ -47,7 +47,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     
   
   <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-  	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"
+  	p:brokerURL="${EmbeddedBrokerURL}"
   />
   
   <bean id="singleConnectionFactory"

@@ -20,11 +20,10 @@ package org.apache.cxf.systest.jms;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -33,6 +32,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.JMSNamingPropertyType;
@@ -44,33 +44,40 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
-    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
-    static final String PORT = GzipServer.PORT;
+    public static final String PORT = allocatePort(GzipServer.class);
     
+    static EmbeddedJMSBrokerLauncher broker;
     private String wsdlString;
     
+    
+    public static class GzipServer extends AbstractBusTestServerBase {
+        Endpoint ep;
+        protected void run()  {
+            Object impleDoc = new GreeterImplDoc();
+            SpringBusFactory bf = new SpringBusFactory();
+            Bus bus = bf.createBus("org/apache/cxf/systest/jms/gzipBus.xml");
+            BusFactory.setDefaultBus(bus);
+            setBus(bus);
+            broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
+            ep = Endpoint.publish(null, impleDoc);
+        }
+        public void tearDown() {
+            ep.stop();
+        }
+    }
     @BeforeClass
     public static void startServers() throws Exception {
-        Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix",
-                      System.getProperty("org.apache.activemq.default.directory.prefix"));
-        }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
-        
+        broker = new EmbeddedJMSBrokerLauncher("vm://" + JMSClientServerGzipTest.class.getSimpleName());
+        launchServer(broker);
         assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-
-        assertTrue("server did not launch correctly", 
-                   launchServer(GzipServer.class));
+                   launchServer(GzipServer.class, true));
         
     }
     
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
         wsdlString = u.toString().intern();
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
+        broker.updateWsdl(getBus(), wsdlString);
         System.gc();
         System.gc();
         return u;
@@ -131,8 +138,8 @@ public class JMSClientServerGzipTest extends AbstractBusClientServerTestBase {
                 } catch (PingMeFault ex) {
                     assertNotNull(ex.getFaultInfo());
                 }
-
             }
+            ((java.io.Closeable)greeter).close();
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }

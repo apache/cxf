@@ -32,9 +32,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldPubSubPort;
 public class JmsDestPubSubImpl implements HelloWorldPubSubPort {
 
     public void greetMeOneWay(String stringParam0) {
-        // TODO Auto-generated method stub
-        System.out.println("*********  greetMeOneWay: " + stringParam0);
-
+        //System.out.println("*********  greetMeOneWay: " + stringParam0);
     }
 
 }
