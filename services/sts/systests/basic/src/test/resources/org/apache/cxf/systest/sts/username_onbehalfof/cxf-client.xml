@@ -37,7 +37,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
     
     <bean id="delegationCallbackHandler" class="org.apache.cxf.ws.security.trust.delegation.WSSUsernameCallbackHandler" />
    
-   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItAsymmetricSAML2BearerPort" 
+   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>

@@ -146,10 +146,6 @@
         </plugins>
     </build>
     
-   <properties>
-        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
-   </properties>
-    
    <profiles>
         <profile>
             <id>standalone</id>

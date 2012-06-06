@@ -46,10 +46,10 @@
 	</wsdl:binding>
 
 	<wsdl:service name="DoubleItService">
-		<wsdl:port name="DoubleItAsymmetricSAML2BearerPort" 
+		<wsdl:port name="DoubleItOBOAsymmetricSAML2BearerPort" 
 		           binding="tns:DoubleItAsymmetricSAML2BearerBinding">
 			<soap:address
-				location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearer" />
+				location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearerobo" />
 		</wsdl:port>
 	</wsdl:service>
 	

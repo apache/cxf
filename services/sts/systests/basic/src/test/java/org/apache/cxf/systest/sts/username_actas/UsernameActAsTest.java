@@ -171,7 +171,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         STSClient stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
+        stsClient.setActAs(new WSSUsernameCallbackHandler());
         BindingProvider p = (BindingProvider)bearerPort;
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
@@ -190,7 +190,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
+        stsClient.setActAs(new WSSUsernameCallbackHandler());
         p = (BindingProvider)bearerPort2;
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
@@ -274,7 +274,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         STSClient stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
+        stsClient.setActAs(new WSSUsernameCallbackHandler());
         BindingProvider p = (BindingProvider)bearerPort;
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
@@ -366,7 +366,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         STSClient stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
+        stsClient.setActAs(new WSSUsernameCallbackHandler());
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         
         // Make a successful invocation - should work as token is cached
@@ -448,7 +448,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
+        stsClient.setActAs(new WSSUsernameCallbackHandler());
         stsClient.setEnableAppliesTo(false);
         p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         

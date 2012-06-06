@@ -99,7 +99,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
         DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(bearerPort, PORT);
@@ -152,7 +152,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
         
         //
         // Proxy no. 1
@@ -247,7 +247,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
         
         DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
@@ -343,7 +343,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
         
         DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
@@ -440,7 +440,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2BearerPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
         
         DoubleItPortType bearerPort = 
             service.getPort(portQName, DoubleItPortType.class);
