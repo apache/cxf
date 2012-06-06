@@ -46,14 +46,14 @@ import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
 import org.apache.cxf.management.web.logging.ReadableLogStorage;
 import org.apache.cxf.management.web.logging.atom.AtomPullServer;
-import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase {
+public class JAXRSLoggingAtomPullSpringTest extends AbstractBusClientServerTestBase {
     public static final int PORT = SpringServer.PORT;
 
     private static JAXBContext context; 
