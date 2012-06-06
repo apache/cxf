@@ -104,16 +104,6 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
     }
     
     @Test
-    public void runTests() throws Exception {
-        //There is a problem if testSuspendAndResumeSourceSequence is run first
-        //Need to get Aki to look at it.  For now, just force them into 
-        //an order that works
-        testManagedEndpointsOneway();
-        stopBus();
-        testSuspendAndResumeSourceSequence();
-    }
-    
-    //@Test
     public void testManagedEndpointsOneway() throws Exception {
         checkServerReady(30000);
         
@@ -146,10 +136,10 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         greeter.greetMeOneWay("one"); // sent
 
         o = mbs.invoke(clientManagerName, "getEndpointIdentifiers", null, null);
-        verifyArray("Expected endpoint identifier", o, new String[]{epId});
+        verifyArray("Expected endpoint identifier", o, new String[]{epId}, true);
 
         o = mbs.invoke(serverManagerName, "getEndpointIdentifiers", null, null);
-        verifyArray("Expected endpoint identifier", o, new String[]{epId});
+        verifyArray("Expected endpoint identifier", o, new String[]{epId}, true);
         
         ObjectName clientEndpointName = RMUtils.getManagedObjectName(clientManager, ep);
         ObjectName serverEndpointName = RMUtils.getManagedObjectName(serverManager, ep);
@@ -163,7 +153,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         assertTrue("Expected sequence identifier", o instanceof String && sseqId.equals(o));
         
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceIds", null, null);
-        verifyArray("Expected sequence identifier", o, new String[]{sseqId}); 
+        verifyArray("Expected sequence identifier", o, new String[]{sseqId}, false); 
         
         o = mbs.invoke(clientEndpointName, "getDestinationSequenceIds", null, null);
         assertTrue("One sequence expected", o instanceof String[] && 1 == ((String[])o).length);
@@ -171,7 +161,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
         o = mbs.invoke(serverEndpointName, "getSourceSequenceIds", 
                        new Object[]{true}, new String[]{"boolean"});
-        verifyArray("Expected sequence identifier", o, new String[]{dseqId}); 
+        verifyArray("Expected sequence identifier", o, new String[]{dseqId}, false); 
         
         o = mbs.invoke(clientEndpointName, "getQueuedMessageTotalCount", null, null);
         assertTrue("No queued message", o instanceof Integer && 0 == ((Integer)o).intValue());
@@ -190,7 +180,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
-        verifyArray("Expected range", o, new Long[]{1L, 1L});
+        verifyArray("Expected range", o, new Long[]{1L, 1L}, true);
         
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
@@ -204,7 +194,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
-        verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L});
+        verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
         
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
@@ -216,7 +206,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceAcknowledgedRange", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
-        verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L});
+        verifyArray("Expected range", o, new Long[]{1L, 1L, 3L, 3L}, true);
 
         // 7 sec retry interval + 5 sec
         LOG.info("waiting for 12 secs for the retry to complete ...");
@@ -227,11 +217,11 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
         o = mbs.invoke(clientEndpointName, "getSourceSequenceAcknowledgedRange", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
-        verifyArray("Expected range", o, new Long[]{1L, 3L});
+        verifyArray("Expected range", o, new Long[]{1L, 3L}, true);
         
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceAcknowledgedRange", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
-        verifyArray("Expected range", o, new Long[]{1L, 3L});
+        verifyArray("Expected range", o, new Long[]{1L, 3L}, true);
 
         o = mbs.invoke(clientEndpointName, "getUnAcknowledgedMessageIdentifiers", 
                        new Object[]{sseqId}, new String[]{"java.lang.String"});
@@ -239,7 +229,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
     }
     
-    //@Test
+    @Test
     public void testSuspendAndResumeSourceSequence() throws Exception {
         checkServerReady(30000);
         
@@ -321,12 +311,26 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         fail("server not ready");
     }
 
-    private <T> void verifyArray(String desc, Object value, T[] target) {
+    private <T> void verifyArray(String desc, Object value, T[] target, boolean exact) {
         assertTrue(desc, target.getClass().isInstance(value));
         @SuppressWarnings("unchecked")
         T[] values = (T[])value;
+        if (exact) {
+            // exact-match
+            assertEquals(desc + " length", target.length, values.length);
+        } else {
+            // partial-match (the values must contain the target) 
+            assertTrue(desc + " length", target.length <= values.length);
+        }
+        int d = 0;
         for (int i = 0; i < target.length; i++) {
-            assertEquals(desc, target[i], values[i]);
+            while (!target[i].equals(values[i + d])) {
+                if (d >= values.length - target.length) {
+                    break;
+                }
+                d++;
+            }
+            assertEquals(desc, target[i], values[i + d]);
         }
     }
 
