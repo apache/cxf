@@ -20,8 +20,6 @@ package org.apache.cxf.systest.jms.swa;
 
 import java.io.Closeable;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -31,33 +29,54 @@ import javax.xml.ws.Holder;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
-import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
-    static String brokerPort = EmbeddedJMSBrokerLauncher.PORT;
-    static String serverPort = TestUtil.getPortNumber(Server.class);
+    public static final String ADDRESS 
+        = "jms:jndi:dynamicQueues/test.cxf.jmstransport.swa.queue"
+            + "?jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=";
     
+    static EmbeddedJMSBrokerLauncher broker;
+    
+    public static class Server extends AbstractBusTestServerBase {
+        protected void run() {
+            try {
+                JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+                factory.setWsdlLocation("classpath:wsdl/swa-mime.wsdl");
+                factory.setTransportId("http://cxf.apache.org/transports/jms");
+                factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
+                factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
+                factory.setAddress(ADDRESS + broker.getBrokerURL());
+                factory.setServiceBean(new SwAServiceImpl());
+                factory.create().start();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
-        Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix",
-                      System.getProperty("org.apache.activemq.default.directory.prefix"));
-        }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
-        
-        assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-        
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        broker = new EmbeddedJMSBrokerLauncher("vm://ClientServerSwaTest");
+        System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
+        launchServer(broker);
+        launchServer(new Server());
         createStaticBus();
     }
+    @AfterClass
+    public static void clearProperty() {
+        System.clearProperty("EmbeddedBrokerURL");
+    }    
     @Test
     public void testSwa() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
@@ -65,7 +84,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         factory.setTransportId("http://cxf.apache.org/transports/jms");
         factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
         factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
-        factory.setAddress(Server.ADDRESS);
+        factory.setAddress(ADDRESS + broker.getBrokerURL());
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         SwAService port = factory.create(SwAService.class);
         

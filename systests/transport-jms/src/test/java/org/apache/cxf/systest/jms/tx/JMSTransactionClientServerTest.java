@@ -20,49 +20,71 @@ package org.apache.cxf.systest.jms.tx;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSConfigFeature;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jms.connection.JmsTransactionManager;
+
 
 public class JMSTransactionClientServerTest extends AbstractBusClientServerTestBase {
-    protected static boolean serversStarted;
-    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    static EmbeddedJMSBrokerLauncher broker;
 
-
-    @Before
-    public void startServers() throws Exception {
-        if (serversStarted) {
-            return;
-        }
-        Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix",
-                      System.getProperty("org.apache.activemq.default.directory.prefix"));
-        }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
-        
-        assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-
-        assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, false));
-        serversStarted = true;
-    }
+    public static class Server extends AbstractBusTestServerBase {
     
+        protected void run()  {
+            // create the application context
+            ClassPathXmlApplicationContext context = 
+                new ClassPathXmlApplicationContext("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
+            context.start();
+            
+            EndpointImpl endpoint = new EndpointImpl(new GreeterImplWithTransaction());
+            endpoint.setAddress("jms://");
+            JMSConfiguration jmsConfig = new JMSConfiguration();
+    
+            ConnectionFactory connectionFactory
+                = context.getBean("jmsConnectionFactory", ConnectionFactory.class);
+            jmsConfig.setConnectionFactory(connectionFactory);
+            jmsConfig.setTargetDestination("greeter.queue.noaop");
+            jmsConfig.setSessionTransacted(true);
+            jmsConfig.setPubSubDomain(false);
+            jmsConfig.setUseJms11(true);
+            jmsConfig.setTransactionManager(new JmsTransactionManager(connectionFactory));
+            jmsConfig.setCacheLevel(3);
+    
+            JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();
+            jmsConfigFeature.setJmsConfig(jmsConfig);
+            endpoint.getFeatures().add(jmsConfigFeature);
+            endpoint.publish();
+        }
+    }
+
+    @BeforeClass
+    public static void startServers() throws Exception {
+        broker = new EmbeddedJMSBrokerLauncher("vm://JMSTransactionClientServerTest");
+        System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
+        launchServer(broker);
+        launchServer(new Server());
+        createStaticBus();
+    }
+    @AfterClass
+    public static void clearProperty() {
+        System.clearProperty("EmbeddedBrokerURL");
+    }
     public URL getWSDLURL(String s) throws Exception {
         return getClass().getResource(s);
     }
@@ -82,7 +104,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         assertNotNull(wsdl);
         String wsdlString = wsdl.toString();
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
+        broker.updateWsdl(getBus(), wsdlString);
         assertNotNull(service);
 
         Greeter greeter = service.getPort(portName, Greeter.class);
@@ -96,7 +118,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
 
         JMSConfiguration jmsConfig = new JMSConfiguration();
         ConnectionFactory connectionFactory
-            = new org.apache.activemq.ActiveMQConnectionFactory("tcp://localhost:" + JMS_PORT);
+            = new org.apache.activemq.ActiveMQConnectionFactory(broker.getBrokerURL());
         jmsConfig.setConnectionFactory(connectionFactory);
         jmsConfig.setTargetDestination("greeter.queue.noaop");
         jmsConfig.setPubSubDomain(false);

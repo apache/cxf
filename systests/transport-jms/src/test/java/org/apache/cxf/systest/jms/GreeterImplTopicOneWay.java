@@ -30,6 +30,6 @@ import org.apache.cxf.hello_world_jms.HelloWorldPubSubPort;
 public class GreeterImplTopicOneWay implements HelloWorldPubSubPort {
 
     public void greetMeOneWay(String stringParam0) {
-        System.out.println("*********  greetMeOneWay: " + stringParam0);
+        //System.out.println("*********  greetMeOneWay: " + stringParam0);
     }
 }

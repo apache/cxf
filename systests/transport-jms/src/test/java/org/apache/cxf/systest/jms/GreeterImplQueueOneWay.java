@@ -32,7 +32,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 public class GreeterImplQueueOneWay implements HelloWorldOneWayPort {
 
     public void greetMeOneWay(String stringParam0) {
-        System.out.println("*********  greetMeOneWay: " + stringParam0);
+        //System.out.println("*********  greetMeOneWay: " + stringParam0);
 
     }
 }

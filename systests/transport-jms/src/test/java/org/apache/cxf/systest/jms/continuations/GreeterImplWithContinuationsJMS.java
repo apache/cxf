@@ -79,7 +79,7 @@ public class GreeterImplWithContinuationsJMS {
                 if (userObject != null) {
                     sb.append(' ').append(userObject.toString());
                 }
-                System.out.println("Saying hi to " + sb.toString());
+                //System.out.println("Saying hi to " + sb.toString());
                 return "Hi " + sb.toString();
             }
         }

@@ -25,17 +25,17 @@ import org.apache.hello_world_doc_lit.types.FaultDetail;
 public class GreeterImplDocBase implements Greeter {
 
     public String sayHi() {
-        System.out.println("Call sayHi here ");
+        //System.out.println("Call sayHi here ");
         return "Bonjour";
     }
 
     public String greetMe(String requestType) {
-        System.out.println("Reached here :" + requestType);
+        //System.out.println("Reached here :" + requestType);
         return "Hello " + requestType;
     }
 
     public void greetMeOneWay(String requestType) {
-        System.out.println("*********  greetMeOneWay: " + requestType);        
+        //System.out.println("*********  greetMeOneWay: " + requestType);        
     }
 
     public void pingMe() throws PingMeFault {

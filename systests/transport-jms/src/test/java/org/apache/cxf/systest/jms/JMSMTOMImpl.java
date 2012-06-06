@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.jms;
 
-import java.io.IOException;
-
 import javax.activation.DataHandler;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
@@ -34,6 +32,7 @@ import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 public class JMSMTOMImpl implements JMSMTOMPortType {
 
     public void testDataHandler(Holder<String> name, Holder<DataHandler> attachinfo) {
+        /*
         System.out.println(name.value);
         try {
             System.out.println(attachinfo.value.getInputStream().available());
@@ -41,5 +40,6 @@ public class JMSMTOMImpl implements JMSMTOMPortType {
             e.printStackTrace();
         }
         System.out.println("TestDataHandler End");
+        */
     }
 }

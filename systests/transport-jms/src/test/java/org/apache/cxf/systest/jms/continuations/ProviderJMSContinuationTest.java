@@ -19,47 +19,55 @@
 package org.apache.cxf.systest.jms.continuations;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ProviderJMSContinuationTest extends AbstractBusClientServerTestBase {
-    protected static boolean serversStarted;
-    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
-    static final String PORT = ProviderServer.PORT;
+    static final String PORT = Server.PORT;
 
+    static EmbeddedJMSBrokerLauncher broker;
+    
+    public static class Server extends AbstractBusTestServerBase {
+        public static final String PORT = allocatePort(Server.class);
 
-    @Before
-    public void startServers() throws Exception {
-        if (serversStarted) {
-            return;
+        protected void run()  {
+            setBus(BusFactory.getDefaultBus());
+            broker.updateWsdl(getBus(),
+                "/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
+
+            Object implementor = new HWSoapMessageDocProvider();        
+            String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
+            Endpoint endpoint = Endpoint.publish(address, implementor);
+            ((EndpointImpl)endpoint).getInInterceptors().add(new IncomingMessageCounterInterceptor());
         }
-        Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix",
-                      System.getProperty("org.apache.activemq.default.directory.prefix"));
-        }
-        props.put("java.util.logging.config.file", 
-                  System.getProperty("java.util.logging.config.file"));
-        
-        assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
-
-        assertTrue("server did not launch correctly", 
-                   launchServer(ProviderServer.class, false));
-        serversStarted = true;
-        createStaticBus();
     }
     
+    @BeforeClass
+    public static void startServers() throws Exception {
+        broker = new EmbeddedJMSBrokerLauncher("vm://ProviderJMSContinuationTest");
+        System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
+        launchServer(broker);
+        launchServer(new Server());
+        createStaticBus();
+    }
+    @AfterClass
+    public static void clearProperty() {
+        System.clearProperty("EmbeddedBrokerURL");
+    }
+
     public URL getWSDLURL(String s) throws Exception {
         return getClass().getResource(s);
     }
@@ -73,24 +81,20 @@ public class ProviderJMSContinuationTest extends AbstractBusClientServerTestBase
         
     @Test
     public void testProviderContinuation() throws Exception {
-        try {
-            QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
-                                 "HelloWorldService"));
-            QName portName = getPortName(
-                    new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
-            URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
-            assertNotNull(wsdl);
-            String wsdlString = wsdl.toString();
-            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
+                             "HelloWorldService"));
+        QName portName = getPortName(
+                new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
+        URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
+        assertNotNull(wsdl);
+        String wsdlString = wsdl.toString();
+        broker.updateWsdl(getStaticBus(), wsdlString);
 
-            HelloWorldService service = new HelloWorldService(wsdl, serviceName);
-            assertNotNull(service);
-            HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
-            greeter.greetMe("ffang");
-        } catch (Exception ex) {
-            fail("shouldn't get exception here, which is caused by " 
-                    + ex.getMessage());
-        }     
+        HelloWorldService service = new HelloWorldService(wsdl, serviceName);
+        assertNotNull(service);
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        greeter.greetMe("ffang");
+        ((java.io.Closeable)greeter).close();
     }
         
 }
