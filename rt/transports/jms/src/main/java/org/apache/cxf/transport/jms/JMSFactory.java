@@ -245,7 +245,12 @@ public final class JMSFactory {
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
         jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
         jmsListener.setMessageListener(listenerHandler);
-        if (jmsConfig.getReceiveTimeout() != null) {
+        if (listenerHandler instanceof JMSDestination) {
+            //timeout on server side?
+            if (jmsConfig.getServerReceiveTimeout() != null) {
+                jmsListener.setReceiveTimeout(jmsConfig.getServerReceiveTimeout());
+            }
+        } else if (jmsConfig.getReceiveTimeout() != null) {
             jmsListener.setReceiveTimeout(jmsConfig.getReceiveTimeout());
         }
         if (jmsConfig.getRecoveryInterval() != JMSConfiguration.DEFAULT_VALUE) {
