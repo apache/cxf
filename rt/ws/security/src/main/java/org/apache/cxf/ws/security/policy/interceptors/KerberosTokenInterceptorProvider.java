@@ -85,10 +85,11 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             }
             if (tokenStore == null) {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
-                tokenStore = 
-                    tokenStoreFactory.newTokenStore(
-                        SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message
-                    );
+                String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
+                if (info.getName() != null) {
+                    cacheKey += "-" + info.getName().toString().hashCode();
+                }
+                tokenStore = tokenStoreFactory.newTokenStore(cacheKey, message);
                 info.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
             }
             return tokenStore;
