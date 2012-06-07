@@ -22,7 +22,6 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
