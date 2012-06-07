@@ -223,9 +223,46 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testRenewDisabled() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SAMLRenewUnitTest.class.getResource("cxf-client-unit.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        String wsdlLocation = 
+            "https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl";
+        
+        // Request the token
+        SecurityToken token = 
+            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 300, false, false);
+        assertNotNull(token);
+        
+        // Validate the token
+        List<SecurityToken> validatedTokens = validateSecurityToken(bus, wsdlLocation, token);
+        assertFalse(validatedTokens.isEmpty());
+        assertTrue(validatedTokens.get(0).equals(token));
+
+        // Renew the token
+        SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
+        assertFalse(token.equals(renewedToken));
+        
+        // Validate the renewed token
+        validateSecurityToken(bus, wsdlLocation, renewedToken);
+
+        bus.shutdown(true);
+    }
     
     private SecurityToken requestSecurityToken(
         Bus bus, String wsdlLocation, String tokenType, int ttl, boolean allowExpired
+    ) throws Exception {
+        return requestSecurityToken(bus, wsdlLocation, tokenType, ttl, allowExpired, true);
+    }
+    
+    private SecurityToken requestSecurityToken(
+        Bus bus, String wsdlLocation, String tokenType, int ttl, boolean allowExpired, boolean sendRenewing
     ) throws Exception {
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation(wsdlLocation);
@@ -250,6 +287,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setRequiresEntropy(true);
         stsClient.setKeySize(128);
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
+        stsClient.setSendRenewing(sendRenewing);
 
         return stsClient.requestSecurityToken("https://localhost:8081/doubleit/services/doubleittransport");
     }

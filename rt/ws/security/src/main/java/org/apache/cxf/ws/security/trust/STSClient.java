@@ -165,6 +165,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     protected boolean isSpnego;
     protected boolean enableLifetime;
     protected int ttl = 300;
+    protected boolean sendRenewing = true;
     protected boolean allowRenewing = true;
     protected boolean allowRenewingAfterExpiry;
     
@@ -213,6 +214,10 @@ public class STSClient implements Configurable, InterceptorProvider {
     
     public void setEnableLifetime(boolean enableLifetime) {
         this.enableLifetime = enableLifetime;
+    }
+    
+    public void setSendRenewing(boolean sendRenewing) {
+        this.sendRenewing = sendRenewing;
     }
     
     /**
@@ -720,14 +725,16 @@ public class STSClient implements Configurable, InterceptorProvider {
         }
         
         // Write out renewal semantics
-        writer.writeStartElement("wst", "Renewing", namespace);
-        if (!allowRenewing) {
-            writer.writeAttribute(null, "Allow", "false");
+        if (sendRenewing) {
+            writer.writeStartElement("wst", "Renewing", namespace);
+            if (!allowRenewing) {
+                writer.writeAttribute(null, "Allow", "false");
+            }
+            if (allowRenewing && allowRenewingAfterExpiry) {
+                writer.writeAttribute(null, "OK", "true");
+            }
+            writer.writeEndElement();
         }
-        if (allowRenewing && allowRenewingAfterExpiry) {
-            writer.writeAttribute(null, "OK", "true");
-        }
-        writer.writeEndElement();
         
         writer.writeEndElement();
 
