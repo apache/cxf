@@ -244,6 +244,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
                 m, getIssuerId(m), getAbsoluteAssertionServiceAddress(m)
             );
         if (isSignRequest()) {
+            authnRequest.setDestination(idpServiceAddress);
             signAuthnRequest(authnRequest);
         }
         Element authnRequestElement = OpenSAMLUtil.toDom(authnRequest, doc);

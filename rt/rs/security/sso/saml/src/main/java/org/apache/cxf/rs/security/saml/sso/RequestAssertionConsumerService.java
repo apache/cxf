@@ -56,6 +56,7 @@ import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.xml.XMLObject;
 
 @Path("sso")
@@ -254,6 +255,8 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
         } catch (Exception ex) {
             throw new WebApplicationException(400);
         }
+        
+        LOG.fine("Received response: " + DOM2Writer.nodeToString(responseDoc.getDocumentElement()));
         
         XMLObject responseObject = null;
         try {
