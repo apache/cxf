@@ -46,6 +46,7 @@ import org.apache.cxf.greeter_control.ControlService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPException;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.cxf.wsdl.WSDLManager;
@@ -126,7 +127,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             bus = null;
         }
     }
-
+    
     @Test
     public void testNoFailoverAcrossBindings() throws Exception {        
         startTarget(REPLICA_D);
@@ -162,13 +163,22 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             // in which case we should revert back to the original 
             // java.net.ConnectionException on the unavailable 
             // replica A
-            //
-            if (!(cause instanceof ConnectException)) {
+
+            boolean isOrig = cause instanceof ConnectException;
+            if (!isOrig) {
+                //depending on the order of the tests, 
+                //the port COULD have been created, but no service deployed
+                isOrig = cause instanceof HTTPException
+                    && cause.getMessage().contains("SoapContext/ReplicatedPortA")
+                    && cause.getMessage().contains("404:");
+            }
+            
+            if (!isOrig) {
                 cause.printStackTrace();
             }
             assertTrue("should revert to original exception when no failover: " 
                        + cause,
-                       cause instanceof ConnectException);
+                       isOrig);
             
             // similarly the current endpoint referenced by the client 
             // should also revert back to the original replica A
