@@ -67,7 +67,7 @@ public abstract class TokenStoreFactory {
         Object o = message.getContextualProperty(SecurityConstants.CACHE_CONFIG_FILE);
         if (o instanceof String) {
             URL url = null;
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+            ResourceManager rm = message.getExchange().getBus().getExtension(ResourceManager.class);
             url = rm.resolveResource((String)o, URL.class);
             try {
                 if (url == null) {

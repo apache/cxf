@@ -38,17 +38,11 @@ public class Server12 extends AbstractServer {
             "org/apache/cxf/systest/ws/wssec11/server/server.xml");
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
-
-        try {
-            new Server12("http://localhost:" + PORT);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        super.run();
     }
     
     public static void main(String args[]) throws Exception {
-        new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server/server.xml");
-        new Server12("http://localhost:" + PORT);
+        new Server12("http://localhost:" + PORT).run();
         System.out.println("Server ready...");
 
         Thread.sleep(60 * 60 * 10000);

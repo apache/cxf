@@ -19,13 +19,19 @@
 
 package org.apache.cxf.sts.cache;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.ws.security.tokenstore.EHCacheTokenStore;
 
 public class DefaultInMemoryTokenStore extends EHCacheTokenStore {
 
+    public DefaultInMemoryTokenStore(Bus b) {
+        super("STS", b, ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
+    }
     public DefaultInMemoryTokenStore() {
-        super("STS", ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
+        super("STS", BusFactory.getDefaultBus(),
+              ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
     }
     
 }

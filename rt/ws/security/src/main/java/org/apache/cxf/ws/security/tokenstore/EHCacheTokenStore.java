@@ -32,6 +32,9 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ws.security.cache.EHCacheManagerHolder;
 
@@ -39,18 +42,24 @@ import org.apache.cxf.ws.security.cache.EHCacheManagerHolder;
  * An in-memory EHCache implementation of the TokenStore interface. The default TTL is 60 minutes
  * and the max TTL is 12 hours.
  */
-public class EHCacheTokenStore implements TokenStore, Closeable {
+public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleListener {
 
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     public static final int MAX_ELEMENTS = 1000000;
     
     private Ehcache cache;
+    private Bus bus;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
-    public EHCacheTokenStore(String key, URL configFileURL) {
-        cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
+    public EHCacheTokenStore(String key, Bus b, URL configFileURL) {
+        bus = b;
+        if (bus != null) {
+            b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
+        }
+
+        cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
 
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
         Ehcache newCache = new Cache(key, MAX_ELEMENTS, false, false, DEFAULT_TTL, DEFAULT_TTL);
@@ -158,7 +167,20 @@ public class EHCacheTokenStore implements TokenStore, Closeable {
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;
+            if (bus != null) {
+                bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
+            }
         }
     }
-    
+
+    public void initComplete() {
+    }
+
+    public void preShutdown() {
+        close();
+    }
+
+    public void postShutdown() {
+        close();
+    }
 }

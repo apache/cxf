@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.tokenstore;
 import java.util.Date;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -38,6 +39,7 @@ public class EHCacheTokenStoreTest extends org.junit.Assert {
             SecurityConstants.CACHE_CONFIG_FILE, 
             ClassLoaderUtils.getResource("cxf-ehcache.xml", EHCacheTokenStoreTest.class)
         );
+        message.setExchange(new ExchangeImpl());
         store = tokenStoreFactory.newTokenStore(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, message);
     }
     

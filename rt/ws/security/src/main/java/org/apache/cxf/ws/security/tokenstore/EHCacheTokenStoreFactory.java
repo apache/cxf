@@ -19,15 +19,9 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.io.IOException;
 import java.net.URL;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.cache.EHCacheReplayCacheFactory;
 
 
 /**
@@ -37,26 +31,7 @@ public class EHCacheTokenStoreFactory extends TokenStoreFactory {
     
     public TokenStore newTokenStore(String key, Message message) {
         URL configFileURL = getConfigFileURL(message);
-        if (configFileURL == null) {
-            String defaultConfigFile = "cxf-ehcache.xml";
-            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
-            configFileURL = rm.resolveResource(defaultConfigFile, URL.class);
-            try {
-                if (configFileURL == null) {
-                    configFileURL = 
-                        ClassLoaderUtils.getResource(defaultConfigFile, EHCacheReplayCacheFactory.class);
-                }
-                if (configFileURL == null) {
-                    configFileURL = new URL(defaultConfigFile);
-                }
-            } catch (IOException e) {
-                // Do nothing
-            }
-        }
-        if (configFileURL != null) {
-            message.setContextualProperty(SecurityConstants.CACHE_CONFIG_FILE, configFileURL);
-        }
-        return new EHCacheTokenStore(key, configFileURL);
+        return new EHCacheTokenStore(key, message.getExchange().getBus(), configFileURL);
     }
     
 }

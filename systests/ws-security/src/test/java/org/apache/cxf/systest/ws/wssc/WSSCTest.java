@@ -216,6 +216,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             } catch (Exception ex) {
                 throw new Exception("Error doing " + portPrefix, ex);
             }
+            ((java.io.Closeable)port).close();
         }
     }
 

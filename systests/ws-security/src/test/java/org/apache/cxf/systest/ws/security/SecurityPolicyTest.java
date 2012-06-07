@@ -45,6 +45,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
@@ -200,7 +201,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
-        getStaticBus().shutdown(true);
         stopAllServers();
     }
     
@@ -449,6 +449,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("bob.properties"));
         assertEquals(10, pt.doubleIt(5));
         
+        
+        ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
 
@@ -476,7 +478,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("alice.properties"));
         assertEquals(10, pt.doubleIt(5));
-        
+        ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
     
@@ -507,7 +509,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleIt di = new DoubleIt();
         di.setNumberToDouble(5);
         assertEquals(10, pt.doubleIt(di, 1).getDoubledNumber());
-        
+        ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
     
@@ -549,12 +551,14 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Certificate revocation")
                        || errorMessage.contains("Error during certificate path validation"));
         }
-        
+        ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
     
     @Test
     public void testCXF4122() throws Exception {
+        Bus epBus = BusFactory.newInstance().createBus();
+        BusFactory.setDefaultBus(epBus);
         URL wsdl = SecurityPolicyTest.class.getResource("DoubleIt.wsdl");
         EndpointImpl ep = (EndpointImpl)Endpoint.create(new DoubleItImpl());
         ep.setEndpointName(
@@ -598,7 +602,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Certificate revocation")
                        || errorMessage.contains("Error during certificate path validation"));
         }
-
+        ((java.io.Closeable)pt).close();
+        ep.stop();
+        epBus.shutdown(true);
         bus.shutdown(true);
     }
 }
