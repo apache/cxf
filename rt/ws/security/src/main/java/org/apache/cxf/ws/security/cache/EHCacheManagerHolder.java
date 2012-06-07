@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
@@ -43,6 +44,24 @@ public final class EHCacheManagerHolder {
         //utility
     }
     
+    
+    public static CacheConfiguration getCacheConfiguration(String key,
+                                                           CacheManager cacheManager) {
+        CacheConfiguration cc = cacheManager.getConfiguration().getCacheConfigurations().get(key);
+        if (cc == null && key.contains("-")) {
+            cc = cacheManager.getConfiguration().getCacheConfigurations().get(key.substring(0, key.indexOf('-')));
+        }
+        if (cc == null) {
+            cc = cacheManager.getConfiguration().getDefaultCacheConfiguration();
+        }
+        if (cc == null) {
+            cc = new CacheConfiguration();
+        } else {
+            cc = (CacheConfiguration)cc.clone();
+        }
+        cc.setName(key);
+        return cc;
+    }
     
     public static CacheManager getCacheManager(Bus bus, URL configFileURL) {
         CacheManager cacheManager = null;

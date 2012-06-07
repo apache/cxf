@@ -31,6 +31,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -46,7 +47,6 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
 
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    public static final int MAX_ELEMENTS = 1000000;
     
     private Ehcache cache;
     private Bus bus;
@@ -60,9 +60,11 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         }
 
         cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
-
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
-        Ehcache newCache = new Cache(key, MAX_ELEMENTS, false, false, DEFAULT_TTL, DEFAULT_TTL);
+        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
+        cc.overflowToDisk(false); //tokens not writable
+        
+        Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
     

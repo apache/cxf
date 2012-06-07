@@ -26,6 +26,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -52,7 +53,9 @@ public class EHCacheReplayCache implements ReplayCache, Closeable, BusLifeCycleL
         }
         cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
         
-        Ehcache newCache = new Cache(key, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
+        CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
+
+        Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
     
