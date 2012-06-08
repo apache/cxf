@@ -341,7 +341,7 @@
                             <ruleset>${cxf.resources.base.path}cxf-pmd-custom.xml</ruleset>
                         </rulesets>
                         <sourceEncoding>UTF-8</sourceEncoding>
-                        <targetJdk>1.5</targetJdk>
+                        <targetJdk>1.6</targetJdk>
                         <linkXRef>false</linkXRef>
                         <includeTests>true</includeTests>
                         <verbose>true</verbose>
@@ -1524,18 +1524,6 @@
 
     <profiles>
         <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <properties>
-                <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
-                <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
-                <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
-                <jdk.version>1.5</jdk.version>
-            </properties>
-        </profile>
-        <profile>
             <id>jdk17</id>
             <activation>
                 <jdk>1.7</jdk>
@@ -1776,7 +1764,7 @@
                                 <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
                             </rulesets>
                             <sourceEncoding>UTF-8</sourceEncoding>
-                            <targetJdk>1.5</targetJdk>
+                            <targetJdk>1.6</targetJdk>
                             <linkXRef>false</linkXRef>
                             <includeTests>true</includeTests>
                             <verbose>true</verbose>

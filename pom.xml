@@ -423,15 +423,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <properties>
-                <jdk.version>1.5</jdk.version>
-            </properties>
-        </profile>
     <profile>
       <id>maven-3-site</id>
       <activation>
@@ -515,10 +506,10 @@
                     <version>2.8</version>
                     <configuration>
                         <attach>true</attach>
-                        <source>1.5</source>
+                        <source>1.6</source>
                         <quiet>true</quiet>
                         <bottom>Apache CXF</bottom>
-                        <javadocVersion>1.5</javadocVersion>
+                        <javadocVersion>1.6</javadocVersion>
                         <encoding>UTF-8</encoding>
                         <detectOfflineLinks>false</detectOfflineLinks>
                         <notimestamp>true</notimestamp>
@@ -540,8 +531,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.5.1</version>
                     <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
+                        <source>1.6</source>
+                        <target>1.6</target>
                         <maxmem>256M</maxmem>
                         <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>
