@@ -37,11 +37,5 @@ public class Server extends AbstractBusTestServerBase {
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
-
-        try {
-            new Server();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

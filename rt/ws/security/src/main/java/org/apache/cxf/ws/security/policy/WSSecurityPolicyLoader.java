@@ -19,8 +19,6 @@
 
 package org.apache.cxf.ws.security.policy;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,20 +26,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.ClientLifeCycleListener;
-import org.apache.cxf.endpoint.ClientLifeCycleManager;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerLifeCycleListener;
-import org.apache.cxf.endpoint.ServerLifeCycleManager;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionBuilderLoader;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderLoader;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.builders.AsymmetricBindingBuilder;
 import org.apache.cxf.ws.security.policy.builders.ContentEncryptedElementsBuilder;
@@ -87,7 +77,6 @@ import org.apache.cxf.ws.security.policy.interceptors.SpnegoTokenInterceptorProv
 import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
-import org.apache.ws.security.cache.ReplayCache;
 
 @NoJSR250Annotations
 public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
@@ -104,45 +93,8 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             //and error out at that point.  If nothing uses ws-securitypolicy
             //no warnings/errors will display
         }
-        ServerLifeCycleManager m = b.getExtension(ServerLifeCycleManager.class);
-        if (m != null) {
-            m.registerListener(new ServerLifeCycleListener() {
-                public void startServer(Server server) {
-                }
-                public void stopServer(Server server) {
-                    shutdownResources(server.getEndpoint().getEndpointInfo());
-                }
-            });
-        }
-        ClientLifeCycleManager cm = b.getExtension(ClientLifeCycleManager.class);
-        if (cm != null) {
-            cm.registerListener(new ClientLifeCycleListener() {
-                public void clientCreated(Client client) {
-                }
-                public void clientDestroyed(Client client) {
-                    shutdownResources(client.getEndpoint().getEndpointInfo());
-                }
-            });
-        }
-    }
-    protected void shutdownResources(EndpointInfo info) {
-        ReplayCache rc = (ReplayCache)info.getProperty(SecurityConstants.NONCE_CACHE_INSTANCE);
-        if (rc instanceof Closeable) {
-            close((Closeable)rc);
-        }
-        rc = (ReplayCache)info.getProperty(SecurityConstants.TIMESTAMP_CACHE_INSTANCE);
-        if (rc instanceof Closeable) {
-            close((Closeable)rc);
-        }
     }
     
-    private void close(Closeable ts) {
-        try {
-            ts.close();
-        } catch (IOException ex) {
-            //ignore, we're shutting down and nothing we can do
-        }
-    }
     public void registerBuilders() {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg == null) {

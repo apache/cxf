@@ -25,10 +25,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 
 abstract class AbstractServer extends AbstractBusTestServerBase {
-    
+    String baseUrl;
     protected AbstractServer(String baseUrl) throws Exception {
-        
-        
+        this.baseUrl = baseUrl;
+    }
+    protected void run() {
         doPublish(baseUrl + "/APingService", new APingService());
         doPublish(baseUrl + "/A-NoTimestampPingService", new ANoTimestampPingService());
         doPublish(baseUrl + "/ADPingService", new ADPingService());

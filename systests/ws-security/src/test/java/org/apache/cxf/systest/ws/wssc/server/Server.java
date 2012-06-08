@@ -85,11 +85,11 @@ public class Server extends AbstractBusTestServerBase {
     
     protected void run()  {
         try {
-            new Server("http://localhost:" + PORT + "/");
             Bus busLocal = new SpringBusFactory().createBus(
-                    "org/apache/cxf/systest/ws/wssc/server/server.xml");
+                "org/apache/cxf/systest/ws/wssc/server/server.xml");
             BusFactory.setDefaultBus(busLocal);
             setBus(busLocal);
+            new Server("http://localhost:" + PORT + "/");
         } catch (Exception e) {
             e.printStackTrace();
         }

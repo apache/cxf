@@ -51,8 +51,7 @@ public class Server extends AbstractBusTestServerBase {
     }
 
     public static void main(String args[]) throws Exception {
-        new Server();
-        new SpringBusFactory().createBus(configFileName);
+        new Server().run();
         System.out.println("Server ready...");
 
         Thread.sleep(60 * 60 * 1000);
