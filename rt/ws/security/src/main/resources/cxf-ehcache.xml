@@ -3,7 +3,7 @@
     <diskStore path="java.io.tmpdir"/>
 
     <defaultCache
-            maxElementsInMemory="50000"
+            maxEntriesLocalHeap="5000"
             eternal="false"
             timeToIdleSeconds="3600"
             timeToLiveSeconds="3600"
@@ -13,4 +13,5 @@
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LRU"
             />
+
 </ehcache>
