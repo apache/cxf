@@ -593,7 +593,7 @@ public class DynamicClientFactory {
         
         javaCompiler.setClassPath(classPath);
         javaCompiler.setOutputDir(dest);
-        javaCompiler.setTarget("1.5");
+        javaCompiler.setTarget("1.6");
         
         return javaCompiler.compileFiles(srcList); 
     }

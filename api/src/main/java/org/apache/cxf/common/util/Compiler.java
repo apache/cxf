@@ -23,12 +23,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import org.apache.cxf.helpers.FileUtils;
 
@@ -124,12 +127,7 @@ public class Compiler {
     public boolean compileFiles(String[] files) {
         String endorsed = SystemPropertyAction.getProperty("java.endorsed.dirs");
         if (!forceFork) {
-            try { 
-                Class.forName("javax.tools.JavaCompiler");
-                return useJava6Compiler(files);
-            } catch (Exception ex) {
-                //ignore - fork javac
-            }
+            return useJava6Compiler(files);
         }
         
         List<String> list = new ArrayList<String>();
@@ -172,32 +170,23 @@ public class Compiler {
         return internalCompile(list.toArray(new String[list.size()]), idx);
     }
 
-    private boolean useJava6Compiler(String[] files) 
-        throws Exception {
-        
-        Object compiler = Class.forName("javax.tools.ToolProvider")
-            .getMethod("getSystemJavaCompiler").invoke(null);
-        Object fileManager = compiler.getClass().getMethod("getStandardFileManager", 
-                                                           Class.forName("javax.tools.DiagnosticListener"),
-                                                           Locale.class,
-                                                           Charset.class).invoke(compiler, null, null, null);
-        Object fileList = fileManager.getClass().getMethod("getJavaFileObjectsFromStrings", Iterable.class)
-            .invoke(fileManager, Arrays.asList(files));
+    private boolean useJava6Compiler(String[] files) {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+        Iterable<? extends JavaFileObject> fileList 
+            = fileManager.getJavaFileObjectsFromStrings(Arrays.asList(files));
         
         
         List<String> args = new ArrayList<String>();
         addArgs(args);
-        Object task = compiler.getClass().getMethod("getTask", 
-                                                    Writer.class,
-                                                    Class.forName("javax.tools.JavaFileManager"),
-                                                    Class.forName("javax.tools.DiagnosticListener"),
-                                                    Iterable.class,
-                                                    Iterable.class,
-                                                    Iterable.class)
-                                                    .invoke(compiler, null, fileManager, null, 
-                                                            args, null, fileList);
-        Boolean ret = (Boolean)task.getClass().getMethod("call").invoke(task);
-        fileManager.getClass().getMethod("close").invoke(fileManager);
+        CompilationTask task = compiler.getTask(null, fileManager, null, args, null, fileList);
+        Boolean ret = task.call();
+        try {
+            fileManager.close();
+        } catch (IOException e) {
+            System.err.print("[ERROR] IOException during compiling.");
+            e.printStackTrace();
+        }
         return ret;
     }
 

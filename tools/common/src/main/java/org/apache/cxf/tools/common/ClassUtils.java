@@ -48,9 +48,6 @@ public class ClassUtils {
         
         compiler.setEncoding((String)context.get(ToolConstants.CFG_ENCODING));
         
-        if ("1.5".equals(System.getProperty("java.specification.version"))) {
-            compiler.setTarget("1.5");
-        }
         if (context.get(ToolConstants.CFG_CLASSDIR) != null) {
             compiler.setOutputDir((String)context.get(ToolConstants.CFG_CLASSDIR));
         }
