@@ -33,6 +33,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.DispatchImpl;
@@ -96,13 +97,12 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testSoap12() throws Exception {
-
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = FaultTest.class.getResource("client/client.xml");
 
@@ -130,13 +130,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testSoap12Dispatch() throws Exception {
-        
+        createBus();
+        BusFactory.setDefaultBus(getBus());
         URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12DispatchPort");
@@ -184,6 +185,8 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
+        
+        client.destroy();
     }
     
     

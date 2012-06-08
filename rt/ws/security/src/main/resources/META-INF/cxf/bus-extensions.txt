@@ -1,1 +1,2 @@
-org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader::true
+org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader::true:true
+org.apache.cxf.ws.security.cache.CacheCleanupListener::true:true

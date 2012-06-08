@@ -19,11 +19,19 @@
 
 package org.apache.cxf.ws.security.cache;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.resource.ResourceManager;
 
 /**
  * We need to reference count the EHCacheManager things
@@ -36,25 +44,99 @@ public final class EHCacheManagerHolder {
         //utility
     }
     
-    public static CacheManager getCacheManager(URL configFileURL) {
-        CacheManager cacheManager;
-        if (configFileURL == null) {
-            cacheManager = CacheManager.create();
+    
+    public static CacheConfiguration getCacheConfiguration(String key,
+                                                           CacheManager cacheManager) {
+        CacheConfiguration cc = cacheManager.getConfiguration().getCacheConfigurations().get(key);
+        if (cc == null && key.contains("-")) {
+            cc = cacheManager.getConfiguration().getCacheConfigurations().get(key.substring(0, key.indexOf('-')));
+        }
+        if (cc == null) {
+            cc = cacheManager.getConfiguration().getDefaultCacheConfiguration();
+        }
+        if (cc == null) {
+            cc = new CacheConfiguration();
         } else {
-            cacheManager = CacheManager.create(configFileURL);
+            cc = (CacheConfiguration)cc.clone();
+        }
+        cc.setName(key);
+        return cc;
+    }
+    
+    public static CacheManager getCacheManager(Bus bus, URL configFileURL) {
+        CacheManager cacheManager = null;
+        if (configFileURL == null) {
+            //using the default
+            cacheManager = findDefaultCacheManager(bus);
+        }
+        if (cacheManager == null) {
+            if (configFileURL == null) {
+                cacheManager = CacheManager.create();
+            } else {
+                cacheManager = CacheManager.create(configFileURL);
+            }
         }
         AtomicInteger a = COUNTS.get(cacheManager.getName());
         if (a == null) {
             COUNTS.putIfAbsent(cacheManager.getName(), new AtomicInteger());
             a = COUNTS.get(cacheManager.getName());
         }
-        a.incrementAndGet();
+        if (a.incrementAndGet() == 1) {
+            //System.out.println("Create!! " + cacheManager.getName());
+        }
         return cacheManager;
     }
     
+    private static CacheManager findDefaultCacheManager(Bus bus) {
+
+        String defaultConfigFile = "cxf-ehcache.xml";
+        URL configFileURL = null;
+        if (bus != null) {
+            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            configFileURL = rm.resolveResource(defaultConfigFile, URL.class);
+        }
+        try {
+            if (configFileURL == null) {
+                configFileURL = 
+                    ClassLoaderUtils.getResource(defaultConfigFile, EHCacheReplayCacheFactory.class);
+            }
+            if (configFileURL == null) {
+                configFileURL = new URL(defaultConfigFile);
+            }
+        } catch (IOException e) {
+            // Do nothing
+        }
+        try {
+            Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
+            /*
+            String perBus = (String)bus.getProperty("ws-security.cachemanager.per.bus");
+            if (perBus == null) {
+                perBus = "true";
+            }
+            if (Boolean.parseBoolean(perBus)) {
+                conf.setName(bus.getId());
+                if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
+                    
+                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
+                        + bus.getId();
+                    conf.getDiskStoreConfiguration().setPath(path);
+                }
+            }
+            */
+            return CacheManager.create(conf);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+
     public static void releaseCacheManger(CacheManager cacheManager) {
         AtomicInteger a = COUNTS.get(cacheManager.getName());
+        if (a == null) {
+            return;
+        }
         if (a.decrementAndGet() == 0) {
+            //System.out.println("Shutdown!! " + cacheManager.getName());
             cacheManager.shutdown();
         }
     }

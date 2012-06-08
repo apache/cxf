@@ -42,6 +42,7 @@ import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
@@ -101,6 +102,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+        createStaticBus();
     }
     
     @Test
@@ -137,15 +139,15 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //expected
         }
+        
+        ((java.io.Closeable)greeter).close();
     }
 
     @Test
     public void testTimestampSignEncrypt() throws Exception {
-        BusFactory.setDefaultBus(
-            new SpringBusFactory().createBus(
-                "org/apache/cxf/systest/ws/security/client.xml"
-            )
-        );
+        Bus b = new SpringBusFactory()
+            .createBus("org/apache/cxf/systest/ws/security/client.xml");
+        BusFactory.setDefaultBus(b);
         final javax.xml.ws.Service svc = javax.xml.ws.Service.create(
             WSDL_LOC,
             GREETER_SERVICE_QNAME
@@ -171,7 +173,10 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         assertTrue("expected Handler.handleMessage() to be called", 
                    handler.handleMessageCalledOutbound);
         assertFalse("expected Handler.handleFault() not to be called", 
-                    handler.handleFaultCalledOutbound); 
+                    handler.handleFaultCalledOutbound);
+        ((java.io.Closeable)greeter).close();
+        b.shutdown(true);
+        BusFactory.setDefaultBus(getStaticBus());
     }
 
     @Test
