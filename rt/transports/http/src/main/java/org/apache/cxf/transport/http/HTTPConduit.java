@@ -1408,12 +1408,6 @@ public class HTTPConduit
             
         }
 
-        public void flush() throws IOException {
-            if (!chunking) {
-                super.flush();
-            }
-        }
-        
         /**
          * Perform any actions required on stream closure (handle response etc.)
          */

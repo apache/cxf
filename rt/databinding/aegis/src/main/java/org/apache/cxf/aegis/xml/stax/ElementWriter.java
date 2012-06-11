@@ -168,7 +168,6 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     public void close() {
         try {
             writer.writeEndElement();
-            writer.flush();
         } catch (XMLStreamException e) {
             throw new DatabindingException("Error writing document.", e);
         }

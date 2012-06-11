@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -75,6 +76,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             XMLOutputFactory factory = getXMLOutputFactory(message);
             if (factory == null) {
                 if (writer == null) {
+                    os = setupOutputStream(message, os);
                     xwriter = StaxUtils.createXMLStreamWriter(os, encoding);
                 } else {
                     xwriter = StaxUtils.createXMLStreamWriter(writer);
@@ -82,6 +84,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             } else {
                 synchronized (factory) {
                     if (writer == null) {
+                        os = setupOutputStream(message, os);
                         xwriter = factory.createXMLStreamWriter(os, encoding);
                     } else {
                         xwriter = factory.createXMLStreamWriter(writer);
@@ -103,6 +106,14 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         // Add a final interceptor to write end elements
         message.getInterceptorChain().add(ENDING);
     }
+    private OutputStream setupOutputStream(Message message, OutputStream os) {
+        if (!(os instanceof AbstractWrappedOutputStream)) {
+            os = new AbstractWrappedOutputStream(os) { };
+        }
+        ((AbstractWrappedOutputStream)os).allowFlush(false);
+        return os;
+    }
+
     @Override
     public void handleFault(Message message) {
         super.handleFault(message);
