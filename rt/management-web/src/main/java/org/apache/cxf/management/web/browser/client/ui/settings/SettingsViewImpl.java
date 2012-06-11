@@ -63,7 +63,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
     @Nullable
     private Presenter presenter;
 
-    @SuppressWarnings("deprecation")
     public SettingsViewImpl() {
         initWidget(UI_BINDER.createAndBindUi(this));
         tabPanel.selectTab(0);
