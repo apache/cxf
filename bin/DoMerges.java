@@ -109,6 +109,9 @@ public class DoMerges {
         }
         public void optimize(Ranges blocked, Set<Integer> ignores) {
             Iterator<Range> it = this.iterator();
+            if (!it.hasNext()) {
+                return;
+            }
             Range last = it.next();
             while (it.hasNext()) {
                 Range r = it.next();
