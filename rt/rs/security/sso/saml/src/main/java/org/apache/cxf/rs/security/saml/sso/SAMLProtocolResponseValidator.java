@@ -18,14 +18,28 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.Base64Exception;
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.rs.security.common.SecurityUtils;
+import org.apache.cxf.rs.security.xml.EncryptionUtils;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
@@ -34,11 +48,16 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.SAMLUtil;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.SignatureTrustValidator;
 import org.apache.ws.security.validate.Validator;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.Constants;
 import org.opensaml.security.SAMLSignatureProfileValidator;
+import org.opensaml.xml.encryption.EncryptedData;
 import org.opensaml.xml.security.x509.BasicX509Credential;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
@@ -91,12 +110,23 @@ public class SAMLProtocolResponseValidator {
         validateResponseAgainstSchemas(samlResponse);
         validateResponseSignature(samlResponse, sigCrypto, callbackHandler);
 
+        Document doc = samlResponse.getDOM().getOwnerDocument();
+        // Decrypt any encrypted Assertions and add them to the Response (note that this will break any
+        // signature on the Response)
+        for (org.opensaml.saml2.core.EncryptedAssertion assertion : samlResponse.getEncryptedAssertions()) {
+            EncryptedData encryptedData = assertion.getEncryptedData();
+            Element encryptedDataDOM = encryptedData.getDOM();
+            
+            Element decAssertion = decryptAssertion(encryptedDataDOM, sigCrypto, callbackHandler);
+            
+            AssertionWrapper wrapper = new AssertionWrapper(decAssertion);
+            samlResponse.getAssertions().add(wrapper.getSaml2());
+        }
+
         // Validate Assertions
         for (org.opensaml.saml2.core.Assertion assertion : samlResponse.getAssertions()) {
             AssertionWrapper wrapper = new AssertionWrapper(assertion);
-            validateAssertion(
-                wrapper, sigCrypto, callbackHandler, samlResponse.getDOM().getOwnerDocument()
-            );
+            validateAssertion(wrapper, sigCrypto, callbackHandler, doc);
         }
     }
     
@@ -337,5 +367,146 @@ public class SAMLProtocolResponseValidator {
         }
     }
     
+    private Element decryptAssertion(
+        Element encryptedDataDOM, Crypto sigCrypto, CallbackHandler callbackHandler
+    ) throws WSSecurityException {
+        Element encKeyElement = getNode(encryptedDataDOM, WSConstants.ENC_NS, "EncryptedKey", 0);
+        if (encKeyElement == null) {
+            LOG.log(Level.FINE, "EncryptedKey element is not available");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        X509Certificate cert = loadCertificate(sigCrypto, encKeyElement);
+        if (cert == null) {
+            LOG.fine("X509Certificate cannot be retrieved from EncryptedKey element");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        // now start decrypting
+        String keyEncAlgo = getEncodingMethodAlgorithm(encKeyElement);
+        String digestAlgo = getDigestMethodAlgorithm(encKeyElement);
+        
+        Element cipherValue = getNode(encKeyElement, WSConstants.ENC_NS, "CipherValue", 0);
+        if (cipherValue == null) {
+            LOG.fine("CipherValue element is not available");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+
+        if (callbackHandler == null) {
+            LOG.fine("A CallbackHandler must be configured to decrypt encrypted Assertions");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        PrivateKey key = null;
+        try {
+            key = sigCrypto.getPrivateKey(cert, callbackHandler);
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Encrypted key can not be decrypted", ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        Cipher cipher = 
+                EncryptionUtils.initCipherWithKey(keyEncAlgo, digestAlgo, Cipher.DECRYPT_MODE, key);
+        byte[] decryptedBytes = null;
+        try {
+            byte[] encryptedBytes = Base64Utility.decode(cipherValue.getTextContent().trim());
+            decryptedBytes = cipher.doFinal(encryptedBytes);
+        } catch (Base64Exception ex) {
+            LOG.log(Level.FINE, "Base64 decoding has failed", ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Encrypted key can not be decrypted", ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        String symKeyAlgo = getEncodingMethodAlgorithm(encryptedDataDOM);
+        
+        byte[] decryptedPayload = null;
+        try {
+            decryptedPayload = decryptPayload(encryptedDataDOM, decryptedBytes, symKeyAlgo);
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Payload can not be decrypted", ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        Document payloadDoc = null;
+        try {
+            payloadDoc = DOMUtils.readXml(new InputStreamReader(new ByteArrayInputStream(decryptedPayload),
+                                               "UTF-8"));
+            return payloadDoc.getDocumentElement();
+        } catch (Exception ex) {
+            LOG.log(Level.FINE, "Payload document can not be created", ex);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+    }
+        
+    private Element getNode(Element parent, String ns, String name, int index) {
+        NodeList list = parent.getElementsByTagNameNS(ns, name);
+        if (list != null && list.getLength() >= index + 1) {
+            return (Element)list.item(index);
+        } 
+        return null;
+    }
+
+
+    private X509Certificate loadCertificate(Crypto crypto, Element encKeyElement) throws WSSecurityException {
+        Element certNode = 
+            getNode(encKeyElement, Constants.SignatureSpecNS, "X509Certificate", 0);
+        if (certNode != null) {
+            try {
+                return SecurityUtils.loadX509Certificate(crypto, certNode);
+            } catch (Exception ex) {
+                LOG.log(Level.FINE, "X509Certificate can not be created", ex);
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        }
+    
+        certNode = getNode(encKeyElement, Constants.SignatureSpecNS, "X509IssuerSerial", 0);
+        if (certNode != null) {
+            try {
+                return SecurityUtils.loadX509IssuerSerial(crypto, certNode);
+            } catch (Exception ex) {
+                LOG.log(Level.FINE, "X509Certificate can not be created", ex);
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        }
+
+        return null;
+    }
+    
+    private String getEncodingMethodAlgorithm(Element parent) throws WSSecurityException {
+        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        if (encMethod == null) {
+            LOG.fine("EncryptionMethod element is not available");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        return encMethod.getAttribute("Algorithm");
+    }
+    
+    private String getDigestMethodAlgorithm(Element parent) {
+        Element encMethod = getNode(parent, WSConstants.ENC_NS, "EncryptionMethod", 0);
+        if (encMethod != null) {
+            Element digestMethod = getNode(encMethod, WSConstants.SIG_NS, "DigestMethod", 0);
+            if (digestMethod != null) {
+                return digestMethod.getAttributeNS(null, "Algorithm");
+            }
+        }
+        return null;
+    }
+        
+    
+    private byte[] decryptPayload(
+        Element root, byte[] secretKeyBytes, String symEncAlgo
+    ) throws WSSecurityException {
+        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKeyBytes);
+        try {
+            XMLCipher xmlCipher = 
+                EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.DECRYPT_MODE, key);
+            return xmlCipher.decryptToByteArray(root);
+        } catch (XMLEncryptionException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, null, null, ex
+            );
+        }
+    }
 
 }

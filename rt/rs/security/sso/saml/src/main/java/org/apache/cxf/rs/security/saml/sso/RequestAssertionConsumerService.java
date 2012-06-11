@@ -27,6 +27,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
 
@@ -278,8 +279,9 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     ) {
         try {
             SAMLProtocolResponseValidator protocolValidator = new SAMLProtocolResponseValidator();
-            protocolValidator.validateSamlResponse(samlResponse, getSignatureCrypto(), null);
+            protocolValidator.validateSamlResponse(samlResponse, getSignatureCrypto(), getCallbackHandler());
         } catch (WSSecurityException ex) {
+            LOG.log(Level.FINE, ex.getMessage(), ex);
             reportError("INVALID_SAML_RESPONSE");
             throw new WebApplicationException(400);
         }
