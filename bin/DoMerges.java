@@ -260,7 +260,9 @@ public class DoMerges {
         line = reader.readLine();
         while (line != null) {
             int idx = line.indexOf(':');
-            parseRevs(line.substring(idx + 1), blocked);
+            if (idx != -1) {
+                parseRevs(line.substring(idx + 1).trim(), blocked);
+            }
             line = reader.readLine();
         } 
         p.waitFor();
