@@ -31,9 +31,14 @@ public abstract class AbstractWrappedOutputStream extends OutputStream {
 
     protected OutputStream wrappedStream;
     protected boolean written;
+    protected boolean allowFlush = true;
     
     protected AbstractWrappedOutputStream() {
         super();
+    }
+    protected AbstractWrappedOutputStream(OutputStream os) {
+        super();
+        wrappedStream = os;
     }
 
     @Override
@@ -75,8 +80,12 @@ public abstract class AbstractWrappedOutputStream extends OutputStream {
 
     @Override
     public void flush() throws IOException {
-        if (written && wrappedStream != null) {
+        if (written && wrappedStream != null && allowFlush) {
             wrappedStream.flush();
         }
+    }
+    
+    public void allowFlush(boolean b) {
+        this.allowFlush = b;
     }
 }

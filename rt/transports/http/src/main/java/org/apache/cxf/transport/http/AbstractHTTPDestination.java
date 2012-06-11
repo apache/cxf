@@ -699,11 +699,6 @@ public abstract class AbstractHTTPDestination
             }
             */
         }
-        
-        public void flush() throws IOException {
-            //ignore until we close 
-            // or we'll force chunking and cause all kinds of network packets
-        }
     }
 
     protected boolean contextMatchOnExact() {
