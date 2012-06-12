@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.cache;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
@@ -114,15 +115,13 @@ public final class EHCacheManagerHolder {
                 perBus = "true";
             }
             if (Boolean.parseBoolean(perBus)) {
-                conf.setName(bus.getId());
-                if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
-                    
-                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                        + bus.getId();
-                    conf.getDiskStoreConfiguration().setPath(path);
-                }
-            }
             */
+            conf.setName(bus.getId());
+            if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
+                String path = conf.getDiskStoreConfiguration().getPath() + File.separator
+                    + bus.getId();
+                conf.getDiskStoreConfiguration().setPath(path);
+            }
             return CacheManager.create(conf);
         } catch (Throwable t) {
             return null;
