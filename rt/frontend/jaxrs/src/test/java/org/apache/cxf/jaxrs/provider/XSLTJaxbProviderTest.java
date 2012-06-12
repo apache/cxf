@@ -26,15 +26,23 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -87,7 +95,7 @@ public class XSLTJaxbProviderTest extends Assert {
     public void testWrite() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
-        
+        provider.setMessageContext(new MessageContextImpl(createMessage()));
         Book b = new Book();
         b.setId(123L);
         b.setName("TheBook");
@@ -109,7 +117,7 @@ public class XSLTJaxbProviderTest extends Assert {
             }
         };
         provider.setOutTemplate(TEMPLATE_LOCATION);
-        
+        provider.setMessageContext(new MessageContextImpl(createMessage()));
         Book b = new Book();
         b.setId(123L);
         b.setName("TheBook");
@@ -225,4 +233,27 @@ public class XSLTJaxbProviderTest extends Assert {
         assertEquals("Transformation is bad", b, b2);
     }
     
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put(Message.ENDPOINT_ADDRESS, "http://localhost:8080/bar");
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get(Application.class.getName());
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
+    }
 }

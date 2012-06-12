@@ -78,6 +78,7 @@ import org.apache.cxf.systest.jaxrs.jaxws.User;
 import org.apache.cxf.systest.jaxrs.jaxws.UserImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -89,7 +90,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class, true));
+                   launchServer(BookServerRestSoap.class));
     }
     
     @Test
@@ -115,21 +116,41 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testHelloSoapCustomDataBinding() throws Exception {
+    public void testHelloSoapCustomDataBindingJaxb() throws Exception {
+        final String address = "http://localhost:" + PORT + "/test/services/hello-soap-databinding-jaxb";
+        doTestHelloSoapCustomDataBinding(address);
+    }
+    
+    @Test
+    public void testHelloSoapCustomDataBindingJaxbXslt() throws Exception {
+        final String address = "http://localhost:" + PORT + "/test/services/hello-soap-databinding-xslt";
+        doTestHelloSoapCustomDataBinding(address);
+    }
+    
+    private void doTestHelloSoapCustomDataBinding(String address) throws Exception {
         final QName serviceName = new QName("http://hello.com", "HelloWorld");
         final QName portName = new QName("http://hello.com", "HelloWorldPort");
-        final String address = "http://localhost:" + PORT + "/test/services/hello-soap-databinding";
         
         Service service = Service.create(serviceName);
         service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
     
         HelloWorld hw = service.getPort(HelloWorld.class); 
+        
+        Client cl = ClientProxy.getClient(hw);
+        
+        HTTPConduit http = (HTTPConduit) cl.getConduit();
+         
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout(0);
+        httpClientPolicy.setReceiveTimeout(0);
+         
+        http.setClient(httpClientPolicy);
     
         User user = new UserImpl("Barry");
         User user2 = hw.echoUser(user);
         
         assertNotSame(user, user2);
-        assertEquals("Barry", user.getName());
+        assertEquals("Barry", user2.getName());
     }
     
     private void useHelloService(HelloWorld service) {
