@@ -15,7 +15,7 @@
             />
             
      <!--  
-         Security Tokens are now writable to Disk so use a memory only
+         Security Tokens are not writable to Disk so use a memory only
          cache with a bit larger maxEntriesLocalHeap.  However, this
          cache is per-endpoint so not "too large" to not consume the
          entire heap.      
