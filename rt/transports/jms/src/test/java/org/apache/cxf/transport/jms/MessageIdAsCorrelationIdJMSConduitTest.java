@@ -27,7 +27,7 @@ import javax.jms.TextMessage;
 
 
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.message.Exchange;
@@ -54,14 +54,14 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
     private String requestMessageId;
 
     
-    public void sendAndReceive(String replyDestination) {
+    public void sendAndReceive(String replyDestination) throws Exception {
         BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
         EndpointInfo endpointInfo = new EndpointInfo();
         EndpointReferenceType target = new EndpointReferenceType();
 
-        connectionFactory = new ActiveMQConnectionFactory(BROKER_URI);
+        connectionFactory = new PooledConnectionFactory(BROKER_URI);
         
         runReceiver();
 
@@ -79,15 +79,16 @@ public class MessageIdAsCorrelationIdJMSConduitTest {
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         Assert.assertEquals(requestMessageId, headers.getJMSCorrelationID());
         conduit.close();
+        bus.shutdown(true);
     }
 
     @Test
-    public void testSendReceiveWithTempReplyQueue() {
+    public void testSendReceiveWithTempReplyQueue() throws Exception {
         sendAndReceive(null);
     }
     
     @Test
-    public void testSendReceive() {
+    public void testSendReceive() throws Exception {
         sendAndReceive("queue:testreply");
     }
 
