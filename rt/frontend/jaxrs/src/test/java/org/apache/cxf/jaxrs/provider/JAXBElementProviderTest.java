@@ -42,6 +42,7 @@ import java.util.TreeSet;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -66,6 +67,9 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2NoRootElement;
@@ -83,6 +87,11 @@ import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -785,6 +794,7 @@ public class JAXBElementProviderTest extends Assert {
 
         //Provider
         JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setMessageContext(new MessageContextImpl(createMessage()));
         provider.setCollectionWrapperName("tagholders");
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}*", "*");
@@ -1488,5 +1498,29 @@ public class JAXBElementProviderTest extends Assert {
         public XmlList<XmlObject> testJaxb() {
             return null;
         }
+    }
+    
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put(Message.ENDPOINT_ADDRESS, "http://localhost:8080/bar");
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get(Application.class.getName());
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
     }
 }

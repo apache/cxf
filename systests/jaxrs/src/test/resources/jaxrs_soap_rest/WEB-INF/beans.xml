@@ -93,25 +93,46 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
           <entry key="org.apache.cxf.endpoint.private" value="true"/>
       </jaxws:properties>
   </jaxws:endpoint>
-  
   <jaxws:endpoint xmlns:s="http://hello.com"
       serviceName="s:HelloWorld"
       endpointName="s:HelloWorldPort"
       id="hello_soap-databinding"
       implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
-      address="/hello-soap-databinding">
+      address="/hello-soap-databinding-jaxb">
       
       <jaxws:dataBinding>
           <ref bean="jaxrs-data-binding"/>
       </jaxws:dataBinding>
       
-  </jaxws:endpoint>        
-
+  </jaxws:endpoint>
+  
+  <jaxws:endpoint xmlns:s="http://hello.com"
+      serviceName="s:HelloWorld"
+      endpointName="s:HelloWorldPort"
+      id="hello_soap-databinding-xslt"
+      implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
+      address="/hello-soap-databinding-xslt">
+      
+      <jaxws:dataBinding>
+          <ref bean="jaxrs-data-binding-xslt"/>
+      </jaxws:dataBinding>
+      
+  </jaxws:endpoint>
+          
   <bean id="jaxrs-data-binding" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
       <property name="provider" ref="jaxbProviderSoap"/>
   </bean>
-
+  
   <bean id="jaxbProviderSoap" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider"/>
+  
+  <bean id="jaxrs-data-binding-xslt" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
+      <property name="provider" ref="jaxbProviderXslt"/>
+  </bean>
+  
+  <bean id="jaxbProviderXslt" class="org.apache.cxf.jaxrs.provider.XSLTJaxbProvider">
+      <property name="inTemplate" value="classpath:/WEB-INF/template.xsl"/>
+      <property name="outTemplate" value="classpath:/WEB-INF/template.xsl"/>
+  </bean>
 
   <jaxrs:server id="restservice2"
 		        address="/rest2">
