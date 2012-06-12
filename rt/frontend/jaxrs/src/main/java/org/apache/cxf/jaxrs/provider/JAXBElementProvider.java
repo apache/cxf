@@ -503,7 +503,9 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 mc.put(XMLStreamWriter.class.getName(), writer);    
             }
             marshalToWriter(ms, obj, writer, mt);
-            writer.writeEndDocument();
+            if (mc != null) { 
+                writer.writeEndDocument();
+            }
         } else {
             marshalToOutputStream(ms, obj, os, mt);
         }

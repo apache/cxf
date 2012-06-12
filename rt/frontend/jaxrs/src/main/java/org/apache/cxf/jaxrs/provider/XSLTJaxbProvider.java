@@ -194,11 +194,11 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         marshalToOutputStream(ms, obj, out, mt);
         
         StaxUtils.copy(new StreamSource(out.getInputStream()), writer);
-        if (getContext() == null) {
-            writer.writeEndDocument();
-            writer.flush();
-            writer.close();
-        }
+    }
+    
+    @Override
+    protected void addAttachmentMarshaller(Marshaller ms) {
+        // complete
     }
     
     @Override
@@ -211,14 +211,20 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             return;
         }
         
-        TransformerHandler th = factory.newTransformerHandler(
-            createTemplates(getOutTemplates(mt), outParamsMap, outProperties));
+        TransformerHandler th = factory.newTransformerHandler(t);
         Result result = new StreamResult(os);
         if (systemId != null) {
             result.setSystemId(systemId);
         }
         th.setResult(result);
+        
+        if (getContext() == null) {
+            th.startDocument();
+        }
         ms.marshal(obj, th);
+        if (getContext() == null) {
+            th.endDocument();
+        }
     }
     
     public void setOutTemplate(String loc) {
