@@ -279,7 +279,7 @@
                                 <id>setup.workspace</id>
                                 <phase>validate</phase>
                                 <configuration>
-                                    <tasks>
+                                    <target>
                                         <path id="ecp.ws.path" location="${eclipse.workspace.dir}" />
                                         <property name="full.eclipse.workspace" refid="ecp.ws.path" />
 
@@ -347,7 +347,7 @@
                                             <entry key="eclipse.preferences.version" value="1" />
                                             <entry key="org.eclipse.wst.sse.ui.custom_templates" value="${eclipse.xml.templates}" />
                                         </propertyfile>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                                 <goals>
                                     <goal>run</goal>
@@ -550,7 +550,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>1.7</version>
                     <dependencies>
                         <dependency>
                             <groupId>ant-contrib</groupId>
