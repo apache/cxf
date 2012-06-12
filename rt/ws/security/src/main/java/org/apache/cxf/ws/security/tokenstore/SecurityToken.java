@@ -141,10 +141,16 @@ public class SecurityToken implements Serializable {
     
     public SecurityToken(String id) {
         this.id = id;
+        if (this.id != null && this.id.length() > 0 && this.id.charAt(0) == '#') {
+            this.id = this.id.substring(1);
+        }
     }
 
     public SecurityToken(String id, Date created, Date expires) {
         this.id = id;
+        if (this.id != null && this.id.length() > 0 && this.id.charAt(0) == '#') {
+            this.id = this.id.substring(1);
+        }
         if (created != null) {
             this.created = new Date(created.getTime());
         }
@@ -158,6 +164,9 @@ public class SecurityToken implements Serializable {
                  Date created,
                  Date expires) {
         this.id = id;
+        if (this.id != null && this.id.length() > 0 && this.id.charAt(0) == '#') {
+            this.id = this.id.substring(1);
+        }
         this.token = cloneElement(tokenElem);
         if (created != null) {
             this.created = new Date(created.getTime());
@@ -171,6 +180,9 @@ public class SecurityToken implements Serializable {
                  Element tokenElem,
                  Element lifetimeElem) {
         this.id = id;
+        if (this.id != null && this.id.length() > 0 && this.id.charAt(0) == '#') {
+            this.id = this.id.substring(1);
+        }
         this.token = cloneElement(tokenElem);
         if (lifetimeElem != null) {
             processLifeTime(lifetimeElem);
@@ -259,6 +271,9 @@ public class SecurityToken implements Serializable {
      */
     public void setId(String id) {
         this.id = id;
+        if (this.id != null && this.id.length() > 0 && this.id.charAt(0) == '#') {
+            this.id = this.id.substring(1);
+        }
     }
     
     /**
