@@ -18,29 +18,6 @@
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-${project.version}">
 
-
-    <feature name="activemq" version="5.4.2">
-        <!-- The ActiveMQ features.xml that is provided by 5.4.2 does not work with modern Karaf versions -->
-        <!-- Thus, we'll duplicate the main activemq definition here with the 'karaf' stuff removed -->
-        <bundle start-level='10' dependency="true">mvn:org.apache.geronimo.specs/geronimo-annotation_1.0_spec/${cxf.geronimo.annotation.version}</bundle>
-        <bundle start-level='10' dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle> 
-        <bundle start-level='10' dependency="true">mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle> 
-        <bundle start-level='10' dependency="true">mvn:org.apache.geronimo.specs/geronimo-j2ee-management_1.1_spec/1.0.1</bundle> 
-        <bundle start-level='50' dependency="true">mvn:commons-pool/commons-pool/1.5.4</bundle>
-        <bundle start-level='50' dependency="true">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
-        <bundle start-level='50' dependency="true">mvn:commons-collections/commons-collections/${cxf.commons-collections.version}</bundle>
-        <bundle start-level='50' dependency="true">mvn:commons-codec/commons-codec/${cxf.commons-codec.version}</bundle>
-        <bundle start-level='50' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.oro/${cxf.oro.bundle.version}</bundle>
-        <bundle start-level='50' dependency="true">mvn:org.apache.velocity/velocity/${cxf.velocity.version}</bundle>
-        <bundle start-level='50' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jasypt/1.6_1</bundle>
-        <bundle start-level='50'>mvn:org.apache.activemq/activemq-core/5.4.2</bundle> 
-        <bundle start-level='50'>mvn:org.apache.activemq/kahadb/5.4.2</bundle> 
-        <bundle start-level='50'>mvn:org.apache.activemq/activemq-console/5.4.2</bundle>
-        <bundle start-level='50'>mvn:org.apache.activemq/activemq-ra/5.4.2</bundle> 
-        <bundle start-level='50'>mvn:org.apache.activemq/activemq-pool/5.4.2</bundle>
-        <bundle start-level='50'>mvn:org.apache.aries.transaction/org.apache.aries.transaction.manager/0.2-incubating</bundle>
-    </feature>
-
     <feature name="cxf-specs" version="${project.version}" resolver='(obr)'>
         <bundle start-level='9'>mvn:org.apache.geronimo.specs/geronimo-osgi-registry/1.1</bundle>
         <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/${cxf.servicemix.specs.version}</bundle>
