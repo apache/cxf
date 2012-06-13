@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Enumeration;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.apache.cxf.Bus;
@@ -69,7 +71,7 @@ public class CXFServlet extends CXFNonSpringServlet
             }
         }
         if (configLocation != null) {
-            wac = createSpringContext(wac, sc, configLocation);
+            wac = createSpringContext(wac, sc.getServletContext(), configLocation);
         }
         if (wac != null) {
             setBus((Bus)wac.getBean("cxf", Bus.class));
@@ -102,12 +104,24 @@ public class CXFServlet extends CXFNonSpringServlet
      * @return
      */
     private ApplicationContext createSpringContext(ApplicationContext ctx,
-                                                   ServletConfig sc,
+                                                   final ServletContext sc,
                                                    String location) {
         XmlWebApplicationContext ctx2 = new XmlWebApplicationContext();
         createdContext = ctx2;
-        ctx2.setServletConfig(sc);
-
+        ctx2.setServletConfig(new ServletConfig() {
+            public String getServletName() {
+                return "CXF";
+            }
+            public ServletContext getServletContext() {
+                return sc;
+            }
+            public String getInitParameter(String name) {
+                return sc.getInitParameter(name);
+            }
+            public Enumeration<String> getInitParameterNames() {
+                return sc.getInitParameterNames();
+            }
+        });
         Resource r = ctx2.getResource(location);
         try {
             InputStream in = r.getInputStream();

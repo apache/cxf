@@ -18,8 +18,13 @@
  */
 package org.apache.cxf.transport.servlet;
 
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,7 +64,6 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         this.globalRegistry = destinationRegistry != null;
         this.loadBus = loadBus;
     }
-
     @Override
     public void init(ServletConfig sc) throws ServletException {
         super.init(sc);
@@ -69,8 +73,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         if (this.bus != null) {
             loader = bus.getExtension(ClassLoader.class);
             ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
-            resourceManager.addResourceResolver(new ServletContextResourceResolver(
-                                                   sc.getServletContext()));
+            resourceManager.addResourceResolver(new ServletContextResourceResolver(sc.getServletContext()));
             if (destinationRegistry == null) {
                 this.destinationRegistry = getDestinationRegistryFromBus(this.bus);
             }
@@ -97,7 +100,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     protected void loadBus(ServletConfig sc) {
         this.bus = BusFactory.newInstance().createBus();
     }
-
+    
     private ServletController createServletController(ServletConfig servletConfig) {
         HttpServlet serviceListGeneratorServlet = 
             new ServiceListGeneratorServlet(destinationRegistry, bus);
@@ -115,7 +118,29 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public void setBus(Bus bus) {
         this.bus = bus;
     }
-
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
+        ClassLoaderHolder origLoader = null;
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
+            try {
+                if (loader != null) {
+                    origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
+                }
+                if (bus != null) {
+                    BusFactory.setThreadDefaultBus(bus);
+                }
+                if (controller.filter((HttpServletRequest)request, (HttpServletResponse)response)) {
+                    return;
+                }
+            } finally {
+                BusFactory.setThreadDefaultBus(null);
+                if (origLoader != null) {
+                    origLoader.reset();
+                }
+            }
+        }
+        chain.doFilter(request, response);
+    }
     @Override
     protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         ClassLoaderHolder origLoader = null;

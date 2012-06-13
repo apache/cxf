@@ -27,7 +27,7 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			classpath:org/apache/cxf/systest/servlet/restful_service.xml
+			classpath:org/apache/cxf/systest/servlet/spring.xml
 		</param-value>
 	</context-param>
 
@@ -37,19 +37,27 @@
 		</listener-class>
 	</listener>
 	
-	<servlet>
-		<servlet-name>CXFServlet</servlet-name>
-		<display-name>CXF Servlet</display-name>
-		<servlet-class>
-			org.apache.cxf.transport.servlet.CXFServlet
-		</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+	<filter>
+		<filter-name>CXFFilter</filter-name>
+		<display-name>CXFFilter</display-name>
+		<filter-class>org.apache.cxf.transport.servlet.CXFServlet</filter-class>
+	</filter>
 
-	<servlet-mapping>
-		<servlet-name>CXFServlet</servlet-name>
+	<filter-mapping>
+		<filter-name>CXFFilter</filter-name>
 		<url-pattern>/*</url-pattern>
-	</servlet-mapping>
+	</filter-mapping>
 
+
+  <servlet>
+    <servlet-name>Default</servlet-name>
+    <display-name>Default</display-name>
+    <servlet-class>org.apache.cxf.systest.servlet.TestServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Default</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
 
 </web-app>

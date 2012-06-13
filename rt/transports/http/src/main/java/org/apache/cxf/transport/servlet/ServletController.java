@@ -130,8 +130,14 @@ public class ServletController {
             this.serviceListRelativePath = serviceListPath;
         }
     }
-    
+    public boolean filter(HttpServletRequest request, HttpServletResponse res) throws ServletException {
+        return invoke(request, res, false);
+    }    
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
+        invoke(request, res, true);
+    }
+    public boolean invoke(HttpServletRequest request, HttpServletResponse res, boolean returnErrors)
+        throws ServletException {
         try {
             String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
             AbstractHTTPDestination d = destinationRegistry.getDestinationForPath(pathInfo, true);
@@ -146,9 +152,12 @@ public class ServletController {
                 } else {
                     d = destinationRegistry.checkRestfulRequest(pathInfo);
                     if (d == null || d.getMessageObserver() == null) {
-                        LOG.warning("Can't find the the request for "
-                                    + request.getRequestURL() + "'s Observer ");
-                        generateNotFound(request, res);
+                        if (returnErrors) {
+                            LOG.warning("Can't find the the request for "
+                                + request.getRequestURL() + "'s Observer ");
+                            generateNotFound(request, res);
+                        }
+                        return false;
                     }  else { // the request should be a restful service request
                         updateDestination(request, d);
                         invokeDestination(request, res, d);
@@ -185,7 +194,7 @@ public class ServletController {
                         
                         if (selectedHandler != null) {
                             respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
-                            return;
+                            return true;
                         }
                     } else {
                         updateDestination(request, d);
@@ -196,11 +205,11 @@ public class ServletController {
                         orig.reset();
                     }
                 }
-                
             }
         } catch (IOException e) {
             throw new ServletException(e);
         }
+        return true;
     }
 
     public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,

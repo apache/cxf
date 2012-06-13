@@ -21,11 +21,14 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -42,8 +45,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 
-
-public abstract class AbstractHTTPServlet extends HttpServlet {
+public abstract class AbstractHTTPServlet extends HttpServlet implements Filter {
     
     private static final long serialVersionUID = -8357252743467075117L;
 
@@ -88,7 +90,23 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         dispatcherServletName = servletConfig.getInitParameter(REDIRECT_SERVLET_NAME_PARAMETER);
         dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
     }
-    
+    public final void init(final FilterConfig filterConfig) throws ServletException {
+        init(new ServletConfig() {
+            public String getServletName() {
+                return filterConfig.getFilterName();
+            }
+            public ServletContext getServletContext() {
+                return filterConfig.getServletContext();
+            }
+            public String getInitParameter(String name) {
+                return filterConfig.getInitParameter(name);
+            }
+            public Enumeration<String> getInitParameterNames() {
+                return filterConfig.getInitParameterNames();
+            }
+        });
+    }
+
     private static List<String> parseListSequence(String values) {
         if (values != null) {
             List<String> list = new LinkedList<String>();
@@ -256,6 +274,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed");
         }   
     }
+    
     
     protected abstract void invoke(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException;
