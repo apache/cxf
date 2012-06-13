@@ -365,7 +365,7 @@ public class WadlGeneratorTest extends Assert {
         int size = book2El == null ? 2 : 3;
         
         assertEquals(size, elementEls.size());
-        String prefix = !customPrefix ? "tns" : "os";
+        String prefix = "tns";
         assertTrue(checkElement(elementEls, bookEl, prefix + ":book"));
         if (book2El != null) {
             assertTrue(checkElement(elementEls, book2El, prefix + ":book2"));
