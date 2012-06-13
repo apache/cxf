@@ -306,8 +306,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
     }
 
     /**
-     * Construct a token containing the secret to return to the client. If encryptIssuedToken is set
-     * then the token is wrapped in an EncryptedKey DOM element, otherwise it is returned in a 
+     * Construct a token containing the secret to return to the client. The secret is returned in a 
      * BinarySecretType JAXBElement.
      */
     private Object constructSecretToken(
@@ -315,17 +314,17 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             EncryptionProperties encryptionProperties, 
             KeyRequirements keyRequirements
     ) throws WSSecurityException {
-        if (encryptIssuedToken) {
+        /*if (encryptIssuedToken) {
             return encryptSecret(secret, encryptionProperties, keyRequirements);
         } else {
-            BinarySecretType binarySecretType = QNameConstants.WS_TRUST_FACTORY.createBinarySecretType();
-            String nonce = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Nonce";
-            binarySecretType.setType(nonce);
-            binarySecretType.setValue(secret);
-            JAXBElement<BinarySecretType> binarySecret = 
+        */
+        BinarySecretType binarySecretType = QNameConstants.WS_TRUST_FACTORY.createBinarySecretType();
+        String nonce = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Nonce";
+        binarySecretType.setType(nonce);
+        binarySecretType.setValue(secret);
+        JAXBElement<BinarySecretType> binarySecret = 
                 QNameConstants.WS_TRUST_FACTORY.createBinarySecret(binarySecretType);
-            return binarySecret;
-        }
+        return binarySecret;
     }
 
 }
