@@ -68,7 +68,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;

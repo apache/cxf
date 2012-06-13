@@ -300,7 +300,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             name = wrapperMap.get(cls.getName());
         }
         if (name == null) {
-            QName qname = getQName(cls, type, null, false);
+            QName qname = getQName(cls, type, null);
             if (qname != null) {
                 name = qname.getLocalPart();
                 String prefix = qname.getPrefix();
@@ -473,7 +473,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
-        QName qname = getQName(actualClass, genericType, actualObject, true);
+        QName qname = getQName(actualClass, genericType, actualObject);
         if (ignoreNamespaces && (isCollection  || dropRootElement)) {        
             qname = new QName(qname.getLocalPart());
         }
@@ -510,27 +510,19 @@ public class JSONProvider extends AbstractJAXBProvider  {
         marshal(ms, actualObject, actualClass, genericType, enc, os, false);
     }
     
-    private QName getQName(Class<?> cls, Type type, Object object, boolean allocatePrefix) 
+    private QName getQName(Class<?> cls, Type type, Object object) 
         throws Exception {
         QName qname = getJaxbQName(cls, type, object, false);
         if (qname != null) {
-            String prefix = getPrefix(qname.getNamespaceURI(), allocatePrefix);
+            String prefix = getPrefix(qname.getNamespaceURI());
             return new QName(qname.getNamespaceURI(), qname.getLocalPart(), prefix);
         }
         return null;
     }
     
-    private String getPrefix(String namespace, boolean allocatePrefix) {
+    private String getPrefix(String namespace) {
         String prefix = namespaceMap.get(namespace);
-        if (prefix == null) {
-            if (allocatePrefix && namespace.length() > 0) {
-                prefix = "ns" + (namespaceMap.size() + 1);
-                namespaceMap.put(namespace, prefix);
-            } else {
-                prefix = "";
-            }
-        }
-        return prefix;
+        return prefix == null ? "" : prefix;
     }
     
     public void setWriteXsiType(boolean writeXsiType) {

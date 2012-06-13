@@ -127,7 +127,7 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter", false);
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
     }
@@ -235,7 +235,7 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
-        checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter");
+        checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter", false);
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:book", "prefix1:book2", "prefix1:chapter");
     }
@@ -253,7 +253,7 @@ public class WadlGeneratorTest extends Assert {
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter", true);
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "ns1:thebook", "ns1:thebook2", "ns1:thechapter");
     }
@@ -309,7 +309,7 @@ public class WadlGeneratorTest extends Assert {
         
         verifyParameters(resourceEls.get(0), 1, new Param("id", "template", "xs:int"));
         
-        checkGrammars(doc.getDocumentElement(), "thebook", null, "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", null, "thechapter", false);
     }
     
     private void checkResponse(Response r) throws Exception {
@@ -342,16 +342,16 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         String wadl = r.getEntity().toString();
-        //System.out.println(wadl);
         Document doc = DOMUtils.readXml(new StringReader(wadl));
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter", true);
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
         Element orderResource = els.get(1);
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
-    private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl) {
+    private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl, 
+                               boolean customPrefix) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
@@ -365,11 +365,12 @@ public class WadlGeneratorTest extends Assert {
         int size = book2El == null ? 2 : 3;
         
         assertEquals(size, elementEls.size());
-        assertTrue(checkElement(elementEls, bookEl, "tns:book"));
+        String prefix = !customPrefix ? "tns" : "os";
+        assertTrue(checkElement(elementEls, bookEl, prefix + ":book"));
         if (book2El != null) {
-            assertTrue(checkElement(elementEls, book2El, "tns:book2"));
+            assertTrue(checkElement(elementEls, book2El, prefix + ":book2"));
         }
-        assertTrue(checkElement(elementEls, chapterEl, "tns:chapter"));
+        assertTrue(checkElement(elementEls, chapterEl, prefix + ":chapter"));
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                                         XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
