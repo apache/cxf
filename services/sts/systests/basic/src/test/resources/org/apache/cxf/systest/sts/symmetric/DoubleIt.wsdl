@@ -70,6 +70,10 @@
 			<soap:address
 				location="http://localhost:8082/doubleit/services/doubleitsymmetricsaml2" />
 		</wsdl:port>
+		<wsdl:port name="DoubleItSymmetricSAML1EncryptedPort" binding="tns:DoubleItSymmetricSAML1Binding">
+            <soap:address
+                location="http://localhost:8082/doubleit/services/doubleitsymmetricsaml1encrypted" />
+        </wsdl:port>
 	</wsdl:service>
 	
 	<wsp:Policy wsu:Id="DoubleItSymmetricBindingSAML1Policy">

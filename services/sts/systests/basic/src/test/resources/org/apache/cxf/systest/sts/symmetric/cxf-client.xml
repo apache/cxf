@@ -89,5 +89,32 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
        </jaxws:properties>
    </jaxws:client>
    
+   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML1EncryptedPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/UTEncrypted?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UTEncrypted_Port"/>
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.username" value="alice"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.username" value="mystskey"/>
+                           <entry key="ws-security.is-bsp-compliant" value="false"/>
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+   </jaxws:client>
+   
 </beans>
 

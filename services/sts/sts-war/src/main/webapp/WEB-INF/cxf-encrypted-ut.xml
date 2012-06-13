@@ -51,7 +51,7 @@
 	</bean>
 
 	<util:list id="encryptedUtEndpoints">
-		<value>http://localhost:(\d)*/doubleit/services/doubleitasymmetricsaml1encrypted
+		<value>http://localhost:(\d)*/doubleit/services/doubleit(a)?symmetricsaml1encrypted
 		</value>
 	</util:list>
 	
