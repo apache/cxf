@@ -590,6 +590,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteToSingleQualifiedTag2() throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
+        p.setNamespaceMap(Collections.singletonMap("http://tags", "ns1"));
         TagVO2 tag = createTag2("a", "b");
         
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -598,7 +599,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        
         assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
         
     }
@@ -997,6 +997,20 @@ public class JSONProviderTest extends Assert {
     
     
     @Test
+    public void testWriteWithXmlRootElementAndPackageInfo() throws Exception {
+        JSONProvider<org.apache.cxf.jaxrs.resources.jaxb.Book2> provider = 
+            new JSONProvider<org.apache.cxf.jaxrs.resources.jaxb.Book2>();
+        org.apache.cxf.jaxrs.resources.jaxb.Book2 book = 
+            new org.apache.cxf.jaxrs.resources.jaxb.Book2(333);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(book, org.apache.cxf.jaxrs.resources.jaxb.Book2.class, 
+                         org.apache.cxf.jaxrs.resources.jaxb.Book2.class,
+                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        assertEquals("{\"os.thebook2\":{\"id\":333}}", bos.toString());
+    }
+    
+    @Test
     public void testDropQualifiedElements() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
         List<String> list = new ArrayList<String>();
@@ -1051,7 +1065,7 @@ public class JSONProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO2.class, TagVO2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        String expected = "{\"ns1.t\":{\"ns1.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        String expected = "{\"ns2.t\":{\"ns2.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
         assertEquals(expected, bos.toString());
     }
     
@@ -1065,7 +1079,7 @@ public class JSONProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO2.class, TagVO2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        String expected = "{\"ps1.t\":{\"ns1.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        String expected = "{\"ps1.t\":{\"ns2.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
         assertEquals(expected, bos.toString());
     }
     
