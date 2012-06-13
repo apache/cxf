@@ -71,7 +71,7 @@
         </dependency>
         <dependency>
            <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-jsp-2.1</artifactId>
+           <artifactId>jetty-jsp</artifactId>
            <version>${cxf.jetty.version}</version>
         </dependency>
         <dependency>
