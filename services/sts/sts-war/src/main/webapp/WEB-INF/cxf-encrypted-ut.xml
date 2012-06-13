@@ -49,6 +49,7 @@
 		<property name="tokenProviders" ref="encryptedUtSamlTokenProvider" />
 		<property name="services" ref="encryptedUtService" />
 		<property name="stsProperties" ref="encryptedUtSTSProperties" />
+		<property name="encryptIssuedToken" value="true" />
 	</bean>
 
 	<bean id="encryptedUtValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
@@ -65,6 +66,11 @@
 		<value>http://localhost:(\d)*/doubleit/services/doubleitasymmetricsaml1encrypted
 		</value>
 	</util:list>
+	
+	<bean id="encProperties" class="org.apache.cxf.sts.service.EncryptionProperties">
+        <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+        <property name="keyWrapAlgorithm" value="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p" />
+    </bean>
 
 	<bean id="encryptedUtSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
 		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
@@ -72,6 +78,7 @@
 		<property name="callbackHandlerClass"
 			value="org.apache.cxf.sts.war.PasswordCallbackHandler" />
 		<property name="encryptionPropertiesFile" value="stsKeystore.properties" />
+		<property name="encryptionProperties" ref="encProperties" />
 		<property name="issuer" value="DoubleItSTSIssuer" />
 		<property name="encryptionUsername" value="myservicekey" />
 	</bean>
