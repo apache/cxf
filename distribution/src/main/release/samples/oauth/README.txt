@@ -5,7 +5,7 @@ The OAuth 1.0a demo that shows protocol's flow between OAuth parties. Demo conta
     client:
             A web application capable of making OAuth-authenticated requests. It is a usual OAuth client,
             not dependent on Apache CXF framework, built to test this demo server part and for OAuth
-            educational purposes. Implementation works with any OAuth 1.0a providers, not only inluded
+            educational purposes. Implementation works with any OAuth 1.0a providers, not only included
             in this demo.
 
 
@@ -39,7 +39,7 @@ Building and running the demo using maven
             Port number is defined in pom.xml.
 
 			
-	Both client and server modules sepends on Spring 3, so you need to use CXF spring3 profile.
+	Both client and server modules depend on Spring 3, so you need to use CXF spring3 profile.
 	You can build both client and server modules using command: 
 			
 			mvn clean install
@@ -54,7 +54,7 @@ When you have successfully deployed client and server you can start with OAuth s
 3. You have registered client application at the OAuth server, with associated and displayed
   client identifier, client shared-secret and callback url. You will need those on the client side.
 4. Go to OAuth client demo (http://localhost:8080) and provide information about the registered application.
-5. Perform usuall OAuth 1.0 flow steps
+5. Perform usual OAuth 1.0 flow steps
 
 
 

@@ -3,7 +3,7 @@ JAX-WS Dispatch/Provider Demo
 
 The demo demonstrates the use of JAX-WS Dispatch and Provider interface.
 The client side Dispatch instance invokes upon an endpoint using a JAX-WS 
-Provider implementor. There are three differnt invocations from the client. 
+Provider implementor. There are three different invocations from the client. 
 The first uses the SOAPMessage data in MESSAGE mode. The second uses the DOMSource 
 data in MESSAGE mode. The third uses the DOMSource in PAYLOAD mode. The three 
 different messages are constructed by reading in the XML files found in the 
