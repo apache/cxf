@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.ext.form;
 
+import java.io.ByteArrayOutputStream;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -50,4 +52,14 @@ public class Form {
         return map;
     }
     
+    public String toString() {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            FormUtils.writeMapToOutputStream(map, bos, "UTF-8", false);
+            return bos.toString("UTF-8");
+        } catch (Exception ex) {
+            // will not happen
+        }
+        return "";
+    }
 }
