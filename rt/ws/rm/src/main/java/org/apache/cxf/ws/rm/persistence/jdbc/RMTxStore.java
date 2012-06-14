@@ -107,10 +107,13 @@ public class RMTxStore implements RMStore {
                                   MESSAGES_TABLE_COLS, MESSAGES_TABLE_KEYS);
 
     private static final String CREATE_DEST_SEQUENCE_STMT_STR 
-        = "INSERT INTO CXF_RM_DEST_SEQUENCES (SEQ_ID, ACKS_TO, ENDPOINT_ID, PROTOCOL_VERSION) " 
+        = "INSERT INTO CXF_RM_DEST_SEQUENCES "
+            + "(SEQ_ID, ACKS_TO, ENDPOINT_ID, PROTOCOL_VERSION) " 
             + "VALUES(?, ?, ?, ?)";
     private static final String CREATE_SRC_SEQUENCE_STMT_STR
-        = "INSERT INTO CXF_RM_SRC_SEQUENCES VALUES(?, 1, '0', ?, ?, ?, ?)";
+        = "INSERT INTO CXF_RM_SRC_SEQUENCES "
+            + "(SEQ_ID, CUR_MSG_NO, LAST_MSG, EXPIRY, OFFERING_SEQ_ID, ENDPOINT_ID, PROTOCOL_VERSION) "
+            + "VALUES(?, 1, '0', ?, ?, ?, ?)";
     private static final String DELETE_DEST_SEQUENCE_STMT_STR =
         "DELETE FROM CXF_RM_DEST_SEQUENCES WHERE SEQ_ID = ?";
     private static final String DELETE_SRC_SEQUENCE_STMT_STR =
@@ -120,7 +123,7 @@ public class RMTxStore implements RMStore {
     private static final String UPDATE_SRC_SEQUENCE_STMT_STR =
         "UPDATE CXF_RM_SRC_SEQUENCES SET CUR_MSG_NO = ?, LAST_MSG = ? WHERE SEQ_ID = ?";
     private static final String CREATE_MESSAGE_STMT_STR 
-        = "INSERT INTO {0} VALUES(?, ?, ?, ?)";
+        = "INSERT INTO {0} (SEQ_ID, MSG_NO, SEND_TO, CONTENT) VALUES(?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
     private static final String SELECT_DEST_SEQUENCE_STMT_STR =
@@ -984,7 +987,7 @@ public class RMTxStore implements RMStore {
         return connection;
     }
 
-    private void verifyConnection() {
+    protected synchronized void verifyConnection() {
         if (createdConnection && nextReconnectAttempt > 0
             && (maxReconnectAttempts < 0 || maxReconnectAttempts > reconnectAttempts)) {
             if (System.currentTimeMillis() > nextReconnectAttempt) {
@@ -1001,7 +1004,7 @@ public class RMTxStore implements RMStore {
         }
     }
 
-    private synchronized void updateConnectionState(SQLException e) {
+    protected synchronized void updateConnectionState(SQLException e) {
         if (e == null) {
             // reset the previous error status
             reconnectDelay = 0;
