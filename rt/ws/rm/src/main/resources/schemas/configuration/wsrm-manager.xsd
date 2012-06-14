@@ -192,6 +192,22 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
+          <xs:attribute name="initialReconnectDelay" type="xs:long" default="60000">
+            <xs:annotation>
+              <xs:documentation>
+                  The initialy delay before attempting to reconnect to the database. The subsequent
+                  delay follows the exponential backoff algorithm.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="maxReconnectAttempts" type="xs:int" default="10">
+            <xs:annotation>
+              <xs:documentation>
+                  The maximum number of attemps taken to reconnect to the database after a connection error.
+                  The value of 0 indicates no attempt, while a negative value indicates no limit. 
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
