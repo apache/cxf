@@ -1,2 +1,2 @@
 org.apache.cxf.bus.spring.SpringBusFactory
-org.springframework.context.ApplicationContext
+org.springframework.context.ApplicationContext,org.springframework.beans.factory.xml.NamespaceHandlerResolver
