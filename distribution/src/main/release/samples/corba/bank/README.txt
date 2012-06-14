@@ -3,7 +3,7 @@ CORBA Bank Demo
 
 This demo illustrates the user of JAX-WS API's for creating a service
 that uses the CORBA/IIOP protocol for communication.  It also 
-shows throwing exceptions accross that connection.
+shows throwing exceptions across that connection.
 
 Please review the README in the samples main directory before continuing.
 

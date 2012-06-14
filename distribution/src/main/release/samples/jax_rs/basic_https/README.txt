@@ -18,7 +18,7 @@ certificates.
 Likewise the client authenticates the server's certificate "CN=Cherry"
 and chain against the same trust store.  Note also the usage of the
 cipherSuitesFilter configuration in the configuration files,
-where each party imposes different ciphersuites contraints, so that the
+where each party imposes different ciphersuites constraints, so that the
 ciphersuite eventually negotiated during the TLS handshake is acceptable
 to both sides. This may be viewed by adding a -Djavax.net.debug=all 
 argument to the JVM.
