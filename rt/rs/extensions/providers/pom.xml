@@ -37,6 +37,7 @@
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
         </cxf.osgi.import>
+        <dom4j.version>1.6.1</dom4j.version>
     </properties>
 
     <dependencies>
@@ -86,6 +87,13 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>${dom4j.version}</version>
+			<scope>provided</scope>
+            <optional>true</optional>
+		</dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
