@@ -192,7 +192,7 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
-          <xs:attribute name="initialReconnectDelay" type="xs:long" default="60000">
+          <xs:attribute name="initialReconnectDelay" type="xs:long">
             <xs:annotation>
               <xs:documentation>
                   The initialy delay before attempting to reconnect to the database. The subsequent
@@ -200,7 +200,7 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
-          <xs:attribute name="maxReconnectAttempts" type="xs:int" default="10">
+          <xs:attribute name="maxReconnectAttempts" type="xs:int">
             <xs:annotation>
               <xs:documentation>
                   The maximum number of attemps taken to reconnect to the database after a connection error.
