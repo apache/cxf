@@ -34,6 +34,8 @@ public class CachedOutClientPersistenceTest extends AbstractClientPersistenceTes
     
     @BeforeClass
     public static void startServers() throws Exception {
+        RMTxStore.deleteDatabaseFiles("cocpt-server", true);
+        RMTxStore.deleteDatabaseFiles("cocpt-client", true);
         startServers(PORT, "cocpt");
         CachedOutputStream.setDefaultThreshold(16);
     }
@@ -41,8 +43,8 @@ public class CachedOutClientPersistenceTest extends AbstractClientPersistenceTes
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
-        RMTxStore.deleteDatabaseFiles("cocpt-server", true);
-        RMTxStore.deleteDatabaseFiles("cocpt-client", true);
+        RMTxStore.deleteDatabaseFiles("cocpt-server", false);
+        RMTxStore.deleteDatabaseFiles("cocpt-client", false);
     }
     
     @Test 

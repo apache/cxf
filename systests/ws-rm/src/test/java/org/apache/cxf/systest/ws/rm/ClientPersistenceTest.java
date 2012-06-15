@@ -35,14 +35,16 @@ public class ClientPersistenceTest extends AbstractClientPersistenceTest {
     
     @BeforeClass
     public static void startServers() throws Exception {
+        RMTxStore.deleteDatabaseFiles("cpt-server", true);
+        RMTxStore.deleteDatabaseFiles("cpt-client", true);
         startServers(PORT, "cpt");
     }
     
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
-        RMTxStore.deleteDatabaseFiles("cpt-server", true);
-        RMTxStore.deleteDatabaseFiles("cpt-client", true);
+        RMTxStore.deleteDatabaseFiles("cpt-server", false);
+        RMTxStore.deleteDatabaseFiles("cpt-client", false);
     }
    
     @Test 

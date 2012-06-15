@@ -35,6 +35,8 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
    
     @BeforeClass
     public static void setProperties() throws Exception {
+        RMTxStore.deleteDatabaseFiles("cospt-recovery", true);
+        RMTxStore.deleteDatabaseFiles("cospt-server", true);
         startServers(PORT, "cospt");
         CachedOutputStream.setDefaultThreshold(16);
     }
@@ -42,8 +44,8 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
-        RMTxStore.deleteDatabaseFiles("cospt-recovery", true);
-        RMTxStore.deleteDatabaseFiles("cospt-server", true);
+        RMTxStore.deleteDatabaseFiles("cospt-recovery", false);
+        RMTxStore.deleteDatabaseFiles("cospt-server", false);
     }
 
     @Test 
