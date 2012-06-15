@@ -505,6 +505,12 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             CachedOutputStream saved = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
             if (saved != null) {
                 saved.releaseTempFileHold();
+                // call close to dispose
+                try {
+                    saved.close();
+                } catch (IOException e) {
+                    // ignore
+                }
             }
 
         }
