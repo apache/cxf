@@ -871,7 +871,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         } catch (Exception e) {
             assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
             if ("322".equals(param)) {
-                //In interecptors not called when checked exception thrown from server
+                //In interceptors not called when checked exception thrown from server
                 assertTrue("In Interceptor not invoked", testFeature.handleMessageOnInInterceptorCalled());
             } else {
                 assertTrue("In Interceptor not invoked", !testFeature.handleMessageOnInInterceptorCalled());
