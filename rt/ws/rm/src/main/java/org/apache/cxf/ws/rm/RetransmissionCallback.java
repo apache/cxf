@@ -48,6 +48,7 @@ public class RetransmissionCallback implements CachedOutputStreamCallback {
         saved.holdTempFile();
         try {
             cos.writeCacheTo(saved);            
+            saved.lockOutputStream();
         } catch (IOException e) {
             // ignore
         }

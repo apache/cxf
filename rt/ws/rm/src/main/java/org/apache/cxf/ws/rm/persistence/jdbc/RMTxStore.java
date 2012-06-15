@@ -733,16 +733,28 @@ public class RMTxStore implements RMStore {
             LOG.log(Level.FINE, "Storing {0} message number {1} for sequence {2}, to = {3}",
                     new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
         }
-        PreparedStatement stmt = outbound ? createOutboundMessageStmt : createInboundMessageStmt;
-        int i = 1;
-        stmt.setString(i++, id);  
-        stmt.setLong(i++, nr);
-        stmt.setString(i++, to); 
-        stmt.setBinaryStream(i++, msg.getInputStream(), (int)msg.getSize());
-        stmt.execute();
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
-                    new Object[] {outbound ? "outbound" : "inbound", nr, id});
+        InputStream msgin = null;
+        try {
+            msgin = msg.getInputStream();
+            PreparedStatement stmt = outbound ? createOutboundMessageStmt : createInboundMessageStmt;
+            int i = 1;
+            stmt.setString(i++, id);  
+            stmt.setLong(i++, nr);
+            stmt.setString(i++, to); 
+            stmt.setBinaryStream(i++, msgin, (int)msg.getSize());
+            stmt.execute();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
+                        new Object[] {outbound ? "outbound" : "inbound", nr, id});
+            }
+        } finally  {
+            if (msgin != null) {
+                try {
+                    msgin.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
         }
         
     }
