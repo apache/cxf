@@ -38,13 +38,15 @@ public class ServerPersistenceTest extends AbstractServerPersistenceTest {
     }
     @BeforeClass
     public static void startServers() throws Exception {
+        RMTxStore.deleteDatabaseFiles("spt-recovery", true);
+        RMTxStore.deleteDatabaseFiles("spt-rmdb", true);
         startServers(PORT, "spt");
     }
     
     @AfterClass
     public static void cleanup() throws Exception {
-        RMTxStore.deleteDatabaseFiles("spt-recovery", true);
-        RMTxStore.deleteDatabaseFiles("spt-rmdb", true);
+        RMTxStore.deleteDatabaseFiles("spt-recovery", false);
+        RMTxStore.deleteDatabaseFiles("spt-rmdb", false);
     }
     
     public String getPrefix() {
