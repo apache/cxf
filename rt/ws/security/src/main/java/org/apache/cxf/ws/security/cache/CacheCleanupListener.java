@@ -22,13 +22,10 @@ package org.apache.cxf.ws.security.cache;
 import java.io.Closeable;
 import java.io.IOException;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
-import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
-import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -39,16 +36,9 @@ import org.apache.ws.security.cache.ReplayCache;
  */
 public class CacheCleanupListener implements ServerLifeCycleListener, ClientLifeCycleListener {
     
-    public CacheCleanupListener(Bus b) {
-        ServerLifeCycleManager m = b.getExtension(ServerLifeCycleManager.class);
-        if (m != null) {
-            m.registerListener(this);
-        }
-        ClientLifeCycleManager cm = b.getExtension(ClientLifeCycleManager.class);
-        if (cm != null) {
-            cm.registerListener(this);
-        }
+    public CacheCleanupListener() {
     }
+    
     public void clientCreated(Client client) {
     }
     public void startServer(Server server) {
