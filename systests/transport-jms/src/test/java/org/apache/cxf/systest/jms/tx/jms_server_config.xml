@@ -46,9 +46,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     </jms:destination>
     
   
-  <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-  	p:brokerURL="${EmbeddedBrokerURL}"
-  />
+  <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+  	<constructor-arg value="${EmbeddedBrokerURL}"/>
+  </bean>
   
   <bean id="singleConnectionFactory"
     class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">

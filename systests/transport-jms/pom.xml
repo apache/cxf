@@ -252,6 +252,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-pool</artifactId>
+            <version>${cxf.activemq.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>${cxf.asm.groupId}</groupId>
             <artifactId>${cxf.asm.artifactId}</artifactId>
         </dependency>

@@ -24,6 +24,7 @@ import java.net.URL;
 import javax.jms.ConnectionFactory;
 import javax.xml.namespace.QName;
 
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -118,7 +119,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
 
         JMSConfiguration jmsConfig = new JMSConfiguration();
         ConnectionFactory connectionFactory
-            = new org.apache.activemq.ActiveMQConnectionFactory(broker.getBrokerURL());
+            = new PooledConnectionFactory(broker.getBrokerURL());
         jmsConfig.setConnectionFactory(connectionFactory);
         jmsConfig.setTargetDestination("greeter.queue.noaop");
         jmsConfig.setPubSubDomain(false);
