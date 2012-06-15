@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
@@ -46,6 +47,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -74,7 +76,6 @@ import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.http.HTTPConduit;
 
 /**
  * Common proxy and http-centric client implementation
@@ -316,17 +317,25 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection)outMessage.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        
-        if (conn == null) {
-            throw new ClientWebApplicationException("HTTP Connection is null"); 
-        }
         checkClientException(exchange.getOutMessage(), exchange.getOutMessage().getContent(Exception.class));
         
         int status = (Integer)exchange.get(Message.RESPONSE_CODE);
         ResponseBuilder currentResponseBuilder = Response.status(status);
         
-        for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+        Message responseMessage = exchange.getInMessage() != null 
+            ? exchange.getInMessage() : exchange.getInFaultMessage();
+        // if there is no response message, we just send the response back directly
+        if (responseMessage == null) {
+            ResponseBuilder rb = currentResponseBuilder.clone();
+            state.setResponseBuilder(currentResponseBuilder);
+            return rb;
+        }
+                
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> protocolHeaders = 
+            (Map<String, List<String>>)responseMessage.get(Message.PROTOCOL_HEADERS);
+                
+        for (Map.Entry<String, List<String>> entry : protocolHeaders.entrySet()) {
             if (null == entry.getKey()) {
                 continue;
             }
@@ -357,27 +366,9 @@ public abstract class AbstractClient implements Client, Retryable {
                 }
             }
         }
-        InputStream mStream = null;
+        InputStream mStream = responseMessage.getContent(InputStream.class);
+        currentResponseBuilder.entity(mStream);
         
-        Message inMessage = exchange.getInMessage();
-        if (inMessage != null) {
-            mStream = inMessage.getContent(InputStream.class);
-        }
-        if (status >= 400) {
-            try {
-                InputStream errorStream = mStream == null ? conn.getErrorStream() : mStream;
-                currentResponseBuilder.entity(errorStream);
-            } catch (Exception ex) {
-                // nothing we can do really
-            }
-        } else {
-            try {
-                InputStream stream = mStream == null ? conn.getInputStream() : mStream;
-                currentResponseBuilder.entity(stream);
-            } catch (Exception ex) {
-                // it may that the successful response has no response body
-            }
-        }
         ResponseBuilder rb = currentResponseBuilder.clone();
         state.setResponseBuilder(currentResponseBuilder);
         return rb;
@@ -413,12 +404,20 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     @SuppressWarnings("unchecked")
-    protected Object readBody(Response r, Message inMessage, Class<?> cls, 
-                              Type type, Annotation[] anns) {
-
+    protected Object readBody(Response r, Message outMessage, Class<?> cls, 
+                             Type type, Annotation[] anns) {
         InputStream inputStream = (InputStream)r.getEntity();
         if (inputStream == null) {
-            return cls == Response.class ? r : null;
+            Message responseMessage = outMessage.getExchange().getInMessage();
+            if (responseMessage == null) {
+                responseMessage = outMessage.getExchange().getInFaultMessage();    
+            }    
+            if (responseMessage == null
+                || responseMessage.getContent(XMLStreamReader.class) == null
+                    && responseMessage.getContent(Reader.class) == null) {
+            
+                return cls == Response.class ? cls.cast(r) : null;
+            }
         }
         
         int status = r.getStatus();
@@ -432,8 +431,8 @@ public abstract class AbstractClient implements Client, Retryable {
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
-            cls, type, anns, contentType, inMessage);
+        MessageBodyReader mbr = ProviderFactory.getInstance(outMessage).createMessageBodyReader(
+            cls, type, anns, contentType, outMessage);
         if (mbr != null) {
             try {
                 return mbr.readFrom(cls, type, anns, contentType, 
