@@ -1776,6 +1776,7 @@ public abstract class AbstractBindingBuilder {
             : getSignatureCrypto(wrapper);
         
         if (endorse && crypto == null && binding instanceof SymmetricBinding) {
+            type = "encryption";
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
             crypto = getEncryptionCrypto(wrapper);
         }
@@ -1784,17 +1785,25 @@ public abstract class AbstractBindingBuilder {
             message.getExchange().put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
         }
         String user = (String)message.getContextualProperty(userNameKey);
-        if (crypto != null && StringUtils.isEmpty(user)) {
-            try {
-                user = crypto.getDefaultX509Identifier();
-            } catch (WSSecurityException e1) {
-                LOG.log(Level.FINE, e1.getMessage(), e1);
-                throw new Fault(e1);
-            }
-        }
         if (StringUtils.isEmpty(user)) {
-            policyNotAsserted(token, "No " + type + " username found.");
-            return null;
+            if (crypto != null) {
+                try {
+                    user = crypto.getDefaultX509Identifier();
+                    if (StringUtils.isEmpty(user)) {
+                        policyNotAsserted(token, "No configured " + type + " username detected");
+                        return null;
+                    }
+                } catch (WSSecurityException e1) {
+                    LOG.log(Level.FINE, e1.getMessage(), e1);
+                    throw new Fault(e1);
+                }
+            } else {
+                policyNotAsserted(token, "Security configuration could not be detected. "
+                    + "Potential cause: Make sure jaxws:client element with name " 
+                    + "attribute value matching endpoint port is defined as well as a " 
+                    + SecurityConstants.SIGNATURE_PROPERTIES + " element within it.");
+                return null;
+            }
         }
 
         String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
@@ -1811,27 +1820,31 @@ public abstract class AbstractBindingBuilder {
         }
         
         if (alsoIncludeToken) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(user);
-            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-            BinarySecurity bstToken = null;
-            if (!sig.isUseSingleCertificate()) {
-                bstToken = new PKIPathSecurity(saaj.getSOAPPart());
-                ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
-            } else {
-                bstToken = new X509Security(saaj.getSOAPPart());
-                ((X509Security) bstToken).setX509Certificate(certs[0]);
-            }
-            bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", certs[0]));
-            WSSecurityUtil.prependChildElement(
-                secHeader.getSecurityHeader(), bstToken.getElement()
-            );
-            bstElement = bstToken.getElement();
+            includeToken(user, crypto, sig);
         }
         
         return sig;
     }
 
+    private void includeToken(String user, Crypto crypto, WSSecSignature sig) throws WSSecurityException {
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias(user);
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        BinarySecurity bstToken = null;
+        if (!sig.isUseSingleCertificate()) {
+            bstToken = new PKIPathSecurity(saaj.getSOAPPart());
+            ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
+        } else {
+            bstToken = new X509Security(saaj.getSOAPPart());
+            ((X509Security) bstToken).setX509Certificate(certs[0]);
+        }
+        bstToken.setID(wssConfig.getIdAllocator().createSecureId("X509-", certs[0]));
+        WSSecurityUtil.prependChildElement(
+            secHeader.getSecurityHeader(), bstToken.getElement()
+        );
+        bstElement = bstToken.getElement();
+    }
+    
     protected void doEndorsedSignatures(Map<Token, Object> tokenMap,
                                         boolean isTokenProtection,
                                         boolean isSigProtect) {
