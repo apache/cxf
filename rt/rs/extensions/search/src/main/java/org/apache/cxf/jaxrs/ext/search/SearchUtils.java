@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
@@ -43,24 +44,31 @@ public final class SearchUtils {
     }
     
     public static <T> String toSQL(SearchCondition<T> sc, String table, String... columns) {
-        SearchConditionVisitor<T> visitor = new SQLPrinterVisitor<T>(table, columns);
+        SQLPrinterVisitor<T> visitor = new SQLPrinterVisitor<T>(table, columns);
         sc.accept(visitor);
-        return visitor.getResult();
+        return visitor.getQuery();
     }
     
-    public static void startSqlQuery(StringBuilder sb, String table, String... columns) {
+    public static void startSqlQuery(StringBuilder sb, 
+                                     String table,
+                                     String tableAlias,
+                                     List<String> columns) {
         sb.append("SELECT ");
-        if (columns.length > 0) {
-            for (int i = 0; i < columns.length; i++) {
-                sb.append(columns[i]);
-                if (i + 1 < columns.length) {
+        if (columns != null && columns.size() > 0) {
+            for (int i = 0; i < columns.size(); i++) {
+                sb.append(columns.get(i));
+                if (i + 1 < columns.size()) {
                     sb.append(",");
                 }
             }
         } else {
             sb.append("*");
         }
-        sb.append(" FROM ").append(table).append(" WHERE ");
+        sb.append(" FROM ").append(table);
+        if (tableAlias != null) {
+            sb.append(" " + tableAlias);
+        }
+        sb.append(" WHERE ");
     }
     
     public static String conditionTypeToSqlOperator(ConditionType ct, String value) {

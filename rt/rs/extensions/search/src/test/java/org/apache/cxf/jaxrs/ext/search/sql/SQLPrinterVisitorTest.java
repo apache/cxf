@@ -39,7 +39,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)
                    || "SELECT * FROM table WHERE (level > '10') AND (name LIKE 'ami%')".equals(sql));
@@ -51,7 +51,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<SearchBean> filter = beanParser.parse("name==ami*;level=gt=10");
         SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)
                    || "SELECT * FROM table WHERE (level > '10') AND (name LIKE 'ami%')".equals(sql));
@@ -62,7 +62,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') OR (level > '10')".equals(sql)
                    || "SELECT * FROM table WHERE (level > '10') OR (name LIKE 'ami%')".equals(sql));
     }
@@ -72,7 +72,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
                    + "OR (level > '10'))").equals(sql)
                    || ("SELECT * FROM table WHERE (name LIKE 'foo%') AND "
@@ -85,7 +85,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<SearchBean> filter = beanParser.parse("name==foo*;(name!=*bar,level=gt=10)");
         SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
                    + "OR (level > '10'))").equals(sql)
                    || ("SELECT * FROM table WHERE (name LIKE 'foo%') AND "
@@ -97,7 +97,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
                    + " AND ((name = 'test1') OR (level <> '19'))").equals(sql)
                    || ("SELECT * FROM table WHERE ((name = 'test1') OR (level <> '19'))"
@@ -109,7 +109,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SearchCondition<Condition> filter = parser.parse("name==test");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue("SELECT * FROM table WHERE name = 'test'".equals(sql));
     }
     
@@ -119,7 +119,7 @@ public class SQLPrinterVisitorTest extends Assert {
         SQLPrinterVisitor<Condition> visitor = 
             new SQLPrinterVisitor<Condition>("table", "NAMES");
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue("SELECT NAMES FROM table WHERE name = 'test'".equals(sql));
     }
     
@@ -129,9 +129,9 @@ public class SQLPrinterVisitorTest extends Assert {
         SQLPrinterVisitor<Condition> visitor = 
             new SQLPrinterVisitor<Condition>(
                 Collections.singletonMap("name", "NAMES"),
-                "table", "NAMES");
+                "table", Collections.singletonList("NAMES"));
         filter.accept(visitor);
-        String sql = visitor.getResult();
+        String sql = visitor.getQuery();
         assertTrue("SELECT NAMES FROM table WHERE NAMES = 'test'".equals(sql));
     }
     

@@ -18,15 +18,30 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-/**
- * Interface for visitors to SearchCondition objects.
- * Custom implementations can use it to convert SearchCondition into
- * specific query language such as SQL, etc
- */
+import java.util.Map;
+import java.util.logging.Logger;
 
-public interface SearchConditionVisitor<T> {
-    /*
-     * Callback providing a current SearchCondition object 
-     */
-    void visit(SearchCondition<T> sc);
+import org.apache.cxf.common.logging.LogUtils;
+
+
+public abstract class AbstractSearchConditionVisitor <T> implements SearchConditionVisitor<T> {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractSearchConditionVisitor.class);
+    
+    private Map<String, String> fieldMap;
+    
+    protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
+        this.fieldMap = fieldMap;
+    }
+    
+    protected String getRealPropertyName(String name) {
+        if (fieldMap != null) {
+            if (fieldMap.containsKey(name)) {
+                return fieldMap.get(name);
+            } else {
+                LOG.warning("Unrecognized field alias : " + name);
+            }
+        }
+        return name;
+    }
 }

@@ -16,17 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
+package org.apache.cxf.jaxrs.ext.search.jpa;
 
-/**
- * Interface for visitors to SearchCondition objects.
- * Custom implementations can use it to convert SearchCondition into
- * specific query language such as SQL, etc
- */
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
-public interface SearchConditionVisitor<T> {
-    /*
-     * Callback providing a current SearchCondition object 
-     */
-    void visit(SearchCondition<T> sc);
+@Entity(name = "Book")
+public class Book {
+    @Id
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
