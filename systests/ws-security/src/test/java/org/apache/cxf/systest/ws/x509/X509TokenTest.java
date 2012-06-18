@@ -34,6 +34,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
+import org.apache.cxf.systest.ws.x509.server.Intermediary;
 import org.apache.cxf.systest.ws.x509.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
@@ -46,7 +47,8 @@ import org.junit.BeforeClass;
  * A set of tests for X.509 Tokens.
  */
 public class X509TokenTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(Server.class);
+    public static final String PORT = allocatePort(Server.class);
+    public static final String INTERMEDIARY_PORT = allocatePort(Intermediary.class);
     static final String PORT2 = allocatePort(Server.class, 2);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -61,6 +63,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             // run the server in the same process
             // set this to false to fork
             launchServer(Server.class, true)
+        );
+        assertTrue(
+            "Intermediary failed to launch",
+            // run the server in the same process
+            // set this to false to fork
+            launchServer(Intermediary.class, true)
         );
     }
     
@@ -117,6 +125,31 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
                 "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
+        
+        x509Port.doubleIt(25);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIntermediary() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/intermediary-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = X509TokenTest.class.getResource("DoubleItIntermediary.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, INTERMEDIARY_PORT);
         
         x509Port.doubleIt(25);
         
