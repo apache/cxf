@@ -18,33 +18,41 @@
  */
 package org.apache.cxf.jaxrs.ext.search.sql;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
-import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 
-public class SQLPrinterVisitor<T> implements SearchConditionVisitor<T> {
+public class SQLPrinterVisitor<T> extends AbstractSearchConditionVisitor<T> {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(SQLPrinterVisitor.class);
-    
     private StringBuilder sb;
     private String table;
-    private String[] columns;
-    private Map<String, String> fieldMap;
+    private String tableAlias;
+    private List<String> columns;
     
     public SQLPrinterVisitor(String table, String... columns) {
-        this(null, table, columns);
+        this(null, table, Arrays.asList(columns));
     }
     
-    public SQLPrinterVisitor(Map<String, String> fieldMap, String table, String... columns) {
-        this.fieldMap = fieldMap;
+    public SQLPrinterVisitor(Map<String, String> fieldMap, 
+                             String table,
+                             List<String> columns) {
+        this(fieldMap, table, null, columns);
+    }
+    
+    public SQLPrinterVisitor(Map<String, String> fieldMap, 
+                             String table, 
+                             String tableAlias,
+                             List<String> columns) {
+        super(fieldMap);
         this.columns = columns;
         this.table = table;
+        this.tableAlias = tableAlias;
     }
     
     public void visit(SearchCondition<T> sc) {
@@ -52,7 +60,7 @@ public class SQLPrinterVisitor<T> implements SearchConditionVisitor<T> {
         if (sb == null) {
             sb = new StringBuilder();
             if (table != null) {
-                SearchUtils.startSqlQuery(sb, table, columns);
+                SearchUtils.startSqlQuery(sb, table, tableAlias, columns);
             }
         }
         
@@ -60,14 +68,10 @@ public class SQLPrinterVisitor<T> implements SearchConditionVisitor<T> {
         if (statement != null) {
             if (statement.getProperty() != null) {
                 String rvalStr = statement.getValue().toString().replaceAll("\\*", "%");
-                String name = statement.getProperty();
-                if (fieldMap != null) {
-                    if (fieldMap.containsKey(name)) {
-                        name = fieldMap.get(name);
-                    } else {
-                        LOG.warning("Unrecognized field alias : " + name);
-                        return;
-                    }
+                String name = getRealPropertyName(statement.getProperty());
+               
+                if (tableAlias != null) {
+                    name = tableAlias + "." + name;
                 }
                 
                 sb.append(name).append(" ").append(
@@ -90,7 +94,12 @@ public class SQLPrinterVisitor<T> implements SearchConditionVisitor<T> {
     }
     
 
+    @Deprecated
     public String getResult() {
+        return getQuery();
+    }
+    
+    public String getQuery() {
         return sb == null ? null : sb.toString();
     }
 }

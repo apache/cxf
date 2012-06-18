@@ -34,6 +34,8 @@
     </parent>
 
     <properties>
+        <hibernate.em.version>4.1.0.Final</hibernate.em.version>
+        <hsqldb.version>1.8.0.10</hsqldb.version>
     </properties>
 
     <dependencies>
@@ -47,12 +49,30 @@
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jpa_2.0_spec</artifactId>
+            <version>${cxf.geronimo.jpa.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>        
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.em.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.10</version>
+			<scope>test</scope>
+		</dependency>
     </dependencies>
     <build>
         <plugins>

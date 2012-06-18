@@ -92,18 +92,4 @@ public interface SearchCondition<T> {
      */
     void accept(SearchConditionVisitor<T> visitor);
     
-    /**
-     * 
-     * This method is now deprecated and will be removed soon.
-     * 
-     * Utility method for converting this condition into an SQL expression
-     * @param table table name
-     * @param columns column names, a wildcard as in 'SELECT * from table' will be used
-     *                if names are not provided 
-     * @return SQL expression
-     */    
-    @Deprecated
-    String toSQL(String table, String... columns);
-    
-    
 }

@@ -16,17 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
+package org.apache.cxf.jaxrs.ext.search.jpa;
 
-/**
- * Interface for visitors to SearchCondition objects.
- * Custom implementations can use it to convert SearchCondition into
- * specific query language such as SQL, etc
- */
+import org.apache.cxf.jaxrs.ext.search.FiqlParser;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
-public interface SearchConditionVisitor<T> {
-    /*
-     * Callback providing a current SearchCondition object 
-     */
-    void visit(SearchCondition<T> sc);
+import org.junit.Assert;
+import org.junit.Test;
+
+public class JPALanguageVisitorTest extends Assert {
+
+    @Test
+    public void testSimpleQuery() throws Exception {
+        
+        SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse("id=lt=10");
+        JPALanguageVisitor<Book> jpa = new JPALanguageVisitor<Book>(Book.class);
+        filter.accept(jpa);
+        assertEquals("SELECT t FROM Book t WHERE t.id < '10'", jpa.getQuery());
+        
+    }
 }
