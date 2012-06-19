@@ -25,8 +25,8 @@ import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
-import org.apache.cxf.jaxrs.ext.search.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
 /**
  * Builds a FIQL search condition.

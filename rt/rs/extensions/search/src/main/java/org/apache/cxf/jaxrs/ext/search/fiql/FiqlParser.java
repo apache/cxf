@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
-
+package org.apache.cxf.jaxrs.ext.search.fiql;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,7 +32,18 @@ import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
+import org.apache.cxf.jaxrs.ext.search.Beanspector;
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchBean;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
+import org.apache.cxf.jaxrs.ext.search.SearchParseException;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
+import org.apache.cxf.jaxrs.ext.search.SimpleSearchCondition;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+
 
 /**
  * Parses <a href="http://tools.ietf.org/html/draft-nottingham-atompub-fiql-00">FIQL</a> expression to
@@ -43,7 +53,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
  * 
  * @param <T> type of search condition.
  */
-public class FiqlParser<T> {
+public class FiqlParser<T> implements SearchConditionParser<T> {
 
     public static final String OR = ",";
     public static final String AND = ";";
@@ -123,15 +133,15 @@ public class FiqlParser<T> {
      * 
      * @param fiqlExpression expression of filter.
      * @return tree of {@link SearchCondition} objects representing runtime search structure.
-     * @throws FiqlParseException when expression does not follow FIQL grammar
+     * @throws SearchParseException when expression does not follow FIQL grammar
      */
-    public SearchCondition<T> parse(String fiqlExpression) throws FiqlParseException {
+    public SearchCondition<T> parse(String fiqlExpression) throws SearchParseException {
         ASTNode<T> ast = parseAndsOrsBrackets(fiqlExpression);
         // System.out.println(ast);
         return ast.build();
     }
 
-    private ASTNode<T> parseAndsOrsBrackets(String expr) throws FiqlParseException {
+    private ASTNode<T> parseAndsOrsBrackets(String expr) throws SearchParseException {
         List<String> subexpressions = new ArrayList<String>();
         List<String> operators = new ArrayList<String>();
         int level = 0;
@@ -144,7 +154,7 @@ public class FiqlParser<T> {
             } else if (c == ')') {
                 level--;
                 if (level < 0) {
-                    throw new FiqlParseException(String.format("Unexpected closing bracket at position %d",
+                    throw new SearchParseException(String.format("Unexpected closing bracket at position %d",
                                                                idx));
                 }
             }
@@ -166,13 +176,13 @@ public class FiqlParser<T> {
             }
         }
         if (level != 0) {
-            throw new FiqlParseException(String
+            throw new SearchParseException(String
                 .format("Unmatched opening and closing brackets in expression: %s", expr));
         }
         if (operators.get(operators.size() - 1) != null) {
             String op = operators.get(operators.size() - 1);
             String ex = subexpressions.get(subexpressions.size() - 1);
-            throw new FiqlParseException("Dangling operator at the end of expression: ..." + ex + op);
+            throw new SearchParseException("Dangling operator at the end of expression: ..." + ex + op);
         }
         // looking for adjacent ANDs then group them into ORs
         // Note: in case not ANDs is found (e.g only ORs) every single subexpression is
@@ -209,29 +219,29 @@ public class FiqlParser<T> {
         }
     }
 
-    private Comparison parseComparison(String expr) throws FiqlParseException {
+    private Comparison parseComparison(String expr) throws SearchParseException {
         Matcher m = COMPARATORS_PATTERN.matcher(expr);
         if (m.find()) {
             String name = expr.substring(0, m.start(1));
             String operator = m.group(1);
             String value = expr.substring(m.end(1));
             if ("".equals(value)) {
-                throw new FiqlParseException("Not a comparison expression: " + expr);
+                throw new SearchParseException("Not a comparison expression: " + expr);
             }
             Object castedValue = parseDatatype(name, value);
             return new Comparison(name, operator, castedValue);
         } else {
-            throw new FiqlParseException("Not a comparison expression: " + expr);
+            throw new SearchParseException("Not a comparison expression: " + expr);
         }
     }
 
-    private Object parseDatatype(String setter, String value) throws FiqlParseException {
+    private Object parseDatatype(String setter, String value) throws SearchParseException {
         Object castedValue = value;
         Class<?> valueType;
         try {
             valueType = beanspector != null ? beanspector.getAccessorType(setter) : String.class;
         } catch (Exception e) {
-            throw new FiqlParseException(e);
+            throw new SearchParseException(e);
         }
         if (Date.class.isAssignableFrom(valueType)) {
             try {
@@ -252,16 +262,16 @@ public class FiqlParser<T> {
                     DatatypeFactory.newInstance().newDuration(value).addTo(now);
                     castedValue = now;
                 } catch (DatatypeConfigurationException e1) {
-                    throw new FiqlParseException(e1);
+                    throw new SearchParseException(e1);
                 } catch (IllegalArgumentException e1) {
-                    throw new FiqlParseException("Can parse " + value + " neither as date nor duration", e);
+                    throw new SearchParseException("Can parse " + value + " neither as date nor duration", e);
                 }
             }
         } else {
             try {
                 castedValue = InjectionUtils.convertStringToPrimitive(value, valueType);
             } catch (Exception e) {
-                throw new FiqlParseException("Cannot convert String value \"" + value
+                throw new SearchParseException("Cannot convert String value \"" + value
                                              + "\" to a value of class " + valueType.getName(), e);
             }
         }
@@ -270,7 +280,7 @@ public class FiqlParser<T> {
 
     // node of abstract syntax tree
     private interface ASTNode<T> {
-        SearchCondition<T> build() throws FiqlParseException;
+        SearchCondition<T> build() throws SearchParseException;
     }
 
     private class SubExpression implements ASTNode<T> {
@@ -303,7 +313,7 @@ public class FiqlParser<T> {
             return s;
         }
 
-        public SearchCondition<T> build() throws FiqlParseException {
+        public SearchCondition<T> build() throws SearchParseException {
             boolean hasSubtree = false;
             for (ASTNode<T> node : subnodes) {
                 if (node instanceof FiqlParser.SubExpression) {
@@ -367,7 +377,7 @@ public class FiqlParser<T> {
             return name + " " + operator + " " + value + " (" + value.getClass().getSimpleName() + ")";
         }
 
-        public SearchCondition<T> build() throws FiqlParseException {
+        public SearchCondition<T> build() throws SearchParseException {
             T cond = createTemplate(name, value);
             ConditionType ct = OPERATORS_MAP.get(operator);
             
@@ -384,7 +394,7 @@ public class FiqlParser<T> {
         }
         
         @SuppressWarnings("unchecked")
-        private T createTemplate(String setter, Object val) throws FiqlParseException {
+        private T createTemplate(String setter, Object val) throws SearchParseException {
             try {
                 if (beanspector != null) {
                     beanspector.instantiate().setValue(setter, val);
@@ -395,7 +405,7 @@ public class FiqlParser<T> {
                     return (T)bean;
                 }
             } catch (Throwable e) {
-                throw new FiqlParseException(e);
+                throw new SearchParseException(e);
             }
         }
     }

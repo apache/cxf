@@ -18,24 +18,6 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-public class FiqlParseException extends Exception {
-
-    private static final long serialVersionUID = 1182999957472822704L;
-
-    public FiqlParseException() {
-        super();
-    }
-
-    public FiqlParseException(String arg0, Throwable arg1) {
-        super(arg0, arg1);
-    }
-
-    public FiqlParseException(String arg0) {
-        super(arg0);
-    }
-
-    public FiqlParseException(Throwable arg0) {
-        super(arg0);
-    }
-
+public interface SearchConditionParser<T> {
+    SearchCondition<T> parse(String fiqlExpression) throws SearchParseException;
 }
