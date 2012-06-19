@@ -198,7 +198,7 @@ public class JAXBElementProviderTest extends Assert {
     public void testGenericsAndSingleContext() throws Exception {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(XmlListResource.class, XmlListResource.class, true, true);
-        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        JAXBElementProvider provider = new JAXBElementProvider();
         provider.setSingleJaxbContext(true);
         provider.init(Collections.singletonList(cri));
         testXmlList(provider);
@@ -608,11 +608,11 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testReadJAXBElement() throws Exception {
         String xml = "<Book><id>123</id><name>CXF in Action</name></Book>";
-        JAXBElementProvider<JAXBElement> provider = new JAXBElementProvider<JAXBElement>();
-        JAXBElement<Book> jaxbElement = provider.readFrom(JAXBElement.class, Book.class,
+        JAXBElementProvider provider = new JAXBElementProvider();
+        JAXBElement jaxbElement = (JAXBElement)provider.readFrom((Class)JAXBElement.class, Book.class,
              new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(),
              new ByteArrayInputStream(xml.getBytes("UTF-8")));
-        Book book = jaxbElement.getValue();
+        Book book = (Book)jaxbElement.getValue();
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action", book.getName());
         
@@ -620,12 +620,13 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     @Ignore
+    @SuppressWarnings("unchecked")
     public void testReadBookJAXBElement() throws Exception {
         String xml = "<Book><id>123</id><name>CXF in Action</name></Book>";
-        JAXBElementProvider<BookJAXBElement> provider = new JAXBElementProvider<BookJAXBElement>();
-        BookJAXBElement jaxbElement = provider.readFrom(BookJAXBElement.class, BookJAXBElement.class,
-             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(),
-             new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        JAXBElementProvider provider = new JAXBElementProvider();
+        BookJAXBElement jaxbElement = (BookJAXBElement)provider.readFrom((Class)BookJAXBElement.class,
+            BookJAXBElement.class, new Annotation[0], MediaType.TEXT_XML_TYPE, 
+            new MetadataMap<String, String>(), new ByteArrayInputStream(xml.getBytes("UTF-8")));
         Book book = jaxbElement.getValue();
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action", book.getName());
