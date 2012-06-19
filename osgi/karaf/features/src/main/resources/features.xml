@@ -129,6 +129,7 @@
     <feature name="cxf-ws-mex" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${project.version}">cxf-ws-addr</feature>
+        <feature version="${project.version}">cxf-jaxws</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-mex/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-security" version="${project.version}" resolver='(obr)'>
@@ -149,6 +150,7 @@
     </feature>
     <feature name="cxf-http-jetty" version="${project.version}" resolver='(obr)'>
         <feature version="[2,3)">cxf-http</feature>
+        <feature version="[7,8)">jetty</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${project.version}</bundle>
     </feature>
     <feature name="cxf-bindings-soap" version="${project.version}" resolver='(obr)'>
@@ -179,6 +181,7 @@
 
     <feature name="cxf-rs-security-xml" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-jaxrs</feature>
+        <feature version="${cxf.wss4j.version}">wss4j</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-rs-security-xml/${project.version}</bundle>
     </feature>
 
@@ -202,13 +205,18 @@
 
     <feature name="cxf-databinding-aegis" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-bindings-soap</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-databinding-aegis/${project.version}</bundle>
     </feature>
     <feature name="cxf-databinding-jibx" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-tools</feature>
         <bundle start-level='25' dependency="true">mvn:joda-time/joda-time/${cxf.joda.time.version}</bundle>
         <bundle start-level='40' dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${cxf.xpp3.bundle.version}</bundle>
         <bundle start-level='40' dependency='true'>mvn:org.jibx/jibx-run/${cxf.jibx.version}</bundle>
+        <bundle start-level='40' dependency='true'>mvn:org.jibx/jibx-bind/${cxf.jibx.version}</bundle>
+        <bundle start-level='40' dependency='true'>mvn:org.jibx/jibx-schema/${cxf.jibx.version}</bundle>
+        <bundle start-level='40' dependency='true'>mvn:org.jibx/jibx-tools/${cxf.jibx.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-databinding-jibx/${project.version}</bundle>
     </feature>
 
@@ -233,10 +241,13 @@
     </feature>
     <feature name="cxf-bindings-coloc" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="[3,4)">spring</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-bindings-coloc/${project.version}</bundle>
     </feature>
     <feature name="cxf-bindings-object" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-transports-local</feature>
+        <feature version="[3,4)">spring</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-bindings-object/${project.version}</bundle>
     </feature>
 
@@ -246,21 +257,24 @@
     </feature>
     <feature name="cxf-transports-jms" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="[3,4)">spring</feature>
         <feature version="[3,4)">spring-jms</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-jms/${project.version}</bundle>
     </feature>
-
-    <feature name="cxf-javascript" version="${project.version}" resolver='(obr)'>
+<feature name="cxf-javascript" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-bindings-soap</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-javascript/${project.version}</bundle>
     </feature>
     <feature name="cxf-frontend-javascript" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <feature version="${project.version}">cxf-jaxws</feature>
         <bundle start-level='40' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.rhino/${cxf.rhino.bundle.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-frontend-js/${project.version}</bundle>
     </feature>
     <feature name="cxf-xjc-runtime" version="${project.version}" resolver='(obr)'>
+        <feature version="${project.version}">cxf-jaxb</feature>
         <bundle start-level='40' dependency="true">mvn:commons-lang/commons-lang/${cxf.commons-lang.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf.xjc-utils/cxf-xjc-runtime/${cxf.xjc-utils.version}</bundle>
     </feature>
@@ -300,6 +314,7 @@
         <feature version="${project.version}">cxf-jaxws</feature>
         <feature version="${project.version}">cxf-jaxrs</feature>
 
+        <feature version="${project.version}">cxf-databinding-jaxb</feature>
         <feature version="${project.version}">cxf-databinding-aegis</feature>
         <feature version="${project.version}">cxf-databinding-xmlbeans</feature>
         <feature version="${project.version}">cxf-bindings-corba</feature>
