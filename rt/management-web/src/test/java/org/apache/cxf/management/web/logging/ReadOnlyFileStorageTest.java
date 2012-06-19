@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
-import org.apache.cxf.jaxrs.ext.search.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
 import org.junit.After;
 import org.junit.Assert;

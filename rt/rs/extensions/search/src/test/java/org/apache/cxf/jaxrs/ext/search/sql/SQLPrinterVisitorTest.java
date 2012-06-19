@@ -21,10 +21,10 @@ package org.apache.cxf.jaxrs.ext.search.sql;
 import java.util.Collections;
 import java.util.Date;
 
-import org.apache.cxf.jaxrs.ext.search.FiqlParseException;
-import org.apache.cxf.jaxrs.ext.search.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchParseException;
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -35,7 +35,7 @@ public class SQLPrinterVisitorTest extends Assert {
     private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
 
     @Test
-    public void testSQL1() throws FiqlParseException {
+    public void testSQL1() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
@@ -46,7 +46,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL1WithSearchBean() throws FiqlParseException {
+    public void testSQL1WithSearchBean() throws SearchParseException {
         FiqlParser<SearchBean> beanParser = new FiqlParser<SearchBean>(SearchBean.class);
         SearchCondition<SearchBean> filter = beanParser.parse("name==ami*;level=gt=10");
         SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
@@ -58,7 +58,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL2() throws FiqlParseException {
+    public void testSQL2() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
@@ -68,7 +68,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL3() throws FiqlParseException {
+    public void testSQL3() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
@@ -80,7 +80,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL3WithSearchBean() throws FiqlParseException {
+    public void testSQL3WithSearchBean() throws SearchParseException {
         FiqlParser<SearchBean> beanParser = new FiqlParser<SearchBean>(SearchBean.class);
         SearchCondition<SearchBean> filter = beanParser.parse("name==foo*;(name!=*bar,level=gt=10)");
         SQLPrinterVisitor<SearchBean> visitor = new SQLPrinterVisitor<SearchBean>("table");
@@ -93,7 +93,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL4() throws FiqlParseException {
+    public void testSQL4() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
@@ -105,7 +105,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL5() throws FiqlParseException {
+    public void testSQL5() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
         filter.accept(visitor);
@@ -114,7 +114,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL5WithColumns() throws FiqlParseException {
+    public void testSQL5WithColumns() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         SQLPrinterVisitor<Condition> visitor = 
             new SQLPrinterVisitor<Condition>("table", "NAMES");
@@ -124,7 +124,7 @@ public class SQLPrinterVisitorTest extends Assert {
     }
     
     @Test
-    public void testSQL5WithFieldMap() throws FiqlParseException {
+    public void testSQL5WithFieldMap() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         SQLPrinterVisitor<Condition> visitor = 
             new SQLPrinterVisitor<Condition>(

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -49,13 +50,13 @@ public class SearchContextImpl implements SearchContext {
             throw new IllegalArgumentException(errorMessage);
         }
         
-        FiqlParser<T> parser = getParser(cls);
+        SearchConditionParser<T> parser = getParser(cls);
         
         String expression = getSearchExpression();
         if (expression != null) {
             try {
                 return parser.parse(expression);
-            } catch (FiqlParseException ex) {
+            } catch (SearchParseException ex) {
                 return null;
             }
         } else {

@@ -28,7 +28,7 @@ import org.junit.Test;
 public class BeanspectorTest extends Assert {
     
     @Test
-    public void testSimpleBean() throws FiqlParseException {
+    public void testSimpleBean() throws SearchParseException {
         Beanspector<SimpleBean> bean = new Beanspector<SimpleBean>(new SimpleBean());
         Set<String> getters = bean.getGettersNames();
         assertEquals(3, getters.size());
@@ -42,7 +42,7 @@ public class BeanspectorTest extends Assert {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMismatchedAccessorTypes() throws FiqlParseException {
+    public void testMismatchedAccessorTypes() throws SearchParseException {
         new Beanspector<MismatchedTypes>(MismatchedTypes.class);
     }
     

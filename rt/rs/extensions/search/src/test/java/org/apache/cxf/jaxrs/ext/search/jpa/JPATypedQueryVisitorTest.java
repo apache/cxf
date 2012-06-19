@@ -27,8 +27,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import org.apache.cxf.jaxrs.ext.search.FiqlParser;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
 import org.junit.After;
 import org.junit.Assert;

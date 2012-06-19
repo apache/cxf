@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * Bean introspection utility.
  */
-class Beanspector<T> {
+public class Beanspector<T> {
 
     private Class<T> tclass;
     private T tobj;

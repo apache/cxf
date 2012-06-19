@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
+package org.apache.cxf.jaxrs.ext.search.fiql;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -28,6 +28,12 @@ import java.util.Map;
 
 import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchParseException;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,93 +41,93 @@ import org.junit.Test;
 public class FiqlParserTest extends Assert {
     private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
 
-    @Test(expected = FiqlParseException.class)
-    public void testCompareWrongComparator() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testCompareWrongComparator() throws SearchParseException {
         parser.parse("name>booba");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testCompareMissingName() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testCompareMissingName() throws SearchParseException {
         parser.parse("==30");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testCompareMissingValue() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testCompareMissingValue() throws SearchParseException {
         parser.parse("name=gt=");
     }
 
     @Test
-    public void testCompareValueTextSpaces() throws FiqlParseException {
+    public void testCompareValueTextSpaces() throws SearchParseException {
         parser.parse("name=gt=some text");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testCompareNameTextSpaces() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testCompareNameTextSpaces() throws SearchParseException {
         parser.parse("some name=gt=text");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testDanglingOperator() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testDanglingOperator() throws SearchParseException {
         parser.parse("name==a;(level==10;),");
     }
 
     @Test
-    public void testMultilevelExpression() throws FiqlParseException {
+    public void testMultilevelExpression() throws SearchParseException {
         parser.parse("name==a;(level==10,(name!=b;name!=c;(level=gt=10)))");
     }
 
     @Test
-    public void testMultilevelExpression2() throws FiqlParseException {
+    public void testMultilevelExpression2() throws SearchParseException {
         parser.parse("((name==a;level==10),name!=b;name!=c);level=gt=10");
     }
 
     @Test
-    public void testRedundantBrackets() throws FiqlParseException {
+    public void testRedundantBrackets() throws SearchParseException {
         parser.parse("name==a;((((level==10))))");
     }
 
     @Test
-    public void testAndOfOrs() throws FiqlParseException {
+    public void testAndOfOrs() throws SearchParseException {
         parser.parse("(name==a,name==b);(level=gt=0,level=lt=10)");
     }
 
     @Test
-    public void testOrOfAnds() throws FiqlParseException {
+    public void testOrOfAnds() throws SearchParseException {
         parser.parse("(name==a;name==b),(level=gt=0;level=lt=10)");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testUnmatchedBracket() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testUnmatchedBracket() throws SearchParseException {
         parser.parse("name==a;(name!=b;(level==10,(name!=b))");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testUnmatchedBracket2() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testUnmatchedBracket2() throws SearchParseException {
         parser.parse("name==bbb;))()level==111");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testMissingComparison() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testMissingComparison() throws SearchParseException {
         parser.parse("name==bbb;,level==111");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testSetterMissing() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testSetterMissing() throws SearchParseException {
         parser.parse("noSuchSetter==xxx");
     }
 
-    @Test(expected = FiqlParseException.class)
-    public void testSetterWrongType() throws FiqlParseException {
+    @Test(expected = SearchParseException.class)
+    public void testSetterWrongType() throws SearchParseException {
         parser.parse("exception==text");
     }
 
     @Test
-    public void testSetterNumericText() throws FiqlParseException {
+    public void testSetterNumericText() throws SearchParseException {
         parser.parse("name==10");
     }
 
     @Test
-    public void testParseName() throws FiqlParseException {
+    public void testParseName() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==king");
         assertTrue(filter.isMet(new Condition("king", 10, new Date())));
         assertTrue(filter.isMet(new Condition("king", 0, null)));
@@ -130,7 +136,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseLevel() throws FiqlParseException {
+    public void testParseLevel() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("level=gt=10");
         assertTrue(filter.isMet(new Condition("whatever", 15, new Date())));
         assertTrue(filter.isMet(new Condition(null, 15, null)));
@@ -139,7 +145,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseDateWithDefaultFormat() throws FiqlParseException, ParseException {
+    public void testParseDateWithDefaultFormat() throws SearchParseException, ParseException {
         SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00.000+00:00");
         DateFormat df = new SimpleDateFormat(FiqlParser.DEFAULT_DATE_FORMAT);
         assertTrue(filter.isMet(new Condition("whatever", 15, df.parse("2010-03-11T18:00:00.000+0000"))));
@@ -149,7 +155,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseDateWithCustomFormat() throws FiqlParseException, ParseException {
+    public void testParseDateWithCustomFormat() throws SearchParseException, ParseException {
         Map<String, String> props = new HashMap<String, String>();
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
@@ -174,7 +180,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseComplex1() throws FiqlParseException {
+    public void testParseComplex1() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         assertEquals(ConditionType.AND, filter.getConditionType());
 
@@ -194,7 +200,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testSQL1() throws FiqlParseException {
+    public void testSQL1() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         String sql = SearchUtils.toSQL(filter, "table");
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)
@@ -202,7 +208,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseComplex2() throws FiqlParseException {
+    public void testParseComplex2() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         assertEquals(ConditionType.OR, filter.getConditionType());
 
@@ -222,7 +228,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testSQL2() throws FiqlParseException {
+    public void testSQL2() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         String sql = SearchUtils.toSQL(filter, "table");
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') OR (level > '10')".equals(sql)
@@ -230,7 +236,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testParseComplex3() throws FiqlParseException {
+    public void testParseComplex3() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         assertTrue(filter.isMet(new Condition("fooooo", 0, null)));
         assertTrue(filter.isMet(new Condition("fooooobar", 20, null)));
@@ -239,7 +245,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testSQL3() throws FiqlParseException {
+    public void testSQL3() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         String sql = SearchUtils.toSQL(filter, "table");
         assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
@@ -249,7 +255,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testSQL4() throws FiqlParseException {
+    public void testSQL4() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
         String sql = SearchUtils.toSQL(filter, "table");
         assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
@@ -259,14 +265,14 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testSQL5() throws FiqlParseException {
+    public void testSQL5() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         String sql = SearchUtils.toSQL(filter, "table");
         assertTrue("SELECT * FROM table WHERE name = 'test'".equals(sql));
     }
 
     @Test
-    public void testParseComplex4() throws FiqlParseException {
+    public void testParseComplex4() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;name!=*bar,level=gt=10");
         assertTrue(filter.isMet(new Condition("zonk", 20, null)));
         assertTrue(filter.isMet(new Condition("foobaz", 0, null)));
@@ -275,7 +281,7 @@ public class FiqlParserTest extends Assert {
     }
 
     @Ignore
-    static class Condition {
+    public static class Condition {
         private String name;
         private Integer level;
         private Date time;

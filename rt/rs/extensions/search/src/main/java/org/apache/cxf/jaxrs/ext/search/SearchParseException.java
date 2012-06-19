@@ -16,23 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search.jpa;
+package org.apache.cxf.jaxrs.ext.search;
 
-import org.apache.cxf.jaxrs.ext.search.SearchCondition;
-import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
+public class SearchParseException extends Exception {
 
-import org.junit.Assert;
-import org.junit.Test;
+    private static final long serialVersionUID = 1182999957472822704L;
 
-public class JPALanguageVisitorTest extends Assert {
-
-    @Test
-    public void testSimpleQuery() throws Exception {
-        
-        SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse("id=lt=10");
-        JPALanguageVisitor<Book> jpa = new JPALanguageVisitor<Book>(Book.class);
-        filter.accept(jpa);
-        assertEquals("SELECT t FROM Book t WHERE t.id < '10'", jpa.getQuery());
-        
+    public SearchParseException() {
+        super();
     }
+
+    public SearchParseException(String arg0, Throwable arg1) {
+        super(arg0, arg1);
+    }
+
+    public SearchParseException(String arg0) {
+        super(arg0);
+    }
+
+    public SearchParseException(Throwable arg0) {
+        super(arg0);
+    }
+
 }
