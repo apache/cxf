@@ -187,10 +187,21 @@ public class JAXBElementProviderTest extends Assert {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(XmlListResource.class, XmlListResource.class, true, true);
         JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setSingleJaxbContext(true);
         provider.setExtraClass(new Class[]{XmlObject.class});
         provider.init(Collections.singletonList(cri));
         testXmlList(provider);
         
+    }
+    
+    @Test
+    public void testGenericsAndSingleContext() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(XmlListResource.class, XmlListResource.class, true, true);
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        provider.setSingleJaxbContext(true);
+        provider.init(Collections.singletonList(cri));
+        testXmlList(provider);
     }
     
     @SuppressWarnings("unchecked")
@@ -591,6 +602,34 @@ public class JAXBElementProviderTest extends Assert {
         provider.writeTo(books, m.getReturnType(), m.getGenericReturnType(),
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         doReadUnqualifiedCollection(bos.toString(), "setBooks", List.class);
+    }
+    
+    @SuppressWarnings({"rawtypes", "unchecked" })
+    @Test
+    public void testReadJAXBElement() throws Exception {
+        String xml = "<Book><id>123</id><name>CXF in Action</name></Book>";
+        JAXBElementProvider<JAXBElement> provider = new JAXBElementProvider<JAXBElement>();
+        JAXBElement<Book> jaxbElement = provider.readFrom(JAXBElement.class, Book.class,
+             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(),
+             new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        Book book = jaxbElement.getValue();
+        assertEquals(123L, book.getId());
+        assertEquals("CXF in Action", book.getName());
+        
+    }
+    
+    @Test
+    @Ignore
+    public void testReadBookJAXBElement() throws Exception {
+        String xml = "<Book><id>123</id><name>CXF in Action</name></Book>";
+        JAXBElementProvider<BookJAXBElement> provider = new JAXBElementProvider<BookJAXBElement>();
+        BookJAXBElement jaxbElement = provider.readFrom(BookJAXBElement.class, BookJAXBElement.class,
+             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(),
+             new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        Book book = jaxbElement.getValue();
+        assertEquals(123L, book.getId());
+        assertEquals("CXF in Action", book.getName());
+        
     }
     
     @Test
@@ -1496,6 +1535,20 @@ public class JAXBElementProviderTest extends Assert {
         @Path("/jaxb")
         public XmlList<XmlObject> testJaxb() {
             return null;
+        }
+    }
+    
+    public static class BookJAXBElement extends JAXBElement<Book> {
+        protected static final QName NAME = new QName("Book");
+
+        private static final long serialVersionUID = -7388721095437704766L;
+        
+        public BookJAXBElement(Book value) {
+            super(NAME, Book.class, null, value);
+        }
+
+        public BookJAXBElement() {
+            super(NAME, Book.class, null, null);
         }
     }
     

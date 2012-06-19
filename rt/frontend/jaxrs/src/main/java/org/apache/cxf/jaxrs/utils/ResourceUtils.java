@@ -473,25 +473,28 @@ public final class ResourceUtils {
     private static void getAllTypesForResource(ClassResourceInfo resource, Map<Class<?>, Type> types,
                                                boolean jaxbOnly) {
         for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
-            Class<?> cls = ori.getMethodToInvoke().getReturnType();
+            Class<?> realReturnType = ori.getMethodToInvoke().getReturnType();
+            Class<?> cls = realReturnType;
             if (cls == Response.class) {
                 cls = getActualJaxbType(cls, ori.getMethodToInvoke(), false);
             }
+            Type type = ori.getMethodToInvoke().getGenericReturnType();
             if (jaxbOnly) {
-                checkJaxbType(cls, types);
+                checkJaxbType(cls, realReturnType == Response.class ? cls : type, types);
             } else {
-                Type type = ori.getMethodToInvoke().getGenericReturnType();
                 types.put(cls, type);
             }
+            
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.REQUEST_BODY) {
                     Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+                    Type paramType = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
                     if (jaxbOnly) {
-                        checkJaxbType(inType, types);
+                        checkJaxbType(inType, paramType, types);
                     } else {
-                        Type type = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
-                        types.put(inType, type);
+                        types.put(inType, paramType);
                     }
+                    
                 }
             }
             
@@ -504,13 +507,20 @@ public final class ResourceUtils {
         }
     }
     
-    private static void checkJaxbType(Class<?> type, Map<Class<?>, Type> types) {
+    private static void checkJaxbType(Class<?> type, Type genericType, Map<Class<?>, Type> types) {
         JAXBElementProvider provider = new JAXBElementProvider();
-        if (!InjectionUtils.isPrimitive(type) 
+        if (type != null 
+            && !InjectionUtils.isPrimitive(type) 
             && !JAXBElement.class.isAssignableFrom(type)
             && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
             types.put(type, type);
-        }        
+            
+            Class<?> genCls = InjectionUtils.getActualType(genericType);
+            if (genCls != type && genCls instanceof Class && genCls != Object.class 
+                && !InjectionUtils.isSupportedCollectionOrArray(genCls)) {
+                types.put(genCls, genCls);
+            }
+        }
     }
     
     private static UserResource getResourceFromElement(Element e) {
