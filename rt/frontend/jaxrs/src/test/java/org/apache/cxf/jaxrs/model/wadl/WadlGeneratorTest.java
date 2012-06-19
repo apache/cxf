@@ -85,7 +85,7 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter", false);
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
     }
@@ -112,7 +112,7 @@ public class WadlGeneratorTest extends Assert {
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
             XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
         assertEquals(1, elementEls.size());
-        assertTrue(checkElement(elementEls, "books", "tns:books"));
+        assertTrue(checkElement(elementEls, "books", "books"));
 
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
             XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
@@ -193,7 +193,7 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
-        checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter", false);
+        checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "prefix1:book", "prefix1:book2", "prefix1:chapter");
     }
@@ -211,7 +211,7 @@ public class WadlGeneratorTest extends Assert {
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter", true);
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0), "ns1:thebook", "ns1:thebook2", "ns1:thechapter");
     }
@@ -267,7 +267,7 @@ public class WadlGeneratorTest extends Assert {
         
         verifyParameters(resourceEls.get(0), 1, new Param("id", "template", "xs:int"));
         
-        checkGrammars(doc.getDocumentElement(), "thebook", null, "thechapter", false);
+        checkGrammars(doc.getDocumentElement(), "thebook", null, "thechapter");
     }
     
     private void checkResponse(Response r) throws Exception {
@@ -301,15 +301,14 @@ public class WadlGeneratorTest extends Assert {
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         String wadl = r.getEntity().toString();
         Document doc = DOMUtils.readXml(new StringReader(wadl));
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter", true);
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
         Element orderResource = els.get(1);
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
-    private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl, 
-                               boolean customPrefix) {
+    private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
@@ -323,12 +322,12 @@ public class WadlGeneratorTest extends Assert {
         int size = book2El == null ? 2 : 3;
         
         assertEquals(size, elementEls.size());
-        String prefix = "tns";
-        assertTrue(checkElement(elementEls, bookEl, prefix + ":book"));
+        
+        assertTrue(checkElement(elementEls, bookEl, "book"));
         if (book2El != null) {
-            assertTrue(checkElement(elementEls, book2El, prefix + ":book2"));
+            assertTrue(checkElement(elementEls, book2El, "book2"));
         }
-        assertTrue(checkElement(elementEls, chapterEl, prefix + ":chapter"));
+        assertTrue(checkElement(elementEls, chapterEl, "chapter"));
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                                         XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
@@ -367,11 +366,16 @@ public class WadlGeneratorTest extends Assert {
         return false;
     }
     
-    private boolean checkElement(List<Element> els, String name, String type) {
+    private boolean checkElement(List<Element> els, String name, String localTypeName) {
         for (Element e : els) {
-            if (name.equals(e.getAttribute("name"))
-                && type.equals(e.getAttribute("type"))) {
-                return true;
+            if (name.equals(e.getAttribute("name"))) {
+                String type = e.getAttribute("type");
+                
+                String expectedType1 = "tns:" + localTypeName;
+                String expectedType2 = "os:" + localTypeName;
+                if (type.equals(expectedType1) || type.equals(expectedType2)) {
+                    return true;
+                }
             }
         }
         return false;
