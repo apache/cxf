@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.saml.sso.state;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -25,7 +26,12 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.rs.security.saml.sso.EHCacheUtil;
 import org.apache.ws.security.util.Loader;
 
 /**
@@ -35,34 +41,58 @@ import org.apache.ws.security.util.Loader;
 public class EHCacheSPStateManager implements SPStateManager {
 
     public static final long DEFAULT_TTL = 60L * 5L;
-    private static final String REQUEST_CACHE_KEY = "cxf-samlp-request-state-cache";
-    private static final String RESPONSE_CACHE_KEY = "cxf-samlp-response-state-cache";
+    public static final String REQUEST_CACHE_KEY = "cxf-samlp-request-state-cache";
+    public static final String RESPONSE_CACHE_KEY = "cxf-samlp-response-state-cache";
+    
     private Ehcache requestCache;
     private Ehcache responseCache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
     public EHCacheSPStateManager() {
+        this((Bus)null);
+    }
+    
+    public EHCacheSPStateManager(Bus bus) {
         String defaultConfigFile = "cxf-samlp-ehcache.xml";
         URL configFileURL = Loader.getResource(defaultConfigFile);
-        createCaches(configFileURL);
+        createCaches(configFileURL, bus);
     }
     
     public EHCacheSPStateManager(URL configFileURL) {
-        createCaches(configFileURL);
+        this(configFileURL, null);
     }
     
-    private void createCaches(URL configFileURL) {
+    public EHCacheSPStateManager(URL configFileURL, Bus bus) {
+        createCaches(configFileURL, bus);
+    }
+    
+    private void createCaches(URL configFileURL, Bus bus) {
         if (configFileURL == null) {
             cacheManager = CacheManager.create();
         } else {
-            cacheManager = CacheManager.create(configFileURL);
+            Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
+            
+            if (bus != null) {
+                conf.setName(bus.getId());
+                if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
+                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
+                        + bus.getId();
+                    conf.getDiskStoreConfiguration().setPath(path);
+                }
+            }
+            
+            cacheManager = CacheManager.create(conf);
         }
         
-        Ehcache newCache = new Cache(REQUEST_CACHE_KEY, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
+        CacheConfiguration requestCC = EHCacheUtil.getCacheConfiguration(REQUEST_CACHE_KEY, cacheManager);
+        
+        Ehcache newCache = new Cache(requestCC);
         requestCache = cacheManager.addCacheIfAbsent(newCache);
         
-        newCache = new Cache(RESPONSE_CACHE_KEY, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
+        CacheConfiguration responseCC = EHCacheUtil.getCacheConfiguration(RESPONSE_CACHE_KEY, cacheManager);
+        
+        newCache = new Cache(responseCC);
         responseCache = cacheManager.addCacheIfAbsent(newCache);
     }
     

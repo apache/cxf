@@ -45,6 +45,7 @@ import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
@@ -93,7 +94,8 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     
     public TokenReplayCache<String> getReplayCache() {
         if (replayCache == null) {
-            replayCache = new EHCacheTokenReplayCache();
+            Bus bus = (Bus)messageContext.getContextualProperty(Bus.class.getName());
+            replayCache = new EHCacheTokenReplayCache(bus);
         }
         return replayCache;
     }
