@@ -86,6 +86,7 @@ public abstract class AbstractClient implements Client, Retryable {
     protected static final String RESPONSE_CONTEXT = "ResponseContext";
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
     
+    private static final String HTTP_SCHEME = "http";
     private static final String PROXY_PROPERTY = "jaxrs.proxy";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
@@ -708,7 +709,7 @@ public abstract class AbstractClient implements Client, Retryable {
         
         String address = (String)message.get(Message.ENDPOINT_ADDRESS);
         // custom conduits may override the initial/current address
-        if (!address.equals(currentURI.toString())) {
+        if (address.startsWith(HTTP_SCHEME) && !address.equals(currentURI.toString())) {
             URI baseAddress = URI.create(address);
             currentURI = calculateNewRequestURI(baseAddress, currentURI, proxy);
             message.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
@@ -745,10 +746,22 @@ public abstract class AbstractClient implements Client, Retryable {
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
         
+        m.put(Message.REST_MESSAGE, Boolean.TRUE);
+        
         m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         m.put(Message.PROTOCOL_HEADERS, headers);
-        m.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
-        m.put(Message.REQUEST_URI, currentURI.toString());
+        if (currentURI.isAbsolute()) {
+            m.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
+        } else {
+            m.put(Message.ENDPOINT_ADDRESS, state.getBaseURI().toString());
+        }
+        
+        Object requestURIProperty = cfg.getRequestContext().get(Message.REQUEST_URI);
+        if (requestURIProperty == null) {
+            m.put(Message.REQUEST_URI, currentURI.toString());
+        } else {
+            m.put(Message.REQUEST_URI, requestURIProperty.toString());
+        }
         
         m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
         

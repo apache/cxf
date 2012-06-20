@@ -24,6 +24,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 /**
@@ -31,6 +32,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
  *
  */
 public class LocalClientState implements ClientState {
+    private static final String HTTP_SCHEME = "http";
     
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
     private MultivaluedMap<String, String> templates;
@@ -44,7 +46,12 @@ public class LocalClientState implements ClientState {
     
     public LocalClientState(URI baseURI) {
         this.baseURI = baseURI;
-        this.currentBuilder = UriBuilder.fromUri(baseURI);
+        String scheme = baseURI.getScheme();
+        if (!StringUtils.isEmpty(scheme) && scheme.startsWith(HTTP_SCHEME)) {
+            this.currentBuilder = UriBuilder.fromUri(baseURI);
+        } else {
+            this.currentBuilder = UriBuilder.fromUri("/");
+        }
     }
     
     public LocalClientState(LocalClientState cs) {
