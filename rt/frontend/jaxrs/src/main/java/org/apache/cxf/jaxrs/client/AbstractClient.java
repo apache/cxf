@@ -320,7 +320,10 @@ public abstract class AbstractClient implements Client, Retryable {
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
         checkClientException(exchange.getOutMessage(), exchange.getOutMessage().getContent(Exception.class));
         
-        int status = (Integer)exchange.get(Message.RESPONSE_CODE);
+        Integer status = (Integer)exchange.get(Message.RESPONSE_CODE);
+        if (status == null) {
+            status = (Integer)exchange.getInMessage().get(Message.RESPONSE_CODE);
+        }
         ResponseBuilder currentResponseBuilder = Response.status(status);
         
         Message responseMessage = exchange.getInMessage() != null 
@@ -493,8 +496,12 @@ public abstract class AbstractClient implements Client, Retryable {
         return result != null ? result.toArray() : null;
     }
     
-    protected void checkClientException(Message message, Exception ex) throws Exception {
-        if (message.getExchange().get(Message.RESPONSE_CODE) == null) {
+    protected void checkClientException(Message outMessage, Exception ex) throws Exception {
+        if (outMessage.getExchange().get(Message.RESPONSE_CODE) == null) {
+            Message inMessage = outMessage.getExchange().getInMessage();
+            if (inMessage != null && inMessage.get(Message.RESPONSE_CODE) != null) {
+                return;
+            }
             if (ex instanceof ClientWebApplicationException) {
                 throw ex;
             } else if (ex != null) {
@@ -750,7 +757,7 @@ public abstract class AbstractClient implements Client, Retryable {
         
         m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         m.put(Message.PROTOCOL_HEADERS, headers);
-        if (currentURI.isAbsolute()) {
+        if (currentURI.isAbsolute() && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
             m.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
         } else {
             m.put(Message.ENDPOINT_ADDRESS, state.getBaseURI().toString());
