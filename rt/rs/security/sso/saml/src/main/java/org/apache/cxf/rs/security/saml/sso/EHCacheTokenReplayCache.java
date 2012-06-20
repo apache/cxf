@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.saml.sso;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -26,7 +27,11 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.apache.cxf.Bus;
 import org.apache.ws.security.util.Loader;
 
 /**
@@ -37,29 +42,51 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private static final String CACHE_KEY = "cxf-samlp-replay-cache";
+    public static final String CACHE_KEY = "cxf-samlp-replay-cache";
+    
     private Ehcache cache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
     public EHCacheTokenReplayCache() {
+        this((Bus)null);
+    }
+    
+    public EHCacheTokenReplayCache(Bus bus) {
         String defaultConfigFile = "cxf-samlp-ehcache.xml";
         URL configFileURL = Loader.getResource(defaultConfigFile);
-        createCache(configFileURL);
+        createCache(configFileURL, bus);
     }
     
     public EHCacheTokenReplayCache(URL configFileURL) {
-        createCache(configFileURL);
+        createCache(configFileURL, null);
     }
     
-    private void createCache(URL configFileURL) {
+    public EHCacheTokenReplayCache(URL configFileURL, Bus bus) {
+        createCache(configFileURL, bus);
+    }
+    
+    private void createCache(URL configFileURL, Bus bus) {
         if (configFileURL == null) {
             cacheManager = CacheManager.create();
         } else {
-            cacheManager = CacheManager.create(configFileURL);
+            Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
+            
+            if (bus != null) {
+                conf.setName(bus.getId());
+                if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
+                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
+                        + bus.getId();
+                    conf.getDiskStoreConfiguration().setPath(path);
+                }
+            }
+            
+            cacheManager = CacheManager.create(conf);
         }
         
-        Ehcache newCache = new Cache(CACHE_KEY, 50000, true, false, DEFAULT_TTL, DEFAULT_TTL);
+        CacheConfiguration cc = EHCacheUtil.getCacheConfiguration(CACHE_KEY, cacheManager);
+        
+        Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
     
