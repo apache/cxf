@@ -78,8 +78,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(MAPCodec.class);
     private static final String IS_REFERENCE_PARAM_ATTR_NAME = "IsReferenceParameter";
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
-    private static final String ONE_WAY_DECOUPLED_FAULT_SUPPORT = 
-        "org.apache.cxf.ws.addressing.oneway.decoupled_fault_support";
+    private static final String DECOUPLED_FAULT_SUPPORT = 
+        "org.apache.cxf.ws.addressing.decoupled_fault_support";
     
     /**
      * REVISIT: map usage that the *same* interceptor instance 
@@ -151,10 +151,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     }
                 }
             }
-        } else if (MessageUtils.getContextualBoolean(message, 
-                                                     ONE_WAY_DECOUPLED_FAULT_SUPPORT, 
-                                                     false)) {
-            new OneWayDecoupledFaultHandler().handleFault(message);
+        } else if (MessageUtils.getContextualBoolean(message, DECOUPLED_FAULT_SUPPORT, false)) {
+            new DecoupledFaultHandler().handleFault(message);
         }
     }
 
