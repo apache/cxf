@@ -41,8 +41,8 @@ import org.apache.ws.security.util.Loader;
 public class EHCacheSPStateManager implements SPStateManager {
 
     public static final long DEFAULT_TTL = 60L * 5L;
-    public static final String REQUEST_CACHE_KEY = "cxf-samlp-request-state-cache";
-    public static final String RESPONSE_CACHE_KEY = "cxf-samlp-response-state-cache";
+    public static final String REQUEST_CACHE_KEY = "cxf.samlp.request.state.cache";
+    public static final String RESPONSE_CACHE_KEY = "cxf.samlp.response.state.cache";
     
     private Ehcache requestCache;
     private Ehcache responseCache;

@@ -33,7 +33,8 @@ public final class EHCacheUtil {
     public static CacheConfiguration getCacheConfiguration(String key, CacheManager cacheManager) {
         CacheConfiguration cc = cacheManager.getConfiguration().getCacheConfigurations().get(key);
         if (cc == null && key.contains("-")) {
-            cc = cacheManager.getConfiguration().getCacheConfigurations().get(key.substring(0, key.indexOf('-')));
+            cc = cacheManager.getConfiguration().getCacheConfigurations().get(
+                    key.substring(0, key.lastIndexOf('-') - 1));
         }
         if (cc == null) {
             cc = cacheManager.getConfiguration().getDefaultCacheConfiguration();
