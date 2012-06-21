@@ -59,7 +59,33 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     private Bus bus;
     private Map<String, Object> requestContext = new HashMap<String, Object>();
     private Map<String, Object> responseContext = new HashMap<String, Object>();
+    private long synchronousTimeout = 60000;
     
+    public long getSynchronousTimeout() {
+        Conduit conduit = getConduit();
+        if (conduit instanceof HTTPConduit) {
+            return ((HTTPConduit)conduit).getClient().getReceiveTimeout();
+        } else {
+            return synchronousTimeout;
+        }
+    }
+
+    /**
+     * Sets the synchronous timeout
+     * @param synchronousTimeout
+     */
+    public void setSynchronousTimeout(long synchronousTimeout) {
+        this.synchronousTimeout = synchronousTimeout;
+    }
+    
+    /**
+     * Indicates if Response may still be expected for oneway requests.
+     * For example, 202 in case of HTTP
+     * @return true if the response can be expected
+     */
+    public boolean isResponseExpectedForOneway() {
+        return getConduit() instanceof HTTPConduit ? true : false;
+    }
     
     /**
      * Sets the conduit selector 

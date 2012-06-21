@@ -59,6 +59,9 @@ class ClientMessageObserver implements MessageObserver {
             if (origLoader != null) {
                 origLoader.reset();
             }
+            synchronized (message.getExchange()) {
+                message.getExchange().notifyAll();
+            }
         }
     }
     
