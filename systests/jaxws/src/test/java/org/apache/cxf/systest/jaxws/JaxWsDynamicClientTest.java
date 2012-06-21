@@ -105,4 +105,19 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         client.invoke("init", list);
     }
     
+    @Test
+    public void testArgfiles() throws Exception {
+        System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
+        Client client = dcf.createClient(new URL("http://localhost:"
+                                                 + PORT1 + "/ArrayService?wsdl"));
+
+        String[] values = new String[] {"foobar", "something" };
+        List<String> list = Arrays.asList(values);
+        
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.invoke("init", list);
+    }
+    
 }
