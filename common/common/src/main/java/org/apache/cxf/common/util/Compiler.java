@@ -40,6 +40,7 @@ public class Compiler {
     private String classPath;
     private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
+    private File classpathTmpFile;
     
     public Compiler() {
     }
@@ -152,7 +153,6 @@ public class Compiler {
             javacstr = SystemPropertyAction.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
                        + platformjavacname;
         }
-
         list.add(javacstr);
         // End of honoring java.home for used javac
 
@@ -165,7 +165,9 @@ public class Compiler {
         list.add("-J-Xmx" + maxMemory);
 
         addArgs(list);
-        
+        int classpathIdx = list.indexOf("-classpath");
+        String classpath = list.get(classpathIdx + 1);
+        checkLongClasspath(classpath, list, classpathIdx);
         int idx = list.size();
         list.addAll(Arrays.asList(files));
 
@@ -258,7 +260,6 @@ public class Compiler {
                 StreamPrinter infoStreamPrinter = new StreamPrinter(p.getInputStream(), "[INFO]", System.out);
                 infoStreamPrinter.start();
             }
-
             if (p != null) {
                 return p.waitFor() == 0 ? true : false;
             }
@@ -274,6 +275,9 @@ public class Compiler {
             if (tmpFile != null && tmpFile.exists()) {
                 FileUtils.delete(tmpFile);
             }
+            if (classpathTmpFile != null && classpathTmpFile.exists()) {
+                FileUtils.delete(classpathTmpFile);
+            }
         }
 
         return false;
@@ -285,6 +289,26 @@ public class Compiler {
             strBuffer.append(args[i]);
         }
         return strBuffer.toString().length() > 4096 ? true : false;
+    }
+    
+    private boolean isLongClasspath(String classpath) {
+        return classpath.length() > 2048 ? true : false;
+    }   
+    
+    private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {
+        if (isLongClasspath(classpath)) {
+            PrintWriter out = null;
+            try {
+                classpathTmpFile = FileUtils.createTempFile("cxf-compiler-classpath", null);
+                out = new PrintWriter(new FileWriter(classpathTmpFile));
+                out.println(classpath);
+                out.flush();
+                out.close();
+                list.set(classpathIdx + 1, "@" + classpathTmpFile);
+            } catch (IOException e) {
+                System.err.print("[ERROR] can't write long classpath to @argfile");
+            }
+        } 
     }
 
     public void setEncoding(String string) {
