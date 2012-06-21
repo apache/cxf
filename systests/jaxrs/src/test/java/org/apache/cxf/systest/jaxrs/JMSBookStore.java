@@ -41,6 +41,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -65,6 +67,16 @@ public class JMSBookStore {
     }
     
 
+    @GET
+    @Path("/bookidarray")
+    @Produces("application/xml")
+    public Book getBookByURLQuery(@QueryParam("id") String[] ids) throws Exception {
+        if (ids == null || ids.length != 3) {
+            throw new WebApplicationException(); 
+        }
+        return doGetBook(ids[0] + ids[1] + ids[2]);
+    }
+    
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/xml")

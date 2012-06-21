@@ -213,6 +213,13 @@ public final class HttpUtils {
             return pathToMatch; 
         }
         String requestAddress = getProtocolHeader(m, Message.REQUEST_URI, "/");
+        if (m.get(Message.QUERY_STRING) == null) {
+            int index = requestAddress.lastIndexOf('?');
+            if (index > 0 && index < requestAddress.length()) {
+                m.put(Message.QUERY_STRING, requestAddress.substring(index + 1));
+                requestAddress = requestAddress.substring(0, index);
+            }
+        }
         String baseAddress = getBaseAddress(m);
         pathToMatch = getPathToMatch(requestAddress, baseAddress, addSlash);
         m.put(var, pathToMatch);
