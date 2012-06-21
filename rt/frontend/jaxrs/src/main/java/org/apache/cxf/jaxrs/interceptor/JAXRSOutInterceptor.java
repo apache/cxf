@@ -108,6 +108,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (isResponseAlreadyHandled(message)) {
             return;
         }
+        message.put(Message.REST_MESSAGE, Boolean.TRUE);
         
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {

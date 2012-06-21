@@ -32,6 +32,12 @@ import org.apache.cxf.transport.Destination;
 public interface Message extends StringMap {
     
     String TRANSPORT = "org.apache.cxf.transport";
+    
+    /*
+     * Boolean property which can be used to check that the current request
+     * is part of the SOAP (JAX-WS) or non-SOAP/REST (JAX-RS) execution context.
+     */
+    String REST_MESSAGE = "org.apache.cxf.rest.message";
 
     /**
      * Boolean property specifying if the message is a request message.

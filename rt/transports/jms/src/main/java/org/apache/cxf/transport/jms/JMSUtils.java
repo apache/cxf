@@ -47,6 +47,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
@@ -212,7 +213,10 @@ public final class JMSUtils {
                     // set the message encoding
                     inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(val));
                 }
-
+                if (name.equals(org.apache.cxf.message.Message.RESPONSE_CODE)) {
+                    inMessage.getExchange().put(org.apache.cxf.message.Message.RESPONSE_CODE, 
+                                                Integer.valueOf(val));
+                }
             }
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
 
@@ -596,67 +600,113 @@ public final class JMSUtils {
     private static void prepareJMSMessageProperties(JMSMessageHeadersType messageProperties,
                                                     org.apache.cxf.message.Message outMessage,
                                                     JMSConfiguration jmsConfig) {
-        if (!messageProperties.isSetSOAPJMSTargetService()) {
-            messageProperties.setSOAPJMSTargetService(jmsConfig.getTargetService());
-        }
-        if (!messageProperties.isSetSOAPJMSBindingVersion()) {
-            messageProperties.setSOAPJMSBindingVersion("1.0");
-        }
-        messageProperties.setSOAPJMSContentType(getContentType(outMessage));
-        if (getContentEncoding(outMessage) != null) {
-            messageProperties.setSOAPJMSContentEncoding(getContentEncoding(outMessage));
-        }
-        String soapAction = null;
+        
         // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
-        if (headers != null) {
-            List<String> action = headers.remove(SOAPConstants.SOAP_ACTION);
-            if (action != null && action.size() > 0) {
-                soapAction = action.get(0);
+        
+        boolean isSoapMessage = 
+            !MessageUtils.isTrue(outMessage.get(org.apache.cxf.message.Message.REST_MESSAGE));
+        
+        if (isSoapMessage) {
+            if (!messageProperties.isSetSOAPJMSTargetService()) {
+                messageProperties.setSOAPJMSTargetService(jmsConfig.getTargetService());
             }
-        }
-        
-        if (soapAction == null) {
-            soapAction = messageProperties.getSOAPJMSSOAPAction();
-        }
-        
-        if (soapAction == null) {
-            soapAction = extractActionFromSoap12(outMessage);
-        }
-        
-        if (soapAction != null) {
-            messageProperties.setSOAPJMSSOAPAction(soapAction);
-        }
-        if (!messageProperties.isSetSOAPJMSIsFault()) {
-            if (outMessage.getContent(Exception.class) != null) {
-                messageProperties.setSOAPJMSIsFault(true);
-            } else {
-                messageProperties.setSOAPJMSIsFault(false);
+            if (!messageProperties.isSetSOAPJMSBindingVersion()) {
+                messageProperties.setSOAPJMSBindingVersion("1.0");
             }
-        }
-        if (!messageProperties.isSetSOAPJMSRequestURI()) {
-            messageProperties.setSOAPJMSRequestURI(jmsConfig.getRequestURI());
-        }
-        for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
-            JMSPropertyType prop = new JMSPropertyType();
-            prop.setName(ent.getKey());
-            if (ent.getValue().size() > 1) {
-                StringBuilder b = new StringBuilder();
-                for (String s : ent.getValue()) {
-                    if (b.length() > 0) {
-                        b.append(',');
-                    }
-                    b.append(s);
+            messageProperties.setSOAPJMSContentType(getContentType(outMessage));
+            if (getContentEncoding(outMessage) != null) {
+                messageProperties.setSOAPJMSContentEncoding(getContentEncoding(outMessage));
+            }
+            String soapAction = null;
+            
+            if (headers != null) {
+                List<String> action = headers.remove(SOAPConstants.SOAP_ACTION);
+                if (action != null && action.size() > 0) {
+                    soapAction = action.get(0);
                 }
-                prop.setValue(b.toString());
-            } else {
-                prop.setValue(ent.getValue().get(0));
             }
-            messageProperties.getProperty().add(prop);
+            
+            if (soapAction == null) {
+                soapAction = messageProperties.getSOAPJMSSOAPAction();
+            }
+            
+            if (soapAction == null) {
+                soapAction = extractActionFromSoap12(outMessage);
+            }
+            
+            if (soapAction != null) {
+                messageProperties.setSOAPJMSSOAPAction(soapAction);
+            }
+            if (!messageProperties.isSetSOAPJMSIsFault()) {
+                if (outMessage.getContent(Exception.class) != null) {
+                    messageProperties.setSOAPJMSIsFault(true);
+                } else {
+                    messageProperties.setSOAPJMSIsFault(false);
+                }
+            }
+            if (!messageProperties.isSetSOAPJMSRequestURI()) {
+                messageProperties.setSOAPJMSRequestURI(jmsConfig.getRequestURI());
+            }
+        } else {
+            if (MessageUtils.isRequestor(outMessage)) {
+                addJMSPropertiesFromMessage(messageProperties, 
+                                            outMessage, 
+                                            org.apache.cxf.message.Message.HTTP_REQUEST_METHOD,
+                                            org.apache.cxf.message.Message.REQUEST_URI,
+                                            org.apache.cxf.message.Message.ACCEPT_CONTENT_TYPE);
+            } else {
+                addJMSPropertyFromMessage(messageProperties, 
+                                          outMessage, 
+                                          org.apache.cxf.message.Message.RESPONSE_CODE);
+            }
+            addJMSPropertyFromMessage(messageProperties, 
+                                      outMessage, 
+                                      org.apache.cxf.message.Message.CONTENT_TYPE);
+        }
+        if (headers != null) {
+            for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
+                JMSPropertyType prop = new JMSPropertyType();
+                prop.setName(ent.getKey());
+                if (ent.getValue().size() > 1) {
+                    StringBuilder b = new StringBuilder();
+                    for (String s : ent.getValue()) {
+                        if (b.length() > 0) {
+                            b.append(',');
+                        }
+                        b.append(s);
+                    }
+                    prop.setValue(b.toString());
+                } else {
+                    prop.setValue(ent.getValue().get(0));
+                }
+                messageProperties.getProperty().add(prop);
+            }
         }
     }
 
+    private static void addJMSPropertiesFromMessage(JMSMessageHeadersType messageProperties,
+                                                    org.apache.cxf.message.Message message, 
+                                                    String... keys) {
+        for (String key : keys) {
+            addJMSPropertyFromMessage(messageProperties, message, key);
+        }
+        
+    }
+    
+    private static void addJMSPropertyFromMessage(JMSMessageHeadersType messageProperties,
+                                                  org.apache.cxf.message.Message message, 
+                                                  String key) {
+        Object value = message.get(key);
+        if (value != null) {
+            JMSPropertyType prop = new JMSPropertyType();
+            prop.setName(key);
+            prop.setValue(value.toString());
+            messageProperties.getProperty().add(prop);
+        }
+    }
+    
     /**
      * @param messageProperties
      * @param inMessageProperties
