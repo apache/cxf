@@ -43,6 +43,7 @@ public class Compiler {
     private String classPath;
     private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
+    private File classpathTmpFile;
     
     public Compiler() {
     }
@@ -262,6 +263,9 @@ public class Compiler {
             if (tmpFile != null && tmpFile.exists()) {
                 FileUtils.delete(tmpFile);
             }
+            if (classpathTmpFile != null && classpathTmpFile.exists()) {
+                FileUtils.delete(classpathTmpFile);
+            }
         }
 
         return false;
@@ -282,14 +286,13 @@ public class Compiler {
     private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {
         if (isLongClasspath(classpath)) {
             PrintWriter out = null;
-            File tmpFile;
             try {
-                tmpFile = FileUtils.createTempFile("cxf-compiler-classpath", null);
-                out = new PrintWriter(new FileWriter(tmpFile));
+                classpathTmpFile = FileUtils.createTempFile("cxf-compiler-classpath", null);
+                out = new PrintWriter(new FileWriter(classpathTmpFile));
                 out.println(classpath);
                 out.flush();
                 out.close();
-                list.set(classpathIdx + 1, "@" + tmpFile);
+                list.set(classpathIdx + 1, "@" + classpathTmpFile);
             } catch (IOException e) {
                 System.err.print("[ERROR] can't write long classpath to @argfile");
             }
