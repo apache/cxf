@@ -1590,7 +1590,7 @@ public abstract class AbstractBindingBuilder {
             policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " crypto object found.");
         }
         if (encrUser == null || "".equals(encrUser)) {
-            policyNotAsserted(token, "No " + (sign ? "signature" : "encryption") + " username found.");
+            policyNotAsserted(token, "A " + (sign ? "signature" : "encryption") + " username needs to be declared.");
         }
         if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(encrUser)) {
             List<WSHandlerResult> results = 

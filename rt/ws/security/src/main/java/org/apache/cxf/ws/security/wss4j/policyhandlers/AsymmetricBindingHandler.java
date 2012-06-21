@@ -37,6 +37,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
@@ -408,6 +409,11 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                         encr.setUseThisCert(securityToken.getX509Certificate());
                     } else {
                         setEncryptionUser(encr, recToken, false, crypto);
+                    }
+                    if (!encr.isCertSet() && crypto == null) {
+                        policyNotAsserted(recToken, "Missing security configuration. "
+                                + "Make sure jaxws:client element is configured " 
+                                + "with a " + SecurityConstants.ENCRYPT_PROPERTIES + " value.");
                     }
                     encr.setSymmetricEncAlgorithm(algorithmSuite.getEncryption());
                     encr.setKeyEncAlgo(algorithmSuite.getAsymmetricKeyWrap());
