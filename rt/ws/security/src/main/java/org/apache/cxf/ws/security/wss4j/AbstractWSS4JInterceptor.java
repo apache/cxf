@@ -160,12 +160,12 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     protected void translateProperties(SoapMessage msg) {
         String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
         if (bspCompliant != null) {
-            setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+            msg.setContextualProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
         }
         String futureTTL = 
             (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_FUTURE_TTL);
         if (futureTTL != null) {
-            setProperty(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
+            msg.setContextualProperty(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
         }
     }
 
