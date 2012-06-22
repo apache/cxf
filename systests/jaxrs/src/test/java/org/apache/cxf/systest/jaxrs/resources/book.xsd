@@ -19,7 +19,7 @@
 -->
 
 <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/books" xmlns:tns="http://www.example.org/books" xmlns:bookids="http://www.example.org/books/id" elementFormDefault="qualified">
-  <xs:import namespace="http://www.example.org/books/id"/>
+  <xs:import namespace="http://www.example.org/books/id" schemaLocation="http://schemas/bookid.xsd"/>
   <element name="Book">
      <complexType>
        <sequence>
