@@ -233,7 +233,7 @@ public abstract class AbstractClient implements Client, Retryable {
      * {@inheritDoc}
      */
     public MultivaluedMap<String, String> getHeaders() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<String, String>(false, true);
         map.putAll(state.getRequestHeaders());
         return map;
     }
@@ -318,9 +318,7 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
-        checkClientException(exchange.getOutMessage(), exchange.getOutMessage().getContent(Exception.class));
-        
-        int status = (Integer)exchange.get(Message.RESPONSE_CODE);
+        Integer status = getResponseCode(exchange);
         ResponseBuilder currentResponseBuilder = Response.status(status);
         
         Message responseMessage = exchange.getInMessage() != null 
@@ -478,14 +476,10 @@ public abstract class AbstractClient implements Client, Retryable {
         
         Exchange exchange = message.getExchange(); 
       
-        Exception ex = null;
-        // Check to see if there is a Fault from the outgoing chain if it's an out Message
-        if (!message.get(Message.INBOUND_MESSAGE).equals(Boolean.TRUE)) {
-            ex = message.getContent(Exception.class);
-        }
+        Exception ex = message.getContent(Exception.class);
         if (ex != null) {
             getConfiguration().getConduitSelector().complete(exchange);
-            checkClientException(message, message.getContent(Exception.class));
+            checkClientException(message, ex);
         }
         checkClientException(message, message.getExchange().get(Exception.class));
         
@@ -493,17 +487,41 @@ public abstract class AbstractClient implements Client, Retryable {
         return result != null ? result.toArray() : null;
     }
     
-    protected void checkClientException(Message message, Exception ex) throws Exception {
-        if (message.getExchange().get(Message.RESPONSE_CODE) == null) {
+    protected void checkClientException(Message outMessage, Exception ex) throws Exception {
+        Integer responseCode = getResponseCode(outMessage.getExchange());
+        if (responseCode == null) {
             if (ex instanceof ClientWebApplicationException) {
                 throw ex;
             } else if (ex != null) {
                 throw new ClientWebApplicationException(ex);
-            } else {
-                throw new ClientWebApplicationException();
+            } else if (!outMessage.getExchange().isOneWay() || cfg.isResponseExpectedForOneway()) {
+                waitForResponseCode(outMessage.getExchange());
             }
         }
     }
+    
+    protected void waitForResponseCode(Exchange exchange) {
+        synchronized (exchange) {
+            try {
+                exchange.wait(cfg.getSynchronousTimeout());
+            } catch (InterruptedException ex) {
+                // ignore
+            }
+        }
+        
+        if (getResponseCode(exchange) == null) {
+            throw new ClientWebApplicationException("Response timeout");
+        }
+    }
+    
+    private static Integer getResponseCode(Exchange exchange) {
+        Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
+        if (responseCode == null && exchange.getInMessage() != null) {
+            responseCode = (Integer)exchange.getInMessage().get(Message.RESPONSE_CODE);
+        }
+        return responseCode;
+    }
+    
     
     protected URI calculateNewRequestURI(Map<String, Object> reqContext) {
         URI newBaseURI = URI.create(reqContext.get(Message.ENDPOINT_ADDRESS).toString());
@@ -750,7 +768,7 @@ public abstract class AbstractClient implements Client, Retryable {
         
         m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         m.put(Message.PROTOCOL_HEADERS, headers);
-        if (currentURI.isAbsolute()) {
+        if (currentURI.isAbsolute() && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
             m.put(Message.ENDPOINT_ADDRESS, currentURI.toString());
         } else {
             m.put(Message.ENDPOINT_ADDRESS, state.getBaseURI().toString());
