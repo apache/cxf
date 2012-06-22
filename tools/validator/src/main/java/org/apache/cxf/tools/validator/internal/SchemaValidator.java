@@ -22,8 +22,6 @@ package org.apache.cxf.tools.validator.internal;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -49,6 +47,7 @@ import javax.xml.validation.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
+
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,6 +55,7 @@ import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.xmlschema.LSInputImpl;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
@@ -430,96 +430,4 @@ class SchemaResourceResolver implements LSResourceResolver {
     }
 }
 
-class LSInputImpl implements LSInput {
-
-    protected String fPublicId;
-
-    protected String fSystemId;
-
-    protected String fBaseSystemId;
-
-    protected InputStream fByteStream;
-
-    protected Reader fCharStream;
-
-    protected String fData;
-
-    protected String fEncoding;
-
-    protected boolean fCertifiedText;
-
-    public LSInputImpl() {
-    }
-
-    public LSInputImpl(String publicId, String systemId, InputStream byteStream) {
-        fPublicId = publicId;
-        fSystemId = systemId;
-        fByteStream = byteStream;
-    }
-
-    public InputStream getByteStream() {
-        return fByteStream;
-    }
-
-    public void setByteStream(InputStream byteStream) {
-        fByteStream = byteStream;
-    }
-
-    public Reader getCharacterStream() {
-        return fCharStream;
-    }
-
-    public void setCharacterStream(Reader characterStream) {
-        fCharStream = characterStream;
-    }
-
-    public String getStringData() {
-        return fData;
-    }
-
-    public void setStringData(String stringData) {
-        fData = stringData;
-    }
-
-    public String getEncoding() {
-        return fEncoding;
-    }
-
-    public void setEncoding(String encoding) {
-        fEncoding = encoding;
-    }
-
-    public String getPublicId() {
-        return fPublicId;
-    }
-
-    public void setPublicId(String publicId) {
-        fPublicId = publicId;
-    }
-
-    public String getSystemId() {
-        return fSystemId;
-    }
-
-    public void setSystemId(String systemId) {
-        fSystemId = systemId;
-    }
-
-    public String getBaseURI() {
-        return fBaseSystemId;
-    }
-
-    public void setBaseURI(String baseURI) {
-        fBaseSystemId = baseURI;
-    }
-
-    public boolean getCertifiedText() {
-        return fCertifiedText;
-    }
-
-    public void setCertifiedText(boolean certifiedText) {
-        fCertifiedText = certifiedText;
-    }
-
-}
 
