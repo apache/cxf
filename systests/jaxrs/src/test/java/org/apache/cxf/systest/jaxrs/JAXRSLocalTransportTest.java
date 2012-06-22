@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.Response;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
@@ -30,7 +32,6 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
@@ -69,6 +70,17 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testProxyDirectDispatchPostWithGzip() throws Exception {
+        BookStore localProxy = 
+            JAXRSClientFactory.create("local://books", BookStore.class);
+        
+        WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
+        
+        Response response = localProxy.addBook(new Book("New", 124L));
+        assertEquals(200, response.getStatus());
+    }
+    
+    @Test
     public void testProxyDirectDispatchPost() throws Exception {
         BookStoreSpring localProxy = 
             JAXRSClientFactory.create("local://books", BookStoreSpring.class);
@@ -77,16 +89,6 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         
         Book response = localProxy.convertBook(new Book2("New", 124L));
         assertEquals(124L, response.getId());
-    }
-    
-    @Test
-    @Ignore
-    public void testProxyPipedDispatchGet() throws Exception {
-        BookStore localProxy = 
-            JAXRSClientFactory.create("local://books", BookStore.class);
-        
-        Book response = localProxy.getBook("123");
-        assertEquals(123L, response.getId());
     }
     
     @Test
@@ -99,13 +101,21 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testWebClient() throws Exception {
+    public void testWebClientDirectDispatch() throws Exception {
         WebClient localClient = WebClient.create("local://books");
         
         WebClient.getConfig(localClient).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         localClient.path("bookstore/books/123");
         Book book = localClient.get(Book.class);
         assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testWebClientPipedDispatch() throws Exception {
+        WebClient localClient = WebClient.create("local://books");
+        localClient.path("bookstore/books");
+        Book book = localClient.post(new Book("New", 124L), Book.class);
+        assertEquals(124L, book.getId());
     }
     
     @Test

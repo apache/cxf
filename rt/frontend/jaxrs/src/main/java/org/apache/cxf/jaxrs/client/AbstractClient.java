@@ -233,7 +233,7 @@ public abstract class AbstractClient implements Client, Retryable {
      * {@inheritDoc}
      */
     public MultivaluedMap<String, String> getHeaders() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<String, String>(false, true);
         map.putAll(state.getRequestHeaders());
         return map;
     }

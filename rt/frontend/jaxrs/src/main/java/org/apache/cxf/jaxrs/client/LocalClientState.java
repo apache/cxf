@@ -34,7 +34,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 public class LocalClientState implements ClientState {
     private static final String HTTP_SCHEME = "http";
     
-    private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
+    private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>(false, true);
     private MultivaluedMap<String, String> templates;
     private ResponseBuilder responseBuilder;
     private URI baseURI;
