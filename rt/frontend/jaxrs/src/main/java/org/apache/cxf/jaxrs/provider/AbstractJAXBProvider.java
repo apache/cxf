@@ -112,6 +112,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     private MessageContext mc;
     private Schema schema;
+    private String catalogLocation;
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
     private List<String> jaxbElementClassNames = Collections.emptyList();
@@ -369,7 +370,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
     
     public void setSchemaLocations(List<String> locations) {
-        schema = SchemaHandler.createSchema(locations, getBus());    
+        schema = SchemaHandler.createSchema(locations, catalogLocation, getBus());    
+    }
+    
+    public void setCatalogLocation(String name) {
+        this.catalogLocation = name;
     }
     
     public void setSchema(Schema s) {
