@@ -158,7 +158,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                         message.getContextualProperty(
                             "org.apache.cxf.oneway.rejected_execution_exception"))) {
                         //the executor queue is full, so run the task in the caller thread
-                        chain.resume();
+                        chain.unpause();
                     }
                     
                 } catch (InterruptedException e) {

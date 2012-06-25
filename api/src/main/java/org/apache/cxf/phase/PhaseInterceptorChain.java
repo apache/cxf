@@ -219,16 +219,26 @@ public class PhaseInterceptorChain implements InterceptorChain {
 
     public synchronized void pause() {
         state = State.PAUSED;
+        pausedMessage = CURRENT_MESSAGE.get();
+    }
+    public synchronized void unpause() {
+        if (state == State.PAUSED || state == State.SUSPENDED) {
+            state = State.EXECUTING;
+            pausedMessage = null;
+        }
     }
     
     public synchronized void suspend() {
         state = State.SUSPENDED;
+        pausedMessage = CURRENT_MESSAGE.get();
     }
 
     public synchronized void resume() {
         if (state == State.PAUSED || state == State.SUSPENDED) {
             state = State.EXECUTING;
-            doIntercept(pausedMessage);
+            Message m = pausedMessage;
+            pausedMessage = null;
+            doIntercept(m);
         }
     }
 
@@ -241,7 +251,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
     @SuppressWarnings("unchecked")
     public synchronized boolean doIntercept(Message message) {
         updateIterator();
-        pausedMessage = message;
 
         Message oldMessage = CURRENT_MESSAGE.get();
         try {
@@ -327,7 +336,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
             }
             if (state == State.EXECUTING) {
                 state = State.COMPLETE;
-                pausedMessage = null;
             }
             return state == State.COMPLETE;
         } finally {

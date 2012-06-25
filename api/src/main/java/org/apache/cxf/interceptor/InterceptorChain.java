@@ -67,11 +67,33 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
 
     boolean doInterceptStartingAt(Message message, String startingAtInterceptorID);
 
+    /**
+     * Pauses the current chain.   When the stack unwinds, the chain will just
+     * return from the doIntercept method normally.
+     */
     void pause();
-    
+
+    /**
+     * Suspends the current chain.  When the stack unwinds, the chain back up
+     * the iterator by one (so on resume, the interceptor that called pause will
+     * be re-entered) and then throw a SuspendedInvocationException to the caller
+     */
     void suspend();
     
+    /**
+     * Resumes the chain.  The chain will use the current thread to continue processing
+     * the last message that was passed into doIntercept
+     */
     void resume();
+
+    /**
+     * If the chain is marked as paused, this will JUST mark the chain as
+     * in the EXECUTING phase.   This is useful if an interceptor pauses the chain,
+     * but then immediately decides it should not have done that.   It can unpause
+     * the chain and return normally and the normal processing will continue.
+     */
+    void unpause();
+
     
     void reset();
     
