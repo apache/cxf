@@ -121,7 +121,7 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="org/apache/cxf/systest/ws/wssec10/server/alice.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
         </jaxws:properties> 
 
@@ -142,7 +142,7 @@
         <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/>
-            <entry key="ws-security.encryption.properties" value="org/apache/cxf/systest/ws/wssec10/server/alice.properties"/>
+            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.KeystorePasswordCallback"/>
         </jaxws:properties> 
 
