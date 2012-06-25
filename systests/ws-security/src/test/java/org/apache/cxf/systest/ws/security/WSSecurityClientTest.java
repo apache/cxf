@@ -123,11 +123,21 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("action", "UsernameToken");
         props.put("user", "alice");
+        props.put("passwordType", "PasswordText");
         WSS4JOutInterceptor wss4jOut = new WSS4JOutInterceptor(props);
         
         client.getOutInterceptors().add(wss4jOut);
 
         ((BindingProvider)greeter).getRequestContext().put("password", "password");
+        
+        try {
+            greeter.greetMe("CXF");
+            fail("should fail because of password text instead of digest");
+        } catch (Exception ex) {
+            //expected
+        }
+        
+        props.put("passwordType", "PasswordDigest");
         String s = greeter.greetMe("CXF");
         assertEquals("Hello CXF", s);
         
