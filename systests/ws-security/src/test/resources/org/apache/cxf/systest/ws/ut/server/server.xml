@@ -151,8 +151,8 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/> 
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -170,8 +170,8 @@
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
-           <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/server/bob.properties"/> 
        </jaxws:properties> 
      
     </jaxws:endpoint> 

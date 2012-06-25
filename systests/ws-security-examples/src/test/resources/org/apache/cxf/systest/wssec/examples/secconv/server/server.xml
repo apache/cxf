@@ -55,8 +55,7 @@
            <entry key="ws-security.callback-handler.sct" 
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties.sct" value="bob.properties"/> 
-           <entry key="ws-security.encryption.properties.sct" value="alice.properties"/> 
-           <entry key="ws-security.encryption.username.sct" value="alice"/>
+           <entry key="ws-security.encryption.username.sct" value="useReqSigCert"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
