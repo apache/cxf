@@ -52,7 +52,6 @@
          <entry key="ws-security.callback-handler" 
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
          <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
-         <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
       </jaxws:properties> 
    </jaxws:endpoint>
    
@@ -69,7 +68,6 @@
          <entry key="ws-security.callback-handler" 
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
          <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
-         <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
       </jaxws:properties> 
    </jaxws:endpoint>
    
@@ -86,7 +84,6 @@
          <entry key="ws-security.callback-handler" 
                 value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
          <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
-         <entry key="ws-security.encryption.properties" value="serviceKeystore.properties"/>
          <entry key="ws-security.is-bsp-compliant" value="false"/>
       </jaxws:properties> 
    </jaxws:endpoint>
