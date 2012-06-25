@@ -703,7 +703,6 @@
                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
-                              <sp:RequireIssuerSerialReference />
                            </wsp:Policy>
                         </sp:X509Token>
                      </wsp:Policy>
@@ -814,7 +813,6 @@
                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
-                              <sp:RequireIssuerSerialReference />
                            </wsp:Policy>
                         </sp:X509Token>
                      </wsp:Policy>
@@ -875,7 +873,6 @@
                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                            <wsp:Policy>
                               <sp:WssX509V3Token10 />
-                              <sp:RequireIssuerSerialReference />
                            </wsp:Policy>
                         </sp:X509Token>
                      </wsp:Policy>

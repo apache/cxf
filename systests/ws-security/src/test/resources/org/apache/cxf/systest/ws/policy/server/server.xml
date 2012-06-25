@@ -79,9 +79,7 @@
 				value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
 			<entry key="ws-security.signature.properties"
 				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
-			<entry key="ws-security.encryption.properties"
-				value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
-			<entry key="ws-security.encryption.username" value="alice" />
+			<entry key="ws-security.encryption.username" value="useReqSigCert" />
 		</jaxws:properties>
 		<jaxws:features>
             <p:policies>
@@ -102,9 +100,7 @@
                 value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
-            <entry key="ws-security.encryption.username" value="alice" />
+            <entry key="ws-security.encryption.username" value="useReqSigCert" />
         </jaxws:properties>
         <jaxws:features>
             <p:policies>
@@ -125,9 +121,7 @@
                 value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
-            <entry key="ws-security.encryption.properties"
-                value="org/apache/cxf/systest/ws/wssec10/client/alice.properties" />
-            <entry key="ws-security.encryption.username" value="alice" />
+            <entry key="ws-security.encryption.username" value="useReqSigCert" />
         </jaxws:properties>
         <jaxws:features>
             <p:policies>
@@ -148,8 +142,8 @@
        depends-on="tls-settings">
         
        <jaxws:properties>
-          <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -171,8 +165,8 @@
        depends-on="tls-settings">
         
        <jaxws:properties>
-          <entry key="ws-security.encryption.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/> 
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
        </jaxws:properties> 
@@ -224,7 +218,6 @@
 												sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
 												<wsp:Policy>
 													<sp:WssX509V3Token10 />
-													<sp:RequireIssuerSerialReference />
 												</wsp:Policy>
 											</sp:X509Token>
 										</wsp:Policy>
