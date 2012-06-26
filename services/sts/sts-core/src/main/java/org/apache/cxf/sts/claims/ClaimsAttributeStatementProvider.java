@@ -43,7 +43,13 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             params.setAppliesToAddress(providerParameters.getAppliesToAddress());
             params.setEncryptionProperties(providerParameters.getEncryptionProperties());
             params.setKeyRequirements(providerParameters.getKeyRequirements());
-            params.setPrincipal(providerParameters.getPrincipal());
+            if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
+                params.setPrincipal(providerParameters.getTokenRequirements().getOnBehalfOf().getPrincipal());    
+            } else if (providerParameters.getTokenRequirements().getActAs() != null) {
+                params.setPrincipal(providerParameters.getTokenRequirements().getActAs().getPrincipal());    
+            } else {
+                params.setPrincipal(providerParameters.getPrincipal());
+            }
             params.setRealm(providerParameters.getRealm());
             params.setStsProperties(providerParameters.getStsProperties());
             params.setTokenRequirements(providerParameters.getTokenRequirements());
