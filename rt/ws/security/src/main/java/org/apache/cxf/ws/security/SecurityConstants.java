@@ -186,6 +186,15 @@ public final class SecurityConstants {
     public static final String DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS =
         "ws-security.sts.disable-wsmex-call-using-epr-address";
     
+    /**
+     * This configuration tag is a comma separated String of regular expressions which
+     * will be applied to the subject DN of the certificate used for signature
+     * validation, after trust verification of the certificate chain associated with the 
+     * certificate. These constraints are not used when the certificate is contained in
+     * the keystore (direct trust).
+     */
+    public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
+    
     public static final Set<String> ALL_PROPERTIES;
     
     static {
@@ -203,7 +212,8 @@ public final class SecurityConstants {
             KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
             ENABLE_NONCE_CACHE, NONCE_CACHE_INSTANCE, ENABLE_TIMESTAMP_CACHE,
             TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE,
-            SAML_ROLE_ATTRIBUTENAME, DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS
+            SAML_ROLE_ATTRIBUTENAME, DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS,
+            SUBJECT_CERT_CONSTRAINTS
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

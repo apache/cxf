@@ -122,6 +122,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint>
@@ -140,6 +141,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint>
@@ -158,6 +160,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint>

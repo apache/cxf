@@ -222,6 +222,14 @@
        </jaxws:properties>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedCertConstraintsPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+       </jaxws:properties>
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportKVTPort" 
                   createdFromAPI="true">
        <jaxws:properties>
