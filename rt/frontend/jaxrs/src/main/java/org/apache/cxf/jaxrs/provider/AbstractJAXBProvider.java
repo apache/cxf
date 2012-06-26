@@ -161,7 +161,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     public void init(List<ClassResourceInfo> cris) {
         if (singleJaxbContext) {
             Set<Class<?>> allTypes = 
-                new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true).keySet());
+                new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true)
+                    .getAllTypes().keySet());
             JAXBContext context = 
                 ResourceUtils.createJaxbContext(allTypes, extraClass, cProperties);
             if (context != null) {
