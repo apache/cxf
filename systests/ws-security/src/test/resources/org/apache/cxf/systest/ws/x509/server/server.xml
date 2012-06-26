@@ -156,6 +156,7 @@
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -174,6 +175,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -192,6 +194,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -232,6 +235,7 @@
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -267,6 +271,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -284,6 +289,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -301,6 +307,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -318,6 +325,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint>
@@ -335,6 +343,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -352,6 +361,25 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="TransportSupportingSignedCertConstraints"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportSupportingSignedCertConstraints" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItTransportSupportingSignedCertConstraintsPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/cxfca.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*CN=alice.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 

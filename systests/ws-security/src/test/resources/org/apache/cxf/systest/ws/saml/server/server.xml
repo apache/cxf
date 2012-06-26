@@ -119,6 +119,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
            <entry key="ws-security.saml2.validator" 
                   value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
@@ -140,6 +141,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -158,6 +160,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -176,6 +179,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -194,6 +198,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -214,6 +219,7 @@
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
            <entry key="ws-security.saml2.validator" 
                   value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
        </jaxws:properties> 
@@ -234,6 +240,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -254,6 +261,7 @@
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
            <entry key="ws-security.saml2.validator" 
                   value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
        </jaxws:properties> 
@@ -276,6 +284,7 @@
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -294,6 +303,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -312,6 +322,7 @@
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
            <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
        <jaxws:features>
          <p:policies>
