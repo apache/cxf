@@ -84,6 +84,7 @@ public class ProviderFactory {
             }
             sb.append(line).append("\n");
         }
+        bufrd.close();
         String scriptStr = sb.toString();
 
         Context cx = ContextFactory.getGlobal().enterContext();

@@ -333,7 +333,9 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     
     protected ConduitSelector getConduitSelector(Endpoint ep) {
         ConduitSelector cs = getConduitSelector();
-        cs = cs == null ? new UpfrontConduitSelector() : cs;
+        if (cs == null) {
+            cs = new UpfrontConduitSelector();
+        }
         cs.setEndpoint(ep);
         return cs;
     }

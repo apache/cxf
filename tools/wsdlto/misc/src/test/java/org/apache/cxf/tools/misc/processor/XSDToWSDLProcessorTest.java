@@ -49,6 +49,7 @@ public class XSDToWSDLProcessorTest
             sb.append(chars, 0, readLen);
             size = size + readLen;
         }
+        fileReader.close();
         String serviceString = new String(sb);
         assertTrue(serviceString.indexOf("<wsdl:types>") >= 0);
         assertTrue(serviceString.indexOf("<schema targetNamespace=\"http:/"
@@ -78,6 +79,7 @@ public class XSDToWSDLProcessorTest
             sb.append(chars, 0, readLen);
             size = size + readLen;
         }
+        fileReader.close();
         String serviceString = new String(sb);
         assertTrue(serviceString.indexOf("<wsdl:types>") >= 0);
         assertTrue(serviceString.indexOf("<schema targetNamespace=\"http:/"

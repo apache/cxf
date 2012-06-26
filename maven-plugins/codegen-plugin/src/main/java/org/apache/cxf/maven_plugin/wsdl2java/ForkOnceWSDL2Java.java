@@ -40,6 +40,7 @@ public final class ForkOnceWSDL2Java {
         while (line != null) {
             int i = Integer.parseInt(line);
             if (i == -1) {
+                reader.close();
                 return;
             }
             String wargs[] = new String[i];
@@ -51,5 +52,6 @@ public final class ForkOnceWSDL2Java {
             
             line = reader.readLine();
         }
+        reader.close();
     }
 }
