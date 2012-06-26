@@ -58,6 +58,7 @@
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -77,6 +78,7 @@
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
@@ -96,6 +98,7 @@
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
           <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 

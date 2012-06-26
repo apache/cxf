@@ -80,6 +80,7 @@
 			<entry key="ws-security.signature.properties"
 				value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
 			<entry key="ws-security.encryption.username" value="useReqSigCert" />
+			<entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
 		</jaxws:properties>
 		<jaxws:features>
             <p:policies>
@@ -101,6 +102,7 @@
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies>
@@ -122,6 +124,7 @@
             <entry key="ws-security.signature.properties"
                 value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
             <entry key="ws-security.encryption.username" value="useReqSigCert" />
+            <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
         </jaxws:properties>
         <jaxws:features>
             <p:policies>
@@ -144,6 +147,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
        <jaxws:features>
             <p:policies>
@@ -167,6 +171,7 @@
        <jaxws:properties>
           <entry key="ws-security.signature.properties" 
                   value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
           <entry key="ws-security.callback-handler"
                 value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
        </jaxws:properties> 

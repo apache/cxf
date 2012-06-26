@@ -343,6 +343,11 @@
                    binding="tns:DoubleItTransportSupportingSignedBinding">
             <soap:address location="https://localhost:9002/DoubleItX509TransportSupportingSigned" />
         </wsdl:port>
+        <wsdl:port name="DoubleItTransportSupportingSignedCertConstraintsPort" 
+                   binding="tns:DoubleItTransportSupportingSignedBinding">
+            <soap:address 
+                  location="https://localhost:9002/DoubleItX509TransportSupportingSignedCertConstraints" />
+        </wsdl:port>
         <wsdl:port name="DoubleItTransportKVTPort" 
                    binding="tns:DoubleItTransportKVTBinding">
             <soap:address location="https://localhost:9002/DoubleItX509TransportKVT" />
