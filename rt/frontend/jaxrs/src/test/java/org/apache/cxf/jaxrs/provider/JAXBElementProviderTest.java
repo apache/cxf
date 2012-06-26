@@ -144,6 +144,8 @@ public class JAXBElementProviderTest extends Assert {
         assertNotNull(bookContext);
         JAXBContext superBookContext = provider.getJAXBContext(SuperBook.class, SuperBook.class);
         assertSame(bookContext, superBookContext);
+        JAXBContext book2Context = provider.getJAXBContext(Book2.class, Book2.class);
+        assertSame(bookContext, book2Context);
     }
     
     @Test
@@ -1466,6 +1468,12 @@ public class JAXBElementProviderTest extends Assert {
         public SuperBook getSuperBook() {
             return null;
         }
+        
+        @GET
+        public List<Book2> getBook2() {
+            return null;
+        }
+        
     }
     
     @XmlRootElement(name = "list")

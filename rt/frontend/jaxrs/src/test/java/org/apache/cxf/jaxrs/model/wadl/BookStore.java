@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -55,6 +56,13 @@ public class BookStore {
     @Consumes("multipart/form-data")
     public void formdata(MultipartBody body) {
         
+    }
+    
+    @GET 
+    @Produces("application/xml")
+    @XMLName("{http://superbooks}books")
+    public List<Book> getBooks() {
+        return Collections.emptyList();
     }
     
     @GET 

@@ -95,6 +95,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.ResourceTypes;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -129,7 +130,8 @@ public class WadlGenerator implements RequestHandler {
     private boolean ignoreRequests;
     private boolean linkJsonToXmlSchema;
     private boolean useJaxbContextForQnames = true;
-
+    private boolean supportCollections = true;
+    
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
     private Map<String, List<String>> externalQnamesMap;
@@ -212,12 +214,14 @@ public class WadlGenerator implements RequestHandler {
 
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
 
-        Set<Class<?>> allTypes =
-            ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames).keySet();
+        ResourceTypes resourceTypes =
+            ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames);
+        Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
+        
         JAXBContext context = useJaxbContextForQnames 
             ? ResourceUtils.createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
         
-        SchemaWriter schemaWriter = createSchemaWriter(context, ui);
+        SchemaWriter schemaWriter = createSchemaWriter(resourceTypes, context, ui);
         ElementQNameResolver qnameResolver =
             schemaWriter == null ? null : createElementQNameResolver(context);
 
@@ -738,14 +742,20 @@ public class WadlGenerator implements RequestHandler {
                 doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns, isJson);
                 sb.append("</representation>");
             } else  { 
-                type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
+                boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
+                if (isCollection) {
+                    type = InjectionUtils.getActualType(!inbound ? opMethod.getGenericReturnType() 
+                        : opMethod.getGenericParameterTypes()[getRequestBodyParam(ori).getIndex()]);
+                } else {
+                    type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
+                }
                 if (isJson) {
                     sb.append(" element=\"").append(type.getSimpleName()).append("\"");
                 } else if (qnameResolver != null 
                         && (mt.getSubtype().contains("xml")
                                 || linkJsonToXmlSchema && mt.getSubtype().contains("json"))
                         && jaxbTypes.contains(type)) {
-                    generateQName(sb, qnameResolver, clsMap, type,
+                    generateQName(sb, qnameResolver, clsMap, type, isCollection,
                                   getBodyAnnotations(ori, inbound));
                 }
                 addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault, isJson);
@@ -910,20 +920,34 @@ public class WadlGenerator implements RequestHandler {
                                ElementQNameResolver qnameResolver,
                                Map<Class<?>, QName> clsMap,
                                Class<?> type,
+                               boolean isCollection,
                                Annotation[] annotations) {
-
-        QName typeQName = clsMap.get(type);
-        if (typeQName != null) {
-            writeQName(sb, typeQName);
-            return;
+        if (!isCollection) {
+            QName typeQName = clsMap.get(type);
+            if (typeQName != null) {
+                writeQName(sb, typeQName);
+                return;
+            }
         }
 
         QName qname = qnameResolver.resolve(type, annotations,
                                             Collections.unmodifiableMap(clsMap));
 
         if (qname != null) {
-            writeQName(sb, qname);
-            clsMap.put(type, qname);
+            if (!isCollection) {
+                writeQName(sb, qname);
+                clsMap.put(type, qname);
+            } else {
+                XMLName name = AnnotationUtils.getAnnotation(annotations, XMLName.class);
+                QName collectionName = null;
+                if (name != null) {
+                    QName tempQName = JAXRSUtils.convertStringToQName(name.value());
+                    collectionName = new QName(qname.getNamespaceURI(), 
+                                               tempQName.getLocalPart(),
+                                               qname.getPrefix());
+                    writeQName(sb, collectionName);
+                }
+            }
         }
     }
 
@@ -932,7 +956,7 @@ public class WadlGenerator implements RequestHandler {
             .append(qname.getLocalPart()).append("\"");
     }
 
-    private SchemaCollection getSchemaCollection(JAXBContext context) {
+    private SchemaCollection getSchemaCollection(ResourceTypes resourceTypes, JAXBContext context) {
         if (context == null) {
             return null;
         }
@@ -942,7 +966,37 @@ public class WadlGenerator implements RequestHandler {
         try {
             for (DOMResult r : JAXBUtils.generateJaxbSchemas(context,
                                     CastUtils.cast(Collections.emptyMap(), String.class, DOMResult.class))) {
-                DOMSource source = new DOMSource(r.getNode(), r.getSystemId());
+                Document doc = (Document)r.getNode();
+                if (supportCollections && !resourceTypes.getCollectionMap().isEmpty()) {
+                    ElementQNameResolver theResolver = createElementQNameResolver(context);
+                    String tns = doc.getDocumentElement().getAttribute("targetNamespace");
+                    for (Map.Entry<Class<?>, QName> entry : resourceTypes.getCollectionMap().entrySet()) {
+                        if (tns.equals(entry.getValue().getNamespaceURI())) {
+                            QName typeName = theResolver.resolve(entry.getKey(), new Annotation[]{}, 
+                                                           Collections.<Class<?>, QName>emptyMap());
+                            if (typeName != null) {
+                                Element newElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                                                         "xs:element");
+                                newElement.setAttribute("name", entry.getValue().getLocalPart());
+                                Element ctElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                    "xs:complexType");
+                                newElement.appendChild(ctElement);
+                                Element seqElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                    "xs:sequence");
+                                ctElement.appendChild(seqElement);
+                                Element xsElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                    "xs:element");
+                                seqElement.appendChild(xsElement);
+                                xsElement.setAttribute("ref", "tns:" + typeName.getLocalPart());
+                                xsElement.setAttribute("minOccurs", "0");
+                                xsElement.setAttribute("maxOccurs", "unbounded");
+                                
+                                doc.getDocumentElement().appendChild(newElement);
+                            }
+                        }
+                    }
+                }
+                DOMSource source = new DOMSource(doc, r.getSystemId());
                 schemas.add(source);
                 String tns = 
                     ((Document)source.getNode()).getDocumentElement().getAttribute("targetNamespace");
@@ -1284,7 +1338,8 @@ public class WadlGenerator implements RequestHandler {
         }
     }
 
-    protected SchemaWriter createSchemaWriter(JAXBContext context, UriInfo ui) {
+    protected SchemaWriter createSchemaWriter(ResourceTypes resourceTypes, JAXBContext context, 
+                                              UriInfo ui) {
         // if neither externalSchemaLinks nor externalSchemasCache is set
         // then JAXBContext will be used to generate the schema
         if (externalSchemaLinks != null && externalSchemasCache == null) {
@@ -1292,7 +1347,7 @@ public class WadlGenerator implements RequestHandler {
         } else if (externalSchemasCache != null) {
             return new StringSchemaWriter(externalSchemasCache, externalSchemaLinks, ui);
         } else if (context != null) {
-            SchemaCollection coll = getSchemaCollection(context);
+            SchemaCollection coll = getSchemaCollection(resourceTypes, context);
             if (coll != null) {
                 return new SchemaCollectionWriter(coll);
             }
@@ -1544,6 +1599,10 @@ public class WadlGenerator implements RequestHandler {
 
     public void setIgnoreRequests(boolean ignoreRequests) {
         this.ignoreRequests = ignoreRequests;
+    }
+    
+    public void setSupportCollections(boolean support) {
+        this.supportCollections = support;
     }
 
     public void setDefaultMediaType(String mt) {
