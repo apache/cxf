@@ -348,7 +348,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             return;
         }
         if (db instanceof PropertiesAwareDataBinding) {
-            Map<Class<?>, Type> allClasses = ResourceUtils.getAllRequestResponseTypes(cris, false);
+            Map<Class<?>, Type> allClasses = 
+                ResourceUtils.getAllRequestResponseTypes(cris, false).getAllTypes();
             Map<String, Object> props = new HashMap<String, Object>();
             props.put(PropertiesAwareDataBinding.TYPES_PROPERTY, allClasses);
             ((PropertiesAwareDataBinding)db).initialize(props);

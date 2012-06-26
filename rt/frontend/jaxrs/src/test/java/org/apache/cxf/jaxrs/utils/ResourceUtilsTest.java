@@ -111,7 +111,8 @@ public class ResourceUtilsTest extends Assert {
         ClassResourceInfo cri1 = 
             ResourceUtils.createClassResourceInfo(BookInterface.class, BookInterface.class, true, true);
         Map<Class<?>, Type> types = 
-            ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true);
+            ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true)
+                .getAllTypes();
         assertEquals(2, types.size());
         assertTrue(types.containsKey(Book.class));
         assertTrue(types.containsKey(Chapter.class));

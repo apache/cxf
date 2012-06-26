@@ -81,10 +81,12 @@ import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.ResourceTypes;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.model.wadl.ElementClass;
+import org.apache.cxf.jaxrs.model.wadl.XMLName;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
@@ -450,9 +452,9 @@ public final class ResourceUtils {
     }
     
 
-    public static Map<Class<?>, Type> getAllRequestResponseTypes(List<ClassResourceInfo> cris, 
-                                                                 boolean jaxbOnly) {
-        Map<Class<?>, Type> types = new HashMap<Class<?>, Type>();
+    public static ResourceTypes getAllRequestResponseTypes(List<ClassResourceInfo> cris, 
+                                                           boolean jaxbOnly) {
+        ResourceTypes types = new ResourceTypes();
         for (ClassResourceInfo resource : cris) {
             getAllTypesForResource(resource, types, jaxbOnly);
         }
@@ -470,29 +472,33 @@ public final class ResourceUtils {
         return type;
     }
     
-    private static void getAllTypesForResource(ClassResourceInfo resource, Map<Class<?>, Type> types,
+    private static void getAllTypesForResource(ClassResourceInfo resource, 
+                                               ResourceTypes types,
                                                boolean jaxbOnly) {
         for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
-            Class<?> realReturnType = ori.getMethodToInvoke().getReturnType();
+            Method method = ori.getMethodToInvoke();
+            Class<?> realReturnType = method.getReturnType();
             Class<?> cls = realReturnType;
             if (cls == Response.class) {
-                cls = getActualJaxbType(cls, ori.getMethodToInvoke(), false);
+                cls = getActualJaxbType(cls, method, false);
             }
-            Type type = ori.getMethodToInvoke().getGenericReturnType();
+            Type type = method.getGenericReturnType();
             if (jaxbOnly) {
-                checkJaxbType(cls, realReturnType == Response.class ? cls : type, types);
+                checkJaxbType(cls, realReturnType == Response.class ? cls : type, types, 
+                    method.getAnnotations());
             } else {
-                types.put(cls, type);
+                types.getAllTypes().put(cls, type);
             }
             
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.REQUEST_BODY) {
-                    Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
-                    Type paramType = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
+                    Class<?> inType = method.getParameterTypes()[pm.getIndex()];
+                    Type paramType = method.getGenericParameterTypes()[pm.getIndex()];
                     if (jaxbOnly) {
-                        checkJaxbType(inType, paramType, types);
+                        checkJaxbType(inType, paramType, types, 
+                                      method.getParameterAnnotations()[pm.getIndex()]);
                     } else {
-                        types.put(inType, paramType);
+                        types.getAllTypes().put(inType, paramType);
                     }
                     
                 }
@@ -507,18 +513,28 @@ public final class ResourceUtils {
         }
     }
     
-    private static void checkJaxbType(Class<?> type, Type genericType, Map<Class<?>, Type> types) {
+    private static void checkJaxbType(Class<?> type, 
+                                      Type genericType, 
+                                      ResourceTypes types,
+                                      Annotation[] anns) {
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            type = InjectionUtils.getActualType(genericType);
+            XMLName name = AnnotationUtils.getAnnotation(anns, XMLName.class);
+            if (name != null) {
+                types.getCollectionMap().put(type, JAXRSUtils.convertStringToQName(name.value()));
+            }
+        }
         JAXBElementProvider provider = new JAXBElementProvider();
         if (type != null 
             && !InjectionUtils.isPrimitive(type) 
             && !JAXBElement.class.isAssignableFrom(type)
             && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
-            types.put(type, type);
+            types.getAllTypes().put(type, type);
             
             Class<?> genCls = InjectionUtils.getActualType(genericType);
             if (genCls != type && genCls instanceof Class && genCls != Object.class 
                 && !InjectionUtils.isSupportedCollectionOrArray(genCls)) {
-                types.put(genCls, genCls);
+                types.getAllTypes().put(genCls, genCls);
             }
         }
     }

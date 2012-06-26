@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
@@ -253,9 +254,13 @@ public class WadlGeneratorTest extends Assert {
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
-        checkBookStoreInfo(els.get(0), "ns1:thebook", "ns1:thebook2", "ns1:thechapter");
+        checkBookStoreInfo(els.get(0), 
+                           "ns1:thebook", 
+                           "ns1:thebook2", 
+                           "ns1:thechapter",
+                           "ns1:books");
     }
     
     @Test
@@ -343,14 +348,24 @@ public class WadlGeneratorTest extends Assert {
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         String wadl = r.getEntity().toString();
         Document doc = DOMUtils.readXml(new StringReader(wadl));
-        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
+        checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
         Element orderResource = els.get(1);
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
-    private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl) {
+    private void checkGrammars(Element appElement, 
+                               String bookEl,
+                               String book2El, 
+                               String chapterEl) {
+        checkGrammars(appElement, bookEl, null, book2El, chapterEl);
+    }
+    private void checkGrammars(Element appElement, 
+                               String bookEl,
+                               String booksEl,
+                               String book2El,
+                               String chapterEl) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
@@ -362,14 +377,21 @@ public class WadlGeneratorTest extends Assert {
                             XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
         
         int size = book2El == null ? 2 : 3;
+        int elementSize = size;
+        if (booksEl != null) {
+            elementSize++;
+        }
         
-        assertEquals(size, elementEls.size());
+        assertEquals(elementSize, elementEls.size());
         
         assertTrue(checkElement(elementEls, bookEl, "book"));
         if (book2El != null) {
             assertTrue(checkElement(elementEls, book2El, "book2"));
         }
         assertTrue(checkElement(elementEls, chapterEl, "chapter"));
+        if (booksEl != null) {
+            assertTrue(checkElement(elementEls, booksEl, "books"));
+        }
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                                         XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
@@ -412,18 +434,46 @@ public class WadlGeneratorTest extends Assert {
         for (Element e : els) {
             if (name.equals(e.getAttribute("name"))) {
                 String type = e.getAttribute("type");
-                
-                String expectedType1 = "tns:" + localTypeName;
-                String expectedType2 = "os:" + localTypeName;
-                if (type.equals(expectedType1) || type.equals(expectedType2)) {
-                    return true;
+                if (!StringUtils.isEmpty(type)) {
+                    String expectedType1 = "tns:" + localTypeName;
+                    String expectedType2 = "os:" + localTypeName;
+                    if (type.equals(expectedType1) || type.equals(expectedType2)) {
+                        return true;
+                    }
+                } else if ("books".equals(name)) {
+                    Element ctElement = 
+                        (Element)e.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                                          "complexType").item(0);
+                    Element seqElement = 
+                        (Element)ctElement.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                                          "sequence").item(0);
+                    Element xsElement = 
+                        (Element)seqElement.getElementsByTagNameNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
+                                                          "element").item(0);
+                    String ref = xsElement.getAttribute("ref");
+                    String expectedRef = "tns:thebook";
+                    String expectedRef2 = "os:thebook";
+                    if (ref.equals(expectedRef) || ref.equals(expectedRef2)) {
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
     
-    private void checkBookStoreInfo(Element resource, String bookEl, String book2El, String chapterEl) {
+    private void checkBookStoreInfo(Element resource, 
+                                    String bookEl, 
+                                    String book2El, 
+                                    String chapterEl) {
+        checkBookStoreInfo(resource, bookEl, book2El, chapterEl, null);
+    }
+    
+    private void checkBookStoreInfo(Element resource, 
+                                    String bookEl, 
+                                    String book2El, 
+                                    String chapterEl,
+                                    String booksEl) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
         checkDocs(resource, "book store resource", "super resource", "en-us");
@@ -443,10 +493,10 @@ public class WadlGeneratorTest extends Assert {
         // must have a single template parameter
         verifyParameters(resource, 1, new Param("id", "template", "xs:long"));
         
-        // must have 3 methods, GET, POST and PUT
-        List<Element> methodEls = getElements(resource, "method", 3);
+        // must have 4 methods, 2 GETs, POST and PUT
+        List<Element> methodEls = getElements(resource, "method", 4);
         
-        // verify GET
+        // verify 1st GET
         assertEquals("GET", methodEls.get(0).getAttribute("name"));
         assertEquals(0, DOMUtils.getChildrenWithName(methodEls.get(0), 
                         WadlGenerator.WADL_NS, "param").size());
@@ -466,16 +516,22 @@ public class WadlGeneratorTest extends Assert {
         //check response
         verifyRepresentation(methodEls.get(0), "response", "text/plain", "");
         
+        // verify 2nd GET
+        assertEquals("GET", methodEls.get(1).getAttribute("name"));
+        if (booksEl != null) {
+            verifyRepresentation(methodEls.get(1), "response", "application/xml", booksEl);
+        }
+        
         // verify POST
-        assertEquals("POST", methodEls.get(1).getAttribute("name"));
-        Element formRep = verifyRepresentation(methodEls.get(1), "request", "multipart/form-data", "");
+        assertEquals("POST", methodEls.get(2).getAttribute("name"));
+        Element formRep = verifyRepresentation(methodEls.get(2), "request", "multipart/form-data", "");
         checkDocs(formRep, "", "Attachments", "");
         
         // verify PUT
-        assertEquals("PUT", methodEls.get(2).getAttribute("name"));
-        verifyRepresentation(methodEls.get(2), "request", "text/plain", "");
+        assertEquals("PUT", methodEls.get(3).getAttribute("name"));
+        verifyRepresentation(methodEls.get(3), "request", "text/plain", "");
         
-        verifyResponseWithStatus(methodEls.get(2), "204");
+        verifyResponseWithStatus(methodEls.get(3), "204");
         
         // verify resource starting with /book2
         verifyGetResourceMethod(resourceEls.get(0), book2El, null);
