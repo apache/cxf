@@ -214,7 +214,11 @@ public class WadlGeneratorTest extends Assert {
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
         checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
-        checkBookStoreInfo(els.get(0), "ns1:thebook", "ns1:thebook2", "ns1:thechapter");
+        checkBookStoreInfo(els.get(0), 
+                           "ns1:thebook", 
+                           "ns1:thebook2", 
+                           "ns1:thechapter",
+                           "ns1:books");
     }
     
     @Test
@@ -420,6 +424,14 @@ public class WadlGeneratorTest extends Assert {
                                     String bookEl, 
                                     String book2El, 
                                     String chapterEl) {
+        checkBookStoreInfo(resource, bookEl, book2El, chapterEl, null);
+    }
+    
+    private void checkBookStoreInfo(Element resource, 
+                                    String bookEl, 
+                                    String book2El, 
+                                    String chapterEl,
+                                    String booksEl) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
         checkDocs(resource, "book store resource", "super resource", "en-us");
@@ -464,6 +476,9 @@ public class WadlGeneratorTest extends Assert {
         
         // verify 2nd GET
         assertEquals("GET", methodEls.get(1).getAttribute("name"));
+        if (booksEl != null) {
+            verifyRepresentation(methodEls.get(1), "response", "application/xml", booksEl);
+        }
         
         // verify POST
         assertEquals("POST", methodEls.get(2).getAttribute("name"));

@@ -942,8 +942,9 @@ public class WadlGenerator implements RequestHandler {
                 QName collectionName = null;
                 if (name != null) {
                     QName tempQName = JAXRSUtils.convertStringToQName(name.value());
-                    collectionName = new QName(qname.getPrefix(), qname.getNamespaceURI(), 
-                                               tempQName.getLocalPart());
+                    collectionName = new QName(qname.getNamespaceURI(), 
+                                               tempQName.getLocalPart(),
+                                               qname.getPrefix());
                     writeQName(sb, collectionName);
                 }
             }
