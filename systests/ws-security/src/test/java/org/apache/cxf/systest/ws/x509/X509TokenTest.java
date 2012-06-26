@@ -454,6 +454,44 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testTransportSupportingSignedCertConstraints() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingSignedCertConstraintsPort");
+        DoubleItPortType x509Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(x509Port, PORT2);
+        
+        ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+        ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "bob");
+        
+        try {
+            x509Port.doubleIt(25);
+            fail("Failure expected on bob");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+            "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+    
+        x509Port.doubleIt(25);
+    }
+    
+    @org.junit.Test
     public void testTransportKVT() throws Exception {
         if (!unrestrictedPoliciesInstalled) {
             return;

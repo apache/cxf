@@ -171,6 +171,15 @@ public final class SecurityConstants {
     public static final String CACHE_CONFIG_FILE = 
         "ws-security.cache.config.file";
     
+    /**
+     * This configuration tag is a comma separated String of regular expressions which
+     * will be applied to the subject DN of the certificate used for signature
+     * validation, after trust verification of the certificate chain associated with the 
+     * certificate. These constraints are not used when the certificate is contained in
+     * the keystore (direct trust).
+     */
+    public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
+    
     public static final Set<String> ALL_PROPERTIES;
     
     static {
@@ -187,7 +196,7 @@ public final class SecurityConstants {
             KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
             ENABLE_NONCE_CACHE, NONCE_CACHE_INSTANCE, ENABLE_TIMESTAMP_CACHE,
-            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE
+            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, SUBJECT_CERT_CONSTRAINTS
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }

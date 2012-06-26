@@ -167,6 +167,11 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (futureTTL != null) {
             msg.setContextualProperty(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
         }
+        String certConstraints = 
+            (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
+        if (certConstraints != null) {
+            msg.setContextualProperty(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
+        }
     }
 
     @Override

@@ -56,6 +56,7 @@
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -72,6 +73,7 @@
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
            <entry key="ws-security.encryption.username" value="useReqSigCert"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -88,6 +90,7 @@
                   value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
            <entry key="ws-security.signature.username" value="bob"/> 
            <entry key="ws-security.signature.properties" value="bob.properties"/> 
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
@@ -107,6 +110,7 @@
            <entry key="ws-security.encryption.properties" value="bob.properties"/> 
            <entry key="ws-security.signature.properties" value="alice.properties"/> 
            <entry key="ws-security.encryption.username" value="alice"/>
+           <entry key="ws-security.subject.cert.constraints" value=".*O=apache.org.*"/>
        </jaxws:properties> 
     </jaxws:endpoint>
     
