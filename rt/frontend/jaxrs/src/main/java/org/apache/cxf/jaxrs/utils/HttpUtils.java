@@ -200,7 +200,10 @@ public final class HttpUtils {
             if (!absolute) {
                 u = URI.create(base + u.toString());
             } else {
-                u = URI.create(u.toString().replace(ANY_IP_ADDRESS, serverAndPort));
+                int originalPort = u.getPort();
+                String replaceValue = originalPort == -1 ? ANY_IP_ADDRESS
+                    : ANY_IP_ADDRESS + ":" + originalPort;
+                u = URI.create(u.toString().replace(replaceValue, serverAndPort));
             }
         }
         return u;
