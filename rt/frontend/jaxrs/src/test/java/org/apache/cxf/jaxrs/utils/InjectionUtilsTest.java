@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.utils;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,12 +28,43 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class InjectionUtilsTest extends Assert {
+    
+    
+    @Test
+    public void testHandleParameterWithXmlAdapterOnInterface() throws Exception {
+        // Arrange
+        String value = "1.1";
+
+        // Act
+        Object id = InjectionUtils.handleParameter(value, 
+                                                   true, 
+                                                   Id.class, 
+                                                   new Annotation[] {}, 
+                                                   ParameterType.PATH,  
+                                                   createMessage());
+
+        // Assert
+        assertTrue(id instanceof Id);
+        assertEquals(value, ((Id)id).getId());
+    }
     
     public void testCollectionTypeFromArray() {
         assertNull(InjectionUtils.getCollectionType(String[].class));
@@ -179,4 +211,62 @@ public class InjectionUtilsTest extends Assert {
         }
     }
     
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get(Application.class.getName());
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
+    }
+    
+    public static class Adapter extends XmlAdapter<String, Id> {
+
+        @Override
+        public String marshal(final Id id) throws Exception {
+            return id.getId();
+        }
+
+        @Override
+        public Id unmarshal(final String idStr) throws Exception {
+            Id id = new DelegatingId();
+            id.setId(idStr);
+            return id;
+        }
+    }
+    
+    @XmlJavaTypeAdapter(Adapter.class)
+    public interface Id {
+        String getId();
+
+        void setId(String id);
+    }
+    
+    public static class DelegatingId implements Id {
+    
+        private String id;
+
+        public String getId() {
+            return this.id;
+        }
+    
+        public void setId(String id) {
+            this.id = id;
+        }
+    
+    }
 }
