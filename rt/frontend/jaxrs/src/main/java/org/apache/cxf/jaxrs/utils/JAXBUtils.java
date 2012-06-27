@@ -29,10 +29,11 @@ public final class JAXBUtils {
         
     }
     
-    public static Object convertWithAdapter(Object obj, 
+    public static Object convertWithAdapter(Object obj,
+                                            Class<?> adapterClass,
                                             Annotation[] anns) {
         return useAdapter(obj, 
-                          getAdapter(obj.getClass(), anns),
+                          getAdapter(adapterClass, anns),
                           false, 
                           obj);
     }

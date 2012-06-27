@@ -367,10 +367,14 @@ public final class InjectionUtils {
             result = createFromParameterHandler(value, cls, message);
         }
         
-        if (result != null && adapterHasToBeUsed) {
+        if (adapterHasToBeUsed) {
             // as the last resort, try XmlJavaTypeAdapters
+            Object valueToReplace = result != null ? result : value;
             try {
-                result = JAXBUtils.convertWithAdapter(result, paramAnns);
+                result = JAXBUtils.useAdapter(valueToReplace, 
+                                              JAXBUtils.getAdapter(pClass, paramAnns),
+                                              false, 
+                                              result);
             } catch (Throwable ex) {
                 result = null; 
             }
