@@ -371,10 +371,7 @@ public final class InjectionUtils {
             // as the last resort, try XmlJavaTypeAdapters
             Object valueToReplace = result != null ? result : value;
             try {
-                result = JAXBUtils.useAdapter(valueToReplace, 
-                                              JAXBUtils.getAdapter(pClass, paramAnns),
-                                              false, 
-                                              result);
+                result = JAXBUtils.convertWithAdapter(valueToReplace, pClass, paramAnns);
             } catch (Throwable ex) {
                 result = null; 
             }
