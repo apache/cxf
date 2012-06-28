@@ -37,7 +37,7 @@ import org.junit.Test;
  * 
  */
 public class RMTxStoreTwoSchemasTest extends Assert {
-    private static final String TEST_DB_NAME = "rmdb3";
+    private static final String TEST_DB_NAME = "rmdbts";
 
     private static final String CLIENT_ENDPOINT_ID = 
         "{http://apache.org/greeter_control}GreeterService/GreeterPort";

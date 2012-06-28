@@ -192,11 +192,19 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
+          <xs:attribute name="keepConnection" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>
+                  Indicates if the connection is kept by the store.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
           <xs:attribute name="initialReconnectDelay" type="xs:long">
             <xs:annotation>
               <xs:documentation>
                   The initialy delay before attempting to reconnect to the database. The subsequent
-                  delay follows the exponential backoff algorithm.
+                  delay follows the exponential backoff algorithm. This attribute is only
+                  relevant when the connection is kept by the store.
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
@@ -204,7 +212,8 @@
             <xs:annotation>
               <xs:documentation>
                   The maximum number of attemps taken to reconnect to the database after a connection error.
-                  The value of 0 indicates no attempt, while a negative value indicates no limit. 
+                  The value of 0 indicates no attempt, while a negative value indicates no limit.
+                  This attribute is only relevant when the connection is kept by the store. 
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
