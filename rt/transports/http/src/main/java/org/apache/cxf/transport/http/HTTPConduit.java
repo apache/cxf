@@ -1008,6 +1008,7 @@ public class HTTPConduit
         switch(responseCode) {
         case HttpURLConnection.HTTP_MOVED_PERM:
         case HttpURLConnection.HTTP_MOVED_TEMP:
+        case HttpURLConnection.HTTP_SEE_OTHER:    
         case 307:
             connection = redirectRetransmit(origConnection, message, cachedStream);
             break;
@@ -1760,6 +1761,7 @@ public class HTTPConduit
         switch (e.responseCode()) {
         case HttpURLConnection.HTTP_MOVED_PERM: // 301
         case HttpURLConnection.HTTP_MOVED_TEMP: // 302
+        case HttpURLConnection.HTTP_SEE_OTHER:  // 303    
         case 307:    
             msg += " that returned location header '" + e.getLocation() + "'";
             break;
