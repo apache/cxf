@@ -69,7 +69,7 @@ public class RMTxStoreUpgradeTest extends Assert {
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
     private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
     
-    private static final String TEST_DB_NAME = "rmdb2";
+    private static final String TEST_DB_NAME = "rmdbu";
 
     @BeforeClass 
     public static void setUpOnce() {

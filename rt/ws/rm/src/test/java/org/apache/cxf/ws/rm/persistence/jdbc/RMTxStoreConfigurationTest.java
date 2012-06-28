@@ -105,7 +105,7 @@ public class RMTxStoreConfigurationTest extends Assert {
         
         assertNull(store.getConnection());
     }
-
+    
     static class TestDataSource implements DataSource {
         public PrintWriter getLogWriter() throws SQLException {
             return null;
