@@ -1694,6 +1694,11 @@
         </profile>
         <profile>
             <id>setup.eclipse</id>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+                <pmd.skip>true</pmd.skip>
+                <checkstyle.skip>true</checkstyle.skip>
+            </properties>
             <build>
                 <defaultGoal>process-test-sources</defaultGoal>
                 <plugins>
