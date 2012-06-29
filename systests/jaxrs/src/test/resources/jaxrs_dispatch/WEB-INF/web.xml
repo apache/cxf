@@ -28,7 +28,7 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>WEB-INF/beans.xml</param-value>
 	</context-param>
-
+	
 	<listener>
 		<listener-class>
 			org.springframework.web.context.ContextLoaderListener
@@ -41,6 +41,22 @@
 		<servlet-class>
 			org.apache.cxf.transport.servlet.CXFServlet
 		</servlet-class>
+		<init-param>
+    		<param-name>redirects-list</param-name>
+	    	<param-value>
+	    	  /
+	    	</param-value>
+	    </init-param>
+	    <init-param>
+    		<param-name>redirect-attributes</param-name>
+	    	<param-value>
+	    	  javax.servlet.include.request_uri
+	    	</param-value>
+	    </init-param>
+	    <init-param>
+    		<param-name>redirect-servlet-name</param-name>
+	    	<param-value>default</param-value>
+	    </init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
@@ -48,7 +64,6 @@
 		<servlet-name>CXFServlet</servlet-name>
 		<url-pattern>/the/*</url-pattern>
 	</servlet-mapping>
-	
 	<servlet>
 		<servlet-name>RedirectCXFServlet</servlet-name>
 		<display-name>Redirect CXF Servlet</display-name>
@@ -57,14 +72,10 @@
 		</servlet-class>
 		<init-param>
     		<param-name>redirects-list</param-name>
-	    	<param-value>/(\w)+.html</param-value>
+	    	<param-value>
+	    	  /(\w)+.html
+	    	</param-value>
 	    </init-param>
-	    <!--
-	    <init-param>
-    		<param-name>reditect-servlet-name</param-name>
-	    	<param-value>DefaultCXFServlet</param-value>
-	    </init-param>
-	    -->
 	    <init-param>
     		<param-name>redirect-servlet-path</param-name>
 	    	<param-value>/static</param-value>
@@ -74,9 +85,8 @@
 
     <servlet-mapping>
 		<servlet-name>RedirectCXFServlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/book.html</url-pattern>
 	</servlet-mapping>
-	
 	<servlet>
 		<servlet-name>DefaultCXFServlet</servlet-name>
 		<display-name>Default CXF Servlet</display-name>
@@ -89,11 +99,63 @@
 	    </init-param>	
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-
-    <servlet-mapping>
+	
+	<servlet-mapping>
 		<servlet-name>DefaultCXFServlet</servlet-name>
 		<url-pattern>/static/*</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<servlet-name>WelcomeCXFServlet</servlet-name>
+		<display-name>Welcome CXF Servlet</display-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<init-param>
+    		<param-name>redirects-list</param-name>
+	    	<param-value>
+	    	  /
+	    	</param-value>
+	    </init-param>
+	    <init-param>
+    		<param-name>redirect-attributes</param-name>
+	    	<param-value>
+	    	  javax.servlet.include.request_uri
+	    	</param-value>
+	    </init-param>
+	    <init-param>
+    		<param-name>redirect-servlet-name</param-name>
+	    	<param-value>default</param-value>
+	    </init-param>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	
+
+    <servlet-mapping>
+		<servlet-name>WelcomeCXFServlet</servlet-name>
+		<url-pattern>/welcome/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>WelcomeCXFServlet2</servlet-name>
+		<display-name>Welcome CXF Servlet2</display-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<init-param>
+    		<param-name>static-welcome-file</param-name>
+	    	<param-value>/welcomeBook.html</param-value>
+	    </init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+    <servlet-mapping>
+		<servlet-name>WelcomeCXFServlet2</servlet-name>
+		<url-pattern>/welcome2/*</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>welcomeBook.html</welcome-file>
+	</welcome-file-list>
 </web-app>
 <!-- END SNIPPET: webxml -->
