@@ -183,6 +183,19 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                     }
                     return b;
                 }
+
+                public void close() throws XMLStreamException {
+                    try {
+                        super.close();
+                    }  catch (XMLStreamException e) {
+                        //ignore
+                    }
+                    try {
+                        ins.close();
+                    }  catch (IOException e) {
+                        //ignore
+                    }
+                }
             };
         }
         return input;
