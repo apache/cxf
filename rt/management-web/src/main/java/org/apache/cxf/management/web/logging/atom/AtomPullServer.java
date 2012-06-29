@@ -465,10 +465,6 @@ public class AtomPullServer extends AbstractAtomBean {
             return null;
         }
 
-        public String toSQL(String table, String... columns) {
-            return null;
-        }
-
         public void accept(SearchConditionVisitor<LogRecord> visitor) {
         }
     }
