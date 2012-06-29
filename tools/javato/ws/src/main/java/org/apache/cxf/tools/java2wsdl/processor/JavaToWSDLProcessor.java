@@ -142,6 +142,7 @@ public class JavaToWSDLProcessor implements Processor {
         factory.setWSDLVersion(getWSDLVersion());
 
         AbstractGenerator<?> generator = factory.newGenerator();
+        generator.setToolContext(context);
         generator.setAllowImports(context.containsKey(ToolConstants.CFG_CREATE_XSD_IMPORTS));
         generator.setOutputBase(wsdlFile);
         return generator;

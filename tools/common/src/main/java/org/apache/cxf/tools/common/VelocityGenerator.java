@@ -122,7 +122,7 @@ public final class VelocityGenerator {
 
     public File parseOutputName(String packageName, String filename, String ext) throws ToolException {
         FileUtils.mkDir(new File(this.baseDir));
-        FileWriterUtil fw = new FileWriterUtil(this.baseDir);
+        FileWriterUtil fw = new FileWriterUtil(this.baseDir, null);
         try {
             return fw.getFileToWrite(packageName, filename + ext);
         } catch (IOException ioe) {

@@ -39,7 +39,7 @@ public class AbstractGeneratorTest extends ProcessorTestBase {
     @Test
     public void testKeep() throws Exception {
         gen = new DummyGenerator();
-        util = new FileWriterUtil(output.toString());
+        util = new FileWriterUtil(output.toString(), null);
 
         context = new ToolContext();
         context.put(ToolConstants.CFG_OUTPUTDIR, output.toString());
@@ -57,7 +57,7 @@ public class AbstractGeneratorTest extends ProcessorTestBase {
     @Test
     public void testOverwrite() throws Exception {
         gen = new DummyGenerator();
-        util = new FileWriterUtil(output.toString());
+        util = new FileWriterUtil(output.toString(), null);
 
         context = new ToolContext();
         context.put(ToolConstants.CFG_OUTPUTDIR, output.toString());

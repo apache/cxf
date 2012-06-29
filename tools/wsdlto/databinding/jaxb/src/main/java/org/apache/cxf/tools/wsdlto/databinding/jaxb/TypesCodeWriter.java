@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -31,24 +30,30 @@ import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JPackage;
 
 import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 
 public class TypesCodeWriter extends CodeWriter {
 
     /** The target directory to put source code. */
     private File target;
+    private OutputStreamCreator osc;
     
     private List<String> excludeFileList = new ArrayList<String>();
     private List<String> excludePkgList;
     
     private List<File> generatedFiles = new ArrayList<File>();
 
-    public TypesCodeWriter(File ftarget, List<String> excludePkgs, String e)
+    public TypesCodeWriter(File ftarget, List<String> excludePkgs, String e,
+                           OutputStreamCreator outputStreamCreator)
         throws IOException {
         target = ftarget;
         excludePkgList = excludePkgs;
         setEncoding(e);
+        osc = outputStreamCreator == null ? new OutputStreamCreator() : outputStreamCreator;
     }
     
+
+
     private void setEncoding(String s) {
         if (s != null) {
             try {
@@ -64,7 +69,7 @@ public class TypesCodeWriter extends CodeWriter {
     public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
         File f = getFile(pkg, fileName);
         generatedFiles.add(f);
-        return new FileOutputStream(getFile(pkg, fileName));
+        return osc.createOutputStream(getFile(pkg, fileName));
     }
 
     public List<File> getGeneratedFiles() {

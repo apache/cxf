@@ -400,9 +400,10 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         
         if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) { 
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();            
-            return FileWriterUtil.getWriter(new File(outputDirectory, filename), encoding); 
+            return new FileWriterUtil()
+                .getWriter(new File(outputDirectory, filename), encoding); 
         } else {
-            FileWriterUtil fw = new FileWriterUtil(outputDirectory);        
+            FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);        
             return fw.getWriter("", filename); 
         }       
     }
@@ -410,9 +411,9 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     public Writer getOutputWriter(File file) throws Exception {        
         if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) { 
             String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();            
-            return FileWriterUtil.getWriter(file, encoding); 
+            return new FileWriterUtil().getWriter(file, encoding); 
         } else {
-            return FileWriterUtil.getWriter(file);
+            return new FileWriterUtil().getWriter(file, "UTF-8");
         }       
     }    
 

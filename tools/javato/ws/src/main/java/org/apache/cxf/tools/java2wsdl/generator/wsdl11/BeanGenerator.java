@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.cxf.common.util.Compiler;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.VelocityGenerator;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
@@ -74,7 +75,8 @@ public class BeanGenerator extends AbstractGenerator<File> {
                                                       wrapperClass.getName());
                 generatedFiles.add(file);
             
-                generator.doWrite(TEMPLATE, FileWriterUtil.getWriter(file));
+                generator.doWrite(TEMPLATE, new FileWriterUtil(file.getParent(), getOutputStreamCreator())
+                    .getWriter(file, (String)getToolContext().get(ToolConstants.CFG_ENCODING)));
             
                 generator.clearAttributes();
             }

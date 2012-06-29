@@ -66,7 +66,7 @@ public final class WSDLUtils {
 
     public static void writeWSDL(Definition def, String outputdir, String wsdlOutput)
         throws WSDLException, IOException {
-        FileWriterUtil fw = new FileWriterUtil(outputdir);
+        FileWriterUtil fw = new FileWriterUtil(outputdir, null);
         Writer outputWriter = fw.getWriter("", wsdlOutput);
 
         writeWSDL(def, outputWriter);

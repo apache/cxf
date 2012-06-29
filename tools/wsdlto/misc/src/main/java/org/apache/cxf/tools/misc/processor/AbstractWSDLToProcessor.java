@@ -40,6 +40,7 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.FileWriterUtil;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.validator.internal.WSDL11Validator;
 import org.apache.cxf.wsdl.WSDLExtensibilityPlugin;
 import org.apache.cxf.wsdl.WSDLManager;
@@ -92,7 +93,7 @@ public class AbstractWSDLToProcessor implements Processor {
         } else {
             outputDir = "./";
         }
-        FileWriterUtil fw = new FileWriterUtil(outputDir);
+        FileWriterUtil fw = new FileWriterUtil(outputDir, env.get(OutputStreamCreator.class));
         try {
             writer = fw.getWriter("", newName);
         } catch (IOException ioe) {

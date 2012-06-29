@@ -20,6 +20,8 @@
 package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,9 +31,11 @@ import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.maven_plugin.AbstractCodegenMoho;
 import org.apache.cxf.maven_plugin.GenericWsdlOption;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -228,8 +232,30 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                 BusFactory.setThreadDefaultBus(bus);
             }
             try {
-                new WSDLToJava(args).run(new ToolContext());
+                ToolContext ctx = new ToolContext();
+                final List<File> files = new ArrayList<File>();                
+                ctx.put(OutputStreamCreator.class, new OutputStreamCreator() {
+                    public OutputStream createOutputStream(File file) throws IOException {
+                        files.add(file);
+                        return buildContext.newFileOutputStream(file);
+                    }
+                });
+                new WSDLToJava(args).run(ctx);
+                
+                List<File> oldFiles = CastUtils.cast((List<?>)buildContext
+                                                     .getValue("cxf.file.list." + doneFile.getName()));
+                if (oldFiles != null) {
+                    for (File f : oldFiles) {
+                        if (!files.contains(f)) {
+                            f.delete();
+                            buildContext.refresh(f);
+                        }
+                    }
+                }
+
+                buildContext.setValue("cxf.file.list." + doneFile.getName(), files);
             } catch (Throwable e) {
+                buildContext.setValue("cxf.file.list." + doneFile.getName(), null);
                 getLog().debug(e);
                 throw new MojoExecutionException(e.getMessage(), e);
             }
@@ -238,6 +264,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
         try {
             doneFile.createNewFile();
+            buildContext.refresh(doneFile);
         } catch (Throwable e) {
             getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
             getLog().debug(e);
@@ -245,9 +272,11 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         }
         if (project != null && getGeneratedSourceRoot() != null && getGeneratedSourceRoot().exists()) {
             project.addCompileSourceRoot(getGeneratedSourceRoot().getAbsolutePath());
+            buildContext.refresh(getGeneratedSourceRoot().getAbsoluteFile());
         }
         if (project != null && getGeneratedTestRoot() != null && getGeneratedTestRoot().exists()) {
             project.addTestCompileSourceRoot(getGeneratedTestRoot().getAbsolutePath());
+            buildContext.refresh(getGeneratedTestRoot().getAbsoluteFile());
         }
         return bus;
     }
