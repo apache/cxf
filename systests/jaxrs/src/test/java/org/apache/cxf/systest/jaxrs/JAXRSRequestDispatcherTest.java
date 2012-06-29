@@ -97,4 +97,33 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
         assertEquals("CXF Rocks", value);
     }
+    @Test
+    public void testGetBookHTMLFromWelcomeList() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/welcome";
+        doTestGetBookHTMLFromWelcomeList(endpointAddress);
+    }
+    
+    @Test
+    public void testGetBookHTMLFromWelcomeList2() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/the";
+        doTestGetBookHTMLFromWelcomeList(endpointAddress);
+    }
+    
+    @Test
+    public void testGetBookHTMLFromStaticWelcomeFile() throws Exception {
+        String endpointAddress = "http://localhost:" + PORT + "/welcome2";
+        doTestGetBookHTMLFromWelcomeList(endpointAddress);
+    }
+    
+    private void doTestGetBookHTMLFromWelcomeList(String address) throws Exception {
+        WebClient client = WebClient.create(address);
+        client.accept("text/html");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
+        XMLSource source = client.accept("text/html").get(XMLSource.class);
+        Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
+        namespaces.put("books", "http://www.w3.org/books");
+        String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
+        assertEquals("Welcome to CXF", value);
+    }
 }

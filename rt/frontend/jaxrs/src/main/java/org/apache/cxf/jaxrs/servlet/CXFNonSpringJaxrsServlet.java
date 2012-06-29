@@ -127,28 +127,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     }
     
     protected void setExtensions(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
-        bean.setExtensionMappings(handleMapSequence(servletConfig.getInitParameter(EXTENSIONS_PARAM)));
-        bean.setLanguageMappings(handleMapSequence(servletConfig.getInitParameter(LANGUAGES_PARAM)));
+        bean.setExtensionMappings(
+             CastUtils.cast((Map<?, ?>)parseMapSequence(servletConfig.getInitParameter(EXTENSIONS_PARAM))));
+        bean.setLanguageMappings(
+             CastUtils.cast((Map<?, ?>)parseMapSequence(servletConfig.getInitParameter(LANGUAGES_PARAM))));
         bean.setProperties(CastUtils.cast(
-                handleMapSequence(servletConfig.getInitParameter(PROPERTIES_PARAM)),
+                parseMapSequence(servletConfig.getInitParameter(PROPERTIES_PARAM)),
                 String.class, Object.class));
-    }
-    
-    protected Map<Object, Object> handleMapSequence(String sequence) {
-        if (sequence != null) {
-            sequence = sequence.trim();
-            Map<Object, Object> map = new HashMap<Object, Object>();
-            String[] pairs = sequence.split(" ");
-            for (String pair : pairs) {
-                String[] value = pair.split("=");
-                if (value.length == 2) {
-                    map.put(value[0].trim(), value[1].trim());
-                }
-            }
-            return map;
-        } else {
-            return Collections.emptyMap();    
-        }
     }
     
     protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
@@ -268,8 +253,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         String theName = cName.trim();
         int ind = theName.indexOf("(");
         if (ind != -1 && theName.endsWith(")")) {
-            props.putAll(CastUtils.cast(handleMapSequence(theName.substring(ind + 1, theName.length() - 1)),
-                    String.class, String.class));
+            props.putAll(parseMapSequence(theName.substring(ind + 1, theName.length() - 1)));
             theName = theName.substring(0, ind).trim();
         }
         return theName;
