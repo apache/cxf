@@ -505,6 +505,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                     FileReader fileReader = new FileReader(addrFile);
                     BufferedReader bufferedReader = new BufferedReader(fileReader);
                     addr = bufferedReader.readLine();
+                    bufferedReader.close();
                 } catch (Exception ex) {
                     throw new ToolException(ex.getMessage(), ex);
                 }
@@ -635,6 +636,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                     while (token != null) {
                         int pos = token.indexOf("=");
                         if (pos == -1) {
+                            reader.close();
                             throw new RuntimeException("Mapping of idl modules to namespaces "
                                                        + "is not specified correctly in the file "
                                                        + mapping + "."
@@ -645,6 +647,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                         map.put(token.substring(0, pos), token.substring(pos + 1));
                         token = reader.readLine();
                     }
+                    reader.close();
                 } catch (Exception ex) {
                     throw new RuntimeException("Incorrect properties file for mns mapping - " + mapping
                                                + ". Cause: " + ex.getMessage());

@@ -327,7 +327,7 @@ public class ServerLauncher {
                         }
                     }
                 }
-                
+                ps.close();
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
                     ex.printStackTrace();

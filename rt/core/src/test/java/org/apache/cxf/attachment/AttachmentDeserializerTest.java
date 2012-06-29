@@ -341,6 +341,7 @@ public class AttachmentDeserializerTest extends Assert {
         assertEquals(10, m.read(new byte[1000]));
         assertEquals(-1, m.read(new byte[1000]));
         assertEquals(-1, m.read(new byte[1000]));
+        m.close();
     }
     
     @Test

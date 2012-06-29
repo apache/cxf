@@ -536,6 +536,7 @@ public final class CorbaUtils {
             java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file));
             String ior = reader.readLine();
             if (ior == null) {
+                reader.close();
                 throw new RuntimeException("Invalid object reference found in file " + url);
             }
             result = orb.string_to_object(ior.trim());

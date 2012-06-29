@@ -131,6 +131,7 @@ public class ParamReader extends ClassReader {
 
         try {
             // get a parameter reader
+            @SuppressWarnings("resource")
             ParamReader pr = new ParamReader(c);
             // get the parameter names
             return pr.getParameterNames(method);

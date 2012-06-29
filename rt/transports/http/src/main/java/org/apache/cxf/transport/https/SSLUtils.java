@@ -111,6 +111,7 @@ public final class SSLUtils {
             DataInputStream dis = new DataInputStream(fis);
             byte[] bytes = new byte[dis.available()];
             dis.readFully(bytes);
+            dis.close();
             ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
             
             if (keyStorePassword != null) {

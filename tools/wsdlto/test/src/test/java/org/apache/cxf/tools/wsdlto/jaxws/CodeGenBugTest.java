@@ -225,6 +225,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         byte[] buffer = new byte[(int)file.length()];
         filebuffer.read(buffer);
         String content = IOUtils.newStringFromBytes(buffer);
+        filebuffer.close();
         assertTrue("wsdl location should be url style in build.xml", content.indexOf("param1=\"file:") > -1);
 
     }
@@ -425,6 +426,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             }
             size = fin.read(buffer);
         }
+        fin.close();
         assertTrue("Service QName in client is not correct", index > -1);
     }
 

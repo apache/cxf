@@ -78,6 +78,7 @@ final class ChunkedUtil {
      * @param connection the given HttpURLConnection
      * @return an input stream containing the response content if non-empty
      */
+    @SuppressWarnings("resource")
     private static InputStream getNonEmptyContent(
         HttpURLConnection connection
     ) {

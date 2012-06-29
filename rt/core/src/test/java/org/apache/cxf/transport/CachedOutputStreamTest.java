@@ -37,6 +37,7 @@ public class CachedOutputStreamTest extends Assert {
         cos.resetOut(out, true);
         String test = out.toString();        
         assertEquals("The test stream content isn't same ", test , result);
+        cos.close();
     }
     
     @Test
