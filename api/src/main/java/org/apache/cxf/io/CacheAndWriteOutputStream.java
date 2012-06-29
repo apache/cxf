@@ -34,6 +34,9 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
     
     public CacheAndWriteOutputStream(OutputStream stream) {
         super();
+        if (stream == null) {
+            throw new IllegalArgumentException("Stream may not be null");
+        }
         flowThroughStream = stream;
     }
 
