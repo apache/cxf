@@ -21,10 +21,12 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -38,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
@@ -54,10 +57,12 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         Arrays.asList(new String[]{"POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"});
     
     private static final String STATIC_RESOURCES_PARAMETER = "static-resources-list";
+    private static final String STATIC_WELCOME_FILE_PARAMETER = "static-welcome-file";
     
     private static final String REDIRECTS_PARAMETER = "redirects-list";
     private static final String REDIRECT_SERVLET_NAME_PARAMETER = "redirect-servlet-name";
     private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
+    private static final String REDIRECT_ATTRIBUTES_PARAMETER = "redirect-attributes";
     private static final String REDIRECT_QUERY_CHECK_PARAMETER = "redirect-query-check";
     
     private static final Map<String, String> STATIC_CONTENT_TYPES;
@@ -72,36 +77,62 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         // TODO : add more types if needed
     }
     
-    private List<String> staticResourcesList;
-    private List<String> redirectList; 
+    private List<Pattern> staticResourcesList;
+    private String staticWelcomeFile;
+    private List<Pattern> redirectList; 
     private String dispatcherServletPath;
     private String dispatcherServletName;
+    private Map<String, String> redirectAttributes;
     private boolean redirectQueryCheck;
     
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
 
         staticResourcesList = parseListSequence(servletConfig.getInitParameter(STATIC_RESOURCES_PARAMETER));
+        staticWelcomeFile = servletConfig.getInitParameter(STATIC_WELCOME_FILE_PARAMETER);
         
         redirectList = parseListSequence(servletConfig.getInitParameter(REDIRECTS_PARAMETER));
         redirectQueryCheck = Boolean.valueOf(servletConfig.getInitParameter(REDIRECT_QUERY_CHECK_PARAMETER));
         dispatcherServletName = servletConfig.getInitParameter(REDIRECT_SERVLET_NAME_PARAMETER);
         dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
+        
+        redirectAttributes = parseMapSequence(servletConfig.getInitParameter(REDIRECT_ATTRIBUTES_PARAMETER));
+            
+        
     }
     
-    private static List<String> parseListSequence(String values) {
+    protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
-            List<String> list = new LinkedList<String>();
+            List<Pattern> list = new LinkedList<Pattern>();
             String[] pathValues = values.split(" ");
             for (String value : pathValues) {
                 String theValue = value.trim();
                 if (theValue.length() > 0) {
-                    list.add(theValue);
+                    list.add(Pattern.compile(theValue));
                 }
             }
             return list;
         } else {
             return null;
+        }
+    }
+    
+    protected static Map<String, String> parseMapSequence(String sequence) {
+        if (sequence != null) {
+            sequence = sequence.trim();
+            Map<String, String> map = new HashMap<String, String>();
+            String[] pairs = sequence.split(" ");
+            for (String pair : pairs) {
+                String[] value = pair.split("=");
+                if (value.length == 2) {
+                    map.put(value[0].trim(), value[1].trim());
+                } else {
+                    map.put(pair.trim(), "");
+                }
+            }
+            return map;
+        } else {
+            return Collections.emptyMap();
         }
     }
     
@@ -180,14 +211,17 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         }
         
         if (staticResourcesList != null 
-            && matchPath(staticResourcesList, request)) {
-            serveStaticContent(request, response, request.getPathInfo());
+            && matchPath(staticResourcesList, request)
+            || staticWelcomeFile != null 
+                && (StringUtils.isEmpty(request.getPathInfo()) || request.getPathInfo().equals("/"))) {
+            serveStaticContent(request, response, 
+                               staticWelcomeFile != null ? staticWelcomeFile : request.getPathInfo());
             return;
         }
         invoke(request, response);
     }
     
-    private boolean matchPath(List<String> values, HttpServletRequest request) {
+    private boolean matchPath(List<Pattern> values, HttpServletRequest request) {
         String path = request.getPathInfo();
         if (path == null) {
             path = "/";
@@ -198,8 +232,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
                 path += "?" + queryString; 
             }
         }
-        for (String value : values) {
-            if (path.matches(value)) {
+        for (Pattern pattern : values) {
+            if (pattern.matcher(path).matches()) {
                 return true;
             }
         }
@@ -249,6 +283,9 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             throw new ServletException(errorMessage);
         }
         try {
+            for (Map.Entry<String, String> entry : redirectAttributes.entrySet()) {
+                request.setAttribute(entry.getKey(), entry.getValue());
+            }
             HttpServletRequestFilter servletRequest = 
                 new HttpServletRequestFilter(request, pathInfo, theServletPath);
             rd.forward(servletRequest, response);
