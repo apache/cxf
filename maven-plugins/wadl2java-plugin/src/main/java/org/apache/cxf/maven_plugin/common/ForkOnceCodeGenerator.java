@@ -38,6 +38,7 @@ public final class ForkOnceCodeGenerator {
         while (line != null) {
             int i = Integer.parseInt(line);
             if (i == -1) {
+                reader.close();
                 return;
             }
             String wargs[] = new String[i];
@@ -49,5 +50,6 @@ public final class ForkOnceCodeGenerator {
             
             line = reader.readLine();
         }
+        reader.close();
     }
 }

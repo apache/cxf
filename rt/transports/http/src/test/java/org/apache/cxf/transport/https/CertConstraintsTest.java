@@ -125,6 +125,7 @@ public class CertConstraintsTest extends org.junit.Assert {
         DataInputStream dis = new DataInputStream(fis);
         byte[] bytes = new byte[dis.available()];
         dis.readFully(bytes);
+        dis.close();
         ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
         store.load(bin, keystorePassword.toCharArray());
         for (java.util.Enumeration<String> aliases = store.aliases(); aliases.hasMoreElements();) {

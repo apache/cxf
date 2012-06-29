@@ -345,6 +345,7 @@ public class WSDLToCorbaBinding {
                     FileReader fileReader = new FileReader(addrFile);
                     BufferedReader bufferedReader = new BufferedReader(fileReader);
                     addr = bufferedReader.readLine();
+                    bufferedReader.close();
                 } catch (Exception ex) {
                     throw new ToolException(ex.getMessage(), ex);
                 }
