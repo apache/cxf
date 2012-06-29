@@ -357,6 +357,16 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
                 "/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
         String bookXsd2 = IOUtils.readStringFromStream(xop2.getAttachinfo().getInputStream());        
         assertEquals(bookXsdOriginal, bookXsd2);
+        
+        String ctString = 
+            client.getResponse().getMetadata().getFirst("Content-Type").toString();
+        MediaType mt = MediaType.valueOf(ctString);
+        Map<String, String> params = mt.getParameters();
+        assertEquals(4, params.size());
+        assertNotNull(params.get("boundary"));
+        assertNotNull(params.get("type"));
+        assertNotNull(params.get("start"));
+        assertNotNull(params.get("start-info"));
     }
     
     private Image getImage(String name) throws Exception {
@@ -413,6 +423,14 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
         assertTrue(Arrays.equals(image1, image2));
+        
+        String ctString = 
+            client.getResponse().getMetadata().getFirst("Content-Type").toString();
+        MediaType mt = MediaType.valueOf(ctString);
+        Map<String, String> params = mt.getParameters();
+        assertEquals(1, params.size());
+        assertNotNull(params.get("boundary"));
+        
     }
     
     @Test

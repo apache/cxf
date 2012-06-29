@@ -62,7 +62,10 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         }
 
         AttachmentSerializer serializer = 
-            new AttachmentSerializer(message, getMultipartType(), getRootHeaders());
+            new AttachmentSerializer(message, 
+                                     getMultipartType(),
+                                     writeOptionalTypeParameters(),
+                                     getRootHeaders());
         serializer.setXop(mtomEnabled);
         
         try {
@@ -78,6 +81,10 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
    
     protected String getMultipartType() {
         return "multipart/related";
+    }
+    
+    protected boolean writeOptionalTypeParameters() {
+        return true;
     }
     
     protected Map<String, List<String>> getRootHeaders() {
