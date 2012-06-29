@@ -83,7 +83,7 @@ public class JavaToWSTest extends ToolTestBase {
     @Test
     public void testCXF2941() throws Exception {
         String[] args = new String[] {
-            "-wsdl", "-wrapperbean", 
+            "-wsdl", "-wrapperbean",
             "-s", output.getPath(), 
             "-o", output.getPath() + "/cxf2941.wsdl", 
             org.apache.cxf.tools.fortest.cxf2941.WebResultService.class.getName()
@@ -377,6 +377,7 @@ public class JavaToWSTest extends ToolTestBase {
         ClassLoader loader = getClass().getClassLoader();
         StringBuffer classPath = new StringBuffer();
         if (loader instanceof URLClassLoader) {
+            @SuppressWarnings("resource")
             URLClassLoader urlLoader = (URLClassLoader)loader;
             for (URL url : urlLoader.getURLs()) {
                 File file;

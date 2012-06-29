@@ -34,6 +34,7 @@ import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
+import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -53,6 +54,7 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
         builder = new JaxwsServiceBuilder();
         builder.setBus(BusFactory.getDefaultBus());
         generator.setBus(builder.getBus());
+        generator.setToolContext(new ToolContext());
         
         Bus b = builder.getBus();
         assertNotNull(b.getExtension(DestinationFactoryManager.class)

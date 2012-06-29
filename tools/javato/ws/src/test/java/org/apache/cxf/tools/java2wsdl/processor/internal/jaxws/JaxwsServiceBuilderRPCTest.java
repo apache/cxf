@@ -39,6 +39,7 @@ public class JaxwsServiceBuilderRPCTest extends ProcessorTestBase {
         JAXBContextCache.clearCaches();
         builder.setBus(BusFactory.getDefaultBus());
         generator.setBus(builder.getBus());
+        generator.setToolContext(env);
     }
 
     @org.junit.After
