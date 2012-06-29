@@ -82,6 +82,7 @@ public class ProcessorTestBase extends Assert {
         ClassLoader loader = getClass().getClassLoader();
         StringBuilder classPath = new StringBuilder();
         if (loader instanceof URLClassLoader) {
+            @SuppressWarnings("resource")
             URLClassLoader urlLoader = (URLClassLoader)loader;
             for (URL url : urlLoader.getURLs()) {
                 File file;
@@ -114,6 +115,7 @@ public class ProcessorTestBase extends Assert {
                             }
                         }
                     }
+                    jar.close();
                 }
             }
         }

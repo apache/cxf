@@ -76,6 +76,7 @@ public final class AnnotationUtil {
     public static synchronized Class<?> loadClass(String className, ClassLoader parent) {
         Class<?> clazz = null;
         URL[] urls = URIParserUtil.pathToURLs(getClassPath());
+        @SuppressWarnings("resource")
         URLClassLoader classLoader = new URLClassLoader(urls, parent);
         try {
             clazz = classLoader.loadClass(className);
@@ -90,6 +91,7 @@ public final class AnnotationUtil {
         ClassLoader loader = AnnotationUtil.class.getClassLoader();
         StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (loader instanceof URLClassLoader) {
+            @SuppressWarnings("resource")
             URLClassLoader urlloader = (URLClassLoader)loader;
             for (URL url : urlloader.getURLs()) {
                 classpath.append(File.pathSeparatorChar);

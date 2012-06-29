@@ -59,6 +59,7 @@ public class JarServiceContractResolver implements ServiceContractResolver {
             JarFile jar = new JarFile(new File(jarURL.toURI()));
             JarEntry jarEntry = jar.getJarEntry(path.toString());
             uri = new URI("jar:" + jarURL + "!/" + jarEntry.toString());
+            jar.close();
             return uri;
         } catch (IOException e1) {
             e1.printStackTrace();

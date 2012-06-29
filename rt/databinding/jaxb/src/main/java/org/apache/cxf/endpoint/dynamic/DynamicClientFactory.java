@@ -629,7 +629,8 @@ public class DynamicClientFactory {
                     classPath.append(File.pathSeparator);
                 }
             }
-        }         
+        }
+        jar.close();
     }
 
     static void setupClasspath(StringBuilder classPath, ClassLoader classLoader)

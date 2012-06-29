@@ -412,6 +412,7 @@ public class ServerLauncher {
         }
         
         if (loader instanceof URLClassLoader) {
+            @SuppressWarnings("resource")
             URLClassLoader urlloader = (URLClassLoader)loader; 
             for (URL url : urlloader.getURLs()) {
                 classpath.append(File.pathSeparatorChar);

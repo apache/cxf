@@ -95,14 +95,12 @@ public class SecureAnnotationsInterceptorTest extends Assert {
     }
     
     private static class TestService {
-        @SuppressWarnings("unused")
         @SecureRolesAllowed("testRole")
         public void echo() {
         }
     }
     
     private static class TestService2 {
-        @SuppressWarnings("unused")
         @SecureRolesAllowed("baz")
         public void echo() {
         }

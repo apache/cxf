@@ -56,6 +56,7 @@ public final class JarResource {
                 }
                 jarContents.add(ze.getName());
             }
+            zf.close();
         } catch (NullPointerException e) {
             System.out.println("done.");
         } catch (ZipException ze) {
