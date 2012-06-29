@@ -43,4 +43,7 @@ public class AttachmentOutputInterceptor extends AttachmentOutInterceptor {
         return Collections.unmodifiableMap(rootHeaders);
     }
     
+    protected boolean writeOptionalTypeParameters() {
+        return false;
+    }
 }
