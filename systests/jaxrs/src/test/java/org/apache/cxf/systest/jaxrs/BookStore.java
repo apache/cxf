@@ -553,25 +553,6 @@ public class BookStore {
         return found.get(0);
     }
     
-    @GET
-    @Path("/books/{fiql}/chapter/{i}")
-    @Produces("application/xml")
-    public Chapter getInChapterFromSelectedBook(@Context SearchContext searchContext,
-                                           @PathParam("fiql") PathSegment fiqlSegment,
-                                           @PathParam("i") int chapterIndex) throws BookNotFoundFault {
-        
-        SearchCondition<Book> sc = searchContext.getCondition(Book.class);
-        if (sc == null) {
-            throw new BookNotFoundFault("Search exception");
-        }
-        List<Book> found = sc.findAll(books.values());
-        if (found.size() != 1) {
-            throw new BookNotFoundFault("Single book is expected");
-        }
-        
-        Book book = found.get(0);
-        return book.getChapter(chapterIndex);
-    }
     
     @GET
     @Path("/books/text/xml/{bookId}")
