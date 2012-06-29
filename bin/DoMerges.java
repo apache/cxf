@@ -425,7 +425,7 @@ public class DoMerges {
         Process p;
         if (isGit) {
             String id = getGitVersion(ver);
-            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "diff", id + "^", id, gitSource}));
+            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "diff", "-R", id + "^", id, gitSource}));
         } else {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "diff", "-c", Integer.toString(ver), svnRoot}));
         }
