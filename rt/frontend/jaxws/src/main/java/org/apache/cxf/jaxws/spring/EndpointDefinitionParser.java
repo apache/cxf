@@ -188,7 +188,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             for (BeanPostProcessor bpp : dlbf.getBeanPostProcessors()) {
                 if (cls != null && cls.isInstance(bpp)) {
                     impl.getServerFactory().setBlockPostConstruct(true);
-                    impl.getServerFactory().setBlockInjection(true);
+                    impl.getServerFactory().setBlockInjection(false);
                     return;
                 }
                 if (bpp instanceof Jsr250BeanPostProcessor) {
