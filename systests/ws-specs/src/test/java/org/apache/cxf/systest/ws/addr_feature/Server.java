@@ -39,6 +39,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
     }
+    
     public void tearDown() {
         ep.stop();
         ep = null;

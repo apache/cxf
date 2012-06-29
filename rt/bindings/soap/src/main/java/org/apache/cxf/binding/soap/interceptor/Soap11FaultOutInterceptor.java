@@ -85,7 +85,12 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
     
                 writer.writeStartElement("faultstring");
                 if (fault.getMessage() != null) {
-                    writer.writeCharacters(fault.getMessage());
+                    if (message.get("forced.faultstring") != null) {
+                        writer.writeCharacters((String)message.get("forced.faultstring"));
+                    } else {
+                        writer.writeCharacters(fault.getMessage());
+                    }
+                    
                 } else {
                     writer.writeCharacters("Fault occurred while processing.");
                 }

@@ -35,11 +35,11 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class OneWayDecoupledFaultHandlerTest extends Assert {
+public class DecoupledFaultHandlerTest extends Assert {
 
     @Test
     public void testOnewayFault() {
-        OneWayDecoupledFaultHandler handler = new OneWayDecoupledFaultHandler() {
+        DecoupledFaultHandler handler = new DecoupledFaultHandler() {
             protected Destination createDecoupledDestination(Exchange exchange, EndpointReferenceType epr) {
                 assertEquals("http://bar", epr.getAddress().getValue());
                 return EasyMock.createMock(Destination.class);

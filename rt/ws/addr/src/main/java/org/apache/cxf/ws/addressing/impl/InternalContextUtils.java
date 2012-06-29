@@ -45,6 +45,7 @@ import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -89,6 +90,7 @@ final class InternalContextUtils {
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
+    //CHECKSTYLE:OFF  Max executable statement count limitation
     public static void rebaseResponse(EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
@@ -104,8 +106,6 @@ final class InternalContextUtils {
             // ensure the inbound MAPs are available in the partial response
             // message (used to determine relatesTo etc.)
             ContextUtils.propogateReceivedMAPs(inMAPs, partialResponse);
-            partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
-            partialResponse.put(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
             Destination target = inMessage.getDestination();
             if (target == null) {
                 return;
@@ -118,8 +118,64 @@ final class InternalContextUtils {
                 Conduit backChannel = target.getBackChannel(inMessage,
                                                             partialResponse,
                                                             reference);
+                Exception exception = inMessage.getContent(Exception.class);
+                //Add this to handle two way faultTo
+                //TODO:Look at how to refactor 
+                if (backChannel != null && !inMessage.getExchange().isOneWay() 
+                    && ContextUtils.isFault(inMessage)) {
+                    // send the fault message to faultTo Endpoint
+                    exchange.setOutMessage(ContextUtils.createMessage(exchange));
+                    exchange.put(ConduitSelector.class, new NullConduitSelector());
+                    exchange.put("org.apache.cxf.http.no_io_exceptions", true);
+                    Destination destination = createDecoupledDestination(exchange, reference);
+                    exchange.setDestination(destination);
 
+                    if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage)) {
+                        DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
+                        if (in != null) {
+                            in.cacheInput();
+                        }
+                        inMessage.getInterceptorChain().reset();
+                        inMessage.getInterceptorChain().doIntercept(inMessage);
+
+                    }
+
+                    // send the partial response to requester
+                    partialResponse.put("forced.faultstring",
+                                        "The server sent HTTP status code :"
+                                            + inMessage.getExchange().get(Message.RESPONSE_CODE));
+                    partialResponse.setContent(Exception.class, exception);
+                    partialResponse.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS,
+                                        inMessage.get(Message.PROTOCOL_HEADERS));
+                    partialResponse.put(org.apache.cxf.message.Message.ENCODING,
+                                        inMessage.get(Message.ENCODING));
+                    partialResponse.put(ContextUtils.ACTION, inMessage.get(ContextUtils.ACTION));
+                    partialResponse.put("javax.xml.ws.addressing.context.inbound",
+                                        inMessage.get("javax.xml.ws.addressing.context.inbound"));
+                    partialResponse.put("javax.xml.ws.addressing.context.outbound",
+                                        inMessage.get("javax.xml.ws.addressing.context.outbound"));
+                    exchange.setOutMessage(partialResponse);
+                    PhaseInterceptorChain newChian = ((PhaseInterceptorChain)inMessage.getInterceptorChain())
+                        .cloneChain();
+                    partialResponse.setInterceptorChain(newChian);
+                    exchange.setDestination(target);
+                    exchange.setOneWay(false);
+                    exchange.put(ConduitSelector.class,
+                                 new PreexistingConduitSelector(backChannel, exchange.get(Endpoint.class)));
+                    if (newChian != null && !newChian.doIntercept(partialResponse)
+                        && partialResponse.getContent(Exception.class) != null) {
+                        if (partialResponse.getContent(Exception.class) instanceof Fault) {
+                            throw (Fault)partialResponse.getContent(Exception.class);
+                        } else {
+                            throw new Fault(partialResponse.getContent(Exception.class));
+                        }
+                    }
+                    return;
+                }
+                
                 if (backChannel != null) {
+                    partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
+                    partialResponse.put(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
                     boolean robust =
                         MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
                     
@@ -214,12 +270,13 @@ final class InternalContextUtils {
                             }
                         }
                     }
-                }
+                } 
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "SERVER_TRANSPORT_REBASE_FAILURE_MSG", e);
             }
         }
     }
+    //CHECKSTYLE:ON
 
     public static Destination createDecoupledDestination(
         Exchange exchange, final EndpointReferenceType reference) {
