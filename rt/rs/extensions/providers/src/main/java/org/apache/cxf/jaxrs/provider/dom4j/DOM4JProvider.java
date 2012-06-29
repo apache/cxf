@@ -35,8 +35,8 @@ import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.helpers.DOMUtils;
 
-@javax.ws.rs.Produces({"application/xml", "application/json" })
-@javax.ws.rs.Consumes({"application/xml", "application/json" })
+@javax.ws.rs.Produces({"application/xml", "text/xml", "application/json" })
+@javax.ws.rs.Consumes({"application/xml", "text/xml", "application/json" })
 public class DOM4JProvider implements MessageBodyReader<org.dom4j.Document>,
                 MessageBodyWriter<org.dom4j.Document> {
 
