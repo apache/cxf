@@ -40,8 +40,11 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -172,20 +175,27 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     }
     
     public static final void setBlocking(ApplicationContext ctx, EndpointImpl impl) {
+        Class<?> cls = null;
         try {
-            Class<?> cls = Class
+            cls = Class
                 .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
-            if (ctx.getBeanNamesForType(cls, true, false).length != 0) {
-                //Spring will handle the postconstruct, but won't inject the 
-                // WebServiceContext so we do need to do that.
-                impl.getServerFactory().setBlockPostConstruct(true);
-            } else if (ctx.containsBean(Jsr250BeanPostProcessor.class.getName())) {
-                impl.getServerFactory().setBlockInjection(true);
-            }
         } catch (ClassNotFoundException e) {
             //ignore
         }
-
+        AutowireCapableBeanFactory fact = ctx.getAutowireCapableBeanFactory();
+        if (fact instanceof DefaultListableBeanFactory) {
+            DefaultListableBeanFactory dlbf = (DefaultListableBeanFactory)fact;
+            for (BeanPostProcessor bpp : dlbf.getBeanPostProcessors()) {
+                if (cls != null && cls.isInstance(bpp)) {
+                    impl.getServerFactory().setBlockPostConstruct(true);
+                    impl.getServerFactory().setBlockInjection(true);
+                    return;
+                }
+                if (bpp instanceof Jsr250BeanPostProcessor) {
+                    impl.getServerFactory().setBlockInjection(true);
+                }
+            }
+        }
     }
     
     @NoJSR250Annotations
