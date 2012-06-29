@@ -59,7 +59,6 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         addAfter(AttachmentOutInterceptor.class.getName());
     }
 
-    @SuppressWarnings("resource")
     public void handleMessage(Message message) {
         OutputStream os = message.getContent(OutputStream.class);
         XMLStreamWriter xwriter = message.getContent(XMLStreamWriter.class);
