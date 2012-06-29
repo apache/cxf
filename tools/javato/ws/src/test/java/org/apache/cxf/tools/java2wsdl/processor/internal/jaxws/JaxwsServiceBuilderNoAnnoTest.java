@@ -41,6 +41,7 @@ public class JaxwsServiceBuilderNoAnnoTest extends ProcessorTestBase {
         JAXBContextCache.clearCaches();
         builder.setBus(BusFactory.getDefaultBus());
         generator.setBus(builder.getBus());
+        generator.setToolContext(env);
     }
 
 

@@ -150,6 +150,7 @@ public class JavaToWSDLProcessor implements Processor {
 
     public void generate(ServiceInfo service, File output) throws ToolException {
         for (AbstractGenerator<?> generator : generators) {
+            generator.setToolContext(context);
             generator.setServiceModel(service);
             generator.setBus(getBus());
             generator.generate(output);

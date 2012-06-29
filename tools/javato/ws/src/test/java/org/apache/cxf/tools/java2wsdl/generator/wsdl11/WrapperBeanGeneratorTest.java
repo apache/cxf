@@ -69,6 +69,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, testingClass);
         
         WrapperBeanGenerator generator = new WrapperBeanGenerator();
+        generator.setToolContext(env);
         generator.setServiceModel(getServiceInfo());
         
         generator.generate(output);
@@ -94,6 +95,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, testingClass);
         
         WrapperBeanGenerator generator = new WrapperBeanGenerator();
+        generator.setToolContext(env);
         generator.setServiceModel(getServiceInfo());
         
         generator.generate(output);
@@ -128,6 +130,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, testingClass);
         
         WrapperBeanGenerator generator = new WrapperBeanGenerator();
+        generator.setToolContext(env);
         generator.setServiceModel(getServiceInfo());
         
         generator.generate(output);
@@ -143,6 +146,7 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, testingClass);
         
         WrapperBeanGenerator generator = new WrapperBeanGenerator();
+        generator.setToolContext(env);
         generator.setServiceModel(getServiceInfo());
         
         generator.generate(output);

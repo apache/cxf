@@ -42,6 +42,7 @@ public class DateTypeCustomGeneratorTest extends ProcessorTestBase {
     @Before
     public void setUp() throws Exception {
         processor.setEnvironment(env);
+        gen.setToolContext(env);
     }
 
     @After

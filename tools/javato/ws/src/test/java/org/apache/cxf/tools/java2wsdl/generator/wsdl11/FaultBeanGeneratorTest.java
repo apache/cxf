@@ -60,6 +60,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
         env.put(ToolConstants.CFG_CLASSNAME, testingClass);
 
         FaultBeanGenerator generator = new FaultBeanGenerator();
+        generator.setToolContext(env);
         generator.setServiceModel(getServiceInfo());
 
         generator.generate(output);
@@ -80,7 +81,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
 
         FaultBeanGenerator generator = new FaultBeanGenerator();
         generator.setServiceModel(getServiceInfo());
-
+        generator.setToolContext(env);
         generator.generate(output);
 
         String pkgBase = "org/apache/cxf/tools/fortest/jaxws/rpc/types";

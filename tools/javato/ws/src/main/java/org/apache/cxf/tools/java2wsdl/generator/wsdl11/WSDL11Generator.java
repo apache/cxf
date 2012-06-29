@@ -143,6 +143,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
         generator.setServiceModel(getServiceModel());
         generator.setAllowImports(allowImports());
         generator.addSchemaFiles(imports);
+        generator.setToolContext(getToolContext());
 
         generator.generate(outputdir);
     }
