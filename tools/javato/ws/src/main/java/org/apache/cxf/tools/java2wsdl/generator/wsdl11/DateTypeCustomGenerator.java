@@ -94,7 +94,8 @@ public final class DateTypeCustomGenerator extends AbstractGenerator<File> {
             }
 
             try {
-                generator.doWrite(getTemplate(), FileWriterUtil.getWriter(xjb));
+                generator.doWrite(getTemplate(), new FileWriterUtil(xjb.getParent(), getOutputStreamCreator())
+                    .getWriter(xjb, "UTF-8"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

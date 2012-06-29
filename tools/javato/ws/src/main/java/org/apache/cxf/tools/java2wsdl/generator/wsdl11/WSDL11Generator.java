@@ -46,6 +46,7 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
 import org.apache.cxf.tools.util.FileWriterUtil;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 
@@ -66,7 +67,8 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
         File outputdir = createOutputDir(file);
         Definition def = null;
         try {
-            Writer os = FileWriterUtil.getWriter(file);
+            Writer os = new FileWriterUtil(file.getParent(),
+                                           getOutputStreamCreator()).getWriter(file, "UTF-8");
             WSDLWriter wsdlWriter = WSDLFactory.newInstance().newWSDLWriter();
 
             ServiceWSDLBuilder builder = new ServiceWSDLBuilder(getBus(), getServiceModel());
@@ -101,7 +103,8 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                 File impfile = new File(file.getParentFile(), imp.getKey());
                 Element el = imp.getValue().getElement();
                 updateImports(el, imports);
-                os = FileWriterUtil.getWriter(impfile);
+                os = new FileWriterUtil(impfile.getParent(),
+                                        getToolContext().get(OutputStreamCreator.class)).getWriter(impfile, "UTF-8");
                 XMLUtils.writeTo(el, os, 2);
                 os.close();
             }

@@ -113,6 +113,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.JAXBUtils;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.DefaultValueProvider;
 import org.apache.cxf.tools.wsdlto.core.RandomValueProvider;
@@ -734,7 +735,8 @@ public class JAXBDataBinding implements DataBindingProfile {
 
             TypesCodeWriter fileCodeWriter = new TypesCodeWriter(new File(dir),
                                                                  context.getExcludePkgList(),
-                                                                 (String)context.get(ToolConstants.CFG_ENCODING));
+                                                                 (String)context.get(ToolConstants.CFG_ENCODING),
+                                                                 context.get(OutputStreamCreator.class));
 
             if (rawJaxbModelGenCode instanceof S2JJAXBModel) {
                 S2JJAXBModel schem2JavaJaxbModel = rawJaxbModelGenCode;

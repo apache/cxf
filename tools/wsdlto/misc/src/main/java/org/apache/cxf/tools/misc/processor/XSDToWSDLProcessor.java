@@ -48,6 +48,7 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.dom.ExtendedDocumentBuilder;
 import org.apache.cxf.tools.util.FileWriterUtil;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
@@ -200,7 +201,7 @@ public class XSDToWSDLProcessor implements Processor {
         } else {
             outputDir = "./";
         }
-        FileWriterUtil fw = new FileWriterUtil(outputDir);
+        FileWriterUtil fw = new FileWriterUtil(outputDir, env.get(OutputStreamCreator.class));
         try {
             writer = fw.getWriter("", newName);
         } catch (IOException ioe) {

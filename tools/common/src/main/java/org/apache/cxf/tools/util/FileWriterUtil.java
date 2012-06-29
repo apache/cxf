@@ -21,7 +21,6 @@ package org.apache.cxf.tools.util;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -34,9 +33,15 @@ import org.apache.cxf.tools.common.ToolException;
 public class FileWriterUtil {
     private static final Logger LOG = LogUtils.getL7dLogger(FileWriterUtil.class);
     private final File target;
+    private final OutputStreamCreator osc;
 
-    public FileWriterUtil(String targetDir) throws ToolException {
+    public FileWriterUtil() throws ToolException {
+        target = null;
+        osc = new OutputStreamCreator();
+    }
+    public FileWriterUtil(String targetDir, OutputStreamCreator osc) throws ToolException {
         target = new File(targetDir);
+        this.osc = osc == null ? new OutputStreamCreator() : osc;
         if (!(target.exists()) || !(target.isDirectory())) {
             Message msg = new Message("DIRECTORY_NOT_EXIST", LOG, target);
             throw new ToolException(msg);
@@ -52,15 +57,15 @@ public class FileWriterUtil {
         return fn;
     }
 
-    public static Writer getWriter(File fn) throws IOException {
+    private Writer getWriter(File fn) throws IOException {
         return getWriter(fn, "UTF-8");
     }
 
-    public static Writer getWriter(File fn, String encoding) throws IOException {
+    public Writer getWriter(File fn, String encoding) throws IOException {
         if (encoding == null) {
             encoding = "UTF-8";
         }
-        return new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(fn)), encoding);
+        return new OutputStreamWriter(new BufferedOutputStream(osc.createOutputStream(fn)), encoding);
     }
     
     public Writer getWriter(String packageName, String fileName) throws IOException {

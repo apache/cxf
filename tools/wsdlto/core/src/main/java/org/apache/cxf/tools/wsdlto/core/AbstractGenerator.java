@@ -36,6 +36,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.VelocityGenerator;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.FileWriterUtil;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.version.Version;
 
 public abstract class AbstractGenerator implements FrontEndGenerator {
@@ -62,7 +63,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         if (env.optionSet(ToolConstants.CFG_GEN_OVERWRITE)) {
             return false;
         }
-        FileWriterUtil fw = new FileWriterUtil((String)env.get(ToolConstants.CFG_OUTPUTDIR));
+        FileWriterUtil fw = new FileWriterUtil((String)env.get(ToolConstants.CFG_OUTPUTDIR), null);
         return fw.isCollision(packageName, filename + ext);
     }
 
@@ -80,7 +81,8 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
             return null;
         }
 
-        fw = new FileWriterUtil(getOutputDir());
+        fw = new FileWriterUtil(getOutputDir(), 
+                                (OutputStreamCreator)env.get(OutputStreamCreator.class));
         try {
             if (".java".equals(ext)) {
                 writer = fw.getWriter(packageName, filename + ext, 

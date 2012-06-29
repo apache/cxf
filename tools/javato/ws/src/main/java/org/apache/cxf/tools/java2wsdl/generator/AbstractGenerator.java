@@ -24,6 +24,7 @@ import java.io.File;
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.tools.util.OutputStreamCreator;
 
 public abstract class AbstractGenerator<T> {
     private ServiceInfo service;
@@ -81,5 +82,14 @@ public abstract class AbstractGenerator<T> {
             parentDir.mkdirs();
         }
         return parentDir;
+    }
+    
+    protected OutputStreamCreator getOutputStreamCreator() {
+        OutputStreamCreator osc = context.get(OutputStreamCreator.class);
+        if (osc == null) {
+            osc = new OutputStreamCreator();
+            context.put(OutputStreamCreator.class, osc);
+        }
+        return osc;
     }
 }

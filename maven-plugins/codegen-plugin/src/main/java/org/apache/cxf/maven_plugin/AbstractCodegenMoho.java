@@ -59,6 +59,7 @@ import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 public abstract class AbstractCodegenMoho extends AbstractMojo {
 
@@ -140,6 +141,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * @parameter expression="${cxf.wsdlRoot}" default-value="${basedir}/src/main/resources/wsdl"
      */
     protected File wsdlRoot;
+    
+    /** @component */
+    protected BuildContext buildContext;
+    
+    
     /**
      * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
      * 
@@ -207,6 +213,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
       * @required
       */
     private ArtifactResolver artifactResolver;
+    
 
     public AbstractCodegenMoho() {
         super();
@@ -268,11 +275,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         // add the generated source into compile source
         if (project != null && getGeneratedSourceRoot() != null && getGeneratedSourceRoot().exists()) {
             project.addCompileSourceRoot(getGeneratedSourceRoot().getAbsolutePath());
+            buildContext.refresh(getGeneratedSourceRoot().getAbsoluteFile());
         }
         if (project != null && getGeneratedTestRoot() != null && getGeneratedTestRoot().exists()) {
             project.addTestCompileSourceRoot(getGeneratedTestRoot().getAbsolutePath());
+            buildContext.refresh(getGeneratedTestRoot().getAbsoluteFile());
         }
-
         System.gc();
     }
 
@@ -346,6 +354,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (f.exists()) {
             return f.delete();
         }
+        buildContext.refresh(f.getParentFile());
 
         return true;
     }
