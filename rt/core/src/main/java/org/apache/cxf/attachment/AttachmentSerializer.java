@@ -35,6 +35,9 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
 public class AttachmentSerializer {
+    // http://tools.ietf.org/html/rfc2387
+    private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
+    
     private Message message;
     private String bodyBoundary;
     private OutputStream out;
@@ -43,15 +46,19 @@ public class AttachmentSerializer {
     private String multipartType;
     private Map<String, List<String>> rootHeaders = Collections.emptyMap();
     private boolean xop = true;
+    private boolean writeOptionalTypeParameters = true;
     
     public AttachmentSerializer(Message messageParam) {
         message = messageParam;
     }
 
-    public AttachmentSerializer(Message messageParam, String multipartType, 
+    public AttachmentSerializer(Message messageParam, 
+                                String multipartType,
+                                boolean writeOptionalTypeParameters,
                                 Map<String, List<String>> headers) {
         message = messageParam;
         this.multipartType = multipartType;
+        this.writeOptionalTypeParameters = writeOptionalTypeParameters;
         this.rootHeaders = headers;
     }
     
@@ -86,11 +93,19 @@ public class AttachmentSerializer {
         }        
         
         // Set transport mime type
-        String requestMimeType = multipartType == null ? "multipart/related" : multipartType;
+        String requestMimeType = multipartType == null ? DEFAULT_MULTIPART_TYPE : multipartType;
         
         StringBuilder ct = new StringBuilder();
         ct.append(requestMimeType);
-        if (requestMimeType.indexOf("type=") == -1) {
+        
+        // having xop set to true implies multipart/related, but just in case...
+        boolean xopOrMultipartRelated = xop 
+            || DEFAULT_MULTIPART_TYPE.equalsIgnoreCase(requestMimeType)
+            || DEFAULT_MULTIPART_TYPE.startsWith(requestMimeType);
+        
+        // type is a required parameter for multipart/related only
+        if (xopOrMultipartRelated
+            && requestMimeType.indexOf("type=") == -1) {
             ct.append("; ");
             if (xop) {
                 ct.append("type=\"application/xop+xml\"");
@@ -98,19 +113,33 @@ public class AttachmentSerializer {
                 ct.append("type=\"").append(bodyCt).append("\"");
             }    
         }
-        ct.append("; ");
         
+        // boundary
+        ct.append("; ")
+            .append("boundary=\"")
+            .append(bodyBoundary)
+            .append("\"");
+            
         String rootContentId = getHeaderValue("Content-ID", AttachmentUtil.BODY_ATTACHMENT_ID);
         
-        ct.append("boundary=\"")
-            .append(bodyBoundary)
-            .append("\"; ")
-            .append("start=\"<")
-            .append(checkAngleBrackets(rootContentId))
-            .append(">\"; ")
-            .append("start-info=\"")
-            .append(bodyCt)
-            .append("\"");
+        // 'start' is a required parameter for XOP/MTOM, clearly defined
+        // for simpler multipart/related payloads but is not needed for
+        // multipart/mixed, multipart/form-data
+        if (xopOrMultipartRelated) {
+            ct.append("; ")
+                .append("start=\"<")
+                .append(checkAngleBrackets(rootContentId))
+                .append(">\"");
+        }
+        
+        // start-info is a required parameter for XOP/MTOM, may be needed for
+        // other WS cases but is redundant in simpler multipart/related cases
+        if (writeOptionalTypeParameters || xop) {
+            ct.append("; ")
+                .append("start-info=\"")
+                .append(bodyCt)
+                .append("\"");
+        }
         
         message.put(Message.CONTENT_TYPE, ct.toString());
 
