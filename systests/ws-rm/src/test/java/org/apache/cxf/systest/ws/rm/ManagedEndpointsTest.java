@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.rm;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.management.MBeanServer;
@@ -35,6 +37,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMUtils;
@@ -131,7 +134,6 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
 
         org.apache.cxf.endpoint.Endpoint ep = ClientProxy.getClient(greeter).getEndpoint();
         String epId = RMUtils.getEndpointIdentifier(ep, clientBus);
-        
         greeter.greetMeOneWay("one"); // sent
 
         o = mbs.invoke(clientManagerName, "getEndpointIdentifiers", null, null);
@@ -141,7 +143,8 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         verifyArray("Expected endpoint identifier", o, new String[]{epId}, true);
         
         ObjectName clientEndpointName = RMUtils.getManagedObjectName(clientManager, ep);
-        ObjectName serverEndpointName = RMUtils.getManagedObjectName(serverManager, ep);
+        // we need to find out serverEndpointName by using the query name
+        ObjectName serverEndpointName = getEndpointName(mbs, serverManager);
         
         o = mbs.invoke(clientEndpointName, "getSourceSequenceIds", 
                        new Object[]{true}, new String[]{"boolean"});
@@ -373,4 +376,13 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         }
         return o;
     }
+    
+    private ObjectName getEndpointName(MBeanServer mbs, RMManager manager) throws Exception {
+        ObjectName serviceEndpointQueryName =  new ObjectName(
+            ManagementConstants.DEFAULT_DOMAIN_NAME + ":" + ManagementConstants.BUS_ID_PROP 
+            + "=" + manager.getBus().getId() + "," + ManagementConstants.TYPE_PROP + "=WSRM.Endpoint,*");
+        Set<?> s = mbs.queryNames(serviceEndpointQueryName, null);
+        Iterator<?> it = s.iterator();
+        return (ObjectName)it.next();
+    }    
 }

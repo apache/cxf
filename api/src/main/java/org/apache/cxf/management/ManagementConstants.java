@@ -29,6 +29,7 @@ public final class ManagementConstants {
     public static final String SERVICE_NAME_PROP = "service";
     public static final String OPERATION_NAME_PROP = "operation";
     public static final String PORT_NAME_PROP = "port";
+    public static final String INSTANCE_ID_PROP = "instance.id";
     
     private ManagementConstants() {
         
