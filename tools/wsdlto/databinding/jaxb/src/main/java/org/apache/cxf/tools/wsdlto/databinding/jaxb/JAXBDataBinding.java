@@ -313,7 +313,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         schemaCompiler.setClassNameAllocator(allocator);
 
-        listener = new JAXBBindErrorListener(context.isVerbose());
+        listener = new JAXBBindErrorListener(context.isVerbose(), context.getErrorListener());
         schemaCompiler.setErrorListener(listener);
         // Collection<SchemaInfo> schemas = serviceInfo.getSchemas();
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
@@ -428,10 +428,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
             }
         }
-        
-        if (listener.hasErrors()) {
-            listener.throwError();
-        }
+
         initialized = true;
     }
 
@@ -534,7 +531,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
         InputSource result = null;
-        ele.setAttribute("schemaLocation", schemaLoc);
+        ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
         XMLUtils.writeTo(ele, new FileOutputStream(tmpFile));
         result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
@@ -729,6 +726,10 @@ public class JAXBDataBinding implements DataBindingProfile {
         if (rawJaxbModelGenCode == null) {
             return;
         }
+        if (c.getErrorListener().getErrorCount() > 0) {
+            return;
+        }
+
 
         try {
             String dir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
@@ -868,8 +869,14 @@ public class JAXBDataBinding implements DataBindingProfile {
             clone = document.createElement(node.getNodeName());
             NamedNodeMap attributes = node.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
-                ((Element)clone).setAttribute(attributes.item(i).getNodeName(), attributes.item(i)
-                    .getNodeValue());
+                ((Element)clone).setAttributeNS(attributes.item(i).getNamespaceURI(),
+                                                attributes.item(i).getNodeName(),
+                                                attributes.item(i).getNodeValue());
+            }
+            try {
+                clone.setUserData("location", node.getUserData("location"), null);
+            } catch (Throwable t) {
+                //non DOM level 3
             }
             break;
 

@@ -124,6 +124,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     
                     processWsdl();
                 }
+                if (context.getErrorListener().getErrorCount() > 0) {
+                    context.getErrorListener().throwToolException();
+                }
             } catch (IOException e) {
                 throw new ToolException(e);
             } finally {
@@ -137,6 +140,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
         } else {
             processWsdl();
+            if (context.getErrorListener().getErrorCount() > 0) {
+                context.getErrorListener().throwToolException();
+            }
         }
     }
 
@@ -240,6 +246,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         }
         
         generateTypes();
+        if (context.getErrorListener().getErrorCount() > 0) {
+            return;
+        }
 
         for (ServiceInfo service : serviceList) {
             context.put(ServiceInfo.class, service);
@@ -248,9 +257,14 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 validate(service);
             }
 
-            // Build the JavaModel from the ServiceModel
-            processor.setEnvironment(context);
-            processor.process();
+            if (context.getErrorListener().getErrorCount() == 0) {
+                // Build the JavaModel from the ServiceModel
+                processor.setEnvironment(context);
+                processor.process();
+            }
+        }
+        if (context.getErrorListener().getErrorCount() > 0) {
+            return;
         }
         if (!isSuppressCodeGen()) {
             // Generate artifacts

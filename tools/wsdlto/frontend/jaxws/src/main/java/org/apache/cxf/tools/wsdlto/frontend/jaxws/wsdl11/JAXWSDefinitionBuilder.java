@@ -181,7 +181,12 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setExtensionRegistry(mgr.getExtensionRegistry());       
 
-        return reader.readWSDL(wsdlLocator);
+        Element el = eleMap.get(wsdlLocator.getBaseURI());
+        if (el == null) {
+            el = (Element)cusParser.getWSDLNode();
+        }
+
+        return reader.readWSDL(wsdlLocator, el);
     }
 
     public Definition getWSDLModel() {

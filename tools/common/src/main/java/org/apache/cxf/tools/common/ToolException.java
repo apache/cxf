@@ -18,6 +18,9 @@
  */
 
 package org.apache.cxf.tools.common;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
@@ -26,12 +29,35 @@ import org.apache.cxf.common.i18n.Message;
  * Exception used for unrecoverable error in a CXF tool.
  */
 public class ToolException extends RuntimeException {
-
-    
     private static final long serialVersionUID = -4418907917249006910L;
+    List<Throwable> suppressed = new ArrayList<Throwable>(0);
+    boolean hasSuppressed;
+    
     public ToolException() {
         super();
     }
+    public ToolException(String message, List<ToolErrorListener.ErrorInfo> e) {
+        super(message);
+        
+        if (e.size() > 1) {
+            for (ToolErrorListener.ErrorInfo er : e) {
+                String ms = createMessage(er);
+                if (ms != null
+                    && er.cause != null
+                    && ms.equals(er.cause.getLocalizedMessage())) {
+                    addSuppressedThrowable(er.cause);
+                } else if (ms == null && er.cause != null) {
+                    addSuppressedThrowable(er.cause);
+                } else {
+                    addSuppressedThrowable(new ToolException(ms, er.cause));
+                }
+            }
+        } else if (e.size() == 1) {
+            initCause(e.get(0).cause);
+        }
+    }
+
+    
     public ToolException(Message msg) {
         super(msg.toString());
     }
@@ -61,5 +87,69 @@ public class ToolException extends RuntimeException {
     public ToolException(String messageId, Logger logger, Object ... args) {
         this(new Message(messageId, logger, args));
     }
+    private String createMessage(ToolErrorListener.ErrorInfo e) {
+        if (e.file != null) {
+            return e.file.getAbsolutePath() + " [" + e.line + "," + e.col + "]: " + e.message; 
+        }
+        if (e.message == null && e.cause != null) {
+            return e.cause.getLocalizedMessage();
+        }
+        return e.message;
+    }
+    public void printStackTrace(PrintStream ps) {
+        if (!hasSuppressed) {
+            super.printStackTrace(ps);
+            return;
+        }
+        printStackTrace(ps, "", "");   
+    }
+    public void printStackTrace(PrintStream ps, String pfx, String cap) {
+        ps.println(pfx + cap + this);
+        StackTraceElement[] trace = super.getStackTrace();
+        for (StackTraceElement traceElement : trace) {
+            ps.println(pfx + "\tat " + traceElement);
+        }
+
+        // Print suppressed exceptions, if any
+        for (Throwable se : suppressed) {
+            printThrowable(se, ps, pfx + "/t", "Suppressed: ");
+        }
+
+        // Print cause, if any
+        Throwable ourCause = getCause();
+        if (ourCause != null &&  ourCause != suppressed.get(0)) {
+            printThrowable(ourCause, ps, pfx + "/t", "Caused by: ");
+        }
+    }    
+    private void printThrowable(Throwable t, PrintStream ps, String pfx, String cap) {
+        if (t instanceof ToolException) {
+            ((ToolException)t).printStackTrace(ps, pfx, cap);
+        } else {
+            ps.println(pfx + cap + t);
+            StackTraceElement[] trace = t.getStackTrace();
+            for (StackTraceElement ste : trace) {
+                ps.println(pfx + "\tat " + ste);
+            }
+            if (t.getCause() != null) {
+                printThrowable(t.getCause(), ps, pfx + "\t", "Caused by: ");
+            }
+        }
+        
+    }
+
+    
+    private void addSuppressedThrowable(Throwable t) {
+        try {
+            this.getClass().getMethod("addSuppressed", Throwable.class).invoke(this, t);
+        } catch (Throwable t2) {
+            //java < 1.7
+            suppressed.add(t2);
+            if (getCause() == null) {
+                initCause(t);
+            }
+            hasSuppressed = true;
+        }
+    }
+
 }
 
