@@ -40,6 +40,7 @@ public class ToolContext {
     private Map<String, Object> paramMap;
     private String packageName;
     private boolean packageNameChanged;
+    private ToolErrorListener errors;
     private Map<String, String> namespacePackageMap = new HashMap<String, String>();
     private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
     private List<InputSource> jaxbBindingFiles = new ArrayList<InputSource>();
@@ -281,6 +282,15 @@ public class ToolContext {
         return null;
     }
     
+    public ToolErrorListener getErrorListener() {
+        if (errors == null) {
+            errors = new ToolErrorListener();
+        }
+        return errors;
+    }
+    public void setErrorListener(ToolErrorListener e) {
+        errors = e;
+    }
     
     public Map<String, String> getNamespacePackageMap() {
         return namespacePackageMap;
@@ -310,7 +320,7 @@ public class ToolContext {
         newCopy.jaxbBindingFiles = new ArrayList<InputSource>(jaxbBindingFiles);
         newCopy.excludePkgList = new ArrayList<String>(excludePkgList);
         newCopy.excludeFileList = new ArrayList<String>(excludeFileList);
-        
+        newCopy.errors = errors;
         return newCopy;
     }    
 }

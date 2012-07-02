@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -154,10 +155,17 @@ public final class CustomizationParser {
         }
         
         try {
-            doc = DOMUtils.readXml(ins);
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(uri, ins);
+            doc = StaxUtils.read(reader, true);
         } catch (Exception e) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
             throw new ToolException(msg, e);
+        } finally {
+            try {
+                ins.close();
+            } catch (IOException ex) {
+                //ignore
+            }
         }
         try {
             doc.setDocumentURI(uri);
@@ -236,8 +244,9 @@ public final class CustomizationParser {
     private void appendJaxbVersion(final Element schemaElement) {
         String jaxbPrefix = schemaElement.lookupPrefix(ToolConstants.NS_JAXB_BINDINGS);
         if (jaxbPrefix == null) {
-            schemaElement.setAttribute("xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
-            schemaElement.setAttribute("jaxb:version", "2.0");
+            schemaElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+                                       "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
+            schemaElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "2.0");
         }
     }
 
@@ -324,8 +333,9 @@ public final class CustomizationParser {
                                 pfxs = "";
                             }
                             String ns = el.lookupNamespaceURI(pfx);
-                            schemaNode.setAttribute("xmlns:" + pfx,
-                                                    ns);
+                            schemaNode.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+                                                      "xmlns:" + pfx,
+                                                      ns);
                         }
                     }
                 }
@@ -383,8 +393,9 @@ public final class CustomizationParser {
 
         for (Map.Entry<String, String> ent : ctx.getUsedNamespaces().entrySet()) {
             if (node.lookupNamespaceURI(ent.getKey()) == null) {
-                node.getOwnerDocument().getDocumentElement().setAttribute("xmlns:" + ent.getKey(),
-                                                                          ent.getValue());
+                node.getOwnerDocument().getDocumentElement().setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+                                                                            "xmlns:" + ent.getKey(),
+                                                                            ent.getValue());
             }
 
         }
@@ -398,16 +409,21 @@ public final class CustomizationParser {
         Node cloneNode = ProcessorUtil.cloneNode(node.getOwnerDocument(), bindings, true);
         Node firstChild = DOMUtils.getChild(node, "jaxws:bindings");
         if (firstChild == null && cloneNode.getNodeName().indexOf("bindings") == -1) {
-            wsdlNode.setAttribute("xmlns:jaxws", ToolConstants.JAXWS_BINDINGS.getNamespaceURI());
-            Element jaxwsBindingElement = node.getOwnerDocument().createElement("jaxws:bindings");
+            wsdlNode.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+                                  "xmlns:jaxws", 
+                                  ToolConstants.JAXWS_BINDINGS.getNamespaceURI());
+            Element jaxwsBindingElement = node.getOwnerDocument()
+                    .createElementNS(ToolConstants.JAXWS_BINDINGS.getNamespaceURI(),
+                                     "jaxws:bindings");
             node.appendChild(jaxwsBindingElement);
             firstChild = jaxwsBindingElement;
         }
 
         if (firstChild == null && cloneNode.getNodeName().indexOf("bindings") > -1) {
             firstChild = node;
-            if (wsdlNode.getAttributeNode("xmls:jaxws") == null) {
-                wsdlNode.setAttribute("xmlns:jaxws", ToolConstants.JAXWS_BINDINGS.getNamespaceURI());
+            if (wsdlNode.getAttributeNodeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "jaxws") == null) {
+                wsdlNode.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
+                                        "xmlns:jaxws", ToolConstants.JAXWS_BINDINGS.getNamespaceURI());
             }
         }
 
@@ -464,7 +480,9 @@ public final class CustomizationParser {
         Element root = null;
         try {
             URIResolver resolver = new URIResolver(bindingFile);
-            root = DOMUtils.readXml(resolver.getInputStream()).getDocumentElement();
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), 
+                                                                     resolver.getInputStream());
+            root = StaxUtils.read(reader, true).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
             throw new ToolException(msg, e1);
@@ -489,11 +507,11 @@ public final class CustomizationParser {
                     throw new ToolException(msg);
                 }
 
-                root.setAttribute("wsdlLocation", wsdlURI);
+                root.setAttributeNS(null, "wsdlLocation", wsdlURI);
             } else {
                 targetNode = wsdlNode;
 
-                root.setAttribute("wsdlLocation", wsdlURL);
+                root.setAttributeNS(null, "wsdlLocation", wsdlURL);
             }
             jaxwsBindingsMap.put(root, targetNode);
 
@@ -562,7 +580,7 @@ public final class CustomizationParser {
 
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
         InputSource result = null;
-        ele.setAttribute("schemaLocation", schemaLoc);
+        ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
         XMLUtils.writeTo(ele, new FileOutputStream(tmpFile));
         result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));

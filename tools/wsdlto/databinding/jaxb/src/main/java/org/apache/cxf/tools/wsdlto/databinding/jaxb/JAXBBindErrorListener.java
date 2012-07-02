@@ -19,52 +19,50 @@
 
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import com.sun.tools.xjc.api.ErrorListener;
 
-import org.apache.cxf.tools.common.ToolException;
+import org.apache.cxf.tools.common.ToolErrorListener;
 
 public class JAXBBindErrorListener implements ErrorListener {
     private boolean isVerbose;
-    private String prefix = "Thrown by JAXB: ";
-    private StringBuilder errors = new StringBuilder();
-    private Exception firstException;
+    private ToolErrorListener listener;
     
-    public JAXBBindErrorListener(boolean verbose) {
+    public JAXBBindErrorListener(boolean verbose, ToolErrorListener l) {
         isVerbose = verbose;
+        listener = l;
     }
 
     public boolean hasErrors() {
-        return errors.length() != 0;
+        return listener.getErrorCount() > 0;
     }
-    public void throwError() {
-        throw new ToolException(prefix + "\n" + errors.toString(), firstException);
-    }
-    
+
     public void error(org.xml.sax.SAXParseException exception) {
-        if (errors.length() == 0) {
-            errors.append(prefix);
+        String s = exception.getSystemId();
+        File file = null;
+        if (s != null && s.startsWith("file:")) {
+            if (s.contains("#")) {
+                s = s.substring(0, s.indexOf('#'));
+            }
+            try {
+                URI uri = new URI(s);
+                file = new File(uri);
+            } catch (URISyntaxException e) {
+                //ignore
+            }
         }
-        errors.append("\n");
-        if (exception.getLineNumber() > 0) {
-            errors.append(exception.getLocalizedMessage() + "\n"
-                       + " at line " + exception.getLineNumber()
-                       + " column " + exception.getColumnNumber()
-                       + " of schema " + exception.getSystemId()
-                       + "\n");
-           
-        } else {
-            errors.append(prefix + mapMessage(exception.getLocalizedMessage())
-                          + "\n");
-        }
-        if (firstException == null) {
-            firstException = exception;
-            firstException.fillInStackTrace();
-        }
+        listener.addError(file,
+                          exception.getLineNumber(),
+                          exception.getColumnNumber(),
+                          mapMessage(exception.getLocalizedMessage()),
+                          exception);
     }
 
     public void fatalError(org.xml.sax.SAXParseException exception) {
-        throw new ToolException(prefix + exception.getLocalizedMessage()
-                                + " of schema " + exception.getSystemId(), exception);
+        error(exception);
     }
 
     public void info(org.xml.sax.SAXParseException exception) {
@@ -79,6 +77,25 @@ public class JAXBBindErrorListener implements ErrorListener {
             System.out.println("JAXB parsing schema warning " + exception.toString()
                                + " in schema " + exception.getSystemId());
         }
+        String s = exception.getSystemId();
+        File file = null;
+        if (s != null && s.startsWith("file:")) {
+            if (s.contains("#")) {
+                s = s.substring(0, s.indexOf('#'));
+            }
+            try {
+                URI uri = new URI(s);
+                file = new File(uri);
+            } catch (URISyntaxException e) {
+                //ignore
+            }
+        }
+        listener.addWarning(file,
+                          exception.getLineNumber(),
+                          exception.getColumnNumber(),
+                          mapMessage(exception.getLocalizedMessage()),
+                          exception);
+        
     }
     
     private String mapMessage(String msg) {

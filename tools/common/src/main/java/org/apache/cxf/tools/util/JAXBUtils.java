@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
+import javax.xml.XMLConstants;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -94,7 +96,7 @@ public final class JAXBUtils {
         } else {
             packagename = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "package");
         }
-        packagename.setAttribute("name", packagevalue);
+        packagename.setAttributeNS(null, "name", packagevalue);
 
         schemaBindings.appendChild(packagename);
 
@@ -110,16 +112,16 @@ public final class JAXBUtils {
      */
     public static File getPackageMappingSchemaBindingFile(String namespace, String pkgName) {
         Document doc = DOMUtils.createDocument();
-        Element rootElement = doc.createElement("schema");
-        rootElement.setAttribute("xmlns", ToolConstants.SCHEMA_URI);
-        rootElement.setAttribute("xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
-        rootElement.setAttribute("jaxb:version", "2.0");
-        rootElement.setAttribute("targetNamespace", namespace);
-        Element annoElement = doc.createElement("annotation");
-        Element appInfo = doc.createElement("appinfo");
-        Element schemaBindings = doc.createElement("jaxb:schemaBindings");
-        Element pkgElement = doc.createElement("jaxb:package");
-        pkgElement.setAttribute("name", pkgName);
+        Element rootElement = doc.createElementNS(ToolConstants.SCHEMA_URI, "schema");
+        rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", ToolConstants.SCHEMA_URI);
+        rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
+        rootElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "2.0");
+        rootElement.setAttributeNS(null, "targetNamespace", namespace);
+        Element annoElement = doc.createElementNS(ToolConstants.SCHEMA_URI, "annotation");
+        Element appInfo = doc.createElementNS(ToolConstants.SCHEMA_URI, "appinfo");
+        Element schemaBindings = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:schemaBindings");
+        Element pkgElement = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:package");
+        pkgElement.setAttributeNS(null, "name", pkgName);
         annoElement.appendChild(appInfo);
         appInfo.appendChild(schemaBindings);
         schemaBindings.appendChild(pkgElement);

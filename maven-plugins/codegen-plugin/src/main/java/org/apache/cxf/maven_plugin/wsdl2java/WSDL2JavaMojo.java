@@ -35,10 +35,12 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.maven_plugin.AbstractCodegenMoho;
 import org.apache.cxf.maven_plugin.GenericWsdlOption;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.tools.common.ToolErrorListener;
 import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * @goal wsdl2java
@@ -201,6 +203,20 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         }
         doneFile.delete();
 
+        try {
+            File file = new File(wsdlURI);
+            if (file.exists()) {
+                buildContext.removeMessages(file);
+            }
+        } catch (Throwable t) {
+            //ignore
+        }
+        if (wsdlOption.getDependencies() != null) {
+            for (File f : wsdlOption.getDependencies()) {
+                buildContext.removeMessages(f);
+            }
+        }
+        
         List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, 
                                                            getLog().isDebugEnabled());
         if (encoding != null) {
@@ -234,10 +250,31 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             try {
                 ToolContext ctx = new ToolContext();
                 final List<File> files = new ArrayList<File>();                
+                final List<File> errorfiles = new ArrayList<File>();                
                 ctx.put(OutputStreamCreator.class, new OutputStreamCreator() {
                     public OutputStream createOutputStream(File file) throws IOException {
                         files.add(file);
                         return buildContext.newFileOutputStream(file);
+                    }
+                });
+                ctx.setErrorListener(new ToolErrorListener() {
+                    public void addError(File file, int line, int column, String message, Throwable t) {
+                        super.addError(file, line, column, message, t);
+                        if (!errorfiles.contains(file)) {
+                            buildContext.removeMessages(file);
+                            errorfiles.add(file);
+                        }
+                        buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, t);
+                    }
+
+                    public void addWarning(File file, int line, int column, String message, Throwable t) {
+                        if (!errorfiles.contains(file)) {
+                            buildContext.removeMessages(file);
+                            errorfiles.add(file);
+                        }
+                        //don't send to super which just LOG.warns.   We'll let Maven do that to
+                        //not duplicate the error message.
+                        buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_WARNING, t);
                     }
                 });
                 new WSDLToJava(args).run(ctx);
@@ -257,6 +294,9 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             } catch (Throwable e) {
                 buildContext.setValue("cxf.file.list." + doneFile.getName(), null);
                 getLog().debug(e);
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException)e;
+                }
                 throw new MojoExecutionException(e.getMessage(), e);
             }
         }
