@@ -127,7 +127,10 @@ public class LocalTransportFactory extends AbstractTransportFactory
         d = destinations.get(addr);
         if (d == null) {
             d = createDestination(ei, reference);
-            destinations.put(addr, d);
+            Destination tmpD = destinations.putIfAbsent(addr, d);
+            if (tmpD != null) {
+                d = tmpD;
+            }
         }
         return d;
     }

@@ -47,8 +47,8 @@ abstract class AbstractSpringBeanMap<X, V>
     protected Class<?> type;
     protected String idsProperty;
     protected String staticFieldName;
-    protected Map<X, List<String>> idToBeanName = new ConcurrentHashMap<X, List<String>>();
-    protected Map<X, V> putStore = new ConcurrentHashMap<X, V>(4, 0.75f, 4);
+    protected ConcurrentHashMap<X, List<String>> idToBeanName = new ConcurrentHashMap<X, List<String>>();
+    protected ConcurrentHashMap<X, V> putStore = new ConcurrentHashMap<X, V>(4, 0.75f, 4);
 
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.context = ctx;
@@ -64,11 +64,11 @@ abstract class AbstractSpringBeanMap<X, V>
     
     protected abstract void processBeans(ApplicationContext beanFactory);
 
-    protected synchronized List<String> getBeanListForId(X id) {
-        List<String> lst = idToBeanName.get(id);
-        if (lst == null) {
-            lst = new CopyOnWriteArrayList<String>();
-            idToBeanName.put(id, lst);
+    protected List<String> getBeanListForId(X id) {
+        List<String> lst = new CopyOnWriteArrayList<String>();
+        List<String> tmpLst = idToBeanName.putIfAbsent(id, lst);
+        if (tmpLst != null) {
+            lst = tmpLst;
         }
         return lst;
     }
@@ -151,11 +151,11 @@ abstract class AbstractSpringBeanMap<X, V>
             for (String name : names) {
                 context.getBean(name);
             }
-            if (putStore.containsKey(key)) {
-                return putStore.get(key);
-            }
             V v = (V)context.getBean(names.get(0));
-            putStore.put((X)key, v);
+            V tmpV = putStore.putIfAbsent((X)key, v);
+            if (tmpV != null) {
+                v = tmpV;
+            }
             idToBeanName.remove(key);
             return v;
         } else {

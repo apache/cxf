@@ -294,7 +294,7 @@ public class ASMHelper {
     }
     
     public static class TypeHelperClassLoader extends ClassLoader {
-        Map<String, Class<?>> defined = new ConcurrentHashMap<String, Class<?>>();
+        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<String, Class<?>>();
         
         TypeHelperClassLoader(ClassLoader parent) {
             super(parent);
@@ -303,7 +303,7 @@ public class ASMHelper {
             return defined.get(name.replace('/', '.'));
         }
         
-        public synchronized Class<?> defineClass(String name, byte bytes[]) {
+        public Class<?> defineClass(String name, byte bytes[]) {
             Class<?> ret = defined.get(name.replace('/', '.'));
             if (ret != null) {
                 return ret;
@@ -323,7 +323,10 @@ public class ASMHelper {
             }
             
             ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
-            defined.put(name.replace('/', '.'), ret);
+            Class<?> tmpRet = defined.putIfAbsent(name.replace('/', '.'), ret);
+            if (tmpRet != null) {
+                ret = tmpRet;
+            }
             return ret;
         }
     }

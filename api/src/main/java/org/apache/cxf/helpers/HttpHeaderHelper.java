@@ -43,7 +43,7 @@ public final class HttpHeaderHelper {
     private static final String ISO88591 = Charset.forName("ISO-8859-1").name();
     
     private static Map<String, String> internalHeaders = new HashMap<String, String>();
-    private static Map<String, String> encodings = new ConcurrentHashMap<String, String>();
+    private static ConcurrentHashMap<String, String> encodings = new ConcurrentHashMap<String, String>();
     
     static {
         internalHeaders.put("Accept-Encoding", "accept-encoding");
@@ -124,7 +124,10 @@ public final class HttpHeaderHelper {
             } catch (UnsupportedCharsetException uce) {
                 return null;
             }
-            encodings.put(enc, newenc);
+            String tmpenc = encodings.putIfAbsent(enc, newenc);
+            if (tmpenc != null) {
+                newenc = tmpenc;
+            }
         }
         return newenc;
     }

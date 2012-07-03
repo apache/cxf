@@ -48,7 +48,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(FailoverTargetSelector.class);
-    protected Map<InvocationKey, InvocationContext> inProgress 
+    protected ConcurrentHashMap<InvocationKey, InvocationContext> inProgress 
         = new ConcurrentHashMap<InvocationKey, InvocationContext>();;
     protected FailoverStrategy failoverStrategy;
     
@@ -73,7 +73,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * 
      * @param message the current Message
      */
-    public synchronized void prepare(Message message) {
+    public void prepare(Message message) {
         Exchange exchange = message.getExchange();
         InvocationKey key = new InvocationKey(exchange);
         if (!inProgress.containsKey(key)) {
@@ -88,7 +88,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                                       bindingOperationInfo,
                                       params,
                                       context);
-            inProgress.put(key, invocation);
+            inProgress.putIfAbsent(key, invocation);
         }
     }
 

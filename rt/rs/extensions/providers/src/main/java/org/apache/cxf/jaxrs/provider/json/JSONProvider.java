@@ -401,8 +401,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             }
             String prefix = "";
             if (!ignoreNamespaces) {
-                if (namespaceMap.containsKey(qname.getNamespaceURI())) {
-                    prefix = namespaceMap.get(qname.getNamespaceURI());
+                prefix = namespaceMap.get(qname.getNamespaceURI());
+                if (prefix != null) {
                     if (prefix.length() > 0) {
                         prefix += ".";
                     }
@@ -410,6 +410,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                     prefix = "ns1.";
                 }
             }
+            prefix = (prefix == null) ? "" : prefix;
             startTag = "{\"" + prefix + qname.getLocalPart() + "\":[";
             endTag = "]}";
         } else if (serializeAsArray) {

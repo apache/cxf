@@ -104,7 +104,7 @@ public class JettyHTTPServerEngineFactory {
         setBus(b);
     }    
     
-    private static synchronized JettyHTTPServerEngine getOrCreate(JettyHTTPServerEngineFactory factory,
+    private static JettyHTTPServerEngine getOrCreate(JettyHTTPServerEngineFactory factory,
                     String host,
                     int port,
                     TLSServerParameters tlsParams) throws IOException, GeneralSecurityException {
@@ -115,8 +115,11 @@ public class JettyHTTPServerEngineFactory {
             if (tlsParams != null) {
                 ref.setTlsServerParameters(tlsParams);
             }
-            portMap.put(port, ref);
+            JettyHTTPServerEngine tmpRef = portMap.putIfAbsent(port, ref);
             ref.finalizeConfig();
+            if (tmpRef != null) {
+                ref = tmpRef;
+            }
         }
         return ref;
     }
