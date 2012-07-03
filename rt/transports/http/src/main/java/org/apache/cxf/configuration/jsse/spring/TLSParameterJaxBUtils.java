@@ -39,6 +39,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.CertStoreType;
@@ -46,6 +48,7 @@ import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.KeyStoreType;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TrustManagersType;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.https.SSLUtils;
 
 /**
@@ -122,8 +125,7 @@ public final class TLSParameterJaxBUtils {
         if (kst.isSetFile()) {
             keyStore.load(new FileInputStream(kst.getFile()), password);
         } else if (kst.isSetResource()) {
-            final java.io.InputStream is =
-                ClassLoaderUtils.getResourceAsStream(kst.getResource(), kst.getClass());
+            final java.io.InputStream is = getResourceAsStream(kst.getResource());
             if (is == null) {
                 final String msg =
                     "Could not load keystore resource " + kst.getResource();
@@ -158,8 +160,7 @@ public final class TLSParameterJaxBUtils {
             return createTrustStore(new FileInputStream(pst.getFile()));
         }
         if (pst.isSetResource()) {
-            final java.io.InputStream is =
-                ClassLoaderUtils.getResourceAsStream(pst.getResource(), pst.getClass());
+            final java.io.InputStream is = getResourceAsStream(pst.getResource());
             if (is == null) {
                 final String msg =
                     "Could not load truststore resource " + pst.getResource();
@@ -175,6 +176,18 @@ public final class TLSParameterJaxBUtils {
         return null;
     }
 
+    private static InputStream getResourceAsStream(String resource) {
+        InputStream is = ClassLoaderUtils.getResourceAsStream(resource, TLSParameterJaxBUtils.class);
+        if (is == null) {
+            Bus bus = BusFactory.getThreadDefaultBus(true);
+            ResourceManager rm = bus.getExtension(ResourceManager.class);
+            if (rm != null) {
+                is = rm.getResourceAsStream(resource);
+            }
+        }
+        return is;
+    }
+    
     /**
      * Create a KeyStore containing the trusted CA certificates contained
      * in the supplied input stream.
