@@ -133,7 +133,10 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, enableStatic,
                                                         getBus());
             if (cri != null) {
-                subResources.putIfAbsent(key, cri);
+                ClassResourceInfo tmpCri = subResources.putIfAbsent(key, cri);
+                if (tmpCri != null) {
+                    cri = tmpCri;
+                }
             }
         }
         return cri;
