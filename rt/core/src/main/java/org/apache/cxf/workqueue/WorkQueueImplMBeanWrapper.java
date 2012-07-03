@@ -117,8 +117,9 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
             //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=Shared,");
         }
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
-        buffer.append(ManagementConstants.NAME_PROP).append('=').append(aWorkQueue.getName());
-
+        buffer.append(ManagementConstants.NAME_PROP).append('=').append(aWorkQueue.getName()).append(',');
+        // Added the instance id to make the ObjectName unique
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + aWorkQueue.hashCode());
         //Use default domain name of server
         return new ObjectName(buffer.toString());
     }

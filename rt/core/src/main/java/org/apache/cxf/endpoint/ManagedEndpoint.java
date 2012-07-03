@@ -107,7 +107,9 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
             endpointName = endpoint.getEndpointInfo().getName().getLocalPart();
         }
         endpointName = ObjectName.quote(endpointName);
-        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName);
+        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName + ",");
+        // Added the instance id to make the ObjectName unique
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + endpoint.hashCode());
         
         //Use default domain name of server
         return new ObjectName(buffer.toString());

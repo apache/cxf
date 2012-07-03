@@ -151,6 +151,8 @@ public final class RMUtils {
     public static ObjectName getManagedObjectName(RMManager manager) throws JMException {
         StringBuilder buffer = new StringBuilder();
         writeTypeProperty(buffer, manager.getBus(), "WSRM.Manager");
+        // Added the instance id to make the ObjectName unique
+        buffer.append("," + ManagementConstants.INSTANCE_ID_PROP + "=" + manager.hashCode());
         return new ObjectName(buffer.toString());
     }
     
@@ -181,6 +183,8 @@ public final class RMUtils {
         buffer.append(",");
         buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
         String endpointName = ObjectName.quote(ep.getEndpointInfo().getName().toString());
-        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName);
+        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName + ",");
+        // Added the instance id to make the ObjectName unique
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + ep.hashCode());
     }
 }
