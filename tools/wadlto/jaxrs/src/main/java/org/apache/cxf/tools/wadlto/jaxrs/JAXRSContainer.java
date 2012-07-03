@@ -21,6 +21,8 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xml.sax.InputSource;
-
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.codegen.SourceGenerator;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
@@ -180,7 +181,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     protected String readWadl(String wadlURI) {
         try {
             URL url = new URL(wadlURI);
-            return IOUtils.toString(url.openStream());
+            Reader reader = new InputStreamReader(url.openStream(), "UTF-8");
+            return IOUtils.toString(reader);
         } catch (IOException e) {
             throw new ToolException(e);
         }
