@@ -136,6 +136,10 @@ final class InternalContextUtils {
                             in.cacheInput();
                         }
                         inMessage.getInterceptorChain().reset();
+                        //cleanup pathinfo
+                        if (inMessage.get(Message.PATH_INFO) != null) {
+                            inMessage.remove(Message.PATH_INFO);
+                        }
                         inMessage.getInterceptorChain().doIntercept(inMessage);
 
                     }
@@ -246,7 +250,10 @@ final class InternalContextUtils {
                         // has been sent (i.e. to a oneway, or a partial response
                         // to a decoupled twoway)
                         
-        
+                        //cleanup pathinfo
+                        if (inMessage.get(Message.PATH_INFO) != null) {
+                            inMessage.remove(Message.PATH_INFO);
+                        }
                         // pause dispatch on current thread ...
                         inMessage.getInterceptorChain().pause();
 
