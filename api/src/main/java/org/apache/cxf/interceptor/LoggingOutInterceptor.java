@@ -19,6 +19,7 @@
 
 package org.apache.cxf.interceptor;
 
+
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +28,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -35,6 +35,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+
 
 /**
  * 
@@ -181,7 +182,11 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             super.close();
         }
     }
-    
+
+    protected String formatLoggingMessage(LoggingMessage buffer) {
+        return buffer.toString();
+    }
+
     class LoggingCallback implements CachedOutputStreamCallback {
         
         private final Message message;
@@ -204,7 +209,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             String ct = (String)message.get(Message.CONTENT_TYPE);
             if (!isShowBinaryContent() && isBinaryContent(ct)) {
                 buffer.getMessage().append(BINARY_CONTENT_MESSAGE).append('\n');
-                log(logger, buffer.toString());
+                log(logger, formatLoggingMessage(buffer));
                 return;
             }
             
@@ -227,7 +232,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 //ignore
             }
 
-            log(logger, buffer.toString());
+            log(logger, formatLoggingMessage(buffer));
             try {
                 //empty out the cache
                 cos.lockOutputStream();
