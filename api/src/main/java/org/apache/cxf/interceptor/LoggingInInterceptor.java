@@ -24,13 +24,14 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+
+
 
 /**
  * A simple logging handler which outputs the bytes of the message to the
@@ -172,7 +173,13 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 
             }
         }
-        log(logger, buffer.toString());
+        log(logger, formatLoggingMessage(buffer));
+    }
+
+
+    protected String formatLoggingMessage(LoggingMessage loggingMessage) {
+
+        return loggingMessage.toString();
     }
 
     @Override
