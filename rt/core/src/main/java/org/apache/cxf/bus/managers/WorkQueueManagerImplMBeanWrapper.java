@@ -57,7 +57,7 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
         buffer.append("WorkQueueManager=").append(NAME_VALUE);
         buffer.append(',').append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + wqManager.hashCode());
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(wqManager.hashCode());
         //Use default domain name of server
         return new ObjectName(buffer.toString());
     }

@@ -89,9 +89,9 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     public ObjectName getObjectName() throws JMException {
         String busId = bus.getId();
         StringBuilder buffer = new StringBuilder();
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
-        buffer.append(ManagementConstants.TYPE_PROP + "=" + "Bus.Service.Endpoint,");
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',');
+        buffer.append(ManagementConstants.TYPE_PROP).append('=').append("Bus.Service.Endpoint,");
        
 
         String serviceName = (String)endpoint.get(SERVICE_NAME);
@@ -99,7 +99,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
             serviceName = endpoint.getService().getName().toString();
         }
         serviceName = ObjectName.quote(serviceName);
-        buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
+        buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
         
         
         String endpointName = (String)endpoint.get(ENDPOINT_NAME);
@@ -107,9 +107,9 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
             endpointName = endpoint.getEndpointInfo().getName().getLocalPart();
         }
         endpointName = ObjectName.quote(endpointName);
-        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName + ",");
+        buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(endpointName).append(',');
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + endpoint.hashCode());
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(endpoint.hashCode());
         
         //Use default domain name of server
         return new ObjectName(buffer.toString());

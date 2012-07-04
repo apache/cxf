@@ -152,7 +152,7 @@ public final class RMUtils {
         StringBuilder buffer = new StringBuilder();
         writeTypeProperty(buffer, manager.getBus(), "WSRM.Manager");
         // Added the instance id to make the ObjectName unique
-        buffer.append("," + ManagementConstants.INSTANCE_ID_PROP + "=" + manager.hashCode());
+        buffer.append(',').append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(manager.hashCode());
         return new ObjectName(buffer.toString());
     }
     
@@ -173,18 +173,18 @@ public final class RMUtils {
 
     private static void writeTypeProperty(StringBuilder buffer, Bus bus, String type) {
         String busId = bus.getId();
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
-        buffer.append(ManagementConstants.TYPE_PROP + "=" + type);
+        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',');
+        buffer.append(ManagementConstants.TYPE_PROP).append('=').append(type);
     }
 
     private static void writeEndpointProperty(StringBuilder buffer, Endpoint ep) {
         String serviceName = ObjectName.quote(ep.getService().getName().toString());
         buffer.append(",");
-        buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
+        buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
         String endpointName = ObjectName.quote(ep.getEndpointInfo().getName().toString());
-        buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + endpointName + ",");
+        buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(endpointName).append(',');
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + ep.hashCode());
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(ep.hashCode());
     }
 }
