@@ -496,7 +496,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         if (null == ss) {
             throw new JMException("no source sequence");
         }
-        //TODO use cancel insted of suspend
+        //TODO use cancel instead of suspend
         RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
         rq.suspend(ss);
         ss.getSource().removeSequence(ss);
@@ -511,7 +511,7 @@ public class ManagedRMEndpoint implements ManagedComponent {
         if (null == ds) {
             throw new JMException("no source sequence");
         }
-        //TODO use cancel insted of suspend
+        //TODO use cancel instead of suspend
 //         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
 //         rq.suspend(ds);
         ds.getDestination().removeSequence(ds);
