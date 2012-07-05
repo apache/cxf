@@ -322,26 +322,27 @@ public final class InjectionUtils {
         }
         
         boolean adapterHasToBeUsed = false;
+        Class<?> cls = pClass;        
         Class<?> valueType = JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
-        if (valueType != pClass) {
-            pClass = valueType;
+        if (valueType != cls) {
+            cls = valueType;
             adapterHasToBeUsed = true;
         }
         
-        Object result = instantiateFromParameterHandler(value, pClass, message);
+        Object result = instantiateFromParameterHandler(value, cls, message);
         if (result != null) {
             return result;
         }
         // check constructors accepting a single String value
         try {
-            Constructor<?> c = pClass.getConstructor(new Class<?>[]{String.class});
+            Constructor<?> c = cls.getConstructor(new Class<?>[]{String.class});
             result = c.newInstance(new Object[]{value});
         } catch (NoSuchMethodException ex) {
             // try valueOf
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (Exception ex) {
-            result = createFromParameterHandler(value, pClass, message);
+            result = createFromParameterHandler(value, cls, message);
             if (result == null) {
                 LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                    BUNDLE, 
@@ -351,11 +352,11 @@ public final class InjectionUtils {
         }
         if (result == null) {
             // check for valueOf(String) static methods
-            String[] methodNames = pClass.isEnum() 
+            String[] methodNames = cls.isEnum() 
                 ? new String[] {"fromString", "fromValue", "valueOf"} 
                 : new String[] {"valueOf", "fromString"};
             for (String mName : methodNames) {   
-                result = evaluateFactoryMethod(value, pClass, pType, mName);
+                result = evaluateFactoryMethod(value, cls, pType, mName);
                 if (result != null) {
                     break;
                 }
@@ -363,7 +364,7 @@ public final class InjectionUtils {
         }
         
         if (result == null) {
-            result = createFromParameterHandler(value, pClass, message);
+            result = createFromParameterHandler(value, cls, message);
         }
         
         if (adapterHasToBeUsed) {
@@ -380,7 +381,7 @@ public final class InjectionUtils {
             reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
         }
         
-        return result;
+        return pClass.cast(result);
     }
 
     private static Object instantiateFromParameterHandler(String value, 
