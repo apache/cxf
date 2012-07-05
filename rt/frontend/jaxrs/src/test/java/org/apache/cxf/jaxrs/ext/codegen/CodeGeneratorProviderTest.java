@@ -123,8 +123,9 @@ public class CodeGeneratorProviderTest extends Assert {
     
     private void verifyClasses(File classesDir, boolean typesOnly) {
         List<File> clsFiles = FileUtils.getFilesRecurse(classesDir, ".+\\.class$");
-        assertEquals(typesOnly ? 5 : 7, clsFiles.size());
+        assertEquals(typesOnly ? 6 : 8, clsFiles.size());
         assertTrue(checkContains(clsFiles, "superbooks.Book.class"));
+        assertTrue(checkContains(clsFiles, "superbooks.Books.class"));
         assertTrue(checkContains(clsFiles, "superbooks.Book2.class"));
         assertTrue(checkContains(clsFiles, "superbooks.Chapter.class"));
         assertTrue(checkContains(clsFiles, "superbooks.ObjectFactory.class"));
