@@ -21,6 +21,7 @@ package org.apache.cxf.systest.servlet;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -29,10 +30,15 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebResponse;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,12 +46,22 @@ import org.junit.Test;
 
 public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
     private static final String PORT = NoSpringServletServer.PORT;
-    
+    private static Bus serverBus;
+    private static NoSpringServletServer server;
     private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
     private final String serviceURL = "http://localhost:" + PORT + "/soap/";
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(NoSpringServletServer.class));
+        server = new NoSpringServletServer();
+        server.run();
+        serverBus = server.getBus();
+    }
+    
+    @AfterClass
+    public static void shutdownServer() throws Exception {
+        if (server != null) {
+            server.tearDown();
+        }
     }
 
     @Test
@@ -73,6 +89,37 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         Hello hello = (Hello) cpfb.create();
         String reply = hello.sayHi(" Willem");
         assertEquals("Get the wrongreply ", reply, "get Willem");
+    }
+    
+    @Test
+    public void testStartAndStopServer() throws Exception {
+        stopServer();
+        // we should not invoke the server this time
+        try {
+            testHelloService();
+            fail("Expect Exception here.");
+        } catch (Exception ex) {
+            // do nothing here
+        }
+        startServer();
+        testHelloService();
+    }
+    
+    private void stopServer() {
+        ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
+        List<Server> servers = reg.getServers();
+        for (Server serv : servers) {
+            System.out.println("expect to get a server here!");
+            serv.stop();
+        }
+    }
+    
+    private void startServer() {
+        ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
+        List<Server> servers = reg.getServers();
+        for (Server serv : servers) {
+            serv.start();
+        }
     }
 
     @Test
