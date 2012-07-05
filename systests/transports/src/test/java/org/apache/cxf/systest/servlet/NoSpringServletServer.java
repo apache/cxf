@@ -33,9 +33,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public class NoSpringServletServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(NoSpringServletServer.class);
-
-    
     Server httpServer;
+    Bus bus;
     @Override
     protected void run() {
         // setup the system properties
@@ -48,7 +47,7 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
 
             ServletContextHandler root = new ServletContextHandler(contexts, "/",
                                                                    ServletContextHandler.SESSIONS);
-            Bus bus = BusFactory.getDefaultBus(true);
+            bus = BusFactory.getDefaultBus(true);
             CXFServlet cxf = new CXFServlet();
             cxf.setBus(bus);
             ServletHolder servlet = new ServletHolder(cxf);
@@ -83,6 +82,11 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             httpServer.stop();
         }
     }
+    
+    public Bus getBus() {
+        return bus;
+    }
+    
 
     public static void main(String[] args) {
         try {

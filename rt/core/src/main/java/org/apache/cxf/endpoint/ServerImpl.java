@@ -173,14 +173,17 @@ public class ServerImpl implements Server {
                 return;
             }
         }
-        getDestination().shutdown();
+        
         getDestination().setMessageObserver(null);
         stopped = true;
     }
     
     public void destroy() {
         stop();
-
+        
+        // we should shutdown the destination here
+        getDestination().shutdown();
+        
         if (null != serverRegistry) {
             LOG.fine("unregister the server to serverRegistry ");
             serverRegistry.unregister(this);
