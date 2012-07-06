@@ -69,15 +69,16 @@ public class EHCacheSPStateManager implements SPStateManager {
     }
     
     private void createCaches(String configFile, Bus bus) {
+        if (bus == null) {
+            bus = BusFactory.getThreadDefaultBus(true);
+        }
+        
         URL configFileURL = null;
         try {
             configFileURL = 
                 ResourceUtils.getClasspathResourceURL(configFile, EHCacheSPStateManager.class, bus);
         } catch (Exception ex) {
             // ignore
-        }
-        if (bus == null) {
-            bus = BusFactory.getThreadDefaultBus(true);
         }
         if (configFileURL == null) {
             cacheManager = CacheManager.create();

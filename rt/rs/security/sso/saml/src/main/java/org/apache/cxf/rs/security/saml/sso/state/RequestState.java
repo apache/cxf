@@ -20,11 +20,14 @@ package org.apache.cxf.rs.security.saml.sso.state;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class RequestState implements Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 869323136115571943L;
     
     private String targetAddress;
@@ -35,6 +38,10 @@ public class RequestState implements Serializable {
     private String webAppDomain;
     private long createdAt;
  
+    public RequestState() {
+        
+    }
+    
     public RequestState(String targetAddress,
                         String idpServiceAddress,
                         String samlRequestId,
