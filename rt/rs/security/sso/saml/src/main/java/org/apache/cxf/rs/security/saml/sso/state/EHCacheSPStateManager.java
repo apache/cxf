@@ -29,10 +29,12 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
+import net.sf.ehcache.config.DiskStoreConfiguration;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.saml.sso.EHCacheUtil;
-import org.apache.ws.security.util.Loader;
 
 /**
  * An in-memory EHCache implementation of the SPStateManager interface. 
@@ -43,6 +45,7 @@ public class EHCacheSPStateManager implements SPStateManager {
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final String REQUEST_CACHE_KEY = "cxf.samlp.request.state.cache";
     public static final String RESPONSE_CACHE_KEY = "cxf.samlp.response.state.cache";
+    private static final String DEFAULT_CONFIG_URL = "cxf-samlp-ehcache.xml";
     
     private Ehcache requestCache;
     private Ehcache responseCache;
@@ -50,24 +53,32 @@ public class EHCacheSPStateManager implements SPStateManager {
     private long ttl = DEFAULT_TTL;
     
     public EHCacheSPStateManager() {
-        this((Bus)null);
+        this(DEFAULT_CONFIG_URL, null);
     }
     
     public EHCacheSPStateManager(Bus bus) {
-        String defaultConfigFile = "cxf-samlp-ehcache.xml";
-        URL configFileURL = Loader.getResource(defaultConfigFile);
-        createCaches(configFileURL, bus);
+        this(DEFAULT_CONFIG_URL, bus);
     }
     
-    public EHCacheSPStateManager(URL configFileURL) {
+    public EHCacheSPStateManager(String configFileURL) {
         this(configFileURL, null);
     }
     
-    public EHCacheSPStateManager(URL configFileURL, Bus bus) {
+    public EHCacheSPStateManager(String configFileURL, Bus bus) {
         createCaches(configFileURL, bus);
     }
     
-    private void createCaches(URL configFileURL, Bus bus) {
+    private void createCaches(String configFile, Bus bus) {
+        URL configFileURL = null;
+        try {
+            configFileURL = 
+                ResourceUtils.getClasspathResourceURL(configFile, EHCacheSPStateManager.class, bus);
+        } catch (Exception ex) {
+            // ignore
+        }
+        if (bus == null) {
+            bus = BusFactory.getThreadDefaultBus(true);
+        }
         if (configFileURL == null) {
             cacheManager = CacheManager.create();
         } else {
@@ -75,7 +86,8 @@ public class EHCacheSPStateManager implements SPStateManager {
             
             if (bus != null) {
                 conf.setName(bus.getId());
-                if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
+                DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
+                if (dsc != null && "java.io.tmpdir".equals(dsc.getOriginalPath())) {
                     String path = conf.getDiskStoreConfiguration().getPath() + File.separator
                         + bus.getId();
                     conf.getDiskStoreConfiguration().setPath(path);
