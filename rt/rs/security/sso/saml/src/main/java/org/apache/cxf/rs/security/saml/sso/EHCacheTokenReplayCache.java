@@ -30,9 +30,11 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
+import net.sf.ehcache.config.DiskStoreConfiguration;
 
 import org.apache.cxf.Bus;
-import org.apache.ws.security.util.Loader;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
  * An in-memory EHCache implementation of the TokenReplayCache interface. 
@@ -43,30 +45,39 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     public static final String CACHE_KEY = "cxf.samlp.replay.cache";
+    private static final String DEFAULT_CONFIG_URL = "cxf-samlp-ehcache.xml";
     
     private Ehcache cache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
     
     public EHCacheTokenReplayCache() {
-        this((Bus)null);
+        this(DEFAULT_CONFIG_URL, null);
     }
     
     public EHCacheTokenReplayCache(Bus bus) {
-        String defaultConfigFile = "cxf-samlp-ehcache.xml";
-        URL configFileURL = Loader.getResource(defaultConfigFile);
+        this(DEFAULT_CONFIG_URL, bus);
+    }
+    
+    public EHCacheTokenReplayCache(String configFileURL) {
+        this(configFileURL, null);
+    }
+    
+    public EHCacheTokenReplayCache(String configFileURL, Bus bus) {
         createCache(configFileURL, bus);
     }
     
-    public EHCacheTokenReplayCache(URL configFileURL) {
-        createCache(configFileURL, null);
-    }
-    
-    public EHCacheTokenReplayCache(URL configFileURL, Bus bus) {
-        createCache(configFileURL, bus);
-    }
-    
-    private void createCache(URL configFileURL, Bus bus) {
+    private void createCache(String configFile, Bus bus) {
+        URL configFileURL = null;
+        try {
+            configFileURL = 
+                ResourceUtils.getClasspathResourceURL(configFile, EHCacheTokenReplayCache.class, bus);
+        } catch (Exception ex) {
+            // ignore
+        }
+        if (bus == null) {
+            bus = BusFactory.getThreadDefaultBus(true);
+        }
         if (configFileURL == null) {
             cacheManager = CacheManager.create();
         } else {
@@ -74,7 +85,8 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
             
             if (bus != null) {
                 conf.setName(bus.getId());
-                if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
+                DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
+                if (dsc != null && "java.io.tmpdir".equals(dsc.getOriginalPath())) {
                     String path = conf.getDiskStoreConfiguration().getPath() + File.separator
                         + bus.getId();
                     conf.getDiskStoreConfiguration().setPath(path);

@@ -137,13 +137,12 @@ public class RequestAssertionConsumerService extends AbstractSSOSpHandler {
     }
     
     @PreDestroy
+    @Override
     public void close() throws IOException {
         if (replayCache != null) {
             replayCache.close();
         }
-        if (getStateProvider() != null) {
-            getStateProvider().close();
-        }
+        super.close();
     }
     
     protected Response doProcessSamlResponse(String encodedSamlResponse,

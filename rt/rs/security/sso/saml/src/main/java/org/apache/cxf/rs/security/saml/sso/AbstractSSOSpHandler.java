@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.annotation.PreDestroy;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.cxf.Bus;
@@ -52,6 +53,14 @@ public class AbstractSSOSpHandler {
     
     static {
         OpenSAMLUtil.initSamlEngine();
+    }
+    
+    @PreDestroy
+    public void close() throws IOException {
+        if (stateProvider != null) {
+            stateProvider.close();
+            stateProvider = null;
+        }
     }
     
     public void setSignatureCrypto(Crypto crypto) {
