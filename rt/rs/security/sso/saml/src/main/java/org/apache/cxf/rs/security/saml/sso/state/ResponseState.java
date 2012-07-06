@@ -20,12 +20,14 @@ package org.apache.cxf.rs.security.saml.sso.state;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class ResponseState implements Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3247188797004342462L;
     
     private String assertion;
@@ -34,6 +36,10 @@ public class ResponseState implements Serializable {
     private String webAppDomain;
     private long createdAt;
     private long expiresAt;
+    
+    public ResponseState() {
+        
+    }
     
     public ResponseState(String assertion,
                          String relayState,
