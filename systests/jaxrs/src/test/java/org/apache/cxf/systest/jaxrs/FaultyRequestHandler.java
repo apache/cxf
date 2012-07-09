@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -32,9 +33,16 @@ public class FaultyRequestHandler implements RequestHandler {
     private UriInfo uriInfo;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
-        if (uriInfo.getPath().endsWith("/propogateexception4")) {
-            m.getExchange().put("org.apache.cxf.systest.for-out-fault-interceptor", Boolean.TRUE);
-            throw new RuntimeException();
+        if (uriInfo.getPath().endsWith("/propogateExceptionVar/1")) {
+            MultivaluedMap<String, String> vars = uriInfo.getPathParameters();
+            if (vars.size() == 1 
+                && vars.get("i") != null 
+                && vars.get("i").size() == 1 
+                && "1".equals(vars.getFirst("i"))) {
+                
+                m.getExchange().put("org.apache.cxf.systest.for-out-fault-interceptor", Boolean.TRUE);
+                throw new RuntimeException();
+            }
         }
         return null;
     }
