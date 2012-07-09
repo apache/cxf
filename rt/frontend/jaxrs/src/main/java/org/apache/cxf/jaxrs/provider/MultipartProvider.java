@@ -74,6 +74,7 @@ import org.apache.cxf.message.MessageUtils;
 public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
+    private static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
     private static final Logger LOG = LogUtils.getL7dLogger(MultipartProvider.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(MultipartProvider.class);
 
@@ -357,8 +358,14 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                             Annotation[] anns,
                                             String mimeType, int id) {
         MediaType mt = MediaType.valueOf(mimeType);
-        MessageBodyWriter<Object> r = 
-            (MessageBodyWriter)mc.getProviders().getMessageBodyWriter(cls, genericType, anns, mt);
+        mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
+        
+        MessageBodyWriter<Object> r = null;
+        try {
+            r = (MessageBodyWriter)mc.getProviders().getMessageBodyWriter(cls, genericType, anns, mt);
+        } finally {
+            mc.put("active.jaxrs.provider", null); 
+        }
         if (r == null) {
             org.apache.cxf.common.i18n.Message message = 
                 new org.apache.cxf.common.i18n.Message("NO_MSG_WRITER",

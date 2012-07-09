@@ -63,6 +63,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ProviderFactory {
+    private static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
     private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     
@@ -642,7 +643,8 @@ public final class ProviderFactory {
             return false;
         }
         boolean injected = false;
-        if (this != SHARED_FACTORY || !isJaxbBasedProvider(ep)) {
+        if ((this != SHARED_FACTORY || !isJaxbBasedProvider(ep))
+            && m.get(ACTIVE_JAXRS_PROVIDER_KEY) != ep) {
             injectContextValues(pi, m);
             injected = true;
         }
