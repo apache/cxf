@@ -32,6 +32,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -46,10 +47,17 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
+    static { 
+        // Ensure that the correct JAX-RS implementation is loaded 
+        RuntimeDelegate runtimeDelegate = new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl(); 
+        RuntimeDelegate.setInstance(runtimeDelegate);
+    }
+    
     private static final long serialVersionUID = -8916352798780577499L;
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
@@ -60,7 +68,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
     private static final String PROVIDERS_PARAM = "jaxrs.providers";
     private static final String OUT_INTERCEPTORS_PARAM = "jaxrs.outInterceptors";
+    private static final String OUT_FAULT_INTERCEPTORS_PARAM = "jaxrs.outFaultInterceptors";
     private static final String IN_INTERCEPTORS_PARAM = "jaxrs.inInterceptors";
+    private static final String INVOKER_PARAM = "jaxrs.invoker";
     private static final String SERVICE_SCOPE_PARAM = "jaxrs.scope";
     private static final String EXTENSIONS_PARAM = "jaxrs.extensions";
     private static final String LANGUAGES_PARAM = "jaxrs.languages";
@@ -101,6 +111,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         setDocLocation(bean, servletConfig);
         setSchemasLocations(bean, servletConfig);
         setAllInterceptors(bean, servletConfig);
+        setInvoker(bean, servletConfig);
         
         Map<Class<?>, Map<String, String>> resourceClasses = 
             getServiceClasses(servletConfig, modelRef != null);
@@ -138,8 +149,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 String.class, Object.class));
     }
     
-    protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
+    protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig) 
+        throws ServletException {
         setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM);
+        setInterceptors(bean, servletConfig, OUT_FAULT_INTERCEPTORS_PARAM);
         setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM);
     }
     
@@ -170,7 +183,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     @SuppressWarnings("unchecked")
     protected void setInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
-                                   String paramName) {
+                                   String paramName) throws ServletException {
         String value  = servletConfig.getInitParameter(paramName);
         if (value == null) {
             return;
@@ -182,30 +195,52 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             String theValue = getClassNameAndProperties(interceptorVal, props);
             if (theValue.length() != 0) {
                 try {
-                    Class<?> intClass = ClassLoaderUtils.loadClass(theValue,
-                                                                   CXFNonSpringJaxrsServlet.class);
+                    Class<?> intClass = loadClass(theValue, "Interceptor");
                     Object object = intClass.newInstance();
                     injectProperties(object, props);
                     list.add((Interceptor<? extends Message>)object);
-                } catch (ClassNotFoundException ex) {
-                    LOG.warning("Interceptor class " + theValue + " can not be found");
-                } catch (InstantiationException ex) {
-                    LOG.warning(theValue + " class can not be instantiated");
-                    ex.printStackTrace();
-                } catch (IllegalAccessException ex) {
-                    LOG.warning("CXF Interceptor can not be instantiated due to IllegalAccessException"); 
-                } catch (ClassCastException ex) {
-                    LOG.warning(theValue + " class does not implement " + Interceptor.class.getName()); 
+                } catch (ServletException ex) {
+                    throw ex;
+                } catch (Exception ex) {
+                    LOG.warning("Interceptor class " + theValue + " can not be created");
+                    throw new ServletException(ex);
                 }
             }
         }
         if (list.size() > 0) {
             if (OUT_INTERCEPTORS_PARAM.equals(paramName)) {
                 bean.setOutInterceptors(list);
+            } else if (OUT_FAULT_INTERCEPTORS_PARAM.equals(paramName)) {
+                bean.setOutFaultInterceptors(list);
             } else {
                 bean.setInInterceptors(list);
             }
         }
+    }
+    
+    protected void setInvoker(JAXRSServerFactoryBean bean, ServletConfig servletConfig) 
+        throws ServletException {
+        String value  = servletConfig.getInitParameter(INVOKER_PARAM);
+        if (value == null) {
+            return;
+        }
+        Map<String, String> props = new HashMap<String, String>();
+        String theValue = getClassNameAndProperties(value, props);
+        if (theValue.length() != 0) {
+            try {
+                Class<?> intClass = loadClass(theValue, "Invoker");
+                Object object = intClass.newInstance();
+                injectProperties(object, props);
+                bean.setInvoker((Invoker)object);
+            } catch (ServletException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                LOG.warning("Invoker class " + theValue + " can not be created");
+                throw new ServletException(ex);
+            }
+        }
+        
+        
     }
     
     protected Map<Class<?>, Map<String, String>> getServiceClasses(ServletConfig servletConfig,
@@ -357,6 +392,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                                             MessageUtils.isTrue(ignoreParam),
                                             getStaticSubResolutionValue(servletConfig));
         setAllInterceptors(bean, servletConfig);
+        setInvoker(bean, servletConfig);
         setExtensions(bean, servletConfig);
         setDocLocation(bean, servletConfig);
         setSchemasLocations(bean, servletConfig);
