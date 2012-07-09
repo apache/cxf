@@ -161,6 +161,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
      * Activate receipt of incoming messages.
      */
     protected void activate() {
+        super.activate();
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
         URL url = null;
         try {
@@ -176,6 +177,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
      * Deactivate receipt of incoming messages.
      */
     protected void deactivate() {
+        super.deactivate();
         LOG.log(Level.FINE, "Deactivating receipt of incoming messages");
         engine.removeServant(nurl);   
     }   
