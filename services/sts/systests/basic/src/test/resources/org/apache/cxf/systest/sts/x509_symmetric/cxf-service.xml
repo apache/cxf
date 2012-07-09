@@ -77,5 +77,21 @@
       </jaxws:properties> 
    </jaxws:endpoint>
    
+   <jaxws:endpoint id="doubleitsymmetricsaml2endorsing"
+      implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl"
+      endpointName="s:DoubleItSymmetricSAML2EndorsingPort"
+      serviceName="s:DoubleItService"
+      address="http://localhost:${testutil.ports.Server}/doubleit/services/doubleitsymmetricsaml2endorsing"
+      wsdlLocation="org/apache/cxf/systest/sts/x509_symmetric/DoubleIt.wsdl"
+      xmlns:s="http://www.example.org/contract/DoubleIt">
+        
+      <jaxws:properties>
+         <entry key="ws-security.callback-handler" 
+                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+         <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+         <entry key="ws-security.is-bsp-compliant" value="false"/>
+      </jaxws:properties> 
+   </jaxws:endpoint>
+   
 </beans>
 

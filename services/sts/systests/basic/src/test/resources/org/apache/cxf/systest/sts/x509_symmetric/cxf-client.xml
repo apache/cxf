@@ -89,5 +89,34 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
        </jaxws:properties>
    </jaxws:client>
    
+   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2EndorsingPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+           <entry key="ws-security.encryption.username" value="myservicekey"/>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/X509?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port"/>
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.signature.username" value="myclientkey"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.username" value="mystskey"/>
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+   </jaxws:client>
+   
 </beans>
 
