@@ -60,6 +60,22 @@
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
+	<wsdl:binding name="DoubleItSymmetricSAML2EndorsingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricBindingSAML2EndorsingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
 
 	<wsdl:service name="DoubleItService">
 		<wsdl:port name="DoubleItSymmetricSAML1Port" binding="tns:DoubleItSymmetricSAML1Binding">
@@ -70,6 +86,11 @@
 			<soap:address
 				location="http://localhost:8082/doubleit/services/doubleitsymmetricsaml2" />
 		</wsdl:port>
+		<wsdl:port name="DoubleItSymmetricSAML2EndorsingPort" 
+		           binding="tns:DoubleItSymmetricSAML2EndorsingBinding">
+            <soap:address
+                location="http://localhost:8082/doubleit/services/doubleitsymmetricsaml2endorsing" />
+        </wsdl:port>
 	</wsdl:service>
 	
 	<wsp:Policy wsu:Id="DoubleItSymmetricBindingSAML1Policy">
@@ -209,6 +230,87 @@
 		</wsp:ExactlyOne>
 	</wsp:Policy>
 	
+	<wsp:Policy wsu:Id="DoubleItSymmetricBindingSAML2EndorsingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsam:Addressing wsp:Optional="false">
+                    <wsp:Policy />
+                </wsam:Addressing>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token
+                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:RequireThumbprintReference/>
+                                        <sp:WssX509V3Token10/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax />
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp />
+                        <sp:OnlySignEntireHeadersAndBody />
+                        <sp:EncryptSignature />
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128 />
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+                <sp:EndorsingSupportingTokens>
+                    <wsp:Policy>
+                        <sp:IssuedToken
+                                    sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <sp:RequestSecurityTokenTemplate>
+                                        <t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0</t:TokenType>
+                                        <t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/SymmetricKey</t:KeyType>
+                                        <t:KeySize>128</t:KeySize>
+                                    </sp:RequestSecurityTokenTemplate>
+                                    <wsp:Policy>
+                                        <sp:RequireInternalReference />
+                                    </wsp:Policy>
+                                    <sp:Issuer>
+                                        <wsaw:Address>http://localhost:8080/SecurityTokenService/UT
+                                        </wsaw:Address>
+                                        <wsaw:Metadata>
+                                            <wsx:Metadata>
+                                                <wsx:MetadataSection>
+                                                    <wsx:MetadataReference>
+                                                        <wsaw:Address>http://localhost:8080/SecurityTokenService/UT/mex
+                                                        </wsaw:Address>
+                                                    </wsx:MetadataReference>
+                                                </wsx:MetadataSection>
+                                            </wsx:Metadata>
+                                        </wsaw:Metadata>
+                                    </sp:Issuer>
+                                </sp:IssuedToken>
+                    </wsp:Policy>
+                </sp:EndorsingSupportingTokens>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefThumbprint />
+                        <sp:MustSupportRefEncryptedKey />
+                    </wsp:Policy>
+                </sp:Wss11>
+                <sp:Trust13>
+                    <wsp:Policy>
+                        <sp:MustSupportIssuedTokens />
+                        <sp:RequireClientEntropy />
+                        <sp:RequireServerEntropy />
+                    </wsp:Policy>
+                </sp:Trust13>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
 	<wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Input_Policy">
 		<wsp:ExactlyOne>
 			<wsp:All>
