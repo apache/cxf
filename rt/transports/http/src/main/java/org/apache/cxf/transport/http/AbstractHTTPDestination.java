@@ -768,11 +768,27 @@ public abstract class AbstractHTTPDestination
     }
 
     @Override
+    protected void activate() {
+        synchronized (this) {
+            if (registry != null) {
+                registry.addDestination(this);
+            }
+        }
+    }
+    @Override
+    protected void deactivate() {
+        synchronized (this) {
+            if (registry != null) {
+                registry.removeDestination(path);
+            }
+        }
+    }
+    
+    @Override
     public void shutdown() {
         synchronized (this) {
             if (registry != null) {
                 registry.removeDestination(path);
-                releaseRegistry();
             }
         }
         super.shutdown();

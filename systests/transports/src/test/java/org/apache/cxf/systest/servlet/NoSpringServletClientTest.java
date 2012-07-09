@@ -100,6 +100,8 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
             fail("Expect Exception here.");
         } catch (Exception ex) {
             // do nothing here
+            assertTrue(ex.getCause() instanceof java.io.IOException);
+            assertTrue(ex.getCause().getMessage().contains("404"));
         }
         startServer();
         testHelloService();
@@ -109,7 +111,6 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
         List<Server> servers = reg.getServers();
         for (Server serv : servers) {
-            System.out.println("expect to get a server here!");
             serv.stop();
         }
     }
