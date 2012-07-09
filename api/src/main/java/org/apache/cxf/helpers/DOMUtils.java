@@ -653,7 +653,8 @@ public final class DOMUtils {
     private static void findAllElementsByTagNameNS(Element el, String nameSpaceURI, String localName,
                                                    List<Element> elementList) {
 
-        if (localName.equals(el.getLocalName()) && nameSpaceURI.contains(el.getNamespaceURI())) {
+        if (el.getNamespaceURI() != null && localName.equals(el.getLocalName())
+            && nameSpaceURI.contains(el.getNamespaceURI())) {
             elementList.add(el);
         }
         Element elem = getFirstElement(el);
