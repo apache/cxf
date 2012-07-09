@@ -877,7 +877,7 @@ public class RMTxStore implements RMStore {
                 }
             }
         } finally {
-            if (connection == null) {
+            if (connection == null && con != null) {
                 con.close();
             }
         }
@@ -1068,7 +1068,6 @@ public class RMTxStore implements RMStore {
                 cacheStatements();
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
             LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
             SQLException se = ex;
             while (se.getNextException() != null) {
@@ -1077,7 +1076,7 @@ public class RMTxStore implements RMStore {
             }
             throw new RMStoreException(ex);
         } catch (Throwable ex) {
-            ex.printStackTrace();
+            LogUtils.log(LOG, Level.SEVERE, "INITIALIZATION_FAILED_MSG", ex);
         }
     }   
     
