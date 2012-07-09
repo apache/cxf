@@ -240,11 +240,19 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testAddBookAsJAXBJSONProxy() throws Exception {
         MultipartStore store = 
             JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
-        
         Book b = store.addBookJaxbJsonWithConsumes(new Book2("CXF in Action", 1L), 
                                            new Book("CXF in Action - 2", 2L));
         assertEquals(124L, b.getId());
         assertEquals("CXF in Action - 2", b.getName());
+    }
+    
+    @Test
+    public void testUseProxyToAddBookAndSimpleParts() throws Exception {
+        MultipartStore store = 
+            JAXRSClientFactory.create("http://localhost:" + PORT, MultipartStore.class);
+        Book b = store.testAddBookAndSimpleParts(new Book("CXF in Action", 124L), "1", "2");
+        assertEquals(124L, b.getId());
+        assertEquals("CXF in Action - 12", b.getName());
     }
     
     @Test

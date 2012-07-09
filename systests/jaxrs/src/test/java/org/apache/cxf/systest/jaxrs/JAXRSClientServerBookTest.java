@@ -375,7 +375,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPropogateException4() throws Exception {
         String data = "<nobook/>";
-        getAndCompare("http://localhost:" + PORT + "/bookstore/propogateexception4",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/propogateExceptionVar/1",
                       data, "application/xml", 500);
     }
     

@@ -215,6 +215,12 @@ public class BookStore {
     }
     
     @GET
+    @Path("propogateExceptionVar/{i}")
+    public Book propogateExceptionWithVar() throws BookNotFoundFault {
+        return null;
+    }
+    
+    @GET
     @Path("name-in-query")
     @Produces("application/xml")
     @XMLInstruction("<!DOCTYPE Something SYSTEM 'my.dtd'><?xmlstylesheet href='common.css'?>")
