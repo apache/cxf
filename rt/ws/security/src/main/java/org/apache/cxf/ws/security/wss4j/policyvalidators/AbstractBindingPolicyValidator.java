@@ -313,13 +313,20 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
     }
     
     /**
-     * Check whether all Signature (and SignatureConfirmation) elements were encrypted
+     * Check whether the primary Signature (and all SignatureConfirmation) elements were encrypted
      */
     protected boolean isSignatureEncrypted(List<WSSecurityEngineResult> results) {
-        for (WSSecurityEngineResult result : results) {
+        boolean foundPrimarySignature = false;
+        for (int i = results.size() - 1; i >= 0; i--) {
+            WSSecurityEngineResult result = results.get(i);
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (actInt.intValue() == WSConstants.SIGN
-                || actInt.intValue() == WSConstants.SC) {
+            if (actInt.intValue() == WSConstants.SIGN && !foundPrimarySignature) {
+                foundPrimarySignature = true;
+                String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                if (sigId == null || !isIdEncrypted(sigId, results)) {
+                    return false;
+                }
+            } else if (actInt.intValue() == WSConstants.SC) {
                 String sigId = (String)result.get(WSSecurityEngineResult.TAG_ID);
                 if (sigId == null || !isIdEncrypted(sigId, results)) {
                     return false;
