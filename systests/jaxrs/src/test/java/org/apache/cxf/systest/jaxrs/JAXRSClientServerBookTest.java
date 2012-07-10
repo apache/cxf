@@ -72,8 +72,41 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class, true));
+                   launchServer(BookServer.class));
         createStaticBus();
+    }
+    
+    @Test
+    public void testGetChapterFromSelectedBook() {
+        String address = "http://localhost:" + PORT + "/bookstore/books/id=le=123/chapter/1";
+        doTestGetChapterFromSelectedBook(address);
+    }
+    
+    @Test
+    public void testGetIntroChapterFromSelectedBook() {
+        String address = "http://localhost:" + PORT + "/bookstore/books(id=le=123)/chapter";
+        doTestGetChapterFromSelectedBook(address);
+    }
+    
+    @Test
+    public void testGetIntroChapterFromSelectedBook2() {
+        String address = "http://localhost:" + PORT + "/bookstore/";
+        WebClient wc = WebClient.create(address);
+        wc.path("books[id=le=123]");
+        wc.path("chapter");
+        wc.accept("application/xml");
+        Chapter chapter = wc.get(Chapter.class);
+        assertEquals("chapter 1", chapter.getTitle());
+    }
+    
+    private void doTestGetChapterFromSelectedBook(String address) {
+        
+        WebClient wc = 
+            WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        wc.accept("application/xml");
+        Chapter chapter = wc.get(Chapter.class);
+        assertEquals("chapter 1", chapter.getTitle());    
     }
     
     @Test

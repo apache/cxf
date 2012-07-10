@@ -559,6 +559,43 @@ public class BookStore {
         return found.get(0);
     }
     
+    @GET
+    @Path("/books/{search}/chapter/{chapter}")
+    @Produces("application/xml")
+    public Chapter getChapterFromSelectedBook(@Context SearchContext searchContext,
+                                              @PathParam("search") String expression,
+                                              @PathParam("chapter") int chapter) {
+        
+        SearchCondition<Book> sc = searchContext.getCondition(expression, Book.class);
+        if (sc == null) {
+            throw new WebApplicationException(404); 
+        }
+        List<Book> found = sc.findAll(books.values());
+        if (found.size() != 1) {
+            throw new WebApplicationException(404);
+        }
+        Book selectedBook = found.get(0);
+        
+        return selectedBook.getChapter(chapter);
+    }
+    
+    @GET
+    @Path("/books({search})/chapter")
+    @Produces("application/xml")
+    public Chapter getIntroChapterFromSelectedBook(@Context SearchContext searchContext,
+                                                   @PathParam("search") String expression) {
+        
+        return getChapterFromSelectedBook(searchContext, expression, 1);
+    }
+    
+    @GET
+    @Path("/books[{search}]/chapter")
+    @Produces("application/xml")
+    public Chapter getIntroChapterFromSelectedBook2(@Context SearchContext searchContext,
+                                                   @PathParam("search") String expression) {
+        
+        return getChapterFromSelectedBook(searchContext, expression, 1);
+    }
     
     @GET
     @Path("/books/text/xml/{bookId}")

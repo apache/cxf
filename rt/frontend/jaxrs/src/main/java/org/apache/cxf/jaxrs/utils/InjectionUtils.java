@@ -101,6 +101,7 @@ public final class InjectionUtils {
     private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
         
     private static final String PARAM_HANDLERS_FIRST = "check.parameter.handlers.first";
+    private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
     
     private InjectionUtils() {
         
@@ -289,12 +290,12 @@ public final class InjectionUtils {
         if (value == null) {
             return null;
         }
-        
         if (pType == ParameterType.PATH) {
             if (PathSegment.class.isAssignableFrom(pClass)) {
                 return pClass.cast(new PathSegmentImpl(value, decoded));   
-            } else {
-                value = new PathSegmentImpl(value, false).getPath();                 
+            } else if (!MessageUtils.isTrue(
+                        message.getContextualProperty(IGNORE_MATRIX_PARAMETERS))) {
+                value = new PathSegmentImpl(value, false).getPath();    
             }
         }
         
