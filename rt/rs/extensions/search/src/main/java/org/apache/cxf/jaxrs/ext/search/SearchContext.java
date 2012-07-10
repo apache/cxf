@@ -19,12 +19,14 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 /**
- * Represents the current search expression
+ * Represents the current search expression.
  */
 public interface SearchContext {
     
     /**
-     * Returns the typed search condition representing the search expression
+     * Returns the typed search condition representing 
+     * the search expression which is extracted from 
+     * the request URI
      * 
      * @param cls the type of the bean(s) the new search condition will 
      *        attempt to match
@@ -34,8 +36,21 @@ public interface SearchContext {
     
     
     /**
-     * Returns the actual query expression
-     * @return the expression
+     * Returns the typed search condition representing 
+     * the provided search expression
+     * 
+     * @param expression the search expression
+     * @param cls the type of the bean(s) the new search condition will 
+     *        attempt to match
+     * @return the search condition
+     */
+    <T> SearchCondition<T> getCondition(String expression, Class<T> cls);
+    
+    
+    /**
+     * Returns the search expression
+     * @return the expression which is extracted from 
+     *         the request URI, can be null
      */
     String getSearchExpression();
 }

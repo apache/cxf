@@ -560,23 +560,41 @@ public class BookStore {
     }
     
     @GET
-    @Path("/books/{fiql}/chapter/{i}")
+    @Path("/books/{search}/chapter/{chapter}")
     @Produces("application/xml")
-    public Chapter getInChapterFromSelectedBook(@Context SearchContext searchContext,
-                                           @PathParam("fiql") PathSegment fiqlSegment,
-                                           @PathParam("i") int chapterIndex) throws BookNotFoundFault {
+    public Chapter getChapterFromSelectedBook(@Context SearchContext searchContext,
+                                              @PathParam("search") String expression,
+                                              @PathParam("chapter") int chapter) {
         
-        SearchCondition<Book> sc = searchContext.getCondition(Book.class);
+        SearchCondition<Book> sc = searchContext.getCondition(expression, Book.class);
         if (sc == null) {
-            throw new BookNotFoundFault("Search exception");
+            throw new WebApplicationException(404); 
         }
         List<Book> found = sc.findAll(books.values());
         if (found.size() != 1) {
-            throw new BookNotFoundFault("Single book is expected");
+            throw new WebApplicationException(404);
         }
+        Book selectedBook = found.get(0);
         
-        Book book = found.get(0);
-        return book.getChapter(chapterIndex);
+        return selectedBook.getChapter(chapter);
+    }
+    
+    @GET
+    @Path("/books({search})/chapter")
+    @Produces("application/xml")
+    public Chapter getIntroChapterFromSelectedBook(@Context SearchContext searchContext,
+                                                   @PathParam("search") String expression) {
+        
+        return getChapterFromSelectedBook(searchContext, expression, 1);
+    }
+    
+    @GET
+    @Path("/books[{search}]/chapter")
+    @Produces("application/xml")
+    public Chapter getIntroChapterFromSelectedBook2(@Context SearchContext searchContext,
+                                                   @PathParam("search") String expression) {
+        
+        return getChapterFromSelectedBook(searchContext, expression, 1);
     }
     
     @GET

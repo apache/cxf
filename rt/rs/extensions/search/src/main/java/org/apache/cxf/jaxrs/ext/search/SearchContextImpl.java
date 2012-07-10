@@ -43,6 +43,10 @@ public class SearchContextImpl implements SearchContext {
     }
     
     public <T> SearchCondition<T> getCondition(Class<T> cls) {
+        return getCondition(null, cls);
+    }
+    
+    public <T> SearchCondition<T> getCondition(String expression, Class<T> cls) {
         
         if (InjectionUtils.isPrimitive(cls)) {
             String errorMessage = "Primitive condition types are not supported"; 
@@ -52,10 +56,11 @@ public class SearchContextImpl implements SearchContext {
         
         SearchConditionParser<T> parser = getParser(cls);
         
-        String expression = getSearchExpression();
-        if (expression != null) {
+        String theExpression = expression == null 
+            ? getSearchExpression() : expression;
+        if (theExpression != null) {
             try {
-                return parser.parse(expression);
+                return parser.parse(theExpression);
             } catch (SearchParseException ex) {
                 return null;
             }
@@ -66,6 +71,7 @@ public class SearchContextImpl implements SearchContext {
     }
 
     public String getSearchExpression() {
+        
         String queryStr = (String)message.get(Message.QUERY_STRING);
         if (queryStr != null 
             && (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY))) {
@@ -81,7 +87,7 @@ public class SearchContextImpl implements SearchContext {
         }
     }
     
-    private <T> FiqlParser<T> getParser(Class<T> cls) {
+    private <T> SearchConditionParser<T> getParser(Class<T> cls) {
         // we can use this method as a parser factory, ex
         // we can get parsers capable of parsing XQuery and other languages
         // depending on the properties set by a user
