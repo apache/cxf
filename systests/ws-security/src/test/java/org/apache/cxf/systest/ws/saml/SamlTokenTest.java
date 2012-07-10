@@ -34,6 +34,7 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
 import org.example.contract.doubleit.DoubleItPortType;
@@ -387,6 +388,36 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", callbackHandler
+        );
+
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml2EndorsingPKOverTransport() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2EndorsingTransportPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT2);
+        
+        SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        callbackHandler.setKeyInfoIdentifier(CERT_IDENTIFIER.KEY_VALUE);
         ((BindingProvider)saml2Port).getRequestContext().put(
             "ws-security.saml-callback-handler", callbackHandler
         );

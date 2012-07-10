@@ -46,6 +46,7 @@ import org.opensaml.common.SAMLVersion;
 public class SamlCallbackHandler implements CallbackHandler {
     private boolean saml2 = true;
     private String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
+    private CERT_IDENTIFIER keyInfoIdentifier = CERT_IDENTIFIER.X509_CERT;
     
     public SamlCallbackHandler() {
         //
@@ -57,6 +58,10 @@ public class SamlCallbackHandler implements CallbackHandler {
     
     public void setConfirmationMethod(String confirmationMethod) {
         this.confirmationMethod = confirmationMethod;
+    }
+    
+    public void setKeyInfoIdentifier(CERT_IDENTIFIER keyInfoIdentifier) {
+        this.keyInfoIdentifier = keyInfoIdentifier;
     }
     
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -114,8 +119,12 @@ public class SamlCallbackHandler implements CallbackHandler {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         
         KeyInfoBean keyInfo = new KeyInfoBean();
-        keyInfo.setCertificate(certs[0]);
-        keyInfo.setCertIdentifer(CERT_IDENTIFIER.X509_CERT);
+        keyInfo.setCertIdentifer(keyInfoIdentifier);
+        if (keyInfoIdentifier == CERT_IDENTIFIER.X509_CERT) {
+            keyInfo.setCertificate(certs[0]);
+        } else if (keyInfoIdentifier == CERT_IDENTIFIER.KEY_VALUE) {
+            keyInfo.setPublicKey(certs[0].getPublicKey());
+        }
         
         return keyInfo;
     }

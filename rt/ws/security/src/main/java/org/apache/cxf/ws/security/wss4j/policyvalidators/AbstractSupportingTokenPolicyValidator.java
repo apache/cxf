@@ -567,14 +567,14 @@ public abstract class AbstractSupportingTokenPolicyValidator
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+        PublicKey publicKey = 
+            (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
         
         // Now see if the same credential exists in the tokenResult list
         for (WSSecurityEngineResult token : tokenResult) {
             Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
             BinarySecurity binarySecurity = 
                 (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            PublicKey publicKey = 
-                (PublicKey)token.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
             if (binarySecurity instanceof X509Security
                 || binarySecurity instanceof PKIPathSecurity) {
                 X509Certificate foundCert = 
@@ -590,10 +590,10 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 if (samlKeyInfo != null) {
                     X509Certificate[] subjectCerts = samlKeyInfo.getCerts();
                     byte[] subjectSecretKey = samlKeyInfo.getSecret();
-                    if (cert != null && subjectCerts != null && cert.equals(subjectCerts[0])) {
-                        return true;
-                    }
-                    if (subjectSecretKey != null && Arrays.equals(subjectSecretKey, secret)) {
+                    PublicKey subjectPublicKey = samlKeyInfo.getPublicKey();
+                    if ((cert != null && subjectCerts != null && cert.equals(subjectCerts[0]))
+                        || (subjectSecretKey != null && Arrays.equals(subjectSecretKey, secret))
+                        || (subjectPublicKey != null && subjectPublicKey.equals(publicKey))) {
                         return true;
                     }
                 }
