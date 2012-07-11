@@ -27,8 +27,8 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.NamespaceContext;
@@ -117,8 +117,8 @@ public final class StaxUtils {
         if (i <= 0) {
             i = 20;
         }
-        NS_AWARE_INPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLInputFactory>(i);
-        OUTPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLOutputFactory>(i);
+        NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLInputFactory>(i);
+        OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLOutputFactory>(i);
         try {
             String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_LEVEL_SYSTEM_PROP, "-1");
             innerElementLevelThreshold = Integer.parseInt(s);
