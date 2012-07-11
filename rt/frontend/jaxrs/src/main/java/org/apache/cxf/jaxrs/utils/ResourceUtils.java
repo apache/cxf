@@ -412,18 +412,22 @@ public final class ResourceUtils {
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
             url = ResourceUtils.getClasspathResourceURL(path, ResourceUtils.class, bus);
-            if (url == null) {
-                LOG.warning("No classpath resource " + loc + " is available on classpath");
-                return null;
-            }
         } else {
-            String actualLoc = loc.startsWith("file:") ? loc.substring(5) : loc;
-            File f = new File(actualLoc);
-            if (!f.exists()) {
-                LOG.warning("No file resource " + loc + " is available on local disk");
-                return null;
+            try {
+                url = new URL(loc);
+            } catch (Exception ex) {
+                // it can be either a classpath or file resource without a scheme
+                url = ResourceUtils.getClasspathResourceURL(loc, ResourceUtils.class, bus);
+                if (url == null) {
+                    File file = new File(loc);
+                    if (file.exists()) {
+                        url = file.toURI().toURL();
+                    }
+                }
             }
-            url = f.toURI().toURL();
+        }
+        if (url == null) {
+            LOG.warning("No resource " + loc + " is available");
         }
         return url;
     }
