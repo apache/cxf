@@ -513,6 +513,10 @@ public class HTTPTransportActivator
                     p.setConnectionTimeout(Long.parseLong(v.trim()));
                 } else if ("ReceiveTimeout".equals(k)) {
                     p.setReceiveTimeout(Long.parseLong(v.trim()));
+                } else if ("AsyncExecuteTimeout".equals(k)) {
+                    p.setAsyncExecuteTimeout(Long.parseLong(v.trim()));
+                } else if ("AsyncExecuteTimeoutRejection".equals(k)) {
+                    p.setAsyncExecuteTimeoutRejection(Boolean.parseBoolean(v.trim()));
                 } else if ("AutoRedirect".equals(k)) {
                     p.setAutoRedirect(Boolean.parseBoolean(v.trim()));
                 } else if ("MaxRetransmits".equals(k)) {
