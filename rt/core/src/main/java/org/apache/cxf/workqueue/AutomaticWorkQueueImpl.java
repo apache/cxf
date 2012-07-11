@@ -391,9 +391,11 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
             execute(work);
         } catch (RejectedExecutionException ree) {
             try {
-                getQueue().offer(work, timeout, TimeUnit.MILLISECONDS);
+                if (!getQueue().offer(work, timeout, TimeUnit.MILLISECONDS)) {
+                    throw ree;
+                }
             } catch (InterruptedException ie) {
-                throw new RejectedExecutionException(ie);
+                throw ree;
             }
         }    
     }
