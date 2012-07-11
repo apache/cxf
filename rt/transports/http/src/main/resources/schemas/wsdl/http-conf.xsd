@@ -183,6 +183,22 @@
                     </xs:annotation>      
                 </xs:attribute>
 
+                <xs:attribute name="AsyncExecuteTimeout" type="ptp:ParameterizedUInt" use="optional" default="5000">
+                    <xs:annotation>
+                        <xs:documentation>
+                        Specifies the amount of time, in milliseconds, that a conduit will try and enqueue the response on the workqueue.
+                        </xs:documentation>
+                    </xs:annotation>      
+                </xs:attribute>
+                <xs:attribute name="AsyncExecuteTimeoutRejection" type="ptp:ParameterizedBoolean" use="optional" default="false">
+                    <xs:annotation>
+                        <xs:documentation>
+                        Specifies whether the conduit should throw and exception if it fails to enqueue the async response handling onto the workqueue. 
+                        By default, if the conduit fails to enqueue the response handling on the workqueue, it will process the response on the current thread.  Set this to true to raise and exception instead.  
+                        </xs:documentation>
+                    </xs:annotation>      
+                </xs:attribute>
+                
                 <xs:attribute name="AutoRedirect" type="ptp:ParameterizedBoolean" use="optional" default="false">
                     <xs:annotation>
                         <xs:documentation>
