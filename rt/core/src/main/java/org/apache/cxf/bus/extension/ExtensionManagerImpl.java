@@ -90,7 +90,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
         load(resources);
     }
-    public final void load(String resources[]) {
+    public final synchronized void load(String resources[]) {
         if (resources == null) {
             return;
         }
@@ -108,7 +108,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             }
         }
     }
-    public void add(Extension ex) {
+    public synchronized void add(Extension ex) {
         all.put(ex.getName(), ex);
     }
     
@@ -146,7 +146,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         load(resource, loader);
     }
-    final void load(String resource, ClassLoader l) throws IOException {
+    final synchronized void load(String resource, ClassLoader l) throws IOException {
         
         Enumeration<URL> urls = l.getResources(resource);
         
@@ -315,7 +315,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         return ex != null && ex.getNamespaces() != null
             && ex.getNamespaces().contains(value);
     }
-    public void destroyBeans() {
+    public synchronized void destroyBeans() {
         for (Extension ex : all.values()) {
             if (ex.getLoadedObject() != null) {
                 ResourceInjector injector = new ResourceInjector(resourceManager);
