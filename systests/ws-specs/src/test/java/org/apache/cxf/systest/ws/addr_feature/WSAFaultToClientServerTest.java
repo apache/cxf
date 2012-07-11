@@ -27,19 +27,20 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
+import org.apache.cxf.systest.ws.addr_feature.FaultToEndpointServer.HelloHandler;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
+import org.apache.hello_world_soap_http.Greeter;
+import org.apache.hello_world_soap_http.SOAPService;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
-    private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
-                                                "AddNumbersService");
 
     @Before
     public void setUp() throws Exception {
@@ -50,16 +51,47 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
     public static void startServers() throws Exception {
         assertTrue("FaultTo server did not launch correctly", launchServer(FaultToEndpointServer.class, true));
     }
-
+    
     @Test
-    public void testJaxwsWsaFeature() throws Exception {
+    public void testOneWayFaultTo() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
+
+        Greeter greeter = new SOAPService(wsdl, serviceName).getPort(Greeter.class, new AddressingFeature());
+        EndpointReferenceType faultTo = new EndpointReferenceType();
+        AddressingProperties addrProperties = new AddressingPropertiesImpl();
+        AttributedURIType epr = new AttributedURIType();
+        String faultToAddress = "http://localhost:" + FaultToEndpointServer.FAULT_PORT  + "/faultTo";
+        epr.setValue(faultToAddress);
+        faultTo.setAddress(epr);
+        addrProperties.setFaultTo(faultTo);
+        
+        BindingProvider provider = (BindingProvider) greeter;
+        Map<String, Object> requestContext = provider.getRequestContext();
+        requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                           "http://localhost:" + FaultToEndpointServer.PORT + "/jaxws/greeter");
+        requestContext.put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProperties);
+
+        greeter.greetMeOneWay("test");
+        //wait for the fault request
+        int i = 2;
+        while (HelloHandler.getFaultRequestPath() == null && i > 0) {
+            Thread.sleep(500);
+            i--;
+        }
+        assertTrue("FaultTo request fpath isn't expected", 
+                   "/faultTo".equals(HelloHandler.getFaultRequestPath()));
+    }
+    
+    @Test
+    public void testTwoWayFaultTo() throws Exception {
         ByteArrayOutputStream input = setupInLogging();
-        AddNumbersPortType port = getPort();
+        AddNumbersPortType port = getTwoWayPort();
 
         EndpointReferenceType faultTo = new EndpointReferenceType();
         AddressingProperties addrProperties = new AddressingPropertiesImpl();
         AttributedURIType epr = new AttributedURIType();
-        epr.setValue("http://localhost:" + FaultToEndpointServer.FAULT_PORT);
+        epr.setValue("http://localhost:" + FaultToEndpointServer.FAULT_PORT + "/faultTo");
         faultTo.setAddress(epr);
         addrProperties.setFaultTo(faultTo);
         
@@ -85,14 +117,16 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
                    new String(input.toByteArray()).indexOf("Negative numbers cant be added") > -1);
     }
      
-    private AddNumbersPortType getPort() throws Exception {
+    private AddNumbersPortType getTwoWayPort() throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);
-
+        QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersService");
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
         AddNumbersPortType port = service.getAddNumbersPort(new AddressingFeature());
         //updateAddressPort(port, PORT);
         return port;
     }
+    
+    
 }
