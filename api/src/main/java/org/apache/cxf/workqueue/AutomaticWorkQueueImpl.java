@@ -435,9 +435,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             execute(work);
         } catch (RejectedExecutionException ree) {
             try {
-                getExecutor().getQueue().offer(work, timeout, TimeUnit.MILLISECONDS);
+                if (!getExecutor().getQueue().offer(work, timeout, TimeUnit.MILLISECONDS)) {
+                    throw ree;
+                }
             } catch (InterruptedException ie) {
-                throw new RejectedExecutionException(ie);
+                throw ree;
             }
         }    
     }

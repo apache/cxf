@@ -77,6 +77,35 @@ public class AutomaticWorkQueueTest extends Assert {
         assertEquals(DEFAULT_LOW_WATER_MARK, workqueue.getLowWaterMark());
     }
 
+    
+    @Test
+    public void testEnqueueWithTimeout() throws Exception {
+        workqueue = new AutomaticWorkQueueImpl(2, 2,
+                                               2,
+                                               2,
+                                               DEFAULT_DEQUEUE_TIMEOUT);
+        
+        final Object lock = new Object();
+        int x = 0;
+        try {
+            synchronized (lock) {
+                for (x = 0; x < 6; x++) {
+                    workqueue.execute(new Runnable() {
+                        public void run() {
+                            synchronized (lock) {
+                                //just need to wait until all the runnables are created and enqueued and such.
+                            }
+                        }
+                    }, 50);
+                }
+            }
+            fail("Should have failed with a RejectedExecutionException as 5th should not be queuable");
+        } catch (RejectedExecutionException rex) {
+            assertEquals(x, 4);
+        }
+    }
+    
+    
     @Test
     public void testEnqueue() {
         workqueue = new AutomaticWorkQueueImpl(DEFAULT_MAX_QUEUE_SIZE, INITIAL_SIZE,
