@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.activation.CommandMap;
@@ -45,6 +46,7 @@ import javax.activation.URLDataSource;
 import javax.mail.Header;
 import javax.mail.internet.InternetHeaders;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -213,6 +215,24 @@ public final class AttachmentUtil {
         AttachmentImpl att = new AttachmentImpl(id);
         
         final String ct = headers.getHeader("Content-Type", null);
+        String cd = headers.getHeader("Content-Disposition", null);
+        String fileName = null;
+        if (!StringUtils.isEmpty(cd)) {
+            StringTokenizer token = new StringTokenizer(cd, ";");
+            while (token.hasMoreElements()) {
+                fileName = token.nextToken();
+                if (fileName.startsWith("name=")) {
+                    break;
+                }
+            }
+            if (!StringUtils.isEmpty(fileName)) {
+                if (fileName.indexOf("\"") > 0) {
+                    fileName = fileName.substring(fileName.indexOf("\"") + 1, fileName.lastIndexOf("\""));
+                } else {
+                    fileName = fileName.substring(fileName.indexOf("=") + 1);
+                }
+            }
+        }
         
         boolean quotedPrintable = false;
         
@@ -231,9 +251,15 @@ public final class AttachmentUtil {
         if (quotedPrintable) {
             DataSource source = new AttachmentDataSource(ct, 
                                                          new QuotedPrintableDecoderStream(stream));
+            if (!StringUtils.isEmpty(fileName)) {
+                ((AttachmentDataSource)source).setName(fileName);
+            }
             att.setDataHandler(new DataHandler(source));
         } else {
             DataSource source = new AttachmentDataSource(ct, stream);
+            if (!StringUtils.isEmpty(fileName)) {
+                ((AttachmentDataSource)source).setName(fileName);
+            }
             att.setDataHandler(new DataHandler(source));
         }
         
@@ -313,6 +339,14 @@ public final class AttachmentUtil {
             throw new Fault(e);
         }
         AttachmentImpl att = new AttachmentImpl(id, handler);
+        if (!StringUtils.isEmpty(handler.getName())) {
+            //set Content-Disposition attachment header if filename isn't null
+            String file = handler.getName();
+            if (StringUtils.isFileExist(file)) {
+                file = file.substring(file.lastIndexOf(File.separator) + 1);
+            }
+            att.setHeader("Content-Disposition", "attachment;name=\"" + file + "\"");
+        }
         att.setXOP(isXop);
         return att;
     }
