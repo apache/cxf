@@ -126,8 +126,9 @@ public abstract class BusFactory {
      * @param bus the default bus.
      */
     public static void setThreadDefaultBus(Bus bus) {
+        Thread cur = Thread.currentThread();
         synchronized (threadBusses) {
-            threadBusses.put(Thread.currentThread(), bus);
+            threadBusses.put(cur, bus);
         }
     }
 
@@ -148,8 +149,9 @@ public abstract class BusFactory {
      */
     public static Bus getThreadDefaultBus(boolean createIfNeeded) {
         Bus threadBus;
+        Thread cur = Thread.currentThread();
         synchronized (threadBusses) {
-            threadBus = threadBusses.get(Thread.currentThread());
+            threadBus = threadBusses.get(cur);
         }
         if (createIfNeeded && threadBus == null) {
             threadBus = createThreadBus();
@@ -158,12 +160,13 @@ public abstract class BusFactory {
     }
     private static synchronized Bus createThreadBus() {
         Bus threadBus;
+        Thread cur = Thread.currentThread();
         synchronized (threadBusses) {
-            threadBus = threadBusses.get(Thread.currentThread());
+            threadBus = threadBusses.get(cur);
         }
         if (threadBus == null) {
             threadBus = getDefaultBus(true);
-            threadBusses.put(Thread.currentThread(), threadBus);
+            threadBusses.put(cur, threadBus);
         }
         return threadBus;
     }
@@ -195,9 +198,10 @@ public abstract class BusFactory {
      * @return true if the bus was not set and is now set
      */
     public static synchronized boolean possiblySetDefaultBus(Bus bus) {
+        Thread cur = Thread.currentThread();
         synchronized (threadBusses) {
-            if (threadBusses.get(Thread.currentThread()) == null) {
-                threadBusses.put(Thread.currentThread(), bus);
+            if (threadBusses.get(cur) == null) {
+                threadBusses.put(cur, bus);
             }
         }
         if (defaultBus == null) {
