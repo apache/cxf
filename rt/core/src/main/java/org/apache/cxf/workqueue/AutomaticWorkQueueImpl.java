@@ -71,7 +71,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     
     AWQThreadFactory threadFactory;
     ReentrantLock mainLock;
-    
+    final ReentrantLock addThreadLock = new ReentrantLock();
     
     DelayQueue<DelayedTaskWrapper> delayQueue;
     WatchDog watchDog;
@@ -440,20 +440,25 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         ex.execute(r);
         if (addWorkerMethod != null 
             && !ex.getQueue().isEmpty() 
-            && this.approxThreadCount < highWaterMark) {
-            mainLock.lock();
+            && this.approxThreadCount < highWaterMark
+            && addThreadLock.tryLock()) {
             try {
-                int ps = this.getPoolSize();
-                int sz = executor.getQueue().size();
-                int sz2 = this.getActiveCount();
-                
-                if ((sz + sz2) > ps) {
-                    ReflectionUtil.setAccessible(addWorkerMethod).invoke(executor, addWorkerArgs);
+                mainLock.lock();
+                try {
+                    int ps = this.getPoolSize();
+                    int sz = executor.getQueue().size();
+                    int sz2 = this.getActiveCount();
+                    
+                    if ((sz + sz2) > ps) {
+                        ReflectionUtil.setAccessible(addWorkerMethod).invoke(executor, addWorkerArgs);
+                    }
+                } catch (Exception exc) {
+                    //ignore
+                } finally {
+                    mainLock.unlock();
                 }
-            } catch (Exception exc) {
-                //ignore
             } finally {
-                mainLock.unlock();
+                addThreadLock.unlock();
             }
         }
     }
