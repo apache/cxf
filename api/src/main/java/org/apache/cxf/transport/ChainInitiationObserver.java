@@ -61,8 +61,7 @@ public class ChainInitiationObserver implements MessageObserver {
     }
 
     public void onMessage(Message m) {
-        Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(bus);
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
@@ -122,7 +121,9 @@ public class ChainInitiationObserver implements MessageObserver {
             phaseChain.doIntercept(message);
             
         } finally {
-            BusFactory.setThreadDefaultBus(origBus);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             if (origLoader != null) {
                 origLoader.reset();
             }

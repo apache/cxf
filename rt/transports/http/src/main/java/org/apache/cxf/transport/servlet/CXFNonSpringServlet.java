@@ -121,19 +121,22 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         ClassLoaderHolder origLoader = null;
+        Bus origBus = null;
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             try {
                 if (loader != null) {
                     origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
                 if (bus != null) {
-                    BusFactory.setThreadDefaultBus(bus);
+                    origBus = BusFactory.getAndSetThreadDefaultBus(bus);
                 }
                 if (controller.filter((HttpServletRequest)request, (HttpServletResponse)response)) {
                     return;
                 }
             } finally {
-                BusFactory.setThreadDefaultBus(null);
+                if (origBus != bus) {
+                    BusFactory.setThreadDefaultBus(origBus);
+                }
                 if (origLoader != null) {
                     origLoader.reset();
                 }
@@ -144,16 +147,19 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     @Override
     protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         ClassLoaderHolder origLoader = null;
+        Bus origBus = null;
         try {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             if (bus != null) {
-                BusFactory.setThreadDefaultBus(bus);
+                origBus = BusFactory.getAndSetThreadDefaultBus(bus);
             }
             controller.invoke(request, response);
         } finally {
-            BusFactory.setThreadDefaultBus(null);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(null);
+            }
             if (origLoader != null) {
                 origLoader.reset();
             }

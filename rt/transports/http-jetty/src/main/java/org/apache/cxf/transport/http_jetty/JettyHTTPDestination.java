@@ -304,14 +304,16 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
 
         // REVISIT: service on executor if associated with endpoint
         ClassLoaderHolder origLoader = null;
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         try {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            BusFactory.setThreadDefaultBus(bus); 
             serviceRequest(context, req, resp);
         } finally {
-            BusFactory.setThreadDefaultBus(null);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             if (origLoader != null) { 
                 origLoader.reset();
             }

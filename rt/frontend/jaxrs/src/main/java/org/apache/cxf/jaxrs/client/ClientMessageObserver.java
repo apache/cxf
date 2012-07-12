@@ -45,8 +45,8 @@ class ClientMessageObserver implements MessageObserver {
         PhaseInterceptorChain chain = AbstractClient.setupInInterceptorChain(cfg);
         message.setInterceptorChain(chain);
         message.getExchange().setInMessage(message);
-        Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(cfg.getBus());
+        Bus bus = cfg.getBus();
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
@@ -55,7 +55,9 @@ class ClientMessageObserver implements MessageObserver {
             // execute chain
             chain.doIntercept(message);
         } finally {
-            BusFactory.setThreadDefaultBus(origBus);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             if (origLoader != null) {
                 origLoader.reset();
             }
