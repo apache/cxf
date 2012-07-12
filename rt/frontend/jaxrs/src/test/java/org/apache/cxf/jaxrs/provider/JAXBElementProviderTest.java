@@ -1191,7 +1191,7 @@ public class JAXBElementProviderTest extends Assert {
         List<String> locations = new ArrayList<String>();
         String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
         
-        locations.add(loc);
+        locations.add("file:" + loc);
         provider.setSchemas(locations);
         Schema s = provider.getSchema();
         assertNotNull("schema can not be read from disk", s);
@@ -1224,7 +1224,7 @@ public class JAXBElementProviderTest extends Assert {
         JAXBElementProvider provider = new JAXBElementProvider();
         List<String> locations = new ArrayList<String>();
         String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
-        locations.add(loc);
+        locations.add("file:" + loc);
         provider.setSchemas(locations);
         Schema s = provider.getSchema();
         assertNotNull("schema can not be read from disk", s);
