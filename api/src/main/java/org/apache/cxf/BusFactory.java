@@ -127,8 +127,33 @@ public abstract class BusFactory {
      */
     public static void setThreadDefaultBus(Bus bus) {
         Thread cur = Thread.currentThread();
-        synchronized (threadBusses) {
-            threadBusses.put(cur, bus);
+        if (bus == null) {
+            synchronized (threadBusses) {
+                threadBusses.remove(cur);
+            }
+        } else {
+            synchronized (threadBusses) {
+                threadBusses.put(cur, bus);
+            }
+        }
+    }
+    
+    /**
+     * Sets the default bus for the thread.
+     *
+     * @param bus the new thread default bus.
+     * @return the old thread default bus or null
+     */
+    public static Bus getAndSetThreadDefaultBus(Bus bus) {
+        Thread cur = Thread.currentThread();
+        if (bus == null) {
+            synchronized (threadBusses) {
+                return threadBusses.remove(cur);
+            }
+        } else {
+            synchronized (threadBusses) {
+                return threadBusses.put(cur, bus);
+            }
         }
     }
 

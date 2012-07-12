@@ -91,9 +91,7 @@ public class OSGiJaxwsEndpointManager extends JaxwsEndpointManager {
     }
 
     private Object setCXFBusInternal() {
-        Object o = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus((Bus)cxfBus);
-        return o;
+        return BusFactory.getAndSetThreadDefaultBus((Bus)cxfBus);
     }
     private void createCXFBus() {
         BlueprintBus bp = new BlueprintBus();

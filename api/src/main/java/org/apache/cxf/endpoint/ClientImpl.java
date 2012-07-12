@@ -469,10 +469,9 @@ public class ClientImpl
                               Object[] params,
                               Map<String, Object> context,
                               Exchange exchange) throws Exception {
-        Bus origBus = BusFactory.getThreadDefaultBus(false);
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         ClassLoaderHolder origLoader = null;
         try {
-            BusFactory.setThreadDefaultBus(bus);
             ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
@@ -544,7 +543,9 @@ public class ClientImpl
             if (origLoader != null) {
                 origLoader.reset();
             }
-            BusFactory.setThreadDefaultBus(origBus);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
         }
     }
 
@@ -749,8 +750,7 @@ public class ClientImpl
         modifyChain(chain, message, true);
         modifyChain(chain, message.getExchange().getOutMessage(), true);
         
-        Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(bus);
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         // execute chain
         ClientCallback callback = message.getExchange().get(ClientCallback.class);
         try {
@@ -822,7 +822,9 @@ public class ClientImpl
                 }
             }
         } finally {
-            BusFactory.setThreadDefaultBus(origBus);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             synchronized (message.getExchange()) {
                 if (!isPartialResponse(message) 
                     || message.getContent(Exception.class) != null) {

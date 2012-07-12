@@ -116,13 +116,15 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
             }
         }
         
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus); 
         try {
-            BusFactory.setThreadDefaultBus(bus);
             serviceRequest(req, resp);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            BusFactory.setThreadDefaultBus(null);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
         }
     }
 

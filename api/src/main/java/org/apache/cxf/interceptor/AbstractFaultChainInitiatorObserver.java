@@ -54,8 +54,7 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
       
         assert null != message;
         
-        Bus origBus = BusFactory.getThreadDefaultBus(false);
-        BusFactory.setThreadDefaultBus(bus);
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
@@ -116,7 +115,9 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
                 throw new RuntimeException(exc);
             }
         } finally {
-            BusFactory.setThreadDefaultBus(origBus);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             if (origLoader != null) {
                 origLoader.reset();
             }
