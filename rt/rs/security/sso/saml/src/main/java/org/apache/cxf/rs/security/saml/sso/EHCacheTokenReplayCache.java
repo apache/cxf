@@ -68,15 +68,15 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     }
     
     private void createCache(String configFile, Bus bus) {
+        if (bus == null) {
+            bus = BusFactory.getThreadDefaultBus(true);
+        }
         URL configFileURL = null;
         try {
             configFileURL = 
                 ResourceUtils.getClasspathResourceURL(configFile, EHCacheTokenReplayCache.class, bus);
         } catch (Exception ex) {
             // ignore
-        }
-        if (bus == null) {
-            bus = BusFactory.getThreadDefaultBus(true);
         }
         if (configFileURL == null) {
             cacheManager = CacheManager.create();

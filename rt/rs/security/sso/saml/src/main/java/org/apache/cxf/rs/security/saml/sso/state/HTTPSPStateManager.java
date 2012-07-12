@@ -31,7 +31,11 @@ import javax.ws.rs.Produces;
 
 @Path("state")
 public class HTTPSPStateManager implements SPStateManager {
-    private MemorySPStateManager manager = new MemorySPStateManager();
+    private SPStateManager manager = new MemorySPStateManager();
+    
+    public void setStateProvider(SPStateManager stateManager) {
+        this.manager = stateManager;
+    }
     
     @POST
     @Path("/request/{relayState}")
