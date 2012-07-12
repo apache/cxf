@@ -191,6 +191,7 @@ public class JMSDestination extends AbstractMultiplexDestination
     }
     public void onMessage(javax.jms.Message message, Session session) {
         ClassLoaderHolder origLoader = null;
+        Bus origBus = null;
         try {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
@@ -215,7 +216,7 @@ public class JMSDestination extends AbstractMultiplexDestination
                                                           jmsConfig));
             }
             
-            BusFactory.setThreadDefaultBus(bus);
+            origBus = BusFactory.getAndSetThreadDefaultBus(bus);
 
             
             Map<Class<?>, ?> mp = JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.get();
@@ -260,7 +261,9 @@ public class JMSDestination extends AbstractMultiplexDestination
         } catch (UnsupportedEncodingException ex) {
             getLogger().log(Level.WARNING, "can't get the right encoding information. " + ex);
         } finally {
-            BusFactory.setThreadDefaultBus(null);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             if (origLoader != null) { 
                 origLoader.reset();
             }

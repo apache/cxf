@@ -112,15 +112,17 @@ public class JMSContinuation implements Continuation {
     protected void doResume() {
         updateContinuations(true);
         ClassLoaderHolder origLoader = null;
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         try {
-            BusFactory.setThreadDefaultBus(bus);
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             incomingObserver.onMessage(inMessage);
         } finally {
             isPending = false;
-            BusFactory.setThreadDefaultBus(null);
+            if (origBus != bus) {
+                BusFactory.setThreadDefaultBus(origBus);
+            }
             if (origLoader != null) { 
                 origLoader.reset();
             }
