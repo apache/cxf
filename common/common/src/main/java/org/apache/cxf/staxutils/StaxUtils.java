@@ -91,7 +91,9 @@ public final class StaxUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
     
     private static final BlockingQueue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
+    private static final XMLInputFactory SAFE_INPUT_FACTORY;
     private static final BlockingQueue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
+    private static final XMLOutputFactory SAFE_OUTPUT_FACTORY;
     
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
     private static final String DEF_PREFIXES[] = new String[] {
@@ -137,8 +139,17 @@ public final class StaxUtils {
         if (innerElementCountThreshold <= 0) {
             innerElementCountThreshold = -1;
         }
+        XMLInputFactory xif = createXMLInputFactory(true);
+        if (!xif.getClass().getName().contains("ctc.wstx")) {
+            xif = null;
+        }
+        SAFE_INPUT_FACTORY = xif;
         
-        
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        if (!xof.getClass().getName().contains("ctc.wstx")) {
+            xof = null;
+        }
+        SAFE_OUTPUT_FACTORY = xof;
     }
     
     private StaxUtils() {
@@ -172,6 +183,9 @@ public final class StaxUtils {
      * @return
      */
     private static XMLInputFactory getXMLInputFactory() {
+        if (SAFE_INPUT_FACTORY != null) {
+            return SAFE_INPUT_FACTORY;
+        }
         XMLInputFactory f = NS_AWARE_INPUT_FACTORY_POOL.poll();
         if (f == null) {
             f = createXMLInputFactory(true);
@@ -180,10 +194,15 @@ public final class StaxUtils {
     }
     
     private static void returnXMLInputFactory(XMLInputFactory factory) {
-        NS_AWARE_INPUT_FACTORY_POOL.offer(factory);
+        if (SAFE_INPUT_FACTORY != factory) {
+            NS_AWARE_INPUT_FACTORY_POOL.offer(factory);
+        }
     }
     
     private static XMLOutputFactory getXMLOutputFactory() {
+        if (SAFE_OUTPUT_FACTORY != null) {
+            return SAFE_OUTPUT_FACTORY;
+        }
         XMLOutputFactory f = OUTPUT_FACTORY_POOL.poll();
         if (f == null) {
             f = XMLOutputFactory.newInstance();
@@ -192,7 +211,9 @@ public final class StaxUtils {
     }
     
     private static void returnXMLOutputFactory(XMLOutputFactory factory) {
-        OUTPUT_FACTORY_POOL.offer(factory);
+        if (SAFE_OUTPUT_FACTORY != factory) {
+            OUTPUT_FACTORY_POOL.offer(factory);
+        }
     }
     
     /**
