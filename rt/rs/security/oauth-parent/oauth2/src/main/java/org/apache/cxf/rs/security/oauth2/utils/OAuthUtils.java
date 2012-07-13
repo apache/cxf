@@ -18,8 +18,12 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -29,7 +33,10 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.security.LoginSecurityContext;
+import org.apache.cxf.security.SecurityContext;
 
 /**
  * Various utility methods 
@@ -39,6 +46,19 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static UserSubject createSubject(SecurityContext securityContext) {
+        List<String> roleNames = Collections.emptyList();
+        if (securityContext instanceof LoginSecurityContext) {
+            roleNames = new ArrayList<String>();
+            Set<Principal> roles = ((LoginSecurityContext)securityContext).getUserRoles();
+            for (Principal p : roles) {
+                roleNames.add(p.getName());
+            }
+        }
+        return 
+            new UserSubject(securityContext.getUserPrincipal().getName(), roleNames);
+    }
+    
     public static String convertPermissionsToScope(List<OAuthPermission> perms) {
         StringBuilder sb = new StringBuilder();
         for (OAuthPermission perm : perms) {
