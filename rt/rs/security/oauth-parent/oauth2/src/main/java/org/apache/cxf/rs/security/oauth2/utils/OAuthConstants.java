@@ -41,8 +41,8 @@ public final class OAuthConstants {
     public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
     public static final String CLIENT_CREDENTIALS_GRANT = "client_credentials";
     public static final String IMPLICIT_GRANT = "implicit";
+    public static final String RESOURCE_OWNER_GRANT = "password";
     public static final String REFRESH_TOKEN_GRANT = "refresh_token";
-    // etc
     
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "bearer";
@@ -63,6 +63,10 @@ public final class OAuthConstants {
     public static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
     public static final String AUTHORIZATION_DECISION_ALLOW = "allow";
     public static final String AUTHORIZATION_DECISION_DENY = "deny";
+    
+    // Resource Owner grant constants
+    public static final String RESOURCE_OWNER_NAME = "username";
+    public static final String RESOURCE_OWNER_PASSWORD = "password";
     
     // Error constants
     public static final String ERROR_KEY = "error";

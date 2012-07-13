@@ -19,12 +19,9 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
@@ -46,7 +43,6 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
-import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 
 
@@ -239,16 +235,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     
     private UserSubject createUserSubject(SecurityContext securityContext) {
-        List<String> roleNames = Collections.emptyList();
-        if (securityContext instanceof LoginSecurityContext) {
-            roleNames = new ArrayList<String>();
-            Set<Principal> roles = ((LoginSecurityContext)securityContext).getUserRoles();
-            for (Principal p : roles) {
-                roleNames.add(p.getName());
-            }
-        }
-        return 
-            new UserSubject(securityContext.getUserPrincipal().getName(), roleNames);
+        return OAuthUtils.createSubject(securityContext);
     }
     
     protected abstract Response createErrorResponse(MultivaluedMap<String, String> params,
