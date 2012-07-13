@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.URL;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -147,6 +148,40 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 
             ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajIn); 
             ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajOut); 
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("Connection reset")
+                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
+                //There seems to be a bug/interaction with Java 1.6 and Jetty where
+                //Jetty will occasionally send back a RST prior to all the data being 
+                //sent back to the client when using localhost (which is what we do)
+                //we'll ignore for now
+                return;
+            }
+            System.out.println(System.getProperties());
+            throw ex;
+        }
+    }
+    
+    @Test
+    public void testMtomWithFileName() throws Exception {
+        TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
+        try {
+            Holder<DataHandler> param = new Holder<DataHandler>();
+            Holder<String> name; 
+                        
+            URL fileURL = getClass().getClassLoader().getResource("me.bmp");
+            
+            ((BindingProvider)mtomPort).getRequestContext().put("schema-validation-enabled",
+                                                                Boolean.TRUE);
+            param.value = new DataHandler(fileURL);
+            name = new Holder<String>("have name");
+            mtomPort.testXop(name, param);
+            assertEquals("can't get file name", "return detail + me.bmp", name.value);
+            assertNotNull(param.value);
+                      
+           
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {

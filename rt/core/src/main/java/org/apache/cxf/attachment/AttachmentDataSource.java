@@ -34,6 +34,7 @@ public class AttachmentDataSource implements DataSource {
     private CachedOutputStream cache;
     private InputStream ins;
     private DelegatingInputStream delegate;
+    private String name;
     
     public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
         this.ct = ctParam;        
@@ -84,7 +85,11 @@ public class AttachmentDataSource implements DataSource {
     }
 
     public String getName() {
-        return null;
+        return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
     }
 
     public OutputStream getOutputStream() throws IOException {
