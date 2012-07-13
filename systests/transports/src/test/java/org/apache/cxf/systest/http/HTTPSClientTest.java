@@ -21,10 +21,16 @@ package org.apache.cxf.systest.http;
 
 import java.net.URL;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.configuration.jsse.TLSParameterJaxBUtils;
+import org.apache.cxf.configuration.security.KeyManagersType;
+import org.apache.cxf.configuration.security.KeyStoreType;
+import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
@@ -143,7 +149,11 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         testSuccessfulCall("resources/jaxws-publish.xml",
                            "https://localhost:" + PORT1 + "/SoapContext/HttpsPort");
     }
-    
+    @Test
+    public final void testJaxwsTLSRefsEndpoint() throws Exception {
+        testSuccessfulCall("resources/jaxws-tlsrefs-publish.xml",
+                           "https://localhost:" + PORT1 + "/SoapContext/HttpsPort");
+    }
     @Test
     public final void testPKCS12Endpoint() throws Exception {
         testSuccessfulCall("resources/pkcs12.xml",
@@ -162,5 +172,38 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
                            new URL("https://localhost:" + PORT5 + "/SoapContext/HttpsPort?wsdl"),
                            true);
         
+    }
+    
+    public static class ClientManagersFactory {
+        public static KeyManager[] getKeyManagers() {
+            KeyManagersType kmt = new KeyManagersType();
+            KeyStoreType kst = new KeyStoreType();
+            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks");
+            kst.setPassword("password");
+            kst.setType("JKS");
+        
+            kmt.setKeyStore(kst);
+            kmt.setKeyPassword("password");
+            try {
+                return TLSParameterJaxBUtils.getKeyManagers(kmt);
+            } catch (Exception e) {
+                throw new RuntimeException("failed to retrieve key managers", e);
+            }
+        }
+    
+        public static TrustManager[] getTrustManagers() {
+            TrustManagersType tmt = new TrustManagersType();
+            KeyStoreType kst = new KeyStoreType();
+            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks");
+            kst.setPassword("password");
+            kst.setType("JKS");
+        
+            tmt.setKeyStore(kst);
+            try {
+                return TLSParameterJaxBUtils.getTrustManagers(tmt);
+            } catch (Exception e) {
+                throw new RuntimeException("failed to retrieve trust managers", e);
+            }
+        }
     }
 }
