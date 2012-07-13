@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.sts.provider;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -28,9 +29,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.xml.bind.Binder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -40,10 +42,17 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
@@ -278,10 +287,54 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     }
 
     private Object convertToJAXBObject(Source source) throws Exception {
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        JAXBElement<?> jaxbElement = (JAXBElement<?>) unmarshaller
-                .unmarshal(source);
+        //this is entirely to work around http://java.net/jira/browse/JAXB-909
+        //if that bug is ever fixed and we can detect it, we can remove this 
+        //complete and total HACK HACK HACK and replace with just:  
+        //Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        //JAXBElement<?> jaxbElement = (JAXBElement<?>) unmarshaller.unmarshal(source);
+        //return jaxbElement.getValue();
+        
+        Document d = StaxUtils.read(source);
+        Binder<Node> binder = jaxbContext.createBinder();
+        JAXBElement<?> jaxbElement = (JAXBElement<?>)binder.unmarshal(d);
+        walkDom("", d.getDocumentElement(), binder, null);
         return jaxbElement.getValue();
+    }
+
+    private void walkDom(String pfx, Element element, Binder<Node> binder, Object parent) {
+        try {
+            Object o = binder.getJAXBNode(element);
+            if (o instanceof JAXBElement) {
+                o = ((JAXBElement<?>)o).getValue();
+            }
+            //System.out.println(pfx + DOMUtils.getElementQName(element) + " ->  " 
+            //    + (o == null ? "null" : o.getClass()));
+            if (o == null && parent != null) {
+                // if it's not able to bind to an object, it's possibly an xsd:any
+                // we'll check the parent for the standard "any" and replace with 
+                // the original element.
+                Field f = parent.getClass().getDeclaredField("any");
+                if (f.getAnnotation(XmlAnyElement.class) != null) {
+                    Object old = ReflectionUtil.setAccessible(f).get(parent);
+                    if (old instanceof Element
+                        && DOMUtils.getElementQName(element).equals(DOMUtils.getElementQName((Element)old))) {
+                        ReflectionUtil.setAccessible(f).set(parent, element);
+                    }
+                }
+            }
+            if (o == null) {
+                return;
+            }
+            Node nd = element.getFirstChild();
+            while (nd != null) {
+                if (nd instanceof Element) {
+                    walkDom(pfx + "  ", (Element)nd, binder, o);
+                }
+                nd = nd.getNextSibling();
+            }
+        } catch (Throwable t) {
+            //ignore -this is a complete hack anyway
+        }
     }
 
     public CancelOperation getCancelOperation() {
