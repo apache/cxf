@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.OAuthValidator;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -57,7 +58,9 @@ public class RequestTokenHandler {
     private long tokenLifetime = 3600L;
     private String defaultScope;
     
-    public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
+    public Response handle(MessageContext mc, 
+                           OAuthDataProvider dataProvider,
+                           OAuthValidator validator) {
         try {
             OAuthMessage oAuthMessage = 
                 OAuthUtils.getOAuthMessage(mc, mc.getHttpServletRequest(), REQUIRED_PARAMETERS);
@@ -69,7 +72,8 @@ public class RequestTokenHandler {
                 throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
             }
 
-            OAuthUtils.validateMessage(oAuthMessage, client, null, dataProvider);
+            OAuthUtils.validateMessage(oAuthMessage, client, null, 
+                                       dataProvider, validator);
 
             String callback = oAuthMessage.getParameter(OAuth.OAUTH_CALLBACK);
             validateCallbackURL(client, callback);
