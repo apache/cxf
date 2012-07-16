@@ -67,7 +67,14 @@ public abstract class BusFactory {
     public static final String DEFAULT_BUS_FACTORY = "org.apache.cxf.bus.CXFBusFactory";
 
     protected static Bus defaultBus;
-    protected static Map<Thread, Bus> threadBusses = new WeakHashMap<Thread, Bus>();
+    
+    static class BusHolder {
+        Bus bus;
+        boolean stale;
+    }
+    
+    protected static Map<Thread, BusHolder> threadBusses = new WeakHashMap<Thread, BusHolder>();
+    protected static ThreadLocal<BusHolder> threadBus = new ThreadLocal<BusHolder>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class, "APIMessages");
 
@@ -105,6 +112,20 @@ public abstract class BusFactory {
             return defaultBus;
         }
     }
+    
+    private static BusHolder getThreadBusHolder() {
+        BusHolder h = threadBus.get();
+        if (h == null || h.stale) {
+            h = new BusHolder();
+            Thread cur = Thread.currentThread();
+            synchronized (threadBusses) {
+                threadBusses.put(cur, h);
+            }
+            threadBus.set(h);
+        }
+        return h;
+    }
+    
 
     /**
      * Sets the default bus.
@@ -126,15 +147,16 @@ public abstract class BusFactory {
      * @param bus the default bus.
      */
     public static void setThreadDefaultBus(Bus bus) {
-        Thread cur = Thread.currentThread();
         if (bus == null) {
-            synchronized (threadBusses) {
-                threadBusses.remove(cur);
+            BusHolder h = threadBus.get();
+            if (h != null) {
+                h.bus = null;
+                h.stale = true;
+                threadBus.remove();
             }
         } else {
-            synchronized (threadBusses) {
-                threadBusses.put(cur, bus);
-            }
+            BusHolder b = getThreadBusHolder();
+            b.bus = bus;
         }
     }
     
@@ -145,16 +167,21 @@ public abstract class BusFactory {
      * @return the old thread default bus or null
      */
     public static Bus getAndSetThreadDefaultBus(Bus bus) {
-        Thread cur = Thread.currentThread();
         if (bus == null) {
-            synchronized (threadBusses) {
-                return threadBusses.remove(cur);
+            BusHolder b = threadBus.get();
+            if (b != null) {
+                Bus orig = b.bus;
+                b.bus = null;
+                b.stale = true;
+                threadBus.remove();
+                return orig;
             }
-        } else {
-            synchronized (threadBusses) {
-                return threadBusses.put(cur, bus);
-            }
+            return null;
         }
+        BusHolder b = getThreadBusHolder();
+        Bus old = b.bus;
+        b.bus = bus;
+        return old;
     }
 
     /**
@@ -173,27 +200,22 @@ public abstract class BusFactory {
      * @return the default bus.
      */
     public static Bus getThreadDefaultBus(boolean createIfNeeded) {
-        Bus threadBus;
-        Thread cur = Thread.currentThread();
-        synchronized (threadBusses) {
-            threadBus = threadBusses.get(cur);
+        if (createIfNeeded) {
+            BusHolder b = getThreadBusHolder();
+            if (b.bus == null) {
+                b.bus = createThreadBus();
+            }
+            return b.bus;
         }
-        if (createIfNeeded && threadBus == null) {
-            threadBus = createThreadBus();
-        }
-        return threadBus;
+        BusHolder b = threadBus.get();
+        return b == null ? null : b.bus;
     }
     private static synchronized Bus createThreadBus() {
-        Bus threadBus;
-        Thread cur = Thread.currentThread();
-        synchronized (threadBusses) {
-            threadBus = threadBusses.get(cur);
+        BusHolder b = getThreadBusHolder();
+        if (b.bus == null) {
+            b.bus = getDefaultBus(true);
         }
-        if (threadBus == null) {
-            threadBus = getDefaultBus(true);
-            threadBusses.put(cur, threadBus);
-        }
-        return threadBus;
+        return b.bus;
     }
     /**
      * Removes a bus from being a thread default bus for any thread.
@@ -206,10 +228,19 @@ public abstract class BusFactory {
      */
     public static void clearDefaultBusForAnyThread(final Bus bus) {
         synchronized (threadBusses) {
-            for (final Iterator<Bus> iterator = threadBusses.values().iterator();
+            for (final Iterator<BusHolder> iterator = threadBusses.values().iterator();
                 iterator.hasNext();) {
-                Bus itBus = iterator.next();
-                if (bus == null || itBus == null || bus.equals(itBus)) {
+                BusHolder itBus = iterator.next();
+                if (bus == null || itBus == null || itBus.bus == null
+                    || itBus.stale
+                    || bus.equals(itBus.bus)) {
+                    if (itBus != null) {
+                        itBus.bus = null;
+                        //mark as stale so if a thread asks again, it will create a new one
+                        itBus.stale = true;  
+                    }
+                    //This will remove the BusHolder from the only place that should
+                    //strongly reference it
                     iterator.remove();
                 }
             }
@@ -223,11 +254,9 @@ public abstract class BusFactory {
      * @return true if the bus was not set and is now set
      */
     public static synchronized boolean possiblySetDefaultBus(Bus bus) {
-        Thread cur = Thread.currentThread();
-        synchronized (threadBusses) {
-            if (threadBusses.get(cur) == null) {
-                threadBusses.put(cur, bus);
-            }
+        BusHolder b = getThreadBusHolder();
+        if (b.bus == null) {
+            b.bus = bus;
         }
         if (defaultBus == null) {
             defaultBus = bus;
