@@ -247,6 +247,12 @@ public abstract class AbstractBPBeanDefinitionParser {
         return r;
     }
 
+    public static PassThroughMetadata createPassThrough(ParserContext context, Object value) {
+        MutablePassThroughMetadata v = context.createMetadata(MutablePassThroughMetadata.class);
+        v.setObject(value);
+        return v;
+    }
+
     public static MutableBeanMetadata createObjectOfClass(ParserContext context, String value) {
         MutableBeanMetadata v = context.createMetadata(MutableBeanMetadata.class);
         v.setClassName(value);

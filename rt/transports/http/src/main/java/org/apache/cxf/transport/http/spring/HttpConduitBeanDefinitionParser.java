@@ -120,13 +120,11 @@ public class HttpConduitBeanDefinitionParser
                 String aname = a.getLocalName();
                 if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname) 
                     || "useHttpsURLConnectionDefaultHostnameVerifier".equals(aname)
-                    || "disableCNCheck".equals(aname)) {
-                    paramsbean.addPropertyValue(aname, Boolean.parseBoolean(a.getValue()));
-                } else if ("jsseProvider".equals(aname) 
-                    || "secureSocketProtocol".equals(aname)) {
-                    paramsbean.addPropertyValue(aname, a.getNodeValue());
-                } else if ("sslCacheTimeout".equals(aname)) {
-                    paramsbean.addPropertyValue(aname, Integer.parseInt(a.getNodeValue()));
+                    || "disableCNCheck".equals(aname)
+                    || "jsseProvider".equals(aname) 
+                    || "secureSocketProtocol".equals(aname)
+                    || "sslCacheTimeout".equals(aname)) {
+                    paramsbean.addPropertyValue(aname, a.getValue());
                 }
             }
         }
