@@ -70,7 +70,7 @@ public abstract class BusFactory {
     
     static class BusHolder {
         Bus bus;
-        boolean stale;
+        volatile boolean stale;
     }
     
     protected static Map<Thread, BusHolder> threadBusses = new WeakHashMap<Thread, BusHolder>();
