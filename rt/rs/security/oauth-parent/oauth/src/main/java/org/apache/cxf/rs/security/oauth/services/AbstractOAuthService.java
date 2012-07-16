@@ -20,7 +20,10 @@ package org.apache.cxf.rs.security.oauth.services;
 
 import javax.ws.rs.core.Context;
 
+import net.oauth.OAuthValidator;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 
@@ -31,6 +34,7 @@ public abstract class AbstractOAuthService {
     private MessageContext mc;
     
     private OAuthDataProvider dataProvider;
+    private OAuthValidator validator = new DefaultOAuthValidator();
 
     @Context 
     public void setMessageContext(MessageContext context) {
@@ -47,6 +51,14 @@ public abstract class AbstractOAuthService {
 
     protected OAuthDataProvider getDataProvider() {
         return OAuthUtils.getOAuthDataProvider(dataProvider, mc.getServletContext());
+    }
+
+    public OAuthValidator getValidator() {
+        return validator;
+    }
+
+    public void setValidator(OAuthValidator validator) {
+        this.validator = validator;
     }
     
     

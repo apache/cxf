@@ -41,6 +41,7 @@ import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -85,7 +86,8 @@ public final class OAuthUtils {
     public static void validateMessage(OAuthMessage oAuthMessage, 
                                        Client client, 
                                        Token token,
-                                       OAuthDataProvider provider) 
+                                       OAuthDataProvider provider,
+                                       OAuthValidator validator) 
         throws Exception {
         OAuthConsumer consumer = new OAuthConsumer(null, client.getConsumerKey(),
             client.getSecretKey(), null);
@@ -98,11 +100,16 @@ public final class OAuthUtils {
             }
             accessor.tokenSecret = token.getTokenSecret();
         }
-        
-        DefaultOAuthValidator validator = new DefaultOAuthValidator(); 
-        validator.validateMessage(oAuthMessage, accessor);
-        if (token != null) {
-            validator.validateToken(token, provider);
+        try {
+            validator.validateMessage(oAuthMessage, accessor);
+        } catch (Exception ex) {
+            if (token != null) {
+                provider.removeToken(token);
+                throw ex;
+            }
+        }
+        if (token != null && validator instanceof DefaultOAuthValidator) {
+            ((DefaultOAuthValidator)validator).validateToken(token, provider);
         }
     }
     
@@ -228,14 +235,6 @@ public final class OAuthUtils {
                                 + " ] context init param in web.xml");
             }
             
-            String oauthValidatorClassName = servletContext
-                    .getInitParameter(OAuthConstants.OAUTH_DATA_VALIDATOR_CLASS);
-
-            if (StringUtils.isEmpty(oauthValidatorClassName)) {
-                //if no validator was provided fallback to default validator
-                oauthValidatorClassName = DefaultOAuthValidator.class.getName();
-            }
-
             try {
                 dataProvider = (OAuthDataProvider) OAuthUtils
                         .instantiateClass(dataProviderClassName);
@@ -250,4 +249,32 @@ public final class OAuthUtils {
 
         return dataProvider;
     }
+    
+    public static synchronized OAuthValidator getOAuthValidator(ServletContext servletContext) {
+
+        OAuthValidator dataProvider = (OAuthValidator) servletContext
+              .getAttribute(OAuthConstants.OAUTH_VALIDATOR_INSTANCE_KEY);
+    
+        if (dataProvider == null) {
+            String dataProviderClassName = servletContext
+                .getInitParameter(OAuthConstants.OAUTH_VALIDATOR_CLASS);
+    
+            if (!StringUtils.isEmpty(dataProviderClassName)) {
+            
+                try {
+                    dataProvider = (OAuthValidator) OAuthUtils
+                        .instantiateClass(dataProviderClassName);
+                 
+                    servletContext
+                        .setAttribute(OAuthConstants.OAUTH_VALIDATOR_INSTANCE_KEY, dataProvider);
+                } catch (Exception e) {
+                    throw new RuntimeException(
+                        "Cannot instantiate OAuthValidator class: " + dataProviderClassName, e);
+                }
+            }
+        }
+    
+        return dataProvider == null ? new DefaultOAuthValidator() : dataProvider;
+    }
+    
 }

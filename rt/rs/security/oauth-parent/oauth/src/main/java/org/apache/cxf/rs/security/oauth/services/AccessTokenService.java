@@ -49,6 +49,8 @@ public class AccessTokenService extends AbstractOAuthService {
     @POST
     @Produces("application/x-www-form-urlencoded")
     public Response getAccessToken() {
-        return handler.handle(getMessageContext(), getDataProvider());
+        return handler.handle(getMessageContext(), 
+                              getDataProvider(),
+                              getValidator());
     }
 }

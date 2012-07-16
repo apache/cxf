@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.OAuthValidator;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -54,7 +55,9 @@ public class AccessTokenHandler {
             OAuth.OAUTH_NONCE
         };
     
-    public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
+    public Response handle(MessageContext mc, 
+                           OAuthDataProvider dataProvider,
+                           OAuthValidator validator) {
         try {
             OAuthMessage oAuthMessage = 
                 OAuthUtils.getOAuthMessage(mc, mc.getHttpServletRequest(), REQUIRED_PARAMETERS);
@@ -75,8 +78,11 @@ public class AccessTokenHandler {
                 throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
             }
             
-            OAuthUtils.validateMessage(oAuthMessage, requestToken.getClient(), requestToken,
-                                       dataProvider);
+            OAuthUtils.validateMessage(oAuthMessage, 
+                                       requestToken.getClient(), 
+                                       requestToken,
+                                       dataProvider,
+                                       validator);
 
             AccessTokenRegistration reg = new AccessTokenRegistration();
             reg.setRequestToken(requestToken);
