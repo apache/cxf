@@ -188,7 +188,7 @@ public final class OAuthClientUtils {
             } else {
                 return token;
             }
-        } else if (400 == response.getStatus() && map.containsValue(OAuthConstants.ERROR_KEY)) {
+        } else if (400 == response.getStatus() && map.containsKey(OAuthConstants.ERROR_KEY)) {
             OAuthError error = new OAuthError(map.get(OAuthConstants.ERROR_KEY),
                                               map.get(OAuthConstants.ERROR_DESCRIPTION_KEY));
             error.setErrorUri(map.get(OAuthConstants.ERROR_URI_KEY));
