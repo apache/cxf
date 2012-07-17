@@ -463,9 +463,13 @@ public class CachedOutputStream extends OutputStream {
         } else {
             try {
                 FileInputStream fileInputStream = new FileInputStream(tempFile) {
+                    boolean closed;
                     public void close() throws IOException {
-                        super.close();
-                        maybeDeleteTempFile(this);
+                        if (!closed) {
+                            super.close();
+                            maybeDeleteTempFile(this);
+                        }
+                        closed = true;
                     }
                 };
                 streamList.add(fileInputStream);
