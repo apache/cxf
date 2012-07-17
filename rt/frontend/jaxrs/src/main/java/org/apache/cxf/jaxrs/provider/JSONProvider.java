@@ -347,7 +347,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
                 marshalCollection(cls, obj, genericType, enc, os, m, anns);
             } else {
                 Object actualObject = checkAdapter(obj, cls, anns, true);
-                Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
+                Class<?> actualClass = obj != actualObject || cls.isInterface()
+                    ? actualObject.getClass() : cls;
                 if (cls == genericType) {
                     genericType = actualClass;
                 }
