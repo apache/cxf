@@ -16,25 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http.auth;
+package org.apache.cxf.common.security;
 
-import java.net.URL;
+import java.security.Principal;
 
-import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.security.SecurityContext;
 
-public class SpnegoAuthSupplier extends AbstractSpnegoAuthSupplier 
-    implements HttpAuthSupplier {
-
-    public boolean requiresRequestCaching() {
-        return false;
+public class SimpleSecurityContext implements SecurityContext {
+    private SimplePrincipal principal;
+    public SimpleSecurityContext(String name) {
+        this.principal = new SimplePrincipal(name);
+    }
+    
+    public Principal getUserPrincipal() {
+        return principal;
     }
 
-    public String getAuthorization(AuthorizationPolicy  authPolicy,
-                                    URL currentURL,
-                                    Message message,
-                                    String fullHeader) {
-        return super.getAuthorization(authPolicy, currentURL, message);
+    public boolean isUserInRole(String role) {
+        return false;
     }
 
 }
