@@ -52,6 +52,8 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
     int maxQueueSize;
     DelayQueue<DelayedTaskWrapper> delayQueue = new DelayQueue<DelayedTaskWrapper>();
     WatchDog watchDog = new WatchDog(delayQueue);
+    Method addWorkerMethod;
+    Object addWorkerArgs[];
     
     WorkQueueManagerImpl manager;
     String name = "default";
@@ -126,6 +128,22 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
                 LOG.log(Level.WARNING, "THREAD_START_FAILURE_MSG", new Object[] {started, initialThreads});
             }
             setCorePoolSize(lowWaterMark);
+
+            try {
+                //java 5/6
+                addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
+                                                                             Runnable.class);
+                addWorkerArgs = new Object[] {null};
+            } catch (Throwable t) {
+                try {
+                    //java 7
+                    addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addWorker",
+                                                                                 Runnable.class, Boolean.TYPE);
+                    addWorkerArgs = new Object[] {null, Boolean.FALSE};
+                } catch (Throwable t2) {
+                    //nothing we cando
+                }
+            }
         }
         
         // start the watch dog thread
@@ -257,11 +275,11 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
             loader = AutomaticWorkQueueImpl.class.getClassLoader();
         }
         
-        public Thread newThread(Runnable r) {
+        public Thread newThread(final Runnable r) {
             if (group.isDestroyed()) {
                 group = new ThreadGroup(group.getParent(), name + "-workqueue");
             }
-            Thread t = new Thread(group, 
+            final Thread t = new Thread(group, 
                                   r, 
                                   name + "-workqueue-" + threadNumber.getAndIncrement(),
                                   0);
@@ -360,11 +378,11 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         //of threads until the queue is full.   However, we would 
         //prefer the number of threads to expand immediately and 
         //only uses the queue if we've reached the maximum number 
-        //of threads.   Thus, we'll set the core size to the max,
-        //add the runnable, and set back.  That will cause the
-        //threads to be created as needed.
+        //of threads.
         super.execute(r);
-        if (!getQueue().isEmpty() && this.getPoolSize() < maxPoolSize) {
+        if (addWorkerMethod != null 
+            && !getQueue().isEmpty() 
+            && getPoolSize() < maxPoolSize) {
             mainLock.lock();
             try {
                 int ps = this.getPoolSize();
@@ -372,10 +390,8 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
                 int sz2 = this.getActiveCount();
                 
                 if ((sz + sz2) > ps) {
-                    Method m = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
-                                                                          Runnable.class);
-                    m.setAccessible(true);
-                    m.invoke(this, new Object[1]);
+                    addWorkerMethod.setAccessible(true);
+                    addWorkerMethod.invoke(this, addWorkerArgs);
                 }
             } catch (Exception ex) {
                 //ignore
