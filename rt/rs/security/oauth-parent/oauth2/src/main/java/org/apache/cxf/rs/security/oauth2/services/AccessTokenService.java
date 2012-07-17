@@ -53,9 +53,14 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AccessTokenService extends AbstractOAuthService {
     private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
     private boolean writeOptionalParameters = true;
+    private boolean writeCustomErrors;
     
     public void setWriteOptionalParameters(boolean write) {
         writeOptionalParameters = write;
+    }
+    
+    public void setWriteCustomErrors(boolean write) {
+        writeCustomErrors = write;
     }
     
     /**
@@ -90,7 +95,11 @@ public class AccessTokenService extends AbstractOAuthService {
         try {
             serverToken = handler.createAccessToken(client, params);
         } catch (OAuthServiceException ex) {
-            // the error response is to be returned next
+            OAuthError customError = ex.getError();
+            if (writeCustomErrors && customError != null) {
+                return createErrorResponseFromBean(customError);
+            }
+
         }
         if (serverToken == null) {
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
@@ -201,7 +210,10 @@ public class AccessTokenService extends AbstractOAuthService {
     
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String error) {
-        OAuthError oauthError = new OAuthError(error);
-        return Response.status(400).entity(oauthError).build();
+        return createErrorResponseFromBean(new OAuthError(error));
+    }
+    
+    protected Response createErrorResponseFromBean(OAuthError errorBean) {
+        return Response.status(400).entity(errorBean).build();
     }
 }
