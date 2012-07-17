@@ -60,6 +60,7 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
     final int corePoolSize;
     final int maxPoolSize;
     final ReentrantLock mainLock;
+    final ReentrantLock addThreadLock = new ReentrantLock();
 
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
@@ -382,21 +383,27 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         super.execute(r);
         if (addWorkerMethod != null 
             && !getQueue().isEmpty() 
-            && getPoolSize() < maxPoolSize) {
-            mainLock.lock();
+            && getPoolSize() < maxPoolSize
+            && addThreadLock.tryLock()) {
+            
             try {
-                int ps = this.getPoolSize();
-                int sz = getQueue().size();
-                int sz2 = this.getActiveCount();
+                mainLock.lock();
+                try {
+                    int ps = this.getPoolSize();
+                    int sz = getQueue().size();
+                    int sz2 = this.getActiveCount();
                 
-                if ((sz + sz2) > ps) {
-                    addWorkerMethod.setAccessible(true);
-                    addWorkerMethod.invoke(this, addWorkerArgs);
+                    if ((sz + sz2) > ps) {
+                        addWorkerMethod.setAccessible(true);
+                        addWorkerMethod.invoke(this, addWorkerArgs);
+                    }
+                } catch (Exception ex) {
+                    //ignore
+                } finally {
+                    mainLock.unlock();
                 }
-            } catch (Exception ex) {
-                //ignore
             } finally {
-                mainLock.unlock();
+                addThreadLock.unlock();
             }
         }
     }
