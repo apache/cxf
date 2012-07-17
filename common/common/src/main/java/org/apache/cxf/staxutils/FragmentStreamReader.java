@@ -56,6 +56,22 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     public int getEventType() {
         return current;
     }
+    
+    public boolean isCharacters() {
+        return current == XMLStreamReader.CHARACTERS;
+    }
+
+    public boolean isEndElement() {
+        return current == XMLStreamReader.END_ELEMENT;
+    }
+
+    public boolean isStartElement() {
+        return current == XMLStreamReader.START_ELEMENT;
+    }
+
+    public boolean isWhiteSpace() {
+        return current == XMLStreamReader.CHARACTERS && reader.isWhiteSpace();
+    }    
 
     public boolean hasNext() throws XMLStreamException {
         
