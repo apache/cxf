@@ -58,6 +58,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
     private String loginContextName;
     private String servicePrincipalName;
     private String realm;
+    private boolean keepUserPrincipalRealm = true;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         
@@ -80,8 +81,21 @@ public class KerberosAuthenticationFilter implements RequestHandler {
 
             Subject.doAs(serviceSubject, new ValidateServiceTicketAction(gssContext, serviceTicket));
             
-            final String clientName = gssContext.getSrcName().toString();            
-            m.put(SecurityContext.class, new SimpleSecurityContext(clientName));
+            GSSName srcName = gssContext.getSrcName();
+            if (srcName == null) {
+                throw new WebApplicationException(getFaultResponse());
+            }
+            
+            String userName = srcName.toString();
+            if (!keepUserPrincipalRealm) {
+                int index = userName.lastIndexOf('@');
+                if (index > 0) {
+                    userName = userName.substring(0, index);
+                    //TODO: still provide a complete user name via KerberosPrincipal
+                }
+            }
+            m.put(SecurityContext.class, new SimpleSecurityContext(userName));
+            
             
         } catch (LoginException e) {
             throw new WebApplicationException(getFaultResponse());
@@ -165,6 +179,11 @@ public class KerberosAuthenticationFilter implements RequestHandler {
 
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
+    }
+
+    
+    public void setKeepUserPrincipalRealm(boolean keep) {
+        this.keepUserPrincipalRealm = keep;
     }
 
     private final class ValidateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
