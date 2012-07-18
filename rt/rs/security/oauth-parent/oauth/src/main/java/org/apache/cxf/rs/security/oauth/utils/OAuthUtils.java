@@ -35,6 +35,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import net.oauth.OAuth;
 import net.oauth.OAuthAccessor;
@@ -50,6 +51,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.RequestToken;
@@ -61,6 +63,7 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
  * Various utility methods 
  */
 public final class OAuthUtils {
+    public static final String REPORT_FAILURE_DETAILS = "report.failure.details";
 
     private OAuthUtils() {
     }
@@ -155,27 +158,14 @@ public final class OAuthUtils {
     }
     
     
-    public static Response handleException(Exception e, int status) {
-        return handleException(e, status, null);
-    }
-
-    public static Response handleException(Exception e, int status,
-                                           String realm) {
-        if (e instanceof OAuthProblemException) {
-            OAuthProblemException problem = (OAuthProblemException) e;
-            OAuthMessage message = new OAuthMessage(null, null, problem
-                    .getParameters().entrySet());
-            try {
-                return
-                        Response.status(status).header("WWW-Authenticate",
-                                message.getAuthorizationHeader(realm)).entity(e.getMessage()).build();
-            } catch (IOException e1) {
-                throw new WebApplicationException(
-                        Response.status(status).entity(e.getMessage()).build());
-            }
+    public static Response handleException(MessageContext mc, 
+                                           Exception e, 
+                                           int status) {
+        ResponseBuilder builder = Response.status(status);
+        if (MessageUtils.isTrue(mc.get(REPORT_FAILURE_DETAILS))) {
+            builder.entity(e.getMessage());
         }
-        throw new WebApplicationException(
-                Response.status(status).entity(e.getMessage()).build());
+        throw new WebApplicationException(builder.build());
     }
 
     public static List<String> parseParamValue(String paramValue, String defaultValue) 
