@@ -34,10 +34,12 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
@@ -51,7 +53,6 @@ public abstract class AbstractSpnegoAuthSupplier {
      * instead of the default spnego OID
      */
     private static final String PROPERTY_USE_KERBEROS_OID = "auth.spnego.useKerberosOid";
-    private static final String PROPERTY_REQUIRE_MUTUAL_AUTH = "auth.spnego.requireMutualAuth";
     private static final String PROPERTY_REQUIRE_CRED_DELEGATION = "auth.spnego.requireCredDelegation";
     
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
@@ -59,9 +60,7 @@ public abstract class AbstractSpnegoAuthSupplier {
 
     private String servicePrincipalName;
     private String realm;
-    private boolean mutualAuth;
     private boolean credDelegation;
-    
     
     public String getAuthorization(AuthorizationPolicy authPolicy,
                                    URL currentURL,
@@ -99,7 +98,7 @@ public abstract class AbstractSpnegoAuthSupplier {
         LoginException {
         final byte[] token = new byte[0];
 
-        if (authPolicy.getUserName() == null || authPolicy.getUserName().trim().length() == 0) {
+        if (authPolicy == null || StringUtils.isEmpty(authPolicy.getUserName())) {
             return context.initSecContext(token, 0, token.length);
         }
 
@@ -136,17 +135,18 @@ public abstract class AbstractSpnegoAuthSupplier {
         GSSManager manager = GSSManager.getInstance();
         GSSName serverName = manager.createName(spn, null);
 
+        GSSCredential delegatedCred = (GSSCredential)message.get(GSSCredential.class.getName());
+        
         GSSContext context = manager
-                .createContext(serverName.canonicalize(oid), oid, null, GSSContext.DEFAULT_LIFETIME);
-        context.requestMutualAuth(isMutualAuthRequired(message));
+                .createContext(serverName.canonicalize(oid), oid, delegatedCred, GSSContext.DEFAULT_LIFETIME);
+        
         context.requestCredDeleg(isCredDelegationRequired(message));
 
-        return getToken(authPolicy, context);
-    }
-    
-    protected boolean isMutualAuthRequired(Message message) { 
-        Object prop = message.getContextualProperty(PROPERTY_REQUIRE_MUTUAL_AUTH);
-        return prop == null ? mutualAuth : MessageUtils.isTrue(prop);
+        // If the delegated cred is not null then we only need the context to
+        // immediately return a ticket based on this credential without attempting
+        // to log on again 
+        return getToken(delegatedCred == null ? authPolicy : null, 
+                        context);
     }
     
     protected boolean isCredDelegationRequired(Message message) { 
@@ -203,6 +203,10 @@ public abstract class AbstractSpnegoAuthSupplier {
             }
         };
         return handler;
+    }
+
+    public void setCredDelegation(boolean delegation) {
+        this.credDelegation = delegation;
     }
 
 }

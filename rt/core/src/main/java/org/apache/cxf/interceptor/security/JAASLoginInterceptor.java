@@ -54,6 +54,10 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.UNMARSHAL);
     }
     
+    public JAASLoginInterceptor(String phase) {
+        super(phase);
+    }
+    
     public void setContextName(String name) {
         contextName = name;
     }

@@ -82,6 +82,7 @@ public class JAXRSKerberosBookTest extends AbstractBusClientServerTestBase {
         policy.setPassword("alice");
         
         kbInterceptor.setPolicy(policy);
+        kbInterceptor.setCredDelegation(true);
         
         WebClient.getConfig(wc).getOutInterceptors().add(new LoggingOutInterceptor());
         WebClient.getConfig(wc).getOutInterceptors().add(kbInterceptor);
