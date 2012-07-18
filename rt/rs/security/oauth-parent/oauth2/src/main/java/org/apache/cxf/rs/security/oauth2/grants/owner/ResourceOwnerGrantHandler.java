@@ -45,14 +45,14 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
         String ownerName = params.getFirst(OAuthConstants.RESOURCE_OWNER_NAME);
         String ownerPassword = params.getFirst(OAuthConstants.RESOURCE_OWNER_PASSWORD);
         if (ownerName == null || ownerPassword == null) {
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         
         UserSubject subject = null;
         try {
             subject = loginHandler.createSubject(ownerName, ownerPassword);
         } catch (Exception ex) { 
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);
+            throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
         
         return doCreateAccessToken(client, 
