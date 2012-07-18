@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -138,8 +139,14 @@ public class AuthorizationRequestHandler {
             if (token.getState() != null) {
                 queryParams.put("state", token.getState());
             }
-            URI callback = buildCallbackURI(getCallbackURI(token), queryParams);
-            return Response.seeOther(callback).build();
+            String callbackValue = getCallbackValue(token);
+            if (OAuthConstants.OAUTH_CALLBACK_OOB.equals(callbackValue)) {
+                OOBAuthorizationResponse bean = convertQueryParamsToOOB(queryParams);
+                return Response.ok().type(MediaType.TEXT_HTML).entity(bean).build();
+            } else {
+                URI callbackURI = buildCallbackURI(callbackValue, queryParams);
+                return Response.seeOther(callbackURI).build();
+            }
             
         } catch (OAuthProblemException e) {
             LOG.log(Level.WARNING, "An OAuth related problem: {0}", new Object[]{e.fillInStackTrace()});
@@ -158,7 +165,7 @@ public class AuthorizationRequestHandler {
         }
     }
 
-    protected String getCallbackURI(RequestToken token) throws OAuthProblemException {
+    protected String getCallbackValue(RequestToken token) throws OAuthProblemException {
         String callback = token.getCallback();
         if (callback == null) {
             callback = token.getClient().getApplicationURI();
@@ -179,12 +186,22 @@ public class AuthorizationRequestHandler {
         return builder.build(); 
     }
     
+    private OOBAuthorizationResponse convertQueryParamsToOOB(Map<String, String> queryParams) {
+
+        OOBAuthorizationResponse oob = new OOBAuthorizationResponse();
+        oob.setRequestToken(queryParams.get(OAuth.OAUTH_TOKEN));
+        oob.setVerifier(queryParams.get(OAuth.OAUTH_VERIFIER));
+        oob.setState(queryParams.get("state"));
+        return oob; 
+    }
+    
     protected OAuthAuthorizationData addAdditionalParams(OAuthAuthorizationData secData,
                                                          OAuthDataProvider dataProvider,
-                                                         RequestToken token) {
+                                                         RequestToken token) throws OAuthProblemException {
         secData.setOauthToken(token.getTokenKey());
         secData.setApplicationName(token.getClient().getApplicationName()); 
         secData.setApplicationURI(token.getClient().getApplicationURI());
+        secData.setCallbackURI(getCallbackValue(token));
         secData.setApplicationDescription(token.getClient().getApplicationDescription());
         secData.setLogoUri(token.getClient().getLogoUri());
         secData.setPermissions(token.getScopes());

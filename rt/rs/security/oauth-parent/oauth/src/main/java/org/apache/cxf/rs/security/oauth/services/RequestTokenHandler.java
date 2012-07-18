@@ -123,21 +123,22 @@ public class RequestTokenHandler {
 
     protected void validateCallbackURL(Client client,
                                        String oauthCallback) throws OAuthProblemException {
-
-        if (StringUtils.isEmpty(oauthCallback) 
-            || client.getCallbackURI() != null
-                && !oauthCallback.equals(client.getCallbackURI())
-            || client.getApplicationURI() != null
-                && !oauthCallback.startsWith(client.getApplicationURI())) {
-            OAuthProblemException problemEx = new OAuthProblemException(
-                OAuth.Problems.PARAMETER_REJECTED + " - " + OAuth.OAUTH_CALLBACK);
-            problemEx
-                .setParameter(OAuthProblemException.HTTP_STATUS_CODE,
-                    HttpServletResponse.SC_BAD_REQUEST);
-            throw problemEx;
-            
+        // the callback must not be empty or null, and it should either match
+        // the pre-registered callback URI or have the common root with the
+        // the pre-registered application URI
+        if (!StringUtils.isEmpty(oauthCallback) 
+            && (!StringUtils.isEmpty(client.getCallbackURI())
+                && oauthCallback.equals(client.getCallbackURI())
+                || !StringUtils.isEmpty(client.getApplicationURI())
+                && oauthCallback.startsWith(client.getApplicationURI()))) {
+            return;
         }
-        
+        OAuthProblemException problemEx = new OAuthProblemException(
+            OAuth.Problems.PARAMETER_REJECTED + " - " + OAuth.OAUTH_CALLBACK);
+        problemEx
+            .setParameter(OAuthProblemException.HTTP_STATUS_CODE,
+                HttpServletResponse.SC_BAD_REQUEST);
+        throw problemEx;
     }
 
     public void setTokenLifetime(long tokenLifetime) {

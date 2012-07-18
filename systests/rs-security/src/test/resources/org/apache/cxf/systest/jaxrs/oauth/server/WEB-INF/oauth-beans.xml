@@ -29,6 +29,10 @@ under the License.
         <jaxrs:serviceBeans>
             <ref bean="temporaryCredentialService"/>
         </jaxrs:serviceBeans>
+        <jaxrs:properties>
+           <entry key="report.failure.details" value="true"/>
+           <entry key="report.failure.details.as.header" value="true"/>
+        </jaxrs:properties>
     </jaxrs:server>
 
     <bean id="temporaryCredentialService"
