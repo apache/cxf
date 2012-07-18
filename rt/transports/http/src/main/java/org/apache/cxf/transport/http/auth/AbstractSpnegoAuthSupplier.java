@@ -135,7 +135,8 @@ public abstract class AbstractSpnegoAuthSupplier {
         GSSManager manager = GSSManager.getInstance();
         GSSName serverName = manager.createName(spn, null);
 
-        GSSCredential delegatedCred = (GSSCredential)message.get(GSSCredential.class.getName());
+        GSSCredential delegatedCred = 
+            (GSSCredential)message.getContextualProperty(GSSCredential.class.getName());
         
         GSSContext context = manager
                 .createContext(serverName.canonicalize(oid), oid, delegatedCred, GSSContext.DEFAULT_LIFETIME);

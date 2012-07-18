@@ -101,12 +101,8 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
                 //test wrong client id
                 parameters.put(OAuth.OAUTH_CONSUMER_KEY, "wrong");
                 message = invokeRequestToken(parameters, style, OAuthServer.PORT);
-
-                wwwHeader = message.getHeader(HttpHeaders.WWW_AUTHENTICATE);
-                List<OAuth.Parameter> list = OAuthMessage.decodeAuthorization(wwwHeader);
-
-                String oauthProblem = OAuthTestUtils.findOAuthParameter(list, "oauth_problem").getValue();
-                Assert.assertEquals(OAuth.Problems.CONSUMER_KEY_UNKNOWN, oauthProblem);
+                String response = message.getHeader("oauth_problem");
+                Assert.assertEquals(OAuth.Problems.CONSUMER_KEY_UNKNOWN, response);
             }
         }
     }
