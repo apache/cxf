@@ -25,7 +25,10 @@ import org.apache.cxf.security.SecurityContext;
 public class SimpleSecurityContext implements SecurityContext {
     private SimplePrincipal principal;
     public SimpleSecurityContext(String name) {
-        this.principal = new SimplePrincipal(name);
+        this(new SimplePrincipal(name));
+    }
+    public SimpleSecurityContext(SimplePrincipal principal) {
+        this.principal = principal;
     }
     
     public Principal getUserPrincipal() {

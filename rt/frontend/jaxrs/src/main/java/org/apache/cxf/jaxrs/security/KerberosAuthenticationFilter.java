@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.security;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -31,6 +32,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -48,6 +51,8 @@ import org.ietf.jgss.Oid;
 
 public class KerberosAuthenticationFilter implements RequestHandler {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(KerberosAuthenticationFilter.class);
+    
     private static final String NEGOTIATE_SCHEME = "Negotiate";
     private static final String PROPERTY_USE_KERBEROS_OID = "auth.spnego.useKerberosOid";
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
@@ -58,17 +63,18 @@ public class KerberosAuthenticationFilter implements RequestHandler {
     private String loginContextName;
     private String servicePrincipalName;
     private String realm;
-    private boolean keepUserPrincipalRealm = true;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         
         List<String> authHeaders = messageContext.getHttpHeaders()
             .getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (authHeaders.size() != 1) {
+            LOG.fine("No Authorization header is available");
             throw new WebApplicationException(getFaultResponse());
         }
         String[] authPair = authHeaders.get(0).split(" ");
         if (authPair.length != 2 || !NEGOTIATE_SCHEME.equalsIgnoreCase(authPair[0])) {
+            LOG.fine("Negotiate Authorization scheme is expected");
             throw new WebApplicationException(getFaultResponse());
         }
                 
@@ -86,22 +92,31 @@ public class KerberosAuthenticationFilter implements RequestHandler {
                 throw new WebApplicationException(getFaultResponse());
             }
             
-            String userName = srcName.toString();
-            if (!keepUserPrincipalRealm) {
-                int index = userName.lastIndexOf('@');
-                if (index > 0) {
-                    userName = userName.substring(0, index);
-                    //TODO: still provide a complete user name via KerberosPrincipal
-                }
-            }
-            m.put(SecurityContext.class, new SimpleSecurityContext(userName));
+            String complexUserName = srcName.toString();
             
+            String simpleUserName = complexUserName;
+            int index = simpleUserName.lastIndexOf('@');
+            if (index > 0) {
+                simpleUserName = simpleUserName.substring(0, index);
+            }
+            if (!gssContext.getCredDelegState()) {
+                gssContext.dispose();
+                gssContext = null;
+            }
+
+            m.put(SecurityContext.class, 
+                new KerberosSecurityContext(new KerberosPrincipal(simpleUserName,
+                                                                  complexUserName),
+                                            gssContext));
             
         } catch (LoginException e) {
+            LOG.fine("Unsuccessful JAAS login for the service principal");
             throw new WebApplicationException(getFaultResponse());
         } catch (GSSException e) {
+            LOG.fine("GSS API exception: " + e.getMessage());
             throw new WebApplicationException(getFaultResponse());
         } catch (PrivilegedActionException e) {
+            LOG.fine("PrivilegedActionException: " + e.getMessage());
             throw new WebApplicationException(getFaultResponse());
         }
         
@@ -181,11 +196,6 @@ public class KerberosAuthenticationFilter implements RequestHandler {
         this.callbackHandler = callbackHandler;
     }
 
-    
-    public void setKeepUserPrincipalRealm(boolean keep) {
-        this.keepUserPrincipalRealm = keep;
-    }
-
     private final class ValidateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
         private final GSSContext context;
         private final byte[] token;
@@ -197,6 +207,31 @@ public class KerberosAuthenticationFilter implements RequestHandler {
 
         public byte[] run() throws GSSException {
             return context.acceptSecContext(token, 0, token.length);
+        }
+    }
+    
+    public static class KerberosPrincipal extends SimplePrincipal {
+        private String complexName;
+        public KerberosPrincipal(String simpleName, String complexName) {
+            super(simpleName);
+            this.complexName = complexName;
+        }
+        
+        public String getKerberosName() {
+            return complexName;
+        }
+    }
+    
+    public static class KerberosSecurityContext extends SimpleSecurityContext {
+        private GSSContext context;
+        public KerberosSecurityContext(KerberosPrincipal principal,
+                                       GSSContext context) {
+            super(principal);
+            this.context = context;
+        }
+        
+        public GSSContext getGSSContext() {
+            return context;
         }
     }
 }
