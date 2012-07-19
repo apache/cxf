@@ -58,6 +58,10 @@ public final class SecurityConstants {
     public static final String STS_CLIENT = "ws-security.sts.client";
     public static final String STS_APPLIES_TO = "ws-security.sts.applies-to";
     
+    /**
+     * This configuration tag specifies the time in seconds after Creation that an incoming 
+     * Timestamp is valid for. The default value is 300 seconds (5 minutes).
+     */
     public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
     
     public static final String ENABLE_REVOCATION = "ws-security.enableRevocation";
