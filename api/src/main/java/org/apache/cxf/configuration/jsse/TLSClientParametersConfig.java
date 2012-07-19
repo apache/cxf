@@ -24,12 +24,15 @@ import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 
+import org.w3c.dom.Node;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -73,6 +76,11 @@ public final class TLSClientParametersConfig {
 
         TLSClientParameters ret = new TLSClientParameters(); 
         boolean usingDefaults = params.isUseHttpsURLConnectionDefaultSslSocketFactory();
+
+        TLSClientParametersTypeInternal iparams = null;
+        if (params instanceof TLSClientParametersTypeInternal) {
+            iparams = (TLSClientParametersTypeInternal)params;
+        }
         
         if (params.isDisableCNCheck()) {
             ret.setDisableCNCheck(true);
@@ -118,6 +126,12 @@ public final class TLSClientParametersConfig {
         if (params.isSetCertAlias()) {
             ret.setCertAlias(params.getCertAlias());
         }
+        if (iparams != null && iparams.isSetKeyManagersRef() && !usingDefaults) {
+            ret.setKeyManagers(iparams.getKeyManagersRef());
+        }
+        if (iparams != null && iparams.isSetTrustManagersRef() && !usingDefaults) {
+            ret.setTrustManagers(iparams.getTrustManagersRef());
+        }
         return ret;
     }
     
@@ -145,5 +159,49 @@ public final class TLSClientParametersConfig {
             throw new RuntimeException(e);
         }
     }
+    
+    public static <T> T createTLSClientParameter(Node data, Class<T> cls) {
+        Unmarshaller u;
+        try {
+            u = getContext().createUnmarshaller();
+            Object obj = u.unmarshal(data, cls);
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> el = (JAXBElement<?>)obj;
+                obj = el.getValue();
+            }
+            return cls.cast(obj);
+        } catch (JAXBException e) {
+            throw new RuntimeException("Could not parse configuration.", e);
+        }
+    }
+    
+    public static class TLSClientParametersTypeInternal extends TLSClientParametersType {
+        private KeyManager[] keyManagersRef;
+        private TrustManager[] trustManagersRef;
 
+        public KeyManager[] getKeyManagersRef() {
+            return keyManagersRef;
+        }
+
+        public void setKeyManagersRef(KeyManager[] keyManagersRef) {
+            this.keyManagersRef = keyManagersRef;
+        }
+        
+        public boolean isSetKeyManagersRef() {
+            return this.keyManagersRef != null;
+        }
+
+        public TrustManager[] getTrustManagersRef() {
+            return trustManagersRef;
+        }
+
+        public void setTrustManagersRef(TrustManager[] trustManagersRef) {
+            this.trustManagersRef = trustManagersRef;
+        }
+        
+        public boolean isSetTrustManagersRef() {
+            return this.trustManagersRef != null;
+        }
+
+    }
 }

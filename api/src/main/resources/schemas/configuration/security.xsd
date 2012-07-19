@@ -265,6 +265,15 @@
                 </xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="ref" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>
+                This attribute contains the reference to the KeyManagers bean. This
+                attribute allows the KeyManagers instance to be constructed by other
+                means and referenced from this object.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="TrustManagersType">
@@ -305,6 +314,15 @@
                 This attribute contains the algorithm the KeyManagers Factory
                 will use in creating the KeyManagers from the KeyStore. Most
                 common examples are "PKIX".
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ref" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>
+                This attribute contains the reference to the TrustManagers bean. This
+                attribute allows the TrustManagers instance to be constructed by other
+                means and referenced from this object.
                 </xs:documentation>
               </xs:annotation>
             </xs:attribute>

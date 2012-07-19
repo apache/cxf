@@ -18,21 +18,24 @@
  */
 package org.apache.cxf.transport.http.spring;
 
-import java.io.StringWriter;
-
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
+import org.apache.cxf.configuration.security.CipherSuites;
+import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
+import org.apache.cxf.configuration.security.SecureRandomParameters;
+import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
@@ -46,6 +49,8 @@ public class HttpConduitBeanDefinitionParser
 
     private static final String HTTP_NS =
         "http://cxf.apache.org/transports/http/configuration";
+    private static final String SECURITY_NS =
+        "http://cxf.apache.org/configuration/security";
 
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
@@ -103,20 +108,77 @@ public class HttpConduitBeanDefinitionParser
      * generated type unmarshalled from the selected node.
      */
     @SuppressWarnings("deprecation")
-    public void mapTLSClientParameters(Element n, BeanDefinitionBuilder bean) {
-        StringWriter writer = new StringWriter();
-        XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
-        try {
-            StaxUtils.copy(n, xmlWriter);
-            xmlWriter.flush();
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+    public void mapTLSClientParameters(Element e, BeanDefinitionBuilder bean) {
+        BeanDefinitionBuilder paramsbean 
+            = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.TLSClientParametersTypeInternal.class);
+        
+        // read the attributes
+        NamedNodeMap as = e.getAttributes();
+        for (int i = 0; i < as.getLength(); i++) {
+            Attr a = (Attr) as.item(i);
+            if (a.getNamespaceURI() == null) {
+                String aname = a.getLocalName();
+                if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname) 
+                    || "useHttpsURLConnectionDefaultHostnameVerifier".equals(aname)
+                    || "disableCNCheck".equals(aname)) {
+                    paramsbean.addPropertyValue(aname, Boolean.parseBoolean(a.getValue()));
+                } else if ("jsseProvider".equals(aname) 
+                    || "secureSocketProtocol".equals(aname)) {
+                    paramsbean.addPropertyValue(aname, a.getNodeValue());
+                } else if ("sslCacheTimeout".equals(aname)) {
+                    paramsbean.addPropertyValue(aname, Integer.parseInt(a.getNodeValue()));
+                }
+            }
+        }
+        
+        // read the child elements
+        Node n = e.getFirstChild();
+        while (n != null) {
+            if (Node.ELEMENT_NODE != n.getNodeType() 
+                || !SECURITY_NS.equals(n.getNamespaceURI())) {
+                n = n.getNextSibling();
+                continue;
+            }
+            String ename = n.getLocalName();
+            // Schema should require that no more than one each of these exist.
+            String ref = ((Element)n).getAttribute("ref");
+
+            if ("keyManagers".equals(ename)) {
+                if (ref != null && ref.length() > 0) {
+                    paramsbean.addPropertyReference("keyManagersRef", ref);
+                } else {
+                    paramsbean.addPropertyValue(ename, 
+                        TLSClientParametersConfig.createTLSClientParameter(n, KeyManagersType.class));
+                }
+            } else if ("trustManagers".equals(ename)) {
+                if (ref != null && ref.length() > 0) {
+                    paramsbean.addPropertyReference("trustManagersRef", ref);
+                } else {
+                    paramsbean.addPropertyValue(ename, 
+                        TLSClientParametersConfig.createTLSClientParameter(n, TrustManagersType.class));
+                }
+            } else if ("cipherSuites".equals(ename)) {
+                paramsbean.addPropertyValue(ename,
+                    TLSClientParametersConfig.createTLSClientParameter(n, CipherSuites.class));
+            } else if ("cipherSuitesFilter".equals(ename)) {
+                paramsbean.addPropertyValue(ename,
+                    TLSClientParametersConfig.createTLSClientParameter(n, FiltersType.class));
+            } else if ("secureRandomParameters".equals(ename)) {
+                paramsbean.addPropertyValue(ename,
+                    TLSClientParametersConfig.createTLSClientParameter(n, SecureRandomParameters.class));
+            } else if ("certConstraints".equals(ename)) {
+                paramsbean.addPropertyValue(ename,
+                    TLSClientParametersConfig.createTLSClientParameter(n, CertificateConstraintsType.class));
+            } else if ("certAlias".equals(ename)) {
+                paramsbean.addPropertyValue(ename, n.getTextContent());
+            }
+            n = n.getNextSibling();
         }
 
         BeanDefinitionBuilder jaxbbean 
             = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.class);
-        jaxbbean.getRawBeanDefinition().setFactoryMethodName("createTLSClientParameters");
-        jaxbbean.addConstructorArg(writer.toString());
+        jaxbbean.getRawBeanDefinition().setFactoryMethodName("createTLSClientParametersFromType");
+        jaxbbean.addConstructorArg(paramsbean.getBeanDefinition());
         bean.addPropertyValue("tlsClientParameters", jaxbbean.getBeanDefinition());
     }
     
