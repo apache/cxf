@@ -191,6 +191,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
         encrKey.setEphemeralKey(secret);
         encrKey.setSymmetricEncAlgorithm(encryptionProperties.getEncryptionAlgorithm());
         encrKey.setUseThisCert(certificate);
+        encrKey.setKeyEncAlgo(encryptionProperties.getKeyWrapAlgorithm());
         encrKey.prepare(doc, encryptionCrypto);
         Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
 
