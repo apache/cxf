@@ -322,7 +322,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, 
                         m.getExchange().get(CorsHeaderConstants.HEADER_ORIGIN));
         rbuilder.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS,
-                        Boolean.toString(allowCredentials));
+                        m.getExchange().get(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS));
         
         if (SIMPLE_REQUEST.equals(op)) {
             /* 5.1.4 expose headers */

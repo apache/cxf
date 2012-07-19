@@ -319,7 +319,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(http);
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertOriginResponse(false, new String[]{"http://area51.mil:31415"}, true, response);
-        assertAllowCredentials(response, false);
+        assertAllowCredentials(response, true);
         List<String> exposeHeadersValues 
             = headerValues(response.getHeaders(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS));
         // preflight never returns Expose-Headers
