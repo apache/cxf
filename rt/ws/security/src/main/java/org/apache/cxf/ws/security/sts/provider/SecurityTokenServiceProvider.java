@@ -48,10 +48,10 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapVersion;
-import org.apache.cxf.jaxb.JAXBContextCache;
-import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxb.JAXBContextCache;
+import org.apache.cxf.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.sts.provider.model.ObjectFactory;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
