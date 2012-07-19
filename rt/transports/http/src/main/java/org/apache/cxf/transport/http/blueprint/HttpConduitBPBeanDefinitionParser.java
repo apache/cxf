@@ -19,22 +19,26 @@
 
 package org.apache.cxf.transport.http.blueprint;
 
-import java.io.StringWriter;
-
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
-import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.configuration.jsse.TLSClientParametersConfig;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
+import org.apache.cxf.configuration.security.CipherSuites;
+import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.configuration.security.KeyManagersType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
-import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.configuration.security.SecureRandomParameters;
+import org.apache.cxf.configuration.security.TLSClientParametersType;
+import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
@@ -44,6 +48,8 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
     private static final String HTTP_NS =
         "http://cxf.apache.org/transports/http/configuration";
+    private static final String SECURITY_NS =
+        "http://cxf.apache.org/configuration/security";
 
     public Metadata parse(Element element, ParserContext context) {
         MutableBeanMetadata bean = context.createMetadata(MutableBeanMetadata.class);
@@ -84,21 +90,83 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
     }
 
     private void mapTLSClientParameters(ParserContext ctx, MutableBeanMetadata bean, Element el) {
-        StringWriter writer = new StringWriter();
-        XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
-        try {
-            StaxUtils.copy(el, xmlWriter);
-            xmlWriter.flush();
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+        MutableBeanMetadata paramsbean = ctx.createMetadata(MutableBeanMetadata.class);
+        paramsbean.setRuntimeClass(TLSClientParametersConfig.TLSClientParametersTypeInternal.class);
+        
+        // read the attributes
+        NamedNodeMap as = el.getAttributes();
+        for (int i = 0; i < as.getLength(); i++) {
+            Attr a = (Attr) as.item(i);
+            if (a.getNamespaceURI() == null) {
+                String aname = a.getLocalName();
+                if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname) 
+                    || "useHttpsURLConnectionDefaultHostnameVerifier".equals(aname)
+                    || "disableCNCheck".equals(aname)
+                    || "jsseProvider".equals(aname) 
+                    || "secureSocketProtocol".equals(aname)
+                    || "sslCacheTimeout".equals(aname)) {
+                    paramsbean.addProperty(aname, createValue(ctx, a.getValue()));
+                }
+            }
         }
-        Object v = TLSClientParametersConfig.createTLSClientParameters(writer.toString());
-        MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
-        value.setObject(v);
-        bean.addProperty("tlsClientParameters", value);
+
+        // read the child elements
+        Node n = el.getFirstChild();
+        while (n != null) {
+            if (Node.ELEMENT_NODE != n.getNodeType() 
+                || !SECURITY_NS.equals(n.getNamespaceURI())) {
+                n = n.getNextSibling();
+                continue;
+            }
+            String ename = n.getLocalName();
+            // Schema should require that no more than one each of these exist.
+            String ref = ((Element)n).getAttribute("ref");
+
+            if ("keyManagers".equals(ename)) {
+                if (ref != null && ref.length() > 0) {
+                    paramsbean.addProperty("keyManagersRef", createRef(ctx, ref));
+                } else {
+                    paramsbean.addProperty(ename, 
+                        createPassThrough(ctx, 
+                            TLSClientParametersConfig.createTLSClientParameter(n, KeyManagersType.class)));
+                }
+            } else if ("trustManagers".equals(ename)) {
+                if (ref != null && ref.length() > 0) {
+                    paramsbean.addProperty("trustManagersRef", createRef(ctx, ref));
+                } else {
+                    paramsbean.addProperty(ename,
+                        createPassThrough(ctx, 
+                            TLSClientParametersConfig.createTLSClientParameter(n, TrustManagersType.class)));
+                }
+            } else if ("cipherSuites".equals(ename)) {
+                paramsbean.addProperty(ename,
+                    createPassThrough(ctx, 
+                        TLSClientParametersConfig.createTLSClientParameter(n, CipherSuites.class)));
+            } else if ("cipherSuitesFilter".equals(ename)) {
+                paramsbean.addProperty(ename,
+                    createPassThrough(ctx, 
+                        TLSClientParametersConfig.createTLSClientParameter(n, FiltersType.class)));
+            } else if ("secureRandomParameters".equals(ename)) {
+                paramsbean.addProperty(ename,
+                    createPassThrough(ctx,
+                        TLSClientParametersConfig.createTLSClientParameter(n, SecureRandomParameters.class)));
+            } else if ("certConstraints".equals(ename)) {
+                paramsbean.addProperty(ename,
+                    createPassThrough(ctx,
+                        TLSClientParametersConfig.createTLSClientParameter(n, CertificateConstraintsType.class)));
+            } else if ("certAlias".equals(ename)) {
+                paramsbean.addProperty(ename, createValue(ctx, n.getTextContent()));
+            }
+            n = n.getNextSibling();
+        }
+
+        MutableBeanMetadata jaxbbean = ctx.createMetadata(MutableBeanMetadata.class);
+        jaxbbean.setRuntimeClass(TLSClientParametersConfig.class);
+        jaxbbean.setFactoryMethod("createTLSClientParametersFromType");
+        jaxbbean.addArgument(paramsbean, TLSClientParametersType.class.getName(), 0);
+        bean.addProperty("tlsClientParameters", jaxbbean);
     }
 
-    
     private void mapBeanOrClassElement(ParserContext ctx, MutableBeanMetadata bean, Element el, 
                                        Class<?> cls) {
         String elementName = el.getLocalName();
