@@ -26,7 +26,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.management.JMException;
 import javax.management.ObjectName;
 
@@ -56,6 +55,9 @@ public class CounterRepository {
     
     public void setBus(Bus b) {
         bus = b;
+        if (bus != null) {
+            registerInterceptorsToBus();
+        }
     }
 
     public Bus getBus() {
@@ -66,7 +68,6 @@ public class CounterRepository {
         return counters;
     }
     
-    @PostConstruct
     void registerInterceptorsToBus() {
         ResponseTimeMessageInInterceptor in = new ResponseTimeMessageInInterceptor();
         ResponseTimeMessageInvokerInterceptor invoker = new ResponseTimeMessageInvokerInterceptor();
