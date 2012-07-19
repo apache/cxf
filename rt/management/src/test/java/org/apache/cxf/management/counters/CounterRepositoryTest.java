@@ -18,10 +18,15 @@
  */
 package org.apache.cxf.management.counters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.management.InstrumentationManager;
+import org.apache.cxf.message.Message;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,26 +34,37 @@ import org.junit.Test;
 
 public class CounterRepositoryTest extends Assert {
     private Bus bus;
+    private CounterRepository cr;
+    private List<Interceptor<? extends Message>> inlist = new ArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> outlist = new ArrayList<Interceptor<? extends Message>>();
     //private InstrumentationManager im;
     private ObjectName serviceCounter;
     private ObjectName operationCounter;
     
     @Before
     public void setUp() throws Exception {
+        inlist.clear();
+        outlist.clear();
         
         serviceCounter = new ObjectName("tandoori:type=counter,service=help");
         operationCounter = new ObjectName("tandoori:type=counter,service=help,operation=me");
-        bus = EasyMock.createMock(Bus.class);        
+        bus = EasyMock.createMock(Bus.class);
+        EasyMock.expect(bus.getInInterceptors()).andReturn(inlist).anyTimes();
+        EasyMock.expect(bus.getOutInterceptors()).andReturn(outlist).anyTimes();
         bus.getExtension(InstrumentationManager.class);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
+
+        cr = new CounterRepository();
+        bus.setExtension(cr, CounterRepository.class);
+        EasyMock.expectLastCall().once();
+        
         EasyMock.replay(bus);
+        cr.setBus(bus);
     }
     
     @Test
     public void testIncreaseOneWayResponseCounter() throws Exception {        
         
-        CounterRepository cr = new CounterRepository();
-        cr.setBus(bus);
         //cr.createCounter(operationCounter, true);
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         EasyMock.expect(mhtr.isOneWay()).andReturn(true).anyTimes();
@@ -64,15 +80,13 @@ public class CounterRepositoryTest extends Assert {
         assertEquals("The operation counter isn't increased", opCounter.getNumInvocations(), 1);
         assertEquals("The Service counter isn't increased", sCounter.getNumInvocations(), 1);
         
-        EasyMock.verify(bus);
-        EasyMock.verify(mhtr);        
+        verifyBus();
+        EasyMock.verify(mhtr);
     }
     
     @Test
     public void testIncreaseOneWayNoResponseCounter() throws Exception {        
         
-        CounterRepository cr = new CounterRepository();
-        cr.setBus(bus);
         //cr.createCounter(operationCounter, true);
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         EasyMock.expect(mhtr.isOneWay()).andReturn(true).anyTimes();
@@ -87,14 +101,12 @@ public class CounterRepositoryTest extends Assert {
         assertEquals("The operation counter isn't increased", opCounter.getNumInvocations(), 1);
         assertEquals("The Service counter isn't increased", sCounter.getNumInvocations(), 1);
         
-        EasyMock.verify(bus);
+        verifyBus();
         EasyMock.verify(mhtr);        
     }
     
     @Test
     public void testIncreaseResponseCounter() throws Exception {
-        CounterRepository cr = new CounterRepository();
-        cr.setBus(bus);
         
         MessageHandlingTimeRecorder mhtr1 = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         EasyMock.expect(mhtr1.isOneWay()).andReturn(false).anyTimes();
@@ -142,9 +154,18 @@ public class CounterRepositoryTest extends Assert {
         assertTrue(opCounter.getMinResponseTime().longValue() == Integer.MAX_VALUE);
         assertTrue(opCounter.getMaxResponseTime().intValue() == 0);
         
-        EasyMock.verify(bus);
+        verifyBus();
         EasyMock.verify(mhtr1);
         EasyMock.verify(mhtr2);
     }
    
+    
+    private void verifyBus() {
+        EasyMock.verify(bus);
+
+        // the numbers should match the implementation of CounterRepository
+        assertEquals(2, inlist.size());
+        assertEquals(1, outlist.size());
+    }
+
 }
