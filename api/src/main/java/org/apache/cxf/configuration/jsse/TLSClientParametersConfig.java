@@ -32,8 +32,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 
-import org.w3c.dom.Node;
-
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
@@ -157,21 +155,6 @@ public final class TLSClientParametersConfig {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-    
-    public static <T> T createTLSClientParameter(Node data, Class<T> cls) {
-        Unmarshaller u;
-        try {
-            u = getContext().createUnmarshaller();
-            Object obj = u.unmarshal(data, cls);
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)obj;
-                obj = el.getValue();
-            }
-            return cls.cast(obj);
-        } catch (JAXBException e) {
-            throw new RuntimeException("Could not parse configuration.", e);
         }
     }
     

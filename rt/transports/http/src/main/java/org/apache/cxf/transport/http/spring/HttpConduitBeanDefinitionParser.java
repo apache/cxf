@@ -145,28 +145,28 @@ public class HttpConduitBeanDefinitionParser
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("keyManagersRef", ref);
                 } else {
-                    paramsbean.addPropertyValue(ename, 
-                        TLSClientParametersConfig.createTLSClientParameter(n, KeyManagersType.class));
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                                             KeyManagersType.class);
                 }
             } else if ("trustManagers".equals(ename)) {
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("trustManagersRef", ref);
                 } else {
-                    paramsbean.addPropertyValue(ename, 
-                        TLSClientParametersConfig.createTLSClientParameter(n, TrustManagersType.class));
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                                             TrustManagersType.class);                    
                 }
             } else if ("cipherSuites".equals(ename)) {
-                paramsbean.addPropertyValue(ename,
-                    TLSClientParametersConfig.createTLSClientParameter(n, CipherSuites.class));
+                mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                                         CipherSuites.class);
             } else if ("cipherSuitesFilter".equals(ename)) {
-                paramsbean.addPropertyValue(ename,
-                    TLSClientParametersConfig.createTLSClientParameter(n, FiltersType.class));
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         FiltersType.class);
             } else if ("secureRandomParameters".equals(ename)) {
-                paramsbean.addPropertyValue(ename,
-                    TLSClientParametersConfig.createTLSClientParameter(n, SecureRandomParameters.class));
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         SecureRandomParameters.class);
             } else if ("certConstraints".equals(ename)) {
-                paramsbean.addPropertyValue(ename,
-                    TLSClientParametersConfig.createTLSClientParameter(n, CertificateConstraintsType.class));
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         CertificateConstraintsType.class);
             } else if ("certAlias".equals(ename)) {
                 paramsbean.addPropertyValue(ename, n.getTextContent());
             }

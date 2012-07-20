@@ -313,12 +313,18 @@ public abstract class AbstractBPBeanDefinitionParser {
                                             QName name,
                                             String propertyName, 
                                             Class<?> c) {
-
         Element data = DOMUtils.getFirstChildWithName(parent, name);
         if (data == null) {
             return;
         }
-        
+
+        mapElementToJaxbProperty(ctx, bean, data, propertyName, c);
+    }
+
+    protected void mapElementToJaxbProperty(ParserContext ctx,
+                                            MutableBeanMetadata bean, Element data, 
+                                            String propertyName, 
+                                            Class<?> c) {
         try {
             Unmarshaller unmarshaller = getContext(c).createUnmarshaller();
             MutablePassThroughMetadata value = ctx.createMetadata(MutablePassThroughMetadata.class);
