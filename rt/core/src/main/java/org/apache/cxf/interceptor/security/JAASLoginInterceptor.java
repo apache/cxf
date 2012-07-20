@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -45,10 +46,12 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAASLoginInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(JAASLoginInterceptor.class);
     
-    private String contextName;
+    private String contextName = "";
+    private Configuration loginConfig;
     private String roleClassifier;
     private String roleClassifierType = ROLE_CLASSIFIER_PREFIX;
     private boolean reportFault;
+    
     
     public JAASLoginInterceptor() {
         super(Phase.UNMARSHAL);
@@ -128,8 +131,11 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         
         try {
+            
+            
             CallbackHandler handler = getCallbackHandler(name, password);  
-            LoginContext ctx = new LoginContext(getContextName(), handler);  
+            LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);  
+            
             ctx.login();
             
             Subject subject = ctx.getSubject();
@@ -157,6 +163,14 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         } else {
             return new DefaultSecurityContext(subject);
         }
+    }
+
+    public Configuration getLoginConfig() {
+        return loginConfig;
+    }
+
+    public void setLoginConfig(Configuration loginConfig) {
+        this.loginConfig = loginConfig;
     }
     
     
