@@ -174,11 +174,44 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         
     }
     
-    public static class ClientManagersFactory {
+    public static class ServerManagersFactory {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
             KeyStoreType kst = new KeyStoreType();
             kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks");
+            kst.setPassword("password");
+            kst.setType("JKS");
+        
+            kmt.setKeyStore(kst);
+            kmt.setKeyPassword("password");
+            try {
+                return TLSParameterJaxBUtils.getKeyManagers(kmt);
+            } catch (Exception e) {
+                throw new RuntimeException("failed to retrieve key managers", e);
+            }
+        }
+    
+        public static TrustManager[] getTrustManagers() {
+            TrustManagersType tmt = new TrustManagersType();
+            KeyStoreType kst = new KeyStoreType();
+            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks");
+            kst.setPassword("password");
+            kst.setType("JKS");
+        
+            tmt.setKeyStore(kst);
+            try {
+                return TLSParameterJaxBUtils.getTrustManagers(tmt);
+            } catch (Exception e) {
+                throw new RuntimeException("failed to retrieve trust managers", e);
+            }
+        }
+    }
+
+    public static class ClientManagersFactory {
+        public static KeyManager[] getKeyManagers() {
+            KeyManagersType kmt = new KeyManagersType();
+            KeyStoreType kst = new KeyStoreType();
+            kst.setFile("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks");
             kst.setPassword("password");
             kst.setType("JKS");
         
