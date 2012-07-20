@@ -21,6 +21,9 @@ package org.apache.cxf.configuration.jsse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 
@@ -36,6 +39,12 @@ public class TLSServerParametersConfig
     public TLSServerParametersConfig(TLSServerParametersType params) 
         throws GeneralSecurityException,
                IOException {
+        
+        TLSServerParametersTypeInternal iparams = null;
+        if (params instanceof TLSServerParametersTypeInternal) {
+            iparams = (TLSServerParametersTypeInternal)params;
+        }
+        
         if (params.isSetSecureSocketProtocol()) {
             this.setSecureSocketProtocol(params.getSecureSocketProtocol());
         }
@@ -71,5 +80,42 @@ public class TLSServerParametersConfig
         if (params.isSetCertAlias()) {
             this.setCertAlias(params.getCertAlias());
         }
+        if (iparams != null && iparams.isSetKeyManagersRef()) {
+            this.setKeyManagers(iparams.getKeyManagersRef());
+        }
+        if (iparams != null && iparams.isSetTrustManagersRef()) {
+            this.setTrustManagers(iparams.getTrustManagersRef());
+        }
     }
+
+    public static class TLSServerParametersTypeInternal extends TLSServerParametersType {
+        private KeyManager[] keyManagersRef;
+        private TrustManager[] trustManagersRef;
+
+        public KeyManager[] getKeyManagersRef() {
+            return keyManagersRef;
+        }
+
+        public void setKeyManagersRef(KeyManager[] keyManagersRef) {
+            this.keyManagersRef = keyManagersRef;
+        }
+        
+        public boolean isSetKeyManagersRef() {
+            return this.keyManagersRef != null;
+        }
+
+        public TrustManager[] getTrustManagersRef() {
+            return trustManagersRef;
+        }
+
+        public void setTrustManagersRef(TrustManager[] trustManagersRef) {
+            this.trustManagersRef = trustManagersRef;
+        }
+        
+        public boolean isSetTrustManagersRef() {
+            return this.trustManagersRef != null;
+        }
+
+    }
+    
 }

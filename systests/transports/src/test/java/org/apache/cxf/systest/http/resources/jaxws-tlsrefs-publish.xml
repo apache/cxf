@@ -59,17 +59,14 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9001 -->
     <!-- -->
+    <bean id="serverKeyManagers" class="org.apache.cxf.systest.http.HTTPSClientTest$ServerManagersFactory" factory-method="getKeyManagers"/>
+    <bean id="serverTrustManagers" class="org.apache.cxf.systest.http.HTTPSClientTest$ServerManagersFactory" factory-method="getTrustManagers"/>
+
     <httpj:engine-factory id="port-9001-tls-config">
         <httpj:engine port="${testutil.ports.BusServer.1}">
             <httpj:tlsServerParameters>
-               <sec:keyManagers keyPassword="password">
-               <sec:keyStore type="JKS" password="password" 
-                    file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
-                </sec:keyManagers>
-                <sec:trustManagers>
-                <sec:keyStore type="JKS" password="password"
-                   file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
-                </sec:trustManagers>
+                <sec:keyManagers ref="serverKeyManagers"/>
+                <sec:trustManagers ref="serverTrustManagers"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>

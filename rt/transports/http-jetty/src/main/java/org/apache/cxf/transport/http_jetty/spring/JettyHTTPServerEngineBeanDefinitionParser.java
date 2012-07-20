@@ -27,13 +27,23 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParametersConfig;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
+import org.apache.cxf.configuration.security.CipherSuites;
+import org.apache.cxf.configuration.security.ClientAuthentication;
+import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.configuration.security.KeyManagersType;
+import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
+import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
@@ -55,6 +65,8 @@ import org.springframework.context.ApplicationContextAware;
 
 
 public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefinitionParser {
+    private static final String SECURITY_NS =
+        "http://cxf.apache.org/configuration/security";
 
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         
@@ -89,12 +101,7 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             while (elem != null) {
                 String name = elem.getLocalName();
                 if ("tlsServerParameters".equals(name)) {
-                    mapElementToJaxbPropertyFactory(elem,
-                                                    bean,
-                                                    "tlsServerParameters",
-                                                    TLSServerParametersType.class,
-                                                    JettyHTTPServerEngineBeanDefinitionParser.class,
-                                                    "createTLSServerParametersConfig");
+                    mapTLSServerParameters(elem, bean);
                 } else if ("threadingParameters".equals(name)) {
                     mapElementToJaxbPropertyFactory(elem,
                                                     bean,
@@ -140,6 +147,76 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         bean.setLazyInit(false);
     }
     
+    private void mapTLSServerParameters(Element e, BeanDefinitionBuilder bean) {
+        BeanDefinitionBuilder paramsbean 
+            = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.TLSServerParametersTypeInternal.class);
+        
+        // read the attributes
+        NamedNodeMap as = e.getAttributes();
+        for (int i = 0; i < as.getLength(); i++) {
+            Attr a = (Attr) as.item(i);
+            if (a.getNamespaceURI() == null) {
+                String aname = a.getLocalName();
+                if ("jsseProvider".equals(aname) 
+                    || "secureSocketProtocol".equals(aname)) {
+                    paramsbean.addPropertyValue(aname, a.getValue());
+                }
+            }
+        }
+        
+        // read the child elements
+        Node n = e.getFirstChild();
+        while (n != null) {
+            if (Node.ELEMENT_NODE != n.getNodeType() 
+                || !SECURITY_NS.equals(n.getNamespaceURI())) {
+                n = n.getNextSibling();
+                continue;
+            }
+            String ename = n.getLocalName();
+            // Schema should require that no more than one each of these exist.
+            String ref = ((Element)n).getAttribute("ref");
+
+            if ("keyManagers".equals(ename)) {
+                if (ref != null && ref.length() > 0) {
+                    paramsbean.addPropertyReference("keyManagersRef", ref);
+                } else {
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                                             KeyManagersType.class);
+                }
+            } else if ("trustManagers".equals(ename)) {
+                if (ref != null && ref.length() > 0) {
+                    paramsbean.addPropertyReference("trustManagersRef", ref);
+                } else {
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                                             TrustManagersType.class);
+                }
+            } else if ("cipherSuites".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         CipherSuites.class);
+            } else if ("cipherSuitesFilter".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         FiltersType.class);
+            } else if ("secureRandomParameters".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         SecureRandomParameters.class);
+            } else if ("clientAuthentication".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         ClientAuthentication.class);
+            } else if ("certConstraints".equals(ename)) {
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                         CertificateConstraintsType.class);
+            } else if ("certAlias".equals(ename)) {
+                paramsbean.addPropertyValue(ename, n.getTextContent());
+            }
+            n = n.getNextSibling();
+        }
+
+        BeanDefinitionBuilder jaxbbean 
+            = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.class);
+        jaxbbean.addConstructorArg(paramsbean.getBeanDefinition());
+        bean.addPropertyValue("tlsServerParameters", jaxbbean.getBeanDefinition());
+    }
+
     private static ThreadingParameters toThreadingParameters(
                                     ThreadingParametersType paramtype) {
         ThreadingParameters params = new ThreadingParameters();
