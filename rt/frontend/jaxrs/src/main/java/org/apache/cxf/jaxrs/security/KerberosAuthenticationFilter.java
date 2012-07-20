@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.WebApplicationException;
@@ -37,6 +38,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -60,7 +62,8 @@ public class KerberosAuthenticationFilter implements RequestHandler {
     
     private MessageContext messageContext;
     private CallbackHandler callbackHandler;
-    private String loginContextName;
+    private Configuration loginConfig;
+    private String loginContextName = "";
     private String servicePrincipalName;
     private String realm;
     
@@ -146,8 +149,15 @@ public class KerberosAuthenticationFilter implements RequestHandler {
         //   meaning that a process which runs this code has the
         //   user identity  
         
-        LoginContext lc = callbackHandler != null 
-            ? new LoginContext(loginContextName, callbackHandler) : new LoginContext(loginContextName);
+        LoginContext lc = null;
+        if (callbackHandler != null || loginConfig != null) {
+            lc = new LoginContext(loginContextName, null, callbackHandler, loginConfig);
+        } else if (!StringUtils.isEmpty(loginContextName)) {
+            lc = new LoginContext(loginContextName);
+        } else {
+            LOG.fine("LoginContext can not be initialized");
+            throw new LoginException();
+        }
         lc.login();
         return lc.getSubject();
     }
@@ -234,4 +244,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             return context;
         }
     }
+    
+    
+
 }

@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.Configuration;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -61,6 +62,10 @@ public class JAASAuthenticationFilter implements RequestHandler {
     
     public void setContextName(String name) {
         interceptor.setContextName(name);
+    }
+    
+    public void setLoginConfig(Configuration config) {
+        interceptor.setLoginConfig(config);
     }
     
     @Deprecated
