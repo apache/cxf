@@ -31,6 +31,10 @@ public class BookLoginJaasConfiguration extends Configuration {
                                       Collections.<String, String>emptyMap())
         };
     }
+
+    @Override
+    public void refresh() {
+    }
 }
 
 
