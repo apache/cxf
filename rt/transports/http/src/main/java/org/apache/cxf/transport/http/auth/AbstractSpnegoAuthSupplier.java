@@ -25,10 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -36,6 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.ietf.jgss.GSSContext;
@@ -61,6 +60,7 @@ public abstract class AbstractSpnegoAuthSupplier {
     private String servicePrincipalName;
     private String realm;
     private boolean credDelegation;
+    private Configuration loginConfig;
     
     public String getAuthorization(AuthorizationPolicy authPolicy,
                                    URL currentURL,
@@ -96,14 +96,23 @@ public abstract class AbstractSpnegoAuthSupplier {
     private byte[] getToken(AuthorizationPolicy authPolicy,
                             final GSSContext context) throws GSSException,
         LoginException {
+        
+        String contextName = authPolicy.getAuthorization();
+        if (contextName == null) {
+            contextName = "";
+        }
+        
         final byte[] token = new byte[0];
 
-        if (authPolicy == null || StringUtils.isEmpty(authPolicy.getUserName())) {
+        if (authPolicy == null 
+            || (StringUtils.isEmpty(authPolicy.getUserName())
+                && StringUtils.isEmpty(contextName) && loginConfig == null)) {
             return context.initSecContext(token, 0, token.length);
         }
-
-        LoginContext lc = new LoginContext(authPolicy.getAuthorization(), getUsernamePasswordHandler(
-            authPolicy.getUserName(), authPolicy.getPassword()));
+        
+        CallbackHandler callbackHandler = getUsernamePasswordHandler(
+            authPolicy.getUserName(), authPolicy.getPassword());
+        LoginContext lc = new LoginContext(contextName, null, callbackHandler, loginConfig);
         lc.login();
         
         try {
@@ -188,26 +197,20 @@ public abstract class AbstractSpnegoAuthSupplier {
         }
     }
     
-    public static CallbackHandler getUsernamePasswordHandler(final String username, final String password) {
-        final CallbackHandler handler = new CallbackHandler() {
-
-            public void handle(final Callback[] callback) {
-                for (int i = 0; i < callback.length; i++) {
-                    if (callback[i] instanceof NameCallback) {
-                        final NameCallback nameCallback = (NameCallback) callback[i];
-                        nameCallback.setName(username);
-                    } else if (callback[i] instanceof PasswordCallback) {
-                        final PasswordCallback passCallback = (PasswordCallback) callback[i];
-                        passCallback.setPassword(password.toCharArray());
-                    }
-                }
-            }
-        };
-        return handler;
+    public CallbackHandler getUsernamePasswordHandler(final String username, final String password) {
+        if (StringUtils.isEmpty(username)) {
+            return null;
+        } else {
+            return new NamePasswordCallbackHandler(username, password);
+        }
     }
 
     public void setCredDelegation(boolean delegation) {
         this.credDelegation = delegation;
+    }
+
+    public void setLoginConfig(Configuration config) {
+        this.loginConfig = config;
     }
 
 }

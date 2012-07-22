@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.WebApplicationException;
@@ -37,6 +38,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -60,7 +62,8 @@ public class KerberosAuthenticationFilter implements RequestHandler {
     
     private MessageContext messageContext;
     private CallbackHandler callbackHandler;
-    private String loginContextName;
+    private Configuration loginConfig;
+    private String loginContextName = "";
     private String servicePrincipalName;
     private String realm;
     
@@ -141,13 +144,17 @@ public class KerberosAuthenticationFilter implements RequestHandler {
         
         // The login without a callback can work if
         // - Kerberos keytabs are used with a principal name set in the JAAS config
-        // - TGT cache is available and either a principalName is set in the JAAS config
-        //   or Kerberos is integrated into the OS logon process
+        // - Kerberos is integrated into the OS logon process
         //   meaning that a process which runs this code has the
         //   user identity  
         
-        LoginContext lc = callbackHandler != null 
-            ? new LoginContext(loginContextName, callbackHandler) : new LoginContext(loginContextName);
+        LoginContext lc = null;
+        if (!StringUtils.isEmpty(loginContextName) || loginConfig != null) {
+            lc = new LoginContext(loginContextName, null, callbackHandler, loginConfig);
+        } else {
+            LOG.fine("LoginContext can not be initialized");
+            throw new LoginException();
+        }
         lc.login();
         return lc.getSubject();
     }
@@ -234,4 +241,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             return context;
         }
     }
+    
+    
+
 }

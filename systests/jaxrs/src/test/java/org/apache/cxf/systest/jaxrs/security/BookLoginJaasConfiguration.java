@@ -16,27 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.common.security;
+package org.apache.cxf.systest.jaxrs.security;
 
-import java.security.Principal;
+import java.util.Collections;
 
-import org.apache.cxf.security.SecurityContext;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
 
-public class SimpleSecurityContext implements SecurityContext {
-    private Principal principal;
-    public SimpleSecurityContext(String name) {
-        this(new SimplePrincipal(name));
+public class BookLoginJaasConfiguration extends Configuration {
+    public AppConfigurationEntry[]  getAppConfigurationEntry(String name) {
+        return new AppConfigurationEntry[] {
+            new AppConfigurationEntry(BookLoginModule.class.getName(),
+                                      AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,
+                                      Collections.<String, String>emptyMap())
+        };
     }
-    public SimpleSecurityContext(Principal principal) {
-        this.principal = principal;
-    }
-    
-    public Principal getUserPrincipal() {
-        return principal;
-    }
-
-    public boolean isUserInRole(String role) {
-        return false;
-    }
-
 }
+
+

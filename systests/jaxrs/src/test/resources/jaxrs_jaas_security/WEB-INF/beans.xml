@@ -58,8 +58,40 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:providers>
   </jaxrs:server>
   
+  <jaxrs:server address="/jaasConfig">
+    <jaxrs:serviceBeans>
+       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+    </jaxrs:serviceBeans>		   
+    <jaxrs:inInterceptors>
+        <ref bean="authenticationInterceptorWithConfig"/>
+        <ref bean="authorizationInterceptor"/>
+    </jaxrs:inInterceptors>
+    
+    <jaxrs:outFaultInterceptors>
+        <bean class="org.apache.cxf.systest.jaxrs.security.SecurityOutFaultInterceptor"/>
+    </jaxrs:outFaultInterceptors>
+    
+  </jaxrs:server>
+  
+  <jaxrs:server address="/jaasConfigFilter">
+	    <jaxrs:serviceBeans>
+	       <bean class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoAnnotations"/>
+	    </jaxrs:serviceBeans>		   
+	    <jaxrs:providers>
+	        <ref bean="authenticationFilterConfig"/>
+	        <ref bean="authorizationFilter"/>
+	    </jaxrs:providers>
+  </jaxrs:server>
+  
+  
   <bean id="authenticationInterceptor" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
         <property name="contextName" value="BookLogin"/>
+        <property name="rolePrefix" value="ROLE_"/>
+  </bean>
+  
+  <bean id="bookLoginConfig" class="org.apache.cxf.systest.jaxrs.security.BookLoginJaasConfiguration"/>
+  <bean id="authenticationInterceptorWithConfig" class="org.apache.cxf.interceptor.security.JAASLoginInterceptor">
+        <property name="loginConfig" ref="bookLoginConfig"/>
         <property name="rolePrefix" value="ROLE_"/>
   </bean>
   
@@ -72,6 +104,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         <property name="rolePrefix" value="ROLE_"/>
         
         <property name="redirectURI" value="/login.jsp"/>
+  </bean>
+  
+  <bean id="authenticationFilterConfig" class="org.apache.cxf.systest.jaxrs.security.JettyJAASFilter">
+        <property name="loginConfig" ref="bookLoginConfig"/>
+        <property name="rolePrefix" value="ROLE_"/>
   </bean>
   
   <bean id="authorizationFilter" class="org.apache.cxf.jaxrs.security.SimpleAuthorizingFilter">

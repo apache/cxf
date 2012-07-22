@@ -19,11 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 
+import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.security.KerberosAuthenticationFilter;
@@ -44,6 +42,8 @@ public class BookKerberosServer extends AbstractBusTestServerBase {
         KerberosAuthenticationFilter filter = new KerberosAuthenticationFilter();
         filter.setLoginContextName("KerberosServer");
         filter.setCallbackHandler(getCallbackHandler("HTTP/localhost", "http"));
+        //filter.setLoginContextName("KerberosServerKeyTab");
+        //filter.setServicePrincipalName("HTTP/ktab");
         sf.setProvider(filter);
         sf.setAddress("http://localhost:" + PORT + "/");
       
@@ -63,20 +63,6 @@ public class BookKerberosServer extends AbstractBusTestServerBase {
     }
     
     public static CallbackHandler getCallbackHandler(final String username, final String password) {
-        final CallbackHandler handler = new CallbackHandler() {
-
-            public void handle(final Callback[] callback) {
-                for (int i = 0; i < callback.length; i++) {
-                    if (callback[i] instanceof NameCallback) {
-                        final NameCallback nameCallback = (NameCallback) callback[i];
-                        nameCallback.setName(username);
-                    } else if (callback[i] instanceof PasswordCallback) {
-                        final PasswordCallback passCallback = (PasswordCallback) callback[i];
-                        passCallback.setPassword(password.toCharArray());
-                    }
-                }
-            }
-        };
-        return handler;
+        return new NamePasswordCallbackHandler(username, password);
     }
 }
