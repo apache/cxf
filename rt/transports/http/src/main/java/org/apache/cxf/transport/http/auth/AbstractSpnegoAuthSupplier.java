@@ -96,15 +96,20 @@ public abstract class AbstractSpnegoAuthSupplier {
     private byte[] getToken(AuthorizationPolicy authPolicy,
                             final GSSContext context) throws GSSException,
         LoginException {
-        final byte[] token = new byte[0];
-
-        if (authPolicy == null || StringUtils.isEmpty(authPolicy.getUserName())) {
-            return context.initSecContext(token, 0, token.length);
-        }
+        
         String contextName = authPolicy.getAuthorization();
         if (contextName == null) {
             contextName = "";
         }
+        
+        final byte[] token = new byte[0];
+
+        if (authPolicy == null 
+            || (StringUtils.isEmpty(authPolicy.getUserName())
+                && StringUtils.isEmpty(contextName) && loginConfig == null)) {
+            return context.initSecContext(token, 0, token.length);
+        }
+        
         CallbackHandler callbackHandler = getUsernamePasswordHandler(
             authPolicy.getUserName(), authPolicy.getPassword());
         LoginContext lc = new LoginContext(contextName, null, callbackHandler, loginConfig);
@@ -193,7 +198,11 @@ public abstract class AbstractSpnegoAuthSupplier {
     }
     
     public CallbackHandler getUsernamePasswordHandler(final String username, final String password) {
-        return new NamePasswordCallbackHandler(username, password);
+        if (StringUtils.isEmpty(username)) {
+            return null;
+        } else {
+            return new NamePasswordCallbackHandler(username, password);
+        }
     }
 
     public void setCredDelegation(boolean delegation) {

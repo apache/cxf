@@ -42,6 +42,8 @@ public class BookKerberosServer extends AbstractBusTestServerBase {
         KerberosAuthenticationFilter filter = new KerberosAuthenticationFilter();
         filter.setLoginContextName("KerberosServer");
         filter.setCallbackHandler(getCallbackHandler("HTTP/localhost", "http"));
+        //filter.setLoginContextName("KerberosServerKeyTab");
+        //filter.setServicePrincipalName("HTTP/ktab");
         sf.setProvider(filter);
         sf.setAddress("http://localhost:" + PORT + "/");
       

@@ -90,4 +90,48 @@ public class JAXRSKerberosBookTest extends AbstractBusClientServerTestBase {
         Book b = wc.get(Book.class);
         assertEquals(b.getId(), 123);
     }
+    
+    @Test
+    @Ignore
+    public void testGetBookWithInterceptorAndKeyTab() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
+        
+        KerberosAuthOutInterceptor kbInterceptor = new KerberosAuthOutInterceptor();
+        
+        AuthorizationPolicy policy = new AuthorizationPolicy();
+        policy.setAuthorizationType(HttpAuthHeader.AUTH_TYPE_NEGOTIATE);
+        policy.setAuthorization("KerberosClientKeyTab");
+        
+        kbInterceptor.setPolicy(policy);
+        kbInterceptor.setCredDelegation(true);
+        
+        WebClient.getConfig(wc).getOutInterceptors().add(new LoggingOutInterceptor());
+        WebClient.getConfig(wc).getOutInterceptors().add(kbInterceptor);
+        
+        Book b = wc.get(Book.class);
+        assertEquals(b.getId(), 123);
+    }
+    
+    @Test
+    @Ignore
+    public void testGetBookWithInterceptorServiceKeyTab() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
+        
+        KerberosAuthOutInterceptor kbInterceptor = new KerberosAuthOutInterceptor();
+        
+        AuthorizationPolicy policy = new AuthorizationPolicy();
+        policy.setAuthorizationType(HttpAuthHeader.AUTH_TYPE_NEGOTIATE);
+        policy.setAuthorization("KerberosClient");
+        policy.setUserName("alice");
+        policy.setPassword("alice");
+        
+        kbInterceptor.setPolicy(policy);
+        kbInterceptor.setServicePrincipalName("HTTP/ktab");
+        
+        WebClient.getConfig(wc).getOutInterceptors().add(new LoggingOutInterceptor());
+        WebClient.getConfig(wc).getOutInterceptors().add(kbInterceptor);
+        
+        Book b = wc.get(Book.class);
+        assertEquals(b.getId(), 123);
+    }
 }

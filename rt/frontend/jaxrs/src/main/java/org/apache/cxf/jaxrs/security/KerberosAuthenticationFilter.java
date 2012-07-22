@@ -144,16 +144,13 @@ public class KerberosAuthenticationFilter implements RequestHandler {
         
         // The login without a callback can work if
         // - Kerberos keytabs are used with a principal name set in the JAAS config
-        // - TGT cache is available and either a principalName is set in the JAAS config
-        //   or Kerberos is integrated into the OS logon process
+        // - Kerberos is integrated into the OS logon process
         //   meaning that a process which runs this code has the
         //   user identity  
         
         LoginContext lc = null;
-        if (callbackHandler != null || loginConfig != null) {
+        if (!StringUtils.isEmpty(loginContextName) || loginConfig != null) {
             lc = new LoginContext(loginContextName, null, callbackHandler, loginConfig);
-        } else if (!StringUtils.isEmpty(loginContextName)) {
-            lc = new LoginContext(loginContextName);
         } else {
             LOG.fine("LoginContext can not be initialized");
             throw new LoginException();
