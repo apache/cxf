@@ -19,14 +19,20 @@
 
 package org.apache.cxf.databinding.source;
 
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.ServiceModelVisitor;
+import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 
 /**
  * A simple databinding implementation which reads and writes Source objects.
@@ -40,7 +46,21 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     }
 
     public void initialize(Service service) {
-        // do nothing
+        for (ServiceInfo serviceInfo : service.getServiceInfos()) {
+            SchemaCollection schemaCollection = serviceInfo.getXmlSchemaCollection();
+            if (schemaCollection.getXmlSchemas().length > 1) {
+                // Schemas are already populated.
+                continue;
+            }
+            new ServiceModelVisitor(serviceInfo) {
+                public void begin(MessagePartInfo part) {
+                    if (part.getTypeQName() != null || part.getElementQName() != null) {
+                        return;
+                    }
+                    part.setTypeQName(XmlSchemaConstants.ANY_TYPE_QNAME);
+                }
+            } .walk();
+        }
     }
     
 
