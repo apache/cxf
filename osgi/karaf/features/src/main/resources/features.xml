@@ -79,7 +79,7 @@
         <bundle start-level='20' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
 
         <feature version='${project.version}'>cxf-jaxb</feature>
-        <feature version="[2,3)">http</feature>
+        <feature version="[2,3)">http-whiteboard</feature>
         <feature version="[3,4)">spring</feature>
         <feature version="[1.2,2)">spring-dm</feature>
         <feature version="[3,4)">spring-jms</feature>
