@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import net.oauth.OAuth;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
+import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -47,6 +48,7 @@ import org.apache.cxf.rs.security.oauth.data.Client;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 import org.apache.cxf.rs.security.oauth.data.UserSubject;
+import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
@@ -77,7 +79,8 @@ public class AbstractAuthFilter {
     
     private boolean useUserSubject;
     private OAuthDataProvider dataProvider;
-
+    private OAuthValidator validator = new DefaultOAuthValidator();
+    
     protected AbstractAuthFilter() {
         
     }
@@ -130,7 +133,8 @@ public class AbstractAuthFilter {
             }
             client = accessToken.getClient(); 
             
-            OAuthUtils.validateMessage(oAuthMessage, client, accessToken, dataProvider);    
+            OAuthUtils.validateMessage(oAuthMessage, client, accessToken, 
+                                       dataProvider, validator);    
         } else {
             String consumerKey = null;
             String consumerSecret = null;
@@ -161,7 +165,8 @@ public class AbstractAuthFilter {
                 LOG.warning("Client secret is invalid");
                 throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
             } else {
-                OAuthUtils.validateMessage(oAuthMessage, client, null, dataProvider);
+                OAuthUtils.validateMessage(oAuthMessage, client, null, 
+                                           dataProvider, validator);
             }
             accessToken = client.getPreAuthorizedToken();
             if (accessToken == null || !accessToken.isPreAuthorized()) {
@@ -265,6 +270,10 @@ public class AbstractAuthFilter {
         return new OAuthContext(subject, info.getMatchedPermissions());
     }
     
+    public void setValidator(OAuthValidator validator) {
+        this.validator = validator;
+    }
+
     private static class CustomHttpServletWrapper extends HttpServletRequestWrapper {
         public CustomHttpServletWrapper(HttpServletRequest req) {
             super(req);
