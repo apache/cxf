@@ -35,6 +35,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String authenticityToken;
     private String applicationName;
     private String applicationURI;
+    private String callbackURI;
     private String applicationDescription;
     private String logoUri;
     private String replyTo;
@@ -109,5 +110,13 @@ public class OAuthAuthorizationData implements Serializable {
 
     public String getLogoUri() {
         return logoUri;
+    }
+
+    public String getCallbackURI() {
+        return callbackURI;
+    }
+
+    public void setCallbackURI(String callbackURI) {
+        this.callbackURI = callbackURI;
     }
 }

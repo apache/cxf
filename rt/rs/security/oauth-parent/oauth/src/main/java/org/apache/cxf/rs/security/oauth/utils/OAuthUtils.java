@@ -64,7 +64,8 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
  */
 public final class OAuthUtils {
     public static final String REPORT_FAILURE_DETAILS = "report.failure.details";
-
+    public static final String REPORT_FAILURE_DETAILS_AS_HEADER = "report.failure.details.as.header";
+    
     private OAuthUtils() {
     }
 
@@ -162,8 +163,24 @@ public final class OAuthUtils {
                                            Exception e, 
                                            int status) {
         ResponseBuilder builder = Response.status(status);
-        if (MessageUtils.isTrue(mc.get(REPORT_FAILURE_DETAILS))) {
-            builder.entity(e.getMessage());
+        if (MessageUtils.isTrue(mc.getContextualProperty(REPORT_FAILURE_DETAILS))) {
+            boolean asHeader = MessageUtils.isTrue(
+                mc.getContextualProperty(REPORT_FAILURE_DETAILS_AS_HEADER));
+            String text = null;
+            if (e instanceof OAuthProblemException) {
+                OAuthProblemException problem = (OAuthProblemException)e;
+                if (asHeader && problem.getProblem() != null) {
+                    text = problem.getProblem();
+                }
+            }
+            if (text == null) {
+                text = e.getMessage();
+            }
+            if (asHeader) {
+                builder.header("oauth_problem", text);
+            } else {
+                builder.entity(e.getMessage());    
+            }
         }
         throw new WebApplicationException(builder.build());
     }
