@@ -213,7 +213,7 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
         BeanDefinitionBuilder jaxbbean 
             = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.class);
-        jaxbbean.addConstructorArg(paramsbean.getBeanDefinition());
+        jaxbbean.addConstructorArgValue(paramsbean.getBeanDefinition());
         bean.addPropertyValue("tlsServerParameters", jaxbbean.getBeanDefinition());
     }
 
