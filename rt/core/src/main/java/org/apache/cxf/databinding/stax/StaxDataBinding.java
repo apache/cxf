@@ -32,13 +32,17 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
@@ -57,9 +61,23 @@ public class StaxDataBinding extends AbstractDataBinding {
     }
 
     public void initialize(Service service) {
-        // do nothing
+        for (ServiceInfo serviceInfo : service.getServiceInfos()) {
+            SchemaCollection schemaCollection = serviceInfo.getXmlSchemaCollection();
+            if (schemaCollection.getXmlSchemas().length > 1) {
+                // Schemas are already populated.
+                continue;
+            }
+            new ServiceModelVisitor(serviceInfo) {
+                public void begin(MessagePartInfo part) {
+                    if (part.getTypeQName() != null || part.getElementQName() != null) {
+                        return;
+                    }
+                    part.setTypeQName(XmlSchemaConstants.ANY_TYPE_QNAME);
+                }
+            } .walk();
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> DataReader<T> createReader(Class<T> cls) {
         if (cls == XMLStreamReader.class) {
