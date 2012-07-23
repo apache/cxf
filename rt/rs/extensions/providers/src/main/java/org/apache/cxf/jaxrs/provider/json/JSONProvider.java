@@ -61,16 +61,18 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.provider.AbstractJAXBProvider;
 import org.apache.cxf.jaxrs.provider.json.utils.JSONUtils;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.staxutils.DepthExceededStaxException;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.codehaus.jettison.JSONSequenceTooLargeException;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.SimpleConverter;
 import org.codehaus.jettison.mapped.TypeConverter;
@@ -201,6 +203,14 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
+        if (isPayloadEmpty()) {
+            if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
+                return null;
+            } else {
+                reportEmptyContentLength();
+            }
+        }
+        
         try {
             InputStream realStream = getInputStream(type, genericType, is);
             if (Document.class.isAssignableFrom(type)) {
@@ -236,10 +246,12 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             
         } catch (JAXBException e) {
             handleJAXBException(e, true);
-        } catch (DepthExceededStaxException e) {
-            throw new WebApplicationException(413);
         } catch (XMLStreamException e) {
-            handleXMLStreamException(e, true);
+            if (e.getCause() instanceof JSONSequenceTooLargeException) {
+                throw new WebApplicationException(413);
+            } else {
+                handleXMLStreamException(e, true);
+            }
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
