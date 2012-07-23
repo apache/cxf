@@ -72,10 +72,13 @@ public final class AnnotationUtil {
         return new URLClassLoader(urls, parent);
     }
 
+    private static ClassLoader newLoader(URL[] urls, ClassLoader parent) {
+        return new URLClassLoader(urls, parent);
+    }
     public static synchronized Class loadClass(String className, ClassLoader parent) {
         Class clazz = null;
         URL[] urls = URIParserUtil.pathToURLs(getClassPath());
-        URLClassLoader classLoader = new URLClassLoader(urls, parent);
+        ClassLoader classLoader = newLoader(urls, parent);
         try {
             clazz = classLoader.loadClass(className);
         } catch (Exception e) {
@@ -89,8 +92,7 @@ public final class AnnotationUtil {
         ClassLoader loader = AnnotationUtil.class.getClassLoader();
         StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (loader instanceof URLClassLoader) {
-            URLClassLoader urlloader = (URLClassLoader)loader;
-            for (URL url : urlloader.getURLs()) {
+            for (URL url : ((URLClassLoader)loader).getURLs()) {
                 classpath.append(File.pathSeparatorChar);
                 classpath.append(url.getFile());
             }
