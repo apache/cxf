@@ -377,9 +377,7 @@ public class JavaToWSTest extends ToolTestBase {
         ClassLoader loader = getClass().getClassLoader();
         StringBuffer classPath = new StringBuffer();
         if (loader instanceof URLClassLoader) {
-            @SuppressWarnings("resource")
-            URLClassLoader urlLoader = (URLClassLoader)loader;
-            for (URL url : urlLoader.getURLs()) {
+            for (URL url : ((URLClassLoader)loader).getURLs()) {
                 File file;
                 file = new File(url.toURI());
                 String filename = file.getAbsolutePath();
