@@ -35,13 +35,15 @@ public abstract class AbstractOAuthService {
     
     private OAuthDataProvider dataProvider;
     private OAuthValidator validator = new DefaultOAuthValidator();
-
+    private boolean reportFailureDetails; 
+    
     @Context 
     public void setMessageContext(MessageContext context) {
         this.mc = context;    
     }
     
     public MessageContext getMessageContext() {
+        mc.put(OAuthUtils.REPORT_FAILURE_DETAILS, reportFailureDetails);
         return mc;
     }
     
