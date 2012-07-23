@@ -129,7 +129,7 @@
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.axiom.version>1.2.10</cxf.axiom.version>
-        <cxf.jettison.version>1.3.1</cxf.jettison.version>
+        <cxf.jettison.version>1.3.2</cxf.jettison.version>
         <cxf.wss4j.version>1.6.7-SNAPSHOT</cxf.wss4j.version>
         <cxf.joda.time.version>1.6.2</cxf.joda.time.version>
         <cxf.joda.time.version2>2.1</cxf.joda.time.version2>

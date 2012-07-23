@@ -625,6 +625,18 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "resources/expected_get_book123.txt");
     }
     
+    @Test
+    public void testAddInvalidBookDuplicateElementJson() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/the/bookstore/books/convert");
+        wc.type("application/json");
+        InputStream is = getClass().getResourceAsStream("resources/add_book2json_duplicate.txt");
+        assertNotNull(is);
+        Response r = wc.post(is);
+        assertEquals(400, r.getStatus());
+        String content = IOUtils.readStringFromStream((InputStream)r.getEntity());
+        assertTrue(content.contains("Invalid content was found starting with element 'id'"));
+    }
+    
     private void doPost(String endpointAddress, int expectedStatus, String contentType,
                         String inResource, String expectedResource) throws Exception {
         
