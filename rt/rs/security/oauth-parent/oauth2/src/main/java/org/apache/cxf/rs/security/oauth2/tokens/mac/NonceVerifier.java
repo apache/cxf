@@ -16,18 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.rs.security.oauth2.tokens.mac;
 
-package org.apache.cxf.rs.security.oauth2.provider;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
-import java.util.List;
-
-import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
-
-public interface AccessTokenValidator {
-    List<String> getSupportedAuthorizationSchemes();
-    AccessTokenValidation validateAccessToken(MessageContext mc,
-                                              String authScheme, 
-                                              String authSchemeData)
+public interface NonceVerifier {
+    void verifyNonce(String tokenKey, String clientNonce, String clientTimestamp) 
         throws OAuthServiceException;
 }

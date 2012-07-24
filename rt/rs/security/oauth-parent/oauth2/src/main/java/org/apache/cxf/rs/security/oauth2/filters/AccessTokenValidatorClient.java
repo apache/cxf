@@ -24,6 +24,7 @@ import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
@@ -37,7 +38,9 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
         return Collections.singletonList(OAuthConstants.ALL_AUTH_SCHEMES);
     }
 
-    public AccessTokenValidation validateAccessToken(String authScheme, String authSchemeData) 
+    public AccessTokenValidation validateAccessToken(MessageContext mc,
+                                                     String authScheme, 
+                                                     String authSchemeData) 
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
         client.header(HttpHeaders.AUTHORIZATION, authScheme + " " + authSchemeData);

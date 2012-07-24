@@ -29,7 +29,6 @@ package org.apache.cxf.rs.security.oauth2.common;
 public class ClientAccessToken extends AccessToken {
 
     private String scope;
-    private String rToken;
     private long expiresIn = -1;
     
     public ClientAccessToken(String tokenType, String tokenKey) {
@@ -54,23 +53,7 @@ public class ClientAccessToken extends AccessToken {
         return scope;
     }
 
-    /**
-     * Sets the refresh token key the client can use to obtain a new
-     * access token
-     * @param refreshToken the refresh token
-     */
-    public void setRefreshToken(String refreshToken) {
-        this.rToken = refreshToken;
-    }
-
-    /**
-     * Gets the refresh token key the client can use to obtain a new
-     * access token
-     * @return the refresh token
-     */
-    public String getRefreshToken() {
-        return rToken;
-    }
+    
 
     /**
      * The token lifetime

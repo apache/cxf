@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,7 +28,9 @@ public abstract class AccessToken {
 
     private String tokenKey;
     private String tokenType;
-    private Map<String, String> parameters = Collections.emptyMap();
+    private String refreshToken;
+    
+    private Map<String, String> parameters = new LinkedHashMap<String, String>();
     
     protected AccessToken(String tokenType, String tokenKey) {
         this.tokenType = tokenType;
@@ -51,6 +53,24 @@ public abstract class AccessToken {
         return tokenKey;
     }
 
+    /**
+     * Sets the refresh token key the client can use to obtain a new
+     * access token
+     * @param refreshToken the refresh token
+     */
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    /**
+     * Gets the refresh token key the client can use to obtain a new
+     * access token
+     * @return the refresh token
+     */
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+    
     /**
      * Sets token parameters
      * @param parameters the token parameters
