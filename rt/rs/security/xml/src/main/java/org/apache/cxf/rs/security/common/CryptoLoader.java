@@ -33,12 +33,13 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 
 public class CryptoLoader {
+    
+    private static final String CRYPTO_CACHE = "rs-security-xml-crypto.cache";
     
     public Crypto getCrypto(Message message,
                             String cryptoKey, 
@@ -93,10 +94,10 @@ public class CryptoLoader {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
             Map<Object, Crypto> o = 
-                CastUtils.cast((Map<?, ?>)info.getProperty(SecurityConstants.CRYPTO_CACHE));
+                CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
             if (o == null) {
                 o = new ConcurrentHashMap<Object, Crypto>();
-                info.setProperty(SecurityConstants.CRYPTO_CACHE, o);
+                info.setProperty(CRYPTO_CACHE, o);
             }
             return o;
         }
