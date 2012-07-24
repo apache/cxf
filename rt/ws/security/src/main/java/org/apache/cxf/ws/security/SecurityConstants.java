@@ -25,44 +25,108 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
+ * Configuration tags used to configure the WS-SecurityPolicy layer.
  */
 public final class SecurityConstants {
-    public static final String USERNAME = "ws-security.username";
-    public static final String PASSWORD = "ws-security.password";
-    public static final String VALIDATE_TOKEN = "ws-security.validate.token";
-    public static final String USERNAME_TOKEN_VALIDATOR = "ws-security.ut.validator";
-    public static final String SAML1_TOKEN_VALIDATOR = "ws-security.saml1.validator";
-    public static final String SAML2_TOKEN_VALIDATOR = "ws-security.saml2.validator";
-    public static final String TIMESTAMP_TOKEN_VALIDATOR = "ws-security.timestamp.validator";
-    public static final String SIGNATURE_TOKEN_VALIDATOR = "ws-security.signature.validator";
-    public static final String BST_TOKEN_VALIDATOR = "ws-security.bst.validator";
-    public static final String SCT_TOKEN_VALIDATOR = "ws-security.sct.validator";
     
-    public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
-    public static final String SAML_CALLBACK_HANDLER = "ws-security.saml-callback-handler";
-    
-    public static final String SIGNATURE_USERNAME = "ws-security.signature.username";
-    public static final String SIGNATURE_PROPERTIES = "ws-security.signature.properties";
-    
-    public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
-    public static final String ENCRYPT_PROPERTIES = "ws-security.encryption.properties";
-    
-    public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
-    public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
-    
-
-    public static final String TOKEN = "ws-security.token";
-    public static final String TOKEN_ID = "ws-security.token.id";
-
-    public static final String STS_CLIENT = "ws-security.sts.client";
-    public static final String STS_APPLIES_TO = "ws-security.sts.applies-to";
+    //
+    // User properties
+    //
     
     /**
-     * This configuration tag specifies the time in seconds after Creation that an incoming 
-     * Timestamp is valid for. The default value is 300 seconds (5 minutes).
+     * The user's name. It is used differently by each of the WS-Security functions:
+     * a) It is used as the name in the UsernameToken
+     * b) It is used as the alias name in the keystore to get the user's cert and private key for signature
+     *    if {@link SIGNATURE_USERNAME} is not set.
+     * c) It is used as the alias name in the keystore to get the user's public key for encryption if 
+     *    {@link ENCRYPT_USERNAME} is not set.
      */
-    public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
+    public static final String USERNAME = "ws-security.username";
+    
+    /**
+     * The user's password when a {@link CALLBACK_HANDLER} is not defined. It is currently only used for 
+     * the case of adding a password to a UsernameToken.
+     */
+    public static final String PASSWORD = "ws-security.password";
+    
+    /**
+     * The user's name for signature. It is used as the alias name in the keystore to get the user's cert 
+     * and private key for signature. If this is not defined, then {@link USERNAME} is used instead. If 
+     * that is also not specified, it uses the the default alias set in the properties file referenced by
+     * {@link SIGNATURE_PROPERTIES}. If that's also not set, and the keystore only contains a single key, 
+     * that key will be used. 
+     */
+    public static final String SIGNATURE_USERNAME = "ws-security.signature.username";
+    
+    /**
+     * The user's name for encryption. It is used as the alias name in the keystore to get the user's public 
+     * key for encryption. If this is not defined, then {@link USERNAME} is used instead. If 
+     * that is also not specified, it uses the the default alias set in the properties file referenced by
+     * {@link ENCRYPT_PROPERTIES}. If that's also not set, and the keystore only contains a single key, 
+     * that key will be used.
+     * 
+     * For the web service provider, the "useReqSigCert" keyword can be used to accept (encrypt to) any 
+     * client whose public key is in the service's truststore (defined in {@link ENCRYPT_PROPERTIES}).
+     */
+    public static final String ENCRYPT_USERNAME = "ws-security.encryption.username";
+    
+    //
+    // Callback class and Crypto properties
+    //
+    
+    /**
+     * The CallbackHandler implementation class used to obtain passwords, for both outbound and inbound 
+     * requests. The value of this tag must be either:
+     * a) The class name of a {@link javax.security.auth.callback.CallbackHandler} instance, which must
+     * be accessible via the classpath.
+     * b) A {@link javax.security.auth.callback.CallbackHandler} instance.
+     */
+    public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
+    
+    /**
+     * The SAML CallbackHandler implementation class used to construct SAML Assertions. The value of this 
+     * tag must be either:
+     * a) The class name of a {@link javax.security.auth.callback.CallbackHandler} instance, which must
+     * be accessible via the classpath.
+     * b) A {@link javax.security.auth.callback.CallbackHandler} instance.
+     */
+    public static final String SAML_CALLBACK_HANDLER = "ws-security.saml-callback-handler";
+    
+    /**
+     * The Crypto property configuration to use for signature, if {@link SIGNATURE_CRYPTO} is not set instead.
+     * The value of this tag must be either:
+     * a) A Java Properties object that contains the Crypto configuration.
+     * b) The path of the Crypto property file that contains the Crypto configuration.
+     * c) A URL that points to the Crypto property file that contains the Crypto configuration.
+     */
+    public static final String SIGNATURE_PROPERTIES = "ws-security.signature.properties";
+    
+    /**
+     * The Crypto property configuration to use for encryption, if {@link ENCRYPT_CRYPTO} is not set instead.
+     * The value of this tag must be either:
+     * a) A Java Properties object that contains the Crypto configuration.
+     * b) The path of the Crypto property file that contains the Crypto configuration.
+     * c) A URL that points to the Crypto property file that contains the Crypto configuration.
+     */
+    public static final String ENCRYPT_PROPERTIES = "ws-security.encryption.properties";
+    
+    /**
+     * A Crypto object to be used for signature. If this is not defined then the 
+     * {@link SIGNATURE_PROPERTIES} is used instead.
+     */
+    public static final String SIGNATURE_CRYPTO = "ws-security.signature.crypto";
+    
+    /**
+     * A Crypto object to be used for encryption. If this is not defined then the 
+     * {@link ENCRYPT_PROPERTIES} is used instead.
+     */
+    public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
+    
+    //
+    // Boolean WS-Security configuration tags, e.g. the value should be "true" or "false".
+    //
+    
+    public static final String VALIDATE_TOKEN = "ws-security.validate.token";
     
     public static final String ENABLE_REVOCATION = "ws-security.enableRevocation";
     
@@ -79,6 +143,39 @@ public final class SecurityConstants {
     public static final String IS_BSP_COMPLIANT = "ws-security.is-bsp-compliant";
     
     /**
+     * This configuration tag specifies whether to self-sign a SAML Assertion or not. If this
+     * is set to true, then an enveloped signature will be generated when the SAML Assertion is
+     * constructed. The default is false.
+     */
+    public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
+    
+    /**
+     * Set this to "false" to not cache UsernameToken nonces. The default value is "true" for
+     * message recipients, and "false" for message initiators. Set it to true to cache for
+     * both cases.
+     */
+    public static final String ENABLE_NONCE_CACHE = 
+        "ws-security.enable.nonce.cache";
+    
+    /**
+     * Set this to "false" to not cache Timestamp Created Strings (these are only cached in 
+     * conjunction with a message Signature). The default value is "true" for message recipients, 
+     * and "false" for message initiators. Set it to true to cache for both cases.
+     */
+    public static final String ENABLE_TIMESTAMP_CACHE = 
+        "ws-security.enable.timestamp.cache";
+    
+    //
+    // (Non-boolean) Configuration parameters
+    //
+    
+    /**
+     * This configuration tag specifies the time in seconds after Creation that an incoming 
+     * Timestamp is valid for. The default value is 300 seconds (5 minutes).
+     */
+    public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
+    
+    /**
      * This configuration tag specifies the time in seconds in the future within which
      * the Created time of an incoming Timestamp is valid. WSS4J rejects by default any
      * timestamp which is "Created" in the future, and so there could potentially be
@@ -87,33 +184,6 @@ public final class SecurityConstants {
      * allowed.
      */
     public static final String TIMESTAMP_FUTURE_TTL = "ws-security.timestamp.futureTimeToLive";
-    
-    /**
-     * This configuration tag specifies whether to self-sign a SAML Assertion or not. If this
-     * is set to true, then an enveloped signature will be generated when the SAML Assertion is
-     * constructed. The default is false.
-     */
-    public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
-    
-    /**
-     * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
-     * the full security on the message. These properties control the way the STS client
-     * will decrypt the EncryptedData elements in the response
-     * 
-     * These are also used by the STSClient to send/process any RSA/DSAKeyValue tokens 
-     * used if the KeyType is "PublicKey" 
-     */
-    public static final String STS_TOKEN_CRYPTO = "ws-security.sts.token.crypto";
-    public static final String STS_TOKEN_PROPERTIES = "ws-security.sts.token.properties";
-    public static final String STS_TOKEN_USERNAME = "ws-security.sts.token.username";
-    public static final String STS_TOKEN_USE_CERT_FOR_KEYINFO = 
-        "ws-security.sts.token.usecert";
-    
-    public static final String STS_TOKEN_DO_CANCEL = "ws-security.sts.token.do.cancel";
-    
-    public static final String STS_TOKEN_ACT_AS = "ws-security.sts.token.act-as";
-    
-    public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
     
     public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
     
@@ -134,32 +204,11 @@ public final class SecurityConstants {
     public static final String SPNEGO_CLIENT_ACTION = "ws-security.spnego.client.action";
     
     /**
-     * Set this to "false" to not cache a SecurityToken per proxy object in the 
-     * IssuedTokenInterceptorProvider. This should be done if a token is being retrieved
-     * from an STS in an intermediary. The default value is "true".
-     */
-    public static final String CACHE_ISSUED_TOKEN_IN_ENDPOINT = 
-        "ws-security.cache.issued.token.in.endpoint";
-    
-    /**
-     * Set this to "true" to cache UsernameToken nonces. The default value is "false".
-     */
-    public static final String ENABLE_NONCE_CACHE = 
-        "ws-security.enable.nonce.cache";
-    
-    /**
      * This holds a reference to a ReplayCache instance used to cache UsernameToken nonces. The
      * default instance that is used is the EHCacheReplayCache.
      */
     public static final String NONCE_CACHE_INSTANCE = 
         "ws-security.nonce.cache.instance";
-    
-    /**
-     * Set this to "true" to cache Timestamp Created Strings (these are only cached in 
-     * conjunction with a message Signature). The default value is "false".
-     */
-    public static final String ENABLE_TIMESTAMP_CACHE = 
-        "ws-security.enable.timestamp.cache";
     
     /**
      * This holds a reference to a ReplayCache instance used to cache Timestamp Created Strings. The
@@ -183,6 +232,61 @@ public final class SecurityConstants {
      * the keystore (direct trust).
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
+    
+    //
+    // Validator implementations for validating received security tokens
+    //
+    
+    public static final String USERNAME_TOKEN_VALIDATOR = "ws-security.ut.validator";
+    public static final String SAML1_TOKEN_VALIDATOR = "ws-security.saml1.validator";
+    public static final String SAML2_TOKEN_VALIDATOR = "ws-security.saml2.validator";
+    public static final String TIMESTAMP_TOKEN_VALIDATOR = "ws-security.timestamp.validator";
+    public static final String SIGNATURE_TOKEN_VALIDATOR = "ws-security.signature.validator";
+    public static final String BST_TOKEN_VALIDATOR = "ws-security.bst.validator";
+    public static final String SCT_TOKEN_VALIDATOR = "ws-security.sct.validator";
+    
+    //
+    // STS Client Configuration tags
+    //
+    
+    public static final String STS_CLIENT = "ws-security.sts.client";
+    public static final String STS_APPLIES_TO = "ws-security.sts.applies-to";
+    
+    public static final String STS_TOKEN_USE_CERT_FOR_KEYINFO = 
+            "ws-security.sts.token.usecert";
+    
+    public static final String STS_TOKEN_DO_CANCEL = "ws-security.sts.token.do.cancel";
+    
+    /**
+     * Set this to "false" to not cache a SecurityToken per proxy object in the 
+     * IssuedTokenInterceptorProvider. This should be done if a token is being retrieved
+     * from an STS in an intermediary. The default value is "true".
+     */
+    public static final String CACHE_ISSUED_TOKEN_IN_ENDPOINT = 
+        "ws-security.cache.issued.token.in.endpoint";
+    
+    /**
+     * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
+     * the full security on the message. These properties control the way the STS client
+     * will decrypt the EncryptedData elements in the response
+     * 
+     * These are also used by the STSClient to send/process any RSA/DSAKeyValue tokens 
+     * used if the KeyType is "PublicKey" 
+     */
+    public static final String STS_TOKEN_CRYPTO = "ws-security.sts.token.crypto";
+    public static final String STS_TOKEN_PROPERTIES = "ws-security.sts.token.properties";
+    public static final String STS_TOKEN_USERNAME = "ws-security.sts.token.username";
+    
+    public static final String STS_TOKEN_ACT_AS = "ws-security.sts.token.act-as";
+    
+    public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
+    
+    //
+    // Internal tags
+    //
+    
+    public static final String TOKEN = "ws-security.token";
+    public static final String TOKEN_ID = "ws-security.token.id";
     
     public static final Set<String> ALL_PROPERTIES;
     
