@@ -772,6 +772,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 // ignore
             }
         }
+<<<<<<< HEAD:maven-plugins/codegen-plugin/src/main/java/org/apache/cxf/maven_plugin/WSDL2JavaMojo.java
         boolean doWork = false;
         if (!doneFile.exists()) {
             doWork = true;
@@ -786,6 +787,45 @@ public class WSDL2JavaMojo extends AbstractMojo {
                     if (files[z].lastModified() > doneFile.lastModified()) {
                         doWork = true;
                     }
+=======
+        if (file == null || !file.exists()) {
+            file = new File(option.getUri());
+        }
+        if (!file.exists()) {
+            file = new File(baseDir, option.getUri());
+        }
+        return file;
+    }
+    
+    public URI getWsdlURI(GenericWsdlOption option, URI baseURI) throws MojoExecutionException {
+        String wsdlLocation = option.getUri();
+        if (wsdlLocation == null) {
+            throw new MojoExecutionException("No wsdl available for base URI " + baseURI);
+        }
+        File wsdlFile = new File(wsdlLocation);
+        return wsdlFile.exists() ? wsdlFile.toURI() 
+            : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
+    }
+
+    protected void downloadRemoteWsdls(List<GenericWsdlOption> effectiveWsdlOptions) 
+        throws MojoExecutionException {
+
+        for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
+            WsdlArtifact wsdlA = wsdlOption.getArtifact();
+            if (wsdlA == null) {
+                continue;
+            }
+            Artifact wsdlArtifact = artifactFactory.createBuildArtifact(wsdlA.getGroupId(),
+                                                                        wsdlA.getArtifactId(),
+                                                                        wsdlA.getVersion(), wsdlA.getType());
+            wsdlArtifact = resolveRemoteWsdlArtifact(wsdlArtifact);
+            if (wsdlArtifact != null) {
+                File supposedFile = wsdlArtifact.getFile();
+                if (!supposedFile.exists() || !supposedFile.isFile()) {
+                    getLog().info("Apparent Maven bug: wsdl artifact 'resolved' to "
+                                      + supposedFile.getAbsolutePath() + " for " + wsdlArtifact.toString());
+                    continue;
+>>>>>>> 646689a... Merged revisions 1365176 via  git cherry-pick from:maven-plugins/codegen-plugin/src/main/java/org/apache/cxf/maven_plugin/AbstractCodegenMoho.java
                 }
             }
         }
