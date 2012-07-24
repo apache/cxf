@@ -213,6 +213,9 @@ public final class OAuthClientUtils {
             if (expiresInStr != null) {
                 token.setExpiresIn(Long.valueOf(expiresInStr));
             }
+            String issuedAtStr = map.remove(OAuthConstants.ACCESS_TOKEN_ISSUED_AT);
+            token.setIssuedAt(issuedAtStr != null ? Long.valueOf(issuedAtStr)
+                                                  : System.currentTimeMillis() / 1000);
             String scope = map.remove(OAuthConstants.SCOPE);
             if (scope != null) {
                 token.setApprovedScope(scope);

@@ -29,8 +29,7 @@ package org.apache.cxf.rs.security.oauth2.common;
 public class ClientAccessToken extends AccessToken {
 
     private String scope;
-    private long expiresIn = -1;
-    
+        
     public ClientAccessToken(String tokenType, String tokenKey) {
         super(tokenType, tokenKey);
     }
@@ -51,20 +50,6 @@ public class ClientAccessToken extends AccessToken {
      */
     public String getApprovedScope() {
         return scope;
-    }
-
-    
-
-    /**
-     * The token lifetime
-     * @return the lifetime, -1 means no 'expires_in' parameter was returned
-     */
-    public long getExpiresIn() {
-        return expiresIn;
-    }
-
-    public void setExpiresIn(long expiresIn) {
-        this.expiresIn = expiresIn;
     }
 
 }
