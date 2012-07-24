@@ -623,7 +623,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
             WsdlArtifact wsdlA = wsdlOption.getArtifact();
             if (wsdlA == null) {
-                return;
+                continue;
             }
             Artifact wsdlArtifact = artifactFactory.createBuildArtifact(wsdlA.getGroupId(),
                                                                         wsdlA.getArtifactId(),
