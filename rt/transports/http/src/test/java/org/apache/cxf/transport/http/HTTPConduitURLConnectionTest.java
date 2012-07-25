@@ -78,7 +78,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
     
         Message message = getNewMessage();
@@ -101,7 +101,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.null/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
     
         Message message = getNewMessage();
@@ -155,7 +155,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("https://secure.nowhere.null/" + "bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
     
         Message message = getNewMessage();

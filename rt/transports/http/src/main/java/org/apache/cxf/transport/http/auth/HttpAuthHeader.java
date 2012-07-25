@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class HttpAuthHeader {
@@ -36,6 +37,26 @@ public final class HttpAuthHeader {
 
     public HttpAuthHeader(String fullHeader) {
         this.fullHeader = (fullHeader == null) ? "" : fullHeader;
+        int spacePos = this.fullHeader.indexOf(' ');
+        if (spacePos == -1) {
+            this.authType = this.fullHeader;
+            this.fullContent = "";
+        } else {
+            this.authType = this.fullHeader.substring(0, spacePos);
+            this.fullContent = this.fullHeader.substring(spacePos + 1);
+        }
+        this.params = parseHeader();
+    }
+    public HttpAuthHeader(List<String> params) {
+        boolean first = true;
+        for (String s : params) {
+            if (!first) {
+                fullHeader += ", " + s;
+            } else {
+                first = false;
+                fullHeader = s;
+            }
+        }
         int spacePos = this.fullHeader.indexOf(' ');
         if (spacePos == -1) {
             this.authType = this.fullHeader;

@@ -27,16 +27,12 @@ import java.io.OutputStream;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.Proxy;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +41,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -65,7 +60,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
@@ -80,14 +74,9 @@ import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
-import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
+import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.cxf.workqueue.AutomaticWorkQueue;
-import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-
 
 /*
  * HTTP Conduit implementation.
@@ -145,16 +134,32 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
  * configuration.
  */
 @NoJSR250Annotations
-public class HTTPConduit 
+public abstract class HTTPConduit 
     extends AbstractConduit 
     implements Configurable, Assertor, PropertyChangeListener {  
 
+    
     /**
      *  This constant is the Message(Map) key for the HttpURLConnection that
      *  is used to get the response.
      */
     public static final String KEY_HTTP_CONNECTION = "http.connection";
 
+    /**
+     * The Logger for this class.
+     */
+    protected static final Logger LOG = LogUtils.getL7dLogger(HTTPConduit.class);
+    
+
+    /**
+     * This constant holds the suffix ".http-conduit" that is appended to the 
+     * Endpoint Qname to give the configuration name of this conduit.
+     */
+    private static final String SC_HTTP_CONDUIT_SUFFIX = ".http-conduit";
+
+    private static final String HTTP_POST_METHOD = "POST"; 
+    private static final String HTTP_PUT_METHOD = "PUT";
+    
     /**
      * This constant is the Message(Map) key for a list of visited URLs that
      * is used in redirect loop protection.
@@ -168,35 +173,9 @@ public class HTTPConduit
     private static final String KEY_AUTH_URLS = "AuthURLs";
     
     /**
-     * The Logger for this class.
-     */
-    private static final Logger LOG = LogUtils.getL7dLogger(HTTPConduit.class);
-
-    private static boolean hasLoggedAsyncWarning;
-    
-    /**
-     * This constant holds the suffix ".http-conduit" that is appended to the 
-     * Endpoint Qname to give the configuration name of this conduit.
-     */
-    private static final String SC_HTTP_CONDUIT_SUFFIX = ".http-conduit";
-
-    private static final String HTTP_POST_METHOD = "POST"; 
-    private static final String HTTP_PUT_METHOD = "PUT";
-    
-    /**
-     * This field holds the connection factory, which primarily is used to 
-     * factor out SSL specific code from this implementation.
-     * <p>
-     * This field is "protected" to facilitate some contrived UnitTesting so
-     * that an extended class may alter its value with an EasyMock URLConnection
-     * Factory. 
-     */
-    protected HttpsURLConnectionFactory connectionFactory;
-    
-    /**
      *  This field holds a reference to the CXF bus associated this conduit.
      */
-    private final Bus bus;
+    protected final Bus bus;
 
     /**
      * This field is used for two reasons. First it provides the base name for
@@ -204,18 +183,18 @@ public class HTTPConduit
      * address information, should it not be supplied in the Message Map, by the 
      * Message.ENDPOINT_ADDRESS property.
      */
-    private final EndpointInfo endpointInfo;
+    protected final EndpointInfo endpointInfo;
     
 
     /**
      * This field holds the "default" URL for this particular conduit, which
      * is created on demand.
      */
-    private URL defaultEndpointURL;
-    private String defaultEndpointURLString;
-    private boolean fromEndpointReferenceType;
+    protected URL defaultEndpointURL;
+    protected String defaultEndpointURLString;
+    protected boolean fromEndpointReferenceType;
     
-    private ProxyFactory proxyFactory;
+    protected ProxyFactory proxyFactory;
 
     // Configurable values
     
@@ -224,48 +203,48 @@ public class HTTPConduit
      * This field is injected via spring configuration based on the conduit
      * name.
      */
-    private HTTPClientPolicy clientSidePolicy;
+    protected HTTPClientPolicy clientSidePolicy;
 
     /**
      * This field holds the password authorization configuration.
      * This field is injected via spring configuration based on the conduit 
      * name.
     */
-    private AuthorizationPolicy authorizationPolicy;
+    protected AuthorizationPolicy authorizationPolicy;
     
     /**
      * This field holds the password authorization configuration for the 
      * configured proxy. This field is injected via spring configuration based 
      * on the conduit name.
      */
-    private ProxyAuthorizationPolicy proxyAuthorizationPolicy;
+    protected ProxyAuthorizationPolicy proxyAuthorizationPolicy;
 
     /**
      * This field holds the configuration TLS configuration which
      * is programmatically configured. 
      */
-    private TLSClientParameters tlsClientParameters;
+    protected TLSClientParameters tlsClientParameters;
     
     /**
      * This field contains the MessageTrustDecider.
      */
-    private MessageTrustDecider trustDecider;
+    protected MessageTrustDecider trustDecider;
     
     /**
      * Implements the authentication handling when talking to a server. If it is not set
      * it will be created from the authorizationPolicy.authType
      */
-    private HttpAuthSupplier authSupplier;
+    protected HttpAuthSupplier authSupplier;
     
     /**
      * Implements the proxy authentication handling. If it is not set
      * it will be created from the proxyAuthorizationPolicy.authType
      */
-    private HttpAuthSupplier proxyAuthSupplier;
+    protected HttpAuthSupplier proxyAuthSupplier;
 
-    private Cookies cookies;
+    protected Cookies cookies;
     
-    private CertConstraints certConstraints;
+    protected CertConstraints certConstraints;
 
     /**
      * Constructor
@@ -300,10 +279,8 @@ public class HTTPConduit
             fromEndpointReferenceType = true;
         }
         proxyFactory = new ProxyFactory();
-        connectionFactory = new HttpsURLConnectionFactory();
         cookies = new Cookies();
         updateClientPolicy();
-        CXFAuthenticator.addAuthenticator();
     }
 
     /**
@@ -416,7 +393,7 @@ public class HTTPConduit
      * causes an injection of the Spring configuration properties
      * of this Conduit.
      */
-    protected void finalizeConfig() {
+    public void finalizeConfig() {
         // See if not set by configuration, if there are defaults
         // in order from the Endpoint, Service, or Bus.
         
@@ -441,11 +418,8 @@ public class HTTPConduit
         return cookies.getSessionCookies();
     }
     
-    private HttpURLConnection createConnection(Message message, URL url) throws IOException {
-        HTTPClientPolicy csPolicy = getClient(message);
-        Proxy proxy = proxyFactory.createProxy(csPolicy , url);
-        return connectionFactory.createConnection(tlsClientParameters, proxy, url);
-    }
+
+    protected abstract void setupConnection(Message message, URL url, HTTPClientPolicy csPolicy) throws IOException;
 
     /**
      * Prepare to send an outbound HTTP message over this http conduit to a 
@@ -478,25 +452,15 @@ public class HTTPConduit
         boolean needToCacheRequest = false;
         
         HTTPClientPolicy csPolicy = getClient(message);
-        HttpURLConnection connection = createConnection(message, currentURL);
-        connection.setDoOutput(true);       
-        
-        int ctimeout = determineConnectionTimeout(message, csPolicy);
-        connection.setConnectTimeout(ctimeout);
-        
-        int rtimeout = determineReceiveTimeout(message, csPolicy);
-        connection.setReadTimeout(rtimeout);
-        
-        connection.setUseCaches(false);
-        // We implement redirects in this conduit. We do not
-        // rely on the underlying URLConnection implementation
-        // because of trust issues.
-        connection.setInstanceFollowRedirects(false);
+        setupConnection(message, currentURL, csPolicy);
         
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod = 
-            (String)message.get(Message.HTTP_REQUEST_METHOD);        
-        connection.setRequestMethod((null != httpRequestMethod) ? httpRequestMethod : "POST");
+            (String)message.get(Message.HTTP_REQUEST_METHOD);
+        if (httpRequestMethod == null) {
+            httpRequestMethod = "POST";
+            message.put(Message.HTTP_REQUEST_METHOD, "POST");
+        }
                 
         boolean isChunking = false;
         int chunkThreshold = 0;
@@ -528,16 +492,12 @@ public class HTTPConduit
         // if chunking is enabled
         // TODO : ensure chunking can be enabled for non-empty PUTs - if requested
         if (csPolicy.isAllowChunking() 
-            && isChunkingSupported(message, connection.getRequestMethod())) {
+            && isChunkingSupported(message, httpRequestMethod)) {
             //TODO: The chunking mode be configured or at least some
             // documented client constant.
             //use -1 and allow the URL connection to pick a default value
             isChunking = true;
             chunkThreshold = csPolicy.getChunkingThreshold();
-            if (chunkThreshold <= 0) {
-                chunkThreshold = 0;
-                connection.setChunkedStreamingMode(-1);                    
-            }
         }
 
         cookies.writeToMessageHeaders(message);
@@ -545,9 +505,7 @@ public class HTTPConduit
         // The trust decision is relegated to after the "flushing" of the
         // request headers.
         
-        // We place the connection on the message to pick it up
-        // in the WrappedOutputStream.
-        message.put(KEY_HTTP_CONNECTION, connection);
+
         
         if (certConstraints != null) {
             message.put(CertConstraints.class.getName(), certConstraints);
@@ -557,7 +515,7 @@ public class HTTPConduit
         setHeadersByAuthorizationPolicy(message, currentURL);
         new Headers(message).setFromClientPolicy(getClient(message));
         message.setContent(OutputStream.class, 
-                           createOutputStream(message, connection,
+                           createOutputStream(message,
                                               needToCacheRequest, 
                                               isChunking,
                                               chunkThreshold));
@@ -581,18 +539,11 @@ public class HTTPConduit
         return false;
     }
     
-    protected OutputStream createOutputStream(Message message, 
-                                              HttpURLConnection connection,
-                                              boolean needToCacheRequest, 
-                                              boolean isChunking,
-                                              int chunkThreshold) {
-        return new WrappedOutputStream(message, connection,
-                                       needToCacheRequest, 
-                                       isChunking,
-                                       chunkThreshold,
-                                       getConduitName());
-    }
-
+    protected abstract OutputStream createOutputStream(Message message, 
+                                                       boolean needToCacheRequest, 
+                                                       boolean isChunking,
+                                                       int chunkThreshold) throws IOException;
+    
     private HttpAuthSupplier createAuthSupplier(String authType) {
         if (HttpAuthHeader.AUTH_TYPE_NEGOTIATE.equals(authType)) {
             return new SpnegoAuthSupplier();
@@ -603,7 +554,7 @@ public class HTTPConduit
         }
     }
 
-    private static int determineReceiveTimeout(Message message,
+    protected static int determineReceiveTimeout(Message message,
             HTTPClientPolicy csPolicy) {
         long rtimeout = csPolicy.getReceiveTimeout();
         if (message.get(Message.RECEIVE_TIMEOUT) != null) {
@@ -622,7 +573,7 @@ public class HTTPConduit
         return (int)rtimeout;
     }
 
-    private static int determineConnectionTimeout(Message message,
+    protected static int determineConnectionTimeout(Message message,
             HTTPClientPolicy csPolicy) {
         long ctimeout = csPolicy.getConnectionTimeout();
         if (message.get(Message.CONNECTION_TIMEOUT) != null) {
@@ -705,19 +656,7 @@ public class HTTPConduit
     /**
      * Close the conduit
      */
-    public void close() {
-        if (defaultEndpointURL != null) {
-            try {
-                URLConnection connect = defaultEndpointURL.openConnection();
-                if (connect instanceof HttpURLConnection) {
-                    ((HttpURLConnection)connect).disconnect();
-                }
-            } catch (IOException ex) {
-                //ignore
-            }
-            //defaultEndpointURL = null;
-        }
-        
+    public void close() {        
         if (clientSidePolicy != null) {
             clientSidePolicy.removePropertyChangeListener(this);
         }
@@ -726,7 +665,7 @@ public class HTTPConduit
     /**
      * @return the default target address
      */
-    protected String getAddress() {
+    public String getAddress() {
         if (defaultEndpointURL != null) {
             return defaultEndpointURLString;
         } else if (fromEndpointReferenceType) {
@@ -785,7 +724,7 @@ public class HTTPConduit
      * @param message
      * @param headers
      */
-    private void setHeadersByAuthorizationPolicy(
+    protected void setHeadersByAuthorizationPolicy(
             Message message,
             URL url
     ) {
@@ -981,265 +920,6 @@ public class HTTPConduit
         this.proxyAuthSupplier = proxyAuthSupplier;
     }
 
-    /**
-     * This function processes any retransmits at the direction of redirections
-     * or "unauthorized" responses.
-     * <p>
-     * If the request was not retransmitted, it returns the given connection. 
-     * If the request was retransmitted, it returns the new connection on
-     * which the request was sent.
-     * 
-     * @param connection   The active URL connection.
-     * @param message      The outgoing message.
-     * @param cachedStream The cached request.
-     * @return
-     * @throws IOException
-     */
-    private HttpURLConnection processRetransmit(
-        final HttpURLConnection origConnection,
-        Message message,
-        CacheAndWriteOutputStream cachedStream
-    ) throws IOException {
-
-        int responseCode = origConnection.getResponseCode();
-        if ((message != null) && (message.getExchange() != null)) {
-            message.getExchange().put(Message.RESPONSE_CODE, responseCode);
-        }
-        HttpURLConnection connection = origConnection;
-        // Process Redirects first.
-        switch(responseCode) {
-        case HttpURLConnection.HTTP_MOVED_PERM:
-        case HttpURLConnection.HTTP_MOVED_TEMP:
-        case HttpURLConnection.HTTP_SEE_OTHER:    
-        case 307:
-            connection = redirectRetransmit(origConnection, message, cachedStream);
-            break;
-        case HttpURLConnection.HTTP_UNAUTHORIZED:
-            connection = authorizationRetransmit(origConnection, message, cachedStream);
-            break;
-        default:
-            break;
-        }
-        return connection;
-    }
-
-    /**
-     * This method performs a redirection retransmit in response to
-     * a 302 or 305 response code.
-     *
-     * @param connection   The active URL connection
-     * @param message      The outbound message.
-     * @param cachedStream The cached request.
-     * @return This method returns the new HttpURLConnection if
-     *         redirected. If it cannot be redirected for some reason
-     *         the same connection is returned.
-     *         
-     * @throws IOException
-     */
-    private HttpURLConnection redirectRetransmit(
-        HttpURLConnection connection,
-        Message message,
-        CacheAndWriteOutputStream cachedStream
-    ) throws IOException {
-        
-        // If we are not redirecting by policy, then we don't.
-        if (!getClient(message).isAutoRedirect()) {
-            return connection;
-        }
-        URL newURL = extractLocation(connection.getHeaderFields());
-        detectRedirectLoop(getConduitName(), connection.getURL(), newURL, message);
-        if (newURL != null) {
-            new Headers(message).removeAuthorizationHeaders();
-            
-            // If user configured this Conduit with preemptive authorization
-            // it is meant to make it to the end. (Too bad that information
-            // went to every URL along the way, but that's what the user 
-            // wants!
-            // TODO: Make this issue a security release note.
-            setHeadersByAuthorizationPolicy(message, newURL);
-            connection.disconnect();
-            return retransmit(newURL, message, cachedStream);
-        }
-        return connection;
-    }
-
-    /**
-     * This method performs a retransmit for authorization information.
-     * 
-     * @param connection The currently active connection.
-     * @param message The outbound message.
-     * @param cachedStream The cached request.
-     * @return A new connection if retransmitted. If not retransmitted
-     *         then this method returns the same connection.
-     * @throws IOException
-     */
-    private HttpURLConnection authorizationRetransmit(
-        HttpURLConnection connection,
-        Message message, 
-        CacheAndWriteOutputStream cachedStream
-    ) throws IOException {
-        HttpAuthHeader authHeader = new HttpAuthHeader(connection.getHeaderField("WWW-Authenticate"));
-        URL currentURL = connection.getURL();
-        String realm = authHeader.getRealm();
-        detectAuthorizationLoop(getConduitName(), message, currentURL, realm);
-        AuthorizationPolicy effectiveAthPolicy = getEffectiveAuthPolicy(message);
-        String authorizationToken = 
-            authSupplier.getAuthorization(
-                effectiveAthPolicy, currentURL, message, authHeader.getFullHeader());
-        if (authorizationToken == null) {
-            // authentication not possible => we give up
-            return connection;
-        }
-        try {
-            //try and consume any content so that the connection might be reusable
-            InputStream ins = connection.getErrorStream();
-            if (ins == null) {
-                ins = connection.getInputStream();
-            }
-            if (ins != null) {
-                IOUtils.consume(ins);
-                ins.close();
-            }
-        } catch (Throwable t) {
-            //ignore
-        }
-        new Headers(message).setAuthorization(authorizationToken);
-        cookies.writeToMessageHeaders(message);
-        return retransmit(currentURL, message, cachedStream);
-    }
-
-    /**
-     * This method retransmits the request.
-     * 
-     * @param connection The currently active connection.
-     * @param newURL     The newURL to connection to.
-     * @param message    The outbound message.
-     * @param stream     The cached request.
-     * @return           This function returns a new connection if
-     *                   retransmitted, otherwise it returns the given
-     *                   connection.
-     *                   
-     * @throws IOException
-     */
-    private HttpURLConnection retransmit(
-            URL                newURL,
-            Message            message, 
-            CacheAndWriteOutputStream stream
-    ) throws IOException {
-        HTTPClientPolicy cp = getClient(message);
-        HttpURLConnection  connection = createConnection(message, newURL);
-        connection.setDoOutput(true);        
-        // TODO: using Message context to decided HTTP send properties
-        connection.setConnectTimeout((int)cp.getConnectionTimeout());
-        connection.setReadTimeout((int)cp.getReceiveTimeout());
-        connection.setUseCaches(false);
-        connection.setInstanceFollowRedirects(false);
-
-        // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
-        String httpRequestMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        connection.setRequestMethod((null != httpRequestMethod) ? httpRequestMethod : "POST");
-
-        message.put(KEY_HTTP_CONNECTION, connection);
-
-        if (stream != null && stream.size() < Integer.MAX_VALUE) {
-            connection.setFixedLengthStreamingMode((int)stream.size());
-        }
-
-        // Need to set the headers before the trust decision
-        // because they are set before the connect().
-        new Headers(message).setProtocolHeadersInConnection(connection);
-        
-        //
-        // This point is where the trust decision is made because the
-        // Sun implementation of URLConnection will not let us 
-        // set/addRequestProperty after a connect() call, and 
-        // makeTrustDecision needs to make a connect() call to
-        // make sure the proper information is available.
-        // 
-        TrustDecisionUtil.makeTrustDecision(trustDecider, message, connection, getConduitName());
-
-        // If this is a GET method we must not touch the output
-        // stream as this automagically turns the request into a POST.
-        if (connection.getRequestMethod().equals("GET")) {
-            return connection;
-        }
-        
-        // Trust is okay, write the cached request
-        OutputStream out = connection.getOutputStream();
-        stream.writeCacheTo(out);
-        
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Conduit \""
-                     + getConduitName() 
-                     + "\" Retransmit message to: " 
-                     + connection.getURL()
-                     + ": "
-                     + new String(stream.getBytes()));
-        }
-        return connection;
-    }
-
-    private static void detectAuthorizationLoop(String conduitName, Message message, 
-                                                URL currentURL, String realm) throws IOException {
-        @SuppressWarnings("unchecked")
-        Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
-        if (authURLs == null) {
-            authURLs = new HashSet<String>();
-            message.put(KEY_AUTH_URLS, authURLs);
-        }
-        // If we have been here (URL & Realm) before for this particular message
-        // retransmit, it means we have already supplied information
-        // which must have been wrong, or we wouldn't be here again.
-        // Otherwise, the server may be 401 looping us around the realms.
-        if (authURLs.contains(currentURL.toString() + realm)) {
-            String logMessage = "Authorization loop detected on Conduit \""
-                + conduitName
-                + "\" on URL \""
-                + currentURL
-                + "\" with realm \""
-                + realm
-                + "\"";
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, logMessage);
-            }
-
-            throw new IOException(logMessage);
-        }
-        // Register that we have been here before we go.
-        authURLs.add(currentURL.toString() + realm);
-    }
-
-    /**
-     * Tracks the visited urls in the message header KEY_VISITED_URLS.
-     * If a URL is to be visited twice an exception is thrown
-     * 
-     * @param conduitName
-     * @param lastURL
-     * @param newURL
-     * @param message
-     * @throws IOException
-     */
-    private static void detectRedirectLoop(String conduitName, 
-                                           URL lastURL, 
-                                           URL newURL,
-                                           Message message) throws IOException {
-        @SuppressWarnings("unchecked")
-        Set<String> visitedURLs = (Set<String>) message.get(KEY_VISITED_URLS);
-        if (visitedURLs == null) {
-            visitedURLs = new HashSet<String>();
-            message.put(KEY_VISITED_URLS, visitedURLs);
-        }
-        visitedURLs.add(lastURL.toString());
-        if (newURL != null && visitedURLs.contains(newURL.toString())) {
-            // See if we are being redirected in a loop as best we can,
-            // using string equality on URL.
-            // We are in a redirect loop; -- bail
-            String msg = "Redirect loop detected on Conduit '" 
-                + conduitName + "' on '" + newURL + "'";
-            LOG.log(Level.INFO, msg);
-            throw new IOException(msg);
-        }
-    }    
     
     /**
      * This method extracts the value of the "Location" Http
@@ -1249,16 +929,14 @@ public class HTTPConduit
      * @return The value of the "Location" header, null if non-existent.
      * @throws MalformedURLException 
      */
-    private URL extractLocation(Map<String, List<String>> headers
-                                ) throws MalformedURLException {
-        
+    protected String extractLocation(Map<String, List<String>> headers) throws MalformedURLException {
         for (Map.Entry<String, List<String>> head : headers.entrySet()) {
             if ("Location".equalsIgnoreCase(head.getKey())) {
                 List<String> locs = head.getValue();
                 if (locs != null && locs.size() > 0) {
                     String location = locs.get(0);
                     if (location != null) {
-                        return new URL(location);
+                        return location;
                     } else {
                         return null;
                     }
@@ -1268,451 +946,6 @@ public class HTTPConduit
         return null;
     }
 
-    /**
-     * Wrapper output stream responsible for flushing headers and handling
-     * the incoming HTTP-level response (not necessarily the MEP response).
-     */
-    protected class WrappedOutputStream extends AbstractThresholdOutputStream {
-        
-        /**
-         * This field contains the currently active connection.
-         */
-        protected HttpURLConnection connection;
-        
-        /**
-         * This boolean is true if the request must be cached.
-         */
-        protected boolean cachingForRetransmission;
-        
-        /**
-         * If we are going to be chunking, we won't flush till close which causes
-         * new chunks, small network packets, etc..
-         */
-        protected final boolean chunking;
-        
-        /**
-         * This field contains the output stream with which we cache
-         * the request. It maybe null if we are not caching.
-         */
-        protected CacheAndWriteOutputStream cachedStream;
-
-        protected Message outMessage;
-
-        protected String conduitName;
-
-        protected WrappedOutputStream(
-                Message outMessage, 
-                HttpURLConnection connection,
-                boolean possibleRetransmit,
-                boolean isChunking,
-                int chunkThreshold,
-                String conduitName
-        ) {
-            super(chunkThreshold);
-            this.outMessage = outMessage;
-            this.connection = connection;
-            this.cachingForRetransmission = possibleRetransmit;
-            this.chunking = isChunking;
-            this.conduitName = conduitName;
-        }
-        
-        // This construction makes extending the HTTPConduit more easier 
-        protected WrappedOutputStream(WrappedOutputStream wos) {
-            super(wos.threshold);
-            this.outMessage = wos.outMessage;
-            this.connection = wos.connection;
-            this.cachingForRetransmission = wos.cachingForRetransmission;
-            this.chunking = wos.chunking;
-            this.conduitName = wos.conduitName;
-        }
-        
-        
-        @Override
-        public void thresholdNotReached() {
-            if (chunking) {
-                connection.setFixedLengthStreamingMode(buffer.size());
-            }
-        }
-
-        @Override
-        public void thresholdReached() {
-            if (chunking) {
-                connection.setChunkedStreamingMode(-1);
-            }
-        }
-
-        /**
-         * Perform any actions required on stream flush (freeze headers,
-         * reset output stream ... etc.)
-         */
-        @Override
-        protected void onFirstWrite() throws IOException {
-            try {
-                handleHeadersTrustCaching();
-            } catch (IOException e) {
-                if (e.getMessage() != null && e.getMessage().contains("HTTPS hostname wrong:")) {
-                    throw new IOException("The https URL hostname does not match the " 
-                        + "Common Name (CN) on the server certificate.  To disable this check " 
-                        + "(NOT recommended for production) set the CXF client TLS configuration " 
-                        + "property \"disableCNCheck\" to true.");
-                } else {
-                    throw e;
-                }
-            }
-            
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Sending "
-                    + connection.getRequestMethod() 
-                    + " Message with Headers to " 
-                    + connection.getURL()
-                    + " Conduit :"
-                    + conduitName
-                    + "\n");
-            }
-        }
-        
-        protected void handleHeadersTrustCaching() throws IOException {
-            // Need to set the headers before the trust decision
-            // because they are set before the connect().
-            new Headers(outMessage).setProtocolHeadersInConnection(connection);
-
-            //
-            // This point is where the trust decision is made because the
-            // Sun implementation of URLConnection will not let us 
-            // set/addRequestProperty after a connect() call, and 
-            // makeTrustDecision needs to make a connect() call to
-            // make sure the proper information is available.
-            // 
-            TrustDecisionUtil.makeTrustDecision(trustDecider, outMessage, connection, conduitName);
-            
-            // Trust is okay, set up for writing the request.
-            
-            // If this is a GET method we must not touch the output
-            // stream as this automatically turns the request into a POST.
-            // Nor it should be done in case of DELETE/HEAD/OPTIONS 
-            // - strangely, empty PUTs work ok 
-            if (!"POST".equals(connection.getRequestMethod())
-                && !"PUT".equals(connection.getRequestMethod())) {
-                return;
-            }
-            if (outMessage.get("org.apache.cxf.post.empty") != null) {
-                return;
-            }
-            
-            // If we need to cache for retransmission, store data in a
-            // CacheAndWriteOutputStream. Otherwise write directly to the output stream.
-            if (cachingForRetransmission) {
-                cachedStream =
-                    new CacheAndWriteOutputStream(connection.getOutputStream());
-                wrappedStream = cachedStream;
-            } else {
-                wrappedStream = connection.getOutputStream();
-            }
-            
-        }
-
-        /**
-         * Perform any actions required on stream closure (handle response etc.)
-         */
-        public void close() throws IOException {
-            try {
-                if (buffer != null && buffer.size() > 0) {
-                    thresholdNotReached();
-                    LoadingByteArrayOutputStream tmp = buffer;
-                    buffer = null;
-                    super.write(tmp.getRawBytes(), 0, tmp.size());
-                }
-                if (!written) {
-                    handleHeadersTrustCaching();
-                }
-                if (!cachingForRetransmission) {
-                    super.close();
-                } else if (cachedStream != null) {
-                    super.flush();
-                    cachedStream.getOut().close();
-                    cachedStream.closeFlowthroughStream();
-                }
-
-                try {
-                    handleResponse();
-                } finally {
-                    if (cachingForRetransmission && cachedStream != null) {
-                        cachedStream.close();
-                    }
-                }
-            } catch (HttpRetryException e) {
-                handleHttpRetryException(e, connection);
-            } catch (IOException e) {
-                String url = connection.getURL().toString();
-                String origMessage = e.getMessage();
-                if (origMessage != null && origMessage.contains(url)) {
-                    throw e;
-                }
-                throw mapException(e.getClass().getSimpleName() 
-                                   + " invoking " + connection.getURL() + ": "
-                                   + e.getMessage(), e,
-                                   IOException.class);
-            } catch (RuntimeException e) {
-                throw mapException(e.getClass().getSimpleName() 
-                                   + " invoking " + connection.getURL() + ": "
-                                   + e.getMessage(), e,
-                                   RuntimeException.class);
-            }
-        }
-        private <T extends Exception> T mapException(String msg, 
-                                                     T ex, Class<T> cls) {
-            T ex2 = ex;
-            try {
-                ex2 = cls.cast(ex.getClass().getConstructor(String.class).newInstance(msg));
-                ex2.initCause(ex);
-            } catch (Throwable e) {
-                ex2 = ex;
-            }
-            
-            
-            return ex2;
-        }
-        
-        /**
-         * This procedure handles all retransmits, if any.
-         *
-         * @throws IOException
-         */
-        protected void handleRetransmits() throws IOException {
-            // If we have a cachedStream, we are caching the request.
-            if (cachedStream != null
-                || ("GET".equals(connection.getRequestMethod()) && getClient().isAutoRedirect())) {
-
-                if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
-                    LOG.fine("Conduit \""
-                             + getConduitName() 
-                             + "\" Transmit cached message to: " 
-                             + connection.getURL()
-                             + ": "
-                             + new String(cachedStream.getBytes()));
-                }
-
-
-                int maxRetransmits = getMaxRetransmits();
-                cookies.readFromConnection(connection);
-                int nretransmits = 0;
-                HttpURLConnection oldcon = null;
-                while (connection != oldcon && (maxRetransmits < 0 || nretransmits < maxRetransmits)) {
-                    nretransmits++;
-                    oldcon = connection;
-                    connection = processRetransmit(connection, outMessage, cachedStream);
-                }
-            }
-        }
-
-        private int getMaxRetransmits() {
-            HTTPClientPolicy policy = getClient(outMessage);
-            // Default MaxRetransmits is -1 which means unlimited.
-            return (policy == null) ? -1 : policy.getMaxRetransmits();
-        }
-        
-        /**
-         * This procedure is called on the close of the output stream so
-         * we are ready to handle the response from the connection. 
-         * We may retransmit until we finally get a response.
-         * 
-         * @throws IOException
-         */
-        protected void handleResponse() throws IOException {
-            
-            // Process retransmits until we fall out.
-            handleRetransmits();
-            
-            if (outMessage == null 
-                || outMessage.getExchange() == null
-                || outMessage.getExchange().isSynchronous()) {
-                handleResponseInternal();
-            } else {
-                Runnable runnable = new Runnable() {
-                    public void run() {
-                        try {
-                            handleResponseInternal();
-                        } catch (Exception e) {
-                            ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
-                            ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
-                            outMessage.setContent(Exception.class, e);
-                            outMessage.getInterceptorChain().getFaultObserver().onMessage(outMessage);
-                        }
-                    }
-                };
-                HTTPClientPolicy policy = getClient(outMessage);
-                try {
-                    Executor ex = outMessage.getExchange().get(Executor.class);
-                    if (ex == null) {
-                        WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
-                            .getExtension(WorkQueueManager.class);
-                        AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
-                        if (qu == null) {
-                            qu = mgr.getAutomaticWorkQueue();
-                        }
-                        long timeout = 5000;
-                        if (policy != null && policy.isSetAsyncExecuteTimeout()) {
-                            timeout = policy.getAsyncExecuteTimeout();
-                        }
-                        if (timeout > 0) {
-                            qu.execute(runnable, timeout);
-                        } else {
-                            qu.execute(runnable);
-                        }
-                    } else {
-                        outMessage.getExchange().put(Executor.class.getName() 
-                                                 + ".USING_SPECIFIED", Boolean.TRUE);
-                        ex.execute(runnable);
-                    }
-                } catch (RejectedExecutionException rex) {
-                    if (policy != null && policy.isSetAsyncExecuteTimeoutRejection()
-                        && policy.isAsyncExecuteTimeoutRejection()) {
-                        throw rex;
-                    }
-                    if (!hasLoggedAsyncWarning) {
-                        LOG.warning("EXECUTOR_FULL_WARNING");
-                        hasLoggedAsyncWarning = true;
-                    }
-                    LOG.fine("EXECUTOR_FULL");
-                    handleResponseInternal();
-                }
-            }
-        }
-
-        /**
-         * This predicate returns true iff the exchange indicates 
-         * a oneway MEP.
-         * 
-         * @param exchange The exchange in question
-         */
-        private boolean isOneway(Exchange exchange) {
-            return exchange != null && exchange.isOneWay();
-        }
-        
-        private boolean doProcessResponse(Message message) {
-            // 1. Not oneWay
-            if (!isOneway(message.getExchange())) {
-                return true;
-            }
-            // 2. Context property
-            return MessageUtils.getContextualBoolean(message, Message.PROCESS_ONEWAY_REPONSE, false);
-        }
-
-        protected void handleResponseInternal() throws IOException {
-            Exchange exchange = outMessage.getExchange();
-            int responseCode = connection.getResponseCode();
-            if (responseCode == -1) {
-                LOG.warning("HTTP Response code appears to be corrupted");
-            }
-            if (exchange != null) {
-                exchange.put(Message.RESPONSE_CODE, responseCode);
-            }
-            
-            logResponseInfo(responseCode);
-            
-            // This property should be set in case the exceptions should not be handled here
-            // For example jax rs uses this
-            boolean noExceptions = MessageUtils.isTrue(outMessage.getContextualProperty(
-                "org.apache.cxf.http.no_io_exceptions"));
-            if (responseCode >= 400 && responseCode != 500 && !noExceptions) {
-                throw new HTTPException(responseCode, connection.getResponseMessage(), 
-                                        connection.getURL());
-            }
-
-            InputStream in = null;
-            // oneway or decoupled twoway calls may expect HTTP 202 with no content
-            if (isOneway(exchange) 
-                || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
-                in = ChunkedUtil.getPartialResponse(connection, responseCode);
-                if ((in == null) || (!doProcessResponse(outMessage))) {
-                    // oneway operation or decoupled MEP without 
-                    // partial response
-                    connection.getInputStream().close();
-                    ClientCallback cc = exchange.get(ClientCallback.class);
-                    if (null != cc) {
-                        //REVISIT move the decoupled destination property name into api
-                        Endpoint ep = exchange.getEndpoint();
-                        if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
-                            getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
-                            cc.handleResponse(null, null);
-                        }
-                    }
-                    if (in != null) {
-                        in.close();
-                    }
-                    return;
-                }
-            } else {
-                //not going to be resending or anything, clear out the stuff in the out message
-                //to free memory
-                outMessage.removeContent(OutputStream.class);
-                if (cachingForRetransmission && cachedStream != null) {
-                    cachedStream.close();
-                }
-                cachedStream = null;
-            }
-            
-            Message inMessage = new MessageImpl();
-            inMessage.setExchange(exchange);
-            new Headers(inMessage).readFromConnection(connection);
-            inMessage.put(Message.RESPONSE_CODE, responseCode);
-            String ct = connection.getContentType();
-            inMessage.put(Message.CONTENT_TYPE, ct);
-            String charset = HttpHeaderHelper.findCharset(ct);
-            String normalizedEncoding = HttpHeaderHelper.mapCharset(charset);
-            if (normalizedEncoding == null) {
-                String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
-                                                                   LOG, charset).toString();
-                LOG.log(Level.WARNING, m);
-                throw new IOException(m);   
-            } 
-            inMessage.put(Message.ENCODING, normalizedEncoding);
-            cookies.readFromConnection(connection);
-            if (in == null) {
-                if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
-                    in = connection.getErrorStream();
-                    if (in == null) {
-                        try {
-                            // just in case - but this will most likely cause an exception
-                            in = connection.getInputStream();
-                        } catch (IOException ex) {
-                            // ignore
-                        }
-                    }
-                } else {
-                    in = connection.getInputStream();
-                }
-            }
-            if (in == null) {
-                // Create an empty stream to avoid NullPointerExceptions
-                in = new ByteArrayInputStream(new byte[] {});
-            }
-            inMessage.setContent(InputStream.class, in);
-            
-            
-            incomingObserver.onMessage(inMessage);
-            
-        }
-
-
-        private void logResponseInfo(int responseCode) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Response Code: " + responseCode + " Conduit: " + conduitName);
-                LOG.fine("Content length: " + connection.getContentLength());
-                Map<String, List<String>> headerFields = connection.getHeaderFields();
-                if (null != headerFields) {
-                    String newLine = SystemPropertyAction.getProperty("line.separator");
-                    StringBuilder buf = new StringBuilder();
-                    buf.append("Header fields: " + newLine);
-                    for (String headerKey : headerFields.keySet()) {
-                        buf.append("    " + headerKey + ": " + headerFields.get(headerKey) + newLine);
-                    }
-                    LOG.fine(buf.toString());
-                }
-            }
-        }
-
-    }
     
     /**
      * Used to set appropriate message properties, exchange etc.
@@ -1730,7 +963,7 @@ public class HTTPConduit
             // disposable exchange, swapped with real Exchange on correlation
             inMessage.setExchange(new ExchangeImpl());
             inMessage.getExchange().put(Bus.class, bus);
-            inMessage.put(DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
+            inMessage.put(Message.DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
             // REVISIT: how to get response headers?
             //inMessage.put(Message.PROTOCOL_HEADERS, req.getXXX());
             Headers.getSetProtocolHeaders(inMessage);
@@ -1773,52 +1006,654 @@ public class HTTPConduit
         }
     }
 
-    private void handleHttpRetryException(HttpRetryException e, HttpURLConnection connection) 
-        throws IOException {
-        String msg = "HTTP response '" + e.responseCode() + ": "
-                     + connection.getResponseMessage() + "' invoking " + connection.getURL();
-        switch (e.responseCode()) {
-        case HttpURLConnection.HTTP_MOVED_PERM: // 301
-        case HttpURLConnection.HTTP_MOVED_TEMP: // 302
-        case HttpURLConnection.HTTP_SEE_OTHER:  // 303    
-        case 307:    
-            msg += " that returned location header '" + e.getLocation() + "'";
-            break;
-        case HttpURLConnection.HTTP_UNAUTHORIZED: // 401
-            if (authorizationPolicy == null || authorizationPolicy.getUserName() == null) {
-                msg += " with NO authorization username configured in conduit " + getConduitName();
-            } else {
-                msg += " with authorization username '" + authorizationPolicy.getUserName() + "'";
+    
+    
+    /**
+     * Wrapper output stream responsible for flushing headers and handling
+     * the incoming HTTP-level response (not necessarily the MEP response).
+     */
+    protected abstract class WrappedOutputStream extends AbstractThresholdOutputStream {
+        /**
+         * This boolean is true if the request must be cached.
+         */
+        protected boolean cachingForRetransmission;
+        
+        /**
+         * If we are going to be chunking, we won't flush till close which causes
+         * new chunks, small network packets, etc..
+         */
+        protected final boolean chunking;
+        
+        /**
+         * This field contains the output stream with which we cache
+         * the request. It maybe null if we are not caching.
+         */
+        protected CacheAndWriteOutputStream cachedStream;
+
+        protected Message outMessage;
+
+        protected String conduitName;
+        
+        protected String url;
+
+        protected WrappedOutputStream(
+                Message outMessage, 
+                boolean possibleRetransmit,
+                boolean isChunking,
+                int chunkThreshold,
+                String conduitName,
+                String url
+        ) {
+            super(chunkThreshold);
+            this.outMessage = outMessage;
+            this.cachingForRetransmission = possibleRetransmit;
+            this.chunking = isChunking;
+            this.conduitName = conduitName;
+            this.url = url;
+        }
+        
+        // This construction makes extending the HTTPConduit more easier 
+        protected WrappedOutputStream(WrappedOutputStream wos) {
+            super(wos.threshold);
+            this.outMessage = wos.outMessage;
+            this.cachingForRetransmission = wos.cachingForRetransmission;
+            this.chunking = wos.chunking;
+            this.conduitName = wos.conduitName;
+            this.url = wos.url;
+        }
+        
+        @Override
+        public void thresholdNotReached() {
+            if (chunking) {
+                setFixedLengthStreamingMode(buffer.size());
             }
-            break;
-        case HttpURLConnection.HTTP_PROXY_AUTH: // 407
-            if (proxyAuthorizationPolicy == null || proxyAuthorizationPolicy.getUserName() == null) {
-                msg += " with NO proxy authorization configured in conduit " + getConduitName();
-            } else {
-                msg += " with proxy authorization username '"
-                       + proxyAuthorizationPolicy.getUserName() + "'";
+        }
+
+        protected abstract void setupWrappedStream() throws IOException;
+        protected abstract void handleResponseAsync() throws IOException;
+        protected abstract void closeInputStream() throws IOException;
+        protected abstract InputStream getInputStream(int rc) throws IOException;
+        protected abstract void updateResponseHeaders(Message inMessage);
+        protected abstract boolean usingProxy();
+        protected abstract HttpsURLConnectionInfo getHttpsURLConnectionInfo() throws IOException;
+        protected abstract int getResponseCode() throws IOException;
+        protected abstract String getResponseMessage() throws IOException;
+        protected abstract void updateCookies();
+        protected abstract InputStream getPartialResponse(int responseCode) throws IOException;
+        protected abstract void setProtocolHeaders() throws IOException;
+        protected abstract void setFixedLengthStreamingMode(int i);
+        protected abstract void retransmitStream() throws IOException;
+        protected abstract void setupNewConnection(String newURL) throws IOException;
+        
+        protected void retransmit(String newURL) throws IOException {
+            setupNewConnection(newURL);
+            
+            if (cachedStream != null && cachedStream.size() < Integer.MAX_VALUE) {
+                setFixedLengthStreamingMode((int)cachedStream.size());
             }
-            if (clientSidePolicy == null || clientSidePolicy.getProxyServer() == null) {
-                if (connection.usingProxy()) {
-                    msg += " using a proxy even if NONE is configured in CXF conduit "
-                           + getConduitName()
-                           + " (maybe one is configured by java.net.ProxySelector)";
+            setProtocolHeaders();
+            
+            //
+            // This point is where the trust decision is made because the
+            // Sun implementation of URLConnection will not let us 
+            // set/addRequestProperty after a connect() call, and 
+            // makeTrustDecision needs to make a connect() call to
+            // make sure the proper information is available.
+            // 
+            makeTrustDecision();
+
+            // If this is a GET method we must not touch the output
+            // stream as this automagically turns the request into a POST.
+            if (getMethod().equals("GET")) {
+                return;
+            }
+            
+            // Trust is okay, write the cached request
+            retransmitStream();
+            
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Conduit \""
+                         + getConduitName() 
+                         + "\" Retransmit message to: " 
+                         + newURL
+                         + ": "
+                         + new String(cachedStream.getBytes()));
+            }
+        }
+        
+       
+        /**
+         * Perform any actions required on stream flush (freeze headers,
+         * reset output stream ... etc.)
+         */
+        @Override
+        protected void onFirstWrite() throws IOException {
+            try {
+                handleHeadersTrustCaching();
+            } catch (IOException e) {
+                if (e.getMessage() != null && e.getMessage().contains("HTTPS hostname wrong:")) {
+                    throw new IOException("The https URL hostname does not match the " 
+                        + "Common Name (CN) on the server certificate.  To disable this check " 
+                        + "(NOT recommended for production) set the CXF client TLS configuration " 
+                        + "property \"disableCNCheck\" to true.");
                 } else {
-                    msg += " but NO proxy was used by the connection (none configured in cxf "
-                           + "conduit and none selected by java.net.ProxySelector)";
+                    throw e;
+                }
+            }
+        }
+        protected String getMethod() {
+            return (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
+        }
+        
+        
+        protected void handleHeadersTrustCaching() throws IOException {
+            // Need to set the headers before the trust decision
+            // because they are set before the connect().
+            setProtocolHeaders();
+
+            //
+            // This point is where the trust decision is made because the
+            // Sun implementation of URLConnection will not let us 
+            // set/addRequestProperty after a connect() call, and 
+            // makeTrustDecision needs to make a connect() call to
+            // make sure the proper information is available.
+            // 
+            makeTrustDecision();
+            
+            // Trust is okay, set up for writing the request.
+            
+            // If this is a GET method we must not touch the output
+            // stream as this automatically turns the request into a POST.
+            // Nor it should be done in case of DELETE/HEAD/OPTIONS 
+            // - strangely, empty PUTs work ok
+            String method = getMethod();
+            if (!"POST".equals(method)
+                && !"PUT".equals(method)) {
+                return;
+            }
+            if (outMessage.get("org.apache.cxf.post.empty") != null) {
+                return;
+            }
+            
+            setupWrappedStream();
+        }
+        
+
+        /**
+         * Perform any actions required on stream closure (handle response etc.)
+         */
+        public void close() throws IOException {
+            try {
+                if (buffer != null && buffer.size() > 0) {
+                    thresholdNotReached();
+                    LoadingByteArrayOutputStream tmp = buffer;
+                    buffer = null;
+                    super.write(tmp.getRawBytes(), 0, tmp.size());
+                }
+                if (!written) {
+                    handleHeadersTrustCaching();
+                }
+                if (!cachingForRetransmission) {
+                    super.close();
+                } else if (cachedStream != null) {
+                    super.flush();
+                    cachedStream.getOut().close();
+                    cachedStream.closeFlowthroughStream();
+                }
+
+                try {
+                    handleResponse();
+                } finally {
+                    if (cachingForRetransmission && cachedStream != null) {
+                        cachedStream.close();
+                    }
+                }
+            } catch (HttpRetryException e) {
+                handleHttpRetryException(e);
+            } catch (IOException e) {
+                String origMessage = e.getMessage();
+                if (origMessage != null && origMessage.contains(url)) {
+                    throw e;
+                }
+                throw mapException(e.getClass().getSimpleName() 
+                                   + " invoking " + url + ": "
+                                   + e.getMessage(), e,
+                                   IOException.class);
+            } catch (RuntimeException e) {
+                throw mapException(e.getClass().getSimpleName() 
+                                   + " invoking " + url + ": "
+                                   + e.getMessage(), e,
+                                   RuntimeException.class);
+            }
+        }
+
+        private <T extends Exception> T mapException(String msg, 
+                                                     T ex, Class<T> cls) {
+            T ex2 = ex;
+            try {
+                ex2 = cls.cast(ex.getClass().getConstructor(String.class).newInstance(msg));
+                ex2.initCause(ex);
+            } catch (Throwable e) {
+                ex2 = ex;
+            }
+            
+            
+            return ex2;
+        }
+        
+        /**
+         * This procedure handles all retransmits, if any.
+         *
+         * @throws IOException
+         */
+        protected void handleRetransmits() throws IOException {
+            // If we have a cachedStream, we are caching the request.
+            if (cachedStream != null
+                || ("GET".equals(getMethod()) && getClient().isAutoRedirect())) {
+
+                if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
+                    LOG.fine("Conduit \""
+                             + getConduitName() 
+                             + "\" Transmit cached message to: " 
+                             + url
+                             + ": "
+                             + new String(cachedStream.getBytes()));
+                }
+
+
+                int maxRetransmits = getMaxRetransmits();
+                updateCookies();
+                int nretransmits = 0;
+                while ((maxRetransmits < 0 || nretransmits < maxRetransmits) && processRetransmit()) {
+                    nretransmits++;
+                }
+            }
+        }
+        /**
+         * This function processes any retransmits at the direction of redirections
+         * or "unauthorized" responses.
+         * 
+         * @return true if there was a retransmit
+         * @throws IOException
+         */
+        protected boolean processRetransmit() throws IOException {
+            int responseCode = getResponseCode();
+            if ((outMessage != null) && (outMessage.getExchange() != null)) {
+                outMessage.getExchange().put(Message.RESPONSE_CODE, responseCode);
+            }
+            // Process Redirects first.
+            switch(responseCode) {
+            case HttpURLConnection.HTTP_MOVED_PERM:
+            case HttpURLConnection.HTTP_MOVED_TEMP:
+            case HttpURLConnection.HTTP_SEE_OTHER:    
+            case 307:
+                return redirectRetransmit();
+            case HttpURLConnection.HTTP_UNAUTHORIZED:
+                return authorizationRetransmit();
+            default:
+                break;
+            }
+            return false;
+        }
+        protected boolean redirectRetransmit() throws IOException {
+            // If we are not redirecting by policy, then we don't.
+            if (!getClient(outMessage).isAutoRedirect()) {
+                return false;
+            }
+            Message m = new MessageImpl();
+            updateResponseHeaders(m);
+            String newURL = extractLocation(Headers.getSetProtocolHeaders(m));
+
+            detectRedirectLoop(getConduitName(), url, newURL, outMessage);
+            if (newURL != null) {
+                new Headers(outMessage).removeAuthorizationHeaders();
+                
+                // If user configured this Conduit with preemptive authorization
+                // it is meant to make it to the end. (Too bad that information
+                // went to every URL along the way, but that's what the user 
+                // wants!
+                setHeadersByAuthorizationPolicy(outMessage, new URL(newURL));
+                retransmit(newURL);
+                return true;
+            }
+            return false;
+        }
+        
+        /**
+         * This method performs a retransmit for authorization information.
+         * 
+         * @param connection The currently active connection.
+         * @param message The outbound message.
+         * @param cachedStream The cached request.
+         * @return A new connection if retransmitted. If not retransmitted
+         *         then this method returns the same connection.
+         * @throws IOException
+         */
+        protected boolean authorizationRetransmit() throws IOException {
+            Message m = new MessageImpl();
+            updateResponseHeaders(m);
+            HttpAuthHeader authHeader = new HttpAuthHeader(Headers.getSetProtocolHeaders(m).get("WWW-Authenticate"));
+            URL currentURL = new URL(url);
+            String realm = authHeader.getRealm();
+            detectAuthorizationLoop(getConduitName(), outMessage, currentURL, realm);
+            AuthorizationPolicy effectiveAthPolicy = getEffectiveAuthPolicy(outMessage);
+            String authorizationToken = 
+                authSupplier.getAuthorization(
+                    effectiveAthPolicy, currentURL, outMessage, authHeader.getFullHeader());
+            if (authorizationToken == null) {
+                // authentication not possible => we give up
+                return false;
+            }
+            
+            try {
+                closeInputStream();
+            } catch (Throwable t) {
+                //ignore
+            }
+            new Headers(outMessage).setAuthorization(authorizationToken);
+            cookies.writeToMessageHeaders(outMessage);
+            retransmit(url);
+            return true;
+        }
+
+
+        
+
+        private int getMaxRetransmits() {
+            HTTPClientPolicy policy = getClient(outMessage);
+            // Default MaxRetransmits is -1 which means unlimited.
+            return (policy == null) ? -1 : policy.getMaxRetransmits();
+        }
+        
+        /**
+         * This procedure is called on the close of the output stream so
+         * we are ready to handle the response from the connection. 
+         * We may retransmit until we finally get a response.
+         * 
+         * @throws IOException
+         */
+        protected void handleResponse() throws IOException {
+            // Process retransmits until we fall out.
+            handleRetransmits();
+
+            if (outMessage == null 
+                || outMessage.getExchange() == null
+                || outMessage.getExchange().isSynchronous()) {
+                handleResponseInternal();
+            } else {
+                handleResponseAsync();
+            }
+        }
+        
+        /**
+         * This predicate returns true iff the exchange indicates 
+         * a oneway MEP.
+         * 
+         * @param exchange The exchange in question
+         */
+        private boolean isOneway(Exchange exchange) {
+            return exchange != null && exchange.isOneWay();
+        }
+        
+        private boolean doProcessResponse(Message message) {
+            // 1. Not oneWay
+            if (!isOneway(message.getExchange())) {
+                return true;
+            }
+            // 2. Context property
+            return MessageUtils.getContextualBoolean(message, Message.PROCESS_ONEWAY_REPONSE, false);
+        }
+
+        protected void handleResponseInternal() throws IOException {
+            Exchange exchange = outMessage.getExchange();
+            int responseCode = getResponseCode();
+            if (responseCode == -1) {
+                LOG.warning("HTTP Response code appears to be corrupted");
+            }
+            if (exchange != null) {
+                exchange.put(Message.RESPONSE_CODE, responseCode);
+            }
+                       
+            // This property should be set in case the exceptions should not be handled here
+            // For example jax rs uses this
+            boolean noExceptions = MessageUtils.isTrue(outMessage.getContextualProperty(
+                "org.apache.cxf.http.no_io_exceptions"));
+            if (responseCode >= 400 && responseCode != 500 && !noExceptions) {
+                throw new HTTPException(responseCode, getResponseMessage(), new URL(url));
+            }
+
+            InputStream in = null;
+            // oneway or decoupled twoway calls may expect HTTP 202 with no content
+            if (isOneway(exchange) 
+                || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
+                in = getPartialResponse(responseCode);
+                if ((in == null) || !doProcessResponse(outMessage)) {
+                    // oneway operation or decoupled MEP without 
+                    // partial response
+                    closeInputStream();
+                    if (isOneway(exchange) && responseCode > 300) {
+                        throw new HTTPException(responseCode, getResponseMessage(), new URL(url));
+                    }
+                    ClientCallback cc = exchange.get(ClientCallback.class);
+                    if (null != cc) {
+                        //REVISIT move the decoupled destination property name into api
+                        Endpoint ep = exchange.getEndpoint();
+                        if (null != ep && null != ep.getEndpointInfo() && null == ep.getEndpointInfo().
+                            getProperty("org.apache.cxf.ws.addressing.MAPAggregator.decoupledDestination")) {
+                            cc.handleResponse(null, null);
+                        }
+                    }
+                    if (in != null) {
+                        in.close();
+                    }
+                    return;
                 }
             } else {
-                msg += " using " + clientSidePolicy.getProxyServerType() + " proxy "
-                       + clientSidePolicy.getProxyServer() + ":"
-                       + clientSidePolicy.getProxyServerPort();
+                //not going to be resending or anything, clear out the stuff in the out message
+                //to free memory
+                outMessage.removeContent(OutputStream.class);
+                if (cachingForRetransmission && cachedStream != null) {
+                    cachedStream.close();
+                }
+                cachedStream = null;
             }
-            break;
-        default:
-            // No other type of HttpRetryException should be thrown
-            break;
+            
+            Message inMessage = new MessageImpl();
+            inMessage.setExchange(exchange);
+            updateResponseHeaders(inMessage);
+            inMessage.put(Message.RESPONSE_CODE, responseCode);
+            String charset = HttpHeaderHelper.findCharset((String)inMessage.get(Message.CONTENT_TYPE));
+            String normalizedEncoding = HttpHeaderHelper.mapCharset(charset);
+            if (normalizedEncoding == null) {
+                String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
+                                                                   LOG, charset).toString();
+                LOG.log(Level.WARNING, m);
+                throw new IOException(m);   
+            } 
+            inMessage.put(Message.ENCODING, normalizedEncoding);
+            if (in == null) {
+                in = getInputStream(responseCode);
+            }
+            if (in == null) {
+                // Create an empty stream to avoid NullPointerExceptions
+                in = new ByteArrayInputStream(new byte[] {});
+            }
+            inMessage.setContent(InputStream.class, in);
+            
+            
+            incomingObserver.onMessage(inMessage);
+            
         }
-        // pass cause with initCause() instead of constructor for jdk 1.5 compatibility
-        throw (IOException) new IOException(msg).initCause(e);
+
+        
+        protected void handleHttpRetryException(HttpRetryException e) throws IOException {
+            String msg = "HTTP response '" + e.responseCode() + ": "
+                + getResponseMessage() + "' invoking " + url;
+            switch (e.responseCode()) {
+            case HttpURLConnection.HTTP_MOVED_PERM: // 301
+            case HttpURLConnection.HTTP_MOVED_TEMP: // 302
+            case HttpURLConnection.HTTP_SEE_OTHER:  // 303    
+            case 307:    
+                msg += " that returned location header '" + e.getLocation() + "'";
+                break;
+            case HttpURLConnection.HTTP_UNAUTHORIZED: // 401
+                if (authorizationPolicy == null || authorizationPolicy.getUserName() == null) {
+                    msg += " with NO authorization username configured in conduit " + getConduitName();
+                } else {
+                    msg += " with authorization username '" + authorizationPolicy.getUserName() + "'";
+                }
+                break;
+            case HttpURLConnection.HTTP_PROXY_AUTH: // 407
+                if (proxyAuthorizationPolicy == null || proxyAuthorizationPolicy.getUserName() == null) {
+                    msg += " with NO proxy authorization configured in conduit " + getConduitName();
+                } else {
+                    msg += " with proxy authorization username '"
+                        + proxyAuthorizationPolicy.getUserName() + "'";
+                }
+                if (clientSidePolicy == null || clientSidePolicy.getProxyServer() == null) {
+                    if (usingProxy()) {
+                        msg += " using a proxy even if NONE is configured in CXF conduit "
+                            + getConduitName()
+                            + " (maybe one is configured by java.net.ProxySelector)";
+                    } else {
+                        msg += " but NO proxy was used by the connection (none configured in cxf "
+                            + "conduit and none selected by java.net.ProxySelector)";
+                    }
+                } else { 
+                    msg += " using " + clientSidePolicy.getProxyServerType() + " proxy "
+                        + clientSidePolicy.getProxyServer() + ":"
+                        + clientSidePolicy.getProxyServerPort();
+                }
+                break;
+            default:
+                // No other type of HttpRetryException should be thrown
+                break;
+            }
+            throw new IOException(msg, e);
+        }
+
+        /**
+         * This call must take place before anything is written to the 
+         * URLConnection. The URLConnection.connect() will be called in order 
+         * to get the connection information. 
+         * 
+         * This method is invoked just after setURLRequestHeaders() from the 
+         * WrappedOutputStream before it writes data to the URLConnection.
+         * 
+         * If trust cannot be established the Trust Decider implemenation
+         * throws an IOException.
+         * 
+         * @param message      The message being sent.
+         * @throws IOException This exception is thrown if trust cannot be
+         *                     established by the configured MessageTrustDecider.
+         * @see MessageTrustDecider
+         */
+        protected void makeTrustDecision() throws IOException {
+        
+            MessageTrustDecider decider2 = outMessage.get(MessageTrustDecider.class);
+            if (trustDecider != null || decider2 != null) {
+                try {
+                    // We must connect or we will not get the credentials.
+                    // The call is (said to be) ingored internally if
+                    // already connected.
+                    HttpsURLConnectionInfo info = getHttpsURLConnectionInfo();
+                    if (trustDecider != null) {
+                        trustDecider.establishTrust(
+                                conduitName, 
+                            info,
+                            outMessage);
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.log(Level.FINE, "Trust Decider "
+                                + trustDecider.getLogicalName()
+                                + " considers Conduit "
+                                + conduitName 
+                                + " trusted.");
+                        }
+                    }
+                    if (decider2 != null) {
+                        decider2.establishTrust(conduitName, 
+                                                info,
+                                                outMessage);
+                        if (LOG.isLoggable(Level.FINE)) {
+                            LOG.log(Level.FINE, "Trust Decider "
+                                + decider2.getLogicalName()
+                                + " considers Conduit "
+                                + conduitName 
+                                + " trusted.");
+                        }
+                    }
+                } catch (UntrustedURLConnectionIOException untrustedEx) {
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.log(Level.FINE, "Trust Decider "
+                            + trustDecider.getLogicalName()
+                            + " considers Conduit "
+                            + conduitName 
+                            + " untrusted.", untrustedEx);
+                    }
+                    throw untrustedEx;
+                }
+            } else {
+                // This case, when there is no trust decider, a trust
+                // decision should be a matter of policy.
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "No Trust Decider for Conduit '"
+                        + conduitName
+                        + "'. An afirmative Trust Decision is assumed.");
+                }
+            }
+        }
     }
+
+    private static void detectRedirectLoop(String conduitName, 
+                                           String lastURL, 
+                                           String newURL,
+                                           Message message) throws IOException {
+        @SuppressWarnings("unchecked")
+        Set<String> visitedURLs = (Set<String>) message.get(KEY_VISITED_URLS);
+        if (visitedURLs == null) {
+            visitedURLs = new HashSet<String>();
+            message.put(KEY_VISITED_URLS, visitedURLs);
+        }
+        visitedURLs.add(lastURL);
+        if (newURL != null && visitedURLs.contains(newURL)) {
+            // See if we are being redirected in a loop as best we can,
+            // using string equality on URL.
+            // We are in a redirect loop; -- bail
+            String msg = "Redirect loop detected on Conduit '" 
+                + conduitName + "' on '" + newURL + "'";
+            LOG.log(Level.INFO, msg);
+            throw new IOException(msg);
+        }
+    }   
+    private static void detectAuthorizationLoop(String conduitName, Message message, 
+                                                URL currentURL, String realm) throws IOException {
+        @SuppressWarnings("unchecked")
+        Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
+        if (authURLs == null) {
+            authURLs = new HashSet<String>();
+            message.put(KEY_AUTH_URLS, authURLs);
+        }
+        // If we have been here (URL & Realm) before for this particular message
+        // retransmit, it means we have already supplied information
+        // which must have been wrong, or we wouldn't be here again.
+        // Otherwise, the server may be 401 looping us around the realms.
+        if (authURLs.contains(currentURL.toString() + realm)) {
+            String logMessage = "Authorization loop detected on Conduit \""
+                + conduitName
+                + "\" on URL \""
+                + currentURL
+                + "\" with realm \""
+                + realm
+                + "\"";
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.log(Level.INFO, logMessage);
+            }
+
+            throw new IOException(logMessage);
+        }
+        // Register that we have been here before we go.
+        authURLs.add(currentURL.toString() + realm);
+    }
+
     
 }

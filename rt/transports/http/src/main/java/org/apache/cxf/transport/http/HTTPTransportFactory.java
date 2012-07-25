@@ -247,7 +247,7 @@ public class HTTPTransportFactory
             EndpointInfo endpointInfo,
             EndpointReferenceType target
     ) throws IOException {
-        HTTPConduit conduit = new HTTPConduit(bus, endpointInfo, target);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
         // Spring configure the conduit.  
         String address = conduit.getAddress();
         if (address != null && address.indexOf('?') != -1) {

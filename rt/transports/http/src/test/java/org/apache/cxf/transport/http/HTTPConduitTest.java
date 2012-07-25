@@ -90,7 +90,7 @@ public class HTTPConduitTest extends Assert {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
 
         EndpointReferenceType target =
@@ -126,7 +126,7 @@ public class HTTPConduitTest extends Assert {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
 
         Message message = getNewMessage();
@@ -147,7 +147,7 @@ public class HTTPConduitTest extends Assert {
         ap.setUserName("testUser");
         ei.addExtensor(ap);
         ei.setAddress("http://nowhere.com/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
         Message message = getNewMessage();
 
@@ -176,7 +176,7 @@ public class HTTPConduitTest extends Assert {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
+        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
         conduit.finalizeConfig();
 
         conduit.getAuthorization().setUserName("Satan");
