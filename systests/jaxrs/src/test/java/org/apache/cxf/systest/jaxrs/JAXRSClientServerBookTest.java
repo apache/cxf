@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -44,7 +45,9 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
@@ -56,6 +59,9 @@ import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -72,7 +78,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
         createStaticBus();
     }
     
@@ -878,6 +884,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testBookExists() throws Exception {
         checkBook("http://localhost:" + PORT + "/bookstore/books/check/123", true);
         checkBook("http://localhost:" + PORT + "/bookstore/books/check/125", false);  
+    }
+    
+    @Test
+    public void testBookExistsMalformedMt() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" + PORT + "/bookstore/books/check/malformedmt/123");
+        wc.accept(MediaType.TEXT_PLAIN);
+        WebClient.getConfig(wc).getInInterceptors().add(new ReplaceContentTypeInterceptor());
+        assertTrue(wc.get(Boolean.class));
     }
     
     @Test
@@ -1852,5 +1867,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         return bos.getOut().toString();        
     }
 
-    
+    public static class ReplaceContentTypeInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ReplaceContentTypeInterceptor() {
+            super(Phase.READ);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            Map<String, List<String>> headers = 
+                CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+            headers.put(Message.CONTENT_TYPE, Collections.singletonList("text/plain"));
+        }
+    }
+
 }

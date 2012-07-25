@@ -75,6 +75,8 @@ public class BookServer extends AbstractBusTestServerBase {
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
 
+        sf.getProperties(true).put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", true);
+        
         server = sf.create();
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
