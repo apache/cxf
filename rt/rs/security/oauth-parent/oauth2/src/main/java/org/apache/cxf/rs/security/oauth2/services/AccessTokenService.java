@@ -108,16 +108,15 @@ public class AccessTokenService extends AbstractOAuthService {
         // Extract the information to be of use for the client
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
                                                               serverToken.getTokenKey());
+        clientToken.setRefreshToken(serverToken.getRefreshToken());
         if (writeOptionalParameters) {
-            clientToken.setExpiresIn(serverToken.getLifetime());
+            clientToken.setExpiresIn(serverToken.getExpiresIn());
             List<OAuthPermission> perms = serverToken.getScopes();
             if (!perms.isEmpty()) {
                 clientToken.setApprovedScope(OAuthUtils.convertPermissionsToScope(perms));    
             }
             clientToken.setParameters(serverToken.getParameters());
         }
-        
-        //TODO: also set a refresh token if any
         
         // Return it to the client
         return Response.ok(clientToken)

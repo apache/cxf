@@ -36,6 +36,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.tokens.mac.MacAuthorizationScheme;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
@@ -212,6 +213,9 @@ public final class OAuthClientUtils {
             if (expiresInStr != null) {
                 token.setExpiresIn(Long.valueOf(expiresInStr));
             }
+            String issuedAtStr = map.remove(OAuthConstants.ACCESS_TOKEN_ISSUED_AT);
+            token.setIssuedAt(issuedAtStr != null ? Long.valueOf(issuedAtStr)
+                                                  : System.currentTimeMillis() / 1000);
             String scope = map.remove(OAuthConstants.SCOPE);
             if (scope != null) {
                 token.setApprovedScope(scope);
@@ -225,7 +229,7 @@ public final class OAuthClientUtils {
     }
     
     /**
-     * Creates OAuth Authorization header for accessing the end user's resources
+     * Creates OAuth Authorization header with Bearer scheme
      * @param consumer represents the registered client
      * @param accessToken the access token  
      * @return the header value
@@ -234,21 +238,46 @@ public final class OAuthClientUtils {
                                                    ClientAccessToken accessToken)
         throws OAuthServiceException {
         StringBuilder sb = new StringBuilder();
-        appendTokenData(sb, accessToken);  
+        appendTokenData(sb, accessToken, null);  
         return sb.toString();
     }
     
-
-    private static void appendTokenData(StringBuilder sb, ClientAccessToken token) 
+    /**
+     * Creates OAuth Authorization header with the scheme that
+     * may require an access to the current HTTP request properties
+     * @param consumer represents the registered client
+     * @param accessToken the access token  
+     * @param httpProps http request properties, can be null for Bearer tokens
+     * @return the header value
+     */
+    public static String createAuthorizationHeader(Consumer consumer,
+                                                   ClientAccessToken accessToken,
+                                                   HttpRequestProperties httpProps)
+        throws OAuthServiceException {
+        StringBuilder sb = new StringBuilder();
+        appendTokenData(sb, accessToken, httpProps);  
+        return sb.toString();
+    }
+    
+    private static void appendTokenData(StringBuilder sb, 
+                                        ClientAccessToken token,
+                                        HttpRequestProperties httpProps) 
         throws OAuthServiceException {
         // this should all be handled by token specific serializers
         if (OAuthConstants.BEARER_TOKEN_TYPE.equals(token.getTokenType())) {
             sb.append(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
             sb.append(" ");
             sb.append(token.getTokenKey());
+        } else if (OAuthConstants.MAC_TOKEN_TYPE.equals(token.getTokenType())) {
+            if (httpProps == null) {
+                throw new IllegalArgumentException("MAC scheme requires HTTP Request properties");
+            }
+            MacAuthorizationScheme macAuthData = new MacAuthorizationScheme(httpProps, token);
+            String macAlgo = token.getParameters().get(OAuthConstants.MAC_TOKEN_ALGORITHM);
+            String macSecret = token.getParameters().get(OAuthConstants.MAC_TOKEN_SECRET);
+            sb.append(macAuthData.toAuthorizationHeader(macAlgo, macSecret));
         } else {
-            // deal with MAC and other tokens
-            throw new OAuthServiceException("Unsupported token type");
+            throw new ClientWebApplicationException(new OAuthServiceException("Unsupported token type"));
         }
         
     }

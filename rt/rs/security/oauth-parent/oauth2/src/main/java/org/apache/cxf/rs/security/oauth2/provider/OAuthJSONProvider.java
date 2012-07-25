@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -160,7 +160,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (!str.startsWith("{") || !str.endsWith("}")) {
             throw new ClientWebApplicationException("JSON Sequence is broken");
         }
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         
         str = str.substring(1, str.length() - 1).trim();
         String[] jsonPairs = str.split(",");

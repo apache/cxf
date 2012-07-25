@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,11 +28,24 @@ public abstract class AccessToken {
 
     private String tokenKey;
     private String tokenType;
-    private Map<String, String> parameters = Collections.emptyMap();
+    private String refreshToken;
+    private long expiresIn = -1;
+    private long issuedAt = -1;
+    
+    
+    private Map<String, String> parameters = new LinkedHashMap<String, String>();
     
     protected AccessToken(String tokenType, String tokenKey) {
         this.tokenType = tokenType;
         this.tokenKey = tokenKey;
+    }
+    
+    protected AccessToken(String tokenType, String tokenKey,
+                          long expiresIn, long issuedAt) {
+        this.tokenType = tokenType;
+        this.tokenKey = tokenKey;
+        this.expiresIn = expiresIn;
+        this.issuedAt = issuedAt;
     }
 
     /**
@@ -52,13 +65,23 @@ public abstract class AccessToken {
     }
 
     /**
-     * Sets token parameters
-     * @param parameters the token parameters
+     * Sets the refresh token key the client can use to obtain a new
+     * access token
+     * @param refreshToken the refresh token
      */
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
+    /**
+     * Gets the refresh token key the client can use to obtain a new
+     * access token
+     * @return the refresh token
+     */
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+    
     /**
      * Gets token parameters 
      * @return
@@ -67,4 +90,33 @@ public abstract class AccessToken {
         return parameters;
     }
 
+    /**
+     * The token lifetime
+     * @return the lifetime, -1 means no 'expires_in' parameter was returned
+     */
+    public long getExpiresIn() {
+        return expiresIn;
+    }
+
+    public void setExpiresIn(long expiresIn) {
+        this.expiresIn = expiresIn;
+    }
+
+    public long getIssuedAt() {
+        return issuedAt;
+    }
+
+    // Can be set at the server or at the moment 
+    // the token is deserialized on the client
+    public void setIssuedAt(long issuedAt) {
+        this.issuedAt = issuedAt;
+    }
+    
+    /**
+     * Sets additional token parameters
+     * @param parameters the token parameters
+     */
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+    }
 }

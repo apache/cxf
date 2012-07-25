@@ -48,11 +48,25 @@ public final class OAuthConstants {
     public static final String BEARER_TOKEN_TYPE = "bearer";
     public static final String MAC_TOKEN_TYPE = "mac";
     
+    // MAC token parameters
+    // Set by Access Token Service
+    public static final String MAC_TOKEN_SECRET = "secret";
+    public static final String MAC_TOKEN_ALGORITHM = "algorithm";
+    public static final String MAC_TOKEN_ALGO_HMAC_SHA_1 = "hmac-sha-1";
+    public static final String MAC_TOKEN_ALGO_HMAC_SHA_256 = "hmac-sha-256";
+    
+    // Set in Authorization header
+    public static final String MAC_TOKEN_ID = "id";
+    public static final String MAC_TOKEN_EXTENSION = "ext";
+    public static final String MAC_TOKEN_NONCE = "nonce";
+    public static final String MAC_TOKEN_SIGNATURE = "mac";
+    
     // Token Authorization schemes
     public static final String BEARER_AUTHORIZATION_SCHEME = "Bearer";
-    public static final String MAC_AUTHORIZATION_SCHEME = "Mac";
+    public static final String MAC_AUTHORIZATION_SCHEME = "MAC";
     public static final String ALL_AUTH_SCHEMES = "*";
 
+    
     // Default Client Authentication Scheme
     public static final String BASIC_SCHEME = "Basic";
     
@@ -82,6 +96,12 @@ public final class OAuthConstants {
     public static final String INVALID_CLIENT = "invalid_client";
     public static final String INVALID_SCOPE = "invalid_scope";
     public static final String ACCESS_DENIED = "access_denied";
+    
+    // CXF-Specific parameters
+    public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
+    // End Of CXF-Specific
+    
+    
     
     private OAuthConstants() {
     }

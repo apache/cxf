@@ -26,8 +26,6 @@ import java.util.List;
  */
 public abstract class ServerAccessToken extends AccessToken {
     private String grantType;
-    private long issuedAt;
-    private long lifetime;
     private Client client;
     private List<OAuthPermission> scopes = Collections.emptyList();
     private UserSubject subject;
@@ -35,12 +33,10 @@ public abstract class ServerAccessToken extends AccessToken {
     protected ServerAccessToken(Client client, 
                                         String tokenType,
                                         String tokenKey,
-                                        long lifetime, 
+                                        long expiresIn, 
                                         long issuedAt) {
-        super(tokenType, tokenKey);
+        super(tokenType, tokenKey, expiresIn, issuedAt);
         this.client = client;
-        this.lifetime = lifetime;
-        this.issuedAt = issuedAt;
     }
 
     /**
@@ -51,20 +47,13 @@ public abstract class ServerAccessToken extends AccessToken {
         return client;
     }
 
-    /**
-     * Returns the time (in seconds) when this token was issued at
-     * @return the seconds
-     */
-    public long getIssuedAt() {
-        return issuedAt;
-    }
-
+    @Deprecated
     /**
      * Returns the number of seconds this token can be valid after it was issued
      * @return the seconds
      */
     public long getLifetime() {
-        return lifetime;
+        return getExpiresIn();
     }
 
     /**

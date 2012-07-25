@@ -103,7 +103,7 @@ public abstract class AbstractAccessTokenValidator {
         if (handler != null) {
             try {
                 // Convert the HTTP Authorization scheme data into a token
-                accessTokenV = handler.validateAccessToken(authScheme, authSchemeData);
+                accessTokenV = handler.validateAccessToken(mc, authScheme, authSchemeData);
             } catch (OAuthServiceException ex) {
                 AuthorizationUtils.throwAuthorizationFailure(
                     Collections.singleton(authScheme));
@@ -136,9 +136,5 @@ public abstract class AbstractAccessTokenValidator {
         return accessTokenV;
     }
     
-    @Deprecated
-    public void setGrantHandlers(List<AccessTokenValidator> validators) {
-        setTokenValidators(validators);
-    }
     
 }
