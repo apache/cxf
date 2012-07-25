@@ -52,8 +52,8 @@ public class XMLMessageInInterceptorTest extends TestBase {
                         MyComplexStructType.class);
         
         OperationInfo op = serviceInfo.getInterface().getOperation(new QName(ns, "testMultiParamPart"));
-        op.getInput().getMessagePartByIndex(0).setTypeClass(MyComplexStructType.class);
-        op.getInput().getMessagePartByIndex(1).setTypeClass(String.class);
+        op.getInput().getMessagePartByIndex(0).setTypeClass(String.class);
+        op.getInput().getMessagePartByIndex(1).setTypeClass(MyComplexStructType.class);
         
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
@@ -61,8 +61,8 @@ public class XMLMessageInInterceptorTest extends TestBase {
         assertNotNull(list);
         assertEquals("expect 2 param", 2, list.size());
         assertEquals("method input in2 is MyComplexStructType", true,
-                        list.get(0) instanceof MyComplexStructType);
-        assertEquals("method input in1 is String tli", true, ((String) list.get(1)).indexOf("tli") >= 0);
+                        list.get(1) instanceof MyComplexStructType);
+        assertEquals("method input in1 is String tli", true, ((String) list.get(0)).indexOf("tli") >= 0);
     }
 
     @Test
