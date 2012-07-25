@@ -67,7 +67,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class, true));
+                   launchServer(BookServerSpring.class));
         createStaticBus();
     }
     
