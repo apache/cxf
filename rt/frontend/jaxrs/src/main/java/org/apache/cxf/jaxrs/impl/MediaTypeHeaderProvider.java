@@ -24,14 +24,22 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
-public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
+public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
+    private static final Logger LOG = LogUtils.getL7dLogger(MediaTypeHeaderProvider.class);
+    private static final String STRICT_MEDIA_TYPE_CHECK = 
+        "org.apache.cxf.jaxrs.mediaTypeCheck.strict";
     private static final Pattern COMPLEX_PARAMETERS = 
         Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/]+))");
     
@@ -43,14 +51,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         
         int i = mType.indexOf('/');
         if (i == -1) {
-            mType = mType.trim();
-            if (mType.startsWith(MediaType.MEDIA_TYPE_WILDCARD)) {
-                char next = mType.length() == 1 ? ' ' : mType.charAt(1);
-                if (next == ' ' || next == ';') {
-                    return new MediaType("*", "*");
-                }
-            }
-            throw new IllegalArgumentException("Media type separator is missing");
+            return handleMediaTypeWithoutSubtype(mType.trim());
         }
         
         int paramsStart = mType.indexOf(';', i + 1);
@@ -109,5 +110,28 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         return sb.toString();
     }
 
-    
+    private MediaType handleMediaTypeWithoutSubtype(String mType) {
+        if (mType.startsWith(MediaType.MEDIA_TYPE_WILDCARD)) {
+            char next = mType.length() == 1 ? ' ' : mType.charAt(1);
+            if (next == ' ' || next == ';') {
+                return MediaType.WILDCARD_TYPE;
+            }
+        }
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message != null 
+            && !MessageUtils.isTrue(message.getContextualProperty(STRICT_MEDIA_TYPE_CHECK))) {
+            MediaType mt = null;
+            if (mType.equals(MediaType.TEXT_PLAIN_TYPE.getType())) {
+                mt = MediaType.TEXT_PLAIN_TYPE;
+            } else if (mType.equals(MediaType.APPLICATION_XML_TYPE.getSubtype())) {
+                mt = MediaType.APPLICATION_XML_TYPE;
+            } else {
+                mt = MediaType.WILDCARD_TYPE;
+            }
+            LOG.fine("Converting a malformed media type '" + mType + "' to '" + mt.toString() + "'");
+            return mt;
+        } else {
+            throw new IllegalArgumentException("Media type separator is missing");
+        }
+    }
 }
