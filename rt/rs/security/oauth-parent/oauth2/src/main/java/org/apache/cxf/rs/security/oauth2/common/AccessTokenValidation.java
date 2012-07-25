@@ -57,7 +57,7 @@ public class AccessTokenValidation {
         this.tokenType = token.getTokenType();
         this.tokenGrantType = token.getGrantType();
         this.tokenIssuedAt = token.getIssuedAt();
-        this.tokenLifetime = token.getLifetime();
+        this.tokenLifetime = token.getExpiresIn();
         
         this.tokenSubject = token.getSubject();
         this.tokenScopes = token.getScopes();        
