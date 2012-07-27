@@ -26,28 +26,22 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.cxf.workqueue.AutomaticWorkQueue;
-import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
  * 
  */
 public class URLConnectionHTTPConduit extends HTTPConduit {
-    private static boolean hasLoggedAsyncWarning;
 
     /**
      * This field holds the connection factory, which primarily is used to 
@@ -168,6 +162,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 wrappedStream = connection.getOutputStream();
             }
         }
+
         @Override
         public void thresholdReached() {
             if (chunking) {
@@ -195,17 +190,24 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             connection.connect();
             return new HttpsURLConnectionInfo(connection);
         }
-        protected void updateCookies() {
-            cookies.readFromConnection(connection);
-        }
         protected void updateResponseHeaders(Message inMessage) {
-            new Headers(inMessage).readFromConnection(connection);
+            Headers h = new Headers(inMessage);
+            h.readFromConnection(connection);
             inMessage.put(Message.CONTENT_TYPE, connection.getContentType());
-            cookies.readFromConnection(connection);
+            cookies.readFromHeaders(h);
         }
-        protected InputStream getInputStream(int responseCode) throws IOException {
+        protected void handleResponseAsync() throws IOException {
+            handleResponseOnWorkqueue(true);
+        }
+        protected void updateCookiesBeforeRetransmit() {
+            Headers h = new Headers();
+            h.readFromConnection(connection);
+            cookies.readFromHeaders(h);
+        }
+        
+        protected InputStream getInputStream() throws IOException {
             InputStream in = null;
-            if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+            if (getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 in = connection.getErrorStream();
                 if (in == null) {
                     try {
@@ -233,64 +235,14 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 ins.close();
             }
         }
-        protected void handleResponseAsync() throws IOException {
-            Runnable runnable = new Runnable() {
-                public void run() {
-                    try {
-                        handleResponseInternal();
-                    } catch (Exception e) {
-                        ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
-                        ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
-                        outMessage.setContent(Exception.class, e);
-                        outMessage.getInterceptorChain().getFaultObserver().onMessage(outMessage);
-                    }
-                }
-            };
-            HTTPClientPolicy policy = getClient(outMessage);
-            try {
-                Executor ex = outMessage.getExchange().get(Executor.class);
-                if (ex == null) {
-                    WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
-                        .getExtension(WorkQueueManager.class);
-                    AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
-                    if (qu == null) {
-                        qu = mgr.getAutomaticWorkQueue();
-                    }
-                    long timeout = 5000;
-                    if (policy != null && policy.isSetAsyncExecuteTimeout()) {
-                        timeout = policy.getAsyncExecuteTimeout();
-                    }
-                    if (timeout > 0) {
-                        qu.execute(runnable, timeout);
-                    } else {
-                        qu.execute(runnable);
-                    }
-                } else {
-                    outMessage.getExchange().put(Executor.class.getName() 
-                                             + ".USING_SPECIFIED", Boolean.TRUE);
-                    ex.execute(runnable);
-                }
-            } catch (RejectedExecutionException rex) {
-                if (policy != null && policy.isSetAsyncExecuteTimeoutRejection()
-                    && policy.isAsyncExecuteTimeoutRejection()) {
-                    throw rex;
-                }
-                if (!hasLoggedAsyncWarning) {
-                    LOG.warning("EXECUTOR_FULL_WARNING");
-                    hasLoggedAsyncWarning = true;
-                }
-                LOG.fine("EXECUTOR_FULL");
-                handleResponseInternal();
-            }
-        }
         protected int getResponseCode() throws IOException {
             return connection.getResponseCode();
         }
         protected String getResponseMessage() throws IOException {
             return connection.getResponseMessage();
         }
-        protected InputStream getPartialResponse(int responseCode) throws IOException {
-            return ChunkedUtil.getPartialResponse(connection, responseCode);
+        protected InputStream getPartialResponse() throws IOException {
+            return ChunkedUtil.getPartialResponse(connection, connection.getResponseCode());
         }
         protected boolean usingProxy() {
             return connection.usingProxy();

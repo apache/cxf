@@ -53,8 +53,8 @@ public class Headers {
      */
     public static final String KEY_HTTP_CONNECTION = "http.connection";
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
-    private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
-    private static final String ADD_HEADERS_PROPERTY = "org.apache.cxf.http.add-headers";             
+    public static final String ADD_HEADERS_PROPERTY = "org.apache.cxf.http.add-headers";             
+    public static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
     
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     private final Message message;
@@ -64,6 +64,15 @@ public class Headers {
         this.message = message;
         this.headers = getSetProtocolHeaders(message);
     }
+    public Headers() {
+        this.headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        this.message = null;
+    }
+    
+    public Map<String, List<String>> headerMap() {
+        return headers;
+    }
+    
 
     /**
      * Write cookie header from given session cookies
@@ -266,7 +275,7 @@ public class Headers {
         logProtocolHeaders(Level.FINE);
     }
 
-    private String determineContentType() {
+    public String determineContentType() {
         String ct  = (String)message.get(Message.CONTENT_TYPE);
         String enc = (String)message.get(Message.ENCODING);
 

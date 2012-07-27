@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,6 +62,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.policy.PolicyDataEngine;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
@@ -76,6 +79,8 @@ import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.workqueue.AutomaticWorkQueue;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /*
@@ -138,7 +143,7 @@ public abstract class HTTPConduit
     extends AbstractConduit 
     implements Configurable, Assertor, PropertyChangeListener {  
 
-    
+
     /**
      *  This constant is the Message(Map) key for the HttpURLConnection that
      *  is used to get the response.
@@ -150,6 +155,7 @@ public abstract class HTTPConduit
      */
     protected static final Logger LOG = LogUtils.getL7dLogger(HTTPConduit.class);
     
+    private static boolean hasLoggedAsyncWarning;
 
     /**
      * This constant holds the suffix ".http-conduit" that is appended to the 
@@ -1069,21 +1075,82 @@ public abstract class HTTPConduit
             }
         }
 
+        // methods used for the outgoing side
         protected abstract void setupWrappedStream() throws IOException;
-        protected abstract void handleResponseAsync() throws IOException;
-        protected abstract void closeInputStream() throws IOException;
-        protected abstract InputStream getInputStream(int rc) throws IOException;
-        protected abstract void updateResponseHeaders(Message inMessage);
-        protected abstract boolean usingProxy();
         protected abstract HttpsURLConnectionInfo getHttpsURLConnectionInfo() throws IOException;
-        protected abstract int getResponseCode() throws IOException;
-        protected abstract String getResponseMessage() throws IOException;
-        protected abstract void updateCookies();
-        protected abstract InputStream getPartialResponse(int responseCode) throws IOException;
         protected abstract void setProtocolHeaders() throws IOException;
         protected abstract void setFixedLengthStreamingMode(int i);
-        protected abstract void retransmitStream() throws IOException;
+        
+        
+        // methods used for the incoming side
+        protected abstract int getResponseCode() throws IOException;
+        protected abstract String getResponseMessage() throws IOException;
+        protected abstract void updateResponseHeaders(Message inMessage);
+        protected abstract void handleResponseAsync() throws IOException;
+        protected abstract void closeInputStream() throws IOException;
+        protected abstract boolean usingProxy();
+        protected abstract InputStream getInputStream() throws IOException;
+        protected abstract InputStream getPartialResponse() throws IOException;
+
+        //methods to support retransmission for auth or redirects
         protected abstract void setupNewConnection(String newURL) throws IOException;
+        protected abstract void retransmitStream() throws IOException;
+        protected abstract void updateCookiesBeforeRetransmit() throws IOException;
+
+        
+        protected void handleResponseOnWorkqueue(boolean allowCurrentThread) throws IOException {
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    try {
+                        handleResponseInternal();
+                    } catch (Throwable e) {
+                        ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
+                        ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
+                        outMessage.setContent(Exception.class, e);
+                        outMessage.getInterceptorChain().getFaultObserver().onMessage(outMessage);
+                    }
+                }
+            };
+            HTTPClientPolicy policy = getClient(outMessage);
+            try {
+                Executor ex = outMessage.getExchange().get(Executor.class);
+                if (ex == null) {
+                    WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
+                        .getExtension(WorkQueueManager.class);
+                    AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");
+                    if (qu == null) {
+                        qu = mgr.getAutomaticWorkQueue();
+                    }
+                    long timeout = 1000;
+                    if (policy != null && policy.isSetAsyncExecuteTimeout()) {
+                        timeout = policy.getAsyncExecuteTimeout();
+                    }
+                    if (timeout > 0) {
+                        qu.execute(runnable, timeout);
+                    } else {
+                        qu.execute(runnable);
+                    }
+                } else {
+                    outMessage.getExchange().put(Executor.class.getName() 
+                                             + ".USING_SPECIFIED", Boolean.TRUE);
+                    ex.execute(runnable);
+                }
+            } catch (RejectedExecutionException rex) {
+                if (allowCurrentThread
+                    && policy != null 
+                    && policy.isSetAsyncExecuteTimeoutRejection()
+                    && policy.isAsyncExecuteTimeoutRejection()) {
+                    throw rex;
+                }
+                if (!hasLoggedAsyncWarning) {
+                    LOG.warning("EXECUTOR_FULL_WARNING");
+                    hasLoggedAsyncWarning = true;
+                }
+                LOG.fine("EXECUTOR_FULL");
+                handleResponseInternal();
+            }
+        }
+
         
         protected void retransmit(String newURL) throws IOException {
             setupNewConnection(newURL);
@@ -1262,7 +1329,7 @@ public abstract class HTTPConduit
 
 
                 int maxRetransmits = getMaxRetransmits();
-                updateCookies();
+                updateCookiesBeforeRetransmit();
                 int nretransmits = 0;
                 while ((maxRetransmits < 0 || nretransmits < maxRetransmits) && processRetransmit()) {
                     nretransmits++;
@@ -1426,7 +1493,7 @@ public abstract class HTTPConduit
             // oneway or decoupled twoway calls may expect HTTP 202 with no content
             if (isOneway(exchange) 
                 || HttpURLConnection.HTTP_ACCEPTED == responseCode) {
-                in = getPartialResponse(responseCode);
+                in = getPartialResponse();
                 if ((in == null) || !doProcessResponse(outMessage)) {
                     // oneway operation or decoupled MEP without 
                     // partial response
@@ -1472,7 +1539,7 @@ public abstract class HTTPConduit
             } 
             inMessage.put(Message.ENCODING, normalizedEncoding);
             if (in == null) {
-                in = getInputStream(responseCode);
+                in = getInputStream();
             }
             if (in == null) {
                 // Create an empty stream to avoid NullPointerExceptions

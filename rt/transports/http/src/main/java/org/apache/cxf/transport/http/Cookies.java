@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http;
 
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,12 +36,11 @@ public class Cookies {
         return sessionCookies;
     }
     
-    public void readFromConnection(HttpURLConnection connection) {
+    public void readFromHeaders(Headers headers) {
         if (maintainSession) {
-            for (Map.Entry<String, List<String>> h : connection.getHeaderFields().entrySet()) {
-                if ("Set-Cookie".equalsIgnoreCase(h.getKey())) {
-                    handleSetCookie(h.getValue());
-                }
+            List<String> c = headers.headerMap().get("Set-Cookie");
+            if (c != null) {
+                handleSetCookie(c);
             }
         }
     }
