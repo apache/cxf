@@ -630,9 +630,8 @@ public class ClientImpl
         if (inMsg != null) {
             if (null != resContext) {
                 resContext.putAll(inMsg);
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("set responseContext to be" + resContext);
-                }
+                // remove the recursive reference if present
+                resContext.remove(Message.INVOCATION_CONTEXT);
                 responseContext.put(Thread.currentThread(), resContext);
             }
             resList = inMsg.getContent(List.class);
