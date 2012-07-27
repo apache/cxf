@@ -65,11 +65,15 @@ public class BusApplicationContextResourceResolver
     }
 
     public <T> T resolve(String resourceName, Class<T> resourceType) {
-        if (resourceName == null) {
-            return null;
-        }   
+           
         try {
-            return resourceType.cast(context.getBean(resourceName, resourceType));
+            T resource = null;
+            if (resourceName == null) {
+                resource = resourceType.cast(context.getBean(resourceType));
+            } else {
+                resource = resourceType.cast(context.getBean(resourceName, resourceType));
+            }
+            return resource;
         } catch (NoSuchBeanDefinitionException def) {
             //ignore
         }
