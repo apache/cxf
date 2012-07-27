@@ -430,7 +430,7 @@ public abstract class AbstractClient implements Client, Retryable {
             }
         }
         
-        MediaType contentType = getResponseContentType(r);
+        MediaType contentType = getResponseContentType(inMessage, r);
         
         MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
             cls, type, anns, contentType, inMessage);
@@ -595,10 +595,19 @@ public abstract class AbstractClient implements Client, Retryable {
         throw new ClientWebApplicationException(errorMsg.toString(), cause, response);
     }
     
-    private static MediaType getResponseContentType(Response r) {
+    private static MediaType getResponseContentType(Message m, Response r) {
         MultivaluedMap<String, Object> map = r.getMetadata();
         if (map.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            return MediaType.valueOf(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
+            try {
+                return MediaType.valueOf(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
+            } catch (IllegalArgumentException ex) {
+                String error = ex.getMessage();
+                if (error != null && error.contains("separator") && m.containsKey(Message.CONTENT_TYPE)) { 
+                    return MediaType.valueOf((String)m.get(Message.CONTENT_TYPE));
+                } else {
+                    throw ex;
+                }
+            }
         }
         return MediaType.WILDCARD_TYPE;
     }

@@ -75,6 +75,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -249,6 +250,15 @@ public class BookStore {
     @Produces("text/plain")
     public boolean checkBook(@PathParam("id") Long id) {
         return books.containsKey(id);
+    }
+    
+    @GET
+    @Path("books/check/malformedmt/{id}")
+    @Produces("text/plain")
+    public Response checkBookMalformedMT(@PathParam("id") Long id,
+                                         @Context MessageContext mc) {
+        mc.put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", false);
+        return Response.ok(books.containsKey(id)).type("text").build();
     }
     
     @POST
