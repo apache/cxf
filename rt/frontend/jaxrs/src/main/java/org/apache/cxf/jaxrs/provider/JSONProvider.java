@@ -245,7 +245,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
         } catch (JAXBException e) {
             handleJAXBException(e, true);
         } catch (XMLStreamException e) {
-            if (e.getCause() instanceof JSONSequenceTooLargeException) {
+            if (e.getCause() instanceof JSONSequenceTooLargeException
+                || e.getNestedException() instanceof JSONSequenceTooLargeException) {
                 throw new WebApplicationException(413);
             } else {
                 handleXMLStreamException(e, true);
