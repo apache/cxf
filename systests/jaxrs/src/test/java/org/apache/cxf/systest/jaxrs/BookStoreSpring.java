@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
@@ -58,8 +57,6 @@ public class BookStoreSpring {
     @Context
     private UriInfo ui;    
     private boolean postConstructCalled;
-    @Resource
-    private Book injectedBook; 
     
     public BookStoreSpring() {
         init();
@@ -69,9 +66,6 @@ public class BookStoreSpring {
     
     @PostConstruct
     public void postConstruct() {
-        if (injectedBook == null) {
-            throw new IllegalStateException("Book resource has not been injected");
-        }    
         postConstructCalled = true;
     }
     
