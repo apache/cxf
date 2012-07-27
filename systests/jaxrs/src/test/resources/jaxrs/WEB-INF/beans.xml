@@ -43,7 +43,6 @@ http://cxf.apache.org/schemas/core.xsd">
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
   <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
-  <bean class="org.apache.cxf.systest.jaxrs.Book"/>
   
   <jaxrs:server id="bookservice"
 		        address="/bookstore">
