@@ -40,6 +40,14 @@
 		           org.apache.cxf.systest.jaxrs.BookStore
 		      </param-value>    
 		</init-param>
+		<init-param>
+		      <param-name>jaxrs.providers</param-name>
+		      <param-value>
+		           org.apache.cxf.jaxrs.provider.json.JSONProvider(dropRootElement=false attributesToElements=true),
+		           org.apache.cxf.jaxrs.provider.JAXBElementProvider
+		      </param-value>    
+		</init-param>
+		
 		<load-on-startup>1</load-on-startup>
 	</servlet>
     
