@@ -21,7 +21,6 @@ package org.apache.cxf.transport.http.auth;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -62,20 +61,20 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
     }
 
     public String getAuthorization(AuthorizationPolicy authPolicy,
-                                   URL currentURL,
+                                   URI currentURI,
                                    Message message,
                                    String fullHeader) {
         if (authPolicy.getUserName() == null && authPolicy.getPassword() == null) {
             return null;
         }
-        URI currentURI = URI.create(currentURL.toString());
+        
         if (fullHeader == null) {
             DigestInfo di = authInfo.get(currentURI);
             if (di != null) {
                 /* Preemptive authentication is only possible if we have a cached
                  * challenge
                  */
-                return di.generateAuth(currentURL.getFile(), 
+                return di.generateAuth(currentURI.getPath(), 
                                        authPolicy.getUserName(),
                                        authPolicy.getPassword());            
             } else {
@@ -104,7 +103,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                 }
                 authInfo.put(currentURI, di);
                 
-                return di.generateAuth(currentURL.getFile(), 
+                return di.generateAuth(currentURI.getPath(), 
                                        authPolicy.getUserName(),
                                        authPolicy.getPassword());
             }

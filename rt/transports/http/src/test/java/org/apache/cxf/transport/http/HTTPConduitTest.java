@@ -21,7 +21,7 @@ package org.apache.cxf.transport.http;
 
 
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class HTTPConduitTest extends Assert {
 
     private final class TestAuthSupplier implements HttpAuthSupplier {
 
-        public String getAuthorization(AuthorizationPolicy authPolicy, URL currentURL, Message message,
+        public String getAuthorization(AuthorizationPolicy authPolicy, URI currentURI, Message message,
                                        String fullHeader) {
             return "myauth";
         }
@@ -109,9 +109,9 @@ public class HTTPConduitTest extends Assert {
                      conduit.getAddress(),
                      "http://nowhere.com/bar/foo");
         assertNull("unexpected upfront URL",
-                    conduit.getURL(false));
+                    conduit.getURI(false));
         assertEquals("unexpected on-demand URL",
-                     conduit.getURL().getPath(),
+                     conduit.getURI().getPath(),
                      "/bar/foo");
     }
     

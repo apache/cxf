@@ -19,8 +19,7 @@
 package org.apache.cxf.transport.http.auth;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class DigestAuthSupplierTest {
     }
 
     @Test
-    public void testEncode() throws MalformedURLException {
+    public void testEncode() throws Exception {
         String origNonce = "MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==";
         String fullHeader = "Digest realm=\"MyCompany realm.\", qop=\"auth\"," + "nonce=\"" + origNonce
                             + "\"";
@@ -74,12 +73,12 @@ public class DigestAuthSupplierTest {
         AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
         authorizationPolicy.setUserName("testUser");
         authorizationPolicy.setPassword("testPassword");
-        URL url = new URL("http://myserver");
+        URI uri = new URI("http://myserver");
         Message message = new MessageImpl();
         control.replay();
         
         String authToken = authSupplier
-            .getAuthorization(authorizationPolicy, url, message, fullHeader);
+            .getAuthorization(authorizationPolicy, uri, message, fullHeader);
         HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
         assertEquals("Digest", authHeader.getAuthType());
         Map<String, String> params = authHeader.getParams();

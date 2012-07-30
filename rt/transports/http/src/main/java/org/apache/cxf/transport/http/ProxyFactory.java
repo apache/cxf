@@ -20,7 +20,7 @@ package org.apache.cxf.transport.http;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.URL;
+import java.net.URI;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -89,7 +89,7 @@ public class ProxyFactory {
      * 
      * @return The proxy server or null, if not set.
      */
-    public Proxy createProxy(HTTPClientPolicy policy, URL currentUrl) {
+    public Proxy createProxy(HTTPClientPolicy policy, URI currentUrl) {
         if (policy != null) {
             // Maybe the user has provided some proxy information
             if (policy.isSetProxyServer()

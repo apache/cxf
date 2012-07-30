@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.http.auth;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
@@ -31,10 +31,10 @@ public class SpnegoAuthSupplier extends AbstractSpnegoAuthSupplier
     }
 
     public String getAuthorization(AuthorizationPolicy  authPolicy,
-                                    URL currentURL,
+                                    URI currentURI,
                                     Message message,
                                     String fullHeader) {
-        return super.getAuthorization(authPolicy, currentURL, message);
+        return super.getAuthorization(authPolicy, currentURI, message);
     }
 
 }

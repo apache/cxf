@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.http.auth;
 
-import java.net.URL;
+import java.net.URI;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.logging.Level;
@@ -63,13 +63,13 @@ public abstract class AbstractSpnegoAuthSupplier {
     private Configuration loginConfig;
     
     public String getAuthorization(AuthorizationPolicy authPolicy,
-                                   URL currentURL,
+                                   URI currentURI,
                                    Message message) {
         if (!HttpAuthHeader.AUTH_TYPE_NEGOTIATE.equals(authPolicy.getAuthorizationType())) {
             return null;
         }
         try {
-            String spn = getCompleteServicePrincipalName(currentURL);
+            String spn = getCompleteServicePrincipalName(currentURI);
             
             boolean useKerberosOid = MessageUtils.isTrue(
                 message.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
@@ -164,9 +164,9 @@ public abstract class AbstractSpnegoAuthSupplier {
         return prop == null ? credDelegation : MessageUtils.isTrue(prop);
     }
 
-    protected String getCompleteServicePrincipalName(URL currentURL) {
+    protected String getCompleteServicePrincipalName(URI currentURI) {
         String name = servicePrincipalName == null 
-            ? "HTTP/" + currentURL.getHost() : servicePrincipalName;
+            ? "HTTP/" + currentURI.getHost() : servicePrincipalName;
         if (realm != null) {            
             name += "@" + realm;
         }

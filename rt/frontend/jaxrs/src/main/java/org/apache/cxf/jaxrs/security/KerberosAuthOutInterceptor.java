@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.jaxrs.security;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,9 +49,9 @@ public class KerberosAuthOutInterceptor extends AbstractSpnegoAuthSupplier
     }
     
     public void handleMessage(Message message) throws Fault {
-        URL currentURL = getCurrentURL(message);
+        URI currentURI = getCurrentURI(message);
         String value = super.getAuthorization(getPolicy(), 
-                                              currentURL, 
+                                              currentURI, 
                                               message);
         Map<String, List<String>> headers = 
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
@@ -62,12 +62,12 @@ public class KerberosAuthOutInterceptor extends AbstractSpnegoAuthSupplier
         headers.put("Authorization", Collections.singletonList(value));
     }
     
-    private URL getCurrentURL(Message message) {
+    private URI getCurrentURI(Message message) {
         try {
-            return new URL((String)message.get(Message.ENDPOINT_ADDRESS));
-        } catch (MalformedURLException ex) {
+            return new URI((String)message.get(Message.ENDPOINT_ADDRESS));
+        } catch (URISyntaxException e) {
             // is not expected to happen
-            throw new RuntimeException(ex);
+            throw new RuntimeException(e);
         }
     }
 

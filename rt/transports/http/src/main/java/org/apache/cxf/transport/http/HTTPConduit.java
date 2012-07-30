@@ -27,6 +27,8 @@ import java.io.OutputStream;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -193,11 +195,11 @@ public abstract class HTTPConduit
     
 
     /**
-     * This field holds the "default" URL for this particular conduit, which
+     * This field holds the "default" URI for this particular conduit, which
      * is created on demand.
      */
-    protected URL defaultEndpointURL;
-    protected String defaultEndpointURLString;
+    protected URI defaultEndpointURI;
+    protected String defaultEndpointURIString;
     protected boolean fromEndpointReferenceType;
     
     protected ProxyFactory proxyFactory;
@@ -425,7 +427,7 @@ public abstract class HTTPConduit
     }
     
 
-    protected abstract void setupConnection(Message message, URL url, HTTPClientPolicy csPolicy) throws IOException;
+    protected abstract void setupConnection(Message message, URI url, HTTPClientPolicy csPolicy) throws IOException;
 
     /**
      * Prepare to send an outbound HTTP message over this http conduit to a 
@@ -452,13 +454,18 @@ public abstract class HTTPConduit
         // This call can possibly change the conduit endpoint address and 
         // protocol from the default set in EndpointInfo that is associated
         // with the Conduit.
-        URL currentURL = setupURL(message);       
+        URI currentURI;
+        try {
+            currentURI = setupURI(message);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }       
 
         // The need to cache the request is off by default
         boolean needToCacheRequest = false;
         
         HTTPClientPolicy csPolicy = getClient(message);
-        setupConnection(message, currentURL, csPolicy);
+        setupConnection(message, currentURI, csPolicy);
         
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod = 
@@ -518,7 +525,7 @@ public abstract class HTTPConduit
             message.getInterceptorChain().add(CertConstraintsInterceptor.INSTANCE);
         }
 
-        setHeadersByAuthorizationPolicy(message, currentURL);
+        setHeadersByAuthorizationPolicy(message, currentURI);
         new Headers(message).setFromClientPolicy(getClient(message));
         message.setContent(OutputStream.class, 
                            createOutputStream(message,
@@ -633,18 +640,19 @@ public abstract class HTTPConduit
      * @return The full URL specifying the HTTP request to the endpoint.
      * 
      * @throws MalformedURLException
+     * @throws URISyntaxException 
      */
-    private URL setupURL(Message message) throws MalformedURLException {
+    private URI setupURI(Message message) throws URISyntaxException {
         String result = (String)message.get(Message.ENDPOINT_ADDRESS);
         String pathInfo = (String)message.get(Message.PATH_INFO);
         String queryString = (String)message.get(Message.QUERY_STRING);
         if (result == null) {
             if (pathInfo == null && queryString == null) {
-                URL url = getURL();
-                message.put(Message.ENDPOINT_ADDRESS, defaultEndpointURLString);
-                return url;
+                URI uri = getURI();
+                message.put(Message.ENDPOINT_ADDRESS, defaultEndpointURIString);
+                return uri;
             }
-            result = getURL().toString();
+            result = getURI().toString();
             message.put(Message.ENDPOINT_ADDRESS, result);
         }
         
@@ -655,7 +663,7 @@ public abstract class HTTPConduit
         if (queryString != null) {
             result = result + "?" + queryString;
         }        
-        return new URL(result);    
+        return new URI(result);    
     }
 
 
@@ -672,8 +680,8 @@ public abstract class HTTPConduit
      * @return the default target address
      */
     public String getAddress() {
-        if (defaultEndpointURL != null) {
-            return defaultEndpointURLString;
+        if (defaultEndpointURI != null) {
+            return defaultEndpointURIString;
         } else if (fromEndpointReferenceType) {
             return getTarget().getAddress().getValue();
         }
@@ -683,29 +691,32 @@ public abstract class HTTPConduit
     /**
      * @return the default target URL
      */
-    protected URL getURL() throws MalformedURLException {
-        return getURL(true);
+    protected URI getURI() throws URISyntaxException {
+        return getURI(true);
     }
 
     /**
      * @param createOnDemand create URL on-demand if null
      * @return the default target URL
+     * @throws URISyntaxException 
      */
-    protected synchronized URL getURL(boolean createOnDemand)
-        throws MalformedURLException {
-        if (defaultEndpointURL == null && createOnDemand) {
+    protected synchronized URI getURI(boolean createOnDemand)
+        throws URISyntaxException {
+        if (defaultEndpointURI == null && createOnDemand) {
             if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
-                defaultEndpointURL = new URL(this.getTarget().getAddress().getValue());
-                defaultEndpointURLString = defaultEndpointURL.toExternalForm();
-                return defaultEndpointURL;
+                defaultEndpointURI = new URI(this.getTarget().getAddress().getValue());
+                defaultEndpointURIString = defaultEndpointURI.toString();
+                return defaultEndpointURI;
             }
             if (endpointInfo.getAddress() == null) {
-                throw new MalformedURLException("Invalid address. Endpoint address cannot be null.");
+                throw new URISyntaxException("<null>", 
+                                             "Invalid address. Endpoint address cannot be null.",
+                                             0);
             }
-            defaultEndpointURL = new URL(endpointInfo.getAddress());
-            defaultEndpointURLString = defaultEndpointURL.toExternalForm();
+            defaultEndpointURI = new URI(endpointInfo.getAddress());
+            defaultEndpointURIString = defaultEndpointURI.toString();
         }
-        return defaultEndpointURL;
+        return defaultEndpointURI;
     }
 
     /**
@@ -732,17 +743,17 @@ public abstract class HTTPConduit
      */
     protected void setHeadersByAuthorizationPolicy(
             Message message,
-            URL url
+            URI currentURI
     ) {
         Headers headers = new Headers(message);
         AuthorizationPolicy effectiveAuthPolicy = getEffectiveAuthPolicy(message);
-        String authString = authSupplier.getAuthorization(effectiveAuthPolicy, url, message, null);
+        String authString = authSupplier.getAuthorization(effectiveAuthPolicy, currentURI, message, null);
         if (authString != null) {
             headers.setAuthorization(authString);
         }
         
         String proxyAuthString = authSupplier.getAuthorization(proxyAuthorizationPolicy, 
-                                                               url, message, null);
+                                                               currentURI, message, null);
         if (proxyAuthString != null) {
             headers.setProxyAuthorization(proxyAuthString);
         }
@@ -1379,7 +1390,11 @@ public abstract class HTTPConduit
                 // it is meant to make it to the end. (Too bad that information
                 // went to every URL along the way, but that's what the user 
                 // wants!
-                setHeadersByAuthorizationPolicy(outMessage, new URL(newURL));
+                try {
+                    setHeadersByAuthorizationPolicy(outMessage, new URI(newURL));
+                } catch (URISyntaxException e) {
+                    throw new IOException(e);
+                }
                 retransmit(newURL);
                 return true;
             }
@@ -1400,13 +1415,18 @@ public abstract class HTTPConduit
             Message m = new MessageImpl();
             updateResponseHeaders(m);
             HttpAuthHeader authHeader = new HttpAuthHeader(Headers.getSetProtocolHeaders(m).get("WWW-Authenticate"));
-            URL currentURL = new URL(url);
+            URI currentURI;
+            try {
+                currentURI = new URI(url);
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
             String realm = authHeader.getRealm();
-            detectAuthorizationLoop(getConduitName(), outMessage, currentURL, realm);
+            detectAuthorizationLoop(getConduitName(), outMessage, currentURI, realm);
             AuthorizationPolicy effectiveAthPolicy = getEffectiveAuthPolicy(outMessage);
             String authorizationToken = 
                 authSupplier.getAuthorization(
-                    effectiveAthPolicy, currentURL, outMessage, authHeader.getFullHeader());
+                    effectiveAthPolicy, currentURI, outMessage, authHeader.getFullHeader());
             if (authorizationToken == null) {
                 // authentication not possible => we give up
                 return false;
@@ -1693,7 +1713,7 @@ public abstract class HTTPConduit
         }
     }   
     private static void detectAuthorizationLoop(String conduitName, Message message, 
-                                                URL currentURL, String realm) throws IOException {
+                                                URI currentURL, String realm) throws IOException {
         @SuppressWarnings("unchecked")
         Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
         if (authURLs == null) {

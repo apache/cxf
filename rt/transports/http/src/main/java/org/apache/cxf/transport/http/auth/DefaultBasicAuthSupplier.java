@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.http.auth;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -39,7 +39,7 @@ public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
     }
 
     public String getAuthorization(AuthorizationPolicy  authPolicy,
-                                   URL currentURL,
+                                   URI currentURI,
                                    Message message,
                                    String fullHeader) {
         if (authPolicy.getUserName() != null && authPolicy.getPassword() != null) {

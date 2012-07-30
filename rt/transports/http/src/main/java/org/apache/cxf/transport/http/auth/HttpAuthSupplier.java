@@ -19,7 +19,7 @@
 
 package org.apache.cxf.transport.http.auth;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
@@ -50,14 +50,14 @@ public interface HttpAuthSupplier {
      * an Authentication token for http authentication.
      * 
      * @param authPolicy credentials for the authentication
-     * @param url The URL we want to connect to
+     * @param uri  The URI we want to connect to
      * @param message     The CXF Message
      * @param fullHeader  The full WWW-Authenticate header or null if preemptive auth
      * @return token for Authenticate string or null if authentication is not possible
      */
     String getAuthorization(
             AuthorizationPolicy  authPolicy,
-            URL     url,
+            URI     url,
             Message message,
             String  fullHeader);
 }

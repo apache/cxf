@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
@@ -71,9 +73,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
      */
     public void close() {
         super.close();
-        if (defaultEndpointURL != null) {
+        if (defaultEndpointURI != null) {
             try {
-                URLConnection connect = defaultEndpointURL.openConnection();
+                URLConnection connect = defaultEndpointURI.toURL().openConnection();
                 if (connect instanceof HttpURLConnection) {
                     ((HttpURLConnection)connect).disconnect();
                 }
@@ -84,11 +86,12 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
     }    
     
-    private HttpURLConnection createConnection(Message message, URL url, HTTPClientPolicy csPolicy) throws IOException {
-        Proxy proxy = proxyFactory.createProxy(csPolicy , url);
+    private HttpURLConnection createConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
+        URL url = uri.toURL();
+        Proxy proxy = proxyFactory.createProxy(csPolicy , uri);
         return connectionFactory.createConnection(tlsClientParameters, proxy, url);
     }
-    protected void setupConnection(Message message, URL currentURL, HTTPClientPolicy csPolicy) throws IOException {
+    protected void setupConnection(Message message, URI currentURL, HTTPClientPolicy csPolicy) throws IOException {
         HttpURLConnection connection = createConnection(message, currentURL, csPolicy);
         connection.setDoOutput(true);       
         
@@ -252,7 +255,12 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         }
         protected void setupNewConnection(String newURL) throws IOException {
             HTTPClientPolicy cp = getClient(outMessage);
-            URL nurl = new URL(newURL);
+            URI nurl;
+            try {
+                nurl = new URI(newURL);
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
             setupConnection(outMessage, nurl, cp);
             url = newURL;
             connection = (HttpURLConnection)outMessage.get(KEY_HTTP_CONNECTION);

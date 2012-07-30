@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -799,7 +800,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
          */
         public String getAuthorization(
                 AuthorizationPolicy authPolicy,
-                URL     currentURL,
+                URI     currentURI,
                 Message message,
                 String fullHeader
         ) {
