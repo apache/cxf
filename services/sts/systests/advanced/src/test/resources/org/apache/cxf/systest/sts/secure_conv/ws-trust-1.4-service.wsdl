@@ -113,7 +113,7 @@
   		transport="http://schemas.xmlsoap.org/soap/http" />
   	<wsdl:operation name="Issue">
   		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" />
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/SCT" />
   		<wsdl:input>
   		    <wsp:PolicyReference
                URI="#Input_policy" />
@@ -141,7 +141,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="Cancel">
   		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" />
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/SCT/Cancel" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -151,7 +151,7 @@
   	</wsdl:operation>
   	<wsdl:operation name="Renew">
   		<soap:operation
-  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" />
+  			soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/SCT/Renew" />
   		<wsdl:input>
   			<soap:body use="literal" />
   		</wsdl:input>
@@ -187,7 +187,7 @@
         transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="Issue">
         <soap:operation
-            soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" />
+            soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/SCT" />
         <wsdl:input>
             <wsp:PolicyReference
                URI="#Input_policy" />
@@ -215,7 +215,7 @@
     </wsdl:operation>
     <wsdl:operation name="Cancel">
         <soap:operation
-            soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" />
+            soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/SCT/Cancel" />
         <wsdl:input>
             <soap:body use="literal" />
         </wsdl:input>
@@ -225,7 +225,7 @@
     </wsdl:operation>
     <wsdl:operation name="Renew">
         <soap:operation
-            soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" />
+            soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/SCT/Renew" />
         <wsdl:input>
             <soap:body use="literal" />
         </wsdl:input>
