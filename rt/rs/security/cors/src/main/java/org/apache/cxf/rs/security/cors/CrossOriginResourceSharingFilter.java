@@ -48,11 +48,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 
 /**
- * An single class that provides both an input and an output filter for CORS, following
- * http://www.w3.org/TR/cors/. The input examines the input headers. If the request is valid, it stores the
+ * A single class that provides both an input and an output filter for CORS, following
+ * http://www.w3.org/TR/cors/. The input filter examines the input headers. If the request is valid, it stores the
  * information in the Exchange to allow the response handler to add the appropriate headers to the response.
  * If you need complex or subtle control of the behavior here (e.g. clearing the prefight cache) you might be
- * better off reading the source of this and implementing this inside your service.
+ * better off reading the source of this class and implementing this inside your service.
  * 
  * This class will perform preflight processing even if there is a resource method annotated 
  * to handle @OPTIONS,
@@ -496,7 +496,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     }
 
     /**
-     * The origin strings to allow. Call {@link #setAllowAllOrigins(boolean)} to enable '*'.
+     * The origin strings to allow. An empty list allows all origins.
      * 
      * @param allowedOrigins a list of case-sensitive origin strings.
      */
@@ -504,6 +504,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         this.allowOrigins = allowedOrigins;
     }
 
+    /** @return the list of allowed origins. */
     public List<String> getAllowOrigins() {
         return allowOrigins;
     }
