@@ -33,7 +33,7 @@ public class Server {
         System.out.println("Starting Server");
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Server.class.getResource("CherryServer.xml");
+        URL busFile = Server.class.getResource("/ServerConfig.xml");
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
 

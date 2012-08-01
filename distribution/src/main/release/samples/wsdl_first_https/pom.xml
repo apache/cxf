@@ -63,28 +63,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/main/java/demo/hw_https/server/CherryServer.xml" todir="${basedir}/target/classes/demo/hw_https/server" />
-                                <copy file="${basedir}/src/main/java/demo/hw_https/client/SecureClient.xml" todir="${basedir}/target/classes/demo/hw_https/client" />
-                                <copy file="${basedir}/src/main/java/demo/hw_https/client/InsecureClient.xml" todir="${basedir}/target/classes/demo/hw_https/client" />
-                                <copy todir="${basedir}/target/classes/certs">
-                                    <fileset dir="${basedir}/certs" />
-                                </copy>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -119,7 +97,7 @@
         <profile>
             <id>insecure.client</id>
             <build>
-                <defaultGoal>test</defaultGoal>
+                <defaultGoal>integration-test</defaultGoal>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>

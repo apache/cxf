@@ -80,10 +80,6 @@ public final class ClientNonSpring {
             System.exit(1);
         }
         
-        
-
-
-
         System.out.println("Invoking greetMe...");
         try {
             String resp = port.greetMe(System.getProperty("user.name"));
@@ -100,35 +96,23 @@ public final class ClientNonSpring {
     
     private static void setupTLS(Greeter port) 
         throws FileNotFoundException, IOException, GeneralSecurityException {
-        String contextPath = "";
-        try {
-            contextPath = new ClientNonSpring().getClass().getResource("/certs").toURI().getPath();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String keyStoreLoc = "src/main/config/clientKeystore.jks";
         HTTPConduit httpConduit = (HTTPConduit) ClientProxy.getClient(port).getConduit();
  
         TLSClientParameters tlsCP = new TLSClientParameters();
-        String keyPassword = "password";
+        String keyPassword = "ckpass";
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        String keyStoreLoc = contextPath + "/wibble.jks";
-        keyStore.load(new FileInputStream(keyStoreLoc), keyPassword.toCharArray());
+        keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
         KeyManager[] myKeyManagers = getKeyManagers(keyStore, keyPassword);
         tlsCP.setKeyManagers(myKeyManagers);
  
         
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        String trustStoreLoc = contextPath + "/truststore.jks";
-        trustStore.load(new FileInputStream(trustStoreLoc), keyPassword.toCharArray());
+        trustStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
         
-        //The following is not recommended and would not be done in a prodcution environment,
-        //this is just for illustrative purpose
-        tlsCP.setDisableCNCheck(true);
- 
         httpConduit.setTlsClientParameters(tlsCP);
-
     }
 
     private static TrustManager[] getTrustManagers(KeyStore trustStore) 
