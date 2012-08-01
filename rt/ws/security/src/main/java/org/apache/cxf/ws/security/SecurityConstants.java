@@ -123,17 +123,27 @@ public final class SecurityConstants {
     public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
     
     //
-    // Boolean WS-Security configuration tags, e.g. the value should be "true" or "false".
+    // Boolean configuration tags, e.g. the value should be "true" or "false".
     //
     
+    /**
+     * Whether to validate the password of a received UsernameToken or not. The default is true.
+     */
     public static final String VALIDATE_TOKEN = "ws-security.validate.token";
     
+    /**
+     * Whether to enable Certificate Revocation List (CRL) checking or not when verifying trust 
+     * in a certificate. The default value is "false".
+     */
     public static final String ENABLE_REVOCATION = "ws-security.enableRevocation";
     
-    //WebLogic and WCF always encrypt UsernameTokens whenever possible
+    // WebLogic and WCF always encrypt UsernameTokens whenever possible
     //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
     //Be default, we will encrypt as well for interop reasons.  However, this
-    //setting can be set to false to turn that off. 
+    //setting can be set to false to turn that off.
+    /**
+     * Whether to always encrypt UsernameTokens whenever possible. The default is true.
+     */
     public static final String ALWAYS_ENCRYPT_UT = "ws-security.username-token.always.encrypted";
     
     /**
@@ -143,27 +153,24 @@ public final class SecurityConstants {
     public static final String IS_BSP_COMPLIANT = "ws-security.is-bsp-compliant";
     
     /**
-     * This configuration tag specifies whether to self-sign a SAML Assertion or not. If this
-     * is set to true, then an enveloped signature will be generated when the SAML Assertion is
-     * constructed. The default is false.
+     * Whether to self-sign a SAML Assertion or not. If this is set to true, then an enveloped signature 
+     * will be generated when the SAML Assertion is constructed. The default is false.
      */
     public static final String SELF_SIGN_SAML_ASSERTION = "ws-security.self-sign-saml-assertion";
     
     /**
-     * Set this to "false" to not cache UsernameToken nonces. The default value is "true" for
-     * message recipients, and "false" for message initiators. Set it to true to cache for
-     * both cases.
+     * Whether to cache UsernameToken nonces. The default value is "true" for message recipients, and 
+     * "false" for message initiators. Set it to true to cache for both cases. Set this to "false" to
+     * not cache UsernameToken nonces. 
      */
-    public static final String ENABLE_NONCE_CACHE = 
-        "ws-security.enable.nonce.cache";
+    public static final String ENABLE_NONCE_CACHE = "ws-security.enable.nonce.cache";
     
     /**
-     * Set this to "false" to not cache Timestamp Created Strings (these are only cached in 
-     * conjunction with a message Signature). The default value is "true" for message recipients, 
-     * and "false" for message initiators. Set it to true to cache for both cases.
+     * Whether to cache Timestamp Created Strings (these are only cached in conjunction with a message 
+     * Signature).The default value is "true" for message recipients, and "false" for message initiators.
+     * Set it to true to cache for both cases. Set this to "false" to not cache Timestamp Created Strings.
      */
-    public static final String ENABLE_TIMESTAMP_CACHE = 
-        "ws-security.enable.timestamp.cache";
+    public static final String ENABLE_TIMESTAMP_CACHE = "ws-security.enable.timestamp.cache";
     
     //
     // (Non-boolean) Configuration parameters
@@ -266,6 +273,16 @@ public final class SecurityConstants {
         "ws-security.cache.issued.token.in.endpoint";
     
     /**
+<<<<<<< HEAD
+=======
+     * Set this property to avoid STS client trying send WS-MetadataExchange call using
+     * STS EPR WSA address when the endpoint contract contains no WS-MetadataExchange info.
+     */
+    public static final String DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS =
+        "ws-security.sts.disable-wsmex-call-using-epr-address";
+    
+    /**
+>>>>>>> 0d7ae81... Merged revisions 1368015 via  git cherry-pick from
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client
      * will decrypt the EncryptedData elements in the response
@@ -292,19 +309,23 @@ public final class SecurityConstants {
     
     static {
         Set<String> s = new HashSet<String>(Arrays.asList(new String[] {
-            USERNAME, PASSWORD, CALLBACK_HANDLER, 
-            SIGNATURE_USERNAME, SIGNATURE_PROPERTIES, SIGNATURE_CRYPTO,
-            ENCRYPT_USERNAME, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
-            TOKEN, TOKEN_ID, STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO,
-            STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, ALWAYS_ENCRYPT_UT,
+            USERNAME, PASSWORD, SIGNATURE_USERNAME, ENCRYPT_USERNAME,
+            CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES, 
+            SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
+            VALIDATE_TOKEN, ENABLE_REVOCATION, ALWAYS_ENCRYPT_UT, IS_BSP_COMPLIANT, 
+            SELF_SIGN_SAML_ASSERTION, ENABLE_NONCE_CACHE, ENABLE_TIMESTAMP_CACHE,
+            STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO,
+            STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, 
             STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO,
             SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
-            SIGNATURE_TOKEN_VALIDATOR, IS_BSP_COMPLIANT, TIMESTAMP_FUTURE_TTL,
+            SIGNATURE_TOKEN_VALIDATOR, TIMESTAMP_FUTURE_TTL,
             BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF,
             KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
-            ENABLE_NONCE_CACHE, NONCE_CACHE_INSTANCE, ENABLE_TIMESTAMP_CACHE,
-            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, SUBJECT_CERT_CONSTRAINTS
+            NONCE_CACHE_INSTANCE, 
+            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS,
+            SUBJECT_CERT_CONSTRAINTS,
+            TOKEN, TOKEN_ID
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
