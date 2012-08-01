@@ -184,7 +184,8 @@ final class NegotiationUtils {
         SoapMessage message, 
         String namespace, 
         Policy policy,
-        Invoker invoker
+        Invoker invoker,
+        boolean secConv
     ) {
         Exchange ex = message.getExchange();
         Bus bus = ex.getBus();
@@ -201,13 +202,22 @@ final class NegotiationUtils {
                 store = new MemoryTokenStore();
                 endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
             }
-            endpoint = STSUtils.createSTSEndpoint(bus, 
-                    namespace,
-                    endpoint.getEndpointInfo().getTransportId(),
-                    destination.getAddress().getAddress().getValue(),
-                    message.getVersion().getBindingId(), 
-                    policy,
-                    null);
+            if (secConv) {
+                endpoint = STSUtils.createSCEndpoint(bus, 
+                                                     namespace,
+                                                     endpoint.getEndpointInfo().getTransportId(),
+                                                     destination.getAddress().getAddress().getValue(),
+                                                     message.getVersion().getBindingId(), 
+                                                     policy);
+            } else {
+                endpoint = STSUtils.createSTSEndpoint(bus, 
+                                                      namespace,
+                                                      endpoint.getEndpointInfo().getTransportId(),
+                                                      destination.getAddress().getAddress().getValue(),
+                                                      message.getVersion().getBindingId(), 
+                                                      policy,
+                                                      null);
+            } 
             endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
             message.getExchange().put(TokenStore.class.getName(), store);
 
