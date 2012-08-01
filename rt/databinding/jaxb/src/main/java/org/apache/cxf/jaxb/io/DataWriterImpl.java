@@ -33,7 +33,6 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -171,9 +170,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                     //RpcLit will use the JAXB Bridge to marshall part message when it is 
                     //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
                     //TODO:Cache the JAXBRIContext
-                    QName qname = new QName(null, part.getConcreteName().getLocalPart());
                     
-                    JAXBEncoderDecoder.marshalWithBridge(qname,
+                    JAXBEncoderDecoder.marshalWithBridge(part.getConcreteName(),
                                                          part.getTypeClass(),
                                                          anns, 
                                                          databinding.getContextClasses(), 
