@@ -164,7 +164,7 @@
 			<!-- 	    </fault> -->
 		</operation>
 		<operation name="addNumbers3">
-			<soap:operation soapAction="" />
+			<soap:operation soapAction="3in" />
 			<input>
 				<soap:body use="literal" />
 			</input>
@@ -206,7 +206,7 @@
 			<!-- 	    </fault> -->
 		</operation>
 		<operation name="addNumbers3">
-			<soap:operation soapAction="" />
+			<soap:operation soapAction="3in" />
 			<input>
 				<soap:body use="literal" />
 			</input>

@@ -157,9 +157,6 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
                                      "http://localhost:" + PORT + "/jaxws/add");
 
-        //manually set the action
-        disp.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY,
-                                     expectedOut);
         disp.invoke(new StreamSource(new StringReader(req)));
         
         assertTrue(output.toString().indexOf(expectedOut) != -1);
