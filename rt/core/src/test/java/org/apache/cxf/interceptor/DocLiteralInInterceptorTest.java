@@ -103,12 +103,18 @@ public class DocLiteralInInterceptorTest extends Assert {
         exchange.put(Endpoint.class, endpoint);
         
         OperationInfo operationInfo = new OperationInfo();
+        operationInfo.setProperty("operation.is.synthetic", Boolean.TRUE);
         MessageInfo messageInfo = new MessageInfo(operationInfo, Type.INPUT, 
                                                   new QName("http://foo.com", "bar"));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo1"), null));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo2"), null));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo3"), null));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo4"), null));
+        
+        for (MessagePartInfo mpi : messageInfo.getMessageParts()) {
+            mpi.setMessageContainer(messageInfo);
+        }
+        
         operationInfo.setInput("inputName", messageInfo);
         
         BindingOperationInfo boi = new BindingOperationInfo(null, operationInfo);
