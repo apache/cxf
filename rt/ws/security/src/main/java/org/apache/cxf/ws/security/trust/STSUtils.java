@@ -212,11 +212,16 @@ public final class STSUtils {
         mpi.setElementQName(new QName(namespace, "RequestSecurityToken"));
         
         MessageInfo mio = oi.createMessage(new QName(servNamespace, 
-                                                     "RequestSecurityTokenResponseMsg"), 
-                                           MessageInfo.Type.OUTPUT);
+            "RequestSecurityTokenResponseMsg"), 
+            MessageInfo.Type.OUTPUT);
         oi.setOutput("RequestSecurityTokenResponseMsg", mio);
         mpi = mio.addMessagePart("response");
-        mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
+        
+        if (WST_NS_05_02.equals(namespace)) {
+            mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponse"));
+        } else {
+            mpi.setElementQName(new QName(namespace, "RequestSecurityTokenResponseCollection"));
+        }
         return oi;
     }
     private static OperationInfo addCancelOperation(InterfaceInfo ii, 
