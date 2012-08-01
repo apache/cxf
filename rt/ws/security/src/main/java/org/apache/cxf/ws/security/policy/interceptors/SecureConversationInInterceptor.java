@@ -180,7 +180,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 if (s.startsWith(STSUtils.WST_NS_05_02)) {
                     ns = STSUtils.WST_NS_05_02;
                 }
-                NegotiationUtils.recalcEffectivePolicy(message, ns, pol, new SecureConversationSTSInvoker());
+                NegotiationUtils.recalcEffectivePolicy(message, ns, pol, 
+                                                       new SecureConversationSTSInvoker(),
+                                                       true);
             } else {
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
