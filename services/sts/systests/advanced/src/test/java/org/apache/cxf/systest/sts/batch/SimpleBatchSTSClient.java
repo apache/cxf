@@ -530,7 +530,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         List<BatchRequest> batchRequestList, String action, String requestType
     ) throws Exception {
         createClient();
-        BindingOperationInfo boi = findOperation("/RST/RequestCollection");
+        BindingOperationInfo boi = findOperation("/BatchIssue");
 
         client.getRequestContext().putAll(ctx);
         client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, action);
@@ -580,7 +580,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         List<BatchRequest> batchRequestList, String action, String requestType
     ) throws Exception {
         createClient();
-        BindingOperationInfo boi = findOperation("/RST/RequestCollection");
+        BindingOperationInfo boi = findOperation("/BatchValidate");
 
         client.getRequestContext().putAll(ctx);
         client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, action);
