@@ -108,7 +108,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 if (s.startsWith(STSUtils.WST_NS_05_02)) {
                     ns = STSUtils.WST_NS_05_02;
                 }
-                NegotiationUtils.recalcEffectivePolicy(message, ns, p, new SpnegoSTSInvoker());
+                NegotiationUtils.recalcEffectivePolicy(message, ns, p, new SpnegoSTSInvoker(), false);
             } else {
                 message.getInterceptorChain().add(SpnegoContextTokenFinderInterceptor.INSTANCE);
             }
