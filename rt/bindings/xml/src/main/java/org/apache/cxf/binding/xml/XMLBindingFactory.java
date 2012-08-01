@@ -41,6 +41,8 @@ import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
@@ -84,7 +86,9 @@ public class XMLBindingFactory extends AbstractBindingFactory {
         info.setName(new QName(service.getName().getNamespaceURI(), 
                                service.getName().getLocalPart() + "XMLBinding"));
 
-        for (OperationInfo op : service.getInterface().getOperations()) {                       
+        for (OperationInfo op : service.getInterface().getOperations()) {
+            adjustConcreteNames(op.getInput());
+            adjustConcreteNames(op.getOutput());
             BindingOperationInfo bop = 
                 info.buildOperation(op.getName(), op.getInputName(), op.getOutputName());
             info.addOperation(bop);
@@ -93,4 +97,14 @@ public class XMLBindingFactory extends AbstractBindingFactory {
         return info;
     }
 
+    private void adjustConcreteNames(MessageInfo mi) {
+        if (mi != null) {
+            for (MessagePartInfo mpi : mi.getMessageParts()) {
+                if (!mpi.isElement()) {
+                    //if it's not an element, we need to make it one
+                    mpi.setElementQName(mpi.getName());
+                }
+            }
+        }
+    }
 }
