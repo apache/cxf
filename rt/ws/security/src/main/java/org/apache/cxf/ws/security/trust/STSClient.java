@@ -558,7 +558,17 @@ public class STSClient implements Configurable, InterceptorProvider {
         BindingInfo bi = client.getEndpoint().getBinding().getBindingInfo();
         for (BindingOperationInfo boi : bi.getOperations()) {
             SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-            if (soi != null && soi.getAction() != null && soi.getAction().endsWith(suffix)) {
+            String soapAction = soi != null ? soi.getAction() : null;
+            Object o  = boi.getOperationInfo().getInput()
+                    .getExtensionAttribute(new QName("http://www.w3.org/2007/05/addressing/metadata",
+                                                     "Action"));
+            if (o instanceof QName) {
+                o = ((QName)o).getLocalPart();
+            }
+            String wsamAction = o == null ? null : o.toString();
+            
+            if ((soapAction != null && soapAction.endsWith(suffix))
+                || (wsamAction != null && wsamAction.endsWith(suffix))) {
                 PolicyEngine pe = bus.getExtension(PolicyEngine.class);
                 Conduit conduit = client.getConduit();
                 EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(client.getEndpoint()
