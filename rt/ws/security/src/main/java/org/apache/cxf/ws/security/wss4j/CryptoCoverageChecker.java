@@ -216,6 +216,18 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             this.xPaths.addAll(xpaths);
         }
     }
+    
+    /**
+     * Adds the XPath expressions to check for, adding to any previously
+     * set expressions.
+     *
+     * @param xPaths the XPath expressions to check for
+     */
+    public final void addXPaths(List<XPathExpression> xpaths) {
+        if (xpaths != null) {
+            this.xPaths.addAll(xpaths);
+        }
+    }
 
     /**
      * Sets the mapping of namespace prefixes to namespace URIs, clearing all previously
@@ -225,6 +237,18 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      */
     public final void setPrefixes(Map<String, String> prefixes) {
         this.prefixMap.clear();
+        if (prefixes != null) {
+            this.prefixMap.putAll(prefixes);
+        }
+    }
+    
+    /**
+     * Adds the mapping of namespace prefixes to namespace URIs, adding to any previously
+     * set mappings.
+     *
+     * @param prefixes the mapping of namespace prefixes to namespace URIs
+     */
+    public final void addPrefixes(Map<String, String> prefixes) {
         if (prefixes != null) {
             this.prefixMap.putAll(prefixes);
         }
@@ -252,6 +276,23 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
          */
         private final CoverageScope scope;
 
+        /**
+         * Create a new expression indicating a cryptographic coverage
+         * requirement with {@code scope} {@link CoverageScope#ELEMENT}.
+         * 
+         * @param xPath
+         *            the XPath expression
+         * @param type
+         *            the type of coverage that the expression is meant to
+         *            enforce
+         * 
+         * @throws NullPointerException
+         *             if {@code xPath} or {@code type} is {@code null}
+         */
+        public XPathExpression(String xPath, CoverageType type) {
+            this(xPath, type, CoverageScope.ELEMENT);
+        }
+        
         /**
          * Create a new expression indicating a cryptographic coverage
          * requirement. If {@code type} is {@link CoverageType#SIGNED}, the
