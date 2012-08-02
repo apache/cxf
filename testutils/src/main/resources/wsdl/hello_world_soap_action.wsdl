@@ -26,6 +26,7 @@
   xmlns:jms="http://cxf.apache.org/transports/jms"
   xmlns:tns="http://apache.org/hello_world_soap_action"
   xmlns:x1="http://apache.org/hello_world_soap_action/types"
+  xmlns:x2="http://apache.org/hello_world_soap_action/types/wrapped"
   xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
   targetNamespace="http://apache.org/hello_world_soap_action"
   name="HelloWorld">
@@ -37,6 +38,36 @@
       <element name="text" type="xsd:string" />
       <element name="text2" type="xsd:string" />
     </schema>
+    <xsd:schema targetNamespace="http://apache.org/hello_world_soap_action/types/wrapped">
+            <xsd:element name="sayHiRequestWrapped">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="wrappedText" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="sayHiResponseWrapped">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="wrappedTextResponse" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="sayHiRequest2Wrapped">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="wrappedText" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="sayHiResponse2Wrapped">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="wrappedTextResponse" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
   </wsdl:types>
   <wsdl:message name="sayHiRequest">
     <wsdl:part name="in" element="x1:text" />
@@ -49,6 +80,19 @@
   </wsdl:message>
   <wsdl:message name="sayHiResponse2">
     <wsdl:part name="out" element="x1:text" />
+  </wsdl:message>
+  
+  <wsdl:message name="sayHiRequestWrapped">
+        <wsdl:part element="x2:sayHiRequestWrapped" name="parameters" />
+  </wsdl:message>
+  <wsdl:message name="sayHiResponseWrapped">
+        <wsdl:part element="x2:sayHiResponseWrapped" name="parameters" />
+  </wsdl:message>
+  <wsdl:message name="sayHiRequest2Wrapped">
+        <wsdl:part element="x2:sayHiRequest2Wrapped" name="parameters" />
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse2Wrapped">
+        <wsdl:part element="x2:sayHiResponse2Wrapped" name="parameters" />
   </wsdl:message>
 
   <wsdl:portType name="Greeter">
@@ -63,6 +107,19 @@
     </wsdl:operation>
 
   </wsdl:portType>
+  
+  <wsdl:portType name="WrappedGreeter">
+        <wsdl:operation name="sayHiRequestWrapped">
+            <wsdl:input message="tns:sayHiRequestWrapped" />
+            <wsdl:output message="tns:sayHiResponseWrapped" />
+        </wsdl:operation>
+        
+        <wsdl:operation name="sayHiRequest2Wrapped">
+            <wsdl:input message="tns:sayHiRequest2Wrapped" />
+            <wsdl:output message="tns:sayHiResponse2Wrapped" />
+        </wsdl:operation>
+  </wsdl:portType>
+  
   <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
     <soap:binding style="document"
       transport="http://schemas.xmlsoap.org/soap/http" />
@@ -86,6 +143,7 @@
     </wsdl:operation>
 
   </wsdl:binding>
+  
   <wsdl:binding name="Greeter_SOAP12Binding" type="tns:Greeter">
     <soap12:binding style="document"
       transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" />
@@ -109,6 +167,53 @@
     </wsdl:operation>
     
   </wsdl:binding>
+  
+  <wsdl:binding name="Greeter_WrappedSOAPBinding" type="tns:WrappedGreeter">
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="sayHiRequestWrapped">
+            <soap:operation soapAction="SAY_HI_1" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sayHiRequest2Wrapped">
+            <soap:operation soapAction="SAY_HI_2" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+  </wsdl:binding>     
+  
+  <wsdl:binding name="Greeter_WrappedSOAP12Binding" type="tns:WrappedGreeter">
+        <soap12:binding style="document"
+            transport="http://www.w3.org/2003/05/soap/bindings/HTTP/" />
+        <wsdl:operation name="sayHiRequestWrapped">
+            <soap12:operation soapAction="SAY_HI_1" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sayHiRequest2Wrapped">
+            <soap12:operation soapAction="SAY_HI_2" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+  </wsdl:binding>     
+  
   <wsdl:service name="SOAPService">
     <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
       <soap:address
@@ -120,5 +225,15 @@
       <soap:address
         location="http://localhost:9001/SOAPDocLitService/Soap12Port" />
     </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="WrappedSOAPService">
+      <wsdl:port name="WrappedSoapPort" binding="tns:Greeter_WrappedSOAPBinding">
+            <soap:address location="http://localhost:9001/SOAPDocLitService/WrappedSoapPort" />
+      </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="WrappedSOAP12Service">
+      <wsdl:port name="WrappedSoap12Port" binding="tns:Greeter_WrappedSOAP12Binding">
+            <soap:address location="http://localhost:9001/SOAPDocLitService/WrappedSoap12Port" />
+      </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>
