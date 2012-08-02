@@ -348,12 +348,25 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         List<WSSecurityEngineResult> wsResult, 
         List<Integer> actions
     ) throws WSSecurityException {
-        /*
-         * now check the security actions: do they match, in any order?
-         */
-        if (!ignoreActions && !checkReceiverResultsAnyOrder(wsResult, actions)) {
+        if (ignoreActions) {
+            // Not applicable for the WS-SecurityPolicy case
+            return;
+        }
+        
+        // now check the security actions: do they match, in any order?
+        if (!checkReceiverResultsAnyOrder(wsResult, actions)) {
             LOG.warning("Security processing failed (actions mismatch)");
             throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+        }
+        
+        // Now check to see if SIGNATURE_PARTS are specified
+        String signatureParts = 
+            (String)getProperty(msg, WSHandlerConstants.SIGNATURE_PARTS);
+        if (signatureParts != null) {
+            String warning = "To enforce that particular elements were signed you must either "
+                + "use WS-SecurityPolicy, or else use the CryptoCoverageChecker or "
+                + "SignatureCoverageChecker";
+            LOG.warning(warning);
         }
     }
     
