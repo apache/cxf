@@ -56,10 +56,6 @@ To remove the target dir, run "mvn clean".
 
 Certificates
 ------------
+See the src/main/config folder for the sample keys used (don't use
+these keys in production!) as well as scripts used for their creation.
 
-If the certificates are expired or unusable for some reason, a shell 
-script in the certs folder will generate a new set of certificates 
-needed for this sample. Just do the following:
-
-  cd certs
-  sh gencerts.sh

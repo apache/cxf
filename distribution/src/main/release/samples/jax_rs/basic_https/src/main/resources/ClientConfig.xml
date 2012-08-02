@@ -35,16 +35,15 @@ under the License.
     <!-- -->
     <http:conduit name="https://localhost:.*/customerservice/.*">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-              <sec:keyStore type="JKS" password="password" 
-                   file="certs/clientKeystore.jks"/>
-              </sec:keyManagers>
-           <sec:trustManagers>
-              <sec:keyStore type="JKS" password="password"
-                  file="certs/commonTruststore.jks"/>
-           </sec:trustManagers>
+        <http:tlsClientParameters>
+            <sec:keyManagers keyPassword="ckpass">
+                <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
+            </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
 
 </beans>
+

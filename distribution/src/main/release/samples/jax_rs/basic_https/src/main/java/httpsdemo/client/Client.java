@@ -41,14 +41,14 @@ public final class Client {
 
     public static void main(String args[]) throws Exception {
        
-        File clientKeystore = new File("certs/clientKeystore.jks");
-        File truststore = new File("certs/commonTruststore.jks");
+        File clientKeystore = new File("src/main/config/clientKeystore.jks");
+        File truststore = new File("src/main/config/clientKeystore.jks");
 
         // Send HTTP GET request to query customer info - using portable HttpClient method
         Protocol authhttps = new Protocol("https",
-                new AuthSSLProtocolSocketFactory(clientKeystore.toURI().toURL(), "password",
-                truststore.toURI().toURL(), "password"),
-                9000);
+            new AuthSSLProtocolSocketFactory(clientKeystore.toURI().toURL(), "cspass",
+            "ckpass", truststore.toURI().toURL(), "cspass"),
+            9000);
         Protocol.registerProtocol("https", authhttps);
 
         System.out.println("Sending HTTPS GET request to query customer info");

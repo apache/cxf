@@ -170,6 +170,7 @@ public class AuthSSLProtocolSocketFactory implements SecureProtocolSocketFactory
 
     private URL keystoreUrl = null;
     private String keystorePassword = null;
+    private String keyPassword = null;
     private URL truststoreUrl = null;
     private String truststorePassword = null;
     private SSLContext sslcontext = null;
@@ -180,17 +181,19 @@ public class AuthSSLProtocolSocketFactory implements SecureProtocolSocketFactory
      *
      * @param keystoreUrl URL of the keystore file. May be <tt>null</tt> if HTTPS client
      *        authentication is not to be used.
-     * @param keystorePassword Password to unlock the keystore. IMPORTANT: this implementation
-     *        assumes that the same password is used to protect the key and the keystore itself.
+     * @param keystorePassword Password to unlock the keystore.
+     * @param keyPassword Password to unlock any private key in the keystore.
      * @param truststoreUrl URL of the truststore file. May be <tt>null</tt> if HTTPS server
      *        authentication is not to be used.
      * @param truststorePassword Password to unlock the truststore.
      */
     public AuthSSLProtocolSocketFactory(final URL keystoreUrl, final String keystorePassword,
+                                        final String keyPassword,
                                         final URL truststoreUrl, final String truststorePassword) {
         super();
         this.keystoreUrl = keystoreUrl;
         this.keystorePassword = keystorePassword;
+        this.keyPassword = keyPassword;
         this.truststoreUrl = truststoreUrl;
         this.truststorePassword = truststorePassword;
     }
@@ -213,14 +216,14 @@ public class AuthSSLProtocolSocketFactory implements SecureProtocolSocketFactory
         return keystore;
     }
 
-    private static KeyManager[] createKeyManagers(final KeyStore keystore, final String password)
+    private static KeyManager[] createKeyManagers(final KeyStore keystore, final String keyPassword)
         throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
         if (keystore == null) {
             throw new IllegalArgumentException("Keystore may not be null");
         }
         LOG.debug("Initializing key manager");
         KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmfactory.init(keystore, password != null ? password.toCharArray() : null);
+        kmfactory.init(keystore, keyPassword != null ? keyPassword.toCharArray() : null);
         return kmfactory.getKeyManagers();
     }
 
@@ -269,7 +272,7 @@ public class AuthSSLProtocolSocketFactory implements SecureProtocolSocketFactory
                         }
                     }
                 }
-                keymanagers = createKeyManagers(keystore, this.keystorePassword);
+                keymanagers = createKeyManagers(keystore, this.keyPassword);
             }
             if (this.truststoreUrl != null) {
                 KeyStore keystore = createKeyStore(this.truststoreUrl, this.truststorePassword);
