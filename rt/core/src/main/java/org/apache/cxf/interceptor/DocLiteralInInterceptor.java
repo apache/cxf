@@ -192,12 +192,11 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     } else {
                         p = findMessagePart(exchange, operations, elName, client, paramNum, message);
                     }
-    
-                    if (p == null) {
-                        throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
-                                        Fault.FAULT_CODE_CLIENT);
-                    }
-    
+                    
+                    //Make sure the elName found on the wire is actually OK for 
+                    //the purpose we need it
+                    validatePart(p, elName, si);
+
                     o = dr.read(p, xmlReader);
                     if (Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare")) 
                         && parameters.isEmpty()) {
@@ -221,6 +220,44 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 f.setFaultCode(Fault.FAULT_CODE_CLIENT);
             }
             throw f;
+        }
+    }
+    
+    private void validatePart(MessagePartInfo p, QName elName, ServiceInfo si) {
+        if (p == null) {
+            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
+                            Fault.FAULT_CODE_CLIENT);
+
+        }
+
+        Boolean synth = Boolean.FALSE;
+        if (p.getMessageInfo() != null && p.getMessageInfo().getOperation() != null) {
+            OperationInfo op = p.getMessageInfo().getOperation();
+            Boolean b = (Boolean)op.getProperty("operation.is.synthetic");
+            if (b != null) {
+                synth = b;
+            }
+        }
+        if (si != null && Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare"))) {
+            // something like a Provider service or similar that is forcing a
+            // doc/lit/bare on an endpoint that may not really be doc/lit/bare.  
+            // we need to just let these through per spec so the endpoint
+            // can process it
+            synth = true;
+        }
+        if (p.isElement()) {
+            if (p.getConcreteName() != null
+                && !elName.equals(p.getConcreteName())
+                && !Boolean.TRUE.equals(synth)) {
+                throw new Fault("UNEXPECTED_ELEMENT", LOG, null, elName,
+                                p.getConcreteName());
+            }
+        } else {
+            if (!(elName.equals(p.getName()) || elName.equals(p.getConcreteName()))
+                && !Boolean.TRUE.equals(synth)) {
+                throw new Fault("UNEXPECTED_ELEMENT", LOG, null, elName,
+                                p.getConcreteName());
+            }
         }
     }
     
