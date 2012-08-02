@@ -19,9 +19,8 @@
 -->
 
 <!-- 
-  ** This file configures the Wibble Client
-  -->
-
+  ** This file configures the web service client
+-->
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:cxf="http://cxf.apache.org/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -47,15 +46,13 @@
     </cxf:bus>
 
   <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
-    <http:tlsClientParameters disableCNCheck="true">
-      <sec:trustManagers>
-          <sec:keyStore type="JKS" password="password"
-               file="certs/truststore.jks"/>
-      </sec:trustManagers>
-      <sec:keyManagers keyPassword="password">
-           <sec:keyStore type="JKS" password="password" 
-                file="certs/wibble.jks"/>
+    <http:tlsClientParameters>
+      <sec:keyManagers keyPassword="ckpass">
+          <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
       </sec:keyManagers>
+      <sec:trustManagers>
+          <sec:keyStore file="src/main/config/clientKeystore.jks" password="cspass" type="JKS"/>
+      </sec:trustManagers>
       <sec:cipherSuitesFilter>
         <!-- these filters ensure that a ciphersuite with
           export-suitable or null encryption is used,

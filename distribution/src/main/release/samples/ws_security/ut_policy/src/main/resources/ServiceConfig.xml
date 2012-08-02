@@ -19,9 +19,8 @@
 -->
 
 <!-- 
-  ** This file configures the Cherry Server.
- -->
-
+  ** This file configures the web service provider.
+-->
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:cxf="http://cxf.apache.org/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -59,7 +58,7 @@
     serviceName="s:SOAPService"
     implementor="demo.wssec.server.GreeterImpl"    
     address="https://localhost:9001/SoapContext/SoapPort"
-    wsdlLocation="wsdl/hello_world.wsdl"
+    wsdlLocation="src/main/config/hello_world.wsdl"
     depends-on="ClientAuthHttpsSettings"
     xmlns:s="http://apache.org/hello_world_soap_http" >
     
@@ -79,13 +78,11 @@
   <httpj:engine-factory id="ClientAuthHttpsSettings">
    <httpj:engine port="9001">
     <httpj:tlsServerParameters>
-      <sec:keyManagers keyPassword="password">
-           <sec:keyStore type="JKS" password="password" 
-                file="certs/cherry.jks"/>
+      <sec:keyManagers keyPassword="skpass">
+           <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
       </sec:keyManagers>
       <sec:trustManagers>
-          <sec:keyStore type="JKS" password="password"
-               file="certs/truststore.jks"/>
+           <sec:keyStore file="src/main/config/serviceKeystore.jks" password="sspass" type="JKS"/>
       </sec:trustManagers>
       <sec:cipherSuitesFilter>
         <!-- these filters ensure that a ciphersuite with

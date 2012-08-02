@@ -32,7 +32,7 @@ public class Server {
         System.out.println("Starting Server");
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Server.class.getResource("wssec.xml");
+        URL busFile = Server.class.getResource("/ServiceConfig.xml");
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
 

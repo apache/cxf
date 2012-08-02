@@ -23,9 +23,7 @@ import java.util.logging.Logger;
 import org.apache.hello_world_soap_http.Greeter;
 
 @javax.jws.WebService(name = "Greeter", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap_http", 
-                      wsdlLocation = "file:./wsdl/hello_world.wsdl")
-                  
+    targetNamespace = "http://apache.org/hello_world_soap_http")
 public class GreeterImpl implements Greeter {
 
     private static final Logger LOG = 
