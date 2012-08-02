@@ -102,7 +102,7 @@ public class XMLBindingFactory extends AbstractBindingFactory {
             for (MessagePartInfo mpi : mi.getMessageParts()) {
                 if (!mpi.isElement()) {
                     //if it's not an element, we need to make it one
-                    mpi.setElementQName(mpi.getName());
+                    mpi.setConcreteName(mpi.getName());
                 }
             }
         }
