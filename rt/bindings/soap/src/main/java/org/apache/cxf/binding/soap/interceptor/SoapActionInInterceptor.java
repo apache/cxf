@@ -22,12 +22,14 @@ package org.apache.cxf.binding.soap.interceptor;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -39,6 +41,8 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public class SoapActionInInterceptor extends AbstractSoapInterceptor {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(SoapActionInInterceptor.class);
     
     public SoapActionInInterceptor() {
         super(Phase.READ);
@@ -91,6 +95,10 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
     }
     
     public void handleMessage(SoapMessage message) throws Fault {
+        if (isRequestor(message)) {
+            return;
+        }
+        
         String action = getSoapAction(message);
         if (!StringUtils.isEmpty(action)) {
             getAndSetOperation(message, action);
@@ -108,24 +116,54 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         
         BindingOperationInfo bindingOp = null;
         
-        Collection<BindingOperationInfo> bops = ep.getBinding().getBindingInfo().getOperations();
-        if (bops == null) {
-            return;
-        }
-        for (BindingOperationInfo boi : bops) {
-            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
-            if (soi != null && action.equals(soi.getAction())) {
-                if (bindingOp != null) {
-                    //more than one op with the same action, will need to parse normally
-                    return;
+        Collection<BindingOperationInfo> bops = ep.getEndpointInfo()
+            .getBinding().getOperations();
+        if (bops != null) {
+            for (BindingOperationInfo boi : bops) {
+                SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
+                if (soi != null && action.equals(soi.getAction())) {
+                    if (bindingOp != null) {
+                        //more than one op with the same action, will need to parse normally
+                        return;
+                    }
+                    bindingOp = boi;
                 }
-                bindingOp = boi;
             }
         }
-        if (bindingOp != null) {
-            ex.put(BindingOperationInfo.class, bindingOp);
-            ex.put(OperationInfo.class, bindingOp.getOperationInfo());
+        
+        if (bindingOp == null) {
+            //we didn't match the an operation, we'll try again later to make
+            //sure the incoming message did end up matching an operation.
+            //This could occur in some cases like WS-RM and WS-SecConv that will
+            //intercept the message with a new endpoint/operation
+            message.getInterceptorChain().add(new SoapActionInAttemptTwoInterceptor());
+            return;
+        }
+        
+        ex.put(BindingOperationInfo.class, bindingOp);
+        ex.put(OperationInfo.class, bindingOp.getOperationInfo());
+    }
+    
+    public static class SoapActionInAttemptTwoInterceptor extends AbstractSoapInterceptor {
+        public SoapActionInAttemptTwoInterceptor() {
+            super(Phase.PRE_LOGICAL);
+        }
+        public void handleMessage(SoapMessage message) throws Fault {
+            BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
+            if (boi == null) {
+                return;
+            }
+            String action = getSoapAction(message);
+            if (StringUtils.isEmpty(action)) {
+                return;
+            }
+            SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
+            if (soi == null || action.equals(soi.getAction())) {
+                return;
+            }
+            throw new Fault("SOAP_ACTION_MISMATCH", LOG, null, action);
         }
     }
+
 
 }
