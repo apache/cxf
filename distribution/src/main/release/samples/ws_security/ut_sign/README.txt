@@ -3,10 +3,14 @@ WS-Security Demo  (Signature and UsernameToken)
 
 This demo shows how WS-Security support in Apache CXF may be enabled.
 
-WS-Security can be configured to the Client and Server endpoints by adding WSS4JInterceptors.
-Both Server and Client can be configured for outgoing and incoming interceptors. Various Actions like,
-Timestamp, UsernameToken, Signature, Encryption, etc., can be applied to the interceptors by passing
+WS-Security can be configured to the Client and Server endpoints by adding
+WSS4JInterceptors. Both Server and Client can be configured for outgoing and
+incoming interceptors. Various Actions like, Timestamp, UsernameToken,
+Signature, Encryption, etc., can be applied to the interceptors by passing
 appropriate configuration properties.
+
+This demo also shows how the DefaultCryptoCoverageChecker can be used to
+make sure that the correct Elements were signed and/or encrypted.
 
 The logging feature is used to log the inbound and outbound
 SOAP messages and display these to the console.
@@ -122,7 +126,5 @@ The server process starts in a new command window.
 After running the client, terminate the server process.
 
 To remove the code generated from the WSDL file and the .class
-files, either delete the build directory and its contents or run:
-
-  ant clean
+files, delete the build directory and its contents.
 
