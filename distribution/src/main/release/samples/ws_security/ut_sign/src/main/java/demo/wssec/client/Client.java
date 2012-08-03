@@ -31,6 +31,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
 
+import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
@@ -56,13 +57,10 @@ public final class Client {
             outProps.put("action", "UsernameToken Timestamp Signature");
 
             outProps.put("passwordType", "PasswordDigest");
-            outProps.put("user", "clientx509v1");
             outProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");
 
-            //If you are using the patch WSS-194, then uncomment below two lines and comment
-            //the above "user" prop line.
-            //outProps.put("user", "abcd");
-            //outProps.put("signatureUser", "clientx509v1");
+            outProps.put("user", "abcd");
+            outProps.put("signatureUser", "clientx509v1");
             outProps.put("signaturePropFile", "etc/Client_Sign.properties");
             outProps.put("signatureKeyIdentifier", "DirectReference");
             outProps.put("signatureParts", 
@@ -81,6 +79,12 @@ public final class Client {
             inProps.put("signatureKeyIdentifier", "DirectReference");
 
             bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
+
+            // Check to make sure that the SOAP Body and Timestamp were signed
+            DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
+            coverageChecker.setSignBody(true);
+            coverageChecker.setSignTimestamp(true);
+            bus.getInInterceptors().add(coverageChecker);
 
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();

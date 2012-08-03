@@ -3,9 +3,10 @@ WS-Security Demo  (UsernameToken and Timestamp)
 
 This demo shows how WS-Security support in Apache CXF may be enabled.
 
-WS-Security can be configured to the Client and Server endpoints by adding WSS4JInterceptors.
-Both Server and Client can be configured for outgoing and incoming interceptors. Various Actions like,
-Timestamp, UsernameToken, Signature, Encryption, etc., can be applied to the interceptors by passing
+WS-Security can be configured to the Client and Server endpoints by adding
+WSS4JInterceptors. Both Server and Client can be configured for outgoing and
+incoming interceptors. Various Actions like, Timestamp, UsernameToken,
+Signature, Encryption, etc., can be applied to the interceptors by passing
 appropriate configuration properties.
 
 The logging feature is used to log the inbound and outbound
