@@ -123,7 +123,7 @@ public final class SecurityConstants {
     public static final String ENCRYPT_CRYPTO = "ws-security.encryption.crypto";
     
     //
-    // Boolean configuration tags, e.g. the value should be "true" or "false".
+    // Boolean WS-Security configuration tags, e.g. the value should be "true" or "false".
     //
     
     /**
@@ -173,26 +173,32 @@ public final class SecurityConstants {
     public static final String ENABLE_TIMESTAMP_CACHE = "ws-security.enable.timestamp.cache";
     
     //
-    // (Non-boolean) Configuration parameters
+    // Non-boolean WS-Security Configuration parameters
     //
     
     /**
-     * This configuration tag specifies the time in seconds after Creation that an incoming 
-     * Timestamp is valid for. The default value is 300 seconds (5 minutes).
+     * The time in seconds after Creation that an incoming Timestamp is valid for. The default
+     * value is 300 seconds (5 minutes).
      */
     public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
     
     /**
-     * This configuration tag specifies the time in seconds in the future within which
-     * the Created time of an incoming Timestamp is valid. WSS4J rejects by default any
-     * timestamp which is "Created" in the future, and so there could potentially be
-     * problems in a scenario where a client's clock is slightly askew. The default
-     * value for this parameter is "0", meaning that no future-created Timestamps are
-     * allowed.
+     * The time in seconds in the future within which the Created time of an incoming 
+     * Timestamp is valid. The default value is "60", to avoid problems where clocks are 
+     * slightly askew. To reject all future-created Timestamps, set this value to "0". 
      */
     public static final String TIMESTAMP_FUTURE_TTL = "ws-security.timestamp.futureTimeToLive";
     
+    /**
+     * A reference to the KerberosClient class used to obtain a service ticket. 
+     */
     public static final String KERBEROS_CLIENT = "ws-security.kerberos.client";
+    
+    /**
+     * The SpnegoClientAction implementation to use for SPNEGO. This allows the user to plug in
+     * a different implementation to obtain a service ticket.
+     */
+    public static final String SPNEGO_CLIENT_ACTION = "ws-security.spnego.client.action";
     
     /**
      * The JAAS Context name to use for Kerberos. This is currently only supported for SPNEGO.
@@ -203,12 +209,6 @@ public final class SecurityConstants {
      * The Kerberos Service Provider Name (spn) to use. This is currently only supported for SPNEGO.
      */
     public static final String KERBEROS_SPN = "ws-security.kerberos.spn";
-    
-    /**
-     * The SpnegoClientAction implementation to use for SPNEGO. This allows the user to plug in
-     * a different implementation to obtain a service ticket.
-     */
-    public static final String SPNEGO_CLIENT_ACTION = "ws-security.spnego.client.action";
     
     /**
      * This holds a reference to a ReplayCache instance used to cache UsernameToken nonces. The
@@ -232,11 +232,25 @@ public final class SecurityConstants {
         "ws-security.cache.config.file";
     
     /**
+<<<<<<< HEAD
      * This configuration tag is a comma separated String of regular expressions which
      * will be applied to the subject DN of the certificate used for signature
      * validation, after trust verification of the certificate chain associated with the 
      * certificate. These constraints are not used when the certificate is contained in
      * the keystore (direct trust).
+=======
+     * The TokenStore instance to use to cache security tokens. By default this uses the
+     * EHCacheTokenStore if EhCache is available. Otherwise it uses the MemoryTokenStore.
+     */
+    public static final String TOKEN_STORE_CACHE_INSTANCE = 
+        "org.apache.cxf.ws.security.tokenstore.TokenStore";
+
+    /**
+     * A comma separated String of regular expressions which will be applied to the subject DN of 
+     * the certificate used for signature validation, after trust verification of the certificate 
+     * chain associated with the  certificate. These constraints are not used when the certificate 
+     * is contained in the keystore (direct trust).
+>>>>>>> 8d01268... Merged revisions 1368875 via  git cherry-pick from
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
     
@@ -244,24 +258,73 @@ public final class SecurityConstants {
     // Validator implementations for validating received security tokens
     //
     
+    /**
+     * The WSS4J Validator instance to use to validate UsernameTokens. The default value is the
+     * UsernameTokenValidator.
+     */
     public static final String USERNAME_TOKEN_VALIDATOR = "ws-security.ut.validator";
+    
+    /**
+     * The WSS4J Validator instance to use to validate SAML 1.1 Tokens. The default value is the
+     * SamlAssertionValidator.
+     */
     public static final String SAML1_TOKEN_VALIDATOR = "ws-security.saml1.validator";
+    
+    /**
+     * The WSS4J Validator instance to use to validate SAML 2.0 Tokens. The default value is the
+     * SamlAssertionValidator.
+     */
     public static final String SAML2_TOKEN_VALIDATOR = "ws-security.saml2.validator";
+    
+    /**
+     * The WSS4J Validator instance to use to validate Timestamps. The default value is the
+     * TimestampValidator.
+     */
     public static final String TIMESTAMP_TOKEN_VALIDATOR = "ws-security.timestamp.validator";
+    
+    /**
+     * The WSS4J Validator instance to use to validate trust in credentials used in
+     * Signature verification. The default value is the SignatureTrustValidator.
+     */
     public static final String SIGNATURE_TOKEN_VALIDATOR = "ws-security.signature.validator";
+    
+    /**
+     * The WSS4J Validator instance to use to validate BinarySecurityTokens. The default value 
+     * is the NoOpValidator.
+     */
     public static final String BST_TOKEN_VALIDATOR = "ws-security.bst.validator";
+    
+    /**
+     * The WSS4J Validator instance to use to validate SecurityContextTokens. The default value is 
+     * the NoOpValidator.
+     */
     public static final String SCT_TOKEN_VALIDATOR = "ws-security.sct.validator";
     
     //
     // STS Client Configuration tags
     //
     
+    /**
+     * A reference to the STSClient class used to communicate with the STS.
+     */
     public static final String STS_CLIENT = "ws-security.sts.client";
+    
+    /**
+     * The "AppliesTo" address to send to the STS. The default is the endpoint address of the 
+     * service provider.
+     */
     public static final String STS_APPLIES_TO = "ws-security.sts.applies-to";
     
-    public static final String STS_TOKEN_USE_CERT_FOR_KEYINFO = 
-            "ws-security.sts.token.usecert";
+    /**
+     * Whether to write out an X509Certificate structure in UseKey/KeyInfo, or whether to write
+     * out a KeyValue structure. The default value is "false".
+     */
+    public static final String STS_TOKEN_USE_CERT_FOR_KEYINFO = "ws-security.sts.token.usecert";
     
+    /**
+     * Whether to cancel a token when using SecureConversation after successful invocation. The
+     * default is "false".
+     */
     public static final String STS_TOKEN_DO_CANCEL = "ws-security.sts.token.do.cancel";
     
     /**
@@ -274,28 +337,66 @@ public final class SecurityConstants {
     
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
      * Set this property to avoid STS client trying send WS-MetadataExchange call using
+=======
+     * Whether to avoid STS client trying send WS-MetadataExchange call using
+>>>>>>> 8d01268... Merged revisions 1368875 via  git cherry-pick from
      * STS EPR WSA address when the endpoint contract contains no WS-MetadataExchange info.
+     * The default value is "false".
      */
     public static final String DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS =
         "ws-security.sts.disable-wsmex-call-using-epr-address";
     
     /**
+<<<<<<< HEAD
 >>>>>>> 0d7ae81... Merged revisions 1368015 via  git cherry-pick from
+=======
+     * 
+     * A Crypto object to be used for the STS. If this is not defined then the 
+     * {@link STS_TOKEN_PROPERTIES} is used instead.
+     * 
+>>>>>>> 8d01268... Merged revisions 1368875 via  git cherry-pick from
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client
-     * will decrypt the EncryptedData elements in the response
+     * will decrypt the EncryptedData elements in the response.
      * 
      * These are also used by the STSClient to send/process any RSA/DSAKeyValue tokens 
      * used if the KeyType is "PublicKey" 
      */
     public static final String STS_TOKEN_CRYPTO = "ws-security.sts.token.crypto";
+    
+    /**
+     * The Crypto property configuration to use for the STS, if {@link STS_TOKEN_CRYPTO} is not
+     * set instead.
+     * The value of this tag must be either:
+     * a) A Java Properties object that contains the Crypto configuration.
+     * b) The path of the Crypto property file that contains the Crypto configuration.
+     * c) A URL that points to the Crypto property file that contains the Crypto configuration.
+     */
     public static final String STS_TOKEN_PROPERTIES = "ws-security.sts.token.properties";
+    
+    /**
+     * The alias name in the keystore to get the user's public key to send to the STS for the
+     * PublicKey KeyType case.
+     */
     public static final String STS_TOKEN_USERNAME = "ws-security.sts.token.username";
     
+    /**
+     * The token to be sent to the STS in an "ActAs" field. It can be either:
+     * a) A String
+     * b) A DOM Element
+     * c) A CallbackHandler object to use to obtain the token
+     */
     public static final String STS_TOKEN_ACT_AS = "ws-security.sts.token.act-as";
     
+    /**
+     * The token to be sent to the STS in an "OnBehalfOf" field. It can be either:
+     * a) A String
+     * b) A DOM Element
+     * c) A CallbackHandler object to use to obtain the token
+     */
     public static final String STS_TOKEN_ON_BEHALF_OF = "ws-security.sts.token.on-behalf-of";
     
     //
@@ -314,17 +415,16 @@ public final class SecurityConstants {
             SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             VALIDATE_TOKEN, ENABLE_REVOCATION, ALWAYS_ENCRYPT_UT, IS_BSP_COMPLIANT, 
             SELF_SIGN_SAML_ASSERTION, ENABLE_NONCE_CACHE, ENABLE_TIMESTAMP_CACHE,
-            STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO,
-            STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, 
-            STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO,
-            SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, TIMESTAMP_TOKEN_VALIDATOR,
-            SIGNATURE_TOKEN_VALIDATOR, TIMESTAMP_FUTURE_TTL,
-            BST_TOKEN_VALIDATOR, SAML_CALLBACK_HANDLER, STS_TOKEN_ON_BEHALF_OF,
-            KERBEROS_CLIENT, SCT_TOKEN_VALIDATOR, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
-            KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, SPNEGO_CLIENT_ACTION,
-            NONCE_CACHE_INSTANCE, 
-            TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS,
-            SUBJECT_CERT_CONSTRAINTS,
+            TIMESTAMP_TTL, TIMESTAMP_FUTURE_TTL,
+            KERBEROS_CLIENT, SPNEGO_CLIENT_ACTION, KERBEROS_JAAS_CONTEXT_NAME, KERBEROS_SPN, 
+            NONCE_CACHE_INSTANCE, TIMESTAMP_CACHE_INSTANCE, CACHE_CONFIG_FILE, 
+            TOKEN_STORE_CACHE_INSTANCE, SUBJECT_CERT_CONSTRAINTS,
+            USERNAME_TOKEN_VALIDATOR, SAML1_TOKEN_VALIDATOR, SAML2_TOKEN_VALIDATOR, 
+            TIMESTAMP_TOKEN_VALIDATOR, SIGNATURE_TOKEN_VALIDATOR, BST_TOKEN_VALIDATOR, 
+            SCT_TOKEN_VALIDATOR, STS_CLIENT, STS_APPLIES_TO, STS_TOKEN_USE_CERT_FOR_KEYINFO,
+            STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
+            DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
+            STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             TOKEN, TOKEN_ID
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
