@@ -47,4 +47,8 @@
                   createdFromAPI="true">
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSignedEncryptedBodyPort" 
+                  createdFromAPI="true">
+    </jaxws:client>
+    
 </beans>

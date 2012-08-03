@@ -36,10 +36,11 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.Test;
 
 /**
- * Test the SignatureCoverageChecker, which extends the CryptoCoverageChecker to provide
- * an easier way to check to see if the SOAP Body and Timestamp were signed.
+ * Test the DefaultCryptoCoverageChecker, which extends the CryptoCoverageChecker to provide
+ * an easier way to check to see if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, and 
+ * if the Timestamp was signed.
  */
-public class SignatureCheckerTest extends AbstractSecurityTest {
+public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
     
     @Test
     public void testSignedWithIncompleteCoverage() throws Exception {
@@ -97,8 +98,7 @@ public class SignatureCheckerTest extends AbstractSecurityTest {
         
         final Document doc = this.readDocument(document);
         final SoapMessage msg = this.getSoapMessageForDom(doc);
-        final SignatureCoverageChecker checker = 
-            new SignatureCoverageChecker(true, true);
+        final CryptoCoverageChecker checker = new DefaultCryptoCoverageChecker();
         checker.addPrefixes(prefixes);
         checker.addXPaths(xpaths);
         final PhaseInterceptor<SoapMessage> wss4jInInterceptor = this.getWss4jInInterceptor();

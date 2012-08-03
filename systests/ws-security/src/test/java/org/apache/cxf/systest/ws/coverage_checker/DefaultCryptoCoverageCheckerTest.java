@@ -39,9 +39,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * A set of tests for the SignatureCoverageChecker.
+ * A set of tests for the DefaultCryptoCoverageChecker.
  */
-public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBase {
+public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
@@ -72,13 +72,13 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SignatureCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SignatureCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampPort");
         DoubleItPortType port = 
@@ -111,13 +111,13 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SignatureCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SignatureCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampPort");
         DoubleItPortType port = 
@@ -153,13 +153,13 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SignatureCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SignatureCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampPort");
         DoubleItPortType port = 
@@ -196,13 +196,13 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SignatureCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SignatureCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampSoap12Port");
         DoubleItPortType port = 
@@ -235,13 +235,13 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SignatureCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SignatureCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampSoap12Port");
         DoubleItPortType port = 
@@ -277,13 +277,13 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SignatureCoverageCheckerTest.class.getResource("client/client.xml");
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
         
-        URL wsdl = SignatureCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampSoap12Port");
         DoubleItPortType port = 
@@ -306,6 +306,96 @@ public class SignatureCoverageCheckerTest extends AbstractBusClientServerTestBas
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the Timestamp");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSignedEncryptedBody() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedBodyPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put("action", "Timestamp Signature Encrypt");
+        outProps.put("signaturePropFile", 
+                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("encryptionPropFile", 
+                     "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+        outProps.put("user", "alice");
+        outProps.put("encryptionUser", "bob");
+        outProps.put("passwordCallbackClass", 
+                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        outProps.put("signatureParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        outProps.put("encryptionParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        
+        bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
+        
+        port.doubleIt(25);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSignedNotEncryptedBody() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedBodyPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put("action", "Timestamp Signature Encrypt");
+        outProps.put("signaturePropFile", 
+                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("encryptionPropFile", 
+                     "org/apache/cxf/systest/ws/wssec10/client/bob.properties");
+        outProps.put("user", "alice");
+        outProps.put("encryptionUser", "bob");
+        outProps.put("passwordCallbackClass", 
+                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        outProps.put("signatureParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+        outProps.put("encryptionParts",
+                     "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
+                     + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
+        
+        bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not encrypting the SOAP Body");
         } catch (Exception ex) {
             // expected
         }
