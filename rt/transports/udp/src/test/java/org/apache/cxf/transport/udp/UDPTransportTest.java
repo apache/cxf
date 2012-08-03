@@ -58,7 +58,9 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
-        assertEquals("Hello World", g.greetMe("World"));
+        for (int x = 0; x < 500; x++) {
+            assertEquals("Hello World", g.greetMe("World"));
+        }
                
         ((java.io.Closeable)g).close();
     }
