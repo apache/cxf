@@ -22,8 +22,14 @@ package org.apache.cxf.transport.udp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.URI;
+import java.util.Enumeration;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +38,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.AbstractConduit;
@@ -64,35 +71,42 @@ public class UDPConduit extends AbstractConduit {
         connector.setHandler(new IoHandlerAdapter() {
             public void messageReceived(IoSession session, Object buf) {
                 Message message = (Message)session.getAttribute(CXF_MESSAGE_ATTR);
-                if (message.getExchange().getInMessage() == null) {
-                    final Message inMessage = new MessageImpl();
-                    inMessage.setExchange(message.getExchange());
-                    message.getExchange().setInMessage(inMessage);
-                    
-                    IoSessionInputStream ins = new IoSessionInputStream();
-                    ins.write((IoBuffer)buf);
-                    inMessage.setContent(InputStream.class, ins);
-                    inMessage.put(IoSessionInputStream.class, ins);
-                    
-                    WorkQueueManager queuem = bus.getExtension(WorkQueueManager.class);
-                    WorkQueue queue = queuem.getNamedWorkQueue("udp-conduit");
-                    if (queue == null) {
-                        queue = queuem.getAutomaticWorkQueue();
-                    }
-                    queue.execute(new Runnable() {
-                        public void run() {
-                            incomingObserver.onMessage(inMessage);
-                        }
-                    });
-                    
-                } else {
-                    IoSessionInputStream ins = message.getExchange().getInMessage().get(IoSessionInputStream.class);
-                    ins.write((IoBuffer)buf);
-                }
+                dataReceived(message, (IoBuffer)buf, true);
             }
         });
     }
 
+    private void dataReceived(Message message, IoBuffer buf, boolean async) { 
+        if (message.getExchange().getInMessage() == null) {
+            final Message inMessage = new MessageImpl();
+            inMessage.setExchange(message.getExchange());
+            message.getExchange().setInMessage(inMessage);
+            
+            IoSessionInputStream ins = new IoSessionInputStream();
+            ins.write((IoBuffer)buf);
+            inMessage.setContent(InputStream.class, ins);
+            inMessage.put(IoSessionInputStream.class, ins);
+            
+            if (async) {
+                WorkQueueManager queuem = bus.getExtension(WorkQueueManager.class);
+                WorkQueue queue = queuem.getNamedWorkQueue("udp-conduit");
+                if (queue == null) {
+                    queue = queuem.getAutomaticWorkQueue();
+                }
+                queue.execute(new Runnable() {
+                    public void run() {
+                        incomingObserver.onMessage(inMessage);
+                    }
+                });
+            } else {
+                incomingObserver.onMessage(inMessage);
+            }
+            
+        } else {
+            IoSessionInputStream ins = message.getExchange().getInMessage().get(IoSessionInputStream.class);
+            ins.write((IoBuffer)buf);
+        }
+    }
     
     public void close(Message msg) throws IOException {
         super.close(msg);
@@ -135,31 +149,96 @@ public class UDPConduit extends AbstractConduit {
                 address = this.getTarget().getAddress().getValue();
             }
             URI uri = new URI(address);
-            InetSocketAddress isa = null;
-            String hp = ""; 
             if (StringUtils.isEmpty(uri.getHost())) {
-                isa = new InetSocketAddress(uri.getPort());
-                hp = ":" + uri.getPort();
+                //NIO doesn't support broadcast, we need to drop down to raw
+                //java.io for these
+                String s = uri.getSchemeSpecificPart();
+                if (s.startsWith("//:")) {
+                    s = s.substring(3);
+                }
+                if (s.indexOf('/') != -1) {
+                    s = s.substring(0, s.indexOf('/'));
+                }
+                final int port = Integer.parseInt(s);
+                message.setContent(OutputStream.class, 
+                    new UDBBroadcastOutputStream(port, message));
+                
             } else {
+                InetSocketAddress isa = null;
+                String hp = ""; 
+
                 isa = new InetSocketAddress(uri.getHost(), uri.getPort());
                 hp = uri.getHost() + ":" + uri.getPort();
+                
+                Queue<ConnectFuture> q = connections.get(hp);
+                ConnectFuture connFuture = null;
+                if (q != null) {
+                    connFuture = q.poll();
+                }
+                if (connFuture == null) {
+                    connFuture = connector.connect(isa);
+                    connFuture.await();
+                }
+                connFuture.getSession().setAttribute(CXF_MESSAGE_ATTR, message);
+                message.setContent(OutputStream.class, new UDPConduitOutputStream(connector, connFuture, message));
+                message.getExchange().put(ConnectFuture.class, connFuture);
+                message.getExchange().put(HOST_PORT, uri.getHost() + ":" + uri.getPort());
             }
-    
-            Queue<ConnectFuture> q = connections.get(hp);
-            ConnectFuture connFuture = null;
-            if (q != null) {
-                connFuture = q.poll();
-            }
-            if (connFuture == null) {
-                connFuture = connector.connect(isa);
-                connFuture.await();
-            }
-            connFuture.getSession().setAttribute(CXF_MESSAGE_ATTR, message);
-            message.setContent(OutputStream.class, new UDPConduitOutputStream(connector, connFuture, message));
-            message.getExchange().put(ConnectFuture.class, connFuture);
-            message.getExchange().put(HOST_PORT, uri.getHost() + ":" + uri.getPort());
         } catch (Exception ex) {
             throw new IOException(ex);
+        }
+    }
+
+    private final class UDBBroadcastOutputStream extends LoadingByteArrayOutputStream {
+        private final int port;
+        private final Message message;
+
+        private UDBBroadcastOutputStream(int port, Message message) {
+            this.port = port;
+            this.message = message;
+        }
+
+        public void close() throws IOException {
+            super.close();
+            final DatagramSocket socket = new DatagramSocket();
+            socket.setBroadcast(true);
+
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                    continue;  
+                }
+                for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                    InetAddress broadcast = interfaceAddress.getBroadcast();
+                    if (broadcast == null) {
+                        continue;
+                    }
+                    DatagramPacket sendPacket = new DatagramPacket(this.getRawBytes(), 
+                                                                   0,
+                                                                   this.size(),
+                                                                   broadcast, 
+                                                                   port);
+                    
+                    try {
+                        socket.send(sendPacket);
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                }
+            }
+            
+            if (!message.getExchange().isOneWay()) {
+                byte bytes[] = new byte[64 * 1024];
+                DatagramPacket p = new DatagramPacket(bytes, bytes.length);
+                socket.setSoTimeout(30000);
+                socket.receive(p);
+                dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false);
+            }
+            socket.close();
+        }
+
+        public void flush() throws IOException {
         }
     }
 

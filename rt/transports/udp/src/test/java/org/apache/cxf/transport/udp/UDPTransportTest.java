@@ -19,6 +19,9 @@
 
 package org.apache.cxf.transport.udp;
 
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -43,7 +46,7 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         createStaticBus();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setBus(getStaticBus());
-        factory.setAddress("udp://localhost:" + PORT);
+        factory.setAddress("udp://:" + PORT);
         factory.setServiceBean(new GreeterImpl());
         server = factory.create();
     }
@@ -58,10 +61,34 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
-        for (int x = 0; x < 500; x++) {
+        for (int x = 0; x < 5; x++) {
             assertEquals("Hello World", g.greetMe("World"));
         }
                
+        ((java.io.Closeable)g).close();
+    }
+    @Test
+    public void testBroadcastUDP() throws Exception {
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        int count = 0;
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
+            if (!networkInterface.isUp() || networkInterface.isLoopback()) {
+                continue;  
+            }
+            count++;
+        }
+        if (count == 0) {
+            //no non-loopbacks, cannot do broadcasts
+            System.out.println("Skipping broadcast test");
+            return;
+        }
+
+        
+        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
+        fact.setAddress("udp://:" + PORT + "/foo");
+        Greeter g = fact.create(Greeter.class);
+        assertEquals("Hello World", g.greetMe("World"));
         ((java.io.Closeable)g).close();
     }
 

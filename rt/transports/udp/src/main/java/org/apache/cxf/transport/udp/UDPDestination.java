@@ -90,7 +90,15 @@ public class UDPDestination extends AbstractDestination {
             URI uri = new URI(this.getAddress().getAddress().getValue());
             InetSocketAddress isa = null;
             if (StringUtils.isEmpty(uri.getHost())) {
-                isa = new InetSocketAddress(uri.getPort());
+                String s = uri.getSchemeSpecificPart();
+                if (s.startsWith("//:")) {
+                    s = s.substring(3);
+                }
+                if (s.indexOf('/') != -1) {
+                    s = s.substring(0, s.indexOf('/'));
+                }
+                int port = Integer.parseInt(s);
+                isa = new InetSocketAddress(port);
             } else {
                 isa = new InetSocketAddress(uri.getHost(), uri.getPort());
             }
