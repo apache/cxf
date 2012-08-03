@@ -51,4 +51,11 @@
                   createdFromAPI="true">
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItWSAPort" 
+                  createdFromAPI="true">
+         <jaxws:features>
+             <wsa:addressing xmlns:wsa="http://cxf.apache.org/ws/addressing"/>
+         </jaxws:features>
+    </jaxws:client>
+    
 </beans>
