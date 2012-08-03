@@ -62,7 +62,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
     public static void cleanup() throws Exception {
         stopAllServers();
     }
-
+    
     @org.junit.Test
     public void testSignedBodyTimestamp() throws Exception {
         if (!unrestrictedPoliciesInstalled) {
@@ -397,6 +397,65 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractBusClientServerTes
         } catch (Exception ex) {
             // expected
         }
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testWSAddressing() throws Exception {
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = DefaultCryptoCoverageCheckerTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = DefaultCryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItWSAPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put("action", "Timestamp Signature");
+        outProps.put("signaturePropFile", 
+                     "org/apache/cxf/systest/ws/wssec10/client/alice.properties");
+        outProps.put("user", "alice");
+        outProps.put("passwordCallbackClass", 
+                     "org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback");
+        outProps.put("signatureParts",
+                     "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
+                     + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
+                     + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
+        
+        WSS4JOutInterceptor wss4jOutInterceptor = new WSS4JOutInterceptor(outProps);
+        bus.getOutInterceptors().add(wss4jOutInterceptor);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not signing the WS-Addressing headers");
+        } catch (Exception ex) {
+            // expected
+        }
+        
+        // Now sign the WS-Addressing headers
+        bus.getOutInterceptors().remove(wss4jOutInterceptor);
+        
+        outProps.put("signatureParts",
+                "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
+                + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
+                + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;"
+                + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
+        
+        wss4jOutInterceptor = new WSS4JOutInterceptor(outProps);
+        bus.getOutInterceptors().add(wss4jOutInterceptor);
+        
+        port.doubleIt(25);
         
         bus.shutdown(true);
     }
