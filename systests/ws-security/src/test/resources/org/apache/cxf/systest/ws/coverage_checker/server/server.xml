@@ -63,10 +63,7 @@
             </map>
            </constructor-arg>
         </bean>
-        <bean class="org.apache.cxf.ws.security.wss4j.SignatureCoverageChecker">
-           <constructor-arg><value>true</value></constructor-arg>
-           <constructor-arg><value>true</value></constructor-arg>
-        </bean>
+        <bean class="org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker"/>
        </jaxws:inInterceptors>
     </jaxws:endpoint> 
     
@@ -90,12 +87,40 @@
             </map>
            </constructor-arg>
         </bean>
-        <bean class="org.apache.cxf.ws.security.wss4j.SignatureCoverageChecker">
-           <constructor-arg><value>true</value></constructor-arg>
-           <constructor-arg><value>true</value></constructor-arg>
+        <bean class="org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker">
+           <property name="signBody" value="true"/>
+           <property name="signTimestamp" value="true"/>
         </bean>
        </jaxws:inInterceptors>
     </jaxws:endpoint> 
     
+    <jaxws:endpoint 
+       id="SignedEncryptedBody"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSignedEncrypted" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSignedEncryptedBodyPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+        
+       <jaxws:inInterceptors>
+         <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+           <constructor-arg>
+            <map>
+               <entry key="action" value="Encrypt Signature Timestamp"/>
+               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+               <entry key="decryptionPropFile" value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+               <entry key="passwordCallbackClass" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+            </map>
+           </constructor-arg>
+        </bean>
+        <bean class="org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker">
+           <property name="signBody" value="true"/>
+           <property name="signTimestamp" value="false"/>
+           <property name="encryptBody" value="true"/>
+        </bean>
+       </jaxws:inInterceptors>
+    </jaxws:endpoint> 
    
 </beans>

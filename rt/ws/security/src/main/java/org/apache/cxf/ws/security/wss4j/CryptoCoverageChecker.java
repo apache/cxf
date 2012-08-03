@@ -346,5 +346,48 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         public CoverageScope getScope() {
             return this.scope;
         }
+        
+        @Override
+        public boolean equals(Object xpathObject) {
+            if (!(xpathObject instanceof XPathExpression)) {
+                return false;
+            }
+            
+            if (xpathObject == this) {
+                return true;
+            }
+            
+            XPathExpression xpath = (XPathExpression)xpathObject;
+            if (xpath.getScope() != getScope()) {
+                return false;
+            }
+            
+            if (xpath.getType() != getType()) {
+                return false;
+            }
+            
+            if (getXPath() == null && xpath.getXPath() != null) {
+                return false;
+            } else if (getXPath() != null && !getXPath().equals(xpath.getXPath())) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        @Override
+        public int hashCode() {
+            int result = 17;
+            if (getXPath() != null) {
+                result = 31 * result + getXPath().hashCode();
+            }
+            if (getType() != null) {
+                result = 31 * result + getType().hashCode();
+            }
+            if (getScope() != null) {
+                result = 31 * result + getScope().hashCode();
+            }
+            return result;
+        }
     }
 }
