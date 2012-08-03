@@ -30,6 +30,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
 
+import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
@@ -55,12 +56,9 @@ public final class Client {
             outProps.put("action", "UsernameToken Timestamp Signature Encrypt");
 
             outProps.put("passwordType", "PasswordDigest");
-            outProps.put("user", "clientx509v1");
 
-            //If you are using the patch WSS-194, then uncomment below two lines and 
-            //comment the above "user" prop line.
-            //outProps.put("user", "abcd");
-            //outProps.put("signatureUser", "clientx509v1");
+            outProps.put("user", "abcd");
+            outProps.put("signatureUser", "clientx509v1");
 
             outProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");
 
@@ -93,6 +91,14 @@ public final class Client {
 
             bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
 
+            // Check to make sure that the SOAP Body and Timestamp were signed,
+            // and that the SOAP Body was encrypted
+            DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
+            coverageChecker.setSignBody(true);
+            coverageChecker.setSignTimestamp(true);
+            coverageChecker.setEncryptBody(true);
+            bus.getInInterceptors().add(coverageChecker);
+
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
 
@@ -104,7 +110,7 @@ public final class Client {
                 System.out.println("response: " + response + "\n");
             }
 
-            // allow aynchronous resends to occur
+            // allow asynchronous resends to occur
             Thread.sleep(30 * 1000);
 
             bus.shutdown(true);

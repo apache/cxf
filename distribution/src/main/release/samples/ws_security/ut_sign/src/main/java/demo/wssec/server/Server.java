@@ -29,6 +29,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
@@ -56,12 +57,8 @@ public class Server {
         outProps.put("action", "UsernameToken Timestamp Signature");
 
         outProps.put("passwordType", "PasswordText");
-        outProps.put("user", "serverx509v1");
-
-        //If you are using WSS4J which includes a patch for WSS-194, then uncomment following 2 
-        //lines for "user" and "signatureUser" props and comment the above line for "user" props.
-        //outProps.put("user", "Alice");
-        //outProps.put("signatureUser", "serverx509v1");
+        outProps.put("user", "Alice");
+        outProps.put("signatureUser", "serverx509v1");
         outProps.put("passwordCallbackClass", "demo.wssec.server.UTPasswordCallback");
 
         outProps.put("signaturePropFile", "etc/Server_Decrypt.properties");
@@ -81,6 +78,12 @@ public class Server {
         inProps.put("signatureKeyIdentifier", "DirectReference");
 
         bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
+
+        // Check to make sure that the SOAP Body and Timestamp were signed
+        DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
+        coverageChecker.setSignBody(true);
+        coverageChecker.setSignTimestamp(true);
+        bus.getInInterceptors().add(coverageChecker);
 
         BusFactory.setDefaultBus(bus);
 
