@@ -19,14 +19,18 @@
 package org.apache.cxf.ws.security.wss4j;
 
 
+import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.ws.security.WSConstants;
 
 /**
  * This utility extends the CryptoCoverageChecker to provide an easy way to check to see
- * if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, and if the Timestamp was signed.
- * The default configuration is that the SOAP Body and Timestamp must be signed.
+ * if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, if the Timestamp was signed,
+ * and if the WS-Addressing ReplyTo and FaultTo headers were signed.
+ * 
+ * The default configuration is that the SOAP Body, Timestamp must be signed, and WS-Addressing
+ * ReplyTo and FaultTo headers must be signed (if they exist in the message payload).
  */
 public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
     
@@ -34,14 +38,16 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
     public static final String SOAP12_NS = WSConstants.URI_SOAP12_ENV;
     public static final String WSU_NS = WSConstants.WSU_NS;
     public static final String WSSE_NS = WSConstants.WSSE_NS;
+    public static final String WSA_NS = Names.WSA_NAMESPACE_NAME;
     
     private boolean signBody;
     private boolean signTimestamp;
     private boolean encryptBody;
+    private boolean signAddressingHeaders;
     
     /**
-     * Creates a new instance. Enforces that the SOAP Body and Timestamp must be signed
-     * (if they exist in the message body).
+     * Creates a new instance. Enforces that the SOAP Body, Timestamp, and WS-Addressing
+     * ReplyTo and FaultTo headers must be signed (if they exist in the message payload).
      */
     public DefaultCryptoCoverageChecker() {
         super(null, null);
@@ -50,12 +56,16 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
         prefixMap.put("soapenv12", SOAP12_NS);
         prefixMap.put("wsu", WSU_NS);
         prefixMap.put("wsse", WSSE_NS);
+        prefixMap.put("wsa", WSA_NS);
         
         // Sign SOAP Body
         setSignBody(true);
         
         // Sign Timestamp
         setSignTimestamp(true);
+        
+        // Sign Addressing Headers
+        setSignAddressingHeaders(true);
     }
     
     public boolean isSignBody() {
@@ -149,6 +159,63 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
             }
             if (xPaths.contains(soap12Expression)) {
                 xPaths.remove(soap12Expression);
+            }
+        }
+    }
+
+    public boolean isSignAddressingHeaders() {
+        return signAddressingHeaders;
+    }
+
+    public final void setSignAddressingHeaders(boolean signAddressingHeaders) {
+        this.signAddressingHeaders = signAddressingHeaders;
+        
+        XPathExpression soap11Expression = 
+            new XPathExpression(
+                "/soapenv:Envelope/soapenv:Header/wsa:ReplyTo", 
+                CoverageType.SIGNED
+            );
+        XPathExpression soap11Expression2 = 
+            new XPathExpression(
+                "/soapenv:Envelope/soapenv:Header/wsa:FaultTo", 
+                CoverageType.SIGNED
+            );
+        XPathExpression soap12Expression = 
+            new XPathExpression(
+                "/soapenv12:Envelope/soapenv12:Header/wsa:ReplyTo", 
+                CoverageType.SIGNED
+            );
+        XPathExpression soap12Expression2 = 
+            new XPathExpression(
+                "/soapenv12:Envelope/soapenv12:Header/wsa:FaultTo", 
+                CoverageType.SIGNED
+            );
+
+        if (signAddressingHeaders) {
+            if (!xPaths.contains(soap11Expression)) {
+                xPaths.add(soap11Expression);
+            }
+            if (!xPaths.contains(soap11Expression2)) {
+                xPaths.add(soap11Expression2);
+            }
+            if (!xPaths.contains(soap12Expression)) {
+                xPaths.add(soap12Expression);
+            }
+            if (!xPaths.contains(soap12Expression2)) {
+                xPaths.add(soap12Expression2);
+            }
+        } else {
+            if (xPaths.contains(soap11Expression)) {
+                xPaths.remove(soap11Expression);
+            }
+            if (xPaths.contains(soap11Expression2)) {
+                xPaths.remove(soap11Expression2);
+            }
+            if (xPaths.contains(soap12Expression)) {
+                xPaths.remove(soap12Expression);
+            }
+            if (xPaths.contains(soap12Expression2)) {
+                xPaths.remove(soap12Expression2);
             }
         }
     }
