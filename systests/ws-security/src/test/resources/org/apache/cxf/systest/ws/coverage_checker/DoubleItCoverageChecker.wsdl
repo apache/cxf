@@ -71,6 +71,9 @@
         <wsdl:port name="DoubleItBodyTimestampSoap12Port" binding="tns:DoubleItSoap12Binding">
             <soap12:address location="http://localhost:9001/DoubleItBodyTimestampSoap12" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSignedEncryptedBodyPort" binding="tns:DoubleItSoapBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignedEncrypted" />
+        </wsdl:port>
     </wsdl:service>
     
 </wsdl:definitions>
