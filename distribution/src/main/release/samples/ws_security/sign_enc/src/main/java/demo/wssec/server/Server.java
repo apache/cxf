@@ -89,7 +89,7 @@ public class Server {
 
         bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
 
- 	// Check to make sure that the SOAP Body and Timestamp were signed,
+        // Check to make sure that the SOAP Body and Timestamp were signed,
         // and that the SOAP Body was encrypted
         DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
         coverageChecker.setSignBody(true);
