@@ -68,6 +68,7 @@ public class UDPConduit extends AbstractConduit {
                       final Bus bus) {
         super(t);
         this.bus = bus;
+        connector.getSessionConfig().setReadBufferSize(64 * 1024);
         connector.setHandler(new IoHandlerAdapter() {
             public void messageReceived(IoSession session, Object buf) {
                 Message message = (Message)session.getAttribute(CXF_MESSAGE_ATTR);
@@ -161,7 +162,7 @@ public class UDPConduit extends AbstractConduit {
                 }
                 final int port = Integer.parseInt(s);
                 message.setContent(OutputStream.class, 
-                    new UDBBroadcastOutputStream(port, message));
+                    new UDPBroadcastOutputStream(port, message));
                 
             } else {
                 InetSocketAddress isa = null;
@@ -189,11 +190,11 @@ public class UDPConduit extends AbstractConduit {
         }
     }
 
-    private final class UDBBroadcastOutputStream extends LoadingByteArrayOutputStream {
+    private final class UDPBroadcastOutputStream extends LoadingByteArrayOutputStream {
         private final int port;
         private final Message message;
 
-        private UDBBroadcastOutputStream(int port, Message message) {
+        private UDPBroadcastOutputStream(int port, Message message) {
             this.port = port;
             this.message = message;
         }
@@ -245,8 +246,8 @@ public class UDPConduit extends AbstractConduit {
     public class UDPConduitOutputStream extends OutputStream {
         final ConnectFuture future;
         final NioDatagramConnector connector;
-        final IoBuffer buffer = IoBuffer.allocate(64 * 1024); //max size
         final Message message;
+        IoBuffer buffer = IoBuffer.allocate(64 * 1024 - 42); //max size
         boolean closed;
         
         public UDPConduitOutputStream(NioDatagramConnector connector,
@@ -258,16 +259,20 @@ public class UDPConduit extends AbstractConduit {
         }
 
         public void write(int b) throws IOException {
-            buffer.put((byte)b);
+            buffer.put(new byte[] {(byte)b}, 0, 1);
         }
         public void write(byte b[], int off, int len) throws IOException {
+            while (len > buffer.remaining()) {
+                int nlen = buffer.remaining();
+                buffer.put(b, off, nlen);
+                len -= nlen;
+                off += nlen;
+                send();
+                buffer = IoBuffer.allocate((64 * 1024) - 42);
+            }
             buffer.put(b, off, len);
         }
-        public void close() throws IOException {
-            if (closed) {
-                return;
-            }
-            closed = true;
+        private void send() throws IOException {
             try {
                 future.await();
             } catch (InterruptedException e) {
@@ -281,6 +286,13 @@ public class UDPConduit extends AbstractConduit {
             }
             buffer.flip();
             future.getSession().write(buffer);
+        }
+        public void close() throws IOException {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            send();
             if (message.getExchange().isOneWay()) {
                 future.getSession().close(true);
             }

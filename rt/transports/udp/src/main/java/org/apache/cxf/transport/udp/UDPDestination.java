@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.udp;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,6 +39,7 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.handler.stream.StreamIoHandler;
@@ -105,6 +105,7 @@ public class UDPDestination extends AbstractDestination {
             acceptor.setDefaultLocalAddress(isa);
 
             DatagramSessionConfig dcfg = acceptor.getSessionConfig();
+            dcfg.setReadBufferSize(64 * 1024);
             dcfg.setReuseAddress(true);
             acceptor.bind();
         } catch (Exception ex) {
@@ -132,14 +133,13 @@ public class UDPDestination extends AbstractDestination {
     
     
     class UDPIOHandler extends StreamIoHandler implements IoHandler {
-        
         protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
             final MessageImpl m = new MessageImpl();
             final Exchange exchange = new ExchangeImpl();
             exchange.setDestination(UDPDestination.this);
             exchange.setInMessage(m);
             m.setContent(InputStream.class, in);
-            out = new BufferedOutputStream(out, 64 * 1024);
+            out = new UDPDestinationOutputStream(out);
             m.put(UDPConnectionInfo.class, new UDPConnectionInfo(session, out, in));
             queue.execute(new Runnable() {
                 public void run() {
@@ -149,4 +149,42 @@ public class UDPDestination extends AbstractDestination {
         }
         
     }
+    
+    public class UDPDestinationOutputStream extends OutputStream {
+        final OutputStream out;
+        IoBuffer buffer = IoBuffer.allocate(64 * 1024 - 42); //max size
+        boolean closed;
+        
+        public UDPDestinationOutputStream(OutputStream out) {
+            this.out = out;
+        }
+
+        public void write(int b) throws IOException {
+            buffer.put(new byte[] {(byte)b}, 0, 1);
+        }
+        public void write(byte b[], int off, int len) throws IOException {
+            while (len > buffer.remaining()) {
+                int nlen = buffer.remaining();
+                buffer.put(b, off, nlen);
+                len -= nlen;
+                off += nlen;
+                send();
+                buffer = IoBuffer.allocate((64 * 1024) - 42);
+            }
+            buffer.put(b, off, len);
+        }
+        private void send() throws IOException {
+            buffer.flip();
+            out.write(buffer.array(), 0, buffer.limit());
+        }
+        public void close() throws IOException {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            send();
+            out.close();
+        }
+    }
+    
 }
