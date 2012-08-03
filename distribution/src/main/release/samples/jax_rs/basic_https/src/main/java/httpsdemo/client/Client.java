@@ -47,8 +47,7 @@ public final class Client {
         // Send HTTP GET request to query customer info - using portable HttpClient method
         Protocol authhttps = new Protocol("https",
             new AuthSSLProtocolSocketFactory(clientKeystore.toURI().toURL(), "cspass",
-            "ckpass", truststore.toURI().toURL(), "cspass"),
-            9000);
+                "ckpass", truststore.toURI().toURL(), "cspass"), 9000);
         Protocol.registerProtocol("https", authhttps);
 
         System.out.println("Sending HTTPS GET request to query customer info");
