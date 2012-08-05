@@ -24,15 +24,10 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-import org.codehaus.jra.Get;
-import org.codehaus.jra.HttpResource;
-
 
 @WebService(targetNamespace = "http://book.customer.cxf.apache.org/")
 public interface BookServiceWrapped {
     
-    @Get
-    @HttpResource(location = "/books/{id}")
     @WebResult(name = "Book")
     Book getBook(@WebParam(name = "id")long bookid) throws BookNotFoundFault;
 
