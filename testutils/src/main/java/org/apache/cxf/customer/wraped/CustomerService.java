@@ -28,11 +28,6 @@ import javax.jws.WebService;
 
 import org.apache.cxf.customer.Customer;
 import org.apache.cxf.customer.Customers;
-import org.codehaus.jra.Delete;
-import org.codehaus.jra.Get;
-import org.codehaus.jra.HttpResource;
-import org.codehaus.jra.Post;
-import org.codehaus.jra.Put;
 
 // END SNIPPET: service
 @WebService(targetNamespace = "http://cxf.apache.org/jra")
@@ -45,8 +40,6 @@ public class CustomerService {
         customers.put(customer.getId(), customer);
     }
 
-    @Get
-    @HttpResource(location = "/customers")
     @WebMethod
     @WebResult(name = "customers")
     public Customers getCustomers() {
@@ -55,24 +48,18 @@ public class CustomerService {
         return cbean;
     }
 
-    @Get
-    @HttpResource(location = "/customers/{id}")
     @WebMethod
     @WebResult(name = "customer")
     public Customer getCustomer(@WebParam(name = "id") Long id) {
         return customers.get(id);
     }
 
-    @Put
-    @HttpResource(location = "/customers/{id}")
     @WebMethod
     public void updateCustomer(@WebParam(name = "id") String id,
                                @WebParam(name = "customer") Customer c) {
         customers.put(c.getId(), c);
     }
 
-    @Post
-    @HttpResource(location = "/customers")
     @WebMethod
     public void addCustomer(@WebParam(name = "customer") Customer c) {
         long id = ++currentId;
@@ -81,8 +68,6 @@ public class CustomerService {
         customers.put(id, c);
     }
 
-    @Delete
-    @HttpResource(location = "/customers/{id}")
     @WebMethod
     public void deleteCustomer(String id) {
         customers.remove(new Long(id));

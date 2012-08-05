@@ -33,11 +33,6 @@ import org.apache.cxf.customer.Customer;
 import org.apache.cxf.customer.CustomerNotFoundDetails;
 import org.apache.cxf.customer.CustomerNotFoundFault;
 import org.apache.cxf.customer.Customers;
-import org.codehaus.jra.Delete;
-import org.codehaus.jra.Get;
-import org.codehaus.jra.HttpResource;
-import org.codehaus.jra.Post;
-import org.codehaus.jra.Put;
 
 // END SNIPPET: service
 @WebService(targetNamespace = "http://cxf.apache.org/jra")
@@ -53,8 +48,6 @@ public class CustomerService {
         customers.put(customer.getId(), customer);
     }
 
-    @Get
-    @HttpResource(location = "/customers")
     @WebMethod
     @WebResult(name = "customers")
     public Customers getCustomers(@WebParam(name = "GetCustomers") GetCustomers req) {
@@ -68,8 +61,6 @@ public class CustomerService {
         return cbean;
     }
 
-    @Get
-    @HttpResource(location = "/customers/{id}")
     @WebMethod
     @WebResult(name = "customer")
     public Customer getCustomer(@WebParam(name = "getCustomer") GetCustomer getCustomer) 
@@ -83,23 +74,17 @@ public class CustomerService {
         return c;
     }
 
-    @Get
-    @HttpResource(location = "/customers/details/{id}")
     @WebMethod
     public String getSomeDetails(@WebParam(name = "getSomeDetails") GetCustomer getCustomer) 
         throws CustomerNotFoundFault {
         return "some details";
     }
     
-    @Put
-    @HttpResource(location = "/customers/{id}")
     @WebMethod
     public void updateCustomer(@WebParam(name = "customer") Customer c) {
         customers.put(c.getId(), c);
     }
 
-    @Post
-    @HttpResource(location = "/customers")
     @WebMethod
     public void addCustomer(@WebParam(name = "customer") Customer c) {
         long id = ++currentId;
@@ -108,8 +93,6 @@ public class CustomerService {
         customers.put(id, c);
     }
 
-    @Delete
-    @HttpResource(location = "/customers/{id}")
     @WebMethod
     public void deleteCustomer(long id) {
         customers.remove(id);

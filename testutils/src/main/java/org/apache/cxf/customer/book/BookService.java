@@ -23,46 +23,28 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-import org.codehaus.jra.Delete;
-import org.codehaus.jra.Get;
-import org.codehaus.jra.HttpResource;
-import org.codehaus.jra.Post;
-import org.codehaus.jra.Put;
-
 @WebService(targetNamespace = "http://book.acme.com")
 public interface BookService {
 
-    @Get
-    @HttpResource(location = "/books")
     @WebResult(name = "Books")
     Books getBooks();
 
-    @Get
-    @HttpResource(location = "/books/{id}")
     @WebResult(name = "Book")
     Book getBook(@WebParam(name = "GetBook")
                          GetBook getBook) throws BookNotFoundFault;
 
-    @Get
-    @HttpResource(location = "/books/another/{id}")
     @WebResult(name = "Book")
     Book getAnotherBook(@WebParam(name = "GetAnotherBook")
                          GetAnotherBook getAnotherBook) throws BookNotFoundFault;
 
     
-    @Put
-    @HttpResource(location = "/books/{id}")
     void updateBook(@WebParam(name = "Book")
                         Book c);
 
-    @Post
-    @HttpResource(location = "/books")
     @WebResult(name = "book")
     long addBook(@WebParam(name = "Book")
                      Book c);
 
-    @Delete
-    @HttpResource(location = "/books/{id}")
     void deleteBook(@WebParam(name = "id")
                         long id) throws BookNotFoundFault;
 
