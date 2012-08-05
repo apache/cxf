@@ -634,11 +634,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jra</groupId>
-                <artifactId>jra</artifactId>
-                <version>1.0-alpha-4</version>
-            </dependency>
-            <dependency>
                 <groupId>jtidy</groupId>
                 <artifactId>jtidy</artifactId>
                 <version>4aug2000r7-dev</version>

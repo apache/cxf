@@ -156,7 +156,6 @@
                             org.apache.ws.commons.schema*;resolution:=optional,
                             org.apache.xml.resolver*;resolution:=optional,
                             org.apache.xmlbeans*;resolution:=optional,
-                            org.codehaus.jra*;resolution:=optional,
                             org.codehaus.jettison*;resolution:=optional,
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
