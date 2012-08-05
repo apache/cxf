@@ -61,7 +61,10 @@ public class BookStore {
     @GET 
     @Produces("application/xml")
     @XMLName("{http://superbooks}books")
-    public List<Book> getBooks() {
+    @Descriptions({ 
+        @Description(value = "Get Books", target = DocTarget.METHOD)
+    })
+    public List<Book> getBooks(@PathParam("id") Long id) {
         return Collections.emptyList();
     }
     

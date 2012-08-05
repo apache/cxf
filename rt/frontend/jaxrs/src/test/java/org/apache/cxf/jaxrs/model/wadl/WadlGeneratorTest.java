@@ -454,30 +454,18 @@ public class WadlGeneratorTest extends Assert {
         // must have 4 methods, 2 GETs, POST and PUT
         List<Element> methodEls = getElements(resource, "method", 4);
         
-        // verify 1st GET
-        assertEquals("GET", methodEls.get(0).getAttribute("name"));
-        assertEquals(0, DOMUtils.getChildrenWithName(methodEls.get(0), 
-                        WadlGenerator.WADL_NS, "param").size());
-        // check request 
-        List<Element> requestEls = getElements(methodEls.get(0), "request", 1);
+        // verify 1st Root GET
+        try {
+            verifyFirstRootGet(methodEls.get(0));
+        } catch (Throwable ex) {
+            verifyFirstRootGet(methodEls.get(1));
+        }
         
-        // 4 parameters are expected
-        verifyParameters(requestEls.get(0), 5, 
-                         new Param("a", "query", "xs:int"),
-                         new Param("c.a", "query", "xs:int"),
-                         new Param("c.b", "query", "xs:int"),
-                         new Param("c.d.a", "query", "xs:int"),
-                         new Param("e", "query", "xs:string", Collections.singleton("A")));
-        
-        assertEquals(0, DOMUtils.getChildrenWithName(requestEls.get(0), 
-                         WadlGenerator.WADL_NS, "representation").size());
-        //check response
-        verifyRepresentation(methodEls.get(0), "response", "text/plain", "");
-        
-        // verify 2nd GET
-        assertEquals("GET", methodEls.get(1).getAttribute("name"));
-        if (booksEl != null) {
-            verifyRepresentation(methodEls.get(1), "response", "application/xml", booksEl);
+        // verify 2nd Root GET
+        try {
+            verifySecondRootGet(methodEls.get(1), booksEl);
+        } catch (Throwable ex) {
+            verifySecondRootGet(methodEls.get(0), booksEl);
         }
         
         // verify POST
@@ -507,7 +495,7 @@ public class WadlGeneratorTest extends Assert {
         // POST 
         assertEquals("POST", methodEls.get(0).getAttribute("name"));
         checkDocs(methodEls.get(0), "", "Update the books collection", "");
-        requestEls = getElements(methodEls.get(0), "request", 1);
+        List<Element> requestEls = getElements(methodEls.get(0), "request", 1);
         
         checkDocs(requestEls.get(0), "", "Request", "");
         
@@ -565,6 +553,35 @@ public class WadlGeneratorTest extends Assert {
                          new Param("cid", "template", "xs:int"));
         // GET
         verifyGetResourceMethod(chapterMethodEls.get(0), chapterEl, "Get the chapter");
+    }
+    
+    private void verifyFirstRootGet(Element methodEl) {
+        assertEquals("GET", methodEl.getAttribute("name"));
+        assertEquals(0, DOMUtils.getChildrenWithName(methodEl, 
+                        WadlGenerator.WADL_NS, "param").size());
+        // check request 
+        List<Element> requestEls = getElements(methodEl, "request", 1);
+        
+        // 4 parameters are expected
+        verifyParameters(requestEls.get(0), 5, 
+                         new Param("a", "query", "xs:int"),
+                         new Param("c.a", "query", "xs:int"),
+                         new Param("c.b", "query", "xs:int"),
+                         new Param("c.d.a", "query", "xs:int"),
+                         new Param("e", "query", "xs:string", Collections.singleton("A")));
+        
+        assertEquals(0, DOMUtils.getChildrenWithName(requestEls.get(0), 
+                         WadlGenerator.WADL_NS, "representation").size());
+        //check response
+        verifyRepresentation(methodEl, "response", "text/plain", "");
+    }
+    
+    private void verifySecondRootGet(Element methodEl, String booksEl) {
+        assertEquals("GET", methodEl.getAttribute("name"));
+        checkDocs(methodEl, "", "Get Books", "");
+        if (booksEl != null) {
+            verifyRepresentation(methodEl, "response", "application/xml", booksEl);
+        }
     }
     
     private void verifyFormSubResources(List<Element> subResourceEls) {
