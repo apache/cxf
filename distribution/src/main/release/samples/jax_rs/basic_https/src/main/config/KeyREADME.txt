@@ -17,4 +17,3 @@ keytool -import -noprompt -trustcacerts -file MyService.cer -alias myservicekey 
 # as configured in resources/ServerConfig.xml
 keytool -export -rfc -keystore clientKeystore.jks -alias myclientkey -file MyClient.cer -storepass cspass
 keytool -import -noprompt -trustcacerts -file MyClient.cer -alias myclientkey -keystore serviceKeystore.jks -storepass sspass
-

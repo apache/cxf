@@ -20,11 +20,17 @@
 package httpsdemo.client;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
 import javax.ws.rs.core.Response;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.contrib.ssl.AuthSSLProtocolSocketFactory;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import httpsdemo.common.Customer;
@@ -39,42 +45,37 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
-       
-        File clientKeystore = new File("src/main/config/clientKeystore.jks");
-        File truststore = new File("src/main/config/clientKeystore.jks");
+    public static void main(String args[]) throws Exception {       
+        String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
-        // Send HTTP GET request to query customer info - using portable HttpClient method
-        Protocol authhttps = new Protocol("https",
-            new AuthSSLProtocolSocketFactory(clientKeystore.toURI().toURL(), "cspass",
-                "ckpass", truststore.toURI().toURL(), "cspass"), 9000);
-        Protocol.registerProtocol("https", authhttps);
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
+
+        /* 
+         * Send HTTP GET request to query customer info using portable HttpClient
+         * object from Apache HttpComponents
+         */
+        SSLSocketFactory sf = new SSLSocketFactory(keyStore, "ckpass", keyStore); 
+        Scheme httpsScheme = new Scheme("https", 9000, sf);
 
         System.out.println("Sending HTTPS GET request to query customer info");
-        HttpClient httpclient = new HttpClient();
-        GetMethod httpget = new GetMethod(BASE_SERVICE_URL + "/123");
-        httpget.addRequestHeader("Accept" , "text/xml");
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
+        HttpGet httpget = new HttpGet(BASE_SERVICE_URL + "/123");
+        BasicHeader bh = new BasicHeader("Accept" , "text/xml");
+        httpget.addHeader(bh);
+        HttpResponse response = httpclient.execute(httpget);
+        HttpEntity entity = response.getEntity();
+        entity.writeTo(System.out);
+        httpclient.getConnectionManager().shutdown();
         
-        // If Basic Authentication required could use: 
-        /*
-        String authorizationHeader = "Basic " 
-           + org.apache.cxf.common.util.Base64Utility.encode("username:password".getBytes());
-        httpget.addRequestHeader("Authorization", authorizationHeader);
-        */
-        try {
-            httpclient.executeMethod(httpget);
-            System.out.println(httpget.getResponseBodyAsString());
-        } finally {
-            httpget.releaseConnection();
-        }
-
         /*
          *  Send HTTP PUT request to update customer info, using CXF WebClient method
          *  Note: if need to use basic authentication, use the WebClient.create(baseAddress,
          *  username,password,configFile) variant, where configFile can be null if you're
          *  not using certificates.
          */
-        System.out.println("Sending HTTPS PUT to update customer name");
+        System.out.println("\n\nSending HTTPS PUT to update customer name");
         WebClient wc = WebClient.create(BASE_SERVICE_URL, CLIENT_CONFIG_FILE);
         Customer customer = new Customer();
         customer.setId(123);
@@ -87,8 +88,7 @@ public final class Client {
          *  username,password,configFile) variant, where configFile can be null if you're
          *  not using certificates.
          */
-        System.out.println("\n");
-        System.out.println("Sending HTTPS POST request to add customer");
+        System.out.println("\n\nSending HTTPS POST request to add customer");
         CustomerService proxy = JAXRSClientFactory.create(BASE_SERVICE_URL, CustomerService.class,
               CLIENT_CONFIG_FILE);
         customer = new Customer();
