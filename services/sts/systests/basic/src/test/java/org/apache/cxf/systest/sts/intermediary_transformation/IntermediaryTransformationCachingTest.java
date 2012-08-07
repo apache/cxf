@@ -70,7 +70,7 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
             launchServer(Server.class, true)
         );
         String deployment = System.getProperty("sts.deployment");
-        if ("standalone".equals(deployment)) {
+        if ("standalone".equals(deployment) || deployment == null) {
             standalone = true;
             assertTrue(
                     "Server failed to launch",
