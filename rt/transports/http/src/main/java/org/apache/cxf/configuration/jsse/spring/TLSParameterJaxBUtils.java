@@ -203,10 +203,6 @@ public final class TLSParameterJaxBUtils {
 
         KeyStore keyStore = getKeyStore(kmc.getKeyStore());
 
-        if (keyStore == null) {
-            return null;
-        }
-
         String alg = kmc.isSetFactoryAlgorithm()
                      ? kmc.getFactoryAlgorithm()
                      : KeyManagerFactory.getDefaultAlgorithm();
@@ -239,9 +235,6 @@ public final class TLSParameterJaxBUtils {
                 : (tmc.isSetCertStore()
                     ? getKeyStore(tmc.getCertStore())
                     : (KeyStore) null);
-        if (keyStore == null) {
-            return null;
-        }
 
         String alg = tmc.isSetFactoryAlgorithm()
                      ? tmc.getFactoryAlgorithm()
