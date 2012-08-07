@@ -170,6 +170,9 @@ public abstract class AbstractSpnegoAuthSupplier {
         if (realm != null) {            
             name += "@" + realm;
         }
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Service Principal Name is " + name);
+        }
         return name;
             
             
