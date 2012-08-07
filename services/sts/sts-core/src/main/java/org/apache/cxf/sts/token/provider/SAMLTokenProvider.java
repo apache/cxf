@@ -458,11 +458,11 @@ public class SAMLTokenProvider implements TokenProvider {
             }
         }
         
-        // If no statements, then default to the DefaultAttributeStatementProvider and the
-        // ClaimsAttributeStatementProvider
-        if ((attrBeanList == null || attrBeanList.isEmpty()) 
-            && (authBeanList == null || authBeanList.isEmpty())
-            && (authDecisionBeanList == null || authDecisionBeanList.isEmpty())) {
+        // If no providers have been configured, then default to the 
+        // DefaultAttributeStatementProvider and the ClaimsAttributeStatementProvider
+        if ((attributeStatementProviders == null || attributeStatementProviders.isEmpty()) 
+            && (authenticationStatementProviders == null || authenticationStatementProviders.isEmpty())
+            && (authDecisionStatementProviders == null || authDecisionStatementProviders.isEmpty())) {
             attrBeanList = new ArrayList<AttributeStatementBean>();
             AttributeStatementProvider attributeProvider = new DefaultAttributeStatementProvider();
             AttributeStatementBean attributeBean = attributeProvider.getStatement(tokenParameters);
