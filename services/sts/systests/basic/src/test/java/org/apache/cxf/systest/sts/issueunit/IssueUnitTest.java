@@ -80,7 +80,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         String deployment = System.getProperty("sts.deployment");
-        if ("standalone".equals(deployment)) {
+        if ("standalone".equals(deployment) || deployment == null) {
             standalone = true;
             assertTrue(
                     "Server failed to launch",
