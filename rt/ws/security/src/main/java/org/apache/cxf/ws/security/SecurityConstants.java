@@ -142,7 +142,9 @@ public final class SecurityConstants {
     //Be default, we will encrypt as well for interop reasons.  However, this
     //setting can be set to false to turn that off.
     /**
-     * Whether to always encrypt UsernameTokens whenever possible. The default is true.
+     * Whether to always encrypt UsernameTokens that are defined as a SupportingToken. The default 
+     * is true. This should not be set to false in a production environment, as it exposes the 
+     * password (or the digest of the password) on the wire.
      */
     public static final String ALWAYS_ENCRYPT_UT = "ws-security.username-token.always.encrypted";
     
@@ -177,8 +179,8 @@ public final class SecurityConstants {
     //
     
     /**
-     * The time in seconds after Creation that an incoming Timestamp is valid for. The default
-     * value is 300 seconds (5 minutes).
+     * The time in seconds to append to the Creation value of an incoming Timestamp to determine
+     * whether to accept the Timestamp as valid or not. The default value is 300 seconds (5 minutes).
      */
     public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
     
