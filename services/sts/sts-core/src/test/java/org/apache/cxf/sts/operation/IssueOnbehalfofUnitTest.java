@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.operation;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,19 +32,27 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
+import org.apache.cxf.sts.claims.ClaimTypes;
+import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
+import org.apache.cxf.sts.claims.ClaimsHandler;
+import org.apache.cxf.sts.claims.ClaimsManager;
+import org.apache.cxf.sts.common.CustomUserClaimsHandler;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.service.StaticService;
+import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
@@ -54,6 +63,7 @@ import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.cxf.ws.security.sts.provider.model.ClaimsType;
 import org.apache.cxf.ws.security.sts.provider.model.OnBehalfOfType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
@@ -67,6 +77,7 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.DOM2Writer;
 
@@ -391,8 +402,221 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("ALICE"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
-    }    
+    }
     
+    /**
+     * Test to successfully issue a SAML 2 token on-behalf-of a SAML 2 token
+     * but WS-Security user different than on-behalf-of subject
+     */
+    @org.junit.Test
+    public void testIssueSaml2TokenOnBehalfOfSaml2DifferentWSUser() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        providerList.add(new SAMLTokenProvider());
+        issueOperation.setTokenProviders(providerList);
+
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        validatorList.add(new SAMLTokenValidator());
+        issueOperation.setTokenValidators(validatorList);
+
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+
+        // Get a SAML Token via the SAMLTokenProvider
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        OnBehalfOfType onbehalfof = new OnBehalfOfType();
+        onbehalfof.setAny(samlToken);
+
+        JAXBElement<OnBehalfOfType> onbehalfofType = 
+            new JAXBElement<OnBehalfOfType>(
+                    QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
+            );
+        request.getAny().add(onbehalfofType);
+
+        // Mock up message context with user 'bob'
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+                SecurityContext.class.getName(), 
+                createSecurityContext(new CustomTokenPrincipal("bob"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+
+        // Issue a token
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        AssertionWrapper assertionWrapper = new AssertionWrapper(assertion);
+        assertEquals(assertionWrapper.getSaml2().getSubject().getNameID().getValue().toLowerCase(), "alice");
+    }
+
+    /**
+     * Test to successfully issue a SAML 2 token on-behalf-of a SAML 2 token
+     * but WS-Security user different than on-behalf-of subject
+     * and request claims
+     */
+    @org.junit.Test
+    public void testIssueSaml2TokenOnBehalfOfSaml2DifferentWSUserAndClaims() throws Exception {
+        TokenIssueOperation issueOperation = new TokenIssueOperation();
+
+        // Add Token Provider
+        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<AttributeStatementProvider> customProviderList = 
+            new ArrayList<AttributeStatementProvider>();
+        customProviderList.add(new ClaimsAttributeStatementProvider());
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        samlTokenProvider.setAttributeStatementProviders(customProviderList);
+        providerList.add(samlTokenProvider);
+        issueOperation.setTokenProviders(providerList);
+
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        validatorList.add(new SAMLTokenValidator());
+        issueOperation.setTokenValidators(validatorList);
+
+        // Add Service
+        ServiceMBean service = new StaticService();
+        service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
+        issueOperation.setServices(Collections.singletonList(service));
+
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        issueOperation.setStsProperties(stsProperties);
+
+        // Set the ClaimsManager
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomUserClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        issueOperation.setClaimsManager(claimsManager);
+
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+        JAXBElement<String> tokenType = 
+            new JAXBElement<String>(
+                    QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+            );
+        request.getAny().add(tokenType);
+
+        // Add a ClaimsType
+        ClaimsType claimsType = new ClaimsType();
+        claimsType.setDialect(STSConstants.IDT_NS_05_05);
+
+        Document docx = DOMUtils.createDocument();
+        Element claimType = createClaimsType(docx);
+        claimsType.getAny().add(claimType);
+
+        JAXBElement<ClaimsType> claimsTypeJaxb = 
+            new JAXBElement<ClaimsType>(
+                    QNameConstants.CLAIMS, ClaimsType.class, claimsType
+            );
+        request.getAny().add(claimsTypeJaxb);
+
+        // Get a SAML Token via the SAMLTokenProvider
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        OnBehalfOfType onbehalfof = new OnBehalfOfType();
+        onbehalfof.setAny(samlToken);
+
+        JAXBElement<OnBehalfOfType> onbehalfofType = 
+            new JAXBElement<OnBehalfOfType>(
+                    QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
+            );
+        request.getAny().add(onbehalfofType);
+
+        // Mock up message context with user 'bob'
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        msgCtx.put(
+                SecurityContext.class.getName(), 
+                createSecurityContext(new CustomTokenPrincipal("bob"))
+        );
+        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
+
+        // Issue a token
+        RequestSecurityTokenResponseCollectionType response = 
+            issueOperation.issue(request, webServiceContext);
+        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+            response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType = 
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.toLowerCase().contains("aliceclaim"));
+        AssertionWrapper assertionWrapper = new AssertionWrapper(assertion);
+        assertEquals(assertionWrapper.getSaml2().getSubject().getNameID().getValue().toLowerCase(), "alice");
+    }
+
 
     /*
      * Mock up an SAML assertion element
@@ -402,7 +626,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     ) throws WSSecurityException {
         return createSAMLAssertion(tokenType, crypto, signatureUsername, callbackHandler, null);
     }
-    
+
     /*
      * Mock up an SAML assertion element
      */
@@ -412,7 +636,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     ) throws WSSecurityException {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        
+
         TokenProviderParameters providerParameters = 
             createProviderParameters(
                     tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
@@ -468,7 +692,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         AttributedString username = new AttributedString();
         username.setValue(name);
         usernameToken.setUsername(username);
-        
+
         // Add a password
         if (password != null) {
             PasswordString passwordString = new PasswordString();
@@ -480,15 +704,15 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
                 );
             usernameToken.getAny().add(passwordType);
         }
-        
+
         JAXBElement<UsernameTokenType> tokenType = 
             new JAXBElement<UsernameTokenType>(
-                QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
+                    QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
+
         return tokenType;
     }
-    
+
     private Map<String, SAMLRealm> createSamlRealms() {
         // Create Realms
         Map<String, SAMLRealm> samlRealms = new HashMap<String, SAMLRealm>();
@@ -510,6 +734,30 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
 
         return properties;
+    }
+
+    /*
+     * Create a security context object
+     */
+    private SecurityContext createSecurityContext(final Principal p) {
+        return new SecurityContext() {
+            public Principal getUserPrincipal() {
+                return p;
+            }
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+        };
+    }
+
+    private Element createClaimsType(Document doc) {
+        Element claimType = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
+        claimType.setAttributeNS(
+                null, "Uri", ClaimTypes.FIRSTNAME.toString()
+        );
+        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+
+        return claimType;
     }
 
 
