@@ -323,7 +323,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public UriBuilder path(@SuppressWarnings("rawtypes") Class resource) throws IllegalArgumentException {
+    public UriBuilder path(Class<?> resource) throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }
@@ -338,7 +338,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public UriBuilder path(@SuppressWarnings("rawtypes") Class resource, String method) 
+    public UriBuilder path(Class<?> resource, String method) 
         throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
@@ -715,5 +715,14 @@ public class UriBuilderImpl extends UriBuilder {
         sb.append(ps.getPath());
         buildMatrix(sb, matrix, false);
         return new PathSegmentImpl(sb.toString());
+    }
+
+
+    public UriBuilder uri(String uriTemplate) throws IllegalArgumentException {
+        try {
+            return uri(URI.create(uriTemplate));
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 }

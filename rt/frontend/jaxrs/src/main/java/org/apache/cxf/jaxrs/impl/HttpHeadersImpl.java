@@ -20,9 +20,11 @@
 package org.apache.cxf.jaxrs.impl;
 
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -39,6 +41,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -270,6 +273,51 @@ public class HttpHeadersImpl implements HttpHeaders {
                 }
                 
             });
+        }
+    }
+
+    public Date getDate() {
+        List<String> values = headers.get(HttpHeaders.DATE);
+        if (values == null || StringUtils.isEmpty(values.get(0))) {
+            return null;
+        }
+        try {
+            return HttpUtils.getHttpDateFormat().parse(values.get(0));
+        } catch (ParseException ex) {
+            return null;
+        }
+    }
+
+    public String getHeaderString(String headerName) {
+        List<String> values = headers.get(headerName);
+        if (values == null) {
+            return null;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < values.size(); i++) {
+                String value = values.get(i);
+                if (StringUtils.isEmpty(value)) {
+                    continue;
+                }
+                sb.append(value);
+                if (i + 1 < values.size()) {
+                    sb.append(",");
+                }
+            }
+            return sb.toString();
+        }
+    }
+
+    public int getLength() {
+        List<String> values = headers.get(HttpHeaders.CONTENT_LENGTH);
+        if (values == null || values.size() != 1) {
+            return -1;
+        }
+        try {
+            int len = Integer.valueOf(values.get(0));
+            return len >= 0 ? len : -1;
+        } catch (Exception ex) {
+            return -1;
         }
     }
     

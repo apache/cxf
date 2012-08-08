@@ -84,7 +84,7 @@ public class VariantListBuilderImpl extends VariantListBuilder {
             handleLanguages(null);
         } else if (encodings.size() > 0) {
             for (String enc : encodings) {
-                variants.add(new Variant(null, null, enc));
+                variants.add(new Variant(null, (Locale)null, enc));
             }
         } 
     }
@@ -95,10 +95,10 @@ public class VariantListBuilderImpl extends VariantListBuilder {
                 handleLanguages(type);
             } else if (encodings.size() > 0) {
                 for (String enc : encodings) {
-                    variants.add(new Variant(type, null, enc));
+                    variants.add(new Variant(type, (Locale)null, enc));
                 }
             } else {
-                variants.add(new Variant(type, null, null));
+                variants.add(new Variant(type, (Locale)null, null));
             }
         }
     }

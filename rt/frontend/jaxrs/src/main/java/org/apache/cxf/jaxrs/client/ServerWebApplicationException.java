@@ -64,8 +64,7 @@ public class ServerWebApplicationException extends WebApplicationException {
         super(cause, response);
     }
     
-    @Override
-    public Response getResponse() {
+    public Response getServerResponse() {
         Response response = super.getResponse();
         
         ResponseBuilder rb = Response.status(response.getStatus());
@@ -144,7 +143,7 @@ public class ServerWebApplicationException extends WebApplicationException {
      * @return the typed entity
      */
     public <T> T toErrorObject(Client client, Class<T> entityCls) {
-        Response response = getResponse();
+        Response response = getServerResponse();
         try {
             MultivaluedMap<String, String> headers = getHeaders();
             Object contentType = headers.getFirst("Content-Type");

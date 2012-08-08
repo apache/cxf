@@ -57,7 +57,11 @@ public class LocalClientState implements ClientState {
     public LocalClientState(LocalClientState cs) {
         this.requestHeaders = new MetadataMap<String, String>(cs.requestHeaders);
         this.templates = cs.templates == null ? null : new MetadataMap<String, String>(cs.templates);
-        this.responseBuilder = cs.responseBuilder != null ? cs.responseBuilder.clone() : null;
+        try {
+            this.responseBuilder = cs.responseBuilder != null ? cs.responseBuilder.clone() : null;
+        } catch (CloneNotSupportedException ex) {
+            throw new ClientWebApplicationException(ex);
+        }
         this.baseURI = cs.baseURI;
         this.currentBuilder = cs.currentBuilder != null ? cs.currentBuilder.clone() : null;
     }

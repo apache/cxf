@@ -287,7 +287,7 @@ public class UriBuilderImplTest extends Assert {
     
     @Test(expected = IllegalArgumentException.class)
     public void testUriNull() throws Exception {
-        new UriBuilderImpl().uri(null);
+        new UriBuilderImpl().uri((URI)null);
     }
 
     @Test

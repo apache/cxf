@@ -20,6 +20,7 @@
 
 package org.apache.cxf.jaxrs.impl.tl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,6 +59,18 @@ public class ThreadLocalHttpHeaders extends AbstractThreadLocalProxy<HttpHeaders
 
     public List<String> getRequestHeader(String name) {
         return get().getRequestHeader(name);
+    }
+
+    public Date getDate() {
+        return get().getDate();
+    }
+
+    public String getHeaderString(String name) {
+        return get().getHeaderString(name);
+    }
+
+    public int getLength() {
+        return get().getLength();
     }
 
 }

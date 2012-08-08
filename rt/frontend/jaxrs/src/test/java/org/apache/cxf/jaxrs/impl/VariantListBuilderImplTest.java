@@ -56,10 +56,10 @@ public class VariantListBuilderImplTest extends Assert {
         List<Variant> variants = 
             vb.mediaTypes(mt1, mt2).encodings("zip", "identity").add().build();
         assertEquals("4 variants need to be created", 4, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(mt1, null, "zip")));
-        assertTrue(verifyVariant(variants, new Variant(mt1, null, "identity")));
-        assertTrue(verifyVariant(variants, new Variant(mt2, null, "zip")));
-        assertTrue(verifyVariant(variants, new Variant(mt2, null, "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, (Locale)null, "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, (Locale)null, "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, (Locale)null, "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, (Locale)null, "identity")));
     }
     
     @Test
@@ -104,8 +104,8 @@ public class VariantListBuilderImplTest extends Assert {
         List<Variant> variants = 
             vb.encodings("zip", "identity").add().build();
         assertEquals("2 variants need to be created", 2, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(null, null, "zip")));
-        assertTrue(verifyVariant(variants, new Variant(null, null, "identity")));
+        assertTrue(verifyVariant(variants, new Variant(null, (Locale)null, "zip")));
+        assertTrue(verifyVariant(variants, new Variant(null, (Locale)null, "identity")));
     }
     
     @Test
@@ -114,8 +114,8 @@ public class VariantListBuilderImplTest extends Assert {
         List<Variant> variants = 
             vb.mediaTypes(new MediaType("*", "*"), new MediaType("text", "xml")).add().build();
         assertEquals("2 variants need to be created", 2, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(new MediaType("*", "*"), null, null)));
-        assertTrue(verifyVariant(variants, new Variant(new MediaType("text", "xml"), null, null)));
+        assertTrue(verifyVariant(variants, new Variant(new MediaType("*", "*"), (Locale)null, null)));
+        assertTrue(verifyVariant(variants, new Variant(new MediaType("text", "xml"), (Locale)null, null)));
     }
 
     private boolean verifyVariant(List<Variant> vs, Variant var) {

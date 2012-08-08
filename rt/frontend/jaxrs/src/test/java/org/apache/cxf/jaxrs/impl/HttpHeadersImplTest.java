@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -156,6 +158,63 @@ public class HttpHeadersImplTest extends Assert {
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals(MediaType.valueOf("*/*"), h.getMediaType());
+    }
+    
+    @Test
+    public void testGetMissingContentLegth() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, new MetadataMap<String, String>());
+        HttpHeaders h = new HttpHeadersImpl(m);
+        assertEquals(-1, h.getLength());
+    }
+    
+    @Test
+    public void testGetContentLegth() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        HttpHeaders h = new HttpHeadersImpl(m);
+        assertEquals(10, h.getLength());
+    }
+    
+    @Test
+    public void testGetDate() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        HttpHeaders h = new HttpHeadersImpl(m);
+        
+        List<String> dateValues = h.getRequestHeader("Date");
+        assertEquals(1, dateValues.size());
+        assertEquals("Tue, 21 Oct 2008 17:00:00 GMT", dateValues.get(0));
+        
+        Date d = h.getDate();
+        
+        String theDateValue = HttpUtils.getHttpDateFormat().format(d);
+        assertEquals(theDateValue, "Tue, 21 Oct 2008 17:00:00 GMT");
+    }
+    
+    @Test
+    public void testGetHeaderString() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        HttpHeaders h = new HttpHeadersImpl(m);
+        
+        String date = h.getHeaderString("Date");
+        assertEquals("Tue, 21 Oct 2008 17:00:00 GMT", date);
+    }
+    
+    @Test
+    public void testGetHeaderString2() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, createHeaders());
+        HttpHeaders h = new HttpHeadersImpl(m);
+        
+        String date = h.getHeaderString("a");
+        assertEquals("1,2", date);
     }
     
     @Test
@@ -307,6 +366,11 @@ public class HttpHeadersImplTest extends Assert {
         hs.putSingle("Accept", "text/bar;q=0.6,text/*;q=1,application/xml");
         hs.putSingle("Content-Type", "*/*");
         hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
+        hs.putSingle("Content-Length", "10");
+        List<String> values = new ArrayList<String>();
+        values.add("1");
+        values.add("2");
+        hs.addAll("a", values);
         return hs;
     }
     

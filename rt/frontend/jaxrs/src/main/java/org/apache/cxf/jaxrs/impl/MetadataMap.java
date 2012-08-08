@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -71,14 +72,27 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
     
     public void add(K key, V value) {
+        addValue(key, value, true);
+    }
+    
+    private void addValue(K key, V value, boolean last) {
+        List<V> data = getList(key);
+        if (last) {
+            data.add(value);
+        } else {
+            data.add(0, value);
+        }
+    }
+
+    private List<V> getList(K key) {
         List<V> data = this.get(key);
         if (data == null) {
             data = new ArrayList<V>();    
             m.put(key, data);
         }
-        data.add(value);
+        return data;
     }
-
+    
     public V getFirst(K key) {
         List<V> data = this.get(key);
         return data == null ? null : data.get(0);
@@ -194,5 +208,27 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
             return s1.compareToIgnoreCase(s2);
         }
         
+    }
+
+    public void addAll(K key, V... newValues) {
+        this.addAllValues(key, Arrays.asList(newValues));
+    }
+
+    public void addAll(K key, List<V> newValues) {
+        this.addAllValues(key, newValues);
+    }
+
+    private void addAllValues(K key, List<V> newValues) {
+        if (newValues == null) {
+            throw new NullPointerException("List is empty");
+        }
+        if (newValues.isEmpty()) {
+            return;
+        }
+        getList(key).addAll(newValues);
+    }
+    
+    public void addFirst(K key, V value) {
+        addValue(key, value, false);
     }
 }

@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -42,6 +43,38 @@ public class MetadataMapTest extends Assert {
         assertEquals("Only a single value should be in the list", 1, value2.size());
         assertEquals("Value is wrong", "clazz", value2.get(0));
         assertNull(m.get("baZ"));
+    }
+    
+    @Test
+    public void testAddFirst() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.addFirst("baz", "foo");
+        List<Object> values = m.get("baz");
+        assertEquals(1, values.size());
+        assertEquals("foo", values.get(0));
+        
+        m.addFirst("baz", "clazz");
+        values = m.get("baz");
+        assertEquals(2, values.size());
+        assertEquals("clazz", values.get(0));
+        assertEquals("foo", values.get(1));
+    }
+    
+    @Test
+    public void testAddAll() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        List<Object> values = new ArrayList<Object>();
+        values.add("foo");
+        m.addAll("baz", values);
+        values = m.get("baz");
+        assertEquals(1, values.size());
+        assertEquals("foo", values.get(0));
+        
+        m.addAll("baz", Collections.<Object>singletonList("foo2"));
+        values = m.get("baz");
+        assertEquals(2, values.size());
+        assertEquals("foo", values.get(0));
+        assertEquals("foo2", values.get(1));
     }
     
     @Test

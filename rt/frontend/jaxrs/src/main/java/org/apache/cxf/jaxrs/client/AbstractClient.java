@@ -259,7 +259,11 @@ public abstract class AbstractClient implements Client, Retryable {
         if (state.getResponseBuilder() == null) {
             return null;
         }
-        return state.getResponseBuilder().clone().build();
+        try {
+            return state.getResponseBuilder().clone().build();
+        } catch (CloneNotSupportedException ex) {
+            throw new ClientWebApplicationException(ex);
+        }
     }
     
     /**
