@@ -315,7 +315,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         if (op == null || op == PREFLIGHT_FAILED) {
             return response;
         }
-
+         
         ResponseBuilder rbuilder = Response.fromResponse(response);
         
         /* Common to simple and preflight */
