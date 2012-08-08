@@ -1176,4 +1176,16 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
+    
+    @Test
+    public void testCXF4452() throws Exception {
+        try {
+            env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+            env.put(ToolConstants.CFG_BINDING, getLocation("/wsdl2java_wsdl/cxf4452/binding.xml"));
+            processor.setContext(env);
+            processor.execute();
+        } catch (Exception e) {
+            fail("shouldn't get exception");
+        }
+    }
 }
