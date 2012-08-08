@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
@@ -122,7 +123,7 @@ public class BootstrapStorage {
                 StaticFile staticFile = new StaticFile(url, acceptsGzip(mc), mime);
                 
                 Response.ResponseBuilder builder = Response.ok(staticFile);
-                builder.variant(new Variant(mime , (String)null, staticFile.isGzipEnabled() ? "gzip" : null));
+                builder.variant(new Variant(mime , (Locale)null, staticFile.isGzipEnabled() ? "gzip" : null));
 
                 return builder.build();
             }
