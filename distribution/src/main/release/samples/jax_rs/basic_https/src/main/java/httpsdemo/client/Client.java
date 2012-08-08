@@ -19,11 +19,12 @@
 
 package httpsdemo.client;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
 import javax.ws.rs.core.Response;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -31,8 +32,6 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.apache.cxf.jaxrs.client.WebClient;
 import httpsdemo.common.Customer;
 import httpsdemo.common.CustomerService;
 
