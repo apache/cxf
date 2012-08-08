@@ -50,6 +50,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.servlet.BaseUrlHelper;
 
 public final class HttpUtils {
     
@@ -59,6 +60,7 @@ public final class HttpUtils {
     private static final String REQUEST_PATH_TO_MATCH = "path_to_match";
     private static final String REQUEST_PATH_TO_MATCH_SLASH = "path_to_match_slash";
     
+    private static final String HTTP_SCHEME = "http";
     private static final String ANY_IP_ADDRESS = "0.0.0.0";
     private static final String ANY_IP_ADDRESS_START = "://0.0.0.0";
     private static final int DEFAULT_HTTP_PORT = 80;
@@ -186,6 +188,16 @@ public final class HttpUtils {
                || HttpHeaders.LAST_MODIFIED.equalsIgnoreCase(headerName); 
     }
     
+    public static boolean isHttpRequest(Message message) {
+        return message.get(AbstractHTTPDestination.HTTP_REQUEST) != null;
+    }
+    
+    public static URI toAbsoluteUri(String relativePath, Message message) {
+        String base = BaseUrlHelper.getBaseURL(
+            (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST));
+        return URI.create(base + relativePath);
+    }
+    
     public static URI toAbsoluteUri(URI u, Message message) {
         HttpServletRequest request = 
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
@@ -240,7 +252,13 @@ public final class HttpUtils {
     public static String getBaseAddress(Message m) {
         String endpointAddress = getEndpointAddress(m);
         try {
-            String path = new URI(endpointAddress).getRawPath();
+            URI uri = new URI(endpointAddress);
+            String path = uri.getRawPath();
+            String scheme = uri.getScheme();
+            if (scheme != null && !scheme.startsWith(HttpUtils.HTTP_SCHEME)
+                && HttpUtils.isHttpRequest(m)) {
+                path = HttpUtils.toAbsoluteUri(path, m).getRawPath();
+            }
             return path.length() == 0 ? "/" : path;
         } catch (URISyntaxException ex) {
             return endpointAddress == null ? "/" : endpointAddress;
