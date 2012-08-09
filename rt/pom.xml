@@ -49,7 +49,7 @@
         <module>transports/http</module>
         <module>transports/http-jetty</module>
         <module>transports/jms</module>
-        <!--module>transports/udp</module-->
+        <module>transports/udp</module>
         <module>ws/policy</module>
         <module>ws/addr</module>
         <module>ws/rm</module>

@@ -106,6 +106,7 @@ public class UDPDestination extends AbstractDestination {
 
             DatagramSessionConfig dcfg = acceptor.getSessionConfig();
             dcfg.setReadBufferSize(64 * 1024);
+            dcfg.setSendBufferSize(64 * 1024);
             dcfg.setReuseAddress(true);
             acceptor.bind();
         } catch (Exception ex) {
@@ -133,6 +134,7 @@ public class UDPDestination extends AbstractDestination {
     
     
     class UDPIOHandler extends StreamIoHandler implements IoHandler {
+
         protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
             final MessageImpl m = new MessageImpl();
             final Exchange exchange = new ExchangeImpl();

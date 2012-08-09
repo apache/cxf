@@ -93,18 +93,16 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testLargRequest() throws Exception {
+    public void testLargeRequest() throws Exception {
         JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
         StringBuilder b = new StringBuilder(100000);
-        for (int x = 0; x < 32100; x++) {
+        for (int x = 0; x < 10000; x++) {
             b.append("Hello ");
         }
         assertEquals("Hello " + b.toString(), g.greetMe(b.toString()));
                
         ((java.io.Closeable)g).close();
-    }
-
-
+    }    
 }

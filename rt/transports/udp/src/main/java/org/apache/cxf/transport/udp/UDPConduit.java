@@ -49,6 +49,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
 
 /**
@@ -69,6 +70,7 @@ public class UDPConduit extends AbstractConduit {
         super(t);
         this.bus = bus;
         connector.getSessionConfig().setReadBufferSize(64 * 1024);
+        connector.getSessionConfig().setSendBufferSize(64 * 1024);
         connector.setHandler(new IoHandlerAdapter() {
             public void messageReceived(IoSession session, Object buf) {
                 Message message = (Message)session.getAttribute(CXF_MESSAGE_ATTR);
@@ -77,7 +79,7 @@ public class UDPConduit extends AbstractConduit {
         });
     }
 
-    private void dataReceived(Message message, IoBuffer buf, boolean async) { 
+    private void dataReceived(Message message, IoBuffer buf, boolean async) {
         if (message.getExchange().getInMessage() == null) {
             final Message inMessage = new MessageImpl();
             inMessage.setExchange(message.getExchange());
@@ -181,6 +183,8 @@ public class UDPConduit extends AbstractConduit {
                     connFuture.await();
                 }
                 connFuture.getSession().setAttribute(CXF_MESSAGE_ATTR, message);
+                ((DatagramSessionConfig)connFuture.getSession().getConfig()).setSendBufferSize(64 * 1024);
+                ((DatagramSessionConfig)connFuture.getSession().getConfig()).setReceiveBufferSize(64 * 1024);
                 message.setContent(OutputStream.class, new UDPConduitOutputStream(connector, connFuture, message));
                 message.getExchange().put(ConnectFuture.class, connFuture);
                 message.getExchange().put(HOST_PORT, uri.getHost() + ":" + uri.getPort());
