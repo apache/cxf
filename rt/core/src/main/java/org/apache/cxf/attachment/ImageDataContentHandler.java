@@ -26,7 +26,10 @@ import java.awt.MediaTracker;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
@@ -36,6 +39,8 @@ import javax.activation.DataSource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
+
+import org.apache.cxf.helpers.IOUtils;
 
 /**
  * 
@@ -51,6 +56,10 @@ public class ImageDataContentHandler implements DataContentHandler {
         }
     }
 
+    public ImageDataContentHandler() {
+        
+    }
+    
     public Object getContent(DataSource ds) throws IOException {
         return ImageIO.read(ds.getInputStream());
     }
@@ -70,17 +79,27 @@ public class ImageDataContentHandler implements DataContentHandler {
     }
 
     public void writeTo(Object obj, String mimeType, OutputStream os) throws IOException {
-        Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
-        if (writers.hasNext()) {
-            ImageWriter writer = writers.next();
-            
-            BufferedImage bimg = convertToBufferedImage((Image)obj);
-            ImageOutputStream out = ImageIO.createImageOutputStream(os); 
-            writer.setOutput(out);
-            writer.write(bimg);
-            writer.dispose();
-            out.flush();
-            out.close();
+        if (obj instanceof Image) {
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
+            if (writers.hasNext()) {
+                ImageWriter writer = writers.next();
+                
+                BufferedImage bimg = convertToBufferedImage((Image)obj);
+                ImageOutputStream out = ImageIO.createImageOutputStream(os); 
+                writer.setOutput(out);
+                writer.write(bimg);
+                writer.dispose();
+                out.flush();
+                out.close();
+                return;
+            }
+        } else if (obj instanceof byte[]) {
+            os.write((byte[])obj);
+        } else if (obj instanceof InputStream) {
+            IOUtils.copyAndCloseInput((InputStream)obj, os);
+        } else if (obj instanceof File) {
+            FileInputStream file = new FileInputStream((File)obj);
+            IOUtils.copyAndCloseInput(file, os);
         } else {
             throw new IOException("Attachment type not spported " + obj.getClass());                    
         }
