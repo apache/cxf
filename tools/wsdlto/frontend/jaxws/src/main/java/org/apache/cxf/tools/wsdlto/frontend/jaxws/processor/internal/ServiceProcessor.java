@@ -205,7 +205,8 @@ public class ServiceProcessor extends AbstractProcessor {
                         name = name.substring(name.lastIndexOf('.') + 1);
                     }
                 }
-                if (serviceBinding2.getJaxwsClass().getComments() != null) {
+                if (serviceBinding2.getJaxwsClass() != null
+                    && serviceBinding2.getJaxwsClass().getComments() != null) {
                     jaxwsBinding.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
                 }
                 if (!serviceBinding2.getPackageJavaDoc().equals("")) {
