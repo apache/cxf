@@ -56,7 +56,7 @@ public final class Client {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Client.class.getResource("wssec.xml");
+        URL busFile = Client.class.getResource("/ClientConfig.xml");
         
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);

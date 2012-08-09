@@ -55,34 +55,13 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/main/config/hello_world.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/demo/wssec/server/wssec.xml" todir="${basedir}/target/classes/demo/wssec/server" />
-                                <copy file="${basedir}/src/demo/wssec/client/wssec.xml" todir="${basedir}/target/classes/demo/wssec/client" />
-                                <copy todir="${basedir}/target/classes/certs">
-                                    <fileset dir="${basedir}/certs" />
-                                </copy>
-                            </tasks>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -107,7 +86,7 @@
                                     <executable>java</executable>
                                     <arguments>
                                         <argument>-classpath</argument>
-                                        <classpath />
+                                        <classpath/>
                                         <argument>demo.wssec.server.Server</argument>
                                     </arguments>
                                 </configuration>
@@ -134,7 +113,7 @@
                                 <configuration>
                                     <mainClass>demo.wssec.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${basedir}/src/main/config/hello_world.wsdl</argument>
                                         <argument>secure</argument>
                                     </arguments>
                                 </configuration>
@@ -161,7 +140,7 @@
                                 <configuration>
                                     <mainClass>demo.wssec.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world_no_policy.wsdl</argument>
+                                        <argument>${basedir}/src/main/config/hello_world_no_policy.wsdl</argument>
                                         <argument>secure</argument>
                                     </arguments>
                                 </configuration>
@@ -176,29 +155,27 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
-       
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>2.6.2-SNAPSHOT</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
