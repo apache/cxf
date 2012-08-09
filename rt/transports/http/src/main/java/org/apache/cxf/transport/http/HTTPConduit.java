@@ -1333,9 +1333,9 @@ public class HTTPConduit
             } catch (IOException e) {
                 if (e.getMessage() != null && e.getMessage().contains("HTTPS hostname wrong:")) {
                     throw new IOException("The https URL hostname does not match the " 
-                        + "Common Name (CN) on the server certificate.  To disable this check " 
-                        + "(NOT recommended for production) set the CXF client TLS configuration " 
-                        + "property \"disableCNCheck\" to true.");
+                        + "Common Name (CN) on the server certificate in the client's truststore.  " 
+                        + "To disable this check (NOT recommended for production) set the CXF " 
+                        + "client TLS configuration property \"disableCNCheck\" to true.");
                 } else {
                     throw e;
                 }
