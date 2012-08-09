@@ -87,10 +87,6 @@ runtime by prompting for the password.  The approach taken here is for
 demonstration purposes only.
 
 Certificates:
-If the certificates have expired, a shell script in bin/gencerts.sh 
-will generate a new set of certificates needed for this sample. 
-Just do the following:
-
-        cd certs
-        sh ../bin/gencerts.sh
+See the src/main/config folder for the sample keys used (don't use
+these keys in production!) as well as scripts used for their creation.
 
