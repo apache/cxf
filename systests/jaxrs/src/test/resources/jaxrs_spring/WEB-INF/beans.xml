@@ -29,6 +29,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
   
+  <bean class="org.apache.cxf.systest.jaxrs.Book"/>
+  
   <jaxrs:server id="bookservice"
 		        address="/rest">
     <jaxrs:serviceBeans>
