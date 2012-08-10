@@ -90,7 +90,7 @@ public class Server extends AbstractBusTestServerBase {
                          + "?jndiInitialContextFactory"
                          + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
                          + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
-                         + broker.getBrokerURL();
+                         + broker.getEncodedBrokerURL();
         Endpoint.publish(address1, spec1);
         
         Object spec2 = new GreeterSpecWithPortError();
@@ -98,7 +98,7 @@ public class Server extends AbstractBusTestServerBase {
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
-            + broker.getBrokerURL();
+            + broker.getEncodedBrokerURL();
         Endpoint.publish(address2, spec2);
         
         initNoWsdlServer();
@@ -113,7 +113,7 @@ public class Server extends AbstractBusTestServerBase {
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL="
-            +  broker.getBrokerURL();
+            +  broker.getEncodedBrokerURL();
         Hello implementor = new HelloImpl();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(Hello.class);

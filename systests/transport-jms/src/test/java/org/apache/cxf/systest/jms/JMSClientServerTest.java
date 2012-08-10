@@ -110,7 +110,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://JMSClientServerTest");
+        broker = new EmbeddedJMSBrokerLauncher("vm://JMSClientServerTest?jms.watchTopicAdvisories=false");
         launchServer(broker);
         launchServer(new Server(broker));
         createStaticBus();
@@ -1203,7 +1203,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=" 
-            + broker.getBrokerURL();
+            + broker.getEncodedBrokerURL();
         if (messageType != null) {
             address = address + "&messageType=" + messageType;
         }

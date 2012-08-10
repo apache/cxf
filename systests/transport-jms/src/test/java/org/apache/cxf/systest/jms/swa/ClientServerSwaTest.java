@@ -55,7 +55,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
                 factory.setTransportId("http://cxf.apache.org/transports/jms");
                 factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
                 factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
-                factory.setAddress(ADDRESS + broker.getBrokerURL());
+                factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());
                 factory.setServiceBean(new SwAServiceImpl());
                 factory.create().start();
             } catch (Exception e) {
@@ -67,7 +67,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        broker = new EmbeddedJMSBrokerLauncher("vm://ClientServerSwaTest");
+        broker = new EmbeddedJMSBrokerLauncher("vm://ClientServerSwaTest?jms.watchTopicAdvisories=false");
         System.setProperty("EmbeddedBrokerURL", broker.getBrokerURL());
         launchServer(broker);
         launchServer(new Server());
@@ -84,7 +84,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         factory.setTransportId("http://cxf.apache.org/transports/jms");
         factory.setServiceName(new QName("http://cxf.apache.org/swa", "SwAService"));
         factory.setEndpointName(new QName("http://cxf.apache.org/swa", "SwAServiceHttpPort"));
-        factory.setAddress(ADDRESS + broker.getBrokerURL());
+        factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         SwAService port = factory.create(SwAService.class);
         
