@@ -36,6 +36,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -194,8 +195,8 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     
                     //Make sure the elName found on the wire is actually OK for 
                     //the purpose we need it
-                    validatePart(p, elName, si);
-
+                    validatePart(p, elName, si, ep.getService());
+             
                     o = dr.read(p, xmlReader);
                     if (Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare")) 
                         && parameters.isEmpty()) {
@@ -222,14 +223,14 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         }
     }
     
-    private void validatePart(MessagePartInfo p, QName elName, ServiceInfo si) {
+    private void validatePart(MessagePartInfo p, QName elName, ServiceInfo si, Service service) {
         if (p == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
                             Fault.FAULT_CODE_CLIENT);
 
         }
 
-        Boolean synth = Boolean.FALSE;
+        boolean synth = false;
         if (p.getMessageInfo() != null && p.getMessageInfo().getOperation() != null) {
             OperationInfo op = p.getMessageInfo().getOperation();
             Boolean b = (Boolean)op.getProperty("operation.is.synthetic");
@@ -237,7 +238,8 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 synth = b;
             }
         }
-        if (si != null && Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare"))) {
+        if ((si != null && Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare")))
+             || (service != null && Boolean.TRUE.equals(service.get("soap.force.doclit.bare")))) {
             // something like a Provider service or similar that is forcing a
             // doc/lit/bare on an endpoint that may not really be doc/lit/bare.  
             // we need to just let these through per spec so the endpoint
@@ -247,13 +249,13 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         if (p.isElement()) {
             if (p.getConcreteName() != null
                 && !elName.equals(p.getConcreteName())
-                && !Boolean.TRUE.equals(synth)) {
+                && !synth) {
                 throw new Fault("UNEXPECTED_ELEMENT", LOG, null, elName,
                                 p.getConcreteName());
             }
         } else {
             if (!(elName.equals(p.getName()) || elName.equals(p.getConcreteName()))
-                && !Boolean.TRUE.equals(synth)) {
+                && !synth) {
                 throw new Fault("UNEXPECTED_ELEMENT", LOG, null, elName,
                                 p.getConcreteName());
             }
