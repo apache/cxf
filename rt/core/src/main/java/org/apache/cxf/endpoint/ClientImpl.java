@@ -670,7 +670,7 @@ public class ClientImpl
         }
     }
 
-    protected void waitResponse(Exchange exchange) {
+    protected void waitResponse(Exchange exchange) throws IOException {
         int remaining = synchronousTimeout;
         while (!Boolean.TRUE.equals(exchange.get(FINISHED)) && remaining > 0) {
             long start = System.currentTimeMillis();
@@ -685,6 +685,10 @@ public class ClientImpl
         if (!Boolean.TRUE.equals(exchange.get(FINISHED))) {
             LogUtils.log(LOG, Level.WARNING, "RESPONSE_TIMEOUT",
                 exchange.get(OperationInfo.class).getName().toString());
+            String msg = new org.apache.cxf.common.i18n.Message("RESPONSE_TIMEOUT", LOG, 
+                                                                exchange.get(OperationInfo.class).getName().toString())
+                .toString();
+            throw new IOException(msg);
         }
     }
 
