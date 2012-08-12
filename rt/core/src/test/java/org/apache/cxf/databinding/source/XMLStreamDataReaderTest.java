@@ -44,22 +44,19 @@ public class XMLStreamDataReaderTest extends Assert {
         XMLStreamDataReader reader = new XMLStreamDataReader();
         Message msg = new MessageImpl();
         TestInputStream in1 = new TestInputStream(DUMMY_DATA);
-        TestInputStream in2 = new TestInputStream(DUMMY_DATA);
         
         msg.setContent(InputStream.class, in1);
         
         reader.setProperty(Message.class.getName(), msg);
         
         Object obj = reader.read(new QName("http://www.apache.org/cxf", "dummy"), 
-                                 StaxUtils.createXMLStreamReader(in2), XMLStreamReader.class);
+                                 StaxUtils.createXMLStreamReader(in1), XMLStreamReader.class);
 
         assertTrue(obj instanceof XMLStreamReader);
         
         assertFalse(in1.isClosed());
-        assertFalse(in2.isClosed());
         ((XMLStreamReader)obj).close();
         
-        assertTrue(in2.isClosed());
         assertTrue(in1.isClosed());
     }
     

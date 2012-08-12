@@ -93,7 +93,7 @@
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.stax.impl.groupId>org.codehaus.woodstox</cxf.stax.impl.groupId>
         <cxf.stax.impl.artifactId>woodstox-core-asl</cxf.stax.impl.artifactId>
-        <cxf.woodstox.core.version>4.1.2</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>4.1.4</cxf.woodstox.core.version>
         <cxf.stax.impl.version>${cxf.woodstox.core.version}</cxf.stax.impl.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
