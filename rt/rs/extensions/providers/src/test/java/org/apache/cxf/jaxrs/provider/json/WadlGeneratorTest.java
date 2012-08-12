@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -41,6 +42,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.EasyMock;
@@ -101,15 +103,22 @@ public class WadlGeneratorTest extends Assert {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         e.put(Service.class, new JAXRSServiceImpl(cris));
-        
+        Endpoint endpoint = control.createMock(Endpoint.class);
+        e.put(Endpoint.class, endpoint);
         m.setExchange(e);
         control.reset();
         ServletDestination d = control.createMock(ServletDestination.class);
-        EndpointInfo epr = new EndpointInfo(); 
+        EndpointInfo epr = new EndpointInfo();
         epr.setAddress(baseAddress);
         d.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(epr).anyTimes();
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(epr).anyTimes();
         e.setDestination(d);
+        BindingInfo bi = control.createMock(BindingInfo.class);
+        epr.setBinding(bi);
+        bi.getProperties();
+        EasyMock.expectLastCall().andReturn(Collections.emptyMap()).anyTimes();
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
         m.put(Message.HTTP_REQUEST_METHOD, "GET");
