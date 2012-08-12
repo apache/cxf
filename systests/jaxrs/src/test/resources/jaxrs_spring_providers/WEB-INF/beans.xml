@@ -49,4 +49,12 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <bean id="exceptionMapper2" class="org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper"/>
     <bean id="plainTextProvider" class="org.apache.cxf.systest.jaxrs.StringTextWriter"/>
     
+    <jaxrs:server id="bookservice2"
+                  address="/resources2"
+                  publishedEndpointUrl="http://proxy">
+        <jaxrs:serviceBeans>
+            <ref bean="bookstore"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    
 </beans>

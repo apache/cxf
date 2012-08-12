@@ -39,6 +39,7 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.PropertiesAwareDataBinding;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
@@ -153,6 +154,11 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
         BindingInfo bindingInfo = createBindingInfo();
         ei.setBinding(bindingInfo);
+        
+        if (!StringUtils.isEmpty(publishedEndpointUrl)) {
+            ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
+        }
+        
         serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINTINFO_CREATED, ei);
 
         return ei;
