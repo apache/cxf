@@ -40,6 +40,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.EasyMock;
@@ -129,6 +130,8 @@ public class RequestPreprocessorTest extends Assert {
         epr.setAddress(baseAddress);
         d.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(epr).anyTimes();
+        endp.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(epr).anyTimes();
         m.put(Message.REQUEST_URI, pathInfo);
         m.put(Message.QUERY_STRING, query);
         m.put(Message.HTTP_REQUEST_METHOD, method);
@@ -137,6 +140,11 @@ public class RequestPreprocessorTest extends Assert {
             headers.put("X-HTTP-Method-Override", Collections.singletonList(methodHeader));   
         }
         m.put(Message.PROTOCOL_HEADERS, headers);
+        BindingInfo bi = control.createMock(BindingInfo.class);
+        epr.setBinding(bi);
+        bi.getProperties();
+        EasyMock.expectLastCall().andReturn(Collections.emptyMap()).anyTimes();
+        
         control.replay();
         return m;
     }
