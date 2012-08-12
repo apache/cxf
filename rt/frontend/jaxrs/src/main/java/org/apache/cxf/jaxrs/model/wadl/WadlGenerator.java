@@ -104,6 +104,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -210,7 +211,7 @@ public class WadlGenerator implements RequestHandler {
         sbGrammars.append("<grammars>");
 
         StringBuilder sbResources = new StringBuilder();
-        sbResources.append("<resources base=\"").append(getBaseURI(ui)).append("\">");
+        sbResources.append("<resources base=\"").append(getBaseURI(m, ui)).append("\">");
 
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
 
@@ -268,8 +269,14 @@ public class WadlGenerator implements RequestHandler {
         }
     }
     
-    private String getBaseURI(UriInfo ui) {
-        return ui.getBaseUri().toString();
+    private String getBaseURI(Message m, UriInfo ui) {
+        EndpointInfo ei = m.getExchange().get(Endpoint.class).getEndpointInfo();
+        String publishedEndpointUrl = (String)ei.getProperty("publishedEndpointUrl");
+        if (publishedEndpointUrl == null) {
+            return ui.getBaseUri().toString();
+        } else {
+            return publishedEndpointUrl;
+        }
     }
     
     private void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars,
@@ -860,7 +867,7 @@ public class WadlGenerator implements RequestHandler {
                                                                                  WadlGenerator.WADL_NS, 
                                                                                  "resources");
                         if (resourceEls.size() == 1) {
-                            DOMUtils.setAttribute(resourceEls.get(0), "base", getBaseURI(ui));
+                            DOMUtils.setAttribute(resourceEls.get(0), "base", getBaseURI(m, ui));
                             return Response.ok().type(mt).entity(new DOMSource(appEl)).build();
                         }
                         
