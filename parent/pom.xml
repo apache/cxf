@@ -93,8 +93,13 @@
         <cxf.stax.impl.version>${cxf.woodstox.core.version}</cxf.stax.impl.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
+<<<<<<< HEAD
         <cxf.xmlbeans.version>2.4.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.2</cxf.xmlschema.version>
+=======
+        <cxf.xmlbeans.version>2.5.0</cxf.xmlbeans.version>
+        <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
+>>>>>>> 77a24d7... Merged revisions 1372095 via  git cherry-pick from
         <cxf.jibx.version>1.2.4.5</cxf.jibx.version>
         <cxf.axiom.version>1.2.10</cxf.axiom.version>
         <cxf.jettison.version>1.3.2</cxf.jettison.version>
