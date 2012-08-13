@@ -290,6 +290,11 @@ public class ServiceImpl extends ServiceDelegate {
         configureObject(dispatchService);
         for (ServiceInfo si : dispatchService.getServiceInfos()) {
             si.setProperty("soap.force.doclit.bare", Boolean.TRUE);
+            if (null == wsdlURL) {
+                for (EndpointInfo ei : si.getEndpoints()) {
+                    ei.setProperty("soap.no.validate.parts", Boolean.TRUE);
+                }
+            }
         }
         return serviceFactory;
     }    
