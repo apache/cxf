@@ -324,6 +324,11 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             // Bind every operation to the invoke method.
             for (ServiceInfo si : getService().getServiceInfos()) {
                 si.setProperty("soap.force.doclit.bare", Boolean.TRUE);
+                if (!isFromWsdl()) {
+                    for (EndpointInfo ei : si.getEndpoints()) {
+                        ei.setProperty("soap.no.validate.parts", Boolean.TRUE);
+                    }
+                }
                 for (BindingInfo bind : si.getBindings()) {
                     for (BindingOperationInfo bop : bind.getOperations()) {
                         OperationInfo o = bop.getOperationInfo();
