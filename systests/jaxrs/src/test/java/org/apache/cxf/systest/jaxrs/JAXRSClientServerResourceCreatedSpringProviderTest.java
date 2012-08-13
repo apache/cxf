@@ -159,7 +159,21 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         assertEquals(1, clsFiles.size());
         assertTrue(checkContains(clsFiles, "org.apache.cxf.systest.jaxrs.PetStore.class"));
     }
-    
+    @Test
+    public void testWadlPublishedEndpointUrl() throws Exception {
+        String requestURI = "http://localhost:" + PORT + "/webapp/resources2";
+        WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
+        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Element root = doc.getDocumentElement();
+        assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
+        assertEquals("application", root.getLocalName());
+        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
+                                                                  WadlGenerator.WADL_NS, "resources");
+        assertEquals(1, resourcesEls.size());
+        Element resourcesEl =  resourcesEls.get(0);
+        assertEquals("http://proxy", resourcesEl.getAttribute("base"));
+        
+    }
     private boolean checkContains(List<File> clsFiles, String name) {
         
         for (File f : clsFiles) {

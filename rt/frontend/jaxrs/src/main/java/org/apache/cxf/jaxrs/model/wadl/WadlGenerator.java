@@ -101,6 +101,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -199,7 +200,7 @@ public class WadlGenerator implements RequestHandler {
         sbGrammars.append("<grammars>");
 
         StringBuilder sbResources = new StringBuilder();
-        sbResources.append("<resources base=\"").append(getBaseURI(ui)).append("\">");
+        sbResources.append("<resources base=\"").append(getBaseURI(m, ui)).append("\">");
 
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
 
@@ -235,8 +236,14 @@ public class WadlGenerator implements RequestHandler {
         return Response.ok().type(type).entity(sbMain.toString()).build();
     }
 
-    private String getBaseURI(UriInfo ui) {
-        return ui.getBaseUri().toString();
+    private String getBaseURI(Message m, UriInfo ui) {
+        EndpointInfo ei = m.getExchange().get(Endpoint.class).getEndpointInfo();
+        String publishedEndpointUrl = (String)ei.getProperty("publishedEndpointUrl");
+        if (publishedEndpointUrl == null) {
+            return ui.getBaseUri().toString();
+        } else {
+            return publishedEndpointUrl;
+        }
     }
     
     private void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars,
@@ -785,14 +792,14 @@ public class WadlGenerator implements RequestHandler {
                                                                                 "grammars");
                         if (grammarEls.size() == 1) {
                             handleSchemaRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), 
-                                WadlGenerator.WADL_NS, "include"), "href", loc, "", ui);
+                                WadlGenerator.WADL_NS, "include"), "href", loc, "", m, ui);
                         }
                         
                         List<Element> resourceEls = DOMUtils.getChildrenWithName(appEl, 
                                                                                  WadlGenerator.WADL_NS, 
                                                                                  "resources");
                         if (resourceEls.size() == 1) {
-                            DOMUtils.setAttribute(resourceEls.get(0), "base", getBaseURI(ui));
+                            DOMUtils.setAttribute(resourceEls.get(0), "base", getBaseURI(m, ui));
                             return Response.ok().type(mt).entity(new DOMSource(appEl)).build();
                         }
                         
@@ -815,9 +822,9 @@ public class WadlGenerator implements RequestHandler {
                 if (is != null) {
                     Element docEl = DOMUtils.readXml(is).getDocumentElement();
                     handleSchemaRefs(DOMUtils.getChildrenWithName(docEl, 
-                        XmlSchemaConstants.XSD_NAMESPACE_URI, "import"), "schemaLocation", loc, href, ui);
+                        XmlSchemaConstants.XSD_NAMESPACE_URI, "import"), "schemaLocation", loc, href, m, ui);
                     handleSchemaRefs(DOMUtils.getChildrenWithName(docEl, 
-                        XmlSchemaConstants.XSD_NAMESPACE_URI, "include"), "schemaLocation", loc, href, ui);
+                        XmlSchemaConstants.XSD_NAMESPACE_URI, "include"), "schemaLocation", loc, href, m, ui);
                     return Response.ok().type(MediaType.APPLICATION_XML_TYPE).entity(
                         new DOMSource(docEl)).build();
                 }
@@ -830,7 +837,8 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private void handleSchemaRefs(List<Element> schemaRefEls, String attrName, 
-                                  String parentDocLoc, String parentRef, UriInfo ui) {
+                                  String parentDocLoc, String parentRef, 
+                                  Message m, UriInfo ui) {
         int index = parentDocLoc.lastIndexOf('/');
         parentDocLoc = index == -1 ? parentDocLoc : parentDocLoc.substring(0, index + 1);
         
@@ -841,7 +849,7 @@ public class WadlGenerator implements RequestHandler {
             String href = schemaRefEl.getAttribute(attrName);
             String actualRef = parentRef + href;
             schemaLocationMap.put(actualRef, parentDocLoc + href);    
-            DOMUtils.setAttribute(schemaRefEl, attrName, getBaseURI(ui) + "/" + actualRef);
+            DOMUtils.setAttribute(schemaRefEl, attrName, getBaseURI(m, ui) + "/" + actualRef);
         }
     }
 
