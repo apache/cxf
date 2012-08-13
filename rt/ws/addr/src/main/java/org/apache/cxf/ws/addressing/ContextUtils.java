@@ -53,6 +53,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -372,22 +373,22 @@ public final class ContextUtils {
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
+    //CHECKSTYLE:OFF  Max executable statement count limitation
     public static void rebaseResponse(EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
         
         String namespaceURI = inMAPs.getNamespaceURI();
-        if (!retrievePartialResponseSent(inMessage)) {
-            storePartialResponseSent(inMessage);
+        if (!ContextUtils.retrievePartialResponseSent(inMessage)) {
+            ContextUtils.storePartialResponseSent(inMessage);
             Exchange exchange = inMessage.getExchange();
             Message fullResponse = exchange.getOutMessage();
-            Message partialResponse = createMessage(exchange);
+            Message partialResponse = ContextUtils.createMessage(exchange);
             ensurePartialResponseMAPs(partialResponse, namespaceURI);
             
             // ensure the inbound MAPs are available in the partial response
             // message (used to determine relatesTo etc.)
-            propogateReceivedMAPs(inMAPs, partialResponse);
-            partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
+            ContextUtils.propogateReceivedMAPs(inMAPs, partialResponse);
             Destination target = inMessage.getDestination();
             if (target == null) {
                 return;
@@ -400,7 +401,67 @@ public final class ContextUtils {
                 Conduit backChannel = target.getBackChannel(inMessage,
                                                             partialResponse,
                                                             reference);
+                Exception exception = inMessage.getContent(Exception.class);
+                //Add this to handle two way faultTo
+                //TODO:Look at how to refactor 
+                if (backChannel != null && !inMessage.getExchange().isOneWay() 
+                    && ContextUtils.isFault(inMessage)) {
+                    // send the fault message to faultTo Endpoint
+                    exchange.setOutMessage(ContextUtils.createMessage(exchange));
+                    exchange.put(ConduitSelector.class, new NullConduitSelector());
+                    exchange.put("org.apache.cxf.http.no_io_exceptions", true);
+                    Destination destination = createDecoupledDestination(exchange, reference);
+                    exchange.setDestination(destination);
+
+                    if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage)) {
+                        DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
+                        if (in != null) {
+                            in.cacheInput();
+                        }
+                        inMessage.getInterceptorChain().reset();
+                        //cleanup pathinfo
+                        if (inMessage.get(Message.PATH_INFO) != null) {
+                            inMessage.remove(Message.PATH_INFO);
+                        }
+                        inMessage.getInterceptorChain().doIntercept(inMessage);
+
+                    }
+
+                    // send the partial response to requester
+                    partialResponse.put("forced.faultstring",
+                                        "The server sent HTTP status code :"
+                                            + inMessage.getExchange().get(Message.RESPONSE_CODE));
+                    partialResponse.setContent(Exception.class, exception);
+                    partialResponse.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS,
+                                        inMessage.get(Message.PROTOCOL_HEADERS));
+                    partialResponse.put(org.apache.cxf.message.Message.ENCODING,
+                                        inMessage.get(Message.ENCODING));
+                    partialResponse.put(ContextUtils.ACTION, inMessage.get(ContextUtils.ACTION));
+                    partialResponse.put("javax.xml.ws.addressing.context.inbound",
+                                        inMessage.get("javax.xml.ws.addressing.context.inbound"));
+                    partialResponse.put("javax.xml.ws.addressing.context.outbound",
+                                        inMessage.get("javax.xml.ws.addressing.context.outbound"));
+                    exchange.setOutMessage(partialResponse);
+                    PhaseInterceptorChain newChian = ((PhaseInterceptorChain)inMessage.getInterceptorChain())
+                        .cloneChain();
+                    partialResponse.setInterceptorChain(newChian);
+                    exchange.setDestination(target);
+                    exchange.setOneWay(false);
+                    exchange.put(ConduitSelector.class,
+                                 new PreexistingConduitSelector(backChannel, exchange.get(Endpoint.class)));
+                    if (newChian != null && !newChian.doIntercept(partialResponse)
+                        && partialResponse.getContent(Exception.class) != null) {
+                        if (partialResponse.getContent(Exception.class) instanceof Fault) {
+                            throw (Fault)partialResponse.getContent(Exception.class);
+                        } else {
+                            throw new Fault(partialResponse.getContent(Exception.class));
+                        }
+                    }
+                    return;
+                }
+                
                 if (backChannel != null) {
+                    partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
                     boolean robust =
                         MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
                     
@@ -422,12 +483,13 @@ public final class ContextUtils {
                         exchange.put(BindingOperationInfo.class, boi);
                     }
                     
+                    
                     // set up interceptor chains and send message
                     InterceptorChain chain =
                         fullResponse != null
                         ? fullResponse.getInterceptorChain()
                         : OutgoingChainInterceptor.getOutInterceptorChain(exchange);
-                    exchange.setOutMessage(partialResponse);                    
+                    exchange.setOutMessage(partialResponse);
                     partialResponse.setInterceptorChain(chain);
                     exchange.put(ConduitSelector.class,
                                  new PreexistingConduitSelector(backChannel,
@@ -447,7 +509,7 @@ public final class ContextUtils {
                     exchange.put(ConduitSelector.class, new NullConduitSelector());
                     
                     if (fullResponse == null) {
-                        fullResponse = createMessage(exchange);
+                        fullResponse = ContextUtils.createMessage(exchange);
                     }
                     exchange.setOutMessage(fullResponse);
                     
@@ -457,7 +519,7 @@ public final class ContextUtils {
                     exchange.setDestination(destination);
                          
                     
-                    if (retrieveAsyncPostResponseDispatch(inMessage)) {
+                    if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage) && !robust) {
                         //need to suck in all the data from the input stream as
                         //the transport might discard any data on the stream when this 
                         //thread unwinds or when the empty response is sent back
@@ -465,24 +527,25 @@ public final class ContextUtils {
                         if (in != null) {
                             in.cacheInput();
                         }
-                        try {
-                            if (!robust) {
-                                // async service invocation required *after* a response
-                                // has been sent (i.e. to a oneway, or a partial response
-                                // to a decoupled twoway)
                         
-        
-                                // pause dispatch on current thread ...
-                                inMessage.getInterceptorChain().pause();
+                        // async service invocation required *after* a response
+                        // has been sent (i.e. to a oneway, or a partial response
+                        // to a decoupled twoway)
+                        
+                        //cleanup pathinfo
+                        if (inMessage.get(Message.PATH_INFO) != null) {
+                            inMessage.remove(Message.PATH_INFO);
+                        }
+                        // pause dispatch on current thread ...
+                        inMessage.getInterceptorChain().pause();
 
-
-                                // ... and resume on executor thread
-                                getExecutor(inMessage).execute(new Runnable() {
-                                    public void run() {
-                                        inMessage.getInterceptorChain().resume();
-                                    }
-                                });
-                            } 
+                        try {
+                            // ... and resume on executor thread
+                            getExecutor(inMessage).execute(new Runnable() {
+                                public void run() {
+                                    inMessage.getInterceptorChain().resume();
+                                }
+                            });
                         } catch (RejectedExecutionException e) {
                             LOG.warning(
                                         "Executor queue is full, use the caller thread." 
@@ -496,13 +559,13 @@ public final class ContextUtils {
                             }
                         }
                     }
-                }
+                } 
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "SERVER_TRANSPORT_REBASE_FAILURE_MSG", e);
             }
         }
     }
-
+    //CHECKSTYLE:ON
     public static Destination createDecoupledDestination(
         Exchange exchange, final EndpointReferenceType reference) {
 

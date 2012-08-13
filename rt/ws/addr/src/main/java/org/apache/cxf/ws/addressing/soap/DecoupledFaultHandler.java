@@ -28,7 +28,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Destination;
-import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
@@ -41,11 +41,11 @@ import org.apache.cxf.ws.addressing.Names;
  * It can be installed using @InInterceptors and @OutInterceptors
  * annotations or explicitly added to the list of interceptors. 
  */
-public class OneWayDecoupledFaultHandler extends AbstractSoapInterceptor {
+public class DecoupledFaultHandler extends AbstractSoapInterceptor {
     
     public static final String WSA_ACTION = "http://schemas.xmlsoap.org/wsdl/soap/envelope/fault";
 
-    public OneWayDecoupledFaultHandler() {
+    public DecoupledFaultHandler() {
         super(Phase.PRE_PROTOCOL);
         addBefore(MAPCodec.class.getName());
     } 
@@ -58,12 +58,11 @@ public class OneWayDecoupledFaultHandler extends AbstractSoapInterceptor {
     // but at the moment PhaseInterceptorChain needs to be tricked that this is
     // a two way request for a fault chain be invoked
     public void handleFault(SoapMessage message) {
-        if (message.getExchange().isOneWay()
-            && !ContextUtils.isRequestor(message)) {
+        if (!ContextUtils.isRequestor(message)) {
             
             Exchange exchange = message.getExchange();
             Message inMessage = exchange.getInMessage();
-            final AddressingPropertiesImpl maps = 
+            final AddressingProperties maps = 
                 ContextUtils.retrieveMAPs(inMessage, false, false, true);
             
             if (maps != null && !ContextUtils.isGenericAddress(maps.getFaultTo())) {
