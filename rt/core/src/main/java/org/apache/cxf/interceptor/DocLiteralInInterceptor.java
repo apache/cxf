@@ -194,13 +194,15 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                         p = findMessagePart(exchange, operations, elName, client, paramNum, message);
                     }
                     
-                    //Make sure the elName found on the wire is actually OK for 
-                    //the purpose we need it
-                    validatePart(p, elName, message);
+                    boolean dlb = Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare"));
+                    if (!dlb) {
+                        //Make sure the elName found on the wire is actually OK for 
+                        //the purpose we need it
+                        validatePart(p, elName, message);
+                    }
              
                     o = dr.read(p, xmlReader);
-                    if (MessageUtils.getContextualBoolean(message, "soap.force.doclit.bare", false) 
-                        && parameters.isEmpty()) {
+                    if (dlb && parameters.isEmpty()) {
                         // webservice provider does not need to ensure size
                         parameters.add(o);
                     } else {
@@ -240,12 +242,15 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             }
         }
         
-        if (MessageUtils.getContextualBoolean(m, "soap.force.doclit.bare", false)) {
+        if (MessageUtils.getContextualBoolean(m, "soap.no.validate.parts", false)) {
             // something like a Provider service or similar that is forcing a
             // doc/lit/bare on an endpoint that may not really be doc/lit/bare.  
             // we need to just let these through per spec so the endpoint
             // can process it
             synth = true;
+        }
+        if (synth) {
+            return;
         }
         if (p.isElement()) {
             if (p.getConcreteName() != null
