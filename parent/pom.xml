@@ -93,8 +93,6 @@
         <cxf.stax.impl.version>${cxf.woodstox.core.version}</cxf.stax.impl.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
-        <cxf.xmlbeans.version>2.4.0</cxf.xmlbeans.version>
-        <cxf.xmlschema.version>2.0.2</cxf.xmlschema.version>
         <cxf.xmlbeans.version>2.5.0</cxf.xmlbeans.version>
         <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
         <cxf.jibx.version>1.2.4.5</cxf.jibx.version>
