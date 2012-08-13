@@ -49,6 +49,7 @@ import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 
 /**
  * Bean to help easily create Server endpoints for JAX-WS.
@@ -183,6 +184,9 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
         if (implInfo.isWebServiceProvider()) {
             bindingInfo.getService().setProperty("soap.force.doclit.bare", Boolean.TRUE);
             if (this.getServiceFactory().isPopulateFromClass()) {
+                for (EndpointInfo ei : bindingInfo.getService().getEndpoints()) {
+                    ei.setProperty("soap.no.validate.parts", Boolean.TRUE);
+                }
                 //Provider, but no wsdl.  Synthetic ops
                 for (BindingOperationInfo op : bindingInfo.getOperations()) {
                     op.setProperty("operation.is.synthetic", Boolean.TRUE);
