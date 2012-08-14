@@ -103,17 +103,20 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         String action = getSoapAction(message);
         if (!StringUtils.isEmpty(action)) {
             getAndSetOperation(message, action);
+            message.put(SoapBindingConstants.SOAP_ACTION, action);
         }
     }
     
-    private void getAndSetOperation(SoapMessage message, String action) {
+    public static void getAndSetOperation(SoapMessage message, String action) {
         if (StringUtils.isEmpty(action)) {
             return;
         }
-        message.put(SoapBindingConstants.SOAP_ACTION, action);
         
         Exchange ex = message.getExchange();
         Endpoint ep = ex.get(Endpoint.class);
+        if (ep == null) {
+            return;
+        }
         
         BindingOperationInfo bindingOp = null;
         
