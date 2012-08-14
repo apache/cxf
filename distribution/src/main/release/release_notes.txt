@@ -1,4 +1,4 @@
-Apache CXF 2.6.1 Release Notes
+Apache CXF 2.6.2 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.1 fixes over 90 JIRA issues reported by users and the community.
+2.6.2 fixes over 85 JIRA issues reported by users and the community.
 
 
 
@@ -78,112 +78,99 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-3589] - Support SAML Web SSO profile
-
 ** Bug
-    * [CXF-2450] - WSDL2java uses system encoding when generating java classes
-    * [CXF-2937] - character encoding in cxf-codegen is wrong
-    * [CXF-4002] - Cannot override read-only parameter: classesDirectory in goal: cxf-codegen:wsdl2java
-    * [CXF-4118] - org.apache.cxf.tools.wadlto.jaxrs.JAXRSContainerTest.testResourceWithEPR breaks when run offline
-    * [CXF-4191] - RM broken in synchronous Mode
-    * [CXF-4240] - CXF WSN cannot run offline in Karaf
-    * [CXF-4243] - RequestImpl.selectVariant() using wrong headers
-    * [CXF-4244] - OutTransformWriter's defaultNamespace setting may not replace all default namespace declarations
-    * [CXF-4245] - JAX-RS databinding support for JiBX
-    * [CXF-4250] - WADL To Java Generator fails to process application level method elements 
-    * [CXF-4254] - NPE in OnlySignEntireHeadersAndBody policy validation when the STR Transform is used
-    * [CXF-4259] - JAX-RS Set-Cookie handler needs to ignore Expires property
-    * [CXF-4265] - Potential NPE when Soap fault has no role
-    * [CXF-4266] - Cannot add CXF Karaf Features due to typo in features.xml
-    * [CXF-4267] - A NPE in AttatchmentDataSource could be guarded.
-    * [CXF-4268] - WADL 2 Java doesn't respect catalogs
-    * [CXF-4269] - In some cases, the javascript client will not output the ns declaration for wrapper element of an rpc/lit method
-    * [CXF-4271] - net.sf.cglib import version range is wrong
-    * [CXF-4275] - Sample readme file incorrect
-    * [CXF-4277] - STSClient does not use returned KeyInfo size when creating a secret key
-    * [CXF-4278] - Karaf features.xml for CXF wants to load EhCache for cxf-sts-ws and cxf-ws-security
-    * [CXF-4279] - WS-Security ehcache things never shutdown
-    * [CXF-4280] - case insensitive MetadataMap keyset
-    * [CXF-4283] - OAuth 2-leg getAccessToken Error 
-    * [CXF-4284] - Fix JAXB-based providers to report 400 for all read-related exceptions
-    * [CXF-4285] - WADLGenerator ignores header or query parameters when FormParam parameters are available
-    * [CXF-4288] - SecureAnnotationsInterceptor maps roles only based on method name
-    * [CXF-4291] - Wadl2java tool executing by cxf-wadl2java-plugin fails if run without tuning JAVA Garbage Collection
-    * [CXF-4292] - Incorrect code generated with wadl2java tool when use JAXB binding and XML symple type with restriction.
-    * [CXF-4293] - Some WS-RM scenarios may not run when there is no internet connection available
-    * [CXF-4294] - Exception Cache ws-security.timestamp.cache.instance already exists or Cache ws-security.nonce.cache.instance already exists
-    * [CXF-4296] - Setting a namespaceMap on JSONProvider does not affect the way JAXB generates prefixes 
-    * [CXF-4297] - WS-RM destination should update ack-ranges in RMStore before sending out acks
-    * [CXF-4298] - MTOM-streaming regression: Worked 2.3.1, no longer works 2.6.0.
-    * [CXF-4300] - feature cxf-core does not install on karaf 3 snapshot
-    * [CXF-4302] - apache-cxf-2.6.0.zip distribution doesn't contain org.springframework.web-3.0.7.RELEASE.jar
-    * [CXF-4303] - WS-RM fails when the GZIP feature is enabled
-    * [CXF-4305] - FIQL only gives nullpointerexception. @Context SearchContext does not seem to work.
-    * [CXF-4306] - Mixing up FormParam and Multipart annotations cause exceptions when some parts contain the binary payload
-    * [CXF-4307] - The inbound Cookie header should be parsed using a semicolon separator by default
-    * [CXF-4309] - OAuth2 Access Token Service: returned ClientAccessToken is not JAXB compliant
-    * [CXF-4310] - WADLGenerator can not create QName when XMLRootElement has no name attribute and correctly manage schemas with empty namespaces
-    * [CXF-4312] - JAX-WS clients set executor to a "thread per async request" version
-    * [CXF-4313] - Hourly GC Caused by Framework - Unable to GC tune application if using framework.
-    * [CXF-4315] - CXF does not read decoupled destination parameters from a config file
-    * [CXF-4316] - Support EndorsingSupportingToken SignedElements with the Transport binding
-    * [CXF-4318] - OAuthRequestFilter generates an empty WWW-Authenticate header
-    * [CXF-4319] - Incoming cookies containing parameters with '$' can not be processed
-    * [CXF-4321] - NPE in MEXInInterceptor
-    * [CXF-4329] - Service using simple frontend with JAXB binding causes a ClassNotFoundException when started in Karaf
-    * [CXF-4331] - When using SpringBusFactory within OSGi, namespace handlers cannot be found
-    * [CXF-4334] - Schema validation does not validate elements in soap header
-    * [CXF-4336] - org.apache.cxf.bus.blueprint.ConfigurerImpl may get IllegalStateException: Execution container has not been set
-    * [CXF-4337] - A NullPointerException is thrown during token validation
-    * [CXF-4341] - AccessTokenService does not identify the authentication scheme
-    * [CXF-4342] - NullPointerException in CachedOutputStream
-    * [CXF-4349] - JAXRS frontend  should report the actual method request and response types to providers
+    * [CXF-3949] - NoClassDefFoundError when using CXF JAX-RS in OSGi environment
+    * [CXF-4054] - Unclear error messages given if client policy configuration can't be found.
+    * [CXF-4144] - CXF JAXRS | Complex response types are not present in the generated wadl when returning list of objects
+    * [CXF-4348] - Content-Type is broken in multipart serialization
+    * [CXF-4352] - SAML Web SSO processing error when receiving a signed Assertion
+    * [CXF-4353] - DigestAuth sends Proxy-Auth headers even when not requested
+    * [CXF-4354] - RMTxStore should explicitly close ResultSet objects
+    * [CXF-4356] - Temp file deleted before returning the stream in CachedOutputStream
+    * [CXF-4357] - NullPointerException in the TransportBindingHandler
+    * [CXF-4364] - Keep TokenStore and ReplayCache instances per-endpoint instead of per-bus
+    * [CXF-4365] - SAML SSO does not set Destination attribute when creating a signed AuthnRequest
+    * [CXF-4366] - If not use WS-SecPolicy, ehcache caches not cleaned up
+    * [CXF-4371] - HTTP OutputStreams block flush()
+    * [CXF-4373] - JAXB and XSLT providers should not end the documents on writers when used in non JAX-RS contexts
+    * [CXF-4374] - JSONProvider blocks namespace prefixes set in package-info.java
+    * [CXF-4376] - STS encryptIssuedToken with the SymmetricKey KeyType does not work
+    * [CXF-4379] - InjectionUtils failes to convert path-value to class annotated with XmlJavaTypeAdapter
+    * [CXF-4380] - JAXBElementProvider is calling wrong method for classes extending JAXBElement
+    * [CXF-4382] - fault message is not transmitted to decoupled faultTo endpoint if error occurs from a two way operation
+    * [CXF-4383] - Some temporary files are not deleted after WS-RM scenarios
+    * [CXF-4384] - ClaimsAttributeStatementProvider only supports principal in WSS header but not OnBehalfOf
+    * [CXF-4386] - Fix the apache-cxf feature issue
+    * [CXF-4387] - when I run a "webapp" of CXF in weblogic9.2, it has some errors.
+    * [CXF-4396] - UriInfo does not report correct base address for URI with port
+    * [CXF-4401] - XMLStreamDataReader does not close the original input stream when it is to be closed
+    * [CXF-4402] - remove http-whiteboard feature from cxf features.xml
+    * [CXF-4403] - When using a binding file, location information for errors is lost
+    * [CXF-4404] - atomicity violation bugs because of misusing concurrent collections
+    * [CXF-4405] - OneWay faultTo request is not correctly transmitted to the specified address 
+    * [CXF-4407] - Server.start() doesn't work after the Server.stop() is called when using Servlet transport
+    * [CXF-4408] - NPE in DOMUtils when soap header contains null namespace element
+    * [CXF-4409] - Proxy-based Client use Multipart getting NullPointerException
+    * [CXF-4410] - sp:EncryptSignature policy validation should only check to see if the primary signature is encrypted
+    * [CXF-4414] - SecurityPolicy validation fails when a KeyValue is used as an EndorsingSupportingToken
+    * [CXF-4417] - Async calls may be silently discarded
+    * [CXF-4425] - OAuth 1.0 timestamp and nonces are not validated and the validation can not be customized
+    * [CXF-4426] - Unable to Render JSON Content using CXF version 2.6.1 - XML content gets rendered properly
+    * [CXF-4427] - Error details are discarded and never sent to the client
+    * [CXF-4429] - Incorrect response check 
+    * [CXF-4432] - [OAuth1.0] oob callback is not supported
+    * [CXF-4433] - CrossOriginResourceSharingFilter ignores allowCredentials from annotation
+    * [CXF-4434] - SecurityConstants.TIMESTAMP_TTL property is not parsed
+    * [CXF-4435] - CounterRepository bean not registering to the bus in blueprint configuration
+    * [CXF-4436] - EncryptionProperties.keyWrapAlgorithm is not used when issuing a Symmetric HOK SAML Assertion
+    * [CXF-4437] - Stack Overflow exception in org.apache.cxf.endpoint.ClientImpl when logging set to FINE
+    * [CXF-4443] - MediaType handler is too strict when processing types without subtypes
+    * [CXF-4444] - Injecting object with @Resource with no specified name attribute is not working
+    * [CXF-4445] - CXFNonSpringJaxrsServlet and initialization jaxrs.providers
+    * [CXF-4447] - javascript client outputting invalid and wrong soapaction
+    * [CXF-4448] - DocLitBare with @XMLList generating invalid SOAP messages
+    * [CXF-4449] - XMLBinding generates different messages if code first or wsdl first
+    * [CXF-4450] - STSClient doesn't consider the wsam:Action when looking up Operations...
+    * [CXF-4452] - NullPointerException when trying to customize the package name for a service definition without customizing the class name.
+    * [CXF-4454] - JSSE KeyManagers and TrustManager XML configurations are ignored if they contain no keystore element.
+    * [CXF-4469] - 2.6.x rt-ws-security bundle is requiring opensaml
 
 ** Improvement
-    * [CXF-4145] - Add the ability to restrict what algorithms were used for encryption/signature
-    * [CXF-4146] - Add the ability to use the same Encryption/Signature algorithms as was received
-    * [CXF-4246] - replace asm:asm by a shaded jar
-    * [CXF-4248] - DocLiteralInInterceptor throws NPE if oneWay operation sends non-empty response
-    * [CXF-4249] - Add to RMTxStore configuration options for schema name and datasource
-    * [CXF-4252] - cxf:list-endpoints karaf command should also have a busid column
-    * [CXF-4256] - Improve the optional generation of enum classes by WADL generator
-    * [CXF-4257] - Should catch RejectedExecutionException in WS-Addr's rebaseReponse as done in OneWayProcessorInterceptor
-    * [CXF-4261] - Add maxRetries option to WS-RM's retry logic
-    * [CXF-4270] - Store bus-id with the endpoint name in WS-RM's RMTxStore to correctly recover two endpoints with the same endpoint name
-    * [CXF-4274] - Support useReqSigCert for encrypting the responses from JAX-RS endpoints 
-    * [CXF-4276] - Make WS-RM's default store instance RMTxStore to be shareable
-    * [CXF-4282] - Make additional properties of WS-RM's RMTxStore configurable using spring and blueprint namespace handlers
-    * [CXF-4287] - Modify -validate flag of wsdl2java to allow turning off all validation
-    * [CXF-4290] - Allow user-specified classloader for JAXRSClientFactory
-    * [CXF-4304] - Complete WSA support for STS client configuration via EPR
-    * [CXF-4308] - Add option for disabling STS client WS-MEX invocation using WSA EPR address
-    * [CXF-4311] - WADL to Java generator should try to create unique method names when no method ids are available
-    * [CXF-4314] - Introduce a search bean which can hold properties with different names
-    * [CXF-4320] - Add the ClaimsAttributeStatementProvider by default to the SAMLTokenProvider
-    * [CXF-4322] - Update RequestDispatcherProvider to do the basic discovery of view handlers based on the current class name
-    * [CXF-4323] - Should use documented Jetty continuation API
-    * [CXF-4326] - Remove the XPathFactory.newInstance from XPathUtils' constructor to improve the performance a bit
-    * [CXF-4327] - Add blueprint support on the cxf-clustering
-    * [CXF-4328] - Add spring schema for cxf clustering
-    * [CXF-4330] - Enforce that received IssuedTokens contain the required claims
-    * [CXF-4332] - Add an option to validate access tokens against remote OAuth2 AccessTokenServices
-    * [CXF-4338] - config option to allow suppression of server version display in http response headers
-    * [CXF-4343] - Remove static maps in AbstractResourceInfo
+    * [CXF-4152] - Make cxf-codegen-plugin m2e compatible
+    * [CXF-4221] - Support FIQL JPA Visitors
     * [CXF-4344] - Provide simplifications and shortcuts in CXF STS configuration
-    * [CXF-4345] - Allow user-specified feature for JAXRSClientFactory
-    * [CXF-4346] - Support to set the messageType from the jms URI
+    * [CXF-4350] - CXF JMS transport should support to JAXRS fontend client out of box
+    * [CXF-4358] - Support KeyValueTokens via the Transport binding
+    * [CXF-4361] - Add support for processing EncryptWith and SignWith parameters in a RST to the STS
+    * [CXF-4362] - Add a reconnect option in WS-RM RMTxStore
+    * [CXF-4363] - JMS transport uses the "clientReceiveTimeout" on server side
+    * [CXF-4370] - Support the ability to decrypt encrypted Assertions for SAML Web SSO
+    * [CXF-4390] - JAXRS Client runtime should be able to work with Local transport
+    * [CXF-4392] - Easier customization of log messages in Logging[In|Out]Interceptor
+    * [CXF-4394] - should add dependency='true' for spec bundles in cxf features.xml
+    * [CXF-4395] - ClaimsAttributeStatementProvider add claims for subject of onbehalf/actas 
+    * [CXF-4398] - Handling of 303 redirections 
+    * [CXF-4399] - Adding the instance.id to the ObjectName
+    * [CXF-4400] - AbstractHTTPServlet should be able to set custom redirect attributes and read specific static files
+    * [CXF-4413] - CXFNonSpringJAXRSServlet needs to support out fault interceptors and custom invokers
+    * [CXF-4415] - Update SearchContext to make it easy for users to do basic hierarchical queries
+    * [CXF-4418] - Add settings to control how the HTTPConduit handles async calls that overflow the workqueue.
+    * [CXF-4419] - Add support for OAuth2 Resource owner password credentials Grant type
+    * [CXF-4420] - CXF JAXWS MTOM should be able to extract Content-Disposition and setName accordingly for AttachmentDataSource
+    * [CXF-4423] - more flexibility in configuring httpconduit's tlsClientParameters in spring and blueprint
+    * [CXF-4438] - more flexibility in configuring tlsServerParameters in spring and blueprint
+    * [CXF-4453] - Make the CryptoCoverageChecker easier to use for common signature verification and decryption use-cases
 
 ** New Feature
-    * [CXF-3587] - SAML support for JAX-RS endpoints
-    * [CXF-4209] - Server side message redelivery support for WS-RM
+    * [CXF-4359] - ParameterizedType#getActualTypeArguments() classes not added to the JAXBContext for JAX-RS providers
 
 ** Task
-    * [CXF-4247] - Add cache for not found wrapper class to avoid trying load them for many times 
-    * [CXF-4340] - Modify Aries version to [0.3,2) at Import-Package
+    * [CXF-3562] - Remove HttpURLConnection references from CXF JAX-RS client code
+    * [CXF-4381] - Add optional DOM4J provider
+    * [CXF-4389] - Move FiqlParser to its own package
+    * [CXF-4430] - Make SpnegoAuthSupplier functionality reusable, add the server side filter
 
-** Test
-    * [CXF-4126] - Can override built-in action  on WSS4JOutInterceptor but seems impossible to add a new custom action on WSS4JOutInterceptor 
-    * [CXF-4335] - WSSecTest  use some unecessary properties for WSS4JInterceptor configuration
+** Wish
+    * [CXF-4428] - [OAuth1.0] allow to set response codes when throwing exception from OAuthDataProvider implementation.
 
 
