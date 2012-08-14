@@ -44,7 +44,7 @@ import org.springframework.context.support.AbstractApplicationContext;
  * 
  */
 public class SpringBus extends ExtensionManagerBus 
-    implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
+    implements ApplicationContextAware {
 
     AbstractApplicationContext ctx;
     boolean closeContext;
@@ -75,11 +75,17 @@ public class SpringBus extends ExtensionManagerBus
     /** {@inheritDoc}*/
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         ctx = (AbstractApplicationContext)applicationContext;
-        ctx.addApplicationListener(this);
+        @SuppressWarnings("rawtypes")
+        ApplicationListener listener = new ApplicationListener() {
+            public void onApplicationEvent(ApplicationEvent event) {
+                SpringBus.this.onApplicationEvent(event);
+            }
+        };
+        ctx.addApplicationListener(listener);
         ApplicationContext ac = applicationContext.getParent();
         while (ac != null) {
             if (ac instanceof AbstractApplicationContext) {
-                ((AbstractApplicationContext)ac).addApplicationListener(this);
+                ((AbstractApplicationContext)ac).addApplicationListener(listener);
             }
             ac = ac.getParent();
         }
