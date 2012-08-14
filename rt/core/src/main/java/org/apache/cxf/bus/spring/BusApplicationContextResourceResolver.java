@@ -71,7 +71,7 @@ public class BusApplicationContextResourceResolver
             if (resourceName == null) {
                 resource = resourceType.cast(context.getBean(resourceType));
             } else {
-                resource = resourceType.cast(resourceType.cast(context.getBean(resourceName, resourceType)));
+                resource = resourceType.cast(context.getBean(resourceName, resourceType));
             }
             return resource;
         } catch (NoSuchBeanDefinitionException def) {
