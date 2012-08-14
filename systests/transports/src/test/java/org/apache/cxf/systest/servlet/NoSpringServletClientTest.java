@@ -20,6 +20,7 @@ package org.apache.cxf.systest.servlet;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,7 +110,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
     
     private void stopServer() {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
-        List<Server> servers = reg.getServers();
+        List<Server> servers = new ArrayList<Server>(reg.getServers());
         for (Server serv : servers) {
             serv.stop();
         }
@@ -117,7 +118,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
     
     private void startServer() {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
-        List<Server> servers = reg.getServers();
+        List<Server> servers = new ArrayList<Server>(reg.getServers());
         for (Server serv : servers) {
             serv.start();
         }
