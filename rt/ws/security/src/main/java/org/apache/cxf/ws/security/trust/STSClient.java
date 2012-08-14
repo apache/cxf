@@ -580,6 +580,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         //operation is not correct as the Action is not set correctly.   Let's see if
         //we can at least find it by name and then set the action and such manually later.
         for (BindingOperationInfo boi : bi.getOperations()) {
+            if (suffix.endsWith(boi.getName().getLocalPart())) {
+                return boi;
+            }
+        }        
+        //Still didn't find anything useful
+        for (BindingOperationInfo boi : bi.getOperations()) {
             if (boi.getInput().getMessageInfo().getMessageParts().size() > 0) {
                 MessagePartInfo mpi = boi.getInput().getMessageInfo().getMessagePart(0);
                 if ("RequestSecurityToken".equals(mpi.getConcreteName().getLocalPart())) {
