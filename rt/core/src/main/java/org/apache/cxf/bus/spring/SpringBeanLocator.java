@@ -101,19 +101,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         }
     }
     
-    public <T> T getBeanOfType(String name, Class<T> type) {
-        T t = null;
-        try {
-            t = type.cast(context.getBean(name, type));
-        } catch (NoSuchBeanDefinitionException nsbde) {
-            //ignore
-        }
-        if (t == null) {
-            t = orig.getBeanOfType(name, type);
-        }
-        return t;
-    }
-    
+
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
         Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
