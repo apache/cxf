@@ -105,7 +105,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     public <T> T getBeanOfType(String name, Class<T> type) {
         T t = null;
         try {
-            t = context.getBean(name, type);
+            t = type.cast(context.getBean(name, type));
         } catch (NoSuchBeanDefinitionException nsbde) {
             //ignore
         }
@@ -133,7 +133,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         s.removeAll(passThroughs);
         List<T> lst = new LinkedList<T>();
         for (String n : s) {
-            lst.add(context.getBean(n, type));
+            lst.add(type.cast(context.getBean(n, type)));
         }
         lst.addAll(orig.getBeansOfType(type));
         if (lst.isEmpty()) {

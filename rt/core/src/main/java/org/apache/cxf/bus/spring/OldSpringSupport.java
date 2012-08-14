@@ -30,6 +30,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * 
  */
+@SuppressWarnings("rawtypes")
 public final class OldSpringSupport implements FactoryBean, BeanNameAware {
     public static final Logger LOG = LogUtils.getL7dLogger(OldSpringSupport.class);
     Bus bus;
