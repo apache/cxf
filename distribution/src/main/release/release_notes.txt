@@ -1,4 +1,4 @@
-Apache CXF 2.4.8 Release Notes
+Apache CXF 2.4.9 Release Notes
 
 1. Overview
 
@@ -43,7 +43,7 @@ have created your own Policy objects or builders.   Additionally, XmlSchema was 
 so any custom Aegis types may need to be updated.
 
 
-2.4.8 fixes over 42 JIRA issues reported by users and the community.
+2.4.9 fixes over 41 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -88,54 +88,48 @@ for caveats when upgrading from CXF 2.3.x to 2.4.x.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-4238] - Spring JAXRSClientFactoryBeanDefinitionParser reports a wrong factory bean class
-    * [CXF-4243] - RequestImpl.selectVariant() using wrong headers
-    * [CXF-4254] - NPE in OnlySignEntireHeadersAndBody policy validation when the STR Transform is used
-    * [CXF-4259] - JAX-RS Set-Cookie handler needs to ignore Expires property
-    * [CXF-4265] - Potential NPE when Soap fault has no role
-    * [CXF-4267] - A NPE in AttatchmentDataSource could be guarded.
-    * [CXF-4268] - WADL 2 Java doesn't respect catalogs
-    * [CXF-4269] - In some cases, the javascript client will not output the ns declaration for wrapper element of an rpc/lit method
-    * [CXF-4275] - Sample readme file incorrect
-    * [CXF-4277] - STSClient does not use returned KeyInfo size when creating a secret key
-    * [CXF-4279] - WS-Security ehcache things never shutdown
-    * [CXF-4280] - case insensitive MetadataMap keyset
-    * [CXF-4284] - Fix JAXB-based providers to report 400 for all read-related exceptions
-    * [CXF-4285] - WADLGenerator ignores header or query parameters when FormParam parameters are available
-    * [CXF-4288] - SecureAnnotationsInterceptor maps roles only based on method name
-    * [CXF-4294] - Exception Cache ws-security.timestamp.cache.instance already exists or Cache ws-security.nonce.cache.instance already exists
-    * [CXF-4297] - WS-RM destination should update ack-ranges in RMStore before sending out acks
-    * [CXF-4305] - FIQL only gives nullpointerexception. @Context SearchContext does not seem to work.
-    * [CXF-4306] - Mixing up FormParam and Multipart annotations cause exceptions when some parts contain the binary payload
-    * [CXF-4307] - The inbound Cookie header should be parsed using a semicolon separator by default
-    * [CXF-4310] - WADLGenerator can not create QName when XMLRootElement has no name attribute and correctly manage schemas with empty namespaces
-    * [CXF-4312] - JAX-WS clients set executor to a "thread per async request" version
-    * [CXF-4313] - Hourly GC Caused by Framework - Unable to GC tune application if using framework.
-    * [CXF-4315] - CXF does not read decoupled destination parameters from a config file
-    * [CXF-4316] - Support EndorsingSupportingToken SignedElements with the Transport binding
-    * [CXF-4319] - Incoming cookies containing parameters with '$' can not be processed
-    * [CXF-4334] - Schema validation does not validate elements in soap header
-    * [CXF-4336] - org.apache.cxf.bus.blueprint.ConfigurerImpl may get IllegalStateException: Execution container has not been set
-    * [CXF-4342] - NullPointerException in CachedOutputStream
-    * [CXF-4349] - JAXRS frontend  should report the actual method request and response types to providers
+    * [CXF-3949] - NoClassDefFoundError when using CXF JAX-RS in OSGi environment
+    * [CXF-4354] - RMTxStore should explicitly close ResultSet objects
+    * [CXF-4356] - Temp file deleted before returning the stream in CachedOutputStream
+    * [CXF-4357] - NullPointerException in the TransportBindingHandler
+    * [CXF-4364] - Keep TokenStore and ReplayCache instances per-endpoint instead of per-bus
+    * [CXF-4366] - If not use WS-SecPolicy, ehcache caches not cleaned up
+    * [CXF-4379] - InjectionUtils failes to convert path-value to class annotated with XmlJavaTypeAdapter
+    * [CXF-4380] - JAXBElementProvider is calling wrong method for classes extending JAXBElement
+    * [CXF-4383] - Some temporary files are not deleted after WS-RM scenarios
+    * [CXF-4387] - when I run a "webapp" of CXF in weblogic9.2, it has some errors.
+    * [CXF-4396] - UriInfo does not report correct base address for URI with port
+    * [CXF-4401] - XMLStreamDataReader does not close the original input stream when it is to be closed
+    * [CXF-4402] - remove http-whiteboard feature from cxf features.xml
+    * [CXF-4407] - Server.start() doesn't work after the Server.stop() is called when using Servlet transport
+    * [CXF-4408] - NPE in DOMUtils when soap header contains null namespace element
+    * [CXF-4409] - Proxy-based Client use Multipart getting NullPointerException
+    * [CXF-4410] - sp:EncryptSignature policy validation should only check to see if the primary signature is encrypted
+    * [CXF-4414] - SecurityPolicy validation fails when a KeyValue is used as an EndorsingSupportingToken
+    * [CXF-4417] - Async calls may be silently discarded
+    * [CXF-4426] - Unable to Render JSON Content using CXF version 2.6.1 - XML content gets rendered properly
+    * [CXF-4434] - SecurityConstants.TIMESTAMP_TTL property is not parsed
+    * [CXF-4435] - CounterRepository bean not registering to the bus in blueprint configuration
+    * [CXF-4437] - Stack Overflow exception in org.apache.cxf.endpoint.ClientImpl when logging set to FINE
+    * [CXF-4443] - MediaType handler is too strict when processing types without subtypes
+    * [CXF-4445] - CXFNonSpringJaxrsServlet and initialization jaxrs.providers
+    * [CXF-4447] - javascript client outputting invalid and wrong soapaction
+    * [CXF-4448] - DocLitBare with @XMLList generating invalid SOAP messages
+    * [CXF-4449] - XMLBinding generates different messages if code first or wsdl first
+    * [CXF-4450] - STSClient doesn't consider the wsam:Action when looking up Operations...
+    * [CXF-4452] - NullPointerException when trying to customize the package name for a service definition without customizing the class name.
+    * [CXF-4454] - JSSE KeyManagers and TrustManager XML configurations are ignored if they contain no keystore element.
+    * [CXF-4468] - Port the fix for faultTo request is not correctly transmitted to the specified address
 
 ** Improvement
-    * [CXF-4248] - DocLiteralInInterceptor throws NPE if oneWay operation sends non-empty response
-    * [CXF-4257] - Should catch RejectedExecutionException in WS-Addr's rebaseReponse as done in OneWayProcessorInterceptor
-    * [CXF-4314] - Introduce a search bean which can hold properties with different names
-    * [CXF-4322] - Update RequestDispatcherProvider to do the basic discovery of view handlers based on the current class name
-    * [CXF-4326] - Remove the XPathFactory.newInstance from XPathUtils' constructor to improve the performance a bit
-    * [CXF-4327] - Add blueprint support on the cxf-clustering
-    * [CXF-4328] - Add spring schema for cxf clustering
-    * [CXF-4338] - config option to allow suppression of server version display in http response headers
-    * [CXF-4345] - Allow user-specified feature for JAXRSClientFactory
-    * [CXF-4346] - Support to set the messageType from the jms URI
+    * [CXF-4358] - Support KeyValueTokens via the Transport binding
+    * [CXF-4363] - JMS transport uses the "clientReceiveTimeout" on server side
+    * [CXF-4394] - should add dependency='true' for spec bundles in cxf features.xml
+    * [CXF-4398] - Handling of 303 redirections 
+    * [CXF-4413] - CXFNonSpringJAXRSServlet needs to support out fault interceptors and custom invokers
+    * [CXF-4418] - Add settings to control how the HTTPConduit handles async calls that overflow the workqueue.
+    * [CXF-4420] - CXF JAXWS MTOM should be able to extract Content-Disposition and setName accordingly for AttachmentDataSource
+    * [CXF-4453] - Make the CryptoCoverageChecker easier to use for common signature verification and decryption use-cases
 
 ** Task
-    * [CXF-4247] - Add cache for not found wrapper class to avoid trying load them for many times 
-
-** Test
-    * [CXF-4126] - Can override built-in action  on WSS4JOutInterceptor but seems impossible to add a new custom action on WSS4JOutInterceptor 
-    * [CXF-4335] - WSSecTest  use some unecessary properties for WSS4JInterceptor configuration
-
-
+    * [CXF-4439] - Update to Jettison 1.3.2
