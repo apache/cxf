@@ -178,7 +178,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
                 new BusWiringBeanFactoryPostProcessor(b).postProcessBeanFactory(cctx.getBeanFactory());
             }
         }
-        return ctx.getBean(Bus.DEFAULT_BUS_ID, Bus.class);
+        return Bus.class.cast(ctx.getBean(Bus.DEFAULT_BUS_ID, Bus.class));
     }
     public static Bus addBus(ApplicationContext ctx, String name) {
         return getBusForName(name, ctx);
