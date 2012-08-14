@@ -39,6 +39,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 
 public class SoapActionInInterceptor extends AbstractSoapInterceptor {
     
@@ -104,7 +105,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             getAndSetOperation(message, action);
         }
     }
-
+    
     private void getAndSetOperation(SoapMessage message, String action) {
         if (StringUtils.isEmpty(action)) {
             return;
@@ -123,6 +124,17 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
                 if (soi != null && action.equals(soi.getAction())) {
                     if (bindingOp != null) {
+                        //more than one op with the same action, will need to parse normally
+                        return;
+                    }
+                    bindingOp = boi;
+                }
+                Object o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME);
+                if (o == null) {
+                    o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME);
+                }
+                if (o != null && action.equals(o.toString())) {
+                    if (bindingOp != null && bindingOp != boi) {
                         //more than one op with the same action, will need to parse normally
                         return;
                     }
@@ -161,6 +173,15 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             if (soi == null || action.equals(soi.getAction())) {
                 return;
             }
+
+            Object o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME);
+            if (o == null) {
+                o = boi.getOperationInfo().getInput().getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME);
+            }
+            if (o != null && action.equals(o.toString())) {
+                return;
+            }
+            
             throw new Fault("SOAP_ACTION_MISMATCH", LOG, null, action);
         }
     }
