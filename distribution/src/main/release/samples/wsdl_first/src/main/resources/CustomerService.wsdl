@@ -120,7 +120,7 @@
       <!-- embedded deployment -->
       <soap:address location="http://localhost:9090/CustomerServicePort"/>
       <!-- standalone Tomcat deployment -->
-      <!--soap:address location="http://localhost:8080/wsdl_first-<cxf-version>/services/CustomerServicePort"/-->
+      <!--soap:address location="http://localhost:8080/wsdl_first/services/CustomerServicePort"/-->
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>
