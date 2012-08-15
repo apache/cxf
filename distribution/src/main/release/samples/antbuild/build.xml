@@ -172,7 +172,7 @@
     <!-- Sample macrodef for running an application that would include the requirements that CXF needs
         It sets up the classpath and the endorsed dirs and add the logging properties and such --> 
     <macrodef name="cxfrun">
-        <attribute name="logging-properties-file" default="${cxf.etc.dir}/logging.properties"/>
+        <attribute name="logging-properties-file" default="${basedir}/logging.properties"/>
         <attribute name="classname"/>
         <attribute name="param1" default=""/>
         <attribute name="param2" default=""/>
