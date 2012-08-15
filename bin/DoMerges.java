@@ -522,7 +522,8 @@ public class DoMerges {
                 blocked.addRange(new Range(s.ver));
             }
             System.out.println("Blocking " + ver);
-            File logF = getLogFile("Blocking", ver.toString(), blocks);
+            //File logF = getLogFile("Blocking", ver.toString(), blocks);
+            File logF = getLogFile("Blocking", ver.toString(), new ArrayList<VerLog>());
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "propset",
                                                                        "svnmerge-blocked",
                                                                        blocked.toProperty(),
