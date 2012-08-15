@@ -21,13 +21,9 @@ files, run "mvn clean".
 
 Alternative: WAR deployment of service in a servlet container (e.g. Tomcat)
 ---------------------------------------------------------------------------
-
 1.) Update the endpointAddress value in the client.Client class to the WAR-hosted 
-value. The endpointAddress value will be installation-specific, but could be 
-"http://localhost:8080/java_first_jaxws-{CXF Version}/services/hello_world" 
-for a default local installation of Tomcat.  Replace {CXF Version} with the
-CXF version declared in the parent POM -- for example, "2.6.1", "2.6.1-SNAPSHOT", 
-etc.
+value, for running this sample on your local machine most likely:
+"http://localhost:8080/java_first_jaxws/services/hello_world".
 
 2.) Manually copy the generated WAR file to the Tomcat webapps folder, or, if you
 have Maven and Tomcat set up to use the Tomcat Maven Plugin 
@@ -38,4 +34,5 @@ switching to the the Tomcat 6-specific "url" element.
 
 Prior to running the client (mvn -Pclient) good to confirm the generated WSDL 
 can be seen from a web browser at: 
-http://{server}:{port}/java_first_jaxws-{CXF Version}/services/hello_world?wsdl
+http://localhost:8080/java_first_jaxws/services/hello_world?wsdl
+

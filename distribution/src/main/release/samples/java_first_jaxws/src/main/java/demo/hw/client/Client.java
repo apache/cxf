@@ -45,7 +45,7 @@ public final class Client {
         // Endpoint Address
         String endpointAddress = "http://localhost:9000/helloWorld";
         // If web service deployed on Tomcat deployment, endpoint should be changed to:
-        // http://localhost:8080/java_first_jaxws-<cxf-version>/services/hello_world
+        // String endpointAddress = "http://localhost:8080/java_first_jaxws/services/hello_world";
 
         // Add a port to the Service
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
