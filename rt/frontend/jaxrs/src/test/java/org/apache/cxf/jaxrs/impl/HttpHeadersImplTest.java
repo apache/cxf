@@ -161,7 +161,7 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
-    public void testGetMissingContentLegth() throws Exception {
+    public void testGetMissingContentLength() throws Exception {
         
         Message m = new MessageImpl();
         m.put(Message.PROTOCOL_HEADERS, new MetadataMap<String, String>());
@@ -170,7 +170,7 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
-    public void testGetContentLegth() throws Exception {
+    public void testGetContentLength() throws Exception {
         
         Message m = new MessageImpl();
         m.put(Message.PROTOCOL_HEADERS, createHeaders());

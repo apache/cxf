@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -126,7 +125,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
-        return values.size() == 0 ? null : createLocale(values.get(0).trim());
+        return values.size() == 0 ? null : HttpUtils.getLocale(values.get(0).trim());
     }
 
     public MediaType getMediaType() {
@@ -150,7 +149,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         for (String l : ls) {
             String[] pair = l.split(";");
             
-            Locale locale = createLocale(pair[0].trim());
+            Locale locale = HttpUtils.getLocale(pair[0].trim());
             
             newLs.add(locale);
             if (pair.length > 1) {
@@ -251,19 +250,6 @@ public class HttpHeadersImpl implements HttpHeaders {
         }
     }
     
-    private Locale createLocale(String value) {
-        String[] values = value.split("-");
-        if (values.length == 0 || values.length > 2) {
-            throw new IllegalArgumentException("Illegal locale value : " + value);
-        }
-        if (values.length == 1) {
-            return new Locale(values[0]);
-        } else {
-            return new Locale(values[0], values[1]);
-        }
-        
-    }
-    
     private void sortMediaTypesUsingQualityFactor(List<MediaType> types) {
         if (types.size() > 1) {
             Collections.sort(types, new Comparator<MediaType>() {
@@ -281,11 +267,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (values == null || StringUtils.isEmpty(values.get(0))) {
             return null;
         }
-        try {
-            return HttpUtils.getHttpDateFormat().parse(values.get(0));
-        } catch (ParseException ex) {
-            return null;
-        }
+        return HttpUtils.getHttpDate(values.get(0));
     }
 
     public String getHeaderString(String headerName) {
@@ -313,12 +295,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (values == null || values.size() != 1) {
             return -1;
         }
-        try {
-            int len = Integer.valueOf(values.get(0));
-            return len >= 0 ? len : -1;
-        } catch (Exception ex) {
-            return -1;
-        }
+        return HttpUtils.getContentLength(values.get(0));
     }
     
 }

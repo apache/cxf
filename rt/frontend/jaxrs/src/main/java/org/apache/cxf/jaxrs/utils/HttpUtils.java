@@ -23,7 +23,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -178,6 +180,46 @@ public final class HttpUtils {
         TimeZone tZone = TimeZone.getTimeZone("GMT");
         dateFormat.setTimeZone(tZone);
         return dateFormat;
+    }
+    
+    public static Date getHttpDate(String value) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return HttpUtils.getHttpDateFormat().parse(value);
+        } catch (ParseException ex) {
+            return null;
+        }
+    }
+    
+    public static Locale getLocale(String value) {
+        if (value == null) {
+            return null;
+        }
+        
+        String[] values = value.split("-");
+        if (values.length == 0 || values.length > 2) {
+            throw new IllegalArgumentException("Illegal locale value : " + value);
+        }
+        if (values.length == 1) {
+            return new Locale(values[0]);
+        } else {
+            return new Locale(values[0], values[1]);
+        }
+        
+    }
+    
+    public static int getContentLength(String value) {
+        if (value == null) {
+            return -1;
+        }
+        try {
+            int len = Integer.valueOf(value);
+            return len >= 0 ? len : -1;
+        } catch (Exception ex) {
+            return -1;
+        }
     }
     
     public static boolean isDateRelatedHeader(String headerName) {
