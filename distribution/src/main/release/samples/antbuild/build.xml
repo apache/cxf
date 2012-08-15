@@ -97,7 +97,7 @@
                     <path refid="cxf.classpath" />
                 </classpath>
                 <jvmarg value="${cxf.endorsed.flag}"/>
-                <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
+                <sysproperty key="java.util.logging.config.file" value="${basedir}/logging.properties"/>
                 <sysproperty key="exitOnFinish" value="true"/>
                 <arg line="@{servicename.arg}"/>
                 <arg line="${package.arg.@{file}}"/>
