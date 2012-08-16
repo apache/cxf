@@ -47,6 +47,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -841,7 +842,9 @@ public class WebClient extends AbstractClient {
             rb.entity(entity instanceof Response 
                       ? ((Response)entity).getEntity() : entity);
             
-            return rb.build();
+            Response r = rb.build();
+            ((ResponseImpl)r).setMessage(outMessage);
+            return r;
         } catch (Throwable ex) {
             throw (ex instanceof ClientWebApplicationException) ? (ClientWebApplicationException)ex
                                                               : new ClientWebApplicationException(ex);

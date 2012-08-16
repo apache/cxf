@@ -54,6 +54,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -567,6 +568,8 @@ public class ClientProxyImpl extends AbstractClient implements
         throws Throwable {
         try {
             Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
+            ((ResponseImpl)r).setMessage(outMessage);
+            
             Method method = outMessage.getExchange().get(Method.class);
             checkResponse(method, r, outMessage);
             if (method.getReturnType() == Void.class) { 

@@ -968,7 +968,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBookFromResponseWithProxy() throws Exception {
+    public void testGetBookFromResponseWithProxyAndReader() throws Exception {
         ResponseReader reader = new ResponseReader();
         reader.setEntityClass(Book.class);
         
@@ -982,7 +982,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBookFromResponseWithWebClient() throws Exception {
+    public void testGetBookFromResponseWithProxy() throws Exception {
+        BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, 
+                                                 BookStore.class);
+        Response r = bs.getGenericResponseBook("123");
+        assertEquals(200, r.getStatus());
+        Book book = r.readEntity(Book.class);
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testGetBookFromResponseWithWebClientAndReader() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/genericresponse/123";
         WebClient wc = WebClient.create(address, 
                                         Collections.singletonList(
@@ -990,6 +1000,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Response r = wc.accept("application/xml").get();
         assertEquals(200, r.getStatus());
         Book book = (Book)r.getEntity();
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testGetBookFromResponseWithWebClient() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/genericresponse/123";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.accept("application/xml").get();
+        assertEquals(200, r.getStatus());
+        Book book = r.readEntity(Book.class);
         assertEquals(123L, book.getId());
     }
     

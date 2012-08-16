@@ -19,10 +19,10 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,15 +45,21 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.message.Message;
 
 public final class ResponseImpl extends Response {
     private final int status;
     private Object entity;
     private MultivaluedMap<String, Object> metadata;
+    
+    private Message responseMessage;
     private boolean entityClosed;    
+    private boolean entityBufferred;
     
     ResponseImpl(int s) {
         this.status = s;
@@ -63,11 +69,19 @@ public final class ResponseImpl extends Response {
         this.status = s;
         this.entity = e;
     }
-
+    
     void addMetadata(MultivaluedMap<String, Object> meta) { 
         this.metadata = meta;
     }
 
+    //TODO: This method is needed because on the client side the
+    // Response processing is done after the chain completes, thus
+    // PhaseInterceptorChain.getCurrentMessage() returns null.
+    // The refactoring will be required
+    public void setMessage(Message message) {
+        this.responseMessage = message;
+    }
+    
     public int getStatus() {
         return status;
     }
@@ -224,42 +238,74 @@ public final class ResponseImpl extends Response {
     }
 
     public <T> T readEntity(Class<T> cls) throws MessageProcessingException, IllegalStateException {
-        checkEntityIsAvailable();
-        return null;
+        return readEntity(cls, new Annotation[]{});
     }
 
     public <T> T readEntity(GenericType<T> genType) throws MessageProcessingException, IllegalStateException {
-        checkEntityIsAvailable();
-        return null;
+        return readEntity(genType, new Annotation[]{});
     }
 
     public <T> T readEntity(Class<T> cls, Annotation[] anns) throws MessageProcessingException,
         IllegalStateException {
-        checkEntityIsAvailable();
-        return null;
+        
+        return doReadEntity(cls, cls, anns);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T readEntity(GenericType<T> genType, Annotation[] anns) throws MessageProcessingException,
         IllegalStateException {
-        checkEntityIsAvailable();
-        return null;
+        return doReadEntity((Class<T>)genType.getRawType(), 
+                            genType.getType(), anns);
     }
     
-    public boolean bufferEntity() throws MessageProcessingException {
-        if (entity instanceof InputStream) {
-            if (entity instanceof ByteArrayInputStream) {
-                return false;
-            } else {
+    public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns) throws MessageProcessingException,
+        IllegalStateException {
+        
+        checkEntityIsAvailable();
+        
+        if (cls.isAssignableFrom(entity.getClass())) {
+            T response = cls.cast(entity);
+            closeIfNotBufferred(cls);
+            return response;
+        }
+        
+        if (responseMessage != null && entity instanceof InputStream) {
+            MediaType mediaType = getMediaType();
+            MessageBodyReader<T> mbr 
+                = ProviderFactory.getInstance(responseMessage).createMessageBodyReader(
+                    cls, t, anns, mediaType, responseMessage);
+            if (mbr != null) {
                 try {
-                    InputStream oldEntity = (InputStream)entity;
-                    entity = IOUtils.loadIntoBAIS(oldEntity);
-                    return true;
-                } catch (IOException ex) {
+                    T response = mbr.readFrom(cls, t, anns, mediaType, getStringHeaders(), 
+                                        InputStream.class.cast(entity));
+                    closeIfNotBufferred(cls);
+                    return response;
+                } catch (Exception ex) {
                     throw new MessageProcessingException(ex);
                 }
             }
         }
-        return false;
+        
+        throw new MessageProcessingException("No Message Body reader is available");
+    }
+    
+    private void closeIfNotBufferred(Class<?> responseCls) {
+        if (!entityBufferred && !InputStream.class.isAssignableFrom(responseCls)) {
+            close();
+        }
+    }
+    
+    public boolean bufferEntity() throws MessageProcessingException {
+        if (!entityBufferred && entity instanceof InputStream) {
+            try {
+                InputStream oldEntity = (InputStream)entity;
+                entity = IOUtils.loadIntoBAIS(oldEntity);
+                entityBufferred = true;
+            } catch (IOException ex) {
+                throw new MessageProcessingException(ex);
+            }
+        }
+        return entityBufferred;
     }
 
     public void close() throws MessageProcessingException {
@@ -275,9 +321,9 @@ public final class ResponseImpl extends Response {
         
     }
     
-    private void checkEntityIsAvailable() throws MessageProcessingException {
-        if (entity == null) {
-            throw new MessageProcessingException("Entity is not available");
+    private void checkEntityIsAvailable() {
+        if (entityClosed) {
+            throw new IllegalStateException("Entity is not available");
         }
     }
 }
