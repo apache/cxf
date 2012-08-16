@@ -156,6 +156,19 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
                         }
                     }
                 }
+            } else if (obj instanceof JAXBElement) {
+                JAXBElement<?> el = (JAXBElement<?>)obj;
+                if (namespaceURI.equals(el.getName().getNamespaceURI())) {
+                    if (namespaceURI.endsWith("addressing")) {
+                        currentNamespaceURI = namespaceURI;
+                        wsaHeaders.add(el.getName().getLocalPart());
+                    } else if (MAPTestBase.CUSTOMER_NAME.getNamespaceURI().equals(namespaceURI)) {
+                        String headerText = (String)el.getValue();
+                        if (MAPTestBase.CUSTOMER_KEY.equals(headerText)) {
+                            wsaHeaders.add(el.getName().getLocalPart());
+                        }
+                    }
+                }
             }
             
         }

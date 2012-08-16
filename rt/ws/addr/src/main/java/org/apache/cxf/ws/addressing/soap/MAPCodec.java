@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -42,6 +41,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -52,6 +52,7 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -202,60 +203,51 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 List<Header> header = message.getHeaders();
                 discardMAPs(header, maps);
 
-                Element hdr = getHeaderFactory().getHeader(message.getVersion());                
                 JAXBContext jaxbContext = 
                     VersionTransformer.getExposedJAXBContext(
                                                      maps.getNamespaceURI());
-                Marshaller marshaller = jaxbContext.createMarshaller();
                 QName duplicate = maps.getDuplicate();
-                marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
                 encodeAsExposed(maps,
                                 message,
                                 maps.getAction(), 
                                 Names.WSA_ACTION_QNAME,
                                 AttributedURIType.class, 
-                                hdr, 
-                                marshaller);
+                                jaxbContext);
                 if (Names.WSA_ACTION_QNAME.equals(duplicate)) {
                     encodeAsExposed(maps,
                                     message,
                                     maps.getAction(), 
                                     Names.WSA_ACTION_QNAME,
                                     AttributedURIType.class, 
-                                    hdr, 
-                                    marshaller);
+                                    jaxbContext);
                 }
                 encodeAsExposed(maps,
                                 message,
                                 maps.getMessageID(), 
                                 Names.WSA_MESSAGEID_QNAME,
                                 AttributedURIType.class, 
-                                hdr, 
-                                marshaller);
+                                jaxbContext);
                 if (Names.WSA_MESSAGEID_QNAME.equals(duplicate)) {
                     encodeAsExposed(maps,
                                     message,
                                     maps.getMessageID(), 
                                     Names.WSA_MESSAGEID_QNAME,
                                     AttributedURIType.class, 
-                                    hdr, 
-                                    marshaller);
+                                    jaxbContext);
                 }
                 encodeAsExposed(maps,
                                 message,
                                 maps.getTo(), 
                                 Names.WSA_TO_QNAME,
                                 AttributedURIType.class,  
-                                hdr, 
-                                marshaller);
+                                jaxbContext);
                 if (Names.WSA_TO_QNAME.equals(duplicate)) {
                     encodeAsExposed(maps,
                                     message,
                                     maps.getTo(), 
                                     Names.WSA_TO_QNAME,
                                     AttributedURIType.class,  
-                                    hdr, 
-                                    marshaller);
+                                    jaxbContext);
                 }
                 if (needsReplyTo(maps)) {
                     encodeAsExposed(maps,
@@ -263,16 +255,14 @@ public class MAPCodec extends AbstractSoapInterceptor {
                             maps.getReplyTo(), 
                             Names.WSA_REPLYTO_QNAME, 
                             EndpointReferenceType.class,
-                            hdr,
-                            marshaller);
+                            jaxbContext);
                     if (Names.WSA_REPLYTO_QNAME.equals(duplicate)) {
                         encodeAsExposed(maps,
                                         message,
                                         maps.getReplyTo(), 
                                         Names.WSA_REPLYTO_QNAME, 
                                         EndpointReferenceType.class,
-                                        hdr,
-                                        marshaller);
+                                        jaxbContext);
                     }
                 }
 
@@ -281,32 +271,28 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                 maps.getRelatesTo(),
                                 Names.WSA_RELATESTO_QNAME,
                                 RelatesToType.class,
-                                hdr,
-                                marshaller);
+                                jaxbContext);
                 if (Names.WSA_RELATESTO_QNAME.equals(duplicate)) {
                     encodeAsExposed(maps,
                                     message,
                                     maps.getRelatesTo(),
                                     Names.WSA_RELATESTO_QNAME,
                                     RelatesToType.class,
-                                    hdr,
-                                    marshaller);
+                                    jaxbContext);
                 }
                 encodeAsExposed(maps,
                                 message,
                                 maps.getFrom(), 
                                 Names.WSA_FROM_QNAME,
                                 EndpointReferenceType.class,  
-                                hdr, 
-                                marshaller);
+                                jaxbContext);
                 if (Names.WSA_FROM_QNAME.equals(duplicate)) {
                     encodeAsExposed(maps,
                                     message,
                                     maps.getFrom(), 
                                     Names.WSA_FROM_QNAME,
                                     EndpointReferenceType.class,  
-                                    hdr, 
-                                    marshaller);
+                                    jaxbContext);
                 }
                 if (needsFaultTo(maps)) {
                     encodeAsExposed(maps,
@@ -314,30 +300,18 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     maps.getFaultTo(), 
                                     Names.WSA_FAULTTO_QNAME, 
                                     EndpointReferenceType.class,
-                                    hdr,
-                                    marshaller);
+                                    jaxbContext);
                     if (Names.WSA_FAULTTO_QNAME.equals(duplicate)) {
                         encodeAsExposed(maps,
                                         message,
                                         maps.getFaultTo(), 
                                         Names.WSA_FAULTTO_QNAME, 
                                         EndpointReferenceType.class,
-                                        hdr,
-                                        marshaller);
+                                        jaxbContext);
                     }
                 }
-                encodeReferenceParameters(maps, hdr, marshaller);
+                encodeReferenceParameters(maps, message, jaxbContext);
                 
-                Node childNode = hdr.getFirstChild();
-                
-                while (childNode != null) {
-                    Header holder = new Header(
-                                               new QName(childNode.getNamespaceURI(), 
-                                                         childNode.getLocalName()), 
-                                                         childNode);
-                    header.add(holder);
-                    childNode = childNode.getNextSibling();
-                }
                 maps.setDuplicate(null);
                 
                 propogateAction(maps.getAction(), message);
@@ -365,14 +339,20 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 .equals(maps.getReplyTo().getAddress().getValue());
     }
 
-    private void encodeReferenceParameters(AddressingProperties maps, Element header, 
-                                           Marshaller marshaller) throws JAXBException {
+    private void encodeReferenceParameters(AddressingProperties maps,
+                                           SoapMessage msg, 
+                                           JAXBContext ctx) throws JAXBException {
+        Element header =  null;
+
         EndpointReferenceType toEpr = maps.getToEndpointReference();
         if (null != toEpr) {
             ReferenceParametersType params = toEpr.getReferenceParameters();
             if (null != params) {
                 for (Object o : params.getAny()) {
                     if (o instanceof Element || o instanceof JAXBElement) {
+                        if (header == null) {
+                            header = getHeaderFactory().getHeader(msg.getVersion());                
+                        }
                         JAXBElement<?> jaxbEl = null;
                         if (o instanceof Element) {
                             Element e = (Element)o;
@@ -380,11 +360,18 @@ public class MAPCodec extends AbstractSoapInterceptor {
                             header.appendChild(importedNode);                            
                         } else {
                             jaxbEl = (JAXBElement<?>) o;
-                            marshaller.marshal(jaxbEl, header);
+                            ctx.createMarshaller().marshal(jaxbEl, header);
                         }
                                                
                         Element lastAdded = (Element)header.getLastChild();
+                        header.removeChild(lastAdded);
                         addIsReferenceParameterMarkerAttribute(lastAdded, maps.getNamespaceURI());
+                        
+                        
+                        Header holder = new Header(new QName(lastAdded.getNamespaceURI(), 
+                                                             lastAdded.getLocalName()),
+                                                             lastAdded);
+                        msg.getHeaders().add(holder);
                     } else {
                         LOG.log(Level.WARNING, "IGNORE_NON_ELEMENT_REF_PARAM_MSG", o);
                     }
@@ -423,35 +410,6 @@ public class MAPCodec extends AbstractSoapInterceptor {
         isRefParamAttr.setTextContent("1");
         lastAdded.setAttributeNodeNS(isRefParamAttr);
     }
-
-    private void addMustUnderstandAttribute(Element header,
-                                            QName name,
-                                            SoapMessage msg,
-                                            AddressingProperties maps) {
-        if (maps.getMustUnderstand().contains(name)) {
-            Element lastAdded = (Element)header.getLastChild();
-            String pfx = lastAdded.lookupPrefix(msg.getVersion().getNamespace());
-            if (StringUtils.isEmpty(pfx)) {
-                pfx = "soap";
-            }
-            if (msg.hasAdditionalEnvNs()) {
-                String ns = msg.getVersion().getNamespace();
-                Map<String, String> nsMap = msg.getEnvelopeNs();
-                for (Map.Entry<String, String> entry : nsMap.entrySet()) {
-                    if (ns.equals(entry.getValue())) {
-                        pfx = entry.getKey();
-                    }
-                }
-            }
-            
-            Attr mustUnderstandAttr = 
-                lastAdded.getOwnerDocument().createAttributeNS(
-                    msg.getVersion().getNamespace(),
-                    pfx + ":mustUnderstand");
-            mustUnderstandAttr.setTextContent("1");
-            lastAdded.setAttributeNodeNS(mustUnderstandAttr);
-        }
-    }
     
     /**
      * Encode message in exposed version.
@@ -462,30 +420,29 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param name the QName for the header 
      * @param clz the class
      * @param header the SOAP header element
-     * @param marshaller the JAXB marshaller to use
+     * @param JAXBContext the JAXB context to use
      */
     private <T> void encodeAsExposed(AddressingProperties maps,
                                      SoapMessage message,
                                      T value,
                                      QName name,
                                      Class<T> clz,
-                                     Element header,
-                                     Marshaller marshaller) throws JAXBException {
+                                     JAXBContext context) throws JAXBException {
         if (value != null) {
             LOG.log(Level.FINE,
                     "{0} : {1}",
                     new Object[] {name.getLocalPart(), getLogText(value)});
-            transformer.encodeAsExposed(maps.getNamespaceURI(),
+            
+            boolean mu = maps.getMustUnderstand().contains(name);
+                
+            transformer.encodeAsExposed(message,
+                                        maps.getNamespaceURI(),
                                         value,
                                         name.getLocalPart(),
                                         clz,
-                                        header,
-                                        marshaller);
+                                        context,
+                                        mu);
         }
-        addMustUnderstandAttribute(header,
-                                   name,
-                                   message,
-                                   maps);
     }
     
     /**
@@ -698,20 +655,23 @@ public class MAPCodec extends AbstractSoapInterceptor {
     /**
      * Encodes an MAP as a SOAP header.
      *
+     * @param message the message to store the headers on
      * @param value the value to encode
      * @param qname the QName for the header 
      * @param clz the class
      * @param header the SOAP header element
-     * @param marshaller the JAXB marshaller to use
+     * @param marshaller the JAXB context to use
      */
-    protected <T> void encodeMAP(T value,
+    protected <T> void encodeMAP(SoapMessage message,
+                                 T value,
                                  QName qname,
                                  Class<T> clz,
-                                 Element header,
-                                 Marshaller marshaller) throws JAXBException {
-        if (value != null) {
-            marshaller.marshal(new JAXBElement<T>(qname, clz, value), header);
-        }
+                                 JAXBContext ctx,
+                                 boolean mustUnderstand) throws JAXBException {
+        SoapHeader h = new SoapHeader(qname, new JAXBElement<T>(qname, clz, value),
+                                      new JAXBDataBinding(ctx));
+        h.setMustUnderstand(mustUnderstand);
+        message.getHeaders().add(h);
     }
 
     /**

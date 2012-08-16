@@ -27,12 +27,10 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -53,7 +51,6 @@ import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 import org.apache.cxf.ws.addressing.v200408.Relationship;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.easymock.EasyMock;
-import org.easymock.IArgumentMatcher;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
@@ -72,9 +69,7 @@ public class MAPCodecTest extends Assert {
     private MAPCodec codec;
     private IMocksControl control;
     private QName[] expectedNames;
-    private Class<?>[] expectedDeclaredTypes;
     private Object[] expectedValues;
-    private int expectedIndex;
     private String expectedNamespaceURI;
     private Map<String, List<String>> mimeHeaders;
     private Exchange correlatedExchange;
@@ -91,9 +86,7 @@ public class MAPCodecTest extends Assert {
     @After
     public void tearDown() throws Exception {
         expectedNames = null;
-        expectedDeclaredTypes = null;
         expectedValues = null;
-        expectedIndex = 0;
         expectedNamespaceURI = null;
         mimeHeaders = null;
         correlatedExchange = null;
@@ -331,43 +324,7 @@ public class MAPCodecTest extends Assert {
                              AddressingPropertiesImpl maps, String mapProperty, boolean invalidMAP,
                              boolean preExistingSOAPAction) throws Exception {
         message.put(mapProperty, maps);
-        Marshaller marshaller = control.createMock(Marshaller.class);
-        ContextUtils.getJAXBContext().createMarshaller();
-        EasyMock.expectLastCall().andReturn(marshaller);
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-        EasyMock.expectLastCall();
-        IArgumentMatcher matcher = new JAXBEltMatcher();
-        int len = expectFaultTo ? expectedValues.length : expectedValues.length - 1;
-        for (int i = 0; i < len; i++) {
-            if (!requestor || i != 4) {
-                EasyMock.reportMatcher(matcher);
-                EasyMock.eq(header);
-                marshaller.marshal(null, header);
-                EasyMock.expectLastCall();
-            }
-        }
-        
-        Node child = control.createMock(Node.class);
-        header.getFirstChild();
-        EasyMock.expectLastCall().andReturn(child);
-        
-        int i = 0;
-        while (child != null) {
-            if (requestor && i == 4) {
-                i++;
-            }
-            child.getNamespaceURI();
-            EasyMock.expectLastCall().andReturn(expectedNames[i].getNamespaceURI());
-            child.getLocalName();
-            EasyMock.expectLastCall().andReturn(expectedNames[i].getLocalPart());
 
-            Node nextChild = ++i < len
-                             ? control.createMock(Node.class)
-                             : null;
-            child.getNextSibling();
-            EasyMock.expectLastCall().andReturn(nextChild);
-            child = nextChild;
-        }
 
         mimeHeaders = new HashMap<String, List<String>>();
         message.put(MIME_HEADERS, mimeHeaders);
@@ -501,12 +458,6 @@ public class MAPCodecTest extends Assert {
             expectedValues = new Object[] {
                 action, id, to, replyTo, relatesTo, from, faultTo
             };
-            expectedDeclaredTypes = new Class<?>[] {
-                AttributedURIType.class, 
-                AttributedURIType.class, AttributedURIType.class, 
-                EndpointReferenceType.class, RelatesToType.class,
-                EndpointReferenceType.class, EndpointReferenceType.class 
-            };
         } else if (exposeAs200408) {
             expectedValues = new Object[] {
                 VersionTransformer.convert(action),
@@ -525,12 +476,6 @@ public class MAPCodecTest extends Assert {
                 VersionTransformer.Names200408.EPR_TYPE.cast(expectedValues[5]).getAddress()
                     .setValue(Names.WSA_ANONYMOUS_ADDRESS);
             }
-            expectedDeclaredTypes = new Class<?>[] {
-                AttributedURI.class, AttributedURI.class, AttributedURI.class,
-                VersionTransformer.Names200408.EPR_TYPE, Relationship.class,
-                VersionTransformer.Names200408.EPR_TYPE, 
-                VersionTransformer.Names200408.EPR_TYPE
-            };
         } else if (exposeAs200403) {
             expectedValues = new Object[] {
                 VersionTransformer.convertTo200403(action),
@@ -549,81 +494,10 @@ public class MAPCodecTest extends Assert {
                 VersionTransformer.Names200403.EPR_TYPE.cast(expectedValues[5]).getAddress()
                     .setValue(Names.WSA_ANONYMOUS_ADDRESS);
             }
-            expectedDeclaredTypes = new Class<?>[] {
-                org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
-                org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
-                org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
-                VersionTransformer.Names200403.EPR_TYPE,
-                org.apache.cxf.ws.addressing.v200403.Relationship.class,
-                VersionTransformer.Names200403.EPR_TYPE,
-                VersionTransformer.Names200403.EPR_TYPE
-            };
         } else {
             fail("unexpected namespace URI: " + uri);
         }
         return maps;
-    }
-
-    private final class JAXBEltMatcher implements IArgumentMatcher {
-        public boolean matches(Object obj) {
-            if (expectedIndex == 4 && !expectRelatesTo) {
-                expectedIndex++;
-            }
-            QName name = expectedNames[expectedIndex];
-            Class<?> declaredType = expectedDeclaredTypes[expectedIndex];
-            Object value = expectedValues[expectedIndex];
-            boolean ret = false;
-            expectedIndex++;
-            if (obj instanceof JAXBElement) {
-                JAXBElement<?> other = (JAXBElement<?>)obj;
-                ret = name.equals(other.getName()) && declaredType.isAssignableFrom(other.getDeclaredType())
-                      && compare(value, other.getValue());
-            }
-            return ret;
-        }
-
-        public void appendTo(StringBuffer buffer) {
-            buffer.append("JAXBElements did not match[" + expectedIndex + "]");
-        }
-
-        private boolean compare(Object a, Object b) {
-            boolean ret = false;
-            if (a instanceof AttributedURI && b instanceof AttributedURI) {
-                ret = ((AttributedURI)a).getValue().equals(((AttributedURI)b).getValue());
-            } else if (a instanceof org.apache.cxf.ws.addressing.v200403.AttributedURI
-                       && b instanceof org.apache.cxf.ws.addressing.v200403.AttributedURI) {
-                ret = ((org.apache.cxf.ws.addressing.v200403.AttributedURI)a).getValue()
-                    .equals(((org.apache.cxf.ws.addressing.v200403.AttributedURI)b).getValue());
-            } else if (a instanceof AttributedURIType && b instanceof AttributedURIType) {
-                ret = ((AttributedURIType)a).getValue().equals(((AttributedURIType)b).getValue());
-            } else if (a instanceof EndpointReferenceType && b instanceof EndpointReferenceType) {
-                EndpointReferenceType aEPR = (EndpointReferenceType)a;
-                EndpointReferenceType bEPR = (EndpointReferenceType)b;
-                ret = aEPR.getAddress() != null && bEPR.getAddress() != null
-                      && aEPR.getAddress().getValue().equals(bEPR.getAddress().getValue());
-            } else if (VersionTransformer.Names200408.EPR_TYPE.isInstance(a)
-                       && VersionTransformer.Names200408.EPR_TYPE.isInstance(b)) {
-                ret = VersionTransformer.Names200408.EPR_TYPE.cast(a).getAddress() != null
-                      && VersionTransformer.Names200408.EPR_TYPE.cast(b).getAddress() != null
-                      && VersionTransformer.Names200408.EPR_TYPE.cast(a).getAddress().getValue()
-                          .equals(VersionTransformer.Names200408.EPR_TYPE.cast(b).getAddress().getValue());
-            } else if (VersionTransformer.Names200403.EPR_TYPE.isInstance(a)
-                       && VersionTransformer.Names200403.EPR_TYPE.isInstance(b)) {
-                ret = VersionTransformer.Names200403.EPR_TYPE.cast(a).getAddress() != null
-                      && VersionTransformer.Names200403.EPR_TYPE.cast(b).getAddress() != null
-                      && VersionTransformer.Names200403.EPR_TYPE.cast(a).getAddress().getValue()
-                          .equals(VersionTransformer.Names200403.EPR_TYPE.cast(b).getAddress().getValue());
-            } else if (a instanceof Relationship && b instanceof Relationship) {
-                ret = ((Relationship)a).getValue().equals(((Relationship)b).getValue());
-            } else if (a instanceof org.apache.cxf.ws.addressing.v200403.Relationship
-                       && b instanceof org.apache.cxf.ws.addressing.v200403.Relationship) {
-                ret = ((org.apache.cxf.ws.addressing.v200403.Relationship)a).getValue()
-                    .equals(((org.apache.cxf.ws.addressing.v200403.Relationship)b).getValue());
-            } else if (a instanceof RelatesToType && b instanceof RelatesToType) {
-                ret = ((RelatesToType)a).getValue().equals(((RelatesToType)b).getValue());
-            }
-            return ret;
-        }
     }
 
     private boolean verifyMAPs(Object obj) {

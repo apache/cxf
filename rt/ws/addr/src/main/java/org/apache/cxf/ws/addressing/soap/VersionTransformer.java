@@ -24,12 +24,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -76,38 +78,48 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
      * @param localName the localName for the header
      * @param clz the class
      * @param header the SOAP header element
-     * @param marshaller the JAXB marshaller to use
+     * @param marshaller the JAXB context to use
      */
-    public <T> void encodeAsExposed(String exposeAs, T value, String localName, Class<T> clz, Element header,
-                                    Marshaller marshaller) throws JAXBException {
+    public <T> void encodeAsExposed(SoapMessage message,
+                                    String exposeAs, T value,
+                                    String localName, Class<T> clz,
+                                    JAXBContext marshaller,
+                                    boolean mustUnderstand) throws JAXBException {
         if (value != null) {
             if (NATIVE_VERSION.equals(exposeAs)) {
-                codec.encodeMAP(value, new QName(exposeAs, localName), clz, header, marshaller);
+                codec.encodeMAP(message, value, new QName(exposeAs, localName), clz,
+                                marshaller, mustUnderstand);
             } else if (Names200408.WSA_NAMESPACE_NAME.equals(exposeAs)) {
                 if (AttributedURIType.class.equals(clz)) {
-                    codec.encodeMAP(convert((AttributedURIType)value), new QName(exposeAs, localName),
-                                    AttributedURI.class, header, marshaller);
+                    codec.encodeMAP(message,
+                                    convert((AttributedURIType)value), new QName(exposeAs, localName),
+                                    AttributedURI.class, marshaller, mustUnderstand);
                 } else if (EndpointReferenceType.class.equals(clz)) {
-                    codec.encodeMAP(convert((EndpointReferenceType)value), new QName(exposeAs, localName),
-                                    Names200408.EPR_TYPE, header, marshaller);
+                    codec.encodeMAP(message,
+                                    convert((EndpointReferenceType)value), new QName(exposeAs, localName),
+                                    Names200408.EPR_TYPE, marshaller, mustUnderstand);
                 } else if (RelatesToType.class.equals(clz)) {
-                    codec.encodeMAP(convert((RelatesToType)value), new QName(exposeAs, localName),
-                                    Relationship.class, header, marshaller);
+                    codec.encodeMAP(message,
+                                    convert((RelatesToType)value), new QName(exposeAs, localName),
+                                    Relationship.class, marshaller, mustUnderstand);
                 }
             } else if (Names200403.WSA_NAMESPACE_NAME.equals(exposeAs)) {
                 if (AttributedURIType.class.equals(clz)) {
-                    codec.encodeMAP(convertTo200403((AttributedURIType)value),
+                    codec.encodeMAP(message,
+                                    convertTo200403((AttributedURIType)value),
                                     new QName(exposeAs, localName),
-                                    org.apache.cxf.ws.addressing.v200403.AttributedURI.class, header,
-                                    marshaller);
+                                    org.apache.cxf.ws.addressing.v200403.AttributedURI.class, 
+                                    marshaller, mustUnderstand);
                 } else if (EndpointReferenceType.class.equals(clz)) {
-                    codec.encodeMAP(convertTo200403((EndpointReferenceType)value), new QName(exposeAs,
+                    codec.encodeMAP(message,
+                                    convertTo200403((EndpointReferenceType)value), new QName(exposeAs,
                                                                                              localName),
-                                    Names200403.EPR_TYPE, header, marshaller);
+                                    Names200403.EPR_TYPE, marshaller, mustUnderstand);
                 } else if (RelatesToType.class.equals(clz)) {
-                    codec.encodeMAP(convertTo200403((RelatesToType)value), new QName(exposeAs, localName),
-                                    org.apache.cxf.ws.addressing.v200403.Relationship.class, header,
-                                    marshaller);
+                    codec.encodeMAP(message,
+                                    convertTo200403((RelatesToType)value), new QName(exposeAs, localName),
+                                    org.apache.cxf.ws.addressing.v200403.Relationship.class,
+                                    marshaller, mustUnderstand);
                 }
             }
         }
