@@ -147,7 +147,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                                 String encoding, String contentType) 
         throws Exception {
         // Just transform the XML message when the cos has content
-        if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0) && cos.size() > 0) {
+        if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0 
+            && contentType.toLowerCase().indexOf("multipart/related") < 0) && cos.size() > 0) {
             Transformer serializer = XMLUtils.newTransformer(2);
             // Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
