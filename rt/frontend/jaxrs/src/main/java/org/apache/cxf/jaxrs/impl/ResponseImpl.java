@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,61 +55,90 @@ public final class ResponseImpl extends Response {
     private MultivaluedMap<String, Object> metadata;
     private boolean entityClosed;    
     
+    ResponseImpl(int s) {
+        this.status = s;
+    }
+    
     ResponseImpl(int s, Object e) {
         this.status = s;
         this.entity = e;
     }
 
-    public Object getEntity() {
-        return entity;
+    void addMetadata(MultivaluedMap<String, Object> meta) { 
+        this.metadata = meta;
     }
 
     public int getStatus() {
         return status;
     }
 
-    void addMetadata(MultivaluedMap<String, Object> meta) { 
-        this.metadata = meta;
+    public StatusType getStatusInfo() {
+        final Response.Status responseStatus = Response.Status.fromStatusCode(status);
+        return new Response.StatusType() {
+
+            public Family getFamily() {
+                return responseStatus.getFamily();
+            }
+
+            public String getReasonPhrase() {
+                return responseStatus.getReasonPhrase();
+            }
+
+            public int getStatusCode() {
+                return responseStatus.getStatusCode();
+            } 
+            
+        };
+    }
+    
+    public Object getEntity() {
+        return entity;
+    }
+
+    public boolean hasEntity() {
+        return getEntity() != null;
     }
     
     public MultivaluedMap<String, Object> getMetadata() {
-        // don't worry about cloning for now
+        return getHeaders();
+    }
+    
+    public MultivaluedMap<String, Object> getHeaders() {
         return metadata;
     }
-
-    public boolean bufferEntity() throws MessageProcessingException {
-        if (entity instanceof InputStream) {
-            if (entity instanceof ByteArrayInputStream) {
-                return false;
-            } else {
-                try {
-                    InputStream oldEntity = (InputStream)entity;
-                    entity = IOUtils.loadIntoBAIS(oldEntity);
-                    return true;
-                } catch (IOException ex) {
-                    throw new MessageProcessingException(ex);
-                }
-            }
+    
+    public MultivaluedMap<String, String> getStringHeaders() {
+        MetadataMap<String, String> headers = new MetadataMap<String, String>(metadata.size());
+        for (Map.Entry<String, List<Object>> entry : metadata.entrySet()) {
+            headers.put(entry.getKey(), toListOfStrings(entry.getValue()));
         }
-        return false;
+        return headers;
     }
 
-    public void close() throws MessageProcessingException {
-        if (!entityClosed && entity instanceof InputStream
-            && !(entity instanceof ByteArrayInputStream)) {
-            // unbuffered entity
-            try {
-                ((InputStream)entity).close();
-                entity = null;
-                entityClosed = true;
-            } catch (IOException ex) {
-                throw new MessageProcessingException(ex);
-            }
-            
-        }
-        
+    // TODO: Make this method private with the upgrade to the latest API snapshot
+    public String getHeader(String header) {
+        Object value = metadata.getFirst(header);
+        return value == null ? null : value.toString();
     }
-
+    
+    public String getHeaderString(String header) {
+        List<Object> methodValues = metadata.get(header);
+        return HttpUtils.getHeaderString(toListOfStrings(methodValues));
+    }
+    
+    // This conversion is needed as some values may not be Strings
+    private List<String> toListOfStrings(List<Object> values) {
+        if (values == null) {
+            return null; 
+        } else {
+            List<String> stringValues = new ArrayList<String>(values.size());
+            for (Object value : values) {
+                stringValues.add(value.toString());
+            }
+            return stringValues;
+        }
+    }
+    
     public Set<String> getAllowedMethods() {
         List<Object> methodValues = metadata.get(HttpHeaders.ALLOW);
         if (methodValues == null) {
@@ -122,6 +152,8 @@ public final class ResponseImpl extends Response {
         }
     }
 
+    
+    
     public Map<String, NewCookie> getCookies() {
         List<Object> cookieValues = metadata.get(HttpHeaders.SET_COOKIE);
         if (cookieValues == null) {
@@ -149,11 +181,6 @@ public final class ResponseImpl extends Response {
         return header == null ? null : EntityTag.valueOf(header);
     }
 
-    public String getHeader(String header) {
-        Object value = metadata.getFirst(header);
-        return value == null ? null : value.toString();
-    }
-
     public Locale getLanguage() {
         return HttpUtils.getLocale(getHeader(HttpHeaders.CONTENT_LANGUAGE));
     }
@@ -166,6 +193,16 @@ public final class ResponseImpl extends Response {
         return HttpUtils.getContentLength(getHeader(HttpHeaders.CONTENT_LENGTH));
     }
 
+    public URI getLocation() {
+        String header = getHeader(HttpHeaders.LOCATION);
+        return header == null ? null : URI.create(header);
+    }
+
+    public MediaType getMediaType() {
+        String header = getHeader(HttpHeaders.CONTENT_TYPE);
+        return header == null ? null : MediaType.valueOf(header);
+    }
+    
     public Link getLink(String relation) {
         // TODO Auto-generated method stub
         return null;
@@ -179,39 +216,6 @@ public final class ResponseImpl extends Response {
     public Set<Link> getLinks() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public URI getLocation() {
-        String header = getHeader(HttpHeaders.LOCATION);
-        return header == null ? null : URI.create(header);
-    }
-
-    public MediaType getMediaType() {
-        String header = getHeader(HttpHeaders.CONTENT_LENGTH);
-        return header == null ? null : MediaType.valueOf(header);
-    }
-
-    public StatusType getStatusInfo() {
-        final Response.Status responseStatus = Response.Status.fromStatusCode(status);
-        return new Response.StatusType() {
-
-            public Family getFamily() {
-                return responseStatus.getFamily();
-            }
-
-            public String getReasonPhrase() {
-                return responseStatus.getReasonPhrase();
-            }
-
-            public int getStatusCode() {
-                return responseStatus.getStatusCode();
-            } 
-            
-        };
-    }
-
-    public boolean hasEntity() {
-        return getEntity() != null;
     }
 
     public boolean hasLink(String relation) {
@@ -239,6 +243,36 @@ public final class ResponseImpl extends Response {
         IllegalStateException {
         checkEntityIsAvailable();
         return null;
+    }
+    
+    public boolean bufferEntity() throws MessageProcessingException {
+        if (entity instanceof InputStream) {
+            if (entity instanceof ByteArrayInputStream) {
+                return false;
+            } else {
+                try {
+                    InputStream oldEntity = (InputStream)entity;
+                    entity = IOUtils.loadIntoBAIS(oldEntity);
+                    return true;
+                } catch (IOException ex) {
+                    throw new MessageProcessingException(ex);
+                }
+            }
+        }
+        return false;
+    }
+
+    public void close() throws MessageProcessingException {
+        if (!entityClosed && entity instanceof InputStream) {
+            try {
+                ((InputStream)entity).close();
+                entity = null;
+                entityClosed = true;
+            } catch (IOException ex) {
+                throw new MessageProcessingException(ex);
+            }
+        }
+        
     }
     
     private void checkEntityIsAvailable() throws MessageProcessingException {

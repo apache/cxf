@@ -271,23 +271,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public String getHeaderString(String headerName) {
-        List<String> values = headers.get(headerName);
-        if (values == null) {
-            return null;
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < values.size(); i++) {
-                String value = values.get(i);
-                if (StringUtils.isEmpty(value)) {
-                    continue;
-                }
-                sb.append(value);
-                if (i + 1 < values.size()) {
-                    sb.append(",");
-                }
-            }
-            return sb.toString();
-        }
+        return HttpUtils.getHeaderString(headers.get(headerName));
     }
 
     public int getLength() {

@@ -44,6 +44,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
@@ -219,6 +220,25 @@ public final class HttpUtils {
             return len >= 0 ? len : -1;
         } catch (Exception ex) {
             return -1;
+        }
+    }
+    
+    public static String getHeaderString(List<String> values) {
+        if (values == null) {
+            return null;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < values.size(); i++) {
+                String value = values.get(i);
+                if (StringUtils.isEmpty(value)) {
+                    continue;
+                }
+                sb.append(value);
+                if (i + 1 < values.size()) {
+                    sb.append(",");
+                }
+            }
+            return sb.toString();
         }
     }
     
