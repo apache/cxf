@@ -85,8 +85,7 @@ public class UDPConduit extends AbstractConduit {
             inMessage.setExchange(message.getExchange());
             message.getExchange().setInMessage(inMessage);
             
-            IoSessionInputStream ins = new IoSessionInputStream();
-            ins.write((IoBuffer)buf);
+            IoSessionInputStream ins = new IoSessionInputStream(buf);
             inMessage.setContent(InputStream.class, ins);
             inMessage.put(IoSessionInputStream.class, ins);
             
@@ -107,7 +106,7 @@ public class UDPConduit extends AbstractConduit {
             
         } else {
             IoSessionInputStream ins = message.getExchange().getInMessage().get(IoSessionInputStream.class);
-            ins.write((IoBuffer)buf);
+            ins.setBuffer((IoBuffer)buf);
         }
     }
     

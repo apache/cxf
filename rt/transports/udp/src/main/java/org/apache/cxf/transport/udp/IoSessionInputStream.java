@@ -25,143 +25,86 @@ import java.io.InputStream;
 import org.apache.mina.core.buffer.IoBuffer;
 
 
-// Copies almost ver-batim from Mina due to the version in Mina not being public
 public class IoSessionInputStream extends InputStream {
-    private final Object mutex = new Object();
-    private final IoBuffer buf;
-    private volatile boolean closed;
-    private volatile boolean released;
-    private IOException exception;
+    private volatile IoBuffer buf;
+    private volatile IOException exception;
 
+    public IoSessionInputStream(IoBuffer b) {
+        buf = IoBuffer.allocate(b.limit());
+        buf.put(b);
+        buf.flip();
+    }
     public IoSessionInputStream() {
-        buf = IoBuffer.allocate(2048);
-        buf.setAutoExpand(true);
-        buf.limit(0);
+        buf = null;
     }
 
     @Override
-    public int available() {
-        if (released) {
+    public int available() throws IOException {
+        if (exception != null) {
+            throw exception;
+        }
+        if (buf == null) {
             return 0;
         }
-
-        synchronized (mutex) {
-            return buf.remaining();
-        }
+        return buf.remaining();
     }
 
     @Override
-    public void close() {
-        if (closed) {
-            return;
-        }
-
-        synchronized (mutex) {
-            closed = true;
-            releaseBuffer();
-
-            mutex.notifyAll();
+    public void close() throws IOException {
+        if (exception != null) {
+            throw exception;
         }
     }
 
     @Override
     public int read() throws IOException {
-        synchronized (mutex) {
-            if (!waitForData()) {
-                return -1;
-            }
-
-            return buf.get() & 0xff;
-        }
-    }
-
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        synchronized (mutex) {
-            if (!waitForData()) {
-                return -1;
-            }
-
-            int readBytes;
-
-            if (len > buf.remaining()) {
-                readBytes = buf.remaining();
-            } else {
-                readBytes = len;
-            }
-
-            buf.get(b, off, readBytes);
-
-            return readBytes;
-        }
-    }
-
-    private boolean waitForData() throws IOException {
-        if (released) {
-            return false;
-        }
-
-        synchronized (mutex) {
-            while (!released && buf.remaining() == 0 && exception == null) {
-                try {
-                    mutex.wait();
-                } catch (InterruptedException e) {
-                    IOException ioe = new IOException(
-                            "Interrupted while waiting for more data");
-                    ioe.initCause(e);
-                    throw ioe;
-                }
-            }
-        }
-
+        waitForData();
         if (exception != null) {
-            releaseBuffer();
             throw exception;
         }
-
-        if (closed && buf.remaining() == 0) {
-            releaseBuffer();
-
-            return false;
-        }
-
-        return true;
+        return buf.get() & 0xff;
     }
 
-    private void releaseBuffer() {
-        if (released) {
-            return;
-        }
-
-        released = true;
-    }
-
-    public void write(IoBuffer src) {
-        synchronized (mutex) {
-            if (closed) {
-                return;
-            }
-
-            if (buf.hasRemaining()) {
-                this.buf.compact();
-                this.buf.put(src);
-                this.buf.flip();
-            } else {
-                this.buf.clear();
-                this.buf.put(src);
-                this.buf.flip();
-                mutex.notifyAll();
+    public synchronized void waitForData() throws IOException {
+        if (exception == null && buf == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new IOException();
             }
         }
     }
-
-    public void throwException(IOException e) {
-        synchronized (mutex) {
-            if (exception == null) {
-                exception = e;
-
-                mutex.notifyAll();
-            }
+    
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        waitForData();
+        if (exception != null) {
+            throw exception;
         }
+        if (buf.remaining() == 0) {
+            return -1;
+        }
+        int readBytes;
+        if (len > buf.remaining()) {
+            readBytes = buf.remaining();
+        } else {
+            readBytes = len;
+        }
+        buf.get(b, off, readBytes);
+        return readBytes;
+    }
+
+    public synchronized void throwException(IOException e) {
+        if (exception == null) {
+            exception = e;
+        }
+        notifyAll();
+    }
+
+    public synchronized void setBuffer(IoBuffer b) {
+        buf = IoBuffer.allocate(b.limit());
+        buf.put(b);
+        buf.flip();
+        notifyAll();
     }
 }
