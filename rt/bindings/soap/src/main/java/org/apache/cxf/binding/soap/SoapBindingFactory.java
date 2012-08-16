@@ -80,6 +80,7 @@ import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.interceptor.DocLiteralInInterceptor;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.interceptor.URIMappingInterceptor;
@@ -89,6 +90,7 @@ import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -97,6 +99,7 @@ import org.apache.cxf.transport.ChainInitiationObserver;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultipleEndpointObserver;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
@@ -327,6 +330,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
     public Binding createBinding(BindingInfo binding) {
         // TODO what about the mix style/use?
 
+
         // The default style should be doc-lit wrapped.
         String parameterStyle = SoapBindingConstants.PARAMETER_STYLE_WRAPPED;
         String bindingStyle = SoapBindingConstants.BINDING_STYLE_DOC;
@@ -435,10 +439,25 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             sb.getInFaultInterceptors().add(new Soap12FaultInInterceptor());
             sb.getOutFaultInterceptors().add(new Soap12FaultOutInterceptor());
         }
+        
+        if (binding.getService() != null) {
+            for (EndpointInfo ei: binding.getService().getEndpoints()) {
+                if (ei.getAddress() != null && ei.getAddress().startsWith("soap.udp")) {
+                    setupUDP(sb);
+                }
+            }
+        }
 
         return sb;
     }
 
+    protected void setupUDP(InterceptorProvider p) {
+        //soap UDP requires ws-addressing turned on
+        WSAddressingFeature add = new WSAddressingFeature();
+        add.setAddressingRequired(true);
+        add.initialize(p, bus);
+    }
+    
     protected void addMessageFromBinding(ExtensibilityElement ext, BindingOperationInfo bop,
                                          boolean isInput) {
         SoapHeader header = SOAPBindingUtil.getSoapHeader(ext);
@@ -832,6 +851,13 @@ public class SoapBindingFactory extends AbstractBindingFactory {
     @Override
     public synchronized void addListener(Destination d, Endpoint e) {
         MessageObserver mo = d.getMessageObserver();
+        if (d.getAddress() != null 
+            && d.getAddress().getAddress() != null 
+            && d.getAddress().getAddress().getValue() != null 
+            && d.getAddress().getAddress().getValue().startsWith("soap.udp")) {
+            //soap.udp REQUIRES usage of WS-Addressing... we need to turn this on
+            setupUDP(e);
+        }
         if (mo == null) {
             super.addListener(d, e);
             return;

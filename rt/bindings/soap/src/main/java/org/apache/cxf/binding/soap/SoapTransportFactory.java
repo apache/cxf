@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -77,6 +78,10 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             "http://www.w3.org/2010/soapjms/",
             "http://www.w3.org/2003/05/soap/bindings/HTTP/",
             "http://schemas.xmlsoap.org/soap/http");
+    public static final Set<String> DEFAULT_PREFIXES 
+        = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+            "soap.udp", "soap.tcp"
+        )));
     
     public SoapTransportFactory() {
         super(DEFAULT_NAMESPACES, null);
@@ -87,12 +92,14 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
     
     public Set<String> getUriPrefixes() {
-        return Collections.singleton("soap.tcp");
+        return DEFAULT_PREFIXES;
     }
     public String mapTransportURI(String s, String address) {
         if (SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID.equals(s)
             || (address != null && address.startsWith("jms"))) {
             s = "http://cxf.apache.org/transports/jms";
+        } else if (address != null && address.startsWith("soap.udp")) {
+            s = "http://cxf.apache.org/transports/udp";
         } else if (SOAP_11_HTTP_BINDING.equals(s)
             || SOAP_12_HTTP_BINDING.equals(s)
             || "http://schemas.xmlsoap.org/wsdl/soap/".equals(s)
@@ -127,6 +134,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             if (StringUtils.isEmpty(address) 
                 || address.startsWith("http") 
                 || address.startsWith("jms")
+                || address.startsWith("soap.udp")
                 || address.startsWith("/")) {
                 destinationFactory = mgr.getDestinationFactory(mapTransportURI(transId, address));
             } else {
@@ -217,7 +225,10 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         ConduitInitiator conduitInit;
         try {
             ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
-            if (StringUtils.isEmpty(address) || address.startsWith("http") || address.startsWith("jms")) {
+            if (StringUtils.isEmpty(address) 
+                || address.startsWith("http")
+                || address.startsWith("jms")
+                || address.startsWith("soap.udp")) {
                 conduitInit = mgr.getConduitInitiator(mapTransportURI(transId, address));
             } else {
                 conduitInit = mgr.getConduitInitiatorForUri(address);
