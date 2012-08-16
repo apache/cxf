@@ -23,9 +23,11 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOutput;
@@ -43,6 +45,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.binding.soap.interceptor.EndpointSelectionInterceptor;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
@@ -76,16 +79,19 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
 import org.apache.cxf.interceptor.DocLiteralInInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -99,6 +105,8 @@ import org.apache.cxf.transport.ChainInitiationObserver;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultipleEndpointObserver;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
@@ -456,6 +464,35 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         WSAddressingFeature add = new WSAddressingFeature();
         add.setAddressingRequired(true);
         add.initialize(p, bus);
+        
+        // UDP has a strict size limit on messages (<64K) so we'll try to shrink the
+        // message a little by putting the WSA namespace into the
+        // the soap:env which allows it to not be written on every header 
+        // element as well as disable the output stream optimizations (doesn't really
+        // matter on such small messages anyway) to make sure we pickup those
+        // namespaces that are declared there.
+        p.getOutInterceptors().add(new AbstractSoapInterceptor(Phase.POST_LOGICAL) {
+            public void handleMessage(SoapMessage message) throws Fault {
+                AddressingProperties p = ContextUtils.retrieveMAPs(message, false, true);
+                if (p == null) {
+                    return;
+                }
+                String ns = p.getNamespaceURI();
+                Map<String, String> nsMap = message.getEnvelopeNs();
+                if (nsMap == null) {
+                    nsMap = new HashMap<String, String>();
+                    message.put("soap.env.ns.map", nsMap);
+                }
+                if (!nsMap.containsValue(ns)) {
+                    nsMap.put("wsa", ns);
+                }
+                ns = message.getExchange().getBinding().getBindingInfo().getName().getNamespaceURI();
+                if (!nsMap.containsValue(ns)) {
+                    nsMap.put("tns", ns);
+                }
+                message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION, Boolean.TRUE);
+            }
+        });
     }
     
     protected void addMessageFromBinding(ExtensibilityElement ext, BindingOperationInfo bop,
