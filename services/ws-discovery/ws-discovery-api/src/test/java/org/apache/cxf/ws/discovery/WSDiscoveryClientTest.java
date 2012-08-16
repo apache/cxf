@@ -23,7 +23,6 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.ws.discovery.wsdl.HelloType;
 
 /**
  * 
@@ -38,11 +37,13 @@ public final class WSDiscoveryClientTest {
     public static void main(String[] arg) throws Exception {
         Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
         WSDiscoveryClient c = new WSDiscoveryClient();
-        HelloType h = c.register(ep.getEndpointReference());
+        c.register(ep.getEndpointReference());
         
-        Thread.sleep(5000);
+        System.out.println("1");
+        Thread.sleep(1000);
         //c.unregister(h);
         c.unregister(ep.getEndpointReference());
+        System.out.println("2");
         c.close();
         
         System.exit(0);
