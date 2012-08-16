@@ -24,12 +24,18 @@ import java.io.IOException;
 
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
 import org.apache.cxf.ws.discovery.wsdl.DiscoveryProxy;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
@@ -45,7 +51,7 @@ public class WSDiscoveryClient implements Closeable {
     public WSDiscoveryClient() {
     }
     
-    private synchronized DiscoveryProxy getClient() {
+    private synchronized DiscoveryProxy getClientInternal() {
         if (client == null) {
             JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
             if (bus != null) {
@@ -54,9 +60,27 @@ public class WSDiscoveryClient implements Closeable {
             factory.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
             factory.setAddress(address);
             client = factory.create(DiscoveryProxy.class);
+            ((BindingProvider)client).getRequestContext()
+                .put("thread.local.request.context", Boolean.TRUE);
         }
         return client;
     }
+    
+    private DiscoveryProxy getClient() {
+        DiscoveryProxy c = getClientInternal();
+    
+        EndpointReferenceType to = new EndpointReferenceType();
+        AddressingProperties addrProperties = new AddressingPropertiesImpl();
+        AttributedURIType epr = new AttributedURIType();
+        epr.setValue("urn:docs-oasis-open-org:ws-dd:ns:discovery:2009:01");
+        to.setAddress(epr);
+        addrProperties.setTo(to);
+    
+        ((BindingProvider)c).getRequestContext()
+            .put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProperties);
+        return c;
+    }
+    
     public synchronized void close() throws IOException {
         if (client != null) {
             ((Closeable)client).close();
@@ -72,6 +96,7 @@ public class WSDiscoveryClient implements Closeable {
         DiscoveryProxy c = getClient();
         c.helloOp(hello);
     }
+    
     public void register(EndpointReference ert) {
         HelloType hello = new HelloType();
         hello.setEndpointReference(toW3CEndpointReference(ert));
