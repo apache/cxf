@@ -342,8 +342,9 @@ public final class AttachmentUtil {
         if (!StringUtils.isEmpty(handler.getName())) {
             //set Content-Disposition attachment header if filename isn't null
             String file = handler.getName();
-            if (StringUtils.isFileExist(file)) {
-                file = file.substring(file.lastIndexOf(File.separator) + 1);
+            File f = new File(file);
+            if (f.exists() && f.isFile()) {
+                file = f.getName();
             }
             att.setHeader("Content-Disposition", "attachment;name=\"" + file + "\"");
         }
