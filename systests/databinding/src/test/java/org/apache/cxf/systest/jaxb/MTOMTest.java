@@ -69,7 +69,7 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
         }
     }
     
-    @Logging
+    @Logging(pretty = true)
     @WebService
     @MTOM(threshold = 1)
     public interface MTOMService {
