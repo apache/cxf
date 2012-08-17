@@ -844,6 +844,9 @@ public class DoMerges {
     }
 
     private static boolean checkAlreadyMerged(List<String[]> gitLogs, String[] logLines) throws IOException {
+        if (gitLogs == null) {
+            return false;
+        }
         for (String[] f : gitLogs) {
             if (compareLogs(f, logLines)) {
                 return true;
