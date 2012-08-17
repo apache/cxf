@@ -182,6 +182,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                        ex.getCause() instanceof java.net.ConnectException
                        || ex.getCause() instanceof java.net.SocketTimeoutException);
         }
+        dispImpl.close();
         
     }
     @Test
