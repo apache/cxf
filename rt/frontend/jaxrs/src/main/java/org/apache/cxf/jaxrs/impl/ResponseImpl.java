@@ -39,7 +39,6 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
-import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
@@ -217,26 +216,42 @@ public final class ResponseImpl extends Response {
         return header == null ? null : MediaType.valueOf(header);
     }
     
+    public boolean hasLink(String relation) {
+        return getLink(relation) != null;
+    }
+    
     public Link getLink(String relation) {
-        // TODO Auto-generated method stub
+        Set<Map.Entry<List<String>, Link>> entries = getAllLinks().entrySet();
+        for (Map.Entry<List<String>, Link> entry : entries) {
+            if (entry.getKey().contains(relation)) {
+                return entry.getValue();
+            }
+        }
         return null;
     }
 
-    public Builder getLinkBuilder(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Link.Builder getLinkBuilder(String relation) {
+        return Link.fromLink(getLink(relation));
     }
 
     public Set<Link> getLinks() {
-        // TODO Auto-generated method stub
-        return null;
+        return new HashSet<Link>(getAllLinks().values());
     }
 
-    public boolean hasLink(String relation) {
-        // TODO Auto-generated method stub
-        return false;
+    private Map<List<String>, Link> getAllLinks() {
+        List<Object> linkValues = metadata.get(HttpHeaders.LINK);
+        if (linkValues == null) {
+            return Collections.emptyMap();
+        } else {
+            Map<List<String>, Link> links = new HashMap<List<String>, Link>();
+            for (Object o : linkValues) {
+                Link link = Link.valueOf(o.toString());
+                links.put(link.getRel(), link);
+            }
+            return links;
+        }
     }
-
+    
     public <T> T readEntity(Class<T> cls) throws MessageProcessingException, IllegalStateException {
         return readEntity(cls, new Annotation[]{});
     }

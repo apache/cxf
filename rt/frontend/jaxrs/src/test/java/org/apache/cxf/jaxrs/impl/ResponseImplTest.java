@@ -21,8 +21,10 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -170,5 +172,35 @@ public class ResponseImplTest extends Assert {
         meta.add(HttpHeaders.CONTENT_TYPE, "text/xml");
         ri.addMetadata(meta);
         assertEquals("text/xml", ri.getMediaType().toString());
+    }
+    
+    @Test
+    public void testGetLinks() {
+        ResponseImpl ri = new ResponseImpl(200);
+        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        ri.addMetadata(meta);
+        assertFalse(ri.hasLink("next"));
+        assertNull(ri.getLink("next"));
+        assertFalse(ri.hasLink("prev"));
+        assertNull(ri.getLink("prev"));
+        
+        meta.add(HttpHeaders.LINK, "<http://next>;rel=next");
+        meta.add(HttpHeaders.LINK, "<http://prev>;rel=prev");
+        
+        assertTrue(ri.hasLink("next"));
+        Link next = ri.getLink("next");
+        assertNotNull(next);
+        assertTrue(ri.hasLink("prev"));
+        Link prev = ri.getLink("prev");
+        assertNotNull(prev);
+        
+        Set<Link> links = ri.getLinks();
+        assertTrue(links.contains(next));
+        assertTrue(links.contains(prev));
+        
+        assertEquals("http://next", next.getUri().toString());
+        assertEquals("next", next.getRel().get(0));
+        assertEquals("http://prev", prev.getUri().toString());
+        assertEquals("prev", prev.getRel().get(0));
     }
 }

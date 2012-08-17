@@ -26,6 +26,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -49,6 +50,7 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         headerProviders.put(EntityTag.class, new EntityTagHeaderProvider());
         headerProviders.put(Cookie.class, new CookieHeaderProvider());
         headerProviders.put(NewCookie.class, new NewCookieHeaderProvider());
+        headerProviders.put(Link.class, new LinkHeaderProvider());
     }
     
     
