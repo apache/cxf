@@ -32,7 +32,7 @@ import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
@@ -225,7 +225,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                                                 FailoverFeature feature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         features.add(feature);
         bean.setFeatures(features);
         

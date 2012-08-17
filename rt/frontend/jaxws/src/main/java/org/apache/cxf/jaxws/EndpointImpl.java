@@ -59,7 +59,8 @@ import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
@@ -106,7 +107,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private Class<?> implementorClass;
     
     private List<String> schemaLocations;
-    private List<AbstractFeature> features;
+    private List<Feature> features;
     private List<Interceptor<? extends Message>> in 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private List<Interceptor<? extends Message>> out 
@@ -737,15 +738,15 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         return handlers;
     }
 
-    public List<AbstractFeature> getFeatures() {
+    public List<Feature> getFeatures() {
         if (features == null) {
-            features = new ArrayList<AbstractFeature>();
+            features = new ArrayList<Feature>();
         }
         return features;
     }
 
-    public void setFeatures(List<AbstractFeature> features) {
-        this.features = features;
+    public void setFeatures(List<? extends Feature> features) {
+        this.features = CastUtils.cast(features);
     }
 
     public Invoker getInvoker() {

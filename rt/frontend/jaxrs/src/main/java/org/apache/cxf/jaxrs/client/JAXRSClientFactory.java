@@ -26,7 +26,7 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.ProxyHelper;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.model.UserResource;
 
 /**
@@ -167,7 +167,7 @@ public final class JAXRSClientFactory {
      * @return typed proxy
      */
     public static <T> T create(String baseAddress, Class<T> cls, List<?> providers,
-                               List<AbstractFeature> features,                    
+                               List<Feature> features,                    
                                String configLocation) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
         bean.setProviders(providers);

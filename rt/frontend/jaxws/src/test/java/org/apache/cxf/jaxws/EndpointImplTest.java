@@ -244,7 +244,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
             assertEquals("BINDING_INCOMPATIBLE_ADDRESS_EXC", ((BusException)ex.getCause()).getCode());
         }
  
-        assertTrue(serviceFactory.getFeatures().size() == 1);
+        assertEquals(1, serviceFactory.getFeatures().size());
         assertTrue(serviceFactory.getFeatures().get(0) instanceof WSAddressingFeature);
     }
 

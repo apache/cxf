@@ -35,6 +35,7 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.message.MessageUtils;
@@ -168,7 +169,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     }
 
     public void setFeatures(List<? extends Feature> features2) {
-        this.features = new ArrayList<Feature>(features2);
+        this.features = CastUtils.cast(features2);
     }
 
     public BindingFactory getBindingFactory() {

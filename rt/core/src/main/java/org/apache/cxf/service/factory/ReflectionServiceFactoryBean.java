@@ -168,7 +168,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private boolean qualifiedSchemas = true;
     private boolean validate;
 
-    private List<? extends Feature> features;
+    private List<Feature> features;
 
     private Map<Method, Boolean> wrappedCache = new HashMap<Method, Boolean>();
     private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
@@ -2534,12 +2534,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         this.ignoredMethods = ignoredMethods;
     }
 
-    public List<? extends Feature> getFeatures() {
+    public List<Feature> getFeatures() {
         return features;
     }
 
     public void setFeatures(List<? extends Feature> features2) {
-        this.features = features2;
+        this.features = CastUtils.cast(features2);
     }
 
     private boolean isValidate() {

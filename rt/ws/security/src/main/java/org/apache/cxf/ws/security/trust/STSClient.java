@@ -64,7 +64,7 @@ import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -186,7 +186,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     protected List<Interceptor<? extends Message>> inFault 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<AbstractFeature> features;
+    protected List<Feature> features;
 
     public STSClient(Bus b) {
         bus = b;
@@ -571,7 +571,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         inFault = null;
         outFault = null;
         if (features != null) {
-            for (AbstractFeature f : features) {
+            for (Feature f : features) {
                 f.initialize(client, bus);
             }
         }
@@ -1592,10 +1592,10 @@ public class STSClient implements Configurable, InterceptorProvider {
         getOutFaultInterceptors().addAll(interceptors);
     }
         
-    public void setFeatures(List<AbstractFeature> f) {
-        features = f;
+    public void setFeatures(List<? extends Feature> f) {
+        features = CastUtils.cast(f);
     }
-    public List<AbstractFeature> getFeatures() {
+    public List<Feature> getFeatures() {
         return features;
     }
 }

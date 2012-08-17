@@ -53,6 +53,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
@@ -132,7 +133,11 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         super(bus, s, ei);
         this.implInfo = implementorInfo;
         this.wsFeatures = wf;
-        features = new ArrayList<Feature>(af);
+        if (af != null) {
+            features = CastUtils.cast(af);
+        } else {
+            features = new ArrayList<Feature>();
+        }
         createJaxwsBinding();
         
         List<Interceptor<? extends Message>> in = super.getInInterceptors();       

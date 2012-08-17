@@ -32,7 +32,8 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
@@ -144,7 +145,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         CXFBusImpl bus;
         String busName;
         String id;
-        Collection<AbstractFeature> features;
+        Collection<Feature> features;
         Map<String, Object> properties;
         
         public BusConfig(String busName) {
@@ -252,18 +253,18 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
         
-        public Collection<AbstractFeature> getFeatures() {
+        public Collection<Feature> getFeatures() {
             if (bus != null) {
                 return bus.getFeatures();
             }
             return features;
         }
 
-        public void setFeatures(Collection<AbstractFeature> features) {
+        public void setFeatures(Collection<? extends Feature> features) {
             if (bus != null) {
                 bus.setFeatures(features);
             } else {
-                this.features = features;
+                this.features = CastUtils.cast(features);
             }
             
         }

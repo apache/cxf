@@ -39,6 +39,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
@@ -371,7 +372,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     public void setFeatures(List<? extends Feature> f) {
-        this.features = new ArrayList<Feature>(f);
+        this.features = CastUtils.cast(f);
     }
 
     public DataBinding getDataBinding() {

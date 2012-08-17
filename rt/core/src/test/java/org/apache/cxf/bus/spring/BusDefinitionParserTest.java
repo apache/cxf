@@ -30,6 +30,7 @@ import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
@@ -55,9 +56,9 @@ public class BusDefinitionParserTest extends Assert {
         }
         assertTrue("could not find logging interceptor.", found);
    
-        Collection<AbstractFeature> features = ((CXFBusImpl)bus).getFeatures();
+        Collection<Feature> features = ((CXFBusImpl)bus).getFeatures();
         TestFeature tf = null;
-        for (AbstractFeature f : features) {
+        for (Feature f : features) {
             if (f instanceof TestFeature) {
                 tf = (TestFeature)f;
                 break;

@@ -31,7 +31,7 @@ import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 
@@ -56,7 +56,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     protected final Map<Class<?>, Object> extensions;
     protected String id;
     private BusState state;      
-    private final Collection<AbstractFeature> features = new CopyOnWriteArrayList<AbstractFeature>();
+    private final Collection<Feature> features = new CopyOnWriteArrayList<Feature>();
     private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>(16, 0.75f, 4);
     
     public CXFBusImpl() {
@@ -208,7 +208,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     protected void initializeFeatures() {
         loadAdditionalFeatures();
         if (features != null) {
-            for (AbstractFeature f : features) {
+            for (Feature f : features) {
                 f.initialize(this);
             }
         }
@@ -252,11 +252,11 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         return state;
     }
 
-    public Collection<AbstractFeature> getFeatures() {
+    public Collection<Feature> getFeatures() {
         return features;
     }
 
-    public synchronized void setFeatures(Collection<AbstractFeature> features) {
+    public synchronized void setFeatures(Collection<? extends Feature> features) {
         this.features.clear();
         this.features.addAll(features);
         if (FORCE_LOGGING) {

@@ -22,7 +22,7 @@ package org.apache.cxf;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -53,5 +53,5 @@ public interface Bus extends InterceptorProvider {
     Map<String, Object> getProperties();
     
     
-    Collection<AbstractFeature> getFeatures();
+    Collection<Feature> getFeatures();
 }

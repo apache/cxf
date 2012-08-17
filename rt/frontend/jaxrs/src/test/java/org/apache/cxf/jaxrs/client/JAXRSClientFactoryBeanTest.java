@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.model.UserOperation;
@@ -168,7 +169,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         TestFeature testFeature = new TestFeature();
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<Feature> features = new ArrayList<Feature>();
         features.add(testFeature);
         bean.setFeatures(features);
         

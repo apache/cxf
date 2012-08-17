@@ -27,9 +27,7 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.feature.WrappedFeature;
 import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -63,11 +61,7 @@ public class SpringBus extends ExtensionManagerBus
             SpringBeanLocator sloc = (SpringBeanLocator)loc;
             List<Feature> features = sloc.getOSGiServices(Feature.class);
             for (Feature feature : features) {
-                if (feature instanceof AbstractFeature) {
-                    this.getFeatures().add((AbstractFeature)feature);
-                } else {
-                    this.getFeatures().add(new WrappedFeature(feature));
-                }
+                this.getFeatures().add(feature);
             }
         }
     }

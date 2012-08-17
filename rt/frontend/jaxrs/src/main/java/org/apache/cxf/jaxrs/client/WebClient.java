@@ -42,7 +42,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -154,7 +154,7 @@ public class WebClient extends AbstractClient {
      */
     public static WebClient create(String baseAddress, 
                                    List<?> providers, 
-                                   List<AbstractFeature> features,
+                                   List<? extends Feature> features,
                                    String configLocation) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
         bean.setProviders(providers);

@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
 
@@ -147,8 +147,8 @@ public class AnnotationInterceptors {
         return getAnnotationInterceptorList(OutInterceptors.class);
     }
         
-    public List<AbstractFeature> getFeatures() {
-        return getAnnotationObject(Features.class, AbstractFeature.class);
+    public List<Feature> getFeatures() {
+        return getAnnotationObject(Features.class, Feature.class);
     }
 
 }

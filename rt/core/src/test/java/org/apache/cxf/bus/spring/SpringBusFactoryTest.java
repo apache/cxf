@@ -39,6 +39,7 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
@@ -256,7 +257,7 @@ public class SpringBusFactoryTest extends Assert {
         
         public void initComplete() {
             assertNull(bus.getExtension(TestFeature.class));
-            Collection<AbstractFeature> features = ((CXFBusImpl)bus).getFeatures();
+            Collection<Feature> features = ((CXFBusImpl)bus).getFeatures();
             assertEquals(1, features.size());
             TestFeature tf = (TestFeature)features.iterator().next();
             assertTrue(tf.initialised);
