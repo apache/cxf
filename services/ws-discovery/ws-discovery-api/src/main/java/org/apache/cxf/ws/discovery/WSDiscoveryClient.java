@@ -22,16 +22,21 @@ package org.apache.cxf.ws.discovery;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.EndpointReference;
+import javax.xml.ws.Response;
+import javax.xml.ws.Service;
+import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
@@ -41,20 +46,19 @@ import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.discovery.wsdl.AppSequenceType;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
-import org.apache.cxf.ws.discovery.wsdl.DiscoveryProxy;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ObjectFactory;
+import org.apache.cxf.ws.discovery.wsdl.ProbeMatchesType;
+import org.apache.cxf.ws.discovery.wsdl.ProbeType;
 import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
@@ -62,13 +66,20 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  * 
  */
 public class WSDiscoveryClient implements Closeable {
+    private static final QName SERVICE_QNAME 
+        = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
+    private static final QName PORT_QNAME 
+        = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
     
-    DiscoveryProxy client;
+    
     String address = "soap.udp://239.255.255.250:3702";
     boolean adHoc = true;
     AtomicInteger msgId = new AtomicInteger(1);
     long instanceId = System.currentTimeMillis();
     JAXBContext jaxbContext;
+    Service service;
+    Dispatch<Object> dispatch;
+    ObjectFactory factory = new ObjectFactory();
     Bus bus;
     
     public WSDiscoveryClient() {
@@ -87,25 +98,24 @@ public class WSDiscoveryClient implements Closeable {
         }
         return jaxbContext;
     }
-    private synchronized DiscoveryProxy getClientInternal() {
-        if (client == null) {
-            JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-            if (bus != null) {
-                factory.setBus(bus);
-            }
-            factory.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
-            factory.setAddress(address);
-            factory.setFeatures(Arrays.asList(new WSAddressingFeature()));
-            client = factory.create(DiscoveryProxy.class);
-            ((BindingProvider)client).getRequestContext()
-                .put("thread.local.request.context", Boolean.TRUE);
+    private synchronized Service getService() {
+        if (service == null) {
+            service = Service.create(SERVICE_QNAME);
+            service.addPort(PORT_QNAME, SOAPBinding.SOAP12HTTP_BINDING, address);
         }
-        return client;
+        return service;
     }
     
-    private DiscoveryProxy getClient() {
-        DiscoveryProxy c = getClientInternal();
-    
+    private synchronized Dispatch<Object> getDispatchInternal(boolean addSeq) {
+        if (dispatch == null) {
+            AddressingFeature f = new AddressingFeature(true, true);
+            dispatch = getService().createDispatch(PORT_QNAME, getJAXBContext(), Service.Mode.PAYLOAD, f);
+            dispatch.getRequestContext().put("thread.local.request.context", Boolean.TRUE);
+        }
+        addAddressing(dispatch, false);
+        return dispatch;
+    }
+    private void addAddressing(BindingProvider p, boolean addSeq) {
         if (adHoc) {
             EndpointReferenceType to = new EndpointReferenceType();
             AddressingProperties addrProperties = new AddressingPropertiesImpl();
@@ -114,28 +124,29 @@ public class WSDiscoveryClient implements Closeable {
             to.setAddress(epr);
             addrProperties.setTo(to);
         
-            ((BindingProvider)c).getRequestContext()
+            p.getRequestContext()
                 .put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProperties);
             
-            AppSequenceType s = new AppSequenceType();
-            s.setInstanceId(instanceId);
-            s.setMessageNumber(msgId.getAndIncrement());
-            JAXBElement<AppSequenceType> seq = new ObjectFactory().createAppSequence(s);
-            Header h = new Header(seq.getName(),
-                                  seq,
-                                  new JAXBDataBinding(getJAXBContext()));
-            List<Header> headers = new ArrayList<Header>();
-            headers.add(h);
-            ((BindingProvider)c).getRequestContext()
-                .put(Header.HEADER_LIST, headers);
+            if (addSeq) {
+                AppSequenceType s = new AppSequenceType();
+                s.setInstanceId(instanceId);
+                s.setMessageNumber(msgId.getAndIncrement());
+                JAXBElement<AppSequenceType> seq = new ObjectFactory().createAppSequence(s);
+                Header h = new Header(seq.getName(),
+                                      seq,
+                                      new JAXBDataBinding(getJAXBContext()));
+                List<Header> headers = new ArrayList<Header>();
+                headers.add(h);
+                p.getRequestContext()
+                    .put(Header.HEADER_LIST, headers);
+            }
         }
-        return c;
     }
     
     public synchronized void close() throws IOException {
-        if (client != null) {
-            ((Closeable)client).close();
-            client = null;
+        if (dispatch != null) {
+            ((Closeable)dispatch).close();
+            dispatch = null;
         }
     }
     public void finalize() throws Throwable {
@@ -149,8 +160,7 @@ public class WSDiscoveryClient implements Closeable {
      * @return the hello
      */
     public HelloType register(HelloType hello) {
-        DiscoveryProxy c = getClient();
-        c.helloOp(hello);
+        getDispatchInternal(true).invokeOneWay(factory.createHello(hello));
         return hello;
     }
     
@@ -167,16 +177,14 @@ public class WSDiscoveryClient implements Closeable {
         proccessEndpointReference(ref, hello.getScopes(),
                                   hello.getTypes(),
                                   hello.getXAddrs());
-        String add = EndpointReferenceUtils.getAddress(ref);
-        hello.setEndpointReference(generateW3CEndpointReference(add));
+        hello.setEndpointReference(generateW3CEndpointReference());
         return register(hello);
     }
 
     
     
     public void unregister(ByeType bye) {
-        DiscoveryProxy c = getClient();
-        c.byeOp(bye);
+        getDispatchInternal(true).invokeOneWay(factory.createBye(bye));
     }
     public void unregister(HelloType hello) {
         ByeType bt = new ByeType();
@@ -191,19 +199,47 @@ public class WSDiscoveryClient implements Closeable {
         proccessEndpointReference(ref, bt.getScopes(),
                                   bt.getTypes(),
                                   bt.getXAddrs());
-        String add = EndpointReferenceUtils.getAddress(ref);
-        bt.setEndpointReference(generateW3CEndpointReference(add));
+        bt.setEndpointReference(generateW3CEndpointReference());
         unregister(bt);
     }
     
+    public ProbeMatchesType probe(ProbeType params) {
+        return probe(params, 1000);
+    }    
+    public ProbeMatchesType probe(ProbeType params, int timeout) {
+        Dispatch<Object> disp = this.getDispatchInternal(false);
+        disp.getRequestContext().put("udp.multi.response.timeout", timeout);
+        final ProbeMatchesType response = new ProbeMatchesType();
+        AsyncHandler<Object> handler = new AsyncHandler<Object>() {
+            public void handleResponse(Response<Object> res) {
+                try {
+                    Object o = res.get();
+                    while (o instanceof JAXBElement) {
+                        o = ((JAXBElement)o).getValue();
+                    }
+                    if (o instanceof ProbeMatchesType) {
+                        response.getProbeMatch().addAll(((ProbeMatchesType)o).getProbeMatch());
+                    } else if (o instanceof HelloType) {
+                        //DiscoveryProxy wants us to switch to managed
+                        //FIXME
+                    }
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        };
+        disp.invokeAsync(new ObjectFactory().createProbe(params), handler);
+        return response;
+    }
     
-    private W3CEndpointReference generateW3CEndpointReference(String add) {
+    
+    private W3CEndpointReference generateW3CEndpointReference() {
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
-        if (StringUtils.isEmpty(add)) {
-            builder.address(ContextUtils.generateUUID());
-        } else {
-            builder.address(add);
-        }
+        builder.address(ContextUtils.generateUUID());
         return builder.build();
     }
     private void proccessEndpointReference(EndpointReferenceType ref,

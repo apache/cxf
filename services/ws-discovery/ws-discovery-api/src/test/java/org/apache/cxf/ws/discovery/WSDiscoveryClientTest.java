@@ -23,6 +23,11 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ws.discovery.wsdl.HelloType;
+import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
+import org.apache.cxf.ws.discovery.wsdl.ProbeMatchesType;
+import org.apache.cxf.ws.discovery.wsdl.ProbeType;
+
 
 /**
  * 
@@ -35,18 +40,31 @@ public final class WSDiscoveryClientTest {
     
     
     public static void main(String[] arg) throws Exception {
-        Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
-        WSDiscoveryClient c = new WSDiscoveryClient();
-        c.register(ep.getEndpointReference());
-        
-        System.out.println("1");
-        Thread.sleep(1000);
-        //c.unregister(h);
-        c.unregister(ep.getEndpointReference());
-        System.out.println("2");
-        c.close();
-        
-        System.exit(0);
+        try {
+            Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
+            WSDiscoveryClient c = new WSDiscoveryClient();
+            HelloType h = c.register(ep.getEndpointReference());
+            
+            System.out.println("1");
+            Thread.sleep(1000);
+            ProbeMatchesType pmts = c.probe(new ProbeType());
+            System.out.println("2");
+            if  (pmts != null) {
+                for (ProbeMatchType pmt : pmts.getProbeMatch()) {
+                    System.out.println("Found " + pmt.getEndpointReference());
+                    System.out.println(pmt.getTypes());
+                    System.out.println(pmt.getXAddrs());
+                }
+            }
+            
+            c.unregister(h);
+            System.out.println("2");
+            c.close();
+            
+            System.exit(0);
+        } catch (Throwable t) {
+            System.exit(1);
+        }
     }
     
 
