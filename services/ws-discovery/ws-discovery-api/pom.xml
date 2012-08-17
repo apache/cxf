@@ -76,11 +76,11 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/org/apache/cxf/ws/discovery/wsdl/wsdd-discovery-1.1-wsdl-os.wsdl</wsdl>
-                                    <asyncMethods></asyncMethods>
                                     <extraargs>
                                         <extraArg>-p</extraArg>
                                         <extraArg>org.apache.cxf.ws.discovery.wsdl</extraArg>
                                     </extraargs>
+                                    <wsdlLocation>classpath:/org/apache/cxf/ws/discovery/wsdl/wsdd-discovery-1.1-wsdl-os.wsdl</wsdlLocation>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>

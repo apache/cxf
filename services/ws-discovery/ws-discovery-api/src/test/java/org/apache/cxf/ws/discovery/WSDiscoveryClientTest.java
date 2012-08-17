@@ -42,11 +42,15 @@ public final class WSDiscoveryClientTest {
     public static void main(String[] arg) throws Exception {
         try {
             Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
+            WSDiscoveryService service = new WSDiscoveryService(null);
+            service.startup();
+            
+            
             WSDiscoveryClient c = new WSDiscoveryClient();
-            HelloType h = c.register(ep.getEndpointReference());
+            HelloType h = service.register(ep.getEndpointReference());
+            
             
             System.out.println("1");
-            Thread.sleep(1000);
             ProbeMatchesType pmts = c.probe(new ProbeType());
             System.out.println("2");
             if  (pmts != null) {
@@ -58,6 +62,7 @@ public final class WSDiscoveryClientTest {
             }
             pmts = c.probe(new ProbeType());
             System.out.println("3");
+            
             if  (pmts != null) {
                 for (ProbeMatchType pmt : pmts.getProbeMatch()) {
                     System.out.println("Found " + pmt.getEndpointReference());
@@ -65,13 +70,13 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
-            
-            c.unregister(h);
+            service.unregister(h);
             System.out.println("4");
             c.close();
             
             System.exit(0);
         } catch (Throwable t) {
+            t.printStackTrace();
             System.exit(1);
         }
     }

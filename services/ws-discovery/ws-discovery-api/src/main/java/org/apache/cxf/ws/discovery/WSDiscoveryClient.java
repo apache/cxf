@@ -198,16 +198,7 @@ public class WSDiscoveryClient implements Closeable {
         bt.setEndpointReference(hello.getEndpointReference());
         unregister(bt);
     }
-    public void unregister(EndpointReference ert) {
-        ByeType bt = new ByeType();
-        bt.setScopes(new ScopesType());
-        EndpointReferenceType ref = ProviderImpl.convertToInternal(ert);
-        proccessEndpointReference(ref, bt.getScopes(),
-                                  bt.getTypes(),
-                                  bt.getXAddrs());
-        bt.setEndpointReference(generateW3CEndpointReference());
-        unregister(bt);
-    }
+    
     
     public ProbeMatchesType probe(ProbeType params) {
         return probe(params, 1000);
