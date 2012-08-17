@@ -27,7 +27,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -103,7 +103,7 @@ public class BasicNameManager implements NameManager {
 
     private JavascriptOptionsFeature getOptions(Endpoint endpoint) {
         if (endpoint != null) {
-            for (AbstractFeature feature : endpoint.getActiveFeatures()) {
+            for (Feature feature : endpoint.getActiveFeatures()) {
                 if (feature instanceof JavascriptOptionsFeature) {
                     return (JavascriptOptionsFeature) feature;
                 }

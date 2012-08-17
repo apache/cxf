@@ -38,7 +38,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
@@ -64,7 +64,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     private String password;
     private Map<String, Object> properties;
     private Bus bus;
-    private List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+    private List<Feature> features = new ArrayList<Feature>();
     private DataBinding dataBinding;
 
     public ClientProxyFactoryBean() {
@@ -366,12 +366,12 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         this.properties = properties;
     }
 
-    public List<AbstractFeature> getFeatures() {
+    public List<Feature> getFeatures() {
         return features;
     }
 
-    public void setFeatures(List<AbstractFeature> f) {
-        this.features = f;
+    public void setFeatures(List<? extends Feature> f) {
+        this.features = new ArrayList<Feature>(f);
     }
 
     public DataBinding getDataBinding() {

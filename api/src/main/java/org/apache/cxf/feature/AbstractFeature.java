@@ -62,11 +62,11 @@ public abstract class AbstractFeature implements Feature {
      * @param type the feature type required
      * @return the feature of the specified type if active
      */
-    public static <T> T getActive(List<AbstractFeature> features,
+    public static <T> T getActive(List<? extends Feature> features,
                                   Class<T> type) {
         T active = null;
         if (features != null) {
-            for (AbstractFeature feature : features) {
+            for (Feature feature : features) {
                 if (type.isInstance(feature)) {
                     active = type.cast(feature);
                     break;

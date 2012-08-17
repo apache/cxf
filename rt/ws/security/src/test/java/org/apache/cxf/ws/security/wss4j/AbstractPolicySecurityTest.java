@@ -45,7 +45,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
 import org.apache.cxf.message.Message;
@@ -551,7 +551,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         }
         
         
-        public List<AbstractFeature> getActiveFeatures() {
+        public List<Feature> getActiveFeatures() {
             return null;
         }
 

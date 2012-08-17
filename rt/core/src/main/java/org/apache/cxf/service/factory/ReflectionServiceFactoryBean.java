@@ -77,7 +77,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.MethodComparator;
 import org.apache.cxf.interceptor.Fault;
@@ -168,7 +168,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private boolean qualifiedSchemas = true;
     private boolean validate;
 
-    private List<AbstractFeature> features;
+    private List<? extends Feature> features;
 
     private Map<Method, Boolean> wrappedCache = new HashMap<Method, Boolean>();
     private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
@@ -398,7 +398,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         WSDLServiceFactory factory = new WSDLServiceFactory(getBus(), url, getServiceQName());
         boolean setEPName = true;
         if (features != null) {
-            for (AbstractFeature f : features) {
+            for (Feature f : features) {
                 if (f.getClass().isAnnotationPresent(EvaluateAllEndpoints.class)) {
                     setEPName = false;
                 }
@@ -2534,12 +2534,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         this.ignoredMethods = ignoredMethods;
     }
 
-    public List<AbstractFeature> getFeatures() {
+    public List<? extends Feature> getFeatures() {
         return features;
     }
 
-    public void setFeatures(List<AbstractFeature> f) {
-        this.features = f;
+    public void setFeatures(List<? extends Feature> features2) {
+        this.features = features2;
     }
 
     private boolean isValidate() {

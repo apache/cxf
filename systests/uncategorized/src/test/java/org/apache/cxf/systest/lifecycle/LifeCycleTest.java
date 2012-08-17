@@ -38,6 +38,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.greeter_control.ControlImpl;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -183,7 +184,7 @@ public class LifeCycleTest extends Assert {
                     endpoint.getEndpointInfo().getName().getLocalPart();
                 if ("SoapPort".equals(portName)) {
                     
-                    List<AbstractFeature> active = endpoint.getActiveFeatures();
+                    List<Feature> active = endpoint.getActiveFeatures();
                     assertNotNull(active);
                     assertEquals(1, active.size());
                     assertTrue(active.get(0) instanceof WSAddressingFeature);
@@ -191,7 +192,7 @@ public class LifeCycleTest extends Assert {
                                AbstractFeature.getActive(active,
                                                          WSAddressingFeature.class));
                 } else {
-                    List<AbstractFeature> active = endpoint.getActiveFeatures();
+                    List<Feature> active = endpoint.getActiveFeatures();
                     assertNotNull(active);
                     assertEquals(0, active.size());
                     assertNull(AbstractFeature.getActive(active,

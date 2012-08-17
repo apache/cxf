@@ -26,7 +26,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -108,7 +108,7 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
     protected void applyFeatures(Client client) {
         if (getFeatures() != null) {
-            for (AbstractFeature feature : getFeatures()) {
+            for (Feature feature : getFeatures()) {
                 feature.initialize(client, getBus());
             }
         }

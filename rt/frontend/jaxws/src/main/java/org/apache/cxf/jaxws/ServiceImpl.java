@@ -70,7 +70,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
@@ -648,7 +648,7 @@ public class ServiceImpl extends ServiceDelegate {
         
         // create the client object, then initialize the endpoint features against it
         Client client = new ClientImpl(clientBus, endpoint, clientFac.getConduitSelector());
-        for (AbstractFeature af : endpoint.getFeatures()) {
+        for (Feature af : endpoint.getFeatures()) {
             af.initialize(client, clientBus);
         }
         //CXF-2822

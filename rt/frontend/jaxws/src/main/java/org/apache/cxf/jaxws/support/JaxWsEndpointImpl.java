@@ -52,7 +52,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
@@ -106,7 +106,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     private Binding jaxwsBinding;
     private JaxWsImplementorInfo implInfo; 
     private List<WebServiceFeature> wsFeatures;
-    private List<AbstractFeature> features;
+    private List<Feature> features;
     
     //interceptors added/removed to chains as needed
     private SOAPHandlerInterceptor soapHandlerInterceptor;
@@ -123,20 +123,16 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, 
                              List<WebServiceFeature> wf) throws EndpointException {
-        this(bus, s, ei, null, wf, new ArrayList<AbstractFeature>(), true);
+        this(bus, s, ei, null, wf, new ArrayList<Feature>(), true);
     }    
 
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, JaxWsImplementorInfo implementorInfo, 
-                             List<WebServiceFeature> wf, List<AbstractFeature> af, boolean isFromWsdl)
+                             List<WebServiceFeature> wf, List<? extends Feature> af, boolean isFromWsdl)
         throws EndpointException {
         super(bus, s, ei);
         this.implInfo = implementorInfo;
         this.wsFeatures = wf;
-        this.features = af;
-
-        if (features == null) {
-            features = new ArrayList<AbstractFeature>();
-        }
+        features = new ArrayList<Feature>(af);
         createJaxwsBinding();
         
         List<Interceptor<? extends Message>> in = super.getInInterceptors();       
@@ -433,7 +429,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
     }
     
-    public List<AbstractFeature> getFeatures() {
+    public List<Feature> getFeatures() {
         return features;
     }
 
@@ -441,7 +437,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         if (features == null) {
             return null;
         }
-        for (AbstractFeature f : features) {
+        for (Feature f : features) {
             if (f instanceof WSAddressingFeature) {
                 return (WSAddressingFeature)f;
             }
@@ -449,15 +445,15 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         return null;
     }
 
-    private void addAddressingFeature(AbstractFeature a) {
-        AbstractFeature f = getWSAddressingFeature();
+    private void addAddressingFeature(WSAddressingFeature a) {
+        Feature f = getWSAddressingFeature();
         if (f == null) {
             features.add(a);
         }
     }
 
     private void removeAddressingFeature() {
-        AbstractFeature f = getWSAddressingFeature();
+        Feature f = getWSAddressingFeature();
         if (f != null) {
             features.remove(f);
         }

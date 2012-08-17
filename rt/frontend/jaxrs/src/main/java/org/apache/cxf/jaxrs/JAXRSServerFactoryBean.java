@@ -35,7 +35,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
@@ -203,7 +203,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
     protected void applyFeatures() {
         if (getFeatures() != null) {
-            for (AbstractFeature feature : getFeatures()) {
+            for (Feature feature : getFeatures()) {
                 feature.initialize(server, getBus());
             }
         }

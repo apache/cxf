@@ -34,7 +34,7 @@ import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.message.MessageUtils;
@@ -58,7 +58,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     protected QName endpointName;
     protected QName serviceName;
     protected Map<String, Object> properties;
-    protected List<AbstractFeature> features;
+    protected List<Feature> features;
     protected BindingConfiguration bindingConfig;
     protected EndpointReferenceType endpointReference;
     protected ConduitSelector conduitSelector;
@@ -160,15 +160,15 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
         this.properties = properties;
     }
 
-    public List<AbstractFeature> getFeatures() {
+    public List<Feature> getFeatures() {
         if (features == null) {
-            features = new ArrayList<AbstractFeature>();
+            features = new ArrayList<Feature>();
         }
         return features;
     }
 
-    public void setFeatures(List<AbstractFeature> features) {
-        this.features = features;
+    public void setFeatures(List<? extends Feature> features2) {
+        this.features = new ArrayList<Feature>(features2);
     }
 
     public BindingFactory getBindingFactory() {

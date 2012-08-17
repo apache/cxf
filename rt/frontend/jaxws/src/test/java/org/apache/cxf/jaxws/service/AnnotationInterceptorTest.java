@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.InFaultInterceptors;
@@ -80,7 +80,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         fb.setServiceBean(hello);
         fb.create();
         
-        List<AbstractFeature> features = fb.getFeatures();
+        List<Feature> features = fb.getFeatures();
         assertTrue(hasAnnotationFeature(features));
     }
     
@@ -94,7 +94,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         List<Interceptor<? extends Message>> interceptors = fb.getServer().getEndpoint().getInInterceptors();
         assertFalse(hasTestInterceptor(interceptors));
         
-        List<AbstractFeature> features = fb.getFeatures();
+        List<Feature> features = fb.getFeatures();
         assertFalse(hasAnnotationFeature(features));
     }
     
@@ -108,7 +108,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         List<Interceptor<? extends Message>> interceptors = jfb.getServer().getEndpoint().getInInterceptors();
         assertFalse(hasTestInterceptor(interceptors));
         
-        List<AbstractFeature> features = fb.getFeatures();
+        List<Feature> features = fb.getFeatures();
         assertFalse(hasAnnotationFeature(features));
     }
     
@@ -127,7 +127,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         assertFalse(hasTestInterceptor(inFaultInterceptors));
         assertTrue(hasTest2Interceptor(inFaultInterceptors));
         
-        List<AbstractFeature> features = jfb.getFeatures();
+        List<Feature> features = jfb.getFeatures();
         assertTrue(hasAnnotationFeature(features));
     }
     
@@ -156,7 +156,7 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         List<Interceptor<? extends Message>> interceptors = jfb.getServer().getEndpoint().getInInterceptors();
         assertTrue(hasTestInterceptor(interceptors));
         
-        List<AbstractFeature> features = jfb.getFeatures();
+        List<Feature> features = jfb.getFeatures();
         assertTrue(hasAnnotationFeature(features));
     }
     
@@ -192,9 +192,9 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
         return flag;
     }
     
-    private boolean hasAnnotationFeature(List<AbstractFeature> features) {
+    private boolean hasAnnotationFeature(List<Feature> features) {
         boolean flag = false;
-        for (AbstractFeature af : features) {
+        for (Feature af : features) {
             if (af instanceof AnnotationFeature) {
                 flag = true;
             }

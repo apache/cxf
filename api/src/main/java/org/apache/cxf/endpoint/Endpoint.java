@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 
 import org.apache.cxf.binding.Binding;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -54,5 +54,5 @@ public interface Endpoint extends Map<String, Object>, InterceptorProvider {
     
     void setOutFaultObserver(MessageObserver observer);
 
-    List<AbstractFeature> getActiveFeatures();
+    List<Feature> getActiveFeatures();
 }

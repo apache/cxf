@@ -30,7 +30,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -244,7 +244,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
     protected void applyFeatures() {
         if (getFeatures() != null) {
-            for (AbstractFeature feature : getFeatures()) {
+            for (Feature feature : getFeatures()) {
                 feature.initialize(server, getBus());
             }
         }

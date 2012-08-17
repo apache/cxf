@@ -46,7 +46,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -281,7 +281,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (message.getExchange() != null && message.getExchange().getEndpoint() != null) {
             Endpoint endpoint = message.getExchange().getEndpoint();
             if (endpoint.getActiveFeatures() != null) {
-                for (AbstractFeature feature : endpoint.getActiveFeatures()) {
+                for (Feature feature : endpoint.getActiveFeatures()) {
                     if (feature instanceof WSAddressingFeature) {
                         return (WSAddressingFeature)feature;
                     }

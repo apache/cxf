@@ -68,7 +68,7 @@ import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -322,18 +322,18 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             // if the addressing feature is enabled, set findDispatchOp to true
             if (!findDispatchOp) {
                 // the feature list to be searched is the endpoint and the bus's lists
-                List<AbstractFeature> endpointFeatures 
+                List<Feature> endpointFeatures 
                     = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
-                List<AbstractFeature> allFeatures;
+                List<Feature> allFeatures;
                 if (client.getBus().getFeatures() != null) {
-                    allFeatures = new ArrayList<AbstractFeature>(endpointFeatures.size() 
+                    allFeatures = new ArrayList<Feature>(endpointFeatures.size() 
                         + client.getBus().getFeatures().size());
                     allFeatures.addAll(endpointFeatures);
                     allFeatures.addAll(client.getBus().getFeatures());
                 } else {
                     allFeatures = endpointFeatures;
                 }
-                for (AbstractFeature feature : allFeatures) {
+                for (Feature feature : allFeatures) {
                     if (feature instanceof WSAddressingFeature) {
                         findDispatchOp = true; 
                     }

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -36,7 +37,7 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
 import org.apache.cxf.interceptor.ClientFaultConverter;
 import org.apache.cxf.interceptor.InFaultChainInitiatorObserver;
@@ -60,7 +61,7 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     private Bus bus;
     private MessageObserver inFaultObserver;
     private MessageObserver outFaultObserver;
-    private List<AbstractFeature> activeFeatures;
+    private List<Feature> activeFeatures;
 
     public EndpointImpl(Bus bus, Service s, QName endpointName) throws EndpointException {
         this(bus, s, s.getEndpointInfo(endpointName));
@@ -169,15 +170,15 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     /**
      * @return the list of fearures <b>already</b> activated for this endpoint.
      */
-    public List<AbstractFeature> getActiveFeatures() {
+    public List<Feature> getActiveFeatures() {
         return activeFeatures;
     }
 
     /**
      * @param the list of fearures <b>already</b> activated for this endpoint.
      */
-    public void initializeActiveFeatures(List<AbstractFeature> features) {
-        activeFeatures = features;
+    public void initializeActiveFeatures(List<? extends Feature> features) {
+        activeFeatures = new ArrayList<Feature>(features);
     }
 
     /**

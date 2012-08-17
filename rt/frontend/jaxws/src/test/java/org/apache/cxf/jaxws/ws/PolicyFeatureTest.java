@@ -28,7 +28,7 @@ import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.policy.PolicyEngine;
@@ -89,7 +89,7 @@ public class PolicyFeatureTest extends Assert {
         c.configureBean("test", sf);
         sf.setStart(false);
         
-        List<AbstractFeature> features = sf.getFeatures();
+        List<Feature> features = sf.getFeatures();
         assertEquals(1, features.size());
         
         Server server = sf.create();
@@ -117,7 +117,7 @@ public class PolicyFeatureTest extends Assert {
         Configurer c = bus.getExtension(Configurer.class);
         c.configureBean("test2004", sf);
         
-        List<AbstractFeature> features = sf.getFeatures();
+        List<? extends Feature> features = sf.getFeatures();
         assertEquals(1, features.size());
         sf.setStart(false);
         
@@ -146,7 +146,7 @@ public class PolicyFeatureTest extends Assert {
         Configurer c = bus.getExtension(Configurer.class);
         c.configureBean("testExternal", sf);
         
-        List<AbstractFeature> features = sf.getFeatures();
+        List<Feature> features = sf.getFeatures();
         assertEquals(1, features.size());
         sf.setStart(false);
         Server server = sf.create();
