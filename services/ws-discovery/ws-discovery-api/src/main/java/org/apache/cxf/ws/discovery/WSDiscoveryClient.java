@@ -105,6 +105,12 @@ public class WSDiscoveryClient implements Closeable {
         }
         return service;
     }
+    private synchronized void resetDispatch(String newad) {
+        address = newad;
+        service = null;
+        dispatch = null;
+        adHoc = false;
+    }
     
     private synchronized Dispatch<Object> getDispatchInternal(boolean addSeq) {
         if (dispatch == null) {
@@ -208,32 +214,46 @@ public class WSDiscoveryClient implements Closeable {
     }    
     public ProbeMatchesType probe(ProbeType params, int timeout) {
         Dispatch<Object> disp = this.getDispatchInternal(false);
-        disp.getRequestContext().put("udp.multi.response.timeout", timeout);
-        final ProbeMatchesType response = new ProbeMatchesType();
-        AsyncHandler<Object> handler = new AsyncHandler<Object>() {
-            public void handleResponse(Response<Object> res) {
-                try {
-                    Object o = res.get();
-                    while (o instanceof JAXBElement) {
-                        o = ((JAXBElement)o).getValue();
+        if (adHoc) {
+            disp.getRequestContext().put("udp.multi.response.timeout", timeout);
+            final ProbeMatchesType response = new ProbeMatchesType();
+            AsyncHandler<Object> handler = new AsyncHandler<Object>() {
+                public void handleResponse(Response<Object> res) {
+                    try {
+                        Object o = res.get();
+                        while (o instanceof JAXBElement) {
+                            o = ((JAXBElement)o).getValue();
+                        }
+                        if (o instanceof ProbeMatchesType) {
+                            response.getProbeMatch().addAll(((ProbeMatchesType)o).getProbeMatch());
+                        } else if (o instanceof HelloType) {
+                            HelloType h = (HelloType)o;
+                            if (h.getTypes().contains(SERVICE_QNAME)
+                                || h.getTypes().contains(new QName("", SERVICE_QNAME.getLocalPart()))) {
+                                // A DiscoveryProxy wants us to flip to managed mode
+                                resetDispatch(h.getXAddrs().get(0));
+                            } else {
+                                System.out.println(h.getTypes());
+                            }
+                            
+                        }
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-                    if (o instanceof ProbeMatchesType) {
-                        response.getProbeMatch().addAll(((ProbeMatchesType)o).getProbeMatch());
-                    } else if (o instanceof HelloType) {
-                        //DiscoveryProxy wants us to switch to managed
-                        //FIXME
-                    }
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
-            }
-        };
-        disp.invokeAsync(new ObjectFactory().createProbe(params), handler);
-        return response;
+            };
+            disp.invokeAsync(new ObjectFactory().createProbe(params), handler);
+            return response;
+        }
+        Object o = disp.invoke(new ObjectFactory().createProbe(params));
+        while (o instanceof JAXBElement) {
+            o = ((JAXBElement)o).getValue();
+        }
+        return (ProbeMatchesType)o;
     }
     
     

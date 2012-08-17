@@ -271,7 +271,7 @@ public class UDPConduit extends AbstractConduit {
                 byte bytes[] = new byte[64 * 1024];
                 DatagramPacket p = new DatagramPacket(bytes, bytes.length);
                 Integer i = (Integer)message.getContextualProperty(MULTI_RESPONSE_TIMEOUT);
-                if (i == null) {
+                if (i == null || message.getExchange().isSynchronous()) {
                     socket.setSoTimeout(30000);
                     socket.receive(p);
                     dataReceived(message, IoBuffer.wrap(bytes, 0, p.getLength()), false);

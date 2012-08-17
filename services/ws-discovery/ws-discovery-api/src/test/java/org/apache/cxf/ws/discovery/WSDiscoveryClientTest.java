@@ -56,9 +56,18 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
+            pmts = c.probe(new ProbeType());
+            System.out.println("3");
+            if  (pmts != null) {
+                for (ProbeMatchType pmt : pmts.getProbeMatch()) {
+                    System.out.println("Found " + pmt.getEndpointReference());
+                    System.out.println(pmt.getTypes());
+                    System.out.println(pmt.getXAddrs());
+                }
+            }
             
             c.unregister(h);
-            System.out.println("2");
+            System.out.println("4");
             c.close();
             
             System.exit(0);
