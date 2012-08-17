@@ -66,7 +66,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  * 
  */
 public class WSDiscoveryClient implements Closeable {
-    private static final QName SERVICE_QNAME 
+    static final QName SERVICE_QNAME 
         = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
     private static final QName PORT_QNAME 
         = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
@@ -223,10 +223,7 @@ public class WSDiscoveryClient implements Closeable {
                                 || h.getTypes().contains(new QName("", SERVICE_QNAME.getLocalPart()))) {
                                 // A DiscoveryProxy wants us to flip to managed mode
                                 resetDispatch(h.getXAddrs().get(0));
-                            } else {
-                                System.out.println(h.getTypes());
                             }
-                            
                         }
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block

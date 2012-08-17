@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.discovery;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.util.JAXBSource;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
@@ -36,6 +38,7 @@ import javax.xml.ws.soap.Addressing;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
+import org.apache.cxf.ws.discovery.wsdl.ByeType;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ObjectFactory;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
@@ -106,6 +109,33 @@ public class WSDiscoveryService {
                         pmt.getProbeMatch().add(m);
                     }
                     return new JAXBSource(context, factory.createProbeMatches(pmt));
+                } else if (obj instanceof HelloType) {
+                    //check if it's a DiscoveryProxy
+                    HelloType h = (HelloType)obj;
+                    if (h.getTypes().contains(WSDiscoveryClient.SERVICE_QNAME)
+                        || h.getTypes().contains(new QName("", WSDiscoveryClient.SERVICE_QNAME.getLocalPart()))) {
+                        // A DiscoveryProxy wants us to flip to managed mode
+                        try {
+                            client.close();
+                            client = new WSDiscoveryClient(h.getXAddrs().get(0));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else if (obj instanceof ByeType) {
+                    ByeType h = (ByeType)obj;
+                    if (h.getTypes().contains(WSDiscoveryClient.SERVICE_QNAME)
+                        || h.getTypes().contains(new QName("", WSDiscoveryClient.SERVICE_QNAME.getLocalPart()))) {
+                        // Our proxy has gone away, flip to ad-hoc
+                        try {
+                            if (client.address.equals(h.getXAddrs().get(0))) {
+                                client.close();
+                                client = new WSDiscoveryClient();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             } catch (JAXBException e) {
                 // TODO Auto-generated catch block
