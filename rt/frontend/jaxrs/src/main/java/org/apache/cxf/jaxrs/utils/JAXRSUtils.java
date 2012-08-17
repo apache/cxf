@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -86,6 +88,7 @@ import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -114,6 +117,12 @@ public final class JAXRSUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
+    
+    private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
+    static {
+        //TODO: Populate it with the upgrade to the more up to date API
+        EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
+    }
     
     private JAXRSUtils() {        
     }
@@ -1214,11 +1223,39 @@ public final class JAXRSUtils {
         return types;
     }
     
+    public static Class<?> getWebApplicationExceptionClass(WebApplicationException ex,
+                                                           Class<?> exceptionType) {
+        int status = ex.getResponse().getStatus();
+        Class<?> cls = EXCEPTIONS_MAP.get(status);
+        //TODO: enable this code after the upgrade to the more up-to-date API
+        //if (cls == null && status / 100 == 5) {
+        //    cls = ServerErrorException.class;
+        //}
+        return cls == null ? exceptionType : cls;
+    }
+    
+    @SuppressWarnings("unchecked")
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
         
         ExceptionMapper<T> mapper = 
-            ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
+            ProviderFactory.getInstance(inMessage).createExceptionMapper(ex, inMessage);
         if (mapper != null) {
+            if (ex.getClass() == WebApplicationException.class 
+                && mapper.getClass() != WebApplicationExceptionMapper.class) {
+                WebApplicationException webEx = (WebApplicationException)ex;
+                Class<?> exceptionClass = getWebApplicationExceptionClass(webEx, 
+                                                                          WebApplicationException.class);
+                if (exceptionClass != WebApplicationException.class) {
+                    //TODO: consider using switch statements
+                    try {
+                        Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
+                        ex = (T)ctr.newInstance(webEx.getResponse());
+                    } catch (Exception ex2) {
+                        ex2.printStackTrace();
+                        return Response.serverError().build();
+                    }
+                }
+            }
             try {
                 return mapper.toResponse(ex);
             } catch (Exception mapperEx) {

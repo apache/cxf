@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -82,6 +83,7 @@ public final class ProviderFactory {
                                     new MultipartProvider(),
                                     new WebApplicationExceptionMapper(),
                                     new WadlGenerator());
+        
     }
     
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders = 
@@ -265,23 +267,38 @@ public final class ProviderFactory {
         return null;
     }
     
+    public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType,
+                                                                          Message m) {
+        return createExceptionMapper(null, exceptionType, m);
+    }
     
-    public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType, Message m) {
+    public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(T ex, 
+                                                                          Message m) {
+        return createExceptionMapper(ex, ex.getClass(), m);
+    }
+    
+    private <T extends Throwable> ExceptionMapper<T> createExceptionMapper(T ex, 
+                                                                           Class<?> exceptionType,
+                                                                           Message m) {
         
-        ExceptionMapper<T> mapper = doCreateExceptionMapper(exceptionType, m);
+        ExceptionMapper<T> mapper = doCreateExceptionMapper(ex, exceptionType, m);
         if (mapper != null || this == SHARED_FACTORY) {
             return mapper;
         }
         
-        return SHARED_FACTORY.createExceptionMapper(exceptionType, m);
+        return SHARED_FACTORY.createExceptionMapper(ex, exceptionType, m);
     }
     
     @SuppressWarnings("unchecked")
     private <T extends Throwable> ExceptionMapper<T> doCreateExceptionMapper(
-        Class<?> exceptionType, Message m) {
+        T exception, Class<?> exceptionType, Message m) {
         
         List<ExceptionMapper<?>> candidates = new LinkedList<ExceptionMapper<?>>();
-        
+        if (WebApplicationException.class == exceptionType 
+            && exception instanceof WebApplicationException) {
+            exceptionType = 
+                JAXRSUtils.getWebApplicationExceptionClass((WebApplicationException)exception, exceptionType);
+        }
         for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
             handleMapper(candidates, em, exceptionType, m, ExceptionMapper.class, true);
         }
