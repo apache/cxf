@@ -22,6 +22,7 @@ package org.apache.cxf.ws.discovery;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,6 +48,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
 import org.apache.cxf.ws.discovery.wsdl.AppSequenceType;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
@@ -71,7 +73,10 @@ public class WSDiscoveryClient implements Closeable {
     
     public WSDiscoveryClient() {
     }
-    
+    public WSDiscoveryClient(String address) {
+        this.address = address;
+        adHoc = false;
+    }
     private synchronized JAXBContext getJAXBContext() {
         if (jaxbContext == null) {
             try {
@@ -90,6 +95,7 @@ public class WSDiscoveryClient implements Closeable {
             }
             factory.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
             factory.setAddress(address);
+            factory.setFeatures(Arrays.asList(new WSAddressingFeature()));
             client = factory.create(DiscoveryProxy.class);
             ((BindingProvider)client).getRequestContext()
                 .put("thread.local.request.context", Boolean.TRUE);
