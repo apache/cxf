@@ -40,6 +40,8 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
@@ -62,12 +64,25 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
     public HeaderVerifier() {
         super(Phase.POST_PROTOCOL);
     }
+    public HeaderVerifier(String s) {
+        super(s);
+    }
     
     public Set<QName> getUnderstoodHeaders() {
         return Names.HEADERS;
     }
 
     public void handleMessage(SoapMessage message) {
+        if (!MessageUtils.isRequestor(message)
+            && !MessageUtils.isOutbound(message)
+            && getPhase().equals(Phase.POST_PROTOCOL)) {
+            message.getInterceptorChain().add(new AbstractSoapInterceptor(Phase.UNMARSHAL) {
+                public void handleMessage(SoapMessage message) throws Fault {
+                    mediate(message);
+                }                
+            });
+            return;
+        }
         mediate(message);
     }
 
@@ -130,8 +145,7 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
             verificationCache.put(MAPTest.verifyHeaders(wsaHeaders, 
                                                         partialResponse,
                                                         isRequestLeg(message),
-                                                        !VersionTransformer.Names200408.WSA_NAMESPACE_NAME
-                                                        .equals(currentNamespaceURI)));
+                                                        false));
         } catch (SOAPException se) {
             verificationCache.put("SOAP header verification failed: " + se);
         }

@@ -494,8 +494,8 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                 message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION, Boolean.TRUE);
             }
         });
-        // don't send the ReplyTo headers if we don't need to either
-        ei.setProperty(MAPAggregator.WRITE_ANONYMOUS_REPLY_TO, Boolean.FALSE);
+        // don't send the optional ReplyTo headers if we don't need to either
+        ei.setProperty("ws-addressing.write.optional.replyto", Boolean.FALSE);
     }
     
     protected void addMessageFromBinding(ExtensibilityElement ext, BindingOperationInfo bop,

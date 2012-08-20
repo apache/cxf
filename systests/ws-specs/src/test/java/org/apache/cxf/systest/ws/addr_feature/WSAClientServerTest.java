@@ -85,7 +85,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         factory.setAddress("http://localhost:" + PORT + "/jaxws/add");
         factory.getFeatures().add(new WSAddressingFeature());
         AddNumbersPortType port = (AddNumbersPortType) factory.create();
-
+        ((BindingProvider)port).getRequestContext().put("ws-addressing.write.optional.replyto", Boolean.TRUE);
         assertEquals(3, port.addNumbers(1, 2));
 
         String expectedOut = "<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>";
@@ -101,6 +101,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         ByteArrayOutputStream output = setupOutLogging();
 
         AddNumbersPortType port = getPort();
+        ((BindingProvider)port).getRequestContext().put("ws-addressing.write.optional.replyto", Boolean.TRUE);
 
         assertEquals(3, port.addNumbers(1, 2));
 

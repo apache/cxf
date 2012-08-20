@@ -314,6 +314,19 @@ public final class ContextUtils {
     }
     
     /**
+     * Helper method to determine if an EPR address is anon (either null,
+     * anonymous).
+     *
+     * @param ref the EPR under test
+     * @return true if the address is generic
+     */
+    public static boolean isAnonymousAddress(EndpointReferenceType ref) {
+        return ref == null 
+               || ref.getAddress() == null
+               || Names.WSA_ANONYMOUS_ADDRESS.equals(ref.getAddress().getValue());
+    }
+    
+    /**
      * Helper method to determine if an EPR address is none.
      *
      * @param ref the EPR under test

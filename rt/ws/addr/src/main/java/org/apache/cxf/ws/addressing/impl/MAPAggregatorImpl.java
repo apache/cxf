@@ -844,12 +844,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                         ContextUtils.WSA_OBJECT_FACTORY.createEndpointReferenceType();
                     replyTo.setAddress(address);
                 }
-                if (ContextUtils.isGenericAddress(replyTo)
-                    && !MessageUtils.getContextualBoolean(message, WRITE_ANONYMOUS_REPLY_TO, true)) {
-                    maps.setReplyTo(null);
-                } else {
-                    maps.setReplyTo(replyTo);
-                }
+                maps.setReplyTo(replyTo);
             }
 
             // FaultTo

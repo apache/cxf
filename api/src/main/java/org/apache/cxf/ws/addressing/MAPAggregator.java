@@ -32,7 +32,6 @@ import org.apache.cxf.phase.PhaseInterceptor;
  */
 public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     public static final String USING_ADDRESSING = MAPAggregator.class.getName() + ".usingAddressing";
-    public static final String WRITE_ANONYMOUS_REPLY_TO = MAPAggregator.class.getName() + ".writeAnonymousReplyTo";
     public static final String ADDRESSING_DISABLED = MAPAggregator.class.getName() + ".addressingDisabled";
     public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName() 
         + ".decoupledDestination";
