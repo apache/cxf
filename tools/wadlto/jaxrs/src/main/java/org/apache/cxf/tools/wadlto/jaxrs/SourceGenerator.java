@@ -91,9 +91,6 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 
-/**
- * TODO: This will need to be moved into a separate module
- */
 public class SourceGenerator {
     public static final String CODE_TYPE_GRAMMAR = "grammar";
     public static final String CODE_TYPE_PROXY = "proxy";
@@ -146,8 +143,22 @@ public class SourceGenerator {
         
         XSD_SPECIFIC_TYPE_MAP = new HashMap<String, String>();
         XSD_SPECIFIC_TYPE_MAP.put("string", "String");
-        XSD_SPECIFIC_TYPE_MAP.put("decimal", "java.math.BigInteger");
         XSD_SPECIFIC_TYPE_MAP.put("integer", "long");
+        XSD_SPECIFIC_TYPE_MAP.put("int", "int");
+        XSD_SPECIFIC_TYPE_MAP.put("long", "long");
+        XSD_SPECIFIC_TYPE_MAP.put("byte", "byte");
+        XSD_SPECIFIC_TYPE_MAP.put("boolean", "boolean");
+        XSD_SPECIFIC_TYPE_MAP.put("unsignedInt", "long");
+        XSD_SPECIFIC_TYPE_MAP.put("unsignedShort", "int");
+        XSD_SPECIFIC_TYPE_MAP.put("unsignedByte", "short");
+        XSD_SPECIFIC_TYPE_MAP.put("unsignedLong", "java.math.BigInteger");
+        XSD_SPECIFIC_TYPE_MAP.put("decimal", "java.math.BigInteger");
+        XSD_SPECIFIC_TYPE_MAP.put("positiveInteger", "java.math.BigInteger");
+        XSD_SPECIFIC_TYPE_MAP.put("QName", "javax.xml.namespace.QName");
+        XSD_SPECIFIC_TYPE_MAP.put("duration", "javax.xml.datatype.Duration");
+        XSD_SPECIFIC_TYPE_MAP.put("date", "java.util.Date");
+        XSD_SPECIFIC_TYPE_MAP.put("dateTime", "java.util.Date");
+        XSD_SPECIFIC_TYPE_MAP.put("time", "java.util.Date");
     }
 
     private Comparator<String> importsComparator;
@@ -1012,7 +1023,9 @@ public class SourceGenerator {
         }
         String[] pair = type.split(":");
         String value = pair.length == 2 ? pair[1] : type;
-        if (XSD_SPECIFIC_TYPE_MAP.containsKey(value)) {
+        if (schemaTypesMap.containsKey(value)) {
+            return schemaTypesMap.get(value);
+        } else if (XSD_SPECIFIC_TYPE_MAP.containsKey(value)) {
             return XSD_SPECIFIC_TYPE_MAP.get(value);
         } else {
             String actualValue = value.replaceAll("[\\-\\_]", "");

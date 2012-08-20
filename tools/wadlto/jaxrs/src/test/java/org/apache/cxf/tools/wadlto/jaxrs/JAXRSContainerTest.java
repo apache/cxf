@@ -177,6 +177,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceWithEPR.xml"));
+            context.put(WadlToolConstants.CFG_TYPE_MAP, "date=javax.xml.datatype.XMLGregorianCalendar");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);

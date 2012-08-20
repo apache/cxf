@@ -66,6 +66,18 @@ Examples:
                     <annotation>[schema-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
+            
+            <option id="typeMap" maxOccurs="unbounded">
+                <annotation>
+                    Specifies the optional mapping between WADL representation 
+                    or parameter type and Java class.
+                </annotation>
+                <switch>tMap</switch>
+                <associatedArgument placement="afterSpace">
+                    <valuetype>NamingSpacePackageString</valuetype>
+                    <annotation>type-name=class-name</annotation>
+                </associatedArgument>
+            </option>
 
             <option id="resourcename">
                 <annotation>

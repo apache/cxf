@@ -72,7 +72,7 @@
         <param name="a" style="query" type="xs:int"/>
         <param name="c.a" style="query" type="xs:int"/>
         <param name="c.b" style="query" type="xs:int"/>
-        <param name="c.d.a" style="query" type="xs:int"/>
+        <param name="c.d.a" style="query" type="xs:dateTime"/>
         <param name="option"  default="A" style="query"
 required="true">
      <option value="A"/>
@@ -125,9 +125,7 @@ required="true">
        <representation mediaType="application/xml" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>
-       <representation mediaType="application/json" element="prefix1:theBook2">
-        <doc>InputBook</doc>
-       </representation>
+       
       </request>
       <response>
        <doc>Response</doc>
@@ -137,6 +135,15 @@ required="true">
        <representation mediaType="application/json">
         <doc>Requested Book</doc>
        </representation>
+      </response>
+     </method>
+
+     <method name="POST" id="addBookXmlDefault">
+      <request>
+       <representation mediaType="application/xml"/>
+      </request>
+      <response>
+       <representation mediaType="application/xml"/>
       </response>
      </method>
 
