@@ -34,6 +34,7 @@
 
     <modules>
         <module>ws-discovery-api</module>
+        <module>ws-discovery-service</module>
     </modules>
 
 </project>

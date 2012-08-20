@@ -57,6 +57,7 @@ import org.apache.cxf.ws.discovery.wsdl.AppSequenceType;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ObjectFactory;
+import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchesType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeType;
 import org.apache.cxf.ws.discovery.wsdl.ScopesType;
@@ -166,6 +167,9 @@ public class WSDiscoveryClient implements Closeable {
      * @return the hello
      */
     public HelloType register(HelloType hello) {
+        if (hello.getEndpointReference() == null) {
+            hello.setEndpointReference(generateW3CEndpointReference());
+        }
         getDispatchInternal(true).invokeOneWay(factory.createHello(hello));
         return hello;
     }
@@ -198,6 +202,25 @@ public class WSDiscoveryClient implements Closeable {
         bt.setEndpointReference(hello.getEndpointReference());
         unregister(bt);
     }
+    
+    public List<EndpointReference> probe(QName type) {
+        ProbeType p = new ProbeType();
+        p.getTypes().add(type);
+        ProbeMatchesType pmt = probe(p, 1000);
+        List<EndpointReference> er = new ArrayList<EndpointReference>();
+        for (ProbeMatchType pm : pmt.getProbeMatch()) {
+            for (String add : pm.getXAddrs()) {
+                W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
+                builder.address(add);
+                //builder.serviceName(type);
+                //builder.endpointName(type);
+                er.add(builder.build());
+            }
+        }
+        return er;
+    }    
+    
+    
     
     
     public ProbeMatchesType probe(ProbeType params) {
