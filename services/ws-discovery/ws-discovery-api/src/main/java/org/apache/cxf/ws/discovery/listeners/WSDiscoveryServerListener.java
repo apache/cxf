@@ -22,22 +22,33 @@ package org.apache.cxf.ws.discovery.listeners;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
-import org.apache.cxf.ws.discovery.WSDiscoveryService;
+import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 
 /**
  * 
  */
 public class WSDiscoveryServerListener implements ServerLifeCycleListener {
-    WSDiscoveryService service;
+    static WSDiscoveryServiceImpl staticService;
+    
+    WSDiscoveryServiceImpl service;
     
     public WSDiscoveryServerListener(Bus bus) {
-        service = bus.getExtension(WSDiscoveryService.class);
+        service = bus.getExtension(WSDiscoveryServiceImpl.class);
         if (service == null) {
-            service = new WSDiscoveryService(bus);
-            bus.setExtension(service, WSDiscoveryService.class);
+            service = getStaticService();
+            bus.setExtension(service, WSDiscoveryServiceImpl.class);
         }
+    }
+
+    private WSDiscoveryServiceImpl getStaticService() {
+        if (staticService == null) {
+            Bus bus = BusFactory.newInstance().createBus();
+            staticService = new WSDiscoveryServiceImpl(bus);
+        }
+        return staticService;
     }
 
     public void startServer(Server server) {

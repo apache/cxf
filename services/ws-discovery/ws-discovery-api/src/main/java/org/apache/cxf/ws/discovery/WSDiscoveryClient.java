@@ -42,6 +42,7 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
@@ -67,9 +68,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  * 
  */
 public class WSDiscoveryClient implements Closeable {
-    static final QName SERVICE_QNAME 
-        = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
-    private static final QName PORT_QNAME 
+    public static final QName SERVICE_QNAME 
         = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
     
     
@@ -85,10 +84,18 @@ public class WSDiscoveryClient implements Closeable {
     
     public WSDiscoveryClient() {
     }
+    public WSDiscoveryClient(Bus bus) {
+        this.bus = bus;
+    }
     public WSDiscoveryClient(String address) {
         this.address = address;
         adHoc = false;
     }
+    
+    public String getAddress() {
+        return address;
+    }
+    
     private synchronized JAXBContext getJAXBContext() {
         if (jaxbContext == null) {
             try {
@@ -101,9 +108,14 @@ public class WSDiscoveryClient implements Closeable {
     }
     private synchronized Service getService() {
         if (service == null) {
-            service = Service.create(SERVICE_QNAME);
-            service.addPort(PORT_QNAME, SOAPBinding.SOAP12HTTP_BINDING, address);
-        }
+            Bus b = BusFactory.getAndSetThreadDefaultBus(bus);
+            try {
+                service = Service.create(SERVICE_QNAME);
+                service.addPort(SERVICE_QNAME, SOAPBinding.SOAP12HTTP_BINDING, address);
+            } finally {
+                BusFactory.setThreadDefaultBus(b);
+            }
+        } 
         return service;
     }
     private synchronized void resetDispatch(String newad) {
@@ -116,7 +128,7 @@ public class WSDiscoveryClient implements Closeable {
     private synchronized Dispatch<Object> getDispatchInternal(boolean addSeq) {
         if (dispatch == null) {
             AddressingFeature f = new AddressingFeature(true, true);
-            dispatch = getService().createDispatch(PORT_QNAME, getJAXBContext(), Service.Mode.PAYLOAD, f);
+            dispatch = getService().createDispatch(SERVICE_QNAME, getJAXBContext(), Service.Mode.PAYLOAD, f);
             dispatch.getRequestContext().put("thread.local.request.context", Boolean.TRUE);
         }
         addAddressing(dispatch, false);

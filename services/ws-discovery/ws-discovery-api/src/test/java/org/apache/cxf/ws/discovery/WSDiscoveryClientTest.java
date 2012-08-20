@@ -23,6 +23,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchesType;
@@ -42,7 +43,7 @@ public final class WSDiscoveryClientTest {
     public static void main(String[] arg) throws Exception {
         try {
             Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
-            WSDiscoveryService service = new WSDiscoveryService(null);
+            WSDiscoveryServiceImpl service = new WSDiscoveryServiceImpl(null);
             service.startup();
             
             

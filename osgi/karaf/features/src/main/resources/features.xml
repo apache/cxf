@@ -28,7 +28,7 @@
         <bundle start-level='10' dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='10' dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${cxf.servicemix.specs.version}</bundle>
         <bundle start-level='10'>mvn:javax.mail/mail/${cxf.javax.mail.version}</bundle>
-        <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/${cxf.servicemix.specs.version}</bundle>
+        <bundle start-level='10'>mvn:javax.ws.rs/javax.ws.rs-api/${cxf.javax.ws.rs.version}</bundle>
 
         <bundle start-level='20'>mvn:org.codehaus.woodstox/stax2-api/${cxf.woodstox.stax2-api.version}</bundle>
         <bundle start-level='20'>mvn:org.codehaus.woodstox/woodstox-core-asl/${cxf.woodstox.core.version}</bundle>
@@ -235,7 +235,11 @@
         <feature version="${project.version}">cxf-bindings-soap</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-jms/${project.version}</bundle>
     </feature>
-<feature name="cxf-javascript" version="${project.version}" resolver='(obr)'>
+    <feature name="cxf-transports-udp" version="${project.version}" resolver='(obr)'>
+        <feature version="${project.version}">cxf-core</feature>
+        <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-udp/${project.version}</bundle>
+    </feature>
+    <feature name="cxf-javascript" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-javascript/${project.version}</bundle>
@@ -298,6 +302,7 @@
 
         <feature version="${project.version}">cxf-transports-local</feature>
         <feature version="${project.version}">cxf-transports-jms</feature>
+        <feature version="${project.version}">cxf-transports-udp</feature>
 
 
         <feature version="${project.version}">cxf-xjc-runtime</feature>
@@ -346,5 +351,17 @@
         <feature version="${project.version}">cxf-http-jetty</feature>
 
         <bundle>mvn:org.apache.cxf.services.wsn/cxf-services-wsn-core/${project.version}</bundle>
+    </feature>
+    
+    <feature name="cxf-ws-discovery-api" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-transports-udp</feature>
+        <feature version="${project.version}">cxf-ws-addr</feature>
+        <feature version="${project.version}">cxf-jaxws</feature>
+        <bundle>mvn:org.apache.cxf.services.ws-discovery/cxf-services-ws-discovery-api/${project.version}</bundle>
+    </feature>
+    
+    <feature name="cxf-ws-discovery" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">cxf-ws-discovery-api</feature>
+        <bundle>mvn:org.apache.cxf.services.ws-discovery/cxf-services-ws-discovery-service/${project.version}</bundle>
     </feature>
 </features>
