@@ -42,7 +42,6 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
 
     public void startServer(Server server) {
         QName sn = server.getEndpoint().getEndpointInfo().getInterface().getName();
-        System.out.println(sn);
         if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
             return;
         }

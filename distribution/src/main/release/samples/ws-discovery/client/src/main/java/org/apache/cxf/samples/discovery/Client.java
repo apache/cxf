@@ -28,28 +28,21 @@ import org.apache.cxf.hello_world.discovery.Greeter;
 import org.apache.cxf.hello_world.discovery.GreeterService;
 import org.apache.cxf.ws.discovery.WSDiscoveryClient;
 
-/**
- * 
- */
 public final class Client {
 
-    /**
-     * 
-     */
-    public Client() {
-        // TODO Auto-generated constructor stub
+    private Client() {
     }
 
-    /**
-     * @param args
-     */
     public static void main(String[] args) throws Exception {
-        
+
+        //USe ws-discovery to find references to services that implement the Greeter portType
         WSDiscoveryClient client = new WSDiscoveryClient();
-        List<EndpointReference> references = client.probe(new QName("http://cxf.apache.org/hello_world/discovery", "Greeter", "tp"));
+        List<EndpointReference> references 
+            = client.probe(new QName("http://cxf.apache.org/hello_world/discovery", "Greeter"));
         client.close();
         
         GreeterService service = new GreeterService();
+        //loop through all of them and have them greet me.
         for (EndpointReference ref : references) {
             Greeter g = service.getPort(ref, Greeter.class);
             System.out.println(g.greetMe("World"));

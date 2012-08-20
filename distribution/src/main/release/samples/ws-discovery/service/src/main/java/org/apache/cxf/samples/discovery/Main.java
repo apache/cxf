@@ -25,17 +25,16 @@ import java.net.ServerSocket;
 
 import javax.xml.ws.Endpoint;
 
-/**
- * 
- */
-public class Main {
+public final class Main {
 
-    public Main() {
-        // TODO Auto-generated constructor stub
+    private Main() {
     }
 
     public static void main(String[] args) throws Exception {
-        //find a randomish port to use
+        //find a randomish port to use.   The clients will
+        //use WS-Discovery to find these services so 
+        //it really doesn't matter what port we publish them
+        //on (or what URL or anything like that)
         ServerSocket sock = new ServerSocket();
         InetSocketAddress s = new InetSocketAddress(InetAddress.getLocalHost(), 0);
         sock.bind(s);
