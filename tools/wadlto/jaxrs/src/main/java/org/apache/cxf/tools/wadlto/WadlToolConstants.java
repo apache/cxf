@@ -38,6 +38,7 @@ public final class WadlToolConstants {
     public static final String CFG_RESOURCENAME = "resourcename";
     
     public static final String CFG_TYPE_MAP = "typeMap";
+    public static final String CFG_MEDIA_TYPE_MAP = "mediaTypeMap";
     public static final String CFG_MULTIPLE_XML_REPS = "supportMultipleXmlReps";
     
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;

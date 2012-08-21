@@ -69,13 +69,26 @@ Examples:
             
             <option id="typeMap" maxOccurs="unbounded">
                 <annotation>
-                    Specifies the optional mapping between WADL representation 
-                    or parameter type and Java class.
+                    Specifies the optional mapping between default Java types
+                    representing WADL representation or parameter types 
+                    and custom Java types.
                 </annotation>
                 <switch>tMap</switch>
                 <associatedArgument placement="afterSpace">
                     <valuetype>NamingSpacePackageString</valuetype>
-                    <annotation>type-name=class-name</annotation>
+                    <annotation>default-java-type=preferred-java-type</annotation>
+                </associatedArgument>
+            </option>
+            
+            <option id="mediaTypeMap" maxOccurs="unbounded">
+                <annotation>
+                    Specifies the optional mapping between a WADL representation
+                    with no wadl:element attribute and Java class.
+                </annotation>
+                <switch>repMap</switch>
+                <associatedArgument placement="afterSpace">
+                    <valuetype>NamingSpacePackageString</valuetype>
+                    <annotation>media-type=class-name</annotation>
                 </associatedArgument>
             </option>
 

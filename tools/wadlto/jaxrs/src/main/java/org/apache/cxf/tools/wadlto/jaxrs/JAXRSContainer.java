@@ -103,6 +103,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         set.add(WadlToolConstants.CFG_BINDING);
         set.add(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
         set.add(WadlToolConstants.CFG_TYPE_MAP);
+        set.add(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
         return set;
     }
     
@@ -144,7 +145,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setSchemaPackageFiles(schemaPackageFiles);
         sg.setSchemaPackageMap(context.getNamespacePackageMap());
         
-        sg.setSchemaTypesMap(getCustomTypeMap());
+        sg.setJavaTypeMap(getCustomTypeMap());
+        sg.setMediaTypeMap(getMediaTypeMap());
 
         if (context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS)) {
             sg.setGenerateEnums(true);
@@ -224,8 +226,20 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     }
     
     private Map<String, String> getCustomTypeMap() {
+        Map<String, String> typeMap = getMap(WadlToolConstants.CFG_TYPE_MAP);
+        if (!typeMap.containsKey(EPR_TYPE_KEY)) {
+            typeMap.put(EPR_TYPE_KEY, DEFAULT_TYPES_MAP.get(EPR_TYPE_KEY));
+        }
+        return typeMap;
+    }
+    
+    private Map<String, String> getMediaTypeMap() {
+        return getMap(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
+    }
+    
+    private Map<String, String> getMap(String parameterName) {
         String[] typeToClasses = new String[]{};
-        Object value = context.get(WadlToolConstants.CFG_TYPE_MAP);
+        Object value = context.get(parameterName);
         if (value != null) {
             typeToClasses = value instanceof String ? new String[]{(String)value}
                                                    : (String[])value;
@@ -238,9 +252,6 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                 String clsName = typeToClasses[i].substring(pos + 1);
                 typeMap.put(type, clsName);
             }
-        }
-        if (!typeMap.containsKey(EPR_TYPE_KEY)) {
-            typeMap.put(EPR_TYPE_KEY, DEFAULT_TYPES_MAP.get(EPR_TYPE_KEY));
         }
         return typeMap;
     }

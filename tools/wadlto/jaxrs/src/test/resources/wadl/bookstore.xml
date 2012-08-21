@@ -125,7 +125,9 @@ required="true">
        <representation mediaType="application/xml" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>
-       
+       <representation mediaType="application/json" element="prefix1:theBook2">
+        <doc>InputBook</doc>
+       </representation>
       </request>
       <response>
        <doc>Response</doc>
@@ -143,7 +145,7 @@ required="true">
        <representation mediaType="application/xml"/>
       </request>
       <response>
-       <representation mediaType="application/xml"/>
+       <representation mediaType="multipart/form-data"/>
       </response>
      </method>
 

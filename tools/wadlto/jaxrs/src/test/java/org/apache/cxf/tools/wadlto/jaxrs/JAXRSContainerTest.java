@@ -40,6 +40,10 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_MEDIA_TYPE_MAP, 
+                        "application/xml=javax.xml.transform.Source");
+            context.put(WadlToolConstants.CFG_MEDIA_TYPE_MAP, 
+                        "multipart/form-data=org.apache.cxf.jaxrs.ext.multipart.MultipartBody");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
@@ -177,7 +181,7 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceWithEPR.xml"));
-            context.put(WadlToolConstants.CFG_TYPE_MAP, "date=javax.xml.datatype.XMLGregorianCalendar");
+            context.put(WadlToolConstants.CFG_TYPE_MAP, "java.util.Date=javax.xml.datatype.XMLGregorianCalendar");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
