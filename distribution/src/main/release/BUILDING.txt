@@ -4,16 +4,16 @@ Building Apache CXF
 Initial Setup
 -------------
 
-1) Install J2SE 5.0 SDK, which can be downloaded from 
-   http://java.sun.com/j2se/1.5.0/download.jsp. Use version of 1.5.0_13 JDK.
-   Note: CXF >=2.1 does build on Java 6 update 4 and later.  It will not build on 
-   updates prior to update 4.
+1) Install J2SE SDK, which can be downloaded from 
+   http://www.oracle.com/technetwork/java/archive-139210.html#javase
+   CXF supports most versions newer than 1.5.0_13 with the exception 
+   of Java 6 updates 1-3.
 
 2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
    $JAVA_HOME$/bin (unix).
 
-3) Install Maven 2.2.1 or newer, which can be downloaded from 
+3) Install Maven 3.0 or newer, which can be downloaded from 
    http://maven.apache.org/download.html. Make sure that your PATH includes 
    the MVN_HOME/bin directory. 
 
@@ -22,8 +22,11 @@ Building
 --------
 
 1) Change to the top level directory of Apache CXF source distribution.
-2) Run
-	$> mvn.
+2) Set the MAVEN_OPTS environment variable to include more memory
+   Unix/Linux/OSX   $> export MAVEN_OPTS="-XX:MaxPermSize=192m -Xmx768M"
+   Windows          > set MAVEN_OPTS="-XX:MaxPermSize=192m -Xmx768M"
+3) Run
+	$> mvn
    This will compile Apache CXF and run all of the tests in the Apache CXF source
    distribution. Alternatively, you can run
          $> mvn -Pfastinstall.
