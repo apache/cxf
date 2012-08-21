@@ -485,13 +485,15 @@ public final class EndpointReferenceUtils {
         if (StringUtils.isEmpty(wsdlLocation)) {
             return "";
         }
-        WSDLManager manager = bus.getExtension(WSDLManager.class);
-        if (manager != null) {
-            try {
-                Definition def = manager.getDefinition(wsdlLocation);
-                return def.getTargetNamespace();
-            } catch (WSDLException e) {
-                //ignore
+        if (bus != null) {
+            WSDLManager manager = bus.getExtension(WSDLManager.class);
+            if (manager != null) {
+                try {
+                    Definition def = manager.getDefinition(wsdlLocation);
+                    return def.getTargetNamespace();
+                } catch (WSDLException e) {
+                    //ignore
+                }
             }
         }
         return "";
