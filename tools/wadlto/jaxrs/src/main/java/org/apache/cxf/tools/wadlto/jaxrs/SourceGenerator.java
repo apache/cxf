@@ -631,6 +631,7 @@ public class SourceGenerator {
             if (id.length() == 0) {
                 id = methodNameLowerCase;
             }
+            
             String suffixName = "";
             if (!jaxpSourceRequired && inXmlRep != null && xmlRequestReps.size() > 1) {
                 String value = inXmlRep.getAttribute("element");
@@ -666,7 +667,8 @@ public class SourceGenerator {
                 responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info);
                 String genMethodName = id + suffixName;
                 if (methodNameLowerCase.equals(genMethodName)) {
-                    genMethodName += firstCharToUpperCase(currentPath.replaceAll("/", ""));
+                    genMethodName += firstCharToUpperCase(
+                        currentPath.replaceAll("/", "").replaceAll("\\{", "").replaceAll("\\}", ""));
                 }
                 sbCode.append(genMethodName);
             } else {
