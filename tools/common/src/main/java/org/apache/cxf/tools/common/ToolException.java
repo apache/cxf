@@ -89,7 +89,7 @@ public class ToolException extends RuntimeException {
     }
     private String createMessage(ToolErrorListener.ErrorInfo e) {
         if (e.file != null) {
-            return e.file.getAbsolutePath() + " [" + e.line + "," + e.col + "]: " + e.message; 
+            return e.file + " [" + e.line + "," + e.col + "]: " + e.message; 
         }
         if (e.message == null && e.cause != null) {
             return e.cause.getLocalizedMessage();

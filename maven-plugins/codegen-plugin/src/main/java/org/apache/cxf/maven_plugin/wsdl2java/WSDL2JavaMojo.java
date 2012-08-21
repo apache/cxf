@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -50,6 +51,69 @@ import org.sonatype.plexus.build.incremental.BuildContext;
  * @threadSafe
  */
 public class WSDL2JavaMojo extends AbstractCodegenMoho {
+
+    final class MavenToolErrorListener extends ToolErrorListener {
+        private final List<File> errorfiles;
+
+        MavenToolErrorListener(List<File> errorfiles) {
+            this.errorfiles = errorfiles;
+        }
+
+        public void addError(final String file, int line, int column, String message, Throwable t) {
+            super.addError(file, line, column, message, t);
+            
+            File f = mapFile(file);
+            
+            if (f != null && !errorfiles.contains(f)) {
+                buildContext.removeMessages(f);
+                errorfiles.add(f);
+            }
+            if (f == null) {
+                f = new File(file) {
+                    private static final long serialVersionUID = 1L;
+                    public String getAbsolutePath() {
+                        return file;
+                    }
+                };
+            }
+            buildContext.addMessage(f, line, column, message, BuildContext.SEVERITY_ERROR, t);
+        }
+
+        public void addWarning(final String file, int line, int column, String message, Throwable t) {
+            File f = mapFile(file);
+            if (f != null && !errorfiles.contains(f)) {
+                buildContext.removeMessages(f);
+                errorfiles.add(f);
+            }
+            if (f == null) {
+                f = new File(file) {
+                    private static final long serialVersionUID = 1L;
+                    public String getAbsolutePath() {
+                        return file;
+                    }
+                };
+            }
+            //don't send to super which just LOG.warns.   We'll let Maven do that to
+            //not duplicate the error message.
+            buildContext.addMessage(f, line, column, message, BuildContext.SEVERITY_WARNING, t);
+        }
+
+        private File mapFile(String s) {
+            File file = null;
+            if (s != null && s.startsWith("file:")) {
+                if (s.contains("#")) {
+                    s = s.substring(0, s.indexOf('#'));
+                }
+                try {
+                    URI uri = new URI(s);
+                    file = new File(uri);
+                } catch (URISyntaxException e) {
+                    //ignore
+                }
+            }
+            return file;
+        }
+    }
 
     /**
      * @parameter expression="${cxf.testSourceRoot}"
@@ -257,26 +321,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                         return buildContext.newFileOutputStream(file);
                     }
                 });
-                ctx.setErrorListener(new ToolErrorListener() {
-                    public void addError(File file, int line, int column, String message, Throwable t) {
-                        super.addError(file, line, column, message, t);
-                        if (!errorfiles.contains(file)) {
-                            buildContext.removeMessages(file);
-                            errorfiles.add(file);
-                        }
-                        buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, t);
-                    }
-
-                    public void addWarning(File file, int line, int column, String message, Throwable t) {
-                        if (!errorfiles.contains(file)) {
-                            buildContext.removeMessages(file);
-                            errorfiles.add(file);
-                        }
-                        //don't send to super which just LOG.warns.   We'll let Maven do that to
-                        //not duplicate the error message.
-                        buildContext.addMessage(file, line, column, message, BuildContext.SEVERITY_WARNING, t);
-                    }
-                });
+                ctx.setErrorListener(new MavenToolErrorListener(errorfiles));
                 new WSDLToJava(args).run(ctx);
                 
                 List<File> oldFiles = CastUtils.cast((List<?>)buildContext

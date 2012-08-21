@@ -19,7 +19,6 @@
 
 package org.apache.cxf.tools.common;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,13 +32,13 @@ public class ToolErrorListener {
     private static final Logger LOG = LogUtils.getL7dLogger(ToolErrorListener.class);
     
     class ErrorInfo {
-        File file;
+        String file;
         int line;
         int col;
         Throwable cause;
         String message;
         
-        ErrorInfo(File f, int l, int c, String m, Throwable t) {
+        ErrorInfo(String f, int l, int c, String m, Throwable t) {
             file = f;
             line = l;
             col = c;
@@ -49,19 +48,19 @@ public class ToolErrorListener {
     }
     List<ErrorInfo> errors = new LinkedList<ErrorInfo>();
     
-    public void addError(File file, int line, int column, String message) {
+    public void addError(String file, int line, int column, String message) {
         addError(file, line, column, null);
     }
-    public void addError(File file, int line, int column, String message, Throwable t) {
+    public void addError(String file, int line, int column, String message, Throwable t) {
         errors.add(new ErrorInfo(file, line, column, message, t));
     }
 
-    public void addWarning(File file, int line, int column, String message) {
+    public void addWarning(String file, int line, int column, String message) {
         addWarning(file, line, column, null);
     }
-    public void addWarning(File file, int line, int column, String message, Throwable t) {
+    public void addWarning(String file, int line, int column, String message, Throwable t) {
         if (file != null) {
-            message = file.getAbsolutePath() + " [" + line + "," + column + "]: " + message; 
+            message = file + " [" + line + "," + column + "]: " + message; 
         }
         LOG.warning(message);
     }
@@ -71,7 +70,7 @@ public class ToolErrorListener {
     }
     private StringBuilder createMessage(StringBuilder b, ToolErrorListener.ErrorInfo e) {
         if (e.file != null) {
-            b.append(e.file.getAbsolutePath())
+            b.append(e.file)
                 .append(" [").append(e.line).append(',').append(e.col).append("]: ").append(e.message);
         } else if (e.message == null && e.cause != null) {
             b.append(e.cause.getLocalizedMessage());
