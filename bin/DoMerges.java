@@ -588,8 +588,71 @@ public class DoMerges {
     }
 
 
+    public static List<String[]> getGitLogs(Integer starting) throws Exception {
+        BufferedReader reader;
+        String line;
+        Process p = Runtime.getRuntime().exec(new String[] {"git", "svn", "log", "-r" , starting.toString(), gitSource});
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
+        String date = null;
+        while (line != null && date == null) {
+            if (line.indexOf('|') != -1) {
+                //strip of rev #
+                line = line.substring(line.indexOf('|') + 1).trim();
+                if (line.indexOf('|') != -1) {
+                    //strip off committer
+                    line = line.substring(line.indexOf('|') + 1).trim();
+                }
+                date = line.substring(0, line.indexOf(' '));
+            }
+            line = reader.readLine();
+        }
+        reader.close();
+        
+        p = Runtime.getRuntime().exec(new String[] {"git", "log", "--since=" + date});
+        reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        line = reader.readLine();
 
-    public static String getLog(Integer ver, Set<String> jiras) throws Exception {
+        List<String[]> map = new LinkedList<String[]>();
+        List<String> list = new ArrayList<String>(10);
+        while (line != null) {
+            if (line.length() > 0 && line.charAt(0) != ' ') {
+                if (!list.isEmpty()) {
+                    addIfNotMergeBlock(map, list);
+                    list.clear();
+                }
+                while (line != null && line.length() > 0 && line.charAt(0) != ' ') {
+                    list.add(line);
+                    line = reader.readLine();
+                }
+            }
+            list.add(line);
+            line = reader.readLine();
+        }
+        if (!list.isEmpty()) {
+            addIfNotMergeBlock(map, list);
+            list.clear();
+        }
+        return map;
+    }
+    private static void addIfNotMergeBlock(List<String[]> map, List<String> list) {
+        for (String s: list) {
+            if (s.trim().startsWith("Merged revision")
+                && s.contains(" via ")) {
+                return;
+            }
+            if (s.trim().startsWith("Recording revision")
+                && s.contains(" via ")) {
+                return;
+            }
+            if (s.trim().startsWith("Blocking revision")
+                && s.contains(" via ")) {
+                return;
+            }
+        }
+        map.add(list.toArray(new String[list.size()]));
+    }
+    public static String[] getLog(Integer ver, Set<String> jiras) throws Exception {
         Process p;
         BufferedReader reader;
         String line;
@@ -600,11 +663,9 @@ public class DoMerges {
         }
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
-        StringWriter swriter = new StringWriter();
-        BufferedWriter writer = new BufferedWriter(swriter);
+        List<String> lines = new ArrayList<String>(10);
         while (line != null) {
-            writer.write(line);
-            writer.newLine();
+            lines.add(line);
             Matcher m = jiraPattern.matcher(line);
             while (m.find()) {
                 jiras.add(m.group());
@@ -612,8 +673,7 @@ public class DoMerges {
             line = reader.readLine();
         }
         p.waitFor();
-        writer.flush();
-        return swriter.toString();
+        return lines.toArray(new String[lines.size()]);
     }
     
     private static void doMerge(int ver, String log, List<VerLog> records) throws Exception {
@@ -697,32 +757,52 @@ public class DoMerges {
             verList.clear();
             verList.add(onlyVersion);
         }
+        if (verList.isEmpty()) {
+            System.out.println("Nothing needs to be merged");
+            System.exit(0);
+        }
 
         System.out.println("Merging versions (" + verList.size() + "): " + verList);
 
+        Integer verArray[] = verList.toArray(new Integer[verList.size()]);
+        List<String[]> gitLogs = null;
+        if (isGit && onlyVersion == -1) {
+            //with GIT, we can relatively quickly check the logs on the current branch 
+            //and compare with what should be merged and check if things are already merged
+            gitLogs = getGitLogs(verArray[0]);
+        }
+        
         List<VerLog> blocks = new ArrayList<VerLog>();
         List<VerLog> records = new ArrayList<VerLog>();
         Set<Integer> ignores = new TreeSet<Integer>();
         Set<String> jiras = new TreeSet<String>();
 
-        Integer verArray[] = verList.toArray(new Integer[verList.size()]);
         for (int cur = 0; cur < verArray.length; cur++) {
             jiras.clear();
             int ver = verArray[cur];
             System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
             System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
             
-            String log = getLog(ver, jiras);
+            String[] logLines = getLog(ver, jiras);
             
             for (String s : jiras) {
                 System.out.println("https://issues.apache.org/jira/browse/" + s);
             }
-            System.out.println(log);
+            StringBuilder log = new StringBuilder();
+            for (String s : logLines) {
+                System.out.println(s);
+                log.append(s);
+            }
+
+            
+            char c = auto ? 'M' : 0;
+            if (checkAlreadyMerged(gitLogs, logLines)) {
+                c = 'R';
+            }
 
             while (System.in.available() > 0) {
                 System.in.read();
             }
-            char c = auto ? 'M' : 0;
             while (c != 'M'
                    && c != 'B'
                    && c != 'I'
@@ -736,13 +816,13 @@ public class DoMerges {
 
             switch (c) {
             case 'M':
-                doMerge(ver, log, records);
+                doMerge(ver, log.toString(), records);
                 break;
             case 'B':
-                blocks.add(new VerLog(ver, log));
+                blocks.add(new VerLog(ver, log.toString()));
                 break;
             case 'R':
-                records.add(new VerLog(ver, log));
+                records.add(new VerLog(ver, log.toString()));
                 break;
             case 'F':
                 flush(blocks, records);
@@ -762,6 +842,49 @@ public class DoMerges {
         flush(blocks, records);
     }
 
+    private static boolean checkAlreadyMerged(List<String[]> gitLogs, String[] logLines) throws IOException {
+        for (String[] f : gitLogs) {
+            if (compareLogs(f, logLines)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static boolean compareLogs(String[] f, String[] logLines) throws IOException {
+        ArrayList<String> onBranch = new ArrayList<String>(f.length);
+        for (String s : f) {
+            if (s.trim().length() > 0 
+                && s.charAt(0) == ' '
+                && !s.contains("git-svn-id")) {
+                onBranch.add(s.trim());
+            }
+        }
+        for (String s : logLines) {
+            onBranch.remove(s.trim());
+        }
+        if (onBranch.isEmpty()) {
+            //everything in the source log is in a log on this branch, let's prompt to record the merge
+            System.out.println("Found possible commit already on branch:");
+            for (String s : f) {
+                System.out.println(s);
+            }
+            
+            while (System.in.available() > 0) {
+                System.in.read();
+            }
+            char c = 0;
+            while (c != 'Y'
+                   && c != 'N') {
+                System.out.print("Record as merged [Y/N]? ");
+                int i = System.in.read();
+                c = Character.toUpperCase((char)i);
+            }
+            if (c == 'Y') {
+                return true;
+            }
+        }
+        return false;
+    }
     private static void optimizeRanges(Set<Integer> ignores) {
         merged.optimize(blocked, ignores);
         blocked.optimize(merged, ignores);
