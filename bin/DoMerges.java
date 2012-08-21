@@ -791,7 +791,7 @@ public class DoMerges {
             StringBuilder log = new StringBuilder();
             for (String s : logLines) {
                 System.out.println(s);
-                log.append(s);
+                log.append(s).append("\n");
             }
 
             
