@@ -19,10 +19,6 @@
 
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import com.sun.tools.xjc.api.ErrorListener;
 
 import org.apache.cxf.tools.common.ToolErrorListener;
@@ -41,20 +37,7 @@ public class JAXBBindErrorListener implements ErrorListener {
     }
 
     public void error(org.xml.sax.SAXParseException exception) {
-        String s = exception.getSystemId();
-        File file = null;
-        if (s != null && s.startsWith("file:")) {
-            if (s.contains("#")) {
-                s = s.substring(0, s.indexOf('#'));
-            }
-            try {
-                URI uri = new URI(s);
-                file = new File(uri);
-            } catch (URISyntaxException e) {
-                //ignore
-            }
-        }
-        listener.addError(file,
+        listener.addError(exception.getSystemId(),
                           exception.getLineNumber(),
                           exception.getColumnNumber(),
                           mapMessage(exception.getLocalizedMessage()),
@@ -77,20 +60,7 @@ public class JAXBBindErrorListener implements ErrorListener {
             System.out.println("JAXB parsing schema warning " + exception.toString()
                                + " in schema " + exception.getSystemId());
         }
-        String s = exception.getSystemId();
-        File file = null;
-        if (s != null && s.startsWith("file:")) {
-            if (s.contains("#")) {
-                s = s.substring(0, s.indexOf('#'));
-            }
-            try {
-                URI uri = new URI(s);
-                file = new File(uri);
-            } catch (URISyntaxException e) {
-                //ignore
-            }
-        }
-        listener.addWarning(file,
+        listener.addWarning(exception.getSystemId(),
                           exception.getLineNumber(),
                           exception.getColumnNumber(),
                           mapMessage(exception.getLocalizedMessage()),
