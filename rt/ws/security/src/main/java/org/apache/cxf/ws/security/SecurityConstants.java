@@ -234,13 +234,6 @@ public final class SecurityConstants {
         "ws-security.cache.config.file";
     
     /**
-<<<<<<< HEAD
-     * This configuration tag is a comma separated String of regular expressions which
-     * will be applied to the subject DN of the certificate used for signature
-     * validation, after trust verification of the certificate chain associated with the 
-     * certificate. These constraints are not used when the certificate is contained in
-     * the keystore (direct trust).
-=======
      * The TokenStore instance to use to cache security tokens. By default this uses the
      * EHCacheTokenStore if EhCache is available. Otherwise it uses the MemoryTokenStore.
      */
@@ -252,7 +245,6 @@ public final class SecurityConstants {
      * the certificate used for signature validation, after trust verification of the certificate 
      * chain associated with the  certificate. These constraints are not used when the certificate 
      * is contained in the keystore (direct trust).
->>>>>>> 8d01268... Merged revisions 1368875 via  git cherry-pick from
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
     
