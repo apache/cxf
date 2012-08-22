@@ -40,6 +40,10 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/bookstore.xml"));
+            context.put(WadlToolConstants.CFG_MEDIA_TYPE_MAP, 
+                        "application/xml=javax.xml.transform.Source");
+            context.put(WadlToolConstants.CFG_MEDIA_TYPE_MAP, 
+                        "multipart/form-data=org.apache.cxf.jaxrs.ext.multipart.MultipartBody");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
             
             container.setContext(context);
@@ -177,6 +181,8 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             ToolContext context = new ToolContext();
             context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceWithEPR.xml"));
+            context.put(WadlToolConstants.CFG_SCHEMA_TYPE_MAP, 
+                        "{http://www.w3.org/2001/XMLSchema}date=javax.xml.datatype.XMLGregorianCalendar");
             context.put(WadlToolConstants.CFG_COMPILE, "true");
 
             container.setContext(context);
@@ -190,6 +196,36 @@ public class JAXRSContainerTest extends ProcessorTestBase {
             assertTrue(checkContains(files, "superbooks" + ".Book.class"));
             assertTrue(checkContains(files, "superbooks" + ".ObjectFactory.class"));
             assertTrue(checkContains(files, "superbooks" + ".package-info.class"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    @Test
+    public void testResourceWithEPRNoSchemaGen() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/resourceWithEPR.xml"));
+            context.put(WadlToolConstants.CFG_SCHEMA_TYPE_MAP, 
+                "{http://www.w3.org/2005/08/addressing}EndpointReferenceType=" 
+                + "javax.xml.ws.wsaddressing.W3CEndpointReference");
+            context.put(WadlToolConstants.CFG_NO_ADDRESS_BINDING, "true");
+            context.put(WadlToolConstants.CFG_NO_TYPES, "true");
+            
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + "class" + "$");
+            assertEquals(1, files.size());
+            assertTrue(checkContains(files, "application" + ".BookstoreResource.class"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
