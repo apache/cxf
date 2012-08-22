@@ -175,6 +175,7 @@ public class SourceGenerator {
     private String wadlPath;
     private String wadlNamespace = WadlGenerator.WADL_NS;
     private boolean generateEnums;
+    private boolean skipSchemaGeneration;
     
     private Map<String, String> properties; 
     
@@ -185,6 +186,7 @@ public class SourceGenerator {
     private List<String> compilerArgs = new ArrayList<String>();
     private Map<String, String> schemaPackageMap = Collections.emptyMap();
     private Map<String, String> javaTypeMap = Collections.emptyMap();
+    private Map<String, String> schemaTypeMap = Collections.emptyMap();
     private Map<String, String> mediaTypesMap = Collections.emptyMap();
     private Bus bus;
     private boolean supportMultipleXmlReps;
@@ -213,6 +215,10 @@ public class SourceGenerator {
     
     public void setGenerateEnums(boolean generate) {
         this.generateEnums = generate;
+    }
+    
+    public void setSkipSchemaGeneration(boolean skip) {
+        this.skipSchemaGeneration = skip;
     }
     
     private String getClassPackageName(String wadlPackageName) {
@@ -247,8 +253,9 @@ public class SourceGenerator {
     
     private GrammarInfo generateSchemaCodeAndInfo(Application app, Set<String> typeClassNames, 
                                                   File srcDir) {
+        
         List<SchemaInfo> schemaElements = getSchemaElements(app);
-        if (schemaElements != null && !schemaElements.isEmpty()) {
+        if (!skipSchemaGeneration && schemaElements != null && !schemaElements.isEmpty()) {
             // generate classes from schema
             JCodeModel codeModel = createCodeModel(schemaElements, typeClassNames);
             if (codeModel != null) {
@@ -1030,25 +1037,29 @@ public class SourceGenerator {
     }
     
     private String getPrimitiveType(Element paramEl, ContextInfo info, Set<String> imports) {
+        final String defaultValue = "String";
         String type = paramEl.getAttribute("type");
         if (type.length() == 0) {
-            return "String";
+            return defaultValue;
         }
+        
         String[] pair = type.split(":");
-        String value = pair.length == 2 ? pair[1] : type;
-        if (XSD_SPECIFIC_TYPE_MAP.containsKey(value)) {
-            String theType = XSD_SPECIFIC_TYPE_MAP.get(value);
-            if (javaTypeMap.containsKey(theType)) {
-                theType = javaTypeMap.get(theType);
+        if (pair.length == 2) {
+            if (XSD_SPECIFIC_TYPE_MAP.containsKey(pair[1])) {
+                String expandedName = "{" + XmlSchemaConstants.XSD_NAMESPACE_URI + "}" + pair[1];
+                if (schemaTypeMap.containsKey(expandedName)) {
+                    return schemaTypeMap.get(expandedName);
+                }
+                
+                return XSD_SPECIFIC_TYPE_MAP.get(pair[1]);
             }
-            return theType;
+            
+            String value = pair[1].replaceAll("[\\-\\_]", "");
+            return convertRefToClassName(pair[0], value, defaultValue, info, imports);
         } else {
-            String actualValue = value.replaceAll("[\\-\\_]", "");
-            if (pair.length > 1) {
-                actualValue = convertRefToClassName(pair[0], actualValue, "String", info, imports);
-            }
-            return actualValue;
+            return type;
         }
+        
     }
     
     private String convertRefToClassName(String prefix,
@@ -1060,9 +1071,14 @@ public class SourceGenerator {
         if (gInfo != null) {
             String namespace = gInfo.getNsMap().get(prefix);
             if (namespace != null) {
+                                
                 String packageName = getPackageFromNamespace(namespace);
                 String clsName = getSchemaClassName(packageName, gInfo, actualValue, 
                                                     info.getTypeClassNames());
+                
+                if (clsName == null) {
+                    clsName = schemaTypeMap.get("{" + namespace + "}" + actualValue);
+                }
                 if (clsName != null) {
                     addImport(imports, clsName);
                     int index = clsName.lastIndexOf(".");
@@ -1423,6 +1439,10 @@ public class SourceGenerator {
     
     public void setJavaTypeMap(Map<String, String> map) {
         this.javaTypeMap = map;
+    }
+    
+    public void setSchemaTypeMap(Map<String, String> map) {
+        this.schemaTypeMap = map;
     }
     
     public void setMediaTypeMap(Map<String, String> map) {

@@ -45,12 +45,12 @@ import org.apache.cxf.tools.wadlto.WadlToolConstants;
 import org.apache.cxf.tools.wadlto.jaxb.CustomizationParser;
 
 public class JAXRSContainer extends AbstractCXFToolContainer {
-    private static final Map<String, String> DEFAULT_TYPES_MAP;
+    private static final Map<String, String> DEFAULT_JAVA_TYPE_MAP;
     private static final String TOOL_NAME = "wadl2java";
     private static final String EPR_TYPE_KEY = "org.w3._2005._08.addressing.EndpointReference";
     
     static {
-        DEFAULT_TYPES_MAP = Collections.singletonMap(EPR_TYPE_KEY, 
+        DEFAULT_JAVA_TYPE_MAP = Collections.singletonMap(EPR_TYPE_KEY, 
                 "javax.xml.ws.wsaddressing.W3CEndpointReference");
     }
     
@@ -102,7 +102,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         Set<String> set = new HashSet<String>();
         set.add(WadlToolConstants.CFG_BINDING);
         set.add(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
-        set.add(WadlToolConstants.CFG_TYPE_MAP);
+        set.add(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
         set.add(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
         return set;
     }
@@ -145,12 +145,14 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setSchemaPackageFiles(schemaPackageFiles);
         sg.setSchemaPackageMap(context.getNamespacePackageMap());
         
-        sg.setJavaTypeMap(getCustomTypeMap());
+        sg.setJavaTypeMap(DEFAULT_JAVA_TYPE_MAP);
+        sg.setSchemaTypeMap(getSchemaTypeMap());
         sg.setMediaTypeMap(getMediaTypeMap());
 
         if (context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS)) {
             sg.setGenerateEnums(true);
         }
+        sg.setSkipSchemaGeneration(context.optionSet(WadlToolConstants.CFG_NO_TYPES));
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
@@ -225,12 +227,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         
     }
     
-    private Map<String, String> getCustomTypeMap() {
-        Map<String, String> typeMap = getMap(WadlToolConstants.CFG_TYPE_MAP);
-        if (!typeMap.containsKey(EPR_TYPE_KEY)) {
-            typeMap.put(EPR_TYPE_KEY, DEFAULT_TYPES_MAP.get(EPR_TYPE_KEY));
-        }
-        return typeMap;
+    private Map<String, String> getSchemaTypeMap() {
+        return getMap(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
     }
     
     private Map<String, String> getMediaTypeMap() {

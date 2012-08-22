@@ -67,16 +67,15 @@ Examples:
                 </associatedArgument>
             </option>
             
-            <option id="typeMap" maxOccurs="unbounded">
+            <option id="schemaTypeMap" maxOccurs="unbounded">
                 <annotation>
-                    Specifies the optional mapping between default Java types
-                    representing WADL representation or parameter types 
-                    and custom Java types.
+                    Specifies the optional mapping between WADL parameter 
+                    or representation schema type and custom Java type.
                 </annotation>
                 <switch>tMap</switch>
                 <associatedArgument placement="afterSpace">
                     <valuetype>NamingSpacePackageString</valuetype>
-                    <annotation>default-java-type=preferred-java-type</annotation>
+                    <annotation>schema-type=java-type</annotation>
                 </associatedArgument>
             </option>
             
@@ -169,6 +168,11 @@ Examples:
                     parameters with multiple options
                 </annotation>
                 <switch>generateEnums</switch>
+            </option>
+            
+            <option id="notypes" maxOccurs="1">
+                <annotation>Turns off generating types</annotation>
+                <switch>noTypes</switch>
             </option>
             
             <option id="noAddressBinding" maxOccurs="1">
