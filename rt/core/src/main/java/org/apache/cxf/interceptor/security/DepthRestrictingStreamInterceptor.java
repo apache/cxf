@@ -36,8 +36,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<Message> {
-    private static final String FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
-    private static final String JSON_CONTENT_TYPE = "application/json";
+    private static final String XML_SUB_TYPE = "xml";
     private int elementCountThreshold = 2000;
     private int innerElementLevelThreshold = 20;
     private int innerElementCountThreshold = 50;
@@ -92,7 +91,7 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
     // custom subclasses can further customize it
     protected boolean canBeIgnored(Message message) {
         String ct = (String)message.get(Message.CONTENT_TYPE);
-        return ct != null && (FORM_CONTENT_TYPE.equals(ct) || JSON_CONTENT_TYPE.equals(ct));
+        return ct != null && !ct.contains(XML_SUB_TYPE);
     }
     
     /**
