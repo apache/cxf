@@ -176,6 +176,7 @@ public class SourceGenerator {
     private String wadlNamespace = WadlGenerator.WADL_NS;
     private boolean generateEnums;
     private boolean skipSchemaGeneration;
+    private boolean inheritResourceParams;
     
     private Map<String, String> properties; 
     
@@ -556,15 +557,23 @@ public class SourceGenerator {
                               String currentPath) {
     //CHECKSTYLE:ON    
         List<Element> methodEls = getWadlElements(rElement, "method");
-       
+        
+        List<Element> currentInheritedParams = inheritResourceParams 
+            ? new LinkedList<Element>(info.getInheritedParams()) : Collections.<Element>emptyList();
         for (Element methodEl : methodEls) {
             writeResourceMethod(methodEl, classPackage, imports, sbCode, info, isRoot, currentPath);    
+        }
+        if (inheritResourceParams && methodEls.isEmpty()) {
+            info.getInheritedParams().addAll(getWadlElements(rElement, "param"));
         }
         
         List<Element> childEls = getWadlElements(rElement, "resource");
         for (Element childEl : childEls) {
             String path = childEl.getAttribute("path");
-            String newPath = (currentPath + path).replace("//", "/");
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+            String newPath = currentPath + path.replace("//", "/");
             String id = childEl.getAttribute("id");
             if (id.length() == 0) {
                 writeMethods(childEl, classPackage, imports, sbCode, info, id, false, newPath);
@@ -572,6 +581,8 @@ public class SourceGenerator {
                 writeResourceMethod(childEl, classPackage, imports, sbCode, info, false, newPath);
             }
         }
+        info.getInheritedParams().clear();
+        info.getInheritedParams().addAll(currentInheritedParams);
     }
     
     private void writeAnnotation(StringBuilder sbCode, Set<String> imports,
@@ -702,7 +713,7 @@ public class SourceGenerator {
             
             sbCode.append("(");
             
-            List<Element> inParamElements = getParameters(resourceEl, 
+            List<Element> inParamElements = getParameters(resourceEl, info.getInheritedParams(),
                         !isRoot && !isResourceElement && resourceEl.getAttribute("id").length() > 0);
             
             Element repElement = getActualRepElement(allRequestReps, inXmlRep); 
@@ -734,15 +745,24 @@ public class SourceGenerator {
         return xmlReps;
     }
     
-    private List<Element> getParameters(Element resourceEl, boolean isSubresourceMethod) {
+    private List<Element> getParameters(Element resourceEl, List<Element> inheritedParams, 
+                                        boolean isSubresourceMethod) {
         List<Element> inParamElements = new LinkedList<Element>();
         List<Element> allParamElements = getWadlElements(resourceEl, "param");
+        List<Element> newInheritedParams = inheritResourceParams ? new LinkedList<Element>() 
+            : Collections.<Element>emptyList();
         for (Element el : allParamElements) {
-            if (isSubresourceMethod && RESOURCE_LEVEL_PARAMS.contains(el.getAttribute("style"))) {
+            boolean isResourceLevelParam = RESOURCE_LEVEL_PARAMS.contains(el.getAttribute("style")); 
+            if (isSubresourceMethod && isResourceLevelParam) {
                 continue;
+            }
+            if (inheritResourceParams && isResourceLevelParam) {
+                newInheritedParams.add(el);
             }
             inParamElements.add(el);
         }
+        inParamElements.addAll(inheritedParams);
+        inheritedParams.addAll(newInheritedParams);
         return inParamElements;
     }
 
@@ -1433,6 +1453,10 @@ public class SourceGenerator {
         this.compilerArgs = args;
     }
 
+    public void setInheritResourceParams(boolean inherit) {
+        this.inheritResourceParams = inherit;
+    }
+    
     public void setSchemaPackageMap(Map<String, String> map) {
         this.schemaPackageMap = map;
     }
@@ -1544,6 +1568,7 @@ public class SourceGenerator {
         private Set<String> resourceClassNames = new HashSet<String>();
         private Application rootApp;
         private File srcDir;
+        private List<Element> inheritedParams = new LinkedList<Element>();
         
         public ContextInfo(Application rootApp,
                            File srcDir,
@@ -1555,6 +1580,9 @@ public class SourceGenerator {
             this.gInfo = gInfo;
             this.rootApp = rootApp;
             this.srcDir = srcDir;
+        }
+        public List<Element> getInheritedParams() {
+            return inheritedParams;
         }
         public Application getApp() {
             return rootApp;
