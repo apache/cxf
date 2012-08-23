@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +45,12 @@ import org.apache.cxf.tools.wadlto.WadlToolConstants;
 import org.apache.cxf.tools.wadlto.jaxb.CustomizationParser;
 
 public class JAXRSContainer extends AbstractCXFToolContainer {
-    private static final Map<String, String> DEFAULT_TYPES_MAP;
+    private static final Map<String, String> DEFAULT_JAVA_TYPE_MAP;
     private static final String TOOL_NAME = "wadl2java";
+    private static final String EPR_TYPE_KEY = "org.w3._2005._08.addressing.EndpointReference";
     
     static {
-        // Should we have a common code which checks W3C EPR bindings in tools-common ?
-        DEFAULT_TYPES_MAP = Collections.singletonMap("org.w3._2005._08.addressing.EndpointReference", 
+        DEFAULT_JAVA_TYPE_MAP = Collections.singletonMap(EPR_TYPE_KEY, 
                 "javax.xml.ws.wsaddressing.W3CEndpointReference");
     }
     
@@ -98,7 +99,12 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     }
 
     public Set<String> getArrayKeys() {
-        return new HashSet<String>();
+        Set<String> set = new HashSet<String>();
+        set.add(WadlToolConstants.CFG_BINDING);
+        set.add(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
+        set.add(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
+        set.add(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
+        return set;
     }
     
     private void processWadl() {
@@ -138,15 +144,15 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         List<InputSource> schemaPackageFiles = parser.getSchemaPackageFiles();
         sg.setSchemaPackageFiles(schemaPackageFiles);
         sg.setSchemaPackageMap(context.getNamespacePackageMap());
-        // sg.setSchemaPackageName((String)context.get(WadlToolConstants.CFG_TOOLS_PACKAGENAME)));
         
-        // TODO: consider introducing an option too for users be able to
-        //       supply custom type mappings
-        sg.setSchemaTypesMap(DEFAULT_TYPES_MAP);
+        sg.setJavaTypeMap(DEFAULT_JAVA_TYPE_MAP);
+        sg.setSchemaTypeMap(getSchemaTypeMap());
+        sg.setMediaTypeMap(getMediaTypeMap());
 
         if (context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS)) {
             sg.setGenerateEnums(true);
         }
+        sg.setSkipSchemaGeneration(context.optionSet(WadlToolConstants.CFG_NO_TYPES));
         
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
@@ -219,5 +225,32 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             }
         }
         
-    }    
+    }
+    
+    private Map<String, String> getSchemaTypeMap() {
+        return getMap(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
+    }
+    
+    private Map<String, String> getMediaTypeMap() {
+        return getMap(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
+    }
+    
+    private Map<String, String> getMap(String parameterName) {
+        String[] typeToClasses = new String[]{};
+        Object value = context.get(parameterName);
+        if (value != null) {
+            typeToClasses = value instanceof String ? new String[]{(String)value}
+                                                   : (String[])value;
+        }
+        Map<String, String> typeMap = new HashMap<String, String>();
+        for (int i = 0; i < typeToClasses.length; i++) {
+            int pos = typeToClasses[i].indexOf("=");
+            if (pos != -1) {
+                String type = typeToClasses[i].substring(0, pos);
+                String clsName = typeToClasses[i].substring(pos + 1);
+                typeMap.put(type, clsName);
+            }
+        }
+        return typeMap;
+    }
 }

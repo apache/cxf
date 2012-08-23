@@ -66,6 +66,30 @@ Examples:
                     <annotation>[schema-namespace =]package-name</annotation>
                 </associatedArgument>
             </option>
+            
+            <option id="schemaTypeMap" maxOccurs="unbounded">
+                <annotation>
+                    Specifies the optional mapping between WADL parameter 
+                    or representation schema type and custom Java type.
+                </annotation>
+                <switch>tMap</switch>
+                <associatedArgument placement="afterSpace">
+                    <valuetype>NamingSpacePackageString</valuetype>
+                    <annotation>schema-type=java-type</annotation>
+                </associatedArgument>
+            </option>
+            
+            <option id="mediaTypeMap" maxOccurs="unbounded">
+                <annotation>
+                    Specifies the optional mapping between a WADL representation
+                    with no wadl:element attribute and Java class.
+                </annotation>
+                <switch>repMap</switch>
+                <associatedArgument placement="afterSpace">
+                    <valuetype>NamingSpacePackageString</valuetype>
+                    <annotation>media-type=class-name</annotation>
+                </associatedArgument>
+            </option>
 
             <option id="resourcename">
                 <annotation>
@@ -144,6 +168,11 @@ Examples:
                     parameters with multiple options
                 </annotation>
                 <switch>generateEnums</switch>
+            </option>
+            
+            <option id="notypes" maxOccurs="1">
+                <annotation>Turns off generating types</annotation>
+                <switch>noTypes</switch>
             </option>
             
             <option id="noAddressBinding" maxOccurs="1">

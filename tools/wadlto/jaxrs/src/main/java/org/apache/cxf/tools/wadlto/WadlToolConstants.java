@@ -37,11 +37,14 @@ public final class WadlToolConstants {
     public static final String CFG_SCHEMA_PACKAGENAME = "schemaPackagename";
     public static final String CFG_RESOURCENAME = "resourcename";
     
+    public static final String CFG_SCHEMA_TYPE_MAP = "schemaTypeMap";
+    public static final String CFG_MEDIA_TYPE_MAP = "mediaTypeMap";
     public static final String CFG_MULTIPLE_XML_REPS = "supportMultipleXmlReps";
     
     public static final String CFG_CATALOG = ToolConstants.CFG_CATALOG;
     public static final String CFG_BINDING = ToolConstants.CFG_BINDING;
     
+    public static final String CFG_NO_TYPES = ToolConstants.CFG_NO_TYPES;
     public static final String CFG_NO_ADDRESS_BINDING = ToolConstants.CFG_NO_ADDRESS_BINDING;
     
     public static final String CFG_WADL_NAMESPACE = "wadlNamespace";

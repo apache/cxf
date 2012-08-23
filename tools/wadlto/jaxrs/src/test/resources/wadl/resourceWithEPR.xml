@@ -41,7 +41,9 @@
  <resources base="http://localhost:8080/baz">
    <resource path="/bookstore">
      <method name="GET">
-      <request/>
+      <request>
+         <param name="date" style="query" type="xs:date"/>
+      </request>
       <response>
        <representation mediaType="application/xml" element="wsa:EndpointReference"/>
       </response>
