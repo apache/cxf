@@ -42,6 +42,7 @@ import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Provider;
 import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.soap.Addressing;
+import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Document;
 
@@ -99,20 +100,40 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         ht.setScopes(new ScopesType());
         ht.setMetadataVersion(1);
         ht.getTypes().add(server.getEndpoint().getEndpointInfo().getInterface().getName());
-        Object o = server.getEndpoint().get("ws-discover.scopes");
+        Object o = server.getEndpoint().get("ws-discovery-scopes");
         if (o != null) {
             setScopes(ht, o);
         }
         setXAddrs(ht, server);
+        String uuid = (String)server.getEndpoint().get("ws-discovery-uuid");
+        if (uuid != null) {
+            //persistent uuid
+            W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
+            builder.address(uuid);
+            ht.setEndpointReference(builder.build());
+        }
         ht = client.register(ht);
         registered.add(ht);
         server.getEndpoint().put(HelloType.class.getName(), ht);
     }
 
     private void setXAddrs(HelloType ht, Server server) {
-        String s = server.getEndpoint().getEndpointInfo().getAddress();
-        //FIXME - servlet mode, need all the servlet information to create a full address
-        ht.getXAddrs().add(s);
+        String s = (String)server.getEndpoint().get("ws-discovery-published-url");
+        if (s == null) {
+            s = (String)server.getEndpoint().getEndpointInfo().getProperty("ws-discovery-published-url");
+        } 
+        if (s == null) {
+            s = (String)server.getEndpoint().get("publishedEndpointUrl");
+        }
+        if (s == null) {
+            s = (String)server.getEndpoint().getEndpointInfo().getProperty("publishedEndpointUrl");
+        }
+        if (s == null) {
+            s = server.getEndpoint().getEndpointInfo().getAddress();
+        }
+        if (s != null) {
+            ht.getXAddrs().add(s);
+        }
     }
 
     private void setScopes(HelloType ht, Object o) {
