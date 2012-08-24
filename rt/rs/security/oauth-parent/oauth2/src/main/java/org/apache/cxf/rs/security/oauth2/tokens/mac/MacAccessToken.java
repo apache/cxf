@@ -24,6 +24,12 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class MacAccessToken extends ServerAccessToken {
+    
+    public MacAccessToken(Client client, 
+                          long lifetime) {
+        this(client, HmacAlgorithm.HmacSHA256, lifetime);
+    }
+    
     public MacAccessToken(Client client, 
                           String macAuthAlgo,
                           long lifetime) {
@@ -45,12 +51,23 @@ public class MacAccessToken extends ServerAccessToken {
                           long lifetime, 
                           long issuedAt) {
         super(client, OAuthConstants.MAC_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
-        this.setExtraParameters(algo);
+        this.setExtraParameters(algo, null);
     }
     
-    private void setExtraParameters(HmacAlgorithm algo) {
+    public MacAccessToken(Client client,
+                          HmacAlgorithm algo,
+                          String tokenKey,
+                          String tokenSecret,
+                          long lifetime, 
+                          long issuedAt) {
+        super(client, OAuthConstants.MAC_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
+        this.setExtraParameters(algo, tokenSecret);
+    }
+    
+    private void setExtraParameters(HmacAlgorithm algo, String secret) {
+        String theSecret = secret == null ? HmacUtils.generateSecret(algo) : secret; 
         super.getParameters().put(OAuthConstants.MAC_TOKEN_SECRET,
-                                  HmacUtils.generateSecret(algo));
+                                  theSecret);
         super.getParameters().put(OAuthConstants.MAC_TOKEN_ALGORITHM,
                                   algo.getOAuthName());
     }
