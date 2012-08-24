@@ -170,6 +170,14 @@ Examples:
                 <switch>generateEnums</switch>
             </option>
             
+            <option id="inheritResourceParams" maxOccurs="1">
+                <annotation>
+                    Specifies that resource-level (path or matrix) parameters
+                    can be inherited by child resources
+                </annotation>
+                <switch>inheritResourceParams</switch>
+            </option>
+            
             <option id="notypes" maxOccurs="1">
                 <annotation>Turns off generating types</annotation>
                 <switch>noTypes</switch>
