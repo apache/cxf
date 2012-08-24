@@ -20,7 +20,7 @@
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:prefix1="http://superbooks">
 
  <resource_type id="main-resource">
-     <param name="id" style="template" type="xs:long"/>
+     <param href="#id1"/>
      <method name="GET">
       <request/>
       <response>
@@ -43,4 +43,6 @@
  <resources base="http://localhost:8080/baz">
      <resource path="/bookstore/{id}" type="#main-resource"/>
   </resources>  
+  
+  <param id="id1" name="id" style="template" type="xs:long"/>
 </application>
