@@ -20,9 +20,11 @@
 package org.apache.cxf.ws.discovery.internal;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.bind.JAXBContext;
@@ -140,6 +142,9 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     public synchronized void startup() {
         if (!started) {
             udpEndpoint = Endpoint.create(new WSDiscoveryProvider());
+            Map<String, Object> props = new HashMap<String, Object>();
+            props.put("jaxws.provider.interpretNullAsOneway", "true");
+            udpEndpoint.setProperties(props);
             udpEndpoint.publish("soap.udp://239.255.255.250:3702");
             started = true;
         }

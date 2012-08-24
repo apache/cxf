@@ -1,2 +1,2 @@
-org.apache.cxf.ws.discovery.WSDiscoveryService::true
+org.apache.cxf.ws.discovery.listeners.WSDiscoveryServerListener::true
 
