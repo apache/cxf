@@ -6,7 +6,6 @@
 #end
 #set( $void = $params.validate() )
 ##
-
 #set( $url = "${serverUrl}/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+${projectName}+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+updated+%3E%3D+-28d&tempMax=500" )
 #set( $jirarss = $rss.fetch( $url ) )
 #set( $issues = $jirarss.fillAttachments() )
