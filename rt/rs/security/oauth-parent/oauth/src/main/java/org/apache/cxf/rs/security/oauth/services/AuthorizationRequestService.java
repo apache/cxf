@@ -59,6 +59,7 @@ public class AuthorizationRequestService extends AbstractOAuthService {
 
     @GET
     @Path("/decision")
+    @Produces({"application/xhtml+xml", "text/html", "application/xml;q=0.9", "application/json;q=0.9" })
     public Response authorizeDecision() {
         return authorize();
     }
@@ -66,6 +67,11 @@ public class AuthorizationRequestService extends AbstractOAuthService {
     @POST
     @Path("/decision")
     @Consumes("application/x-www-form-urlencoded")
+    @Produces({"application/xhtml+xml", 
+               "text/html", 
+               "application/xml;q=0.9", 
+               "application/json;q=0.9",
+               "application/x-www-form-urlencoded" })
     public Response authorizeDecisionForm() {
         return authorizeDecision();
     }

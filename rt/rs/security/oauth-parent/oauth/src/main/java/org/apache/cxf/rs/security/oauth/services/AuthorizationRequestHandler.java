@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -81,14 +81,22 @@ public class AuthorizationRequestHandler {
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
             
+            String decision = oAuthMessage.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
+            
             OAuthAuthorizationData secData = new OAuthAuthorizationData();
             if (!compareRequestSessionTokens(request, oAuthMessage)) {
+                if (decision != null) {
+                    // this is a user decision request, the session has expired or been possibly hijacked
+                    LOG.warning("Session authenticity token is missing or invalid");
+                    throw new WebApplicationException(400);
+                }
+                // assume it is an initial authorization request
                 addAuthenticityTokenToSession(secData, request);
                 return Response.ok(
                         addAdditionalParams(secData, dataProvider, token)).build();
             }
             
-            String decision = oAuthMessage.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
+            
             boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
 
             Map<String, String> queryParams = new HashMap<String, String>();
@@ -142,7 +150,7 @@ public class AuthorizationRequestHandler {
             String callbackValue = getCallbackValue(token);
             if (OAuthConstants.OAUTH_CALLBACK_OOB.equals(callbackValue)) {
                 OOBAuthorizationResponse bean = convertQueryParamsToOOB(queryParams);
-                return Response.ok().type(MediaType.TEXT_HTML).entity(bean).build();
+                return Response.ok().entity(bean).build();
             } else {
                 URI callbackURI = buildCallbackURI(callbackValue, queryParams);
                 return Response.seeOther(callbackURI).build();
