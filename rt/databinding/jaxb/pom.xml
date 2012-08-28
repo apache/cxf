@@ -35,6 +35,7 @@
             javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
+            com.sun.tools*;resolution:=optional,
         </cxf.osgi.import>
     </properties>
     <build>
