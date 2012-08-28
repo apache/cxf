@@ -811,18 +811,12 @@ public class JAXBDataBinding implements DataBindingProfile {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
-        List<Node> ns = new ArrayList<Node>();
 
         impElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                        ToolConstants.SCHEMA_URI,
                                                        "import");
-        for (Element elem : impElemList) {
-            Node importNode = elem;
-            ns.add(importNode);
-        }
-        for (Node item : ns) {
-            Node schemaNode = item.getParentNode();
-            schemaNode.removeChild(item);
+        for (Element item : impElemList) {
+            item.removeAttribute("schemaLocation");
         }
 
         incElemList = DOMUtils.findAllElementsByTagNameNS(element,
