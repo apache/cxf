@@ -145,7 +145,7 @@ public class AuthorizationRequestHandler {
             }
             queryParams.put(OAuth.OAUTH_TOKEN, token.getTokenKey());
             if (token.getState() != null) {
-                queryParams.put("state", token.getState());
+                queryParams.put(OAuthConstants.X_OAUTH_STATE, token.getState());
             }
             String callbackValue = getCallbackValue(token);
             if (OAuthConstants.OAUTH_CALLBACK_OOB.equals(callbackValue)) {
