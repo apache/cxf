@@ -56,6 +56,17 @@ public class JAXBBindErrorListener implements ErrorListener {
     }
 
     public void warning(org.xml.sax.SAXParseException exception) {
+        for (StackTraceElement el : new Exception().getStackTrace()) {
+            if (el.getClassName().contains("DowngradingErrorHandler")) {
+                //this is from within JAXB as it tries to validate the schemas
+                //Xerces has issues with schema imports that don't have a
+                //schemaLocation (or a schemaLocation that is not fully resolvable)
+                //and emits strange warnings that are completely not 
+                //correct so we'll try and skip them.
+                return;
+            }
+        }
+        
         if (this.isVerbose) {
             System.out.println("JAXB parsing schema warning " + exception.toString()
                                + " in schema " + exception.getSystemId());
