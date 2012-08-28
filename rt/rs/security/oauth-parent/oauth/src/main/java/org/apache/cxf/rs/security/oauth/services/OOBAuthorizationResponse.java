@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth.services;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class OOBAuthorizationResponse {
     private String requestToken;
     private String verifier;

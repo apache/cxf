@@ -124,14 +124,20 @@ public class RequestTokenHandler {
     protected void validateCallbackURL(Client client,
                                        String oauthCallback) throws OAuthProblemException {
         // the callback must not be empty or null, and it should either match
-        // the pre-registered callback URI or have the common root with the
-        // the pre-registered application URI
-        if (!StringUtils.isEmpty(oauthCallback) 
-            && (!StringUtils.isEmpty(client.getCallbackURI())
-                && oauthCallback.equals(client.getCallbackURI())
-                || !StringUtils.isEmpty(client.getApplicationURI())
-                && oauthCallback.startsWith(client.getApplicationURI()))) {
-            return;
+        // the registered callback URI or have the common root with the
+        // the registered application URI (but only if no callback was registered)
+        if (!StringUtils.isEmpty(oauthCallback)) {
+            boolean registeredCallbackIsEmpty = StringUtils.isEmpty(client.getCallbackURI());
+            if (!registeredCallbackIsEmpty
+                && oauthCallback.equals(client.getCallbackURI())) {
+                return;
+            }
+            if (registeredCallbackIsEmpty 
+                && !StringUtils.isEmpty(client.getApplicationURI())
+                && oauthCallback.startsWith(client.getApplicationURI())) {
+                return;
+            }    
+            
         }
         OAuthProblemException problemEx = new OAuthProblemException(
             OAuth.Problems.PARAMETER_REJECTED + " - " + OAuth.OAUTH_CALLBACK);
