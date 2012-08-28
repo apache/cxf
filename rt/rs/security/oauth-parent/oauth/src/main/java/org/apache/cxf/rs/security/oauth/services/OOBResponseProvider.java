@@ -90,6 +90,7 @@ public class OOBResponseProvider implements
         if (obj.getState() != null) {
             form.set(OAuthConstants.X_OAUTH_STATE, obj.getState());
         }
+        formProvider.writeTo(form, Form.class, Form.class, anns, mt, headers, os);
     }
 
 }
