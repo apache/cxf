@@ -85,7 +85,7 @@ public class RequestTokenHandler {
             RequestTokenRegistration reg = new RequestTokenRegistration();
             reg.setClient(client);
             reg.setCallback(callback);
-            reg.setState(oAuthMessage.getParameter("state"));
+            reg.setState(oAuthMessage.getParameter(OAuthConstants.X_OAUTH_STATE));
             reg.setScopes(scopes);
             reg.setLifetime(tokenLifetime);
             reg.setIssuedAt(System.currentTimeMillis() / 1000);
