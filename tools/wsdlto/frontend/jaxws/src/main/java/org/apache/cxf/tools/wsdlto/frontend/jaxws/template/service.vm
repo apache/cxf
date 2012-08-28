@@ -21,7 +21,9 @@ $service.packageJavaDoc
 #end
 package $service.PackageName;
 
+#if ($wsdlLocation != "" && not($useGetResource) && not($wsdlLocation.startsWith("classpath:")))
 import java.net.MalformedURLException;
+#end
 import java.net.URL;
 #if ($mark-generated == "true")
 import javax.annotation.Generated;
