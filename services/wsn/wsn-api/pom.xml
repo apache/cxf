@@ -87,7 +87,6 @@
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
                             javax.xml.ws*;version="[0.0,3)",
-                            org.apache.cxf.jaxws.spi;version="[2.4,3)",
                             org.apache.cxf*;version="[2.4,3)",
                             *
                         </Import-Package>
