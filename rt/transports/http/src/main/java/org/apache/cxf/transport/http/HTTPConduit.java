@@ -1109,6 +1109,13 @@ public abstract class HTTPConduit
         protected abstract void updateCookiesBeforeRetransmit() throws IOException;
 
         
+        protected void handleNoOutput() throws IOException {
+            //For GET and DELETE and such, this will be called
+            //For some implementations, this notice may be required to 
+            //actually execute the request
+        }
+
+        
         protected void handleResponseOnWorkqueue(boolean allowCurrentThread, boolean forceWQ) throws IOException {
             Runnable runnable = new Runnable() {
                 public void run() {
@@ -1194,6 +1201,7 @@ public abstract class HTTPConduit
             // If this is a GET method we must not touch the output
             // stream as this automagically turns the request into a POST.
             if (getMethod().equals("GET")) {
+                handleNoOutput();
                 return;
             }
             
@@ -1259,9 +1267,11 @@ public abstract class HTTPConduit
             String method = getMethod();
             if (!"POST".equals(method)
                 && !"PUT".equals(method)) {
+                handleNoOutput();
                 return;
             }
             if (outMessage.get("org.apache.cxf.post.empty") != null) {
+                handleNoOutput();
                 return;
             }
             
