@@ -36,6 +36,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -551,16 +552,16 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         
         class TestExecutor implements Executor {
             
-            private int count;
+            private AtomicInteger count = new AtomicInteger();
             
             public void execute(Runnable command) {
-                count++;
-                LOG.info("asyn call time " + count);
+                int c = count.incrementAndGet();
+                LOG.info("asyn call time " + c);
                 command.run();
             }
             
             public int getCount() {
-                return count;
+                return count.get();
             }
         }
         Executor executor = new TestExecutor();

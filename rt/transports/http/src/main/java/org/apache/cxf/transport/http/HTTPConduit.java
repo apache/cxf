@@ -1109,7 +1109,7 @@ public abstract class HTTPConduit
         protected abstract void updateCookiesBeforeRetransmit() throws IOException;
 
         
-        protected void handleResponseOnWorkqueue(boolean allowCurrentThread) throws IOException {
+        protected void handleResponseOnWorkqueue(boolean allowCurrentThread, boolean forceWQ) throws IOException {
             Runnable runnable = new Runnable() {
                 public void run() {
                     try {
@@ -1125,7 +1125,18 @@ public abstract class HTTPConduit
             HTTPClientPolicy policy = getClient(outMessage);
             try {
                 Executor ex = outMessage.getExchange().get(Executor.class);
-                if (ex == null) {
+                if (forceWQ && ex != null) {
+                    final Executor ex2 = ex;
+                    final Runnable origRunnable = runnable;
+                    runnable = new Runnable() {
+                        public void run() {
+                            outMessage.getExchange().put(Executor.class.getName() 
+                                                         + ".USING_SPECIFIED", Boolean.TRUE);
+                            ex2.execute(origRunnable);
+                        }
+                    };
+                }
+                if (ex == null || forceWQ) {
                     WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
                         .getExtension(WorkQueueManager.class);
                     AutomaticWorkQueue qu = mgr.getNamedWorkQueue("http-conduit");

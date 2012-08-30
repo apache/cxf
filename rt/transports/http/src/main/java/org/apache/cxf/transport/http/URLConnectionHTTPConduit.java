@@ -200,7 +200,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             cookies.readFromHeaders(h);
         }
         protected void handleResponseAsync() throws IOException {
-            handleResponseOnWorkqueue(true);
+            handleResponseOnWorkqueue(true, false);
         }
         protected void updateCookiesBeforeRetransmit() {
             Headers h = new Headers();

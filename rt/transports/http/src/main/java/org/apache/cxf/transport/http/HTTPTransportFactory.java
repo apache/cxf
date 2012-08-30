@@ -62,6 +62,14 @@ public class HTTPTransportFactory
     extends AbstractTransportFactory 
     implements WSDLEndpointFactory, ConduitInitiator, DestinationFactory {
     
+
+    public interface HTTPConduitFactory {
+        HTTPConduit createConduit(HTTPTransportFactory f,
+                                  EndpointInfo localInfo,
+                                  EndpointReferenceType target) throws IOException;
+    }
+        
+    
     public static final List<String> DEFAULT_NAMESPACES 
         = Arrays.asList(
             "http://cxf.apache.org/transports/http",
@@ -247,7 +255,16 @@ public class HTTPTransportFactory
             EndpointInfo endpointInfo,
             EndpointReferenceType target
     ) throws IOException {
-        HTTPConduit conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
+        
+        HTTPConduitFactory factory = findFactory(endpointInfo);
+        HTTPConduit conduit = null;
+        if (factory != null) {
+            conduit = factory.createConduit(this, endpointInfo, target);
+        }
+        if (conduit == null) {
+            conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
+        }
+
         // Spring configure the conduit.  
         String address = conduit.getAddress();
         if (address != null && address.indexOf('?') != -1) {
@@ -262,6 +279,13 @@ public class HTTPTransportFactory
         return conduit;
     }
     
+    protected HTTPConduitFactory findFactory(EndpointInfo endpointInfo) {
+        HTTPConduitFactory f = endpointInfo.getProperty(HTTPConduitFactory.class.getName(), HTTPConduitFactory.class);
+        if (f == null) {
+            f = bus.getExtension(HTTPConduitFactory.class);
+        }
+        return f;
+    }
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
         if (endpointInfo == null) {
             throw new IllegalArgumentException("EndpointInfo cannot be null");
