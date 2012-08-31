@@ -883,9 +883,14 @@ public class MAPAggregatorImpl extends MAPAggregator {
  
             if (isFault
                 && !ContextUtils.isGenericAddress(inMAPs.getFaultTo())) {
+                
+                Message m = message.getExchange().getInFaultMessage();
+                if (m == null) {
+                    m = message;
+                }
                 InternalContextUtils.rebaseResponse(inMAPs.getFaultTo(),
                                             inMAPs,
-                                            message);
+                                            m);
             }
         }
     }

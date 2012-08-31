@@ -67,6 +67,9 @@ public class DecoupledFaultHandler extends AbstractSoapInterceptor {
             
             if (maps != null && !ContextUtils.isGenericAddress(maps.getFaultTo())) {
                 //Just keep the wsa headers to remove the not understand headers
+                if (exchange.getOutMessage() != null) {
+                    message = (SoapMessage)exchange.getOutMessage();
+                }
                 Iterator<Header> iterator = message.getHeaders().iterator();
                 while (iterator.hasNext()) {
                     Header header = iterator.next();
