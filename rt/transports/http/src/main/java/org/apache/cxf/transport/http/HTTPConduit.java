@@ -1096,7 +1096,7 @@ public abstract class HTTPConduit
         // methods used for the incoming side
         protected abstract int getResponseCode() throws IOException;
         protected abstract String getResponseMessage() throws IOException;
-        protected abstract void updateResponseHeaders(Message inMessage);
+        protected abstract void updateResponseHeaders(Message inMessage) throws IOException;
         protected abstract void handleResponseAsync() throws IOException;
         protected abstract void closeInputStream() throws IOException;
         protected abstract boolean usingProxy();
