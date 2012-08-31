@@ -41,15 +41,15 @@ public class TrustHandler
     ) throws UntrustedURLConnectionIOException {
         System.out.println("Trust decision for conduit: "
                 + conduitName + " and " 
-                + connectionInfo.getURL());
+                + connectionInfo.getURI());
         if (connectionInfo instanceof HttpURLConnectionInfo) {
             HttpURLConnectionInfo c = (HttpURLConnectionInfo) connectionInfo;
             System.out.println("Http method: " 
-                    + c.getHttpRequestMethod() + " on " + c.getURL());
+                    + c.getHttpRequestMethod() + " on " + c.getURI());
         }
         if (connectionInfo instanceof HttpsURLConnectionInfo) {
             HttpsURLConnectionInfo c = (HttpsURLConnectionInfo) connectionInfo;
-            System.out.println("TLS Connection to: " + c.getURL());
+            System.out.println("TLS Connection to: " + c.getURI());
             System.out.println("Enabled Cipher: " + c.getEnabledCipherSuite());
             System.out.println("Local Principal: " + c.getLocalPrincipal());
             System.out.println("Peer Principal: " + c.getPeerPrincipal());

@@ -19,12 +19,10 @@
 
 package org.apache.cxf.transport.https;
 
-import java.net.HttpURLConnection;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -56,10 +54,9 @@ public final class CertConstraintsInterceptor extends AbstractPhaseInterceptor<M
         
         if (isRequestor(message)) {
             try {
-                HttpURLConnection connection = 
-                    (HttpURLConnection) message.get("http.connection");
+                String scheme = (String)message.get("http.scheme");
                 
-                if (connection instanceof HttpsURLConnection) {
+                if ("https".equals(scheme)) {
                     final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
                     MessageTrustDecider trust = new HttpsMessageTrustDecider(certConstraints, orig);
                     message.put(MessageTrustDecider.class, trust);

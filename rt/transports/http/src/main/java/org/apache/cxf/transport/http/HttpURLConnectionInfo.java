@@ -19,7 +19,8 @@
  
 package org.apache.cxf.transport.http;
 
-import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 
 /**
  * This class contains the information about the HTTP Connection that
@@ -34,9 +35,18 @@ public class HttpURLConnectionInfo extends URLConnectionInfo {
      * This constructor takes the HttpURLConnection and extracts
      * the httpRequestMethod.
      */
-    public HttpURLConnectionInfo(HttpURLConnection con) {
-        super(con);
-        httpRequestMethod = con.getRequestMethod();
+    public HttpURLConnectionInfo(URL url, String method) {
+        super(url);
+        httpRequestMethod = method;
+    }
+    
+    /**
+     * This constructor takes the HttpURLConnection and extracts
+     * the httpRequestMethod.
+     */
+    public HttpURLConnectionInfo(URI uri, String method) {
+        super(uri);
+        httpRequestMethod = method;
     }
     
     /**

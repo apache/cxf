@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.net.HttpURLConnection;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -27,8 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -99,14 +96,11 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
         private void assertHttps(Collection<AssertionInfo> ais, Message message) {
             for (AssertionInfo ai : ais) {
                 HttpsToken token = (HttpsToken)ai.getAssertion();
-                
-                HttpURLConnection connection = 
-                    (HttpURLConnection) message.get("http.connection");
-                
+                String scheme = (String)message.get("http.scheme");
                 ai.setAsserted(true);
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);
                 
-                if (connection instanceof HttpsURLConnection) {
+                if ("https".equals(scheme)) {
                     if (token.isRequireClientCertificate()) {
                         final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
                         MessageTrustDecider trust = new MessageTrustDecider() {
@@ -144,7 +138,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         }                        
                     }
                 } else {
-                    ai.setNotAsserted("HttpURLConnection is not a HttpsURLConnection");
+                    ai.setNotAsserted("Not an HTTPs connection");
                 }
                 if (!ai.isAsserted()) {
                     throw new PolicyException(ai);

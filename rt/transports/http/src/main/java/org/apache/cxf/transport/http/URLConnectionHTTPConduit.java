@@ -89,6 +89,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
     private HttpURLConnection createConnection(Message message, URI uri, HTTPClientPolicy csPolicy) throws IOException {
         URL url = uri.toURL();
         Proxy proxy = proxyFactory.createProxy(csPolicy , uri);
+        message.put("http.scheme", uri.getScheme());
         return connectionFactory.createConnection(tlsClientParameters, proxy, url);
     }
     protected void setupConnection(Message message, URI currentURL, HTTPClientPolicy csPolicy) throws IOException {
@@ -125,28 +126,32 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
     protected OutputStream createOutputStream(Message message, 
                                               boolean needToCacheRequest, 
                                               boolean isChunking,
-                                              int chunkThreshold) {
+                                              int chunkThreshold) throws IOException {
         HttpURLConnection connection = (HttpURLConnection)message.get(KEY_HTTP_CONNECTION);
         
         if (isChunking && chunkThreshold <= 0) {
             chunkThreshold = 0;
             connection.setChunkedStreamingMode(-1);                    
         }
-        return new URLConnectionWrappedOutputStream(message, connection,
-                                       needToCacheRequest, 
-                                       isChunking,
-                                       chunkThreshold,
-                                       getConduitName());
+        try {
+            return new URLConnectionWrappedOutputStream(message, connection,
+                                           needToCacheRequest, 
+                                           isChunking,
+                                           chunkThreshold,
+                                           getConduitName());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
     }
     
     class URLConnectionWrappedOutputStream extends WrappedOutputStream {
         HttpURLConnection connection;
         public URLConnectionWrappedOutputStream(Message message, HttpURLConnection connection,
                                                 boolean needToCacheRequest, boolean isChunking,
-                                                int chunkThreshold, String conduitName) {
+                                                int chunkThreshold, String conduitName) throws URISyntaxException {
             super(message, needToCacheRequest, isChunking,
                   chunkThreshold, conduitName,
-                  connection.getURL().toString());
+                  connection.getURL().toURI());
             this.connection = connection;
         }
         // This construction makes extending the HTTPConduit more easier 
@@ -262,7 +267,11 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 throw new IOException(e);
             }
             setupConnection(outMessage, nurl, cp);
-            url = newURL;
+            try {
+                url = new URI(newURL);
+            } catch (URISyntaxException e) {
+                throw new IOException(e); 
+            }
             connection = (HttpURLConnection)outMessage.get(KEY_HTTP_CONNECTION);
         }
 

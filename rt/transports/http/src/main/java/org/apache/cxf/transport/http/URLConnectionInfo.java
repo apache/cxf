@@ -19,8 +19,9 @@
  
 package org.apache.cxf.transport.http;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * This class is returned from the URLConnectionFactory to give
@@ -31,24 +32,29 @@ public class URLConnectionInfo {
     /**
      * The URL the connection is associated with.
      */
-    protected final URL theURL;
+    protected final URI theURI;
     
-    /**
-     * This constructor is used to represent a URLConnection.
-     * 
-     * @param connection The URLConnection that this info object will represent.
-     */
-    public URLConnectionInfo(URLConnection connection) {
-        theURL = connection.getURL();
+    public URLConnectionInfo(URL url) {
+        URI u = null;
+        try {
+            u = url.toURI();
+        } catch (URISyntaxException e) {
+            //ignore
+        }
+        theURI = u;
+    }
+    
+    public URLConnectionInfo(URI uri) {
+        theURI = uri;
     }
     
     /**
-     * This field returns the URL associated with the connection
+     * This field returns the URI associated with the connection
      * in question.
      * 
      * @return
      */
-    public URL getURL() {
-        return theURL;
+    public URI getURI() {
+        return theURI;
     }
 }

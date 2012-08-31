@@ -22,6 +22,7 @@ package org.apache.cxf.transport.https;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.security.Principal;
 import java.security.cert.Certificate;
 
@@ -66,6 +67,23 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
     protected Principal peerPrincipal;
 
     
+    public HttpsURLConnectionInfo(URI uri,
+                                  String method,
+                                  String cipherSuite,
+                                  Certificate[] localCerts,
+                                  Principal principal,
+                                  Certificate[] serverCerts,
+                                  Principal peer) {
+        super(uri, method);
+        enabledCipherSuite = cipherSuite;
+        localCertificates = localCerts;
+        localPrincipal = principal;
+        serverCertificates = serverCerts;
+        peerPrincipal = peer;
+    }
+    
+
+    
     /**
      * This constructor is used to create the info object
      * representing the this HttpsURLConnection. Connection parameter is 
@@ -74,7 +92,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
      */
     public HttpsURLConnectionInfo(HttpURLConnection connection)
         throws IOException {
-        super(connection);
+        super(connection.getURL(), connection.getRequestMethod());
         if (connection instanceof HttpsURLConnection) {
             HttpsURLConnection conn = (HttpsURLConnection) connection;
             enabledCipherSuite = conn.getCipherSuite();
