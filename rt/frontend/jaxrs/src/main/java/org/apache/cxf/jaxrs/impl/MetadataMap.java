@@ -231,4 +231,22 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     public void addFirst(K key, V value) {
         addValue(key, value, false);
     }
+
+    public boolean equalsIgnoreValueOrder(MultivaluedMap<K, V> map) {
+        Set<K> mapKeys = map.keySet();
+        if (mapKeys.size() != m.keySet().size()) {
+            return false;
+        }
+        
+        for (K key : mapKeys) {
+            List<V> localValues = this.get(key);
+            List<V> mapValues = map.get(key);
+            if (localValues == null 
+                || localValues.size() != mapValues.size()
+                || !localValues.containsAll(mapValues)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

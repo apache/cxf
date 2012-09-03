@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -276,12 +275,6 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
 
     @Override
     public ResponseBuilder entity(Object arg0, Annotation[] arg1) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ResponseBuilder entity(Object arg0, Type arg1, Annotation[] arg2) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -199,8 +199,8 @@ public class ResponseImplTest extends Assert {
         assertTrue(links.contains(prev));
         
         assertEquals("http://next", next.getUri().toString());
-        assertEquals("next", next.getRel().get(0));
+        assertEquals("next", next.getRel());
         assertEquals("http://prev", prev.getUri().toString());
-        assertEquals("prev", prev.getRel().get(0));
+        assertEquals("prev", prev.getRel());
     }
 }

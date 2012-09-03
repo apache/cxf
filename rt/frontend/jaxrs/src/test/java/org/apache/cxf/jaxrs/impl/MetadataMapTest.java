@@ -231,6 +231,30 @@ public class MetadataMapTest extends Assert {
         assertEquals("bar", values.get(0).toString());
     }
     
-    
+    @Test
+    public void testCompareIgnoreValueOrder() {
+        MetadataMap<String, String> m = new MetadataMap<String, String>();
+        m.add("baz", "bar1");
+        m.add("baz", "bar2");
+        List<String> values = m.get("baz");
+        assertEquals("bar1", values.get(0));
+        assertEquals("bar2", values.get(1));
+        
+        MetadataMap<String, String> m2 = new MetadataMap<String, String>();
+        m2.add("baz", "bar2");
+        m2.add("baz", "bar1");
+        values = m2.get("baz");
+        assertEquals("bar2", values.get(0));
+        assertEquals("bar1", values.get(1));
+        
+        assertTrue(m.equalsIgnoreValueOrder(m2));
+        assertTrue(m.equalsIgnoreValueOrder(m));
+        assertTrue(m2.equalsIgnoreValueOrder(m));
+        
+        MetadataMap<String, String> m3 = new MetadataMap<String, String>();
+        m3.add("baz", "bar1");
+        assertFalse(m.equalsIgnoreValueOrder(m3));
+        assertFalse(m2.equalsIgnoreValueOrder(m3));
+    }
     
 }

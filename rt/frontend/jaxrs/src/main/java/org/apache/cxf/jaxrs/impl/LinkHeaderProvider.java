@@ -21,12 +21,13 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Link;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+
+import org.apache.cxf.common.util.StringUtils;
 
 public class LinkHeaderProvider implements HeaderDelegate<Link> {
 
@@ -99,7 +100,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         sb.append(link.getUri());
         sb.append('>');
         
-        List<String> rels = link.getRel();
+        String rels = link.getRel();
         if (!rels.isEmpty()) {
             sb.append(";").append(REL).append('=');
             writeListParamValues(sb, rels);
@@ -110,7 +111,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         if (link.getType() != null) {
             sb.append(";").append(TYPE).append('=').append(link.getType());
         }
-        for (Map.Entry<String, List<String>> entry : link.getParams().entrySet()) {
+        for (Map.Entry<String, String> entry : link.getParams().entrySet()) {
             if (KNOWN_PARAMETERS.contains(entry.getKey())) {
                 continue;
             }
@@ -122,17 +123,16 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         
     }
 
-    private void writeListParamValues(StringBuilder sb, List<String> values) {
-        if (values.size() > 1) {
+    private void writeListParamValues(StringBuilder sb, String value) {
+        if (StringUtils.isEmpty(value)) {
+            return;
+        }
+        boolean commaAvailable = value.contains(",");
+        if (commaAvailable) {
             sb.append('"');
         }
-        for (int i = 0; i < values.size(); i++) {
-            sb.append(values.get(i));
-            if (i < values.size() - 1) { 
-                sb.append(',');    
-            }
-        }
-        if (values.size() > 1) {
+        sb.append(value);
+        if (commaAvailable) {
             sb.append('"');
         }
     }

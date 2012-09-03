@@ -221,8 +221,8 @@ public final class ResponseImpl extends Response {
     }
     
     public Link getLink(String relation) {
-        Set<Map.Entry<List<String>, Link>> entries = getAllLinks().entrySet();
-        for (Map.Entry<List<String>, Link> entry : entries) {
+        Set<Map.Entry<String, Link>> entries = getAllLinks().entrySet();
+        for (Map.Entry<String, Link> entry : entries) {
             if (entry.getKey().contains(relation)) {
                 return entry.getValue();
             }
@@ -238,12 +238,12 @@ public final class ResponseImpl extends Response {
         return new HashSet<Link>(getAllLinks().values());
     }
 
-    private Map<List<String>, Link> getAllLinks() {
+    private Map<String, Link> getAllLinks() {
         List<Object> linkValues = metadata.get(HttpHeaders.LINK);
         if (linkValues == null) {
             return Collections.emptyMap();
         } else {
-            Map<List<String>, Link> links = new HashMap<List<String>, Link>();
+            Map<String, Link> links = new HashMap<String, Link>();
             for (Object o : linkValues) {
                 Link link = Link.valueOf(o.toString());
                 links.put(link.getRel(), link);
@@ -311,6 +311,9 @@ public final class ResponseImpl extends Response {
     }
     
     public boolean bufferEntity() throws MessageProcessingException {
+        if (entityClosed) {
+            throw new IllegalStateException();
+        }
         if (!entityBufferred && entity instanceof InputStream) {
             try {
                 InputStream oldEntity = (InputStream)entity;

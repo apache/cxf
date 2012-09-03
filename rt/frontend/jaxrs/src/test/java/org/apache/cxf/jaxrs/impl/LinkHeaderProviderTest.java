@@ -19,8 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.util.List;
-
 import javax.ws.rs.core.Link;
 
 import org.junit.Assert;
@@ -44,11 +42,11 @@ public class LinkHeaderProviderTest extends Assert {
     public void testFromComplexString() {
         Link l = Link.valueOf("<http://bar>;rel=next;title=\"Next Link\";type=text/xml;method=get");
         assertEquals("http://bar", l.getUri().toString());
-        List<String> rels = l.getRel();
-        assertEquals(1, rels.size());
-        assertEquals("next", rels.get(0));
+        String rel = l.getRel();
+        assertEquals("next", rel);
         assertEquals("Next Link", l.getTitle());
-        assertEquals("get", l.getMethod());
+        assertEquals("text/xml", l.getType());
+        assertEquals("get", l.getParams().get("method"));
     }
     
     @Test

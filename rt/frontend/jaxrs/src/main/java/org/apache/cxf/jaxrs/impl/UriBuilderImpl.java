@@ -72,10 +72,10 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
-        return doBuild(false, values);
+        return doBuild(false, false, values);
     }
 
-    private URI doBuild(boolean fromEncoded, Object... values) {
+    private URI doBuild(boolean fromEncoded, boolean encodePathSlash, Object... values) {
         
         String thePath = buildPath(fromEncoded);
         URITemplate pathTempl = new URITemplate(thePath);
@@ -176,6 +176,53 @@ public class UriBuilderImpl extends UriBuilder {
         return schemeSpecificPart != null;
     }
     
+    @Override
+    public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
+        // Problem: multi-arg URI c-tor always forces encoding, operation contract would be broken;
+        // use os single-arg URI c-tor requires unnecessary concatenate-parse roundtrip.
+        // While decoding back given values and passing as non-decoded to regular build() method
+        // is promising unfortunatley it causes the loss of encoded reserved values such as +,
+        // which might cause problems if consumers do rely on URLEncoder which would turn '+' into
+        // ' ' or would break the contract in when query parameters are expected to have %2B 
+        if (values == null) {
+            throw new IllegalArgumentException("Template parameter values are set to null");
+        }
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                throw new IllegalArgumentException("Template parameter value is set to null");
+            }
+            
+            values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
+        }
+        return doBuild(true, false, values);
+    }
+
+    @Override
+    public URI buildFromMap(Map<String, ?> map) throws IllegalArgumentException,
+        UriBuilderException {
+        return doBuildFromMap(map, false, false);
+    }
+
+    private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded, 
+                               boolean encodePathSlash) 
+        throws IllegalArgumentException, UriBuilderException {
+        try {
+            String thePath = buildPath(fromEncoded);
+            thePath = substituteMapped(thePath, map);
+            
+            String theQuery = buildQuery(fromEncoded);
+            if (theQuery != null) {
+                theQuery = substituteMapped(theQuery, map);
+            }
+            
+            String theFragment = fragment == null ? null : substituteMapped(fragment, map);
+            
+            return buildURI(fromEncoded, thePath, theQuery, theFragment);
+        } catch (URISyntaxException ex) {
+            throw new UriBuilderException("URI can not be built", ex);
+        }
+    }
+    
     private String substituteVarargs(URITemplate templ, Object[] values, int ind) {
         Map<String, String> varValueMap = new HashMap<String, String>();
         
@@ -196,52 +243,6 @@ public class UriBuilderImpl extends UriBuilder {
         }
         return templ.substitute(varValueMap);
     }
-
-    @Override
-    public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
-        // Problem: multi-arg URI c-tor always forces encoding, operation contract would be broken;
-        // use os single-arg URI c-tor requires unnecessary concatenate-parse roundtrip.
-        // While decoding back given values and passing as non-decoded to regular build() method
-        // is promising unfortunatley it causes the loss of encoded reserved values such as +,
-        // which might cause problems if consumers do rely on URLEncoder which would turn '+' into
-        // ' ' or would break the contract in when query parameters are expected to have %2B 
-        if (values == null) {
-            throw new IllegalArgumentException("Template parameter values are set to null");
-        }
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] == null) {
-                throw new IllegalArgumentException("Template parameter value is set to null");
-            }
-            
-            values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
-        }
-        return doBuild(true, values);
-    }
-
-    @Override
-    public URI buildFromMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
-        UriBuilderException {
-        return doBuildFromMap(map, false);
-    }
-
-    private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded) 
-        throws IllegalArgumentException, UriBuilderException {
-        try {
-            String thePath = buildPath(fromEncoded);
-            thePath = substituteMapped(thePath, map);
-            
-            String theQuery = buildQuery(fromEncoded);
-            if (theQuery != null) {
-                theQuery = substituteMapped(theQuery, map);
-            }
-            
-            String theFragment = fragment == null ? null : substituteMapped(fragment, map);
-            
-            return buildURI(fromEncoded, thePath, theQuery, theFragment);
-        } catch (URISyntaxException ex) {
-            throw new UriBuilderException("URI can not be built", ex);
-        }
-    }
     
     private String substituteMapped(String path, Map<String, ? extends Object> varValueMap) {
     
@@ -257,7 +258,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
-    public URI buildFromEncodedMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
+    public URI buildFromEncodedMap(Map<String, ?> map) throws IllegalArgumentException,
         UriBuilderException {
         
         Map<String, String> decodedMap = new HashMap<String, String>(map.size());
@@ -285,7 +286,7 @@ public class UriBuilderImpl extends UriBuilder {
             }
             
         }
-        return doBuildFromMap(decodedMap, true);
+        return doBuildFromMap(decodedMap, true, false);
     }
 
     // CHECKSTYLE:OFF
@@ -724,5 +725,28 @@ public class UriBuilderImpl extends UriBuilder {
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex);
         }
+    }
+
+    //the clarified rules for encoding values of uri templates are:
+    //  - encode each value contextually based on the URI component containing the template
+    //  - in path templates, by default, encode also slashes (i.e. treat all path templates as 
+    //    part of a single path segment, to be consistent with @Path annotation templates)
+    //  - for special cases when the slash encoding in path templates is not desired, 
+    //    users may use the newly added build methods to override the default behavior
+    
+    @Override
+    public URI build(Object[] vars, boolean encodePathSlash) throws IllegalArgumentException, UriBuilderException {
+        return doBuild(false, encodePathSlash, vars);
+    }
+
+    @Override
+    public URI buildFromMap(Map<String, ?> map, boolean encodePathSlash) throws IllegalArgumentException,
+        UriBuilderException {
+        return doBuildFromMap(map, false, encodePathSlash);
+    }
+
+    @Override
+    public String toTemplate() {
+        throw new UnsupportedOperationException();
     }
 }
