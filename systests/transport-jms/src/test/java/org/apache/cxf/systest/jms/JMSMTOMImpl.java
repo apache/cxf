@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.systest.jms;
 
+import java.net.URL;
+
 import javax.activation.DataHandler;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
+
 
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 
@@ -41,5 +44,11 @@ public class JMSMTOMImpl implements JMSMTOMPortType {
         }
         System.out.println("TestDataHandler End");
         */
+    }
+
+   
+    public DataHandler testOutMtom() {
+        URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
+        return new DataHandler(fileURL);
     }
 }

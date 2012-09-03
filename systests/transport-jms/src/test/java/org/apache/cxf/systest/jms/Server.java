@@ -24,6 +24,8 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -83,7 +85,9 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint.publish("", i8);
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://cxf.apache.org/transports/jms", mtom);
         Binding binding = ep.getBinding();        
-        ((SOAPBinding)binding).setMTOMEnabled(true);  
+        ((SOAPBinding)binding).setMTOMEnabled(true); 
+        ep.getInInterceptors().add(new LoggingInInterceptor());
+        ep.getOutInterceptors().add(new LoggingOutInterceptor());
         
         Object spec1 = new GreeterSpecImpl();
         String address1 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2"
