@@ -73,6 +73,7 @@ import org.apache.cxf.jms_greeter.JMSGreeterService;
 import org.apache.cxf.jms_greeter.JMSGreeterService2;
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
+import org.apache.cxf.jms_mtom.JMSOutMTOMService;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
@@ -1093,6 +1094,28 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         
         byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
         assertEquals("The response file is not same with the sent file.", size, bytes.length);
+    }
+    
+    
+    @Test
+    public void testOutMTOM() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
+        QName portName = new QName("http://cxf.apache.org/jms_mtom", "MTOMPort");
+
+        URL wsdl = getWSDLURL("/wsdl/jms_test_mtom.wsdl");
+        assertNotNull(wsdl);
+
+        JMSOutMTOMService service = new JMSOutMTOMService(wsdl, serviceName);
+        assertNotNull(service);
+
+        JMSMTOMPortType mtom = service.getPort(portName, JMSMTOMPortType.class);
+        URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
+        DataHandler handler1 = new DataHandler(fileURL);
+        int size = handler1.getInputStream().available();
+        DataHandler ret = mtom.testOutMtom();
+        
+        byte bytes[] = IOUtils.readBytesFromStream(ret.getInputStream());
+        assertEquals("The response file is not same with the original file.", size, bytes.length);
     }
     
     @Test
