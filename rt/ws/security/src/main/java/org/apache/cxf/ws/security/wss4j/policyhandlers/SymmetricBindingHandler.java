@@ -593,7 +593,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     return encr;
                 } catch (WSSecurityException e) {
-                    policyNotAsserted(recToken, e.getMessage());
+                    policyNotAsserted(recToken, e);
                 }    
             }
         }

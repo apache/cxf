@@ -286,7 +286,9 @@ public abstract class AbstractBindingBuilder {
                 }
             }
         }
-        throw new PolicyException(reason);
+        if (!assertion.isOptional()) {
+            throw new PolicyException(new Message(reason.getMessage(), LOG));
+        }
     }
     
     protected void policyNotAsserted(Assertion assertion, String reason) {
