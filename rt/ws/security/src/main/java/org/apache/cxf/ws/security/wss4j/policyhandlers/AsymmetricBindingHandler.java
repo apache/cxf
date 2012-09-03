@@ -279,7 +279,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 try {
                     addSupportingTokens(sigParts);
                 } catch (WSSecurityException ex) {
-                    policyNotAsserted(encryptionToken, ex.getMessage());
+                    policyNotAsserted(encryptionToken, ex);
                 }
             } else {
                 addSignatureConfirmation(sigParts);
@@ -431,7 +431,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     this.addEncryptedKeyElement(encryptedKeyElement);
                     return encr;
                 } catch (WSSecurityException e) {
-                    policyNotAsserted(recToken, e.getMessage());
+                    policyNotAsserted(recToken, e);
                 }    
             }
         }
