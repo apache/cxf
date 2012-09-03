@@ -579,7 +579,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             if (faultActions != null && faultActions.length > 0 && operation.getFaults() != null) {
                 for (FaultAction faultAction : faultActions) {
                     FaultInfo faultInfo = getFaultInfo(operation, faultAction.className());
-                    if (!StringUtils.isEmpty(faultAction.value())) {
+                    if (faultInfo != null && !StringUtils.isEmpty(faultAction.value())) {
                         faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction
                             .value());
                         faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction
@@ -587,7 +587,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                     }
                     if (operation.isUnwrappedCapable()) {
                         faultInfo = getFaultInfo(operation.getUnwrappedOperation(), faultAction.className());
-                        if (!StringUtils.isEmpty(faultAction.value())) {
+                        if (faultInfo != null && !StringUtils.isEmpty(faultAction.value())) {
                             faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction
                                 .value());
                             faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction
