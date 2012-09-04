@@ -216,7 +216,6 @@ public class UDPDestination extends AbstractDestination {
         
         @Override
         public void sessionOpened(IoSession session) {
-            System.out.println("open");
             // Set timeouts
             session.getConfig().setWriteTimeout(getWriteTimeout());
             session.getConfig().setIdleTime(IdleStatus.READER_IDLE, getReadTimeout());
@@ -246,7 +245,6 @@ public class UDPDestination extends AbstractDestination {
         }
         
         public void sessionClosed(IoSession session) throws Exception {
-            System.out.println("close");
             final InputStream in = (InputStream) session.getAttribute(KEY_IN);
             final OutputStream out = (OutputStream) session.getAttribute(KEY_OUT);
             try {
@@ -257,14 +255,12 @@ public class UDPDestination extends AbstractDestination {
         }
 
         public void messageReceived(IoSession session, Object buf) {
-            System.out.println("mr");
             final IoSessionInputStream in = (IoSessionInputStream) session
                     .getAttribute(KEY_IN);
             in.setBuffer((IoBuffer) buf);
         }
 
         public void exceptionCaught(IoSession session, Throwable cause) {
-            System.out.println("ex");
             final IoSessionInputStream in = (IoSessionInputStream) session
                     .getAttribute(KEY_IN);
 
@@ -282,7 +278,6 @@ public class UDPDestination extends AbstractDestination {
             }
         }
         public void sessionIdle(IoSession session, IdleStatus status) {
-            System.out.println("idle");
             if (status == IdleStatus.READER_IDLE) {
                 throw new StreamIoException(new SocketTimeoutException(
                         "Read timeout"));
