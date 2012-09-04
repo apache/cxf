@@ -49,6 +49,7 @@ import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
@@ -291,7 +292,9 @@ public class JMSDestination extends AbstractMultiplexDestination
             final javax.jms.Message request = (javax.jms.Message)inMessage
                 .get(JMSConstants.JMS_REQUEST_MESSAGE);
             final String msgType;
-            if (request instanceof TextMessage) {
+            if (isMtomEnabled(outMessage)) {
+                msgType = JMSConstants.BINARY_MESSAGE_TYPE;
+            } else if (request instanceof TextMessage) {
                 msgType = JMSConstants.TEXT_MESSAGE_TYPE;
             } else if (request instanceof BytesMessage) {
                 msgType = JMSConstants.BYTE_MESSAGE_TYPE;
@@ -388,7 +391,8 @@ public class JMSDestination extends AbstractMultiplexDestination
             Exchange exchange = inMessage.getExchange();
             exchange.setOutMessage(message);
             message.setContent(OutputStream.class, new JMSOutputStream(sender, exchange,
-                                                                       jmsMessage instanceof TextMessage));
+                                                                       (jmsMessage instanceof TextMessage) 
+                                                                           && !isMtomEnabled(message)));
         }
 
         protected Logger getLogger() {
@@ -396,4 +400,8 @@ public class JMSDestination extends AbstractMultiplexDestination
         }
     }
 
+    private boolean isMtomEnabled(final Message message) {
+        return MessageUtils.isTrue(message.getContextualProperty(
+                                                       org.apache.cxf.message.Message.MTOM_ENABLED));
+    }
 }
