@@ -263,7 +263,7 @@ public class ClientProxyImpl extends AbstractClient implements
         Throwable t = null;
         int status = r.getStatus();
         
-        if (status >= 400) {
+        if (status >= 300) {
             if (m.getReturnType() == Response.class && m.getExceptionTypes().length == 0) {
                 return;
             }            
@@ -276,7 +276,7 @@ public class ClientProxyImpl extends AbstractClient implements
             } 
                         
             if (t == null) {
-                t = new ServerWebApplicationException(r);
+                t = convertToWebApplicationException(r);
             }
 
             

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -65,6 +67,7 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -405,6 +408,18 @@ public abstract class AbstractClient implements Client, Retryable {
                                                                                  
     }
     
+    protected WebApplicationException convertToWebApplicationException(Response r) {
+        Class<?> exceptionClass = JAXRSUtils.getWebApplicationExceptionClass(r, 
+                                       WebApplicationException.class);
+        try {
+            Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
+            return (WebApplicationException)ctr.newInstance(r);
+        } catch (Exception ex2) {
+            ex2.printStackTrace();
+            return new WebApplicationException(r);
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     protected <T> T readBody(Response r, Message outMessage, Class<T> cls, 
                              Type type, Annotation[] anns) {
@@ -423,10 +438,9 @@ public abstract class AbstractClient implements Client, Retryable {
         }
         
         int status = r.getStatus();
-        if (status < 200 || status == 204 || status > 300) {
+        if (status < 200 || status == 204 || status >= 300) {
             Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
-            if (length == null || Integer.parseInt(length.toString()) == 0
-                || status >= 400) {
+            if (length == null || Integer.parseInt(length.toString()) == 0 || status >= 300) {
                 if (cls == Response.class) {
                     return cls.cast(r);
                 } else {

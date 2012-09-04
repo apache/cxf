@@ -48,8 +48,18 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.NotAllowedException;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.Produces;
+import javax.ws.rs.RedirectionException;
+import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Cookie;
@@ -120,8 +130,15 @@ public final class JAXRSUtils {
     
     private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
     static {
-        //TODO: Populate it with the upgrade to the more up to date API
         EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
+        EXCEPTIONS_MAP.put(400, BadRequestException.class);
+        EXCEPTIONS_MAP.put(404, NotFoundException.class);
+        EXCEPTIONS_MAP.put(500, InternalServerErrorException.class);
+        EXCEPTIONS_MAP.put(405, NotAllowedException.class);
+        EXCEPTIONS_MAP.put(406, NotAcceptableException.class);
+        EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
+        EXCEPTIONS_MAP.put(415, NotSupportedException.class);
+        EXCEPTIONS_MAP.put(503, ServiceUnavailableException.class);
     }
     
     private JAXRSUtils() {        
@@ -1223,15 +1240,19 @@ public final class JAXRSUtils {
         return types;
     }
     
-    public static Class<?> getWebApplicationExceptionClass(WebApplicationException ex,
-                                                           Class<?> exceptionType) {
-        int status = ex.getResponse().getStatus();
+    public static Class<?> getWebApplicationExceptionClass(Response exResponse,
+                                                           Class<?> defaultExceptionType) {
+        int status = exResponse.getStatus();
         Class<?> cls = EXCEPTIONS_MAP.get(status);
-        //TODO: enable this code after the upgrade to the more up-to-date API
-        //if (cls == null && status / 100 == 5) {
-        //    cls = ServerErrorException.class;
-        //}
-        return cls == null ? exceptionType : cls;
+        if (cls == null) {
+            int family = status / 100;
+            if (family == 5) {
+                cls = ServerErrorException.class;
+            } else if (family == 3) {
+                cls = RedirectionException.class;
+            }
+        }
+        return cls == null ? defaultExceptionType : cls;
     }
     
     @SuppressWarnings("unchecked")
@@ -1243,7 +1264,7 @@ public final class JAXRSUtils {
             if (ex.getClass() == WebApplicationException.class 
                 && mapper.getClass() != WebApplicationExceptionMapper.class) {
                 WebApplicationException webEx = (WebApplicationException)ex;
-                Class<?> exceptionClass = getWebApplicationExceptionClass(webEx, 
+                Class<?> exceptionClass = getWebApplicationExceptionClass(webEx.getResponse(), 
                                                                           WebApplicationException.class);
                 if (exceptionClass != WebApplicationException.class) {
                     //TODO: consider using switch statements

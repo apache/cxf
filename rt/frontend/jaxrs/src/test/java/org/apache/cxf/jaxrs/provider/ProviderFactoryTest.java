@@ -37,8 +37,12 @@ import java.util.concurrent.TimeUnit;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -68,6 +72,7 @@ import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -317,6 +322,67 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testNotFoundExceptionMapper() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        Message message = prepareMessage(pf);
+        
+        
+        ExceptionMapper<?> mapper = 
+            pf.createExceptionMapper(WebApplicationException.class, message);
+        assertTrue(mapper instanceof WebApplicationExceptionMapper);
+        
+        mapper = pf.createExceptionMapper(NotFoundException.class, message);
+        assertTrue(mapper instanceof WebApplicationExceptionMapper);
+        
+        NotFoundExceptionMapper nf = new NotFoundExceptionMapper(); 
+        pf.registerUserProvider(nf);
+        
+        mapper = pf.createExceptionMapper(NotFoundException.class, message);
+        assertSame(mapper, nf);
+        
+        mapper = pf.createExceptionMapper(new NotFoundException(), message);
+        assertSame(mapper, nf);
+        
+        mapper = pf.createExceptionMapper(new WebApplicationException(404), message);
+        assertSame(mapper, nf);
+        
+        Response r = JAXRSUtils.convertFaultToResponse(new NotFoundException(), message);
+        assertNotNull(r);
+        assertEquals(404, r.getStatus());
+        
+        r = JAXRSUtils.convertFaultToResponse(new WebApplicationException(404), message);
+        assertNotNull(r);
+        assertEquals(404, r.getStatus());
+    }
+    
+    @Test
+    public void testServerErrorExceptionMapper() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        Message message = prepareMessage(pf);
+        
+        ServerErrorExceptionMapper nf = new ServerErrorExceptionMapper(); 
+        pf.registerUserProvider(nf);
+        
+        ExceptionMapper<?> mapper = pf.createExceptionMapper(ServerErrorException.class, message);
+        assertSame(mapper, nf);
+        
+        mapper = pf.createExceptionMapper(new ServerErrorException(500), message);
+        assertSame(mapper, nf);
+        
+        mapper = pf.createExceptionMapper(new WebApplicationException(500), message);
+        assertSame(mapper, nf);
+        
+        mapper = pf.createExceptionMapper(new InternalServerErrorException(), message);
+        assertSame(mapper, nf);
+        
+        InternalServerErrorExceptionMapper is = new InternalServerErrorExceptionMapper(); 
+        pf.registerUserProvider(is);
+        
+        mapper = pf.createExceptionMapper(new InternalServerErrorException(), message);
+        assertSame(mapper, is);
+    }
+    
+    @Test
     public void testExceptionMappersHierarchy1() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
@@ -539,6 +605,29 @@ public class ProviderFactoryTest extends Assert {
                    instanceof JAXBContextProvider);
         assertTrue(((ProviderFactory.ContextResolverProxy<?>)cr).getResolvers().get(1) 
                    instanceof JAXBContextProvider2);
+    }
+    
+    private Message prepareMessage(ProviderFactory pf) {
+        
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get(Application.class.getName());
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(pf).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
     }
     
     private Message prepareMessage(String contentType, String acceptType) {
@@ -878,4 +967,27 @@ public class ProviderFactoryTest extends Assert {
         }
         
     }
+    
+    private static class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
+
+        public Response toResponse(NotFoundException arg0) {
+            return Response.status(404).build();
+        }
+    }
+    
+    private static class ServerErrorExceptionMapper implements ExceptionMapper<ServerErrorException> {
+
+        public Response toResponse(ServerErrorException arg0) {
+            return Response.status(404).build();
+        }
+    }
+    
+    private static class InternalServerErrorExceptionMapper 
+        implements ExceptionMapper<InternalServerErrorException> {
+
+        public Response toResponse(InternalServerErrorException arg0) {
+            return Response.status(404).build();
+        }
+    }
+
 }

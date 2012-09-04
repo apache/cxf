@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
@@ -30,7 +31,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
@@ -41,6 +41,7 @@ import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -62,7 +63,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         try {
             Book book = wc.get(Book.class);
             assertEquals(123L, book.getId());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ClientWebApplicationException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
@@ -87,7 +88,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             Book book = wc.post(new Form().set("name", "CXF").set("id", 125),
                                 Book.class);                
             assertEquals(125L, book.getId());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ClientWebApplicationException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
@@ -123,7 +124,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         try {
             Book book = wc.post(new Book("CXF", 125L), Book.class);                
             assertEquals(125L, book.getId());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ClientWebApplicationException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {

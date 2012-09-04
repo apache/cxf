@@ -24,12 +24,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -55,8 +55,8 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         try {
             wc.post(new Book("CXF", 125L), Book.class);
             fail("403 is expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(403, ex.getStatus());
+        } catch (WebApplicationException ex) {
+            assertEquals(403, ex.getResponse().getStatus());
         }
     }
     
@@ -81,8 +81,8 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         try {
             wc.post(new Book("CXF", 125L), Book.class);                
             fail("403 is expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(403, ex.getStatus());
+        } catch (WebApplicationException ex) {
+            assertEquals(403, ex.getResponse().getStatus());
         }
     }
     
@@ -109,8 +109,8 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         try {
             wc.post(new Book("CXF", 125L), Book.class);                
             fail("403 is expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(403, ex.getStatus());
+        } catch (WebApplicationException ex) {
+            assertEquals(403, ex.getResponse().getStatus());
         }
     }
 
@@ -126,8 +126,8 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         try {
             wc.post(new Book("CXF", 125L), Book.class);                
             fail("403 is expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(403, ex.getStatus());
+        } catch (WebApplicationException ex) {
+            assertEquals(403, ex.getResponse().getStatus());
         }
     }
     

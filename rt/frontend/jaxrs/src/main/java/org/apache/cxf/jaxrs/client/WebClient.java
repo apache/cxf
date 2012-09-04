@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -743,8 +744,8 @@ public class WebClient extends AbstractClient {
         resetResponse();
         Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
                                          responseClass, outGenericType, null, null);
-        if (r.getStatus() >= 400 && responseClass != Response.class) {
-            throw new ServerWebApplicationException(r);
+        if (r.getStatus() >= 300 && responseClass != Response.class) {
+            throw convertToWebApplicationException(r);
         }
         return r;
     }
@@ -805,8 +806,8 @@ public class WebClient extends AbstractClient {
                 return (Response)results[0];
             }
         } catch (Exception ex) {
-            throw ex instanceof ServerWebApplicationException 
-                ? (ServerWebApplicationException)ex 
+            throw ex instanceof WebApplicationException 
+                ? (WebApplicationException)ex 
                 : ex instanceof ClientWebApplicationException 
                 ? new ClientWebApplicationException(ex) : new RuntimeException(ex); 
         }

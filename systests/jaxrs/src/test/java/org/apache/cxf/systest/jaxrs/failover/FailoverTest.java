@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.clustering.FailoverFeature;
@@ -35,7 +36,6 @@ import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -144,7 +144,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, true);
     }
     
-    @Test(expected = ServerWebApplicationException.class)
+    @Test(expected = InternalServerErrorException.class)
     public void testSequentialStrategyWithServerException() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, Server.ADDRESS2, Server.ADDRESS3); 

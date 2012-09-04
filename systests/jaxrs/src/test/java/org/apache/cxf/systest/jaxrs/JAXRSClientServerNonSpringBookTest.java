@@ -23,6 +23,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.WebApplicationException;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -30,7 +33,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -158,8 +160,8 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         try {
             wc.accept("*/*").get(Book.class);
             fail();
-        } catch (ServerWebApplicationException ex) {
-            assertEquals("No book found at all : 321", ex.getMessage());
+        } catch (InternalServerErrorException ex) {
+            assertEquals("No book found at all : 321", ex.getResponse().readEntity(String.class));
         }
         
     }
@@ -171,8 +173,8 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         try {
             wc.accept("*/*").get(Book.class);
             fail();
-        } catch (ServerWebApplicationException ex) {
-            assertEquals("Nonexistent method", ex.getMessage());
+        } catch (WebApplicationException ex) {
+            assertEquals("Nonexistent method", ex.getResponse().readEntity(String.class));
         }
         
     }

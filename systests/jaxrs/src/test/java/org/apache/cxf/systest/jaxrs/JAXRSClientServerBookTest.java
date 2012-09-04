@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -52,8 +55,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ResponseReader;
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -428,10 +429,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         try {
             wc.get(Book.class);
             fail("Exception expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(500, ex.getStatus());
-            assertEquals("This is a WebApplicationException", ex.getMessage());
-            assertTrue(ex.toString().contains("This is a WebApplicationException"));
+        } catch (ServerErrorException ex) {
+            assertEquals(500, ex.getResponse().getStatus());
+            assertEquals("This is a WebApplicationException", ex.getResponse().readEntity(String.class));
         }
     }
     
@@ -442,24 +442,21 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         try {
             Response r = wc.get(Response.class);
             assertEquals(500, r.getStatus());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             fail("Unexpected exception");
         }
     }
     
     @Test
     public void testServerWebApplicationExceptionXML() throws Exception {
-        ResponseReader reader = new ResponseReader();
-        reader.setEntityClass(Book.class);
-        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/webappexceptionXML",
-                                        Collections.singletonList(reader));
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/webappexceptionXML");
         wc.accept("application/xml");
         try {
             wc.get(Book.class);
             fail("Exception expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(406, ex.getStatus());
-            Book exBook = ex.toErrorObject(wc, Book.class);
+        } catch (NotAcceptableException ex) {
+            assertEquals(406, ex.getResponse().getStatus());
+            Book exBook = ex.getResponse().readEntity(Book.class);
             assertEquals("Exception", exBook.getName());
             assertEquals(999L, exBook.getId());
         }
@@ -467,16 +464,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testServerWebApplicationExceptionXMLWithProxy() throws Exception {
-        ResponseReader reader = new ResponseReader();
-        reader.setEntityClass(Book.class);
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT,
-                                                    BookStore.class, Collections.singletonList(reader));
+                                                    BookStore.class);
         try {
             proxy.throwExceptionXML();
             fail("Exception expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(406, ex.getStatus());
-            Book exBook = ex.toErrorObject(WebClient.client(proxy), Book.class);
+        } catch (NotAcceptableException ex) {
+            assertEquals(406, ex.getResponse().getStatus());
+            Book exBook = ex.getResponse().readEntity(Book.class);
             assertEquals("Exception", exBook.getName());
             assertEquals(999L, exBook.getId());
         }
@@ -488,10 +483,21 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         try {
             store.throwException();
             fail("Exception expected");
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(500, ex.getStatus());
-            assertEquals("This is a WebApplicationException", ex.getMessage());
-            assertTrue(ex.toString().contains("This is a WebApplicationException"));
+        } catch (ServerErrorException ex) {
+            assertEquals(500, ex.getResponse().getStatus());
+            assertEquals("This is a WebApplicationException", ex.getResponse().readEntity(String.class));
+        }
+    }
+    
+    @Test
+    public void testServerWebApplicationExceptionWithProxy2() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        try {
+            store.throwException();
+            fail("Exception expected");
+        } catch (WebApplicationException ex) {
+            assertEquals(500, ex.getResponse().getStatus());
+            assertEquals("This is a WebApplicationException", ex.getResponse().readEntity(String.class));
         }
     }
     
@@ -969,15 +975,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBookFromResponseWithProxyAndReader() throws Exception {
-        ResponseReader reader = new ResponseReader();
-        reader.setEntityClass(Book.class);
-        
         BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, 
-                                                 BookStore.class,
-                                                 Collections.singletonList(reader));
+                                                 BookStore.class);
         Response r = bs.getGenericResponseBook("123");
         assertEquals(200, r.getStatus());
-        Book book = (Book)r.getEntity();
+        Book book = r.readEntity(Book.class);
         assertEquals(123L, book.getId());
     }
     
@@ -994,12 +996,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookFromResponseWithWebClientAndReader() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/genericresponse/123";
-        WebClient wc = WebClient.create(address, 
-                                        Collections.singletonList(
-                                        new ResponseReader(Book.class)));
+        WebClient wc = WebClient.create(address);
         Response r = wc.accept("application/xml").get();
         assertEquals(200, r.getStatus());
-        Book book = (Book)r.getEntity();
+        Book book = r.readEntity(Book.class);
         assertEquals(123L, book.getId());
     }
     

@@ -297,7 +297,8 @@ public final class ProviderFactory {
         if (WebApplicationException.class == exceptionType 
             && exception instanceof WebApplicationException) {
             exceptionType = 
-                JAXRSUtils.getWebApplicationExceptionClass((WebApplicationException)exception, exceptionType);
+                JAXRSUtils.getWebApplicationExceptionClass(((WebApplicationException)exception).getResponse(), 
+                                                           exceptionType);
         }
         for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
             handleMapper(candidates, em, exceptionType, m, ExceptionMapper.class, true);

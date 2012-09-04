@@ -23,11 +23,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.WebApplicationException;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.SecurityUtils;
 import org.apache.cxf.rs.security.xml.XmlEncInInterceptor;
@@ -84,7 +86,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         try {
             Book book = store.addBook(new Book("CXF", 126L));
             assertEquals(126L, book.getId());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ClientWebApplicationException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
@@ -134,7 +136,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         try {
             Book book = wc.post(new Book("CXF", 126L), Book.class);
             assertEquals(126L, book.getId());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ClientWebApplicationException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
@@ -229,8 +231,8 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         try {
             doTestPostEncryptedBook(address, true, properties, SecurityUtils.X509_CERT, 
                                 "http://www.w3.org/2009/xmlenc11#aes128-gcm", null, true);
-        } catch (ServerWebApplicationException ex) {
-            assertEquals(400, ex.getStatus());
+        } catch (BadRequestException ex) {
+            assertEquals(400, ex.getResponse().getStatus());
         }
         
     }
@@ -292,7 +294,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         try {
             Book book = wc.post(new Book("CXF", 126L), Book.class);
             assertEquals(126L, book.getId());
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             if (propagateException) {
                 throw ex;
             } else {
