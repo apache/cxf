@@ -18,7 +18,8 @@
  */
 package org.apache.cxf.systest.sts.basic_auth;
 
-import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
+import javax.ws.rs.WebApplicationException;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -85,7 +86,7 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
             }
             System.out.println("The number " + numToDouble + " doubled is " + resp);
             org.junit.Assert.assertEquals(2 * numToDouble, resp);
-        } catch (ServerWebApplicationException ex) {
+        } catch (WebApplicationException ex) {
             if (!authFailureExpected) {
                 throw new RuntimeException("Unexpected exception");
             }
