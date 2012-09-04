@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -32,6 +33,7 @@ import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.maven_plugin.AbstractCodegenMoho;
 import org.apache.cxf.maven_plugin.GenericWsdlOption;
@@ -211,16 +213,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     protected boolean shouldRun(GenericWsdlOption genericWsdlOption, 
                                 File doneFile, URI wsdlURI) {
         WsdlOption wsdlOption = (WsdlOption) genericWsdlOption;
-        long timestamp = 0;
-        if ("file".equals(wsdlURI.getScheme())) {
-            timestamp = new File(wsdlURI).lastModified();
-        } else {
-            try {
-                timestamp = wsdlURI.toURL().openConnection().getDate();
-            } catch (Exception e) {
-                // ignore
-            }
-        }
+        long timestamp = getTimestamp(wsdlURI);
         boolean doWork = false;
         if (!doneFile.exists()) {
             doWork = true;
@@ -229,16 +222,74 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         } else if (wsdlOption.isDefServiceName()) {
             doWork = true;
         } else {
-            File files[] = wsdlOption.getDependencies();
-            if (files != null) {
-                for (int z = 0; z < files.length; ++z) {
-                    if (files[z].lastModified() > doneFile.lastModified()) {
+            URI dependencies[] = wsdlOption.getDependencyURIs(project
+                    .getBasedir().toURI());
+            if (dependencies != null) {
+                for (int z = 0; z < dependencies.length; ++z) {
+                    long dependencyTimestamp = getTimestamp(dependencies[z]);
+                    if (dependencyTimestamp > doneFile.lastModified()) {
                         doWork = true;
+                        break;
                     }
                 }
             }
         }
         return doWork;
+    }
+
+    /**
+     * Finds the timestamp for a given URI. Calls {@link #getBaseFileURI(URI)} prior to the timestamp
+     * check in order to handle "classpath" and "jar" URIs.
+     * 
+     * @param uri the URI to timestamp
+     * @return a timestamp
+     */
+    protected long getTimestamp(URI uri) {
+        long timestamp = 0;
+        URI baseURI = getBaseFileURI(uri);
+        if ("file".equals(baseURI.getScheme())) {
+            timestamp = new File(baseURI).lastModified();
+        } else {
+            try {
+                timestamp = baseURI.toURL().openConnection().getDate();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+        return timestamp;
+    }
+
+    /**
+     * Finds the base file URI that 'contains' the given URI. If the URI can not be resolved to a file URI
+     * then the original URI is returned. This method currently attempts to resolve only "classpath" and
+     * "jar" URIs.
+     * 
+     * @param uri the URI to resolve
+     * @return uri a file URI if the original URI is contained in a file, otherwise the original URI
+     */
+    protected URI getBaseFileURI(URI uri) {
+        if ("classpath".equals(uri.getScheme())) {
+            URL resource = ClassLoaderUtils.getResource(uri.toString().substring(10), getClass());
+            if (resource != null) {
+                try {
+                    return getBaseFileURI(resource.toURI());
+                } catch (URISyntaxException e) {
+                    // ignore
+                }
+            }
+        } else if ("jar".equals(uri.getScheme())) {
+            String jarUrl = uri.toString();
+            int embeddedUrlEndIndex = jarUrl.lastIndexOf("!/");
+            if (embeddedUrlEndIndex != -1) {
+                String embeddedUrl = jarUrl.substring(4, embeddedUrlEndIndex);
+                try {
+                    return getBaseFileURI(new URI(embeddedUrl));
+                } catch (URISyntaxException e) {
+                    // ignore
+                }
+            }
+        }
+        return uri;
     }
 
     protected List<String> generateCommandLine(GenericWsdlOption wsdlOption)
@@ -268,7 +319,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         doneFile.delete();
 
         try {
-            File file = new File(wsdlURI);
+            File file = new File(getBaseFileURI(wsdlURI));
             if (file.exists()) {
                 buildContext.removeMessages(file);
             }
@@ -276,8 +327,12 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             //ignore
         }
         if (wsdlOption.getDependencies() != null) {
-            for (File f : wsdlOption.getDependencies()) {
-                buildContext.removeMessages(f);
+            for (URI dependency : wsdlOption.getDependencyURIs(project
+                    .getBasedir().toURI())) {
+                URI baseDependency = getBaseFileURI(dependency);
+                if ("file".equals(baseDependency.getScheme())) {
+                    buildContext.removeMessages(new File(baseDependency));
+                }
             }
         }
         

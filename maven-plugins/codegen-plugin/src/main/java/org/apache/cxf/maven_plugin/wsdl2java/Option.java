@@ -20,11 +20,13 @@
 package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.cxf.common.util.URIParserUtil;
 
 public class Option {
     static final String DEFAULT_BINDING_FILE_PATH = "src" + File.separator + "main"
@@ -87,7 +89,7 @@ public class Option {
      * A set of dependent files used to detect that the generator must process WSDL, even 
      * if generator marker files are up to date.
      */
-    File dependencies[];
+    String dependencies[];
 
     /**
      * Redundant directories to be deleted after code generation
@@ -239,12 +241,25 @@ public class Option {
     public void setNamespaceExcludes(List<String> namespaceExcludes) {
         this.namespaceExcludes = namespaceExcludes;
     }
-    public void setDependencies(File files[]) {
-        dependencies = files;
+    public void setDependencies(String dependencies[]) {
+        this.dependencies = dependencies;
     }
 
-    public File[] getDependencies() {
+    public String[] getDependencies() {
         return dependencies;
+    }
+
+    public URI[] getDependencyURIs(URI baseURI) {
+        if (dependencies == null) {
+            return null;
+        }
+        URI[] uris = new URI[dependencies.length];
+        for (int i = 0; i < dependencies.length; i++) {
+            File file = new File(dependencies[i]);
+            uris[i] = file.exists() ? file.toURI() : baseURI
+                    .resolve(URIParserUtil.escapeChars(dependencies[i]));
+        }
+        return uris;
     }
 
     public void setDeleteDirs(File files[]) {
@@ -496,7 +511,7 @@ public class Option {
         extraargs.addAll(defaultOptions.extraargs);
         xjcargs.addAll(defaultOptions.xjcargs);
         bindingFiles.addAll(defaultOptions.getBindingFiles());
-        dependencies = mergeList(dependencies, defaultOptions.dependencies, File.class);
+        dependencies = mergeList(dependencies, defaultOptions.dependencies, String.class);
         redundantDirs = mergeList(redundantDirs, defaultOptions.redundantDirs, File.class);
         packagenames.addAll(defaultOptions.packagenames);
         namespaceExcludes.addAll(defaultOptions.namespaceExcludes);
