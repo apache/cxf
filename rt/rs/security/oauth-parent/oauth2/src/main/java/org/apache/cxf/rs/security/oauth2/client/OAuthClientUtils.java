@@ -24,11 +24,11 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
@@ -164,7 +164,7 @@ public final class OAuthClientUtils {
                     String data = consumer.getKey() + ":" + consumer.getSecret();
                     sb.append(Base64Utility.encode(data.getBytes("UTF-8")));
                 } catch (Exception ex) {
-                    throw new ClientWebApplicationException(ex);
+                    throw new ClientException(ex);
                 }
                 accessTokenService.header("Authorization", sb.toString());
             } else {
@@ -180,7 +180,7 @@ public final class OAuthClientUtils {
         try {
             map = new OAuthJSONProvider().readJSONResponse((InputStream)response.getEntity());
         } catch (IOException ex) {
-            throw new ClientWebApplicationException(ex);
+            throw new ClientException(ex);
         }
         if (200 == response.getStatus()) {
             ClientAccessToken token = fromMapToClientToken(map);
@@ -277,7 +277,7 @@ public final class OAuthClientUtils {
             String macSecret = token.getParameters().get(OAuthConstants.MAC_TOKEN_SECRET);
             sb.append(macAuthData.toAuthorizationHeader(macAlgo, macSecret));
         } else {
-            throw new ClientWebApplicationException(new OAuthServiceException("Unsupported token type"));
+            throw new ClientException(new OAuthServiceException("Unsupported token type"));
         }
         
     }

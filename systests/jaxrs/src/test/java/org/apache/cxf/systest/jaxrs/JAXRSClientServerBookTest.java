@@ -34,6 +34,7 @@ import java.util.Map;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -52,7 +53,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -140,8 +140,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                                     BookStore.class);
         try {
             store.getBook("123");
-            fail("ClientWebApplicationException expected");
-        } catch (ClientWebApplicationException ex) {
+            fail("ClientException expected");
+        } catch (ClientException ex) {
             // expected
         }
     }

@@ -49,6 +49,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
@@ -132,12 +133,12 @@ public final class JAXRSUtils {
     static {
         EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
         EXCEPTIONS_MAP.put(400, BadRequestException.class);
+        EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
         EXCEPTIONS_MAP.put(404, NotFoundException.class);
-        EXCEPTIONS_MAP.put(500, InternalServerErrorException.class);
         EXCEPTIONS_MAP.put(405, NotAllowedException.class);
         EXCEPTIONS_MAP.put(406, NotAcceptableException.class);
-        EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
         EXCEPTIONS_MAP.put(415, NotSupportedException.class);
+        EXCEPTIONS_MAP.put(500, InternalServerErrorException.class);
         EXCEPTIONS_MAP.put(503, ServiceUnavailableException.class);
     }
     
@@ -1246,10 +1247,12 @@ public final class JAXRSUtils {
         Class<?> cls = EXCEPTIONS_MAP.get(status);
         if (cls == null) {
             int family = status / 100;
-            if (family == 5) {
-                cls = ServerErrorException.class;
-            } else if (family == 3) {
+            if (family == 3) {
                 cls = RedirectionException.class;
+            } else if (family == 4) {
+                cls = ClientErrorException.class;
+            } else if (family == 5) {
+                cls = ServerErrorException.class;
             }
         }
         return cls == null ? defaultExceptionType : cls;

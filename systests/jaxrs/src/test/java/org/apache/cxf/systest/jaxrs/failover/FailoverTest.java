@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.clustering.FailoverFeature;
@@ -34,7 +35,6 @@ import org.apache.cxf.clustering.RetryStrategy;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.message.Exchange;
@@ -151,7 +151,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, true, false, false);
     }
     
-    @Test(expected = ClientWebApplicationException.class)    
+    @Test(expected = ClientException.class)    
     public void testSequentialStrategyFailure() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, "http://localhost:" + NON_PORT + "/non-existent"); 
@@ -176,7 +176,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         try {
             store.getBook("1");
             fail("Exception expected");
-        } catch (ClientWebApplicationException ex) {
+        } catch (ClientException ex) {
             assertEquals(10, strategy.getTotalCount());
             assertEquals(5, strategy.getAddressCount(address));
             assertEquals(5, strategy.getAddressCount(address2));

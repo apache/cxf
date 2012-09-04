@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
 
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
@@ -60,7 +61,7 @@ public class LocalClientState implements ClientState {
         try {
             this.responseBuilder = cs.responseBuilder != null ? cs.responseBuilder.clone() : null;
         } catch (CloneNotSupportedException ex) {
-            throw new ClientWebApplicationException(ex);
+            throw new ClientException(ex);
         }
         this.baseURI = cs.baseURI;
         this.currentBuilder = cs.currentBuilder != null ? cs.currentBuilder.clone() : null;

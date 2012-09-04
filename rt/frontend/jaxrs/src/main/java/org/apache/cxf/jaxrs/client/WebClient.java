@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -808,8 +809,8 @@ public class WebClient extends AbstractClient {
         } catch (Exception ex) {
             throw ex instanceof WebApplicationException 
                 ? (WebApplicationException)ex 
-                : ex instanceof ClientWebApplicationException 
-                ? new ClientWebApplicationException(ex) : new RuntimeException(ex); 
+                : ex instanceof ClientException 
+                ? new ClientException(ex) : new RuntimeException(ex); 
         }
         
         Response response = null;
@@ -847,8 +848,8 @@ public class WebClient extends AbstractClient {
             ((ResponseImpl)r).setMessage(outMessage);
             return r;
         } catch (Throwable ex) {
-            throw (ex instanceof ClientWebApplicationException) ? (ClientWebApplicationException)ex
-                                                              : new ClientWebApplicationException(ex);
+            throw (ex instanceof ClientException) ? (ClientException)ex
+                                                  : new ClientException(ex);
         } finally {
             ProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }

@@ -25,10 +25,10 @@ import java.util.Map;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.SecurityUtils;
@@ -88,7 +88,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             assertEquals(126L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientWebApplicationException ex) {
+        } catch (ClientException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -138,7 +138,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             assertEquals(126L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientWebApplicationException ex) {
+        } catch (ClientException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -300,7 +300,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             } else {
                 fail(ex.getMessage());
             }
-        } catch (ClientWebApplicationException ex) {
+        } catch (ClientException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {

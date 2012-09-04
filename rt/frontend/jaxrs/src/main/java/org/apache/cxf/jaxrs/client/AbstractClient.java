@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -265,7 +266,7 @@ public abstract class AbstractClient implements Client, Retryable {
         try {
             return state.getResponseBuilder().clone().build();
         } catch (CloneNotSupportedException ex) {
-            throw new ClientWebApplicationException(ex);
+            throw new ClientException(ex);
         }
     }
     
@@ -508,10 +509,10 @@ public abstract class AbstractClient implements Client, Retryable {
     protected void checkClientException(Message outMessage, Exception ex) throws Exception {
         Integer responseCode = getResponseCode(outMessage.getExchange());
         if (responseCode == null) {
-            if (ex instanceof ClientWebApplicationException) {
+            if (ex instanceof ClientException) {
                 throw ex;
             } else if (ex != null) {
-                throw new ClientWebApplicationException(ex);
+                throw new ClientException(ex);
             } else if (!outMessage.getExchange().isOneWay() || cfg.isResponseExpectedForOneway()) {
                 waitForResponseCode(outMessage.getExchange());
             }
@@ -528,7 +529,7 @@ public abstract class AbstractClient implements Client, Retryable {
         }
         
         if (getResponseCode(exchange) == null) {
-            throw new ClientWebApplicationException("Response timeout");
+            throw new ClientException("Response timeout");
         }
     }
     
@@ -644,7 +645,7 @@ public abstract class AbstractClient implements Client, Retryable {
                                                    cls,
                                                    ct.toString());
         LOG.severe(errorMsg.toString());
-        throw new ClientWebApplicationException(errorMsg.toString(), cause, response);
+        throw new ClientException(errorMsg.toString(), cause);
     }
     
     private static MediaType getResponseContentType(Response r) {

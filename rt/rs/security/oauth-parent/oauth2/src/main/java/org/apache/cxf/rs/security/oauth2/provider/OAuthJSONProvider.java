@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -37,7 +38,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -158,7 +158,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             return Collections.emptyMap();
         }
         if (!str.startsWith("{") || !str.endsWith("}")) {
-            throw new ClientWebApplicationException("JSON Sequence is broken");
+            throw new ClientException("JSON Sequence is broken");
         }
         Map<String, String> map = new LinkedHashMap<String, String>();
         
