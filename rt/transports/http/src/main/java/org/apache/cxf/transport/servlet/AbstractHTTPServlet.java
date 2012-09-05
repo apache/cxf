@@ -209,13 +209,13 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             redirect(request, response, request.getPathInfo());
             return;
         }
-        
-        if (staticResourcesList != null 
-            && matchPath(staticResourcesList, request)
-            || staticWelcomeFile != null 
-                && (StringUtils.isEmpty(request.getPathInfo()) || request.getPathInfo().equals("/"))) {
+        boolean staticResourcesMatch = staticResourcesList != null 
+            && matchPath(staticResourcesList, request);
+        boolean staticWelcomeFileMatch = staticWelcomeFile != null 
+            && (StringUtils.isEmpty(request.getPathInfo()) || request.getPathInfo().equals("/")); 
+        if (staticResourcesMatch || staticWelcomeFileMatch) {
             serveStaticContent(request, response, 
-                               staticWelcomeFile != null ? staticWelcomeFile : request.getPathInfo());
+                               staticWelcomeFileMatch ? staticWelcomeFile : request.getPathInfo());
             return;
         }
         invoke(request, response);

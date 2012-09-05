@@ -146,6 +146,10 @@
     		<param-name>static-welcome-file</param-name>
 	    	<param-value>/welcomeBook.html</param-value>
 	    </init-param>
+	    <init-param>
+    		<param-name>static-resources-list</param-name>
+	    	<param-value>/welcome.txt</param-value>
+	    </init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
