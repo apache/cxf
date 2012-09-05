@@ -21,6 +21,7 @@ package org.apache.cxf.interceptor.security;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -45,14 +46,12 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     
     public void handleMessage(Message message) throws Fault {
         SecurityContext sc = message.get(SecurityContext.class);
-        if (sc == null) {
-            return;
-        }
-        
-        Method method = getTargetMethod(message);
-        
-        if (authorize(sc, method)) {
-            return;
+        if (sc != null && sc.getUserPrincipal() != null) {
+            Method method = getTargetMethod(message);
+            
+            if (authorize(sc, method)) {
+                return;
+            }
         }
         
         throw new AccessDeniedException("Unauthorized");
@@ -84,7 +83,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         if (isUserInRole(sc, expectedRoles, false)) {
             return true;
         }
-        if (sc.getUserPrincipal() != null) {
+        if (LOG.isLoggable(Level.FINE)) {
             LOG.fine(sc.getUserPrincipal().getName() + " is not authorized");
         }
         return false;

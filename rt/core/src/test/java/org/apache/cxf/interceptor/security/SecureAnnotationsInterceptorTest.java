@@ -22,10 +22,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import java.lang.reflect.Method;
 import java.security.Principal;
 
+import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -111,7 +111,7 @@ public class SecureAnnotationsInterceptorTest extends Assert {
     private static class TestSecurityContext implements SecurityContext {
 
         public Principal getUserPrincipal() {
-            return null;
+            return new SimplePrincipal("user");
         }
 
         public boolean isUserInRole(String role) {

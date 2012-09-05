@@ -62,6 +62,18 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
         EasyMock.replay(service, md);
     }
     
+    @Test(expected = AccessDeniedException.class)
+    public void testNoSecurityContext() {
+        message.put(SecurityContext.class, null);
+        new SimpleAuthorizingInterceptor().handleMessage(message);
+    }
+    
+    @Test(expected = AccessDeniedException.class)
+    public void testIncompleteSecurityContext() {
+        message.put(SecurityContext.class, new IncompleteSecurityContext());
+        new SimpleAuthorizingInterceptor().handleMessage(message);    
+    }
+    
     @Test
     public void testPermitWithNoRoles() {
         new SimpleAuthorizingInterceptor().handleMessage(message);    
@@ -71,6 +83,32 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     public void testPermitWithMethodRoles() {
         SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
         in.setMethodRolesMap(Collections.singletonMap("echo", "role1 testRole"));
+        in.handleMessage(message);    
+    }
+    
+    @Test
+    public void testPermitWithMethodRolesConfigurationOnly() {
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        in.setCheckConfiguredRolesOnly(true);
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.setMethodRolesMap(Collections.singletonMap("echo", "role1 role2"));
+        in.handleMessage(message);    
+    }
+    
+    @Test(expected = AccessDeniedException.class)
+    public void testDenyWithMethodRolesConfigurationOnly() {
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        in.setCheckConfiguredRolesOnly(true);
+        in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
+        in.setMethodRolesMap(Collections.singletonMap("echo", "role2 role3"));
+        in.handleMessage(message);    
+    }
+    
+    @Test(expected = AccessDeniedException.class)
+    public void testEmptyRolesConfigurationOnly() {
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        in.setCheckConfiguredRolesOnly(true);
+        in.setMethodRolesMap(Collections.singletonMap("echo", "role1 role2"));
         in.handleMessage(message);    
     }
     
@@ -145,10 +183,26 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
         }
     }
     
-    private static class TestSecurityContext implements SecurityContext {
+    private static class IncompleteSecurityContext implements SecurityContext {
 
         public Principal getUserPrincipal() {
             return null;
+        }
+
+        public boolean isUserInRole(String role) {
+            return false;
+        }
+        
+    }
+    
+    private static class TestSecurityContext implements SecurityContext {
+
+        public Principal getUserPrincipal() {
+            return new Principal() {
+                public String getName() {
+                    return "testUser";
+                }
+            };
         }
 
         public boolean isUserInRole(String role) {
