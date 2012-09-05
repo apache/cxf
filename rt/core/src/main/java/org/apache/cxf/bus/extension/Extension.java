@@ -156,7 +156,7 @@ public class Extension {
                     // using the extension classloader as a fallback
                     clazz = this.getClass().getClassLoader().loadClass(className);
                 } catch (ClassNotFoundException nex) {
-                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, name), nex);
+                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, className), nex);
                 }
             }
         }
