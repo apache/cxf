@@ -99,6 +99,8 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     public static final String USE_JAXB_BRIDGE = "use.jaxb.bridge";
 
+    public static final String JAXB_SCAN_PACKAGES = "jaxb.scanPackages";
+
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
 
     private static final Class<?> SUPPORTED_READER_FORMATS[] = new Class<?>[] {Node.class,
@@ -194,7 +196,7 @@ public class JAXBDataBinding extends AbstractDataBinding
     private ValidationEventHandler validationEventHandler;
 
     private boolean unwrapJAXBElement = true;
-
+    private boolean scanPackages = true;
     private boolean qualifiedSchemas;
 
     private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> in
@@ -229,6 +231,9 @@ public class JAXBDataBinding extends AbstractDataBinding
             extraClass = (Class[])o;
         }
 
+        if (props != null && "false".equalsIgnoreCase((String) props.get(JAXB_SCAN_PACKAGES))) {
+            scanPackages = false;
+        }
     }
 
     public JAXBDataBinding(JAXBContext context) {
@@ -448,13 +453,14 @@ public class JAXBDataBinding extends AbstractDataBinding
                 classes.add(clz);
             }
         }
-        JAXBContextCache.scanPackages(classes);
+        if (scanPackages) {
+            JAXBContextCache.scanPackages(classes);
+        }
         addWsAddressingTypes(classes);
-
+        
         return JAXBContextCache.getCachedContextAndSchemas(classes, defaultNs,  
                                                           contextProperties, 
                                                           typeRefs, true);
-
     }
 
 
