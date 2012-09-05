@@ -33,15 +33,15 @@ import org.apache.cxf.configuration.security.FiltersType;
  * to both client and server sides.
  */
 public class TLSParameterBase {
-    private KeyManager[]    keyManagers;
-    private TrustManager[]  trustManagers;
-    private String          provider;
-    private List<String>    ciphersuites = new ArrayList<String>();
-    private FiltersType     cipherSuiteFilters;
-    private CertificateConstraintsType certConstraints;
-    private SecureRandom    secureRandom;
-    private String          protocol;
-    private String          certAlias;
+    protected KeyManager[]    keyManagers;
+    protected TrustManager[]  trustManagers;
+    protected String          provider;
+    protected List<String>    ciphersuites = new ArrayList<String>();
+    protected FiltersType     cipherSuiteFilters;
+    protected CertificateConstraintsType certConstraints;
+    protected SecureRandom    secureRandom;
+    protected String          protocol;
+    protected String          certAlias;
     /**
      * Set the JSSE provider. If not set,
      * it uses system default.

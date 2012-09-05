@@ -505,6 +505,10 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         assertEquals("Set the wrong pass word form the configuration",
                      "password", authPolicy.getPassword());
         String answer = bethal.sayHi();
+        answer = bethal.sayHi();
+        answer = bethal.sayHi();
+        answer = bethal.sayHi();
+        answer = bethal.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Bethal".equals(answer));
     }
