@@ -22,12 +22,16 @@ package org.apache.cxf.bus.extension;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 
 public class Extension {
-   
+    private static final Logger LOG = LogUtils.getL7dLogger(Extension.class);
+    
     protected String className;
     protected ClassLoader classloader;
     protected Class<?> clazz;
@@ -152,7 +156,7 @@ public class Extension {
                     // using the extension classloader as a fallback
                     clazz = this.getClass().getClassLoader().loadClass(className);
                 } catch (ClassNotFoundException nex) {
-                    throw new ExtensionException(nex);
+                    throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS", LOG, name), nex);
                 }
             }
         }
@@ -191,6 +195,8 @@ public class Extension {
                 //ignore
             }
             obj = cls.newInstance();
+        } catch (ExtensionException ex) {
+            throw ex;
         } catch (IllegalAccessException ex) {
             throw new ExtensionException(ex);
         } catch (InstantiationException ex) {
