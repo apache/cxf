@@ -33,10 +33,11 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     private Map<String, List<String>> methodRolesMap = new HashMap<String, List<String>>();
     private Map<String, List<String>> userRolesMap = Collections.emptyMap();
     private List<String> globalRoles = Collections.emptyList();
+    private boolean checkConfiguredRolesOnly;
     
     @Override 
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
-        if (!super.isUserInRole(sc, roles, deny)) {
+        if (!checkConfiguredRolesOnly && !super.isUserInRole(sc, roles, deny)) {
             return false;
         }
         // Additional check.
@@ -52,7 +53,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
             }
             return false;
         } else {
-            return true;
+            return !checkConfiguredRolesOnly;
         }
     }
     
@@ -94,6 +95,10 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     
     public void setGlobalRoles(String roles) {
         globalRoles = Arrays.asList(roles.split(" "));
+    }
+    
+    public void setCheckConfiguredRolesOnly(boolean checkConfiguredRolesOnly) {
+        this.checkConfiguredRolesOnly = checkConfiguredRolesOnly;
     }
     
     private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
