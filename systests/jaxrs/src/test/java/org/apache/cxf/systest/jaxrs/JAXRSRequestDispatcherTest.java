@@ -115,6 +115,16 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         doTestGetBookHTMLFromWelcomeList(endpointAddress);
     }
     
+    @Test
+    public void testGetTextWelcomeFile() throws Exception {
+        String address = "http://localhost:" + PORT + "/welcome2/welcome.txt";
+        WebClient client = WebClient.create(address);
+        client.accept("text/plain");
+        String welcome = client.get(String.class);
+        System.out.println(welcome);
+        assertEquals("Welcome", welcome);
+    }
+    
     private void doTestGetBookHTMLFromWelcomeList(String address) throws Exception {
         WebClient client = WebClient.create(address);
         client.accept("text/html");
