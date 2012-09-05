@@ -36,6 +36,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /*
@@ -180,11 +181,12 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         if (outMessage == null) {
             Endpoint endpoint = exchange.get(Endpoint.class);
             outMessage = new MessageImpl();
+            outMessage.putAll(message);
+            outMessage.remove(Message.PROTOCOL_HEADERS);
             outMessage.setExchange(exchange);
             outMessage = endpoint.getBinding().createMessage(outMessage);
             exchange.setOutMessage(outMessage);
         }
-        outMessage.putAll(message);
         return outMessage;
     }
     
@@ -192,14 +194,9 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
      * This function sets the header in the PROTOCO_HEADERS of
      * the message.
      */
-    @SuppressWarnings("unchecked")
     private void setHeader(Message message, String key, String value) {
-        Map<String, List<String>> responseHeaders =
-            (Map<String, List<String>>) 
-                message.get(Message.PROTOCOL_HEADERS);
-        if (responseHeaders != null) {
-            responseHeaders.put(key, Arrays.asList(new String[] {value}));
-        }
+        Map<String, List<String>> responseHeaders = Headers.getSetProtocolHeaders(message);
+        responseHeaders.put(key, Arrays.asList(new String[] {value}));
     }
     
     /**
