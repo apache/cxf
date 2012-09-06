@@ -282,6 +282,16 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         return fac.getTrustManagers();
     }
 
+    //methods that a subclass can override to inject a Proxy into the flow
+    //and assert the proxy was appropriately called
+    public void configureProxy(Client c) {
+    }
+    public void resetProxyCount() {
+    }
+    public void assertProxyRequestCount(int i) {
+    }
+
+    
     private Greeter getMortimerGreeter() throws MalformedURLException {
         URL wsdl = getClass().getResource("resources/greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -292,6 +302,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         updateAddressPort(mortimer, PORT0);
+        
+        configureProxy(ClientProxy.getClient(mortimer));
         return mortimer;
     }
 
@@ -303,6 +315,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         String answer = mortimer.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Mortimer".equals(answer));
+        assertProxyRequestCount(1);
     }
 
     @Test
@@ -318,6 +331,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         } finally {
             rootLogger.setLevel(oldLevel);
         }
+        assertProxyRequestCount(1);
     }
 
     /**
@@ -343,7 +357,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter rethwel = service.getPort(rethwelQ, Greeter.class);
         assertNotNull("Port is null", rethwel);
-        updateAddressPort(rethwel, PORT5);
+        updateAddressPort(rethwel, PORT4);
+        configureProxy(ClientProxy.getClient(rethwel));
 
         String answer = null;
         try {
@@ -352,6 +367,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         } catch (Exception e) {
             //e.printStackTrace();
         }
+        assertProxyRequestCount(1);
         
     }
     
@@ -393,10 +409,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         Greeter rethwel = service.getPort(rethwelQ, Greeter.class);
         updateAddressPort(rethwel, PORT4);
         assertNotNull("Port is null", rethwel);
+        configureProxy(ClientProxy.getClient(rethwel));
         
         String answer = rethwel.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Mortimer".equals(answer));
+        assertProxyRequestCount(2);        
     }
     
     /**
@@ -426,6 +444,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         Greeter hurlon = service.getPort(hurlonQ, Greeter.class);
         assertNotNull("Port is null", hurlon);
         updateAddressPort(hurlon, PORT6);
+        configureProxy(ClientProxy.getClient(hurlon));
         
         String answer = null;
         try {
@@ -436,7 +455,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             // read from the StreamReader
             //e.printStackTrace();
         }
-        
+        assertProxyRequestCount(2);        
     }
     /**
      * This methods tests a basic https connection to Bethal.
@@ -459,6 +478,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);
 
         Greeter bethal = service.getPort(bethalQ, Greeter.class);
+
         assertNotNull("Port is null", bethal);
         updateAddressPort(bethal, PORT2);
         verifyBethalClient(bethal);        
@@ -486,6 +506,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     // we just verify the configurations are loaded successfully
     private void verifyBethalClient(Greeter bethal) {
         Client client = ClientProxy.getClient(bethal);
+
         HTTPConduit http = 
             (HTTPConduit) client.getConduit();
         
@@ -504,6 +525,9 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
                      "Betty", authPolicy.getUserName());
         assertEquals("Set the wrong pass word form the configuration",
                      "password", authPolicy.getPassword());
+
+        configureProxy(ClientProxy.getClient(bethal));
+        
         String answer = bethal.sayHi();
         answer = bethal.sayHi();
         answer = bethal.sayHi();
@@ -511,6 +535,10 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         answer = bethal.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Bethal".equals(answer));
+        
+        //With HTTPS, it will just be a CONNECT to the proxy and all the 
+        //data is encrypted.  Thus, the proxy cannot distinquish the requests
+        assertProxyRequestCount(0);
     }
     
     /**
@@ -552,9 +580,11 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         http.setTlsClientParameters(tlsClientParameters);
         http.setAuthorization(authPolicy);
         
+        configureProxy(client);
         String answer = bethal.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Bethal".equals(answer));
+        assertProxyRequestCount(0);
     }
     
 
@@ -585,7 +615,11 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
+        configureProxy(client);
         poltim.sayHi();
+        //client -> poltim is https and thus not recorded but then redirected to mortimer
+        //client -> mortimer is http and recoreded
+        assertProxyRequestCount(1);
     }
     
     class MyHttpsTrustDecider extends MessageTrustDecider {
@@ -681,9 +715,12 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         // Our expected server should be OU=Bethal
         http.setTrustDecider(new MyHttpsTrustDecider("Bethal"));
         
+        configureProxy(client);
         String answer = bethal.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Bethal".equals(answer));
+        assertProxyRequestCount(0);
+        
         
         // Nobody will not equal OU=Bethal
         MyHttpsTrustDecider trustDecider =
@@ -697,6 +734,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             //assertTrue("Trust Decider was not called", 
             //              0 > trustDecider.wasCalled());
         }
+        assertProxyRequestCount(0);
     }
 
     @Test
@@ -743,7 +781,9 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
         // We actually get our answer from Bethal at the end of the
         // redirects.
+        configureProxy(ClientProxy.getClient(tarpin));
         String answer = tarpin.sayHi();
+        assertProxyRequestCount(0);
         
         assertTrue("Trust Decider wasn't called correctly", 
                        3 == trustDecider.wasCalled());
@@ -759,6 +799,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         } catch (Exception e) {
             //e.printStackTrace();
         }
+        assertProxyRequestCount(0);
         
         // Set back to unlimited.
         http.getClient().setMaxRetransmits(-1);
@@ -777,7 +818,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             assertTrue("Trust Decider wasn't called correctly",
                      2 == trustDecider.wasCalled());
         }
-        
+        assertProxyRequestCount(0);
     }
 
     public class MyBasicAuthSupplier implements HttpAuthSupplier {
