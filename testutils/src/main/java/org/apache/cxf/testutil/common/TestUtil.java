@@ -122,6 +122,24 @@ public final class TestUtil {
     public static String getPortNumber(String name) {
         return getPortNumber(name, name);
     }
+    
+    public static String getNewPortNumber(Class<?> cls) {
+        return getNewPortNumber(cls.getName(), cls.getSimpleName());
+    }
+    public static String getNewPortNumber(Class<?> cls, int count) {
+        return getNewPortNumber(cls.getName() + "." + count,
+                             cls.getSimpleName() + "." + count);
+    }
+    public static String getNewPortNumber(String name) {
+        return getNewPortNumber(name, name);
+    }
+    public static String getNewPortNumber(String fullName, String simpleName) {
+        ports.remove("testutil.ports." + fullName);
+        ports.remove("testutil.ports." + simpleName);
+        System.clearProperty("testutil.ports." + fullName);
+        System.clearProperty("testutil.ports." + simpleName);        
+        return getPortNumber(fullName, simpleName);
+    }    
     public static String getPortNumber(String fullName, String simpleName) {
         String p = ports.getProperty("testutil.ports." + fullName);
         if (p == null) {
