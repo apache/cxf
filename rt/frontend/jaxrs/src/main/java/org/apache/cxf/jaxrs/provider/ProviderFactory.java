@@ -25,16 +25,22 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -61,6 +67,7 @@ import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -96,12 +103,31 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
+    // RequestHandler & ResponseHandler will have to be deprecated for 2.7.0
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
         new ArrayList<ProviderInfo<RequestHandler>>(1);
     private List<ProviderInfo<ResponseHandler>> responseHandlers = 
         new ArrayList<ProviderInfo<ResponseHandler>>(1);
+    
+    // ContainerRequestFilter & ContainerResponseFilter are introduced in JAX-RS 2.0
+    private List<ProviderInfo<ContainerRequestFilter>> globalContainerRequestFilters = 
+        new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
+    private List<ProviderInfo<ContainerRequestFilter>> globalPreContainerRequestFilters = 
+        new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
+    private List<ProviderInfo<ContainerResponseFilter>> globalContainerResponseFilters = 
+        new ArrayList<ProviderInfo<ContainerResponseFilter>>(1);
+    private List<ProviderInfo<ContainerResponseFilter>> globalPreContainerResponseFilters = 
+        new ArrayList<ProviderInfo<ContainerResponseFilter>>(1);
+    private Map<String, ProviderInfo<ContainerRequestFilter>> boundContainerRequestFilters = 
+        new LinkedHashMap<String, ProviderInfo<ContainerRequestFilter>>();
+    private Map<String, ProviderInfo<ContainerResponseFilter>> boundContainerResponseFilters = 
+        new LinkedHashMap<String, ProviderInfo<ContainerResponseFilter>>();
+    
+    // ParamConverter and ParamConverterProvider is introduced in JAX-RS 2.0
+    // ParameterHandler will have to be deprecated
     private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
         new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
+    
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
     private RequestPreprocessor requestPreprocessor;
@@ -111,6 +137,9 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
     private List<ProviderInfo<MessageBodyWriter<?>>> jaxbWriters = 
         new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
+    
+    private Collection<ProviderInfo<?>> injectedProviders = 
+        new LinkedList<ProviderInfo<?>>();
     
     private Bus bus;
     
@@ -267,6 +296,7 @@ public final class ProviderFactory {
         return null;
     }
     
+    //This method can only be called from providers
     public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType,
                                                                           Message m) {
         return createExceptionMapper(null, exceptionType, m);
@@ -436,6 +466,36 @@ public final class ProviderFactory {
         return JAXB_PROVIDER_NAME.equals(clsName) || JSON_PROVIDER_NAME.equals(clsName);
     }
     
+    public List<ProviderInfo<ContainerRequestFilter>> getGlobalContainerRequestFilters(boolean preMatch) {
+        return Collections.unmodifiableList(
+            preMatch ? globalPreContainerRequestFilters : globalContainerRequestFilters);
+    }
+    
+    public List<ProviderInfo<ContainerResponseFilter>> getGlobalContainerResponseFilters(boolean preMatch) {
+        return Collections.unmodifiableList(
+            preMatch ? globalPreContainerResponseFilters : globalContainerResponseFilters);
+    }
+    
+    public List<ProviderInfo<ContainerRequestFilter>> getBoundContainerRequestFilters(List<String> names) {
+        return getBoundContainerFilters(boundContainerRequestFilters, names);
+    }
+    
+    public List<ProviderInfo<ContainerResponseFilter>> getBoundContainerResponseFilters(List<String> names) {
+        return getBoundContainerFilters(boundContainerResponseFilters, names);
+    }
+    
+    private static <T> List<ProviderInfo<T>> getBoundContainerFilters(Map<String, ProviderInfo<T>> filters,
+                                                                             List<String> names) {
+        List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
+        for (String name : names) {
+            ProviderInfo<T> filter = filters.get(name);
+            if (filter != null) {
+                list.add(filter);
+            }
+        }
+        return list;
+    }
+    
     public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
         List<ProviderInfo<RequestHandler>> handlers = null;
         if (requestHandlers.size() == 0) {
@@ -530,6 +590,16 @@ public final class ProviderFactory {
                 responseHandlers.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o, bus)); 
             }
             
+            if (ContainerRequestFilter.class.isAssignableFrom(oClass)) {
+                addContainerRequestFilter(
+                   new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)o, bus));
+            }
+            
+            if (ContainerResponseFilter.class.isAssignableFrom(oClass)) {
+                addContainerResponseFilter(
+                   new ProviderInfo<ContainerResponseFilter>((ContainerResponseFilter)o, bus)); 
+            }
+            
             if (ExceptionMapper.class.isAssignableFrom(oClass)) {
                 exceptionMappers.add(new ProviderInfo<ExceptionMapper<?>>((ExceptionMapper<?>)o, bus)); 
             }
@@ -547,26 +617,60 @@ public final class ProviderFactory {
         sortContextResolvers();
         
         injectContextProxies(messageReaders, messageWriters, contextResolvers, 
-        			requestHandlers, responseHandlers,
-                       exceptionMappers);
+            requestHandlers, responseHandlers, exceptionMappers,
+            boundContainerRequestFilters.values(), globalPreContainerRequestFilters, globalContainerRequestFilters,
+            boundContainerResponseFilters.values(), globalPreContainerResponseFilters, globalContainerResponseFilters);
     }
 //CHECKSTYLE:ON
     
-    static void injectContextValues(ProviderInfo<?> pi, Message m) {
-        if (m != null) {
-            InjectionUtils.injectContextFields(pi.getProvider(), pi, m);
-            InjectionUtils.injectContextMethods(pi.getProvider(), pi, m);
+    private void addContainerRequestFilter(ProviderInfo<ContainerRequestFilter> p) {
+        addContainerFilter(p, boundContainerRequestFilters, 
+                           globalPreContainerRequestFilters, globalContainerRequestFilters);
+    }
+    
+    private void addContainerResponseFilter(ProviderInfo<ContainerResponseFilter> p) {
+        addContainerFilter(p, boundContainerResponseFilters, 
+                           globalPreContainerResponseFilters, globalContainerResponseFilters);
+    }
+    
+    private static <T> void addContainerFilter(ProviderInfo<T> p,
+                                               Map<String, ProviderInfo<T>> boundFilters,
+                                               List<ProviderInfo<T>> globalPreFilters,
+                                               List<ProviderInfo<T>> globalPostFilters) {
+        T filter = p.getProvider();
+        Annotation[] annotations = filter.getClass().getAnnotations();
+        List<String> names = AnnotationUtils.getNameBindings(annotations);
+        if (!names.isEmpty()) {
+            for (String name : names) {
+                boundFilters.put(name, p);
+            }
+        } else {
+            boolean isPreMatch = AnnotationUtils.getAnnotation(annotations, PreMatching.class) != null;
+            if (isPreMatch) {
+                globalPreFilters.add(p);
+            } else {
+                globalPostFilters.add(p);
+            }
         }
     }
     
-    void injectContextProxies(List<?> ... providerLists) {
-        for (List<?> list : providerLists) {
-            List<ProviderInfo<?>> l2 = CastUtils.cast(list);
+    static void injectContextValues(ProviderInfo<?> pi, Message m) {
+        if (m != null) {
+            InjectionUtils.injectContexts(pi.getProvider(), pi, m);
+        }
+    }
+    
+    void injectContextProxies(Collection<?> ... providerLists) {
+        for (Collection<?> list : providerLists) {
+            Collection<ProviderInfo<?>> l2 = CastUtils.cast(list);
             for (ProviderInfo<?> pi : l2) {
                 if (ProviderFactory.SHARED_FACTORY == this && isJaxbBasedProvider(pi.getProvider())) {
                     continue;
                 }
-                InjectionUtils.injectContextProxies(pi, pi.getProvider());
+                if (pi.contextsAvailable()) {
+                    InjectionUtils.injectContextProxies(pi, pi.getProvider());
+                    injectedProviders.add(pi);
+                }
             }
         }
     }
@@ -804,15 +908,13 @@ public final class ProviderFactory {
         return requestPreprocessor;
     }
     
+    public void clearExceptionMapperProxies() {
+        clearProxies(exceptionMappers);
+    }
+    
     public void clearThreadLocalProxies() {
-        clearProxies(messageReaders,
-                     messageWriters,
-                     jaxbReaders,
-                     jaxbWriters,
-                     contextResolvers,
-                     requestHandlers,
-                     responseHandlers,
-                     exceptionMappers);
+        clearProxies(injectedProviders);
+        
         if (application != null) {
             application.clearThreadLocalProxies();
         }
@@ -821,9 +923,9 @@ public final class ProviderFactory {
         }
     }
     
-    void clearProxies(List<?> ...lists) {
-        for (List<?> list : lists) {
-            List<ProviderInfo<?>> l2 = CastUtils.cast(list);
+    void clearProxies(Collection<?> ...lists) {
+        for (Collection<?> list : lists) {
+            Collection<ProviderInfo<?>> l2 = CastUtils.cast(list);
             for (ProviderInfo<?> pi : l2) {
                 pi.clearThreadLocalProxies();
             }
@@ -834,9 +936,16 @@ public final class ProviderFactory {
         messageReaders.clear();
         messageWriters.clear();
         contextResolvers.clear();
+        contextProviders.clear();
         exceptionMappers.clear();
         requestHandlers.clear();
         responseHandlers.clear();
+        globalContainerRequestFilters.clear();
+        globalContainerResponseFilters.clear();
+        boundContainerRequestFilters.clear();
+        boundContainerResponseFilters.clear();
+        globalPreContainerRequestFilters.clear();
+        globalPreContainerResponseFilters.clear();
         paramHandlers.clear();
         responseExceptionMappers.clear();
     }

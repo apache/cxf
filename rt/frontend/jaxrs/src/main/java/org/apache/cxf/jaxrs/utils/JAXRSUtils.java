@@ -1260,9 +1260,8 @@ public final class JAXRSUtils {
     
     @SuppressWarnings("unchecked")
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
-        
-        ExceptionMapper<T> mapper = 
-            ProviderFactory.getInstance(inMessage).createExceptionMapper(ex, inMessage);
+        ProviderFactory factory = ProviderFactory.getInstance(inMessage);
+        ExceptionMapper<T> mapper = factory.createExceptionMapper(ex, inMessage);
         if (mapper != null) {
             if (ex.getClass() == WebApplicationException.class 
                 && mapper.getClass() != WebApplicationExceptionMapper.class) {
@@ -1270,7 +1269,6 @@ public final class JAXRSUtils {
                 Class<?> exceptionClass = getWebApplicationExceptionClass(webEx.getResponse(), 
                                                                           WebApplicationException.class);
                 if (exceptionClass != WebApplicationException.class) {
-                    //TODO: consider using switch statements
                     try {
                         Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
                         ex = (T)ctr.newInstance(webEx.getResponse());
@@ -1280,11 +1278,14 @@ public final class JAXRSUtils {
                     }
                 }
             }
+            
             try {
                 return mapper.toResponse(ex);
             } catch (Exception mapperEx) {
                 mapperEx.printStackTrace();
                 return Response.serverError().build();
+            } finally {
+                factory.clearExceptionMapperProxies();
             }
         }
         

@@ -165,18 +165,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         boolean operChecked = false;
         List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(message).getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
-            String newAcceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, "*/*");
-            if (!acceptTypes.equals(newAcceptTypes) || (ori == null && !operChecked)) {
-                acceptTypes = newAcceptTypes;
-                acceptContentTypes = JAXRSUtils.sortMediaTypes(newAcceptTypes);
-                message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
-                if (ori != null) {
-                    values = new MetadataMap<String, String>();
-                    resource = JAXRSUtils.selectResourceClass(resources, 
-                                                              rawPath, 
-                                                              values,
-                                                              message);
-                }
+            if (ori == null && !operChecked) {
                 try {                
                     ori = JAXRSUtils.findTargetMethod(resource, 
                         message, httpMethod, values, 
@@ -187,27 +176,16 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
                 
             }
-            InjectionUtils.injectContextFields(sh.getProvider(), sh, message);
-            InjectionUtils.injectContextMethods(sh.getProvider(), sh, message);
+            InjectionUtils.injectContexts(sh.getProvider(), sh, message);
             Response response = sh.getProvider().handleRequest(message, resource);
             if (response != null) {
                 message.getExchange().put(Response.class, response);
                 return;
             }
+            
         }
         
-        String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-        if (!acceptTypes.equals(newAcceptTypes) || ori == null) {
-            acceptTypes = newAcceptTypes;
-            acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
-            message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
-            if (ori != null) {
-                values = new MetadataMap<String, String>();
-                resource = JAXRSUtils.selectResourceClass(resources, 
-                                                          rawPath, 
-                                                          values,
-                                                          message);
-            }
+        if (ori == null) {
             try {                
                 ori = JAXRSUtils.findTargetMethod(resource, message, 
                                             httpMethod, values, requestContentType, acceptContentTypes, true);

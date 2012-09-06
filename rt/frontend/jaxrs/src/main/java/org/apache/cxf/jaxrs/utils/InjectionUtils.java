@@ -905,7 +905,7 @@ public final class InjectionUtils {
     public static void injectContextProxiesAndApplication(AbstractResourceInfo cri, 
                                                           Object instance,
                                                           Application app) {
-        if (!cri.isSingleton()) {
+        if (!cri.contextsAvailable() || !cri.isSingleton()) {
             return;
         }
         
@@ -942,8 +942,10 @@ public final class InjectionUtils {
     public static void injectContexts(Object requestObject,
                                  AbstractResourceInfo resource,
                                  Message message) {
-        injectContextMethods(requestObject, resource, message);
-        injectContextFields(requestObject, resource, message);
+        if (resource.contextsAvailable()) {
+            injectContextMethods(requestObject, resource, message);
+            injectContextFields(requestObject, resource, message);
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -974,8 +976,6 @@ public final class InjectionUtils {
             }
         }
     }
-    
-    // TODO : should we have context and resource fields be treated as context fields ?
     
     public static void injectContextFields(Object o,
                                            AbstractResourceInfo cri,

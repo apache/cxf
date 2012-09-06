@@ -50,6 +50,7 @@ public abstract class AbstractResourceInfo {
     private Map<Class<?>, List<Field>> contextFields;
     private Map<Class<?>, Map<Class<?>, Method>> contextMethods;
     private Bus bus;
+    private boolean contextsAvailable = true;
     
     protected AbstractResourceInfo(Bus bus) {
         this.bus = bus;
@@ -61,9 +62,19 @@ public abstract class AbstractResourceInfo {
         this.resourceClass = resourceClass;
         root = isRoot;
         if (root && resourceClass != null) {
-            findContextFields(serviceClass);
-            findContextSetterMethods(serviceClass);
+            findContexts(serviceClass);   
         }
+    }
+    
+    private void findContexts(Class<?> cls) {
+        findContextFields(cls);
+        findContextSetterMethods(cls);
+        contextsAvailable = contextFields != null && !contextFields.isEmpty() 
+            || contextMethods != null && !contextMethods.isEmpty();
+    }
+    
+    public boolean contextsAvailable() {
+        return contextsAvailable;
     }
     
     public Bus getBus() {
@@ -73,8 +84,7 @@ public abstract class AbstractResourceInfo {
     public void setResourceClass(Class<?> rClass) {
         resourceClass = rClass;
         if (serviceClass.isInterface() && resourceClass != null && !resourceClass.isInterface()) {
-            findContextFields(resourceClass);
-            findContextSetterMethods(resourceClass);
+            findContexts(resourceClass);
         }
     }
     

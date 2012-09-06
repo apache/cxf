@@ -133,14 +133,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         List<ProviderInfo<ResponseHandler>> handlers = 
             ProviderFactory.getInstance(message).getResponseHandlers();
         for (ProviderInfo<ResponseHandler> rh : handlers) {
-            InjectionUtils.injectContextFields(rh.getProvider(), rh, 
-                                               message.getExchange().getInMessage());
-            InjectionUtils.injectContextFields(rh.getProvider(), rh, 
+            InjectionUtils.injectContexts(rh.getProvider(), rh, 
                                                message.getExchange().getInMessage());
             Response r = rh.getProvider().handleResponse(message, ori, response);
             if (r != null) {
                 response = r;
             }
+            
         }
         
         serializeMessage(message, response, ori, true);        

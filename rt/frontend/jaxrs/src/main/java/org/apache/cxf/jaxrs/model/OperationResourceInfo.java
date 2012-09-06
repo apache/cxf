@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -45,6 +46,7 @@ public class OperationResourceInfo {
     private String defaultParamValue;
     private List<Parameter> parameters;
     private boolean oneway; 
+    private List<String> nameBindings = Collections.emptyList();
 
     public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
         this(mInvoke, mInvoke, cri);
@@ -62,6 +64,7 @@ public class OperationResourceInfo {
         this.parameters = ori.parameters;
         this.oneway = ori.oneway;
         this.classResourceInfo = cri;
+        this.nameBindings = ori.nameBindings;
     }
     
     public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
@@ -69,6 +72,7 @@ public class OperationResourceInfo {
         annotatedMethod = mAnnotated;
         if (mAnnotated != null) {
             parameters = ResourceUtils.getParameters(mAnnotated);
+            nameBindings = AnnotationUtils.getNameBindings(mAnnotated.getAnnotations());
         }
         classResourceInfo = cri;
         checkMediaTypes(null, null);
@@ -95,6 +99,10 @@ public class OperationResourceInfo {
         checkMediaTypes(consumeMediaTypes, produceMediaTypes);
         parameters = params;
         this.oneway = oneway;
+    }
+    
+    public List<String> getNameBindings() {
+        return nameBindings;
     }
     
     private void checkOneway() {

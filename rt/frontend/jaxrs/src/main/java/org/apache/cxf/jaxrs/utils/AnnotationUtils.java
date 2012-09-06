@@ -21,7 +21,10 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -37,6 +40,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
+import javax.ws.rs.NameBinding;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -118,6 +122,20 @@ public final class AnnotationUtils {
         return classes;
     }
 
+    public static List<String> getNameBindings(Annotation[] targetAnns) {
+        if (targetAnns.length == 0) {
+            return Collections.emptyList();
+        }
+        List<String> names = new LinkedList<String>();
+        for (Annotation a : targetAnns) {
+            NameBinding nb = a.annotationType().getAnnotation(NameBinding.class);
+            if (nb != null) {
+                names.add(a.getClass().getName());
+            }
+        }
+        return names;
+    }
+    
     public static boolean isContextClass(Class<?> contextClass) {
         return CONTEXT_CLASSES.contains(contextClass);
     }
