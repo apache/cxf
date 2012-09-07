@@ -119,10 +119,15 @@ public final class HttpUtils {
     
     public static String urlEncode(String value) {
         
+        return urlEncode(value, "UTF-8");
+    }
+    
+    public static String urlEncode(String value, String enc) {
+        
         try {
-            value = URLEncoder.encode(value, "UTF-8");
+            value = URLEncoder.encode(value, enc);
         } catch (UnsupportedEncodingException ex) {
-            // unlikely to happen
+            throw new RuntimeException(ex);
         }
         
         return value;
