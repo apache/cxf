@@ -231,7 +231,13 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                          contentType,
                                                          acceptContentType,
                                                          true);
-
+                
+                if (!ori.getNameBindings().isEmpty() 
+                    && JAXRSUtils.runContainerFilters(ProviderFactory.getInstance(exchange.getInMessage()),
+                                                      exchange.getInMessage(),
+                                                      false, ori.getNameBindings())) {
+                    return new MessageContentsList(exchange.get(Response.class));
+                }                
 
                 exchange.put(OperationResourceInfo.class, subOri);
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);

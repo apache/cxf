@@ -50,7 +50,7 @@ public abstract class AbstractResourceInfo {
     private Map<Class<?>, List<Field>> contextFields;
     private Map<Class<?>, Map<Class<?>, Method>> contextMethods;
     private Bus bus;
-    private boolean contextsAvailable = true;
+    private boolean contextsAvailable;
     
     protected AbstractResourceInfo(Bus bus) {
         this.bus = bus;

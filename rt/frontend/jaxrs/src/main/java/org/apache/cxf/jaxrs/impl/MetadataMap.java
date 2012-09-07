@@ -55,19 +55,30 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     
     public MetadataMap(Map<K, List<V>> store, boolean readOnly, boolean caseInsensitive) {
         
-        this.caseInsensitive = caseInsensitive;
+        this (store, true, readOnly, caseInsensitive);
         
-        this.m = new LinkedHashMap<K, List<V>>();
-        if (store != null) {
-            for (Map.Entry<K, List<V>> entry : store.entrySet()) {
-                List<V> values = new ArrayList<V>(entry.getValue());
-                m.put(entry.getKey(), readOnly 
-                      ? Collections.unmodifiableList(values) : values);
+    }
+    // TODO: Review the use of this constructor,
+    //       refactor the code, copyStore and readOnly are duplicates
+    public MetadataMap(Map<K, List<V>> store, boolean copyStore, 
+                       boolean readOnly, boolean caseInsensitive) {
+        
+        if (copyStore) {
+            this.m = new LinkedHashMap<K, List<V>>();
+            if (store != null) {
+                for (Map.Entry<K, List<V>> entry : store.entrySet()) {
+                    List<V> values = new ArrayList<V>(entry.getValue());
+                    m.put(entry.getKey(), readOnly 
+                          ? Collections.unmodifiableList(values) : values);
+                }
             }
+            if (readOnly) {
+                this.m = Collections.unmodifiableMap(m);
+            }
+        } else {
+            this.m = store;
         }
-        if (readOnly) {
-            this.m = Collections.unmodifiableMap(m);
-        }
+        this.caseInsensitive = caseInsensitive;
         
     }
     

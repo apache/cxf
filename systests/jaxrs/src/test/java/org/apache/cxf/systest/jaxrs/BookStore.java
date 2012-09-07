@@ -426,6 +426,12 @@ public class BookStore {
     }
     
     @GET
+    @Path("/bookheaders/simple/")
+    public Book getBookByHeaderSimple(@HeaderParam("BOOK") String header) throws Exception {
+        return doGetBook(header);
+    }
+    
+    @GET
     @Path("/bookheaders/")
     public Book getBookByHeader(@HeaderParam("BOOK") List<String> ids) throws Exception {
         List<MediaType> types = httpHeaders.getAcceptableMediaTypes();

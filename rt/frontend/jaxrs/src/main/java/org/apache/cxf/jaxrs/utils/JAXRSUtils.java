@@ -62,6 +62,8 @@ import javax.ws.rs.RedirectionException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -91,6 +93,7 @@ import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -1333,4 +1336,23 @@ public final class JAXRSUtils {
         return XMLUtils.convertStringToQName(name, "");
     }
     
+    public static boolean runContainerFilters(ProviderFactory pf, Message m, boolean preMatch, 
+                                              List<String> names) {
+        List<ProviderInfo<ContainerRequestFilter>> containerFilters = names == null 
+            ? pf.getGlobalContainerRequestFilters(preMatch) : pf.getBoundContainerRequestFilters(names);
+        if (!containerFilters.isEmpty()) {
+            ContainerRequestContext context = new ContainerRequestContextImpl(m, true);
+            for (ProviderInfo<ContainerRequestFilter> filter : containerFilters) {
+                try {
+                    filter.getProvider().filter(context);
+                } catch (IOException ex) {
+                    throw new WebApplicationException(ex);
+                }
+                if (m.getExchange().get(Response.class) != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

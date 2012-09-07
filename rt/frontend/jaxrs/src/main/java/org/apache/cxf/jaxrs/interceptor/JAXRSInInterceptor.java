@@ -85,6 +85,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     
     public void handleMessage(Message message) {
         
+        if (message.getExchange().get(OperationResourceInfo.class) != null) {
+            // it's a suspended invocation;
+            return;
+        }
+        
         try {
             processRequest(message);
         } catch (RuntimeException ex) {
@@ -103,17 +108,18 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private void processRequest(Message message) {
         
-        if (message.getExchange().get(OperationResourceInfo.class) != null) {
-            // it's a suspended invocation;
-            return;
-        }
+        ProviderFactory providerFactory = ProviderFactory.getInstance(message);
         
-        RequestPreprocessor rp = ProviderFactory.getInstance(message).getRequestPreprocessor();
+        RequestPreprocessor rp = providerFactory.getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
             if (message.getExchange().get(Response.class) != null) {
                 return;
             }
+        }
+        
+        if (JAXRSUtils.runContainerFilters(providerFactory, message, true, null)) {
+            return;
         }
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
@@ -157,13 +163,17 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new WebApplicationException(resp);
         }
 
+        if (JAXRSUtils.runContainerFilters(providerFactory, message, false, null)) {
+            return;
+        }
+        
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
 
         String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
         OperationResourceInfo ori = null;     
         
         boolean operChecked = false;
-        List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(message).getRequestHandlers();
+        List<ProviderInfo<RequestHandler>> shs = providerFactory.getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
             if (ori == null && !operChecked) {
                 try {                
@@ -201,6 +211,11 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
+        if (!ori.getNameBindings().isEmpty() 
+            && JAXRSUtils.runContainerFilters(providerFactory, message, false, ori.getNameBindings())) {
+            return;
+        }
+        
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Request path is: " + rawPath);
             LOG.fine("Request HTTP method is: " + httpMethod);
@@ -209,8 +224,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
             LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         }
-        setExchangeProperties(message, ori, values, resources.size());  
-      
+        
+        setExchangeProperties(message, ori, values, resources.size());
+        
         //Process parameters
         try {
             List<Object> params = JAXRSUtils.processParameters(ori, values, message);
