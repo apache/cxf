@@ -30,9 +30,11 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 
-@Deprecated
-public class ClaimsAttributeStatementProvider implements AttributeStatementProvider {
+public class CorrectedClaimsAttributeStatementProvider implements AttributeStatementProvider {
+    
+    private String nameFormat = SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED;
 
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
         // Handle Claims
@@ -78,14 +80,25 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
         while (claimIterator.hasNext()) {
             Claim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
-            URI name = claim.getNamespace().relativize(claim.getClaimType());
+            
+            URI claimType = claim.getClaimType();
             if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                 || WSConstants.SAML2_NS.equals(tokenType)) {
-                attributeBean.setQualifiedName(name.toString());
-                attributeBean.setNameFormat(claim.getNamespace().toString());
+                attributeBean.setQualifiedName(claimType.toString());
+                attributeBean.setNameFormat(nameFormat);
             } else {
-                attributeBean.setSimpleName(name.toString());
-                attributeBean.setQualifiedName(claim.getNamespace().toString());
+                String uri = claimType.toString();
+                int lastSlash = uri.lastIndexOf("/");
+                if (lastSlash == (uri.length() - 1)) {
+                    uri = uri.substring(0, lastSlash);
+                    lastSlash = uri.lastIndexOf("/");
+                }
+
+                String namespace = uri.substring(0, lastSlash);
+                String name = uri.substring(lastSlash + 1, uri.length());
+                
+                attributeBean.setSimpleName(name);
+                attributeBean.setQualifiedName(namespace);
             }
             attributeBean.setAttributeValues(Collections.singletonList(claim.getValue()));
             attributeList.add(attributeBean);
@@ -93,6 +106,14 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
         attrBean.setSamlAttributes(attributeList);
 
         return attrBean;
+    }
+
+    public String getNameFormat() {
+        return nameFormat;
+    }
+
+    public void setNameFormat(String nameFormat) {
+        this.nameFormat = nameFormat;
     }
 
 }
