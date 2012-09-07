@@ -92,6 +92,28 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testSaml1CustomClaims() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClaimsTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1CustomClaimsPort");
+        DoubleItPortType transportClaimsPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportClaimsPort, PORT);
+        
+        doubleIt(transportClaimsPort, 25);
+        
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testSaml1WrongClaims() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

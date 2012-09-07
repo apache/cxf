@@ -38,6 +38,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
             URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");  
     public static final URI GIVEN_NAME = 
         URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");  
+    public static final URI LANGUAGE = 
+        URI.create("http://schemas.mycompany.com/claims/language");
     
     public ClaimCollection retrieveClaimValues(
             RequestClaimCollection claims, ClaimsParameters parameters) {
@@ -47,13 +49,13 @@ public class CustomClaimsHandler implements ClaimsHandler {
             for (RequestClaim requestClaim : claims) {
                 Claim claim = new Claim();
                 claim.setClaimType(requestClaim.getClaimType());
+                claim.setIssuer("Test Issuer");
+                claim.setOriginalIssuer("Original Issuer");
                 if (ROLE.equals(requestClaim.getClaimType())) {
-                    claim.setIssuer("Test Issuer");
-                    claim.setOriginalIssuer("Original Issuer");
                     claim.setValue("admin-user");
                 } else if (GIVEN_NAME.equals(requestClaim.getClaimType())) {
-                    claim.setIssuer("Test Issuer");
-                    claim.setOriginalIssuer("Original Issuer");
+                    claim.setValue(parameters.getPrincipal().getName());
+                } else if (LANGUAGE.equals(requestClaim.getClaimType())) {
                     claim.setValue(parameters.getPrincipal().getName());
                 }
                 claimCollection.add(claim);
@@ -67,6 +69,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
         List<URI> list = new ArrayList<URI>();
         list.add(ROLE);
         list.add(GIVEN_NAME);
+        list.add(LANGUAGE);
         return list;
     }
 

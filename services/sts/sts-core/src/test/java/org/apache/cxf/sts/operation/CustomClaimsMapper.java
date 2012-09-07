@@ -42,7 +42,6 @@ public class CustomClaimsMapper implements ClaimsMapper {
             Claim nc = new Claim();
             nc.setClaimType(c.getClaimType());
             nc.setIssuer(c.getIssuer());
-            nc.setNamespace(c.getNamespace());
             nc.setOriginalIssuer(c.getOriginalIssuer());
             nc.setPrincipal(c.getPrincipal());
             nc.setValue(c.getValue().toUpperCase());

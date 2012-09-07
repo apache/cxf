@@ -137,13 +137,6 @@ public class ClaimsManager {
                     if (c.getClaimType().equals(claimType)) {
                         found = true;
                         break;
-                    } else {
-                        StringBuffer sb = new StringBuffer();
-                        sb.append(c.getNamespace()).append('/').append(c.getClaimType());
-                        if (sb.toString().equals(claimType.toString())) {
-                            found = true;
-                            break;
-                        }
                     }
                 }
                 if (!found) {

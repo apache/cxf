@@ -31,21 +31,12 @@ public class Claim implements Serializable {
     /**
      * 
      */
-    private static final long serialVersionUID = 1856135937386473416L;
+    private static final long serialVersionUID = -1151700035195497499L;
     private URI claimType;
     private String issuer;
     private String originalIssuer;
     private transient Principal principal;
     private String value;
-    private URI namespace = ClaimTypes.URI_BASE;
-
-    public URI getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(URI namespace) {
-        this.namespace = namespace;
-    }
 
     public String getIssuer() {
         return issuer;

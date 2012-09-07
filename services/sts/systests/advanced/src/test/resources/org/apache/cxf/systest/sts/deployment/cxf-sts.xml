@@ -107,6 +107,20 @@
 -->
 	<bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
 		<property name="claimHandlers" ref="claimHandlerList" />
+		<property name="claimParsers" ref="claimParserList" />
+	</bean>
+	
+	<util:list id="claimParserList">
+		<ref bean="customClaimsParser" />
+		<ref bean="identityClaimsParser" />
+	</util:list>
+	
+	<bean id="customClaimsParser"
+		class="org.apache.cxf.systest.sts.deployment.CustomClaimsParser">
+	</bean>
+	
+	<bean id="identityClaimsParser"
+		class="org.apache.cxf.sts.claims.IdentityClaimsParser">
 	</bean>
 
 	<util:list id="claimHandlerList">

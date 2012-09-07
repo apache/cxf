@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -68,9 +69,11 @@ public class ClaimsValidator extends SamlAssertionValidator {
         for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
             List<org.opensaml.saml1.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml1.core.Attribute attribute : attributes) {
-                if (!"role".equals(attribute.getAttributeName())) {
+                
+                if (!ClaimTypes.URI_BASE.toString().equals(attribute.getAttributeNamespace())) {
                     continue;
                 }
+                
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();
@@ -95,9 +98,10 @@ public class ClaimsValidator extends SamlAssertionValidator {
         for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
             List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml2.core.Attribute attribute : attributes) {
-                if (!"role".equals(attribute.getName())) {
+                if (!attribute.getName().startsWith(ClaimTypes.URI_BASE.toString())) {
                     continue;
                 }
+                
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();
