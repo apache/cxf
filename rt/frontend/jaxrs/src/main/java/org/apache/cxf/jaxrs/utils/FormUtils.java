@@ -138,7 +138,7 @@ public final class FormUtils {
                 String value = entryIterator.next();
                 os.write(entry.getKey().getBytes(enc));
                 os.write('=');
-                String data = encoded ? value : HttpUtils.urlEncode(value);
+                String data = encoded ? value : HttpUtils.urlEncode(value, enc);
                 os.write(data.getBytes(enc));
                 if (entryIterator.hasNext() || it.hasNext()) {
                     os.write('&');
