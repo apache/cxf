@@ -39,6 +39,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public class ContainerRequestContextImpl implements ContainerRequestContext {
@@ -201,7 +202,7 @@ public class ContainerRequestContextImpl implements ContainerRequestContext {
         if (!preMatch) {
             throw new IllegalStateException();
         }
-        m.put(Message.REQUEST_URI, requestUri.toString());
+        HttpUtils.resetRequestURI(m, requestUri.toString());
     }
 
     @Override

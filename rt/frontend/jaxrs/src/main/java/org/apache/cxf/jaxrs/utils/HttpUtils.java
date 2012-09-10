@@ -288,6 +288,13 @@ public final class HttpUtils {
         return u;
     }
     
+    public static void resetRequestURI(Message m, String requestURI) {
+        m.remove(REQUEST_PATH_TO_MATCH_SLASH);
+        m.remove(REQUEST_PATH_TO_MATCH);
+        m.put(Message.REQUEST_URI, requestURI);
+    }
+    
+    
     public static String getPathToMatch(Message m, boolean addSlash) {
         String var = addSlash ? REQUEST_PATH_TO_MATCH_SLASH : REQUEST_PATH_TO_MATCH;
         String pathToMatch = (String)m.get(var);
