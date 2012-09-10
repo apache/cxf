@@ -40,6 +40,8 @@ import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 @Provider
 public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
+    private boolean useDataSourceContentType;
+    
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, mt);
     }
@@ -71,7 +73,9 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
         throws IOException {
         DataSource ds = DataSource.class.isAssignableFrom(cls) 
             ? (DataSource)src : ((DataHandler)src).getDataSource();
-        setContentTypeIfNeeded(type, headers, ds.getContentType());
+        if (useDataSourceContentType) {    
+            setContentTypeIfNeeded(type, headers, ds.getContentType());
+        }
         IOUtils.copy(ds.getInputStream(), os);
     }
     
@@ -81,6 +85,10 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
         if (!StringUtils.isEmpty(ct) && !type.equals(MediaType.valueOf(ct))) { 
             headers.putSingle("Content-Type", ct);
         }
+    }
+
+    public void setUseDataSourceContentType(boolean useDataSourceContentType) {
+        this.useDataSourceContentType = useDataSourceContentType;
     }
     
 
