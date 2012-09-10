@@ -52,7 +52,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public final class ResponseImpl extends Response {
-    private final int status;
+    private int status;
     private Object entity;
     private MultivaluedMap<String, Object> metadata;
     
@@ -71,6 +71,14 @@ public final class ResponseImpl extends Response {
     
     void addMetadata(MultivaluedMap<String, Object> meta) { 
         this.metadata = meta;
+    }
+    
+    void setStatus(int s) { 
+        this.status = s;
+    }
+    
+    void setEntity(Object entity) { 
+        this.entity = entity;
     }
 
     //TODO: This method is needed because on the client side the

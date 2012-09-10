@@ -118,7 +118,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         
-        if (JAXRSUtils.runContainerFilters(providerFactory, message, true, null)) {
+        // Global pre-match request filters
+        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null)) {
             return;
         }
         
@@ -163,10 +164,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new WebApplicationException(resp);
         }
 
-        if (JAXRSUtils.runContainerFilters(providerFactory, message, false, null)) {
-            return;
-        }
-        
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
 
         String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
@@ -211,8 +208,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
-        if (!ori.getNameBindings().isEmpty() 
-            && JAXRSUtils.runContainerFilters(providerFactory, message, false, ori.getNameBindings())) {
+        // Global and name-bound request filters
+        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, false, ori.getNameBindings())) {
             return;
         }
         

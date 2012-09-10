@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -40,5 +42,8 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient wc = WebClient.create(address);
         Book book = wc.get(Book.class);
         assertEquals(123L, book.getId());
+        Response response = wc.getResponse();
+        assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("custom", response.getHeaderString("Custom"));
     }
 }

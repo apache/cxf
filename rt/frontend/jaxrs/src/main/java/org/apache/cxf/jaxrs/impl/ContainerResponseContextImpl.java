@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Date;
@@ -34,176 +35,172 @@ import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
+
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.message.Message;
 
 public class ContainerResponseContextImpl implements ContainerResponseContext {
 
+    private Message m;
+    private Response r;
+    private OperationResourceInfo ori;
+    public ContainerResponseContextImpl(Response r, 
+                                        Message m,
+                                        OperationResourceInfo ori) {
+        this.m = m;
+        this.r = r;
+        this.ori = ori;
+    }
+    
     @Override
     public Set<String> getAllowedMethods() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getAllowedMethods();
     }
 
     @Override
     public Map<String, NewCookie> getCookies() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getCookies();
     }
 
     @Override
     public Date getDate() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getDate();
     }
 
     @Override
     public Object getEntity() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getEntity();
     }
 
     @Override
     public Annotation[] getEntityAnnotations() {
-        // TODO Auto-generated method stub
-        return null;
+        Method method = ori == null ? null : ori.getAnnotatedMethod();
+        return method == null ? null : method.getAnnotations();
     }
 
     @Override
     public Class<?> getEntityClass() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public OutputStream getEntityStream() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public EntityTag getEntityTag() {
-        // TODO Auto-generated method stub
-        return null;
+        return ori == null ? null : ori.getMethodToInvoke().getReturnType();
     }
 
     @Override
     public Type getEntityType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ori == null ? null : ori.getMethodToInvoke().getGenericReturnType();
+    }
+    
+    @Override
+    public OutputStream getEntityStream() {
+        return m.get(OutputStream.class);
     }
 
     @Override
-    public String getHeaderString(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public EntityTag getEntityTag() {
+        return r.getEntityTag();
+    }
+
+    @Override
+    public String getHeaderString(String name) {
+        return r.getHeaderString(name);
     }
 
     @Override
     public MultivaluedMap<String, Object> getHeaders() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getMetadata();
     }
 
     @Override
     public Locale getLanguage() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getLanguage();
     }
 
     @Override
     public Date getLastModified() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getLastModified();
     }
 
     @Override
     public int getLength() {
-        // TODO Auto-generated method stub
-        return 0;
+        return r.getLength();
     }
 
     @Override
-    public Link getLink(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Link getLink(String rel) {
+        return r.getLink(rel);
     }
 
     @Override
-    public Builder getLinkBuilder(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public Builder getLinkBuilder(String rel) {
+        return r.getLinkBuilder(rel);
     }
 
     @Override
     public Set<Link> getLinks() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getLinks();
     }
 
     @Override
     public URI getLocation() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getLocation();
     }
 
     @Override
     public MediaType getMediaType() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getMediaType();
     }
 
     @Override
     public int getStatus() {
-        // TODO Auto-generated method stub
-        return 0;
+        return r.getStatus();
     }
 
     @Override
     public StatusType getStatusInfo() {
-        // TODO Auto-generated method stub
-        return null;
+        return r.getStatusInfo();
     }
 
     @Override
     public MultivaluedMap<String, String> getStringHeaders() {
-        // TODO Auto-generated method stub
-        return null;
+        //TODO: right now this view is not modifiable
+        return r.getStringHeaders();
     }
 
     @Override
     public boolean hasEntity() {
-        // TODO Auto-generated method stub
-        return false;
+        return r.hasEntity();
     }
 
     @Override
-    public boolean hasLink(String arg0) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean hasLink(String rel) {
+        return r.hasLink(rel);
     }
 
     @Override
-    public void setEntity(Object arg0, Annotation[] arg1, MediaType arg2) {
-        // TODO Auto-generated method stub
+    public void setEntityStream(OutputStream os) {
+        m.put(OutputStream.class, os);
 
     }
 
     @Override
-    public void setEntityStream(OutputStream arg0) {
-        // TODO Auto-generated method stub
-
+    public void setEntity(Object entity, Annotation[] anns, MediaType mt) {
+        ((ResponseImpl)r).setEntity(entity);
+        updateMessageResponse();
+        //TODO: review this code after API gets finalized
+    }
+    
+    @Override
+    public void setStatus(int status) {
+        ((ResponseImpl)r).setStatus(status);
+        updateMessageResponse();
     }
 
     @Override
-    public void setStatus(int arg0) {
-        // TODO Auto-generated method stub
-
+    public void setStatusInfo(StatusType status) {
+        setStatus(status.getStatusCode());
     }
 
-    @Override
-    public void setStatusInfo(StatusType arg0) {
-        // TODO Auto-generated method stub
-
+    private void updateMessageResponse() {
+        m.put(Response.class, r);
     }
-
 }

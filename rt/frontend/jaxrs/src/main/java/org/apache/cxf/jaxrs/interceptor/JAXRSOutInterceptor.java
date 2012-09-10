@@ -79,9 +79,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     public void handleMessage(Message message) {
-        
+        ProviderFactory providerFactory = ProviderFactory.getInstance(message);
         try {
-            processResponse(message);
+            processResponse(providerFactory, message);
         } finally {
             Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
             Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
@@ -93,7 +93,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                 + tex.getMessage());
                 }
             }
-            ProviderFactory.getInstance(message).clearThreadLocalProxies();
+            providerFactory.clearThreadLocalProxies();
             ClassResourceInfo cri =
                 (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
             if (cri != null) {
@@ -104,7 +104,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     }
     
-    private void processResponse(Message message) {
+    private void processResponse(ProviderFactory providerFactory, Message message) {
         
         if (isResponseAlreadyHandled(message)) {
             return;
@@ -129,7 +129,21 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Exchange exchange = message.getExchange();
         OperationResourceInfo ori = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
             .getName());
-
+        
+        // Global post-match and name-bound response filters
+        if (ori != null) {
+            JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori, false);
+            Response updatedResponse = message.get(Response.class);
+            if (updatedResponse != null) {
+                response = updatedResponse;
+            }
+        }
+        
+        // TODO: enable or remove, depending on the API clarifications
+        // Global pre-match response filters 
+        // JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori, true);
+        
+        
         List<ProviderInfo<ResponseHandler>> handlers = 
             ProviderFactory.getInstance(message).getResponseHandlers();
         for (ProviderInfo<ResponseHandler> rh : handlers) {

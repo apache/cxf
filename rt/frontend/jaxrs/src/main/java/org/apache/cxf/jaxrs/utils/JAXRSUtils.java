@@ -64,6 +64,8 @@ import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -94,6 +96,7 @@ import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
+import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -1336,12 +1339,12 @@ public final class JAXRSUtils {
         return XMLUtils.convertStringToQName(name, "");
     }
     
-    public static boolean runContainerFilters(ProviderFactory pf, Message m, boolean preMatch, 
+    public static boolean runContainerRequestFilters(ProviderFactory pf, Message m, boolean preMatch, 
                                               List<String> names) {
-        List<ProviderInfo<ContainerRequestFilter>> containerFilters = names == null 
-            ? pf.getGlobalContainerRequestFilters(preMatch) : pf.getBoundContainerRequestFilters(names);
+        List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
+            ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);
         if (!containerFilters.isEmpty()) {
-            ContainerRequestContext context = new ContainerRequestContextImpl(m, true);
+            ContainerRequestContext context = new ContainerRequestContextImpl(m, preMatch, false);
             for (ProviderInfo<ContainerRequestFilter> filter : containerFilters) {
                 try {
                     filter.getProvider().filter(context);
@@ -1354,5 +1357,30 @@ public final class JAXRSUtils {
             }
         }
         return false;
+    }
+    
+    public static void runContainerResponseFilters(ProviderFactory pf,
+                                                   Response r,
+                                                   Message m, 
+                                                   OperationResourceInfo ori,
+                                                   boolean preMatch) {
+        List<ProviderInfo<ContainerResponseFilter>> containerFilters = preMatch 
+            ? pf.getPreMatchContainerResponseFilters() 
+            : pf.getPostMatchContainerResponseFilters(ori == null ? null : ori.getNameBindings());
+        if (!containerFilters.isEmpty()) {
+            ContainerRequestContext requestContext = 
+                new ContainerRequestContextImpl(m.getExchange().getInMessage(), 
+                                               preMatch,
+                                               true);
+            ContainerResponseContext responseContext = 
+                new ContainerResponseContextImpl(r, m, ori);
+            for (ProviderInfo<ContainerResponseFilter> filter : containerFilters) {
+                try {
+                    filter.getProvider().filter(requestContext, responseContext);
+                } catch (IOException ex) {
+                    throw new WebApplicationException(ex);
+                }
+            }
+        }
     }
 }

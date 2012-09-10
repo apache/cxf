@@ -118,29 +118,30 @@ public class JAXRSInvoker extends AbstractInvoker {
     @SuppressWarnings("unchecked")
     public Object invoke(Exchange exchange, Object request, Object resourceObject) {
 
-        OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
-        ClassResourceInfo cri = ori.getClassResourceInfo();
+        final OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
+        final ClassResourceInfo cri = ori.getClassResourceInfo();
+        final Message inMessage = exchange.getInMessage();
+        final ProviderFactory providerFactory = ProviderFactory.getInstance(inMessage);
 
         boolean wasSuspended = exchange.remove(REQUEST_WAS_SUSPENDED) != null;
         
         if (!wasSuspended) {
-            pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
+            pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), inMessage);
                     
             if (cri.isRoot()) {
                 Object realResourceObject = ClassHelper.getRealObject(resourceObject);
-                JAXRSUtils.injectParameters(ori, realResourceObject,
-                                         exchange.getInMessage());
+                JAXRSUtils.injectParameters(ori, realResourceObject, inMessage);
     
                 InjectionUtils.injectContexts(realResourceObject,
                                               ori.getClassResourceInfo(),
-                                              exchange.getInMessage());
+                                              inMessage);
                 
                 ProviderInfo<?> appProvider = 
                     (ProviderInfo<?>)exchange.getEndpoint().get(Application.class.getName());
                 if (appProvider != null) {
                     InjectionUtils.injectContexts(appProvider.getProvider(),
                                                   appProvider,
-                                                  exchange.getInMessage());
+                                                  inMessage);
                 }
                 
             }
@@ -160,7 +161,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         Object result = null;
         ClassLoaderHolder contextLoader = null;
         try {
-            if (setServiceLoaderAsContextLoader(exchange.getInMessage())) {
+            if (setServiceLoaderAsContextLoader(inMessage)) {
                 contextLoader = ClassLoaderUtils
                     .setThreadContextClassloader(resourceObject.getClass().getClassLoader());
             }
@@ -179,7 +180,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), 
                                                                      exchange.getInMessage());
             if (excResponse == null) {
-                ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
+                providerFactory.clearThreadLocalProxies();
                 ClassResourceInfo criRoot =
                     (ClassResourceInfo)exchange.get(JAXRSUtils.ROOT_RESOURCE_CLASS);
                 if (criRoot != null) {
@@ -231,9 +232,9 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                          contentType,
                                                          acceptContentType,
                                                          true);
-                
-                if (!ori.getNameBindings().isEmpty() 
-                    && JAXRSUtils.runContainerFilters(ProviderFactory.getInstance(exchange.getInMessage()),
+                // Global and name-bound request filters
+                if (JAXRSUtils.runContainerRequestFilters(
+                                                      providerFactory,
                                                       exchange.getInMessage(),
                                                       false, ori.getNameBindings())) {
                     return new MessageContentsList(exchange.get(Response.class));

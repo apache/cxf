@@ -82,6 +82,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
 
 @Path("/bookstore")
 @GZIP(threshold = 1)
@@ -427,6 +428,7 @@ public class BookStore {
     
     @GET
     @Path("/bookheaders/simple/")
+    @CustomHeaderAdded
     public Book getBookByHeaderSimple(@HeaderParam("BOOK") String header) throws Exception {
         return doGetBook(header);
     }

@@ -114,12 +114,12 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
     private List<ProviderInfo<ContainerRequestFilter>> globalPreContainerRequestFilters = 
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
+    private Map<String, ProviderInfo<ContainerRequestFilter>> boundContainerRequestFilters = 
+        new LinkedHashMap<String, ProviderInfo<ContainerRequestFilter>>();
     private List<ProviderInfo<ContainerResponseFilter>> globalContainerResponseFilters = 
         new ArrayList<ProviderInfo<ContainerResponseFilter>>(1);
     private List<ProviderInfo<ContainerResponseFilter>> globalPreContainerResponseFilters = 
         new ArrayList<ProviderInfo<ContainerResponseFilter>>(1);
-    private Map<String, ProviderInfo<ContainerRequestFilter>> boundContainerRequestFilters = 
-        new LinkedHashMap<String, ProviderInfo<ContainerRequestFilter>>();
     private Map<String, ProviderInfo<ContainerResponseFilter>> boundContainerResponseFilters = 
         new LinkedHashMap<String, ProviderInfo<ContainerResponseFilter>>();
     
@@ -466,31 +466,43 @@ public final class ProviderFactory {
         return JAXB_PROVIDER_NAME.equals(clsName) || JSON_PROVIDER_NAME.equals(clsName);
     }
     
-    public List<ProviderInfo<ContainerRequestFilter>> getGlobalContainerRequestFilters(boolean preMatch) {
-        return Collections.unmodifiableList(
-            preMatch ? globalPreContainerRequestFilters : globalContainerRequestFilters);
+    public List<ProviderInfo<ContainerRequestFilter>> getPreMatchContainerRequestFilters() {
+        return Collections.unmodifiableList(globalPreContainerRequestFilters);
     }
     
-    public List<ProviderInfo<ContainerResponseFilter>> getGlobalContainerResponseFilters(boolean preMatch) {
-        return Collections.unmodifiableList(
-            preMatch ? globalPreContainerResponseFilters : globalContainerResponseFilters);
+    public List<ProviderInfo<ContainerRequestFilter>> getPostMatchContainerRequestFilters(List<String> names) {
+        return getPostMatchContainerFilters(globalContainerRequestFilters, 
+                                            boundContainerRequestFilters, 
+                                            names);
     }
     
-    public List<ProviderInfo<ContainerRequestFilter>> getBoundContainerRequestFilters(List<String> names) {
-        return getBoundContainerFilters(boundContainerRequestFilters, names);
+    public List<ProviderInfo<ContainerResponseFilter>> getPreMatchContainerResponseFilters() {
+        return Collections.unmodifiableList(globalPreContainerResponseFilters);
     }
     
-    public List<ProviderInfo<ContainerResponseFilter>> getBoundContainerResponseFilters(List<String> names) {
-        return getBoundContainerFilters(boundContainerResponseFilters, names);
+    public List<ProviderInfo<ContainerResponseFilter>> getPostMatchContainerResponseFilters(List<String> names) {
+        return getPostMatchContainerFilters(globalContainerResponseFilters, 
+                                            boundContainerResponseFilters, 
+                                            names);
     }
     
-    private static <T> List<ProviderInfo<T>> getBoundContainerFilters(Map<String, ProviderInfo<T>> filters,
-                                                                             List<String> names) {
+    private static <T> List<ProviderInfo<T>> getPostMatchContainerFilters(List<ProviderInfo<T>> globalFilters,
+                                                                         Map<String, ProviderInfo<T>> boundFilters,
+                                                                         List<String> names) {
+        
+        if (globalFilters.isEmpty() && boundFilters.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
         List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
-        for (String name : names) {
-            ProviderInfo<T> filter = filters.get(name);
-            if (filter != null) {
-                list.add(filter);
+        list.addAll(globalFilters);
+
+        if (names != null) {
+            for (String name : names) {
+                ProviderInfo<T> filter = boundFilters.get(name);
+                if (filter != null) {
+                    list.add(filter);
+                }
             }
         }
         return list;
@@ -612,6 +624,7 @@ public final class ProviderFactory {
                 paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o, bus)); 
             }
         }
+        //TODO: BindingPriority has to be checked too
         sortReaders();
         sortWriters();
         sortContextResolvers();
