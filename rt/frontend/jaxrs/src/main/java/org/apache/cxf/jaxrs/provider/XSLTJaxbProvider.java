@@ -63,6 +63,7 @@ import org.xml.sax.XMLFilter;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -101,6 +102,9 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            return false;
+        }
         // JAXB support is required
         if (!super.isReadable(type, genericType, anns, mt)) {
             return false;
@@ -116,6 +120,9 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            return false;
+        }
         // JAXB support is required
         if (!super.isReadable(type, genericType, anns, mt)) {
             return false;

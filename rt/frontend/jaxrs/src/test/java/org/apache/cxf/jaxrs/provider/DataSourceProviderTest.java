@@ -88,12 +88,13 @@ public class DataSourceProviderTest extends Assert {
     @Test
     public void testWriteDataSourceWithDiffCT() throws Exception {
         DataSourceProvider p = new DataSourceProvider();
+        p.setUseDataSourceContentType(true);
         DataSource ds = new InputStreamDataSource(new ByteArrayInputStream("image".getBytes()), 
                                                   "image/png"); 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MultivaluedMap<String, Object> outHeaders = new MetadataMap<String, Object>();
         p.writeTo(ds, DataSource.class, DataSource.class, new Annotation[]{}, 
-                   MediaType.valueOf("image/bar"), outHeaders, os);
+                   MediaType.valueOf("image/jpeg"), outHeaders, os);
         assertEquals("image", os.toString());
         assertEquals("image/png", outHeaders.getFirst("Content-Type"));
     }
