@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxws;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -89,7 +90,7 @@ import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
-public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
+public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable {
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchImpl.class);
     private static final String DISPATCH_NS = "http://cxf.apache.org/jaxws/dispatch";
     private static final String INVOKE_NAME = "Invoke";
@@ -528,6 +529,10 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             }
         }
         return payloadElementMap;
+    }
+
+    public void close() throws IOException {
+        client.destroy();
     }
     
 }
