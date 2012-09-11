@@ -73,19 +73,11 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
 
         if (wrapped != null) {
             MessageContentsList objs = MessageContentsList.getContentsList(message);
-
             WrapperHelper helper = parts.get(0).getProperty("WRAPPER_CLASS", WrapperHelper.class);
             if (helper == null) {
-                Service service = ServiceModelUtil.getService(message.getExchange());
-                DataBinding dataBinding = service.getDataBinding();
-                if (dataBinding instanceof WrapperCapableDatabinding) {
-                    helper = createWrapperHelper((WrapperCapableDatabinding)dataBinding,
-                                                 messageInfo, wrappedMsgInfo, wrapped);
-                    parts.get(0).setProperty("WRAPPER_CLASS", helper);
-                } else {
-                    return;
-                }
+                helper = getWrapperHelper(message, messageInfo, wrappedMsgInfo, wrapped, parts.get(0));
             }
+            
             try {
                 MessageContentsList newObjs = new MessageContentsList();
                 Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
@@ -135,6 +127,24 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         }
     }
 
+
+    private synchronized WrapperHelper getWrapperHelper(Message message,
+                                           MessageInfo messageInfo,
+                                           MessageInfo wrappedMessageInfo,
+                                           Class<?> wrapClass,
+                                           MessagePartInfo messagePartInfo) {
+        WrapperHelper helper = messagePartInfo.getProperty("WRAPPER_CLASS", WrapperHelper.class);
+        if (helper == null) {
+            Service service = ServiceModelUtil.getService(message.getExchange());
+            DataBinding dataBinding = service.getDataBinding();
+            if (dataBinding instanceof WrapperCapableDatabinding) {
+                helper = createWrapperHelper((WrapperCapableDatabinding)dataBinding,
+                                             messageInfo, wrappedMessageInfo, wrapClass);
+                messagePartInfo.setProperty("WRAPPER_CLASS", helper);
+            }
+        }
+        return helper;
+    }
 
     private void ensureSize(List<?> lst, int idx) {
         while (idx >= lst.size()) {
