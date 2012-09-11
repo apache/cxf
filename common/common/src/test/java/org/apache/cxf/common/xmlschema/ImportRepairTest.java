@@ -69,19 +69,21 @@ public class ImportRepairTest extends Assert {
 
     static boolean dumpSchemas;
 
-    private static final class ListLSInput implements LSInputList {
-        private final List<DOMLSInput> inputs;
+    @SuppressWarnings("rawtypes")
+    private static final class ListLSInput extends ArrayList implements LSInputList {
+        private static final long serialVersionUID = 1L;
 
-        private ListLSInput(List<DOMLSInput> inputs) {
-            this.inputs = inputs;
+        @SuppressWarnings("unchecked")
+        private ListLSInput(List inputs) {
+            super(inputs);
         }
 
         public int getLength() {
-            return inputs.size();
+            return size();
         }
 
         public LSInput item(int index) {
-            return inputs.get(index);
+            return (LSInput)get(index);
         }
     }
 
