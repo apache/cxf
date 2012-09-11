@@ -20,6 +20,7 @@
 package org.apache.cxf.bus.extension;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -216,6 +217,11 @@ public class Extension {
                     obj = con.newInstance(args);
                     return obj;                    
                 }
+            } catch (InvocationTargetException ex) {
+                throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), 
+                                             ex.getCause());
+            } catch (InstantiationException ex) {
+                throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
             } catch (Exception ex) {
                 //ignore
             }
