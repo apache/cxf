@@ -320,7 +320,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         answer = mortimer.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Mortimer".equals(answer));
-        assertProxyRequestCount(1);
+        assertProxyRequestCount(3);
     }
 
     @Test
