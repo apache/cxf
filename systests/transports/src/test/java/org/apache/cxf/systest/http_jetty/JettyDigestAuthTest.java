@@ -123,7 +123,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
     }
 
     @Test
-    public void testBasicAuth() throws Exception { 
+    public void testDigestAuth() throws Exception { 
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
         assertEquals("Hello Bob", greeter.greetMe("Bob"));
 
