@@ -30,6 +30,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -37,12 +38,6 @@ import org.junit.Test;
  * HTTP/S service.
  */
 public class HTTPSClientTest extends AbstractBusClientServerTestBase {
-    public static final String PORT1 = BusServer.PORT1;
-    public static final String PORT2 = BusServer.PORT2;
-    public static final String PORT3 = BusServer.PORT3;
-    public static final String PORT4 = BusServer.PORT4;
-    public static final String PORT5 = BusServer.PORT5;
-    public static final String PORT6 = BusServer.PORT6;
     //
     // data
     //
@@ -60,6 +55,11 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         } catch (final Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    @BeforeClass
+    public static void setupPorts() {
+        BusServer.resetPortMap();
     }
           
     public void startServers() throws Exception {
@@ -131,35 +131,35 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     @Test
     public final void testJaxwsServer() throws Exception {
         testSuccessfulCall("resources/jaxws-server.xml", 
-                           "https://localhost:" + PORT2 + "/SoapContext/HttpsPort");        
+                           "https://localhost:" + BusServer.getPort(2) + "/SoapContext/HttpsPort");        
     }
     @Test
     public final void testJaxwsServerChangeHttpsToHttp() throws Exception {
         testSuccessfulCall("resources/jaxws-server.xml", 
-                            "http://localhost:" + PORT3 + "/SoapContext/HttpPort");    
+                            "http://localhost:" + BusServer.getPort(3) + "/SoapContext/HttpPort");    
     }    
     @Test
     public final void testJaxwsEndpoint() throws Exception {
         testSuccessfulCall("resources/jaxws-publish.xml",
-                           "https://localhost:" + PORT1 + "/SoapContext/HttpsPort");
+                           "https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
     }
-    
+
     @Test
     public final void testPKCS12Endpoint() throws Exception {
         testSuccessfulCall("resources/pkcs12.xml",
-                           "https://localhost:" + PORT6 + "/SoapContext/HttpsPort");
+                           "https://localhost:" + BusServer.getPort(6) + "/SoapContext/HttpsPort");
     }
     
     @Test
     public final void testResourceKeySpecEndpoint() throws Exception {
         testSuccessfulCall("resources/resource-key-spec.xml",
-                           "https://localhost:" + PORT4 + "/SoapContext/HttpsPort");
+                           "https://localhost:" + BusServer.getPort(4) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testResourceKeySpecEndpointURL() throws Exception {
         testSuccessfulCall("resources/resource-key-spec-url.xml",
-                           "https://localhost:" + PORT5 + "/SoapContext/HttpsPort",
-                           new URL("https://localhost:" + PORT5 + "/SoapContext/HttpsPort?wsdl"),
+                           "https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort",
+                           new URL("https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort?wsdl"),
                            true);
         
     }

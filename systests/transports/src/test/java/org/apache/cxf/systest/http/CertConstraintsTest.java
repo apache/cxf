@@ -29,6 +29,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -36,18 +37,14 @@ import org.junit.Test;
  * constraints logic.
  */
 public class CertConstraintsTest extends AbstractBusClientServerTestBase {
-    public static final String PORT0 = BusServer.PORT0;
-    public static final String PORT1 = BusServer.PORT1;
-    public static final String PORT2 = BusServer.PORT2;
-    public static final String PORT3 = BusServer.PORT3;
-    public static final String PORT4 = BusServer.PORT4;
-    public static final String PORT5 = BusServer.PORT5;
-    public static final String PORT6 = BusServer.PORT6;
-    public static final String PORT7 = BusServer.PORT7;
-    public static final String PORT8 = BusServer.PORT8;
     //
     // data
     //
+    
+    @BeforeClass
+    public static void allocatePorts() {
+        BusServer.resetPortMap();
+    }
     
     /**
      * the package path used to locate resources specific to this test
@@ -130,35 +127,35 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         //
         // Good Subject DN
         //
-        testSuccessfulCall("https://localhost:" + PORT0 + "/SoapContext/HttpsPort");
+        testSuccessfulCall("https://localhost:" + BusServer.getPort(0) + "/SoapContext/HttpsPort");
         //
         // Bad Subject DN
         //
-        testFailedCall("https://localhost:" + PORT1 + "/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + BusServer.getPort(1) + "/SoapContext/HttpsPort");
         //
         // Mixed Subject DN (ALL)
         //
-        testFailedCall("https://localhost:" + PORT2 + "/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + BusServer.getPort(2) + "/SoapContext/HttpsPort");
         //
         // Mixed Subject DN (ANY)
         //
-        testSuccessfulCall("https://localhost:" + PORT3 + "/SoapContext/HttpsPort");
+        testSuccessfulCall("https://localhost:" + BusServer.getPort(3) + "/SoapContext/HttpsPort");
         //
         // Mixed Issuer DN (ALL)
         //
-        testFailedCall("https://localhost:" + PORT4 + "/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + BusServer.getPort(4) + "/SoapContext/HttpsPort");
         //
         // Mixed Issuer DN (ANY)
         //
-        testSuccessfulCall("https://localhost:" + PORT5 + "/SoapContext/HttpsPort");
+        testSuccessfulCall("https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort");
         //
         // Bad server Subject DN
         //
-        testFailedCall("https://localhost:" + PORT6 + "/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + BusServer.getPort(6) + "/SoapContext/HttpsPort");
         //
         // Bad server Issuer DN
         //
-        testFailedCall("https://localhost:" + PORT7 + "/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + BusServer.getPort(7) + "/SoapContext/HttpsPort");
         
         stopServers();
     }
