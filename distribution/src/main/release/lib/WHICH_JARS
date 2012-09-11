@@ -56,8 +56,10 @@ For XML Configuration support:
 - spring-beans.jar
 - spring-context.jar
 - spring-core.jar
-- spring.web.jar
 - FastInfoset.jar
+
+For hosting web services within WARs while using Spring-based CXFServlet:
+- spring.web.jar
 
 For standalone HTTP support:
 - geronimo-servlet.jar
