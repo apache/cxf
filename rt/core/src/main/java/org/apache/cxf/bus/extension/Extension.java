@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
@@ -222,16 +223,35 @@ public class Extension {
                                              ex.getCause());
             } catch (InstantiationException ex) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
-            } catch (Exception ex) {
+            } catch (SecurityException ex) {
+                throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
+            } catch (NoSuchMethodException e) {
                 //ignore
             }
-            obj = cls.newInstance();
+            obj = cls.getConstructor().newInstance();
         } catch (ExtensionException ex) {
             throw ex;
         } catch (IllegalAccessException ex) {
             throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
         } catch (InstantiationException ex) {
             throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
+        } catch (IllegalArgumentException e) {
+            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
+        } catch (SecurityException e) {
+            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
+        } catch (InvocationTargetException ex) {
+            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), 
+                                         ex.getCause());
+        } catch (NoSuchMethodException ex) {
+            List<Object> a = new ArrayList<Object>();
+            if (b != null) {
+                a.add(b);
+            }
+            if (args != null) {
+                a.add(args);
+            }
+            throw new ExtensionException(new Message("PROBLEM_FINDING_CONSTRUCTOR", LOG,
+                                                     cls.getName(), a), ex);
         }
         return obj;
     }

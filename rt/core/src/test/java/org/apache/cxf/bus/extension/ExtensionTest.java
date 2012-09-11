@@ -60,15 +60,15 @@ public class ExtensionTest extends Assert {
         try {
             e.load(cl, null);                  
         } catch (ExtensionException ex) {
-            assertTrue("ExtensionException does not wrap IllegalAccessException",
-                       ex.getCause() instanceof IllegalAccessException);
+            assertTrue("ExtensionException does not wrap NoSuchMethodException " + ex.getCause(),
+                       ex.getCause() instanceof NoSuchMethodException);
         } 
         e.setClassname(MyServiceConstructorThrowsException.class.getName());
         try {
             e.load(cl, null);                  
         } catch (ExtensionException ex) {
-            assertTrue("ExtensionException does not wrap InstantiationException",
-                       ex.getCause() instanceof InstantiationException);
+            assertTrue("ExtensionException does not wrap IllegalArgumentException",
+                       ex.getCause() instanceof IllegalArgumentException);
         } 
         e.setClassname("java.lang.String");
         Object obj = e.load(cl, null);
@@ -92,7 +92,7 @@ public class ExtensionTest extends Assert {
         assertNotNull(cls);
     }
     
-    class MyServiceConstructorThrowsException {
+    static class MyServiceConstructorThrowsException {
         public MyServiceConstructorThrowsException() {
             throw new IllegalArgumentException();
         }
