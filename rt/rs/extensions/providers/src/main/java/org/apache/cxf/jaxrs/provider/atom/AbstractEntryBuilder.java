@@ -42,4 +42,13 @@ public abstract class AbstractEntryBuilder<T> extends AbstractAtomElementBuilder
     public String getSummary(T pojo) {
         return null;
     }
+    
+    /**
+     * 
+     * @param pojo Object which is being mapped
+     * @return entry content
+     */
+    public String getContent(T pojo) {
+        return null;
+    }
 }
