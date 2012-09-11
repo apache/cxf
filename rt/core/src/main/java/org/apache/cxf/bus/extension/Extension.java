@@ -163,8 +163,8 @@ public class Extension {
         return clazz;
     }
     public Object load(ClassLoader cl, Bus b) {
+        Class<?> cls = getClassObject(cl);
         try {
-            Class<?> cls = getClassObject(cl);
             try {
                 //if there is a Bus constructor, use it.
                 if (b != null && args == null) {
@@ -198,9 +198,9 @@ public class Extension {
         } catch (ExtensionException ex) {
             throw ex;
         } catch (IllegalAccessException ex) {
-            throw new ExtensionException(ex);
+            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
         } catch (InstantiationException ex) {
-            throw new ExtensionException(ex);
+            throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), ex);
         }
         return obj;
     }
