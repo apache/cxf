@@ -31,6 +31,13 @@ http://www.springframework.org/schema/util/spring-util.xsd">
     <property name="atomBuilders" ref="atomBuilders"/>
   </bean>
   
+  <bean id="atomNoJaxb" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
+    <property name="atomWriters" ref="atomWriters"/>
+    <property name="atomBuilders" ref="atomBuilders"/>
+    <property name="useJaxbForContent" value="false"/>
+    <property name="entryContentMethodName" value="getXMLContent"/>
+  </bean>
+  
   <bean id="atom2" class="org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider">
     <property name="atomWriters" ref="atomWriters2"/>
     <property name="atomBuilders" ref="atomBuilders2"/>

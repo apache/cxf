@@ -70,6 +70,7 @@ public class AtomPojoProvider<T> extends AbstractConfigurableProvider
     
     private static final Logger LOG = LogUtils.getL7dLogger(AtomPojoProvider.class);
     private static final Abdera ATOM_ENGINE = new Abdera();
+    private static final String DEFAULT_ENTRY_CONTENT_METHOD = "getContent";
     
     private JAXBElementProvider<T> jaxbProvider = new JAXBElementProvider<T>();
     private Map<String, String> collectionGetters = Collections.emptyMap();
@@ -80,6 +81,16 @@ public class AtomPojoProvider<T> extends AbstractConfigurableProvider
     
     private MessageContext mc;   
     private boolean formattedOutput;
+    private boolean useJaxbForContent = true;
+    private String entryContentMethodName = DEFAULT_ENTRY_CONTENT_METHOD;
+    
+    public void setUseJaxbForContent(boolean use) {
+        this.useJaxbForContent = use;
+    }
+    
+    public void setEntryContentMethodName(String name) {
+        this.entryContentMethodName = name;
+    }
     
     @Context
     public void setMessageContext(MessageContext context) {
@@ -343,16 +354,27 @@ public class AtomPojoProvider<T> extends AbstractConfigurableProvider
     
     protected void createEntryContent(Entry e, Object o, Class<?> cls) throws Exception {
     
+        String content = null;
+        
+        if (useJaxbForContent) {
+            JAXBContext jc = jaxbProvider.getJAXBContext(cls, cls);
+            StringWriter writer = new StringWriter();
+            jc.createMarshaller().marshal(o, writer);
+            content = writer.toString();
+        } else {
+            Method m = cls.getMethod(entryContentMethodName, new Class[]{});
+            content = (String)m.invoke(o, new Object[]{});
+        }
+        
+        setEntryContent(e, content);
+        
+    }
+    
+    protected void setEntryContent(Entry e, String content) {
         Factory factory = Abdera.getNewFactory();
-        JAXBContext jc = jaxbProvider.getJAXBContext(cls, cls);
-        
-        StringWriter writer = new StringWriter();
-        jc.createMarshaller().marshal(o, writer);
-        
         e.setContentElement(factory.newContent());
         e.getContentElement().setContentType(Content.Type.XML);
-        e.getContentElement().setValue(writer.toString());
-        
+        e.getContentElement().setValue(content);
     }
     
     protected <X> void setEntryProperties(Factory factory, Entry entry, 
@@ -417,6 +439,11 @@ public class AtomPojoProvider<T> extends AbstractConfigurableProvider
             for (String term : terms) {
                 entry.addCategory(term);
             }
+        }
+        
+        String content = theBuilder.getContent(o);
+        if (content != null) {
+            setEntryContent(entry, content);    
         }
         
     }

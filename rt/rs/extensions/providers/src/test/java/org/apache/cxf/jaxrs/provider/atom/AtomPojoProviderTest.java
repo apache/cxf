@@ -75,6 +75,40 @@ public class AtomPojoProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteFeedWithBuildersNoJaxb() throws Exception {
+        @SuppressWarnings("unchecked")
+        AtomPojoProvider<Books> provider = (AtomPojoProvider<Books>)ctx.getBean("atomNoJaxb");
+        assertNotNull(provider);
+        provider.setFormattedOutput(true);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        
+        Books books = new Books();
+        List<Book> bs = new ArrayList<Book>();
+        bs.add(new Book("a"));
+        bs.add(new Book("b"));
+        books.setBooks(bs);
+        provider.writeTo(books, Books.class, Books.class, new Annotation[]{},
+                         MediaType.valueOf("application/atom+xml"), null, bos);
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        Feed feed = new AtomFeedProvider().readFrom(Feed.class, null, null, null, null, bis);
+        assertEquals("Books", feed.getTitle()); 
+        List<Entry> entries = feed.getEntries();
+        assertEquals(2, entries.size());
+        
+        Entry entryA = getEntry(entries, "a");
+        verifyEntry(entryA, "a");
+        String entryAContent = entryA.getContent();
+        assertTrue("<a/>".equals(entryAContent) || "<a><a/>".equals(entryAContent)
+                   || "<a xmlns=\"\"/>".equals(entryAContent));
+        
+        Entry entryB = getEntry(entries, "b");
+        verifyEntry(entryB, "b");
+        String entryBContent = entryB.getContent();
+        assertTrue("<b/>".equals(entryBContent) || "<b><b/>".equals(entryBContent)
+                   || "<b xmlns=\"\"/>".equals(entryBContent));
+    }
+    
+    @Test
     public void testWriteEntryWithBuilders() throws Exception {
         @SuppressWarnings("unchecked")
         AtomPojoProvider<Book> provider = (AtomPojoProvider<Book>)ctx.getBean("atom2");
@@ -160,7 +194,7 @@ public class AtomPojoProviderTest extends Assert {
         assertNotNull(e);
         assertEquals(title, e.getTitle());
     }
- 
+    
     public static class CustomFeedWriter implements AtomElementWriter<Feed, Books> {
 
         public void writeTo(Feed feed, Books pojoFeed) {
@@ -245,6 +279,9 @@ public class AtomPojoProviderTest extends Assert {
             return name;
         }
         
+        public String getXMLContent() {
+            return "<" + name + "/>";
+        }
         
     }
     
