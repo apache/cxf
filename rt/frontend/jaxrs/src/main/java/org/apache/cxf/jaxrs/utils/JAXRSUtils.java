@@ -1376,6 +1376,7 @@ public final class JAXRSUtils {
                 new ContainerResponseContextImpl(r, m, ori);
             for (ProviderInfo<ContainerResponseFilter> filter : containerFilters) {
                 try {
+                    InjectionUtils.injectContexts(filter.getProvider(), filter, m);
                     filter.getProvider().filter(requestContext, responseContext);
                 } catch (IOException ex) {
                     throw new WebApplicationException(ex);

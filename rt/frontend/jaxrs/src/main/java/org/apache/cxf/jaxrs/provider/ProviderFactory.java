@@ -38,6 +38,8 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
@@ -103,6 +105,7 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
+    
     // RequestHandler & ResponseHandler will have to be deprecated for 2.7.0
     private List<ProviderInfo<RequestHandler>> requestHandlers = 
         new ArrayList<ProviderInfo<RequestHandler>>(1);
@@ -128,8 +131,6 @@ public final class ProviderFactory {
     private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
         new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
     
-    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
-        new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
     
@@ -142,6 +143,14 @@ public final class ProviderFactory {
         new LinkedList<ProviderInfo<?>>();
     
     private Bus bus;
+    
+    // Client-only providers, consider introducing ClientProviderFactory
+    private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters = 
+        new ArrayList<ProviderInfo<ClientRequestFilter>>(1);
+    private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters = 
+        new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
+    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
+        new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
     
     private ProviderFactory(Bus bus) {
         this.bus = bus;
@@ -486,6 +495,14 @@ public final class ProviderFactory {
                                             names);
     }
     
+    public List<ProviderInfo<ClientRequestFilter>> getClientRequestFilters() {
+        return Collections.unmodifiableList(clientRequestFilters);
+    }
+    
+    public List<ProviderInfo<ClientResponseFilter>> getClientResponseFilters() {
+        return Collections.unmodifiableList(clientResponseFilters);
+    }
+    
     private static <T> List<ProviderInfo<T>> getPostMatchContainerFilters(List<ProviderInfo<T>> globalFilters,
                                                                          Map<String, ProviderInfo<T>> boundFilters,
                                                                          List<String> names) {
@@ -612,6 +629,16 @@ public final class ProviderFactory {
                    new ProviderInfo<ContainerResponseFilter>((ContainerResponseFilter)o, bus)); 
             }
             
+            if (ClientRequestFilter.class.isAssignableFrom(oClass)) {
+                clientRequestFilters.add(
+                   new ProviderInfo<ClientRequestFilter>((ClientRequestFilter)o, bus));
+            }
+            
+            if (ClientResponseFilter.class.isAssignableFrom(oClass)) {
+                clientResponseFilters.add(
+                   new ProviderInfo<ClientResponseFilter>((ClientResponseFilter)o, bus));
+            }
+            
             if (ExceptionMapper.class.isAssignableFrom(oClass)) {
                 exceptionMappers.add(new ProviderInfo<ExceptionMapper<?>>((ExceptionMapper<?>)o, bus)); 
             }
@@ -632,7 +659,8 @@ public final class ProviderFactory {
         injectContextProxies(messageReaders, messageWriters, contextResolvers, 
             requestHandlers, responseHandlers, exceptionMappers,
             boundContainerRequestFilters.values(), globalPreContainerRequestFilters, globalContainerRequestFilters,
-            boundContainerResponseFilters.values(), globalPreContainerResponseFilters, globalContainerResponseFilters);
+            boundContainerResponseFilters.values(), globalPreContainerResponseFilters, globalContainerResponseFilters,
+            responseExceptionMappers, clientRequestFilters, clientResponseFilters);
     }
 //CHECKSTYLE:ON
     
@@ -961,6 +989,8 @@ public final class ProviderFactory {
         globalPreContainerResponseFilters.clear();
         paramHandlers.clear();
         responseExceptionMappers.clear();
+        clientRequestFilters.clear();
+        clientResponseFilters.clear();
     }
     
     public void setBus(Bus bus) {
