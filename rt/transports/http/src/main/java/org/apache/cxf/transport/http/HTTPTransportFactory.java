@@ -63,13 +63,6 @@ public class HTTPTransportFactory
     implements WSDLEndpointFactory, ConduitInitiator, DestinationFactory {
     
 
-    public interface HTTPConduitFactory {
-        HTTPConduit createConduit(HTTPTransportFactory f,
-                                  EndpointInfo localInfo,
-                                  EndpointReferenceType target) throws IOException;
-    }
-        
-    
     public static final List<String> DEFAULT_NAMESPACES 
         = Arrays.asList(
             "http://cxf.apache.org/transports/http",
