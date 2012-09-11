@@ -85,6 +85,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
 
     private void changeToOneway(Exchange exchange) {
         exchange.setOneWay(true);
+        exchange.setOutMessage(null);
         javax.servlet.http.HttpServletResponse httpresp = 
             (javax.servlet.http.HttpServletResponse)exchange.getInMessage().
                 get("HTTP.RESPONSE");
