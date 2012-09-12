@@ -62,6 +62,16 @@ under the License.
             type="String" 
             default="ASYNC_ONLY" 
             description="" /> 
+        <AD name="MAX_CONNECTIONS" 
+            id="org.apache.cxf.transport.http.async.MAX_CONNECTIONS"
+            type="Integer" 
+            default="5000" 
+            description="" /> 
+        <AD name="MAX_PER_HOST_CONNECTIONS" 
+            id="org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS"
+            type="Integer" 
+            default="1000" 
+            description="" /> 
     </OCD>
     <Designate pid="org.apache.cxf.transport.http.async">
         <Object ocdref="org.apache.cxf.transport.http.async" />

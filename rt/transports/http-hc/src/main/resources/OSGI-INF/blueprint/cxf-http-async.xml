@@ -37,9 +37,11 @@ under the License.
       <cm:property name="org.apache.cxf.transport.http.async.SO_TIMEOUT" value="0"/>
 
       <cm:property name="org.apache.cxf.transport.http.async.usePolicy" value="ASYNC_ONLY"/>
+      
+      <cm:property name="org.apache.cxf.transport.http.async.MAX_CONNECTIONS" value="5000"/>
+      <cm:property name="org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS" value="1000"/>
     </cm:default-properties>
   </cm:property-placeholder>
-
 
   <bean id="osgiAsyncCondFact" 
       class="org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory"
@@ -56,8 +58,12 @@ under the License.
             <entry key="org.apache.cxf.transport.http.async.SO_TIMEOUT" value="${org.apache.cxf.transport.http.async.SO_TIMEOUT}"/>
 
             <entry key="org.apache.cxf.transport.http.async.usePolicy" value="${org.apache.cxf.transport.http.async.usePolicy}"/>
+            <entry key="org.apache.cxf.transport.http.async.MAX_CONNECTIONS" value="${org.apache.cxf.transport.http.async.MAX_CONNECTIONS}"/>
+            <entry key="org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS" value="${org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS}"/>
         </map>
     </argument>
+    <cm:managed-properties persistent-id="org.apache.cxf.transport.http.async"
+                        update-strategy="component-managed" update-method="update"/> 
   </bean>
 
   <service ref="osgiAsyncCondFact" interface="org.apache.cxf.transport.http.HTTPConduitFactory"/>

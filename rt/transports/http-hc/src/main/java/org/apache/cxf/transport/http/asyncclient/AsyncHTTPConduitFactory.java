@@ -72,6 +72,11 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     public static final String SO_LINGER = "org.apache.cxf.transport.http.async.SO_LINGER";
     public static final String SO_TIMEOUT = "org.apache.cxf.transport.http.async.SO_LINGER";
 
+    //ConnectionPool
+    public static final String MAX_CONNECTIONS = "org.apache.cxf.transport.http.async.MAX_CONNECTIONS";
+    public static final String MAX_PER_HOST_CONNECTIONS 
+        = "org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS";
+    
     //AsycClient specific props
     public static final String THREAD_COUNT = "org.apache.cxf.transport.http.async.ioThreadCount";
     public static final String INTEREST_OP_QUEUED = "org.apache.cxf.transport.http.async.interestOpQueued";
@@ -86,11 +91,14 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     };
     
     final IOReactorConfig config = new IOReactorConfig();
-    CXFAsyncRequester requester;
-    ConnectingIOReactor ioReactor;
-    PoolingClientAsyncConnectionManager connectionManager;
+    volatile CXFAsyncRequester requester;
+    volatile ConnectingIOReactor ioReactor;
+    volatile PoolingClientAsyncConnectionManager connectionManager;
+    
     boolean isShutdown;
     UseAsyncPolicy policy;
+    int maxConnections = 5000;
+    int maxPerRoute = 1000;
     
     
     public AsyncHTTPConduitFactory(Map<String, Object> conf) {
@@ -111,16 +119,26 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         return policy;
     }
     
-    private void setProperties(Map<String, Object> s) {
-        config.setIoThreadCount(getInt(s.get(THREAD_COUNT), Runtime.getRuntime().availableProcessors()));
-        config.setInterestOpQueued(getBoolean(s.get(INTEREST_OP_QUEUED), false));
-        config.setSelectInterval(getInt(s.get(SO_LINGER), 1000));
-        
-        config.setTcpNoDelay(getBoolean(s.get(TCP_NODELAY), true));
-        config.setSoLinger(getInt(s.get(SO_LINGER), -1));
-        config.setSoKeepalive(getBoolean(s.get(SO_KEEPALIVE), false));
-        config.setSoTimeout(getInt(s.get(SO_TIMEOUT), 0));
-        
+    public void update(Map<String, Object> props) {
+        if (setProperties(props) && ioReactor != null) {
+            restartReactor(); 
+        }
+    }
+    private void restartReactor() {
+        ConnectingIOReactor ioReactor2 = ioReactor;
+        PoolingClientAsyncConnectionManager connectionManager2 = connectionManager;
+        resetVars();
+        shutdown(ioReactor2, connectionManager2);
+    }
+    private synchronized void resetVars() {
+        requester = null;
+        ioReactor = null;
+        connectionManager = null;
+    }
+    
+
+    private boolean setProperties(Map<String, Object> s) {
+        //properties that can be updated "live"
         Object st = s.get(USE_POLICY);
         if (st == null) {
             st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
@@ -132,6 +150,46 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         } else {
             policy = UseAsyncPolicy.ASYNC_ONLY;
         }
+        
+        maxConnections = getInt(s.get(MAX_CONNECTIONS), maxConnections);
+        maxPerRoute = getInt(s.get(MAX_PER_HOST_CONNECTIONS), maxPerRoute);
+        if (connectionManager != null) {
+            connectionManager.setMaxTotal(maxConnections);
+            connectionManager.setDefaultMaxPerRoute(maxPerRoute);
+        }
+        
+        //properties that need a restart of the reactor
+        boolean changed = false;
+        
+        int i = config.getIoThreadCount();
+        config.setIoThreadCount(getInt(s.get(THREAD_COUNT), Runtime.getRuntime().availableProcessors()));
+        changed |= i != config.getIoThreadCount();
+        
+        long l = config.getSelectInterval();
+        config.setSelectInterval(getInt(s.get(SELECT_INTERVAL), 1000));
+        changed |= l != config.getSelectInterval();
+
+        i = config.getSoLinger();
+        config.setSoLinger(getInt(s.get(SO_LINGER), -1));
+        changed |= i != config.getSoLinger();
+
+        i = config.getSoTimeout();
+        config.setSoTimeout(getInt(s.get(SO_TIMEOUT), 0));
+        changed |= i != config.getSoTimeout();
+
+        boolean b = config.isInterestOpQueued();
+        config.setInterestOpQueued(getBoolean(s.get(INTEREST_OP_QUEUED), false));
+        changed |= b != config.isInterestOpQueued();
+        
+        b = config.isTcpNoDelay();
+        config.setTcpNoDelay(getBoolean(s.get(TCP_NODELAY), true));
+        changed |= b != config.isTcpNoDelay();
+
+        b = config.isSoKeepalive();
+        config.setSoKeepalive(getBoolean(s.get(SO_KEEPALIVE), false));
+        changed |= b != config.isSoKeepalive();
+                
+        return changed;
     }
     private int getInt(Object s, int defaultv) {
         int i = defaultv;
@@ -183,23 +241,29 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     
     public void shutdown() {
         if (ioReactor != null) {
-            try {
-                connectionManager.shutdown();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            try {
-                ioReactor.shutdown();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            shutdown(ioReactor, connectionManager);
             connectionManager = null;
             ioReactor = null;
             requester = null;
         }
         isShutdown = true;
     }
-    
+    private static void shutdown(ConnectingIOReactor ioReactor2,
+                          PoolingClientAsyncConnectionManager connectionManager2) {
+        
+        try {
+            connectionManager2.shutdown();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            ioReactor2.shutdown();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void addListener(Bus b) {
         b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
     }
@@ -270,8 +334,8 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
             }
             
         };
-        connectionManager.setDefaultMaxPerRoute(2500);
-        connectionManager.setMaxTotal(5000);
+        connectionManager.setDefaultMaxPerRoute(maxPerRoute);
+        connectionManager.setMaxTotal(maxConnections);
         requester = new CXFAsyncRequester(connectionManager);
     }
     
