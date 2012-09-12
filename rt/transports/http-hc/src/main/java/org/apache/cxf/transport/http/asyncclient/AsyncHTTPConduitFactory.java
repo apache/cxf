@@ -95,6 +95,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     
     public AsyncHTTPConduitFactory(Map<String, Object> conf) {
         super();
+        System.out.println(conf);
         config.setTcpNoDelay(true);
         setProperties(conf);
     }
