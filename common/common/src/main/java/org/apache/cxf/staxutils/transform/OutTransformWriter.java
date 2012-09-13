@@ -153,6 +153,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     @Override
     public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
         currentDepth++;
+        namespaceContext.down();
         if (matchesDropped(false)) {
             return;
         }
@@ -293,6 +294,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeEndElement() throws XMLStreamException {
+        namespaceContext.up();
         --currentDepth;
         if (matchesDropped(false)) {
             return;

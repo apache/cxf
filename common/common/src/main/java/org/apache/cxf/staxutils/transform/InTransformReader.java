@@ -111,6 +111,7 @@ public class InTransformReader extends DepthXMLStreamReader {
         int event = super.next();
         if (event == XMLStreamConstants.START_ELEMENT) {
             attributesIndexed = false;
+            namespaceContext.down();
             final QName theName = super.getName();
             final ElementProperty appendProp = inAppendMap.remove(theName);
             final boolean replaceContent = appendProp != null && theName.equals(appendProp.getName());
@@ -168,6 +169,7 @@ public class InTransformReader extends DepthXMLStreamReader {
                 LOG.fine("read EndElement " + theName + " at " + getDepth());
             }
             
+            namespaceContext.up();
             final boolean dropped = inDropSet.contains(theName);
             if (!dropped) {
                 List<ParsingEvent> pe = pushedAheadEvents.pop();
