@@ -28,7 +28,12 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
@@ -113,6 +118,17 @@ public class CXFAsyncRequester {
             }
         };
         context.setAttribute(ClientContext.SCHEME_REGISTRY, reg);
+        //CXF handles redirects ourselves
+        dhac.setRedirectStrategy(new RedirectStrategy() {
+            public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)
+                throws ProtocolException {
+                return false;
+            }
+            public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context)
+                throws ProtocolException {
+                return null;
+            }
+        });
         dhac.execute(requestProducer, responseConsumer, context, callback);
 
         return future;
