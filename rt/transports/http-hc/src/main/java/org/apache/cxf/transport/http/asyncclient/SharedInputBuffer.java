@@ -255,7 +255,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
             if (!hasData()) {
                 this.waitingBuffer = ByteBuffer.wrap(b, off, len);
                 waitForData();
-                int i = waitingBuffer.position();
+                int i = waitingBuffer.position() - off;
                 waitingBuffer = null;
                 if (i > 0) {
                     //++waitCnt;
