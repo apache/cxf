@@ -218,6 +218,74 @@ public class OutTransformWriterTest extends Assert {
     }
 
     @Test
+    public void testReadWithComplexTransformationNamespace2() throws Exception {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://testbeans.com/double}*", 
+            "{http://testbeans.com/double/v2}*");
+        map.put("{http://testbeans.com}*", 
+            "{http://testbeans.com/v3}*");
+        
+        // the namespaces are prefixed in the input
+        XMLStreamReader reader = 
+            TransformTestUtils.createOutTransformedStreamReader("../resources/doubleBeanIn1.xml", 
+                                                                map, null, null, null, false, null);
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/doubleBean.xml"));        
+        TransformTestUtils.verifyReaders(reader2, reader, true, false);
+
+        // the child elements with the default namespace that is declared in the elements
+        reader = 
+            TransformTestUtils.createOutTransformedStreamReader("../resources/doubleBeanIn2.xml", 
+                                                                map, null, null, null, false, null);
+        reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/doubleBean.xml"));        
+        TransformTestUtils.verifyReaders(reader2, reader, true, false);
+
+        // the child elements with the default namespace that is declared in their parent element
+        reader = 
+            TransformTestUtils.createOutTransformedStreamReader("../resources/doubleBeanIn3.xml", 
+                                                                map, null, null, null, false, null);
+        reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/doubleBean.xml"));        
+        TransformTestUtils.verifyReaders(reader2, reader, true, false);
+        
+        // writing each child separately (as the soap header children are serialized)
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        XMLStreamWriter writer =
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, "UTF-8"), 
+                                   map, null,
+                                   null, null, false, null);
+        boolean nsset = "ns3".equals(writer.getNamespaceContext().getPrefix("http://testbeans.com/double"));
+        writer.writeStartElement("ns3", "testDoubleBean", "http://testbeans.com/double");
+        if (!nsset) {
+            writer.writeNamespace("ns3", "http://testbeans.com/double");
+        }
+        nsset = "".equals(writer.getNamespaceContext().getPrefix("http://testbeans.com"));
+        writer.writeStartElement("", "bean", "http://testbeans.com");
+        if (!nsset) {
+            writer.writeNamespace("", "http://testbeans.com");    
+        }
+        writer.writeEndElement();
+        nsset = "".equals(writer.getNamespaceContext().getPrefix("http://testbeans.com"));
+        writer.writeStartElement("", "beanNext", "http://testbeans.com");
+        if (!nsset) {
+            writer.writeNamespace("", "http://testbeans.com");    
+        }
+        writer.writeEndElement();
+        writer.writeEndElement();
+        writer.flush();
+        
+        reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(os.toByteArray()));
+        reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/doubleBean.xml"));        
+        TransformTestUtils.verifyReaders(reader2, reader, true, false);
+    }
+
+    @Test
     public void testReadWithReplaceAppend() throws Exception {
         Map<String, String> transformElements = new HashMap<String, String>();
         transformElements.put("requestValue",
