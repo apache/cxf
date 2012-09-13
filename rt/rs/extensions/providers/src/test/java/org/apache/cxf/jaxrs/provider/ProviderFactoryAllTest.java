@@ -17,26 +17,47 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.provider.json;
+package org.apache.cxf.jaxrs.provider;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.atom.AtomPojoProvider;
+import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.Chapter;
 import org.apache.cxf.message.MessageImpl;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProviderFactoryJsonTest extends Assert {
+public class ProviderFactoryAllTest extends Assert {
 
     @Before
     public void setUp() {
         ProviderFactory.getInstance().clearProviders();
     }
+    
+    @Test
+    public void testAtomPojoProvider() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        AtomPojoProvider provider = new AtomPojoProvider();
+        pf.registerUserProvider(provider);
+        MessageBodyReader<?> feedReader = pf.createMessageBodyReader(Book.class,
+                                               Book.class, null, 
+                                               MediaType.valueOf("application/atom+xml"), 
+                                               new MessageImpl());
+        assertSame(feedReader, provider);
+        
+        MessageBodyReader<?> entryReader = pf.createMessageBodyReader(Chapter.class, 
+                                               Chapter.class, null, 
+                                               MediaType.valueOf("application/atom+xml;type=entry"), 
+                                               new MessageImpl());
+        assertSame(entryReader, provider);
+    }
+    
     
     @Test
     public void testCustomJsonProvider() {
