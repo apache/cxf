@@ -208,6 +208,15 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>async</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-http-hc</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
-
 </project>

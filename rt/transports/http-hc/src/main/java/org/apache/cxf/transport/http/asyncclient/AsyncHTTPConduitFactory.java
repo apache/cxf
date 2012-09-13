@@ -147,6 +147,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         } else if (st instanceof String) {
             policy = UseAsyncPolicy.valueOf((String)st);
         } else {
+            //policy = UseAsyncPolicy.ALWAYS;
             policy = UseAsyncPolicy.ASYNC_ONLY;
         }
         
