@@ -400,6 +400,7 @@
                             <derby.system.home>${basedir}/target/derby</derby.system.home>
                             <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                             <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
+                            <org.apache.cxf.transport.http.async.usePolicy>ALWAYS</org.apache.cxf.transport.http.async.usePolicy>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
