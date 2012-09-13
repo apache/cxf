@@ -169,12 +169,20 @@ public class SharedInputBuffer extends ExpandableBuffer {
         }
     }
 
-    protected void waitForData() throws IOException {
+    protected void waitForData(int waitPos) throws IOException {
         this.lock.lock();
         try {
             try {
-                while ((this.waitingBuffer != null && this.waitingBuffer.position() == 0) 
-                    && !super.hasData() && !this.endOfStream) {
+                while (true) {
+                    if (this.waitingBuffer != null && this.waitingBuffer.position() > waitPos) {
+                        return;
+                    }
+                    if (super.hasData()) {
+                        return;
+                    }
+                    if (this.endOfStream) {
+                        return;
+                    }
                     if (this.shutdown) {
                         throw new InterruptedIOException("Input operation aborted");
                     }
@@ -231,12 +239,13 @@ public class SharedInputBuffer extends ExpandableBuffer {
         }
         this.lock.lock();
         try {
-            if (!hasData()) {
-                waitForData();
+            if (!super.hasData()) {
+                waitForData(0);
             }
             if (isEndOfStream()) {
                 return -1;
             }
+            setOutputMode();
             return this.buffer.get() & 0xff;
         } finally {
             this.lock.unlock();
@@ -254,7 +263,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
         try {
             if (!hasData()) {
                 this.waitingBuffer = ByteBuffer.wrap(b, off, len);
-                waitForData();
+                waitForData(off);
                 int i = waitingBuffer.position() - off;
                 waitingBuffer = null;
                 if (i > 0) {
