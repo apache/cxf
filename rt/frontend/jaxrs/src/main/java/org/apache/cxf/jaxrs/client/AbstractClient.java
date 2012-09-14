@@ -51,6 +51,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -59,8 +60,11 @@ import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Retryable;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.jaxrs.client.spec.ClientRequestFilterInterceptor;
+import org.apache.cxf.jaxrs.client.spec.ClientResponseFilterInterceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -74,6 +78,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
@@ -326,6 +331,13 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
+        Response response = exchange.get(Response.class);
+        if (response != null) {
+            ResponseBuilder rb = Response.fromResponse(response);
+            state.setResponseBuilder(rb);
+            return rb.clone();
+        }
+        
         Integer status = getResponseCode(exchange);
         ResponseBuilder currentResponseBuilder = Response.status(status);
         
@@ -760,7 +772,9 @@ public abstract class AbstractClient implements Client, Retryable {
         List<Interceptor<? extends Message>> i1 = cfg.getBus().getOutInterceptors();
         List<Interceptor<? extends Message>> i2 = cfg.getOutInterceptors();
         List<Interceptor<? extends Message>> i3 = cfg.getConduitSelector().getEndpoint().getOutInterceptors();
-        return new PhaseChainCache().get(pm.getOutPhases(), i1, i2, i3);
+        PhaseInterceptorChain chain = new PhaseChainCache().get(pm.getOutPhases(), i1, i2, i3);
+        chain.add(new ClientRequestFilterInterceptor());
+        return chain;
     }
     
     protected static PhaseInterceptorChain setupInInterceptorChain(ClientConfiguration cfg) { 
@@ -768,8 +782,9 @@ public abstract class AbstractClient implements Client, Retryable {
         List<Interceptor<? extends Message>> i1 = cfg.getBus().getInInterceptors();
         List<Interceptor<? extends Message>> i2 = cfg.getInInterceptors();
         List<Interceptor<? extends Message>> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
-        
-        return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
+        PhaseInterceptorChain chain = new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
+        chain.add(new ClientResponseFilterInterceptor());
+        return chain;
     }
     
     protected Message createMessage(Object body,
@@ -887,4 +902,37 @@ public abstract class AbstractClient implements Client, Retryable {
         outMessage.getExchange().put("org.apache.cxf.resource.operation.name", name);
     }
     
+    protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
+
+        public AbstractBodyWriter() {
+            super(Phase.WRITE);
+        }
+        
+        @SuppressWarnings("unchecked")
+        public void handleMessage(Message outMessage) throws Fault {
+            
+            MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
+            if (objs == null || objs.size() == 0) {
+                return;
+            }
+            
+            OutputStream os = outMessage.getContent(OutputStream.class);
+            if (os == null) {
+                XMLStreamWriter writer = outMessage.getContent(XMLStreamWriter.class);
+                if (writer == null) {
+                    return;
+                }
+            }
+            
+            MultivaluedMap<String, Object> headers = 
+                (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
+            
+            Object body = objs.get(0);
+            
+            doWriteBody(outMessage, body, headers, os);
+        }
+        
+        protected abstract void doWriteBody(Message outMessage, Object body,
+                                 MultivaluedMap<String, Object> headers, OutputStream os) throws Fault;
+    }
 }

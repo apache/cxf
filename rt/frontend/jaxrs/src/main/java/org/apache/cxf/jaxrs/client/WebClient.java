@@ -40,13 +40,11 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
@@ -58,8 +56,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.phase.Phase;
 
 
 /**
@@ -802,8 +798,6 @@ public class WebClient extends AbstractClient {
         try {
             Object[] results = preProcessResult(m);
             if (results != null && results.length == 1) {
-                // this can happen if a connection exception has occurred and
-                // failover feature used this client to invoke on a different address  
                 return (Response)results[0];
             }
         } catch (Exception ex) {
@@ -856,27 +850,11 @@ public class WebClient extends AbstractClient {
     }
     
     
-    private class BodyWriter extends AbstractOutDatabindingInterceptor {
+    private class BodyWriter extends AbstractBodyWriter {
 
-        public BodyWriter() {
-            super(Phase.WRITE);
-        }
-        
-        @SuppressWarnings("unchecked")
-        public void handleMessage(Message outMessage) throws Fault {
-            
-            OutputStream os = outMessage.getContent(OutputStream.class);
-            XMLStreamWriter writer = outMessage.getContent(XMLStreamWriter.class);
-            if (os == null && writer == null) {
-                return;
-            }
-            MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
-            if (objs == null || objs.size() == 0) {
-                return;
-            }
-            MultivaluedMap<String, Object> headers = 
-                (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
-            Object body = objs.get(0);
+        protected void doWriteBody(Message outMessage, Object body,
+                                   MultivaluedMap<String, Object> headers, 
+                                   OutputStream os) throws Fault {    
             
             Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);
             Class<?> requestClass = null;

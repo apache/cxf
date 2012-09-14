@@ -54,6 +54,7 @@ import org.apache.cxf.message.Message;
 public final class ResponseImpl extends Response {
     private int status;
     private Object entity;
+    private Annotation[] entityAnnotations; 
     private MultivaluedMap<String, Object> metadata;
     
     private Message responseMessage;
@@ -77,8 +78,13 @@ public final class ResponseImpl extends Response {
         this.status = s;
     }
     
-    void setEntity(Object entity) { 
-        this.entity = entity;
+    void setEntity(Object e, Annotation[] anns) { 
+        this.entity = e;
+        this.entityAnnotations = anns;
+    }
+    
+    Annotation[] getEntityAnnotations() {
+        return entityAnnotations;
     }
 
     //TODO: This method is needed because on the client side the

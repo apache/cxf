@@ -22,15 +22,20 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.Configuration;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.AbstractRequestContextImpl;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
+
 
 public class ClientRequestContextImpl extends AbstractRequestContextImpl
     implements ClientRequestContext {
@@ -82,21 +87,25 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     }
 
     @Override
-    public URI getUri() {
-        String requestURI = (String)m.get(Message.REQUEST_URI);
-        return requestURI  == null ? null : URI.create(requestURI);
-    }
-
-    @Override
     public boolean hasEntity() {
         // TODO Auto-generated method stub
         return false;
     }
-
+    
     @Override
-    public void setEntity(Object arg0, Annotation[] arg1, MediaType arg2) {
-        // TODO Auto-generated method stub
+    public void setEntity(Object entity, Annotation[] anns, MediaType mt) {
+        if (mt != null) {
+            MultivaluedMap<String, Object> headers = getHeaders();
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, mt);
+            m.put(Message.CONTENT_TYPE, mt.toString());
+        }
+    }
 
+    
+    @Override
+    public URI getUri() {
+        String requestURI = (String)m.get(Message.REQUEST_URI);
+        return requestURI  == null ? null : URI.create(requestURI);
     }
 
     @Override
@@ -112,15 +121,18 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public MultivaluedMap<String, Object> getHeaders() {
-        return null;    
+        h = null;
+        return new MetadataMap<String, Object>(
+            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, true, true);    
 
     }
 
     @Override
     public MultivaluedMap<String, String> getStringHeaders() {
-        return null;
+        return h.getRequestHeaders();
     }
 
 }

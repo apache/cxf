@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.MediaType;
@@ -35,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
 import org.apache.cxf.message.Message;
+
 
 public abstract class AbstractResponseContextImpl {
 
@@ -111,7 +113,6 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public MultivaluedMap<String, String> getStringHeaders() {
-        //TODO: right now this view is not modifiable
         return r.getStringHeaders();
     }
 
@@ -124,12 +125,24 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public void setEntity(Object entity, Annotation[] anns, MediaType mt) {
-        ((ResponseImpl)r).setEntity(entity);
+        ((ResponseImpl)r).setEntity(entity, anns);
+        if (mt != null) {
+            r.getMetadata().putSingle(HttpHeaders.CONTENT_TYPE, mt);
+            m.put(Message.CONTENT_TYPE, mt.toString());
+        }
         updateMessageResponse();
-        //TODO: review this code after API gets finalized
+    }
+    
+    protected Annotation[] getResponseEntityAnnotations() {
+        return ((ResponseImpl)r).getEntityAnnotations();
+    }
+    
+    protected Class<?> getResponseEntityClass() {
+        return r.getEntity().getClass();
     }
     
     public void setStatus(int status) {
+        m.put(Message.RESPONSE_CODE, status);
         ((ResponseImpl)r).setStatus(status);
         updateMessageResponse();
     }

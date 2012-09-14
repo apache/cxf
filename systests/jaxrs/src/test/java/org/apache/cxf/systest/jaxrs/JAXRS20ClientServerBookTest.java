@@ -19,6 +19,15 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -49,11 +58,55 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     private void doTestBook(String address) {
-        WebClient wc = WebClient.create(address);
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new ClientHeaderRequestFilter());
+        providers.add(new ClientHeaderResponseFilter());
+        WebClient wc = WebClient.create(address, providers);
         Book book = wc.get(Book.class);
         assertEquals(124L, book.getId());
         Response response = wc.getResponse();
         assertEquals("OK", response.getHeaderString("Response"));
         assertEquals("custom", response.getHeaderString("Custom"));
+        assertEquals("simple", response.getHeaderString("Simple"));
+        assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
+    }
+    
+    @Test
+    public void testClientFiltersLocalResponse() {
+        String address = "http://localhost:" + PORT + "/bookstores";
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new ClientCacheRequestFilter());
+        providers.add(new ClientHeaderResponseFilter());
+        WebClient wc = WebClient.create(address, providers);
+        Response r = wc.get();
+        assertEquals(201, r.getStatus());
+        assertEquals("http://localhost/redirect", r.getHeaderString(HttpHeaders.LOCATION));
+    }
+    
+    private static class ClientCacheRequestFilter implements ClientRequestFilter {
+
+        @Override
+        public void filter(ClientRequestContext context) throws IOException {
+            context.abortWith(Response.status(201).build());
+        }
+    }
+    
+    private static class ClientHeaderRequestFilter implements ClientRequestFilter {
+
+        @Override
+        public void filter(ClientRequestContext context) throws IOException {
+            context.getHeaders().putSingle("Simple", "simple");
+        }
+    }
+    
+    private static class ClientHeaderResponseFilter implements ClientResponseFilter {
+
+        @Override
+        public void filter(ClientRequestContext reqContext, 
+                           ClientResponseContext respContext) throws IOException {
+            respContext.getHeaders().putSingle(HttpHeaders.LOCATION, "http://localhost/redirect");
+            
+        }
+        
     }
 }

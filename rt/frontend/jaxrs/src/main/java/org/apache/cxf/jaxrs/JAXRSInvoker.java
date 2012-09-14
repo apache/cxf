@@ -126,6 +126,15 @@ public class JAXRSInvoker extends AbstractInvoker {
         boolean wasSuspended = exchange.remove(REQUEST_WAS_SUSPENDED) != null;
         
         if (!wasSuspended) {
+            
+            // Global and name-bound request filters
+            if (!ori.isSubResourceLocator() && JAXRSUtils.runContainerRequestFilters(
+                                                  providerFactory,
+                                                  exchange.getInMessage(),
+                                                  false, ori.getNameBindings())) {
+                return new MessageContentsList(exchange.get(Response.class));
+            }
+            
             pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), inMessage);
                     
             if (cri.isRoot()) {
@@ -232,14 +241,6 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                          contentType,
                                                          acceptContentType,
                                                          true);
-                // Global and name-bound request filters
-                if (JAXRSUtils.runContainerRequestFilters(
-                                                      providerFactory,
-                                                      exchange.getInMessage(),
-                                                      false, ori.getNameBindings())) {
-                    return new MessageContentsList(exchange.get(Response.class));
-                }                
-
                 exchange.put(OperationResourceInfo.class, subOri);
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
                 // work out request parameters for the sub-resource class. Here we

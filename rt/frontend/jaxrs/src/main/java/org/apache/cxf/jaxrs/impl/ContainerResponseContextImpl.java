@@ -43,18 +43,22 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
     
     @Override
     public Annotation[] getEntityAnnotations() {
-        Method method = ori == null ? null : ori.getAnnotatedMethod();
-        return method == null ? null : method.getAnnotations();
+        Annotation[] anns = super.getResponseEntityAnnotations();
+        if (anns == null) {
+            Method method = ori == null ? null : ori.getAnnotatedMethod();
+            anns = method == null ? new Annotation[]{} : method.getAnnotations();
+        }
+        return anns;
     }
 
     @Override
     public Class<?> getEntityClass() {
-        return ori == null ? null : ori.getMethodToInvoke().getReturnType();
+        return ori == null ? getResponseEntityClass() : ori.getMethodToInvoke().getReturnType();
     }
 
     @Override
     public Type getEntityType() {
-        return ori == null ? null : ori.getMethodToInvoke().getGenericReturnType();
+        return ori == null ? getResponseEntityClass() : ori.getMethodToInvoke().getGenericReturnType();
     }
     
     @Override

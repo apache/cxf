@@ -45,8 +45,11 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     @SuppressWarnings("unchecked")
     @Override
     public MultivaluedMap<String, String> getHeaders() {
-        return new MetadataMap<String, String>(
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, true, true);
+        Object headers = m.get(Message.PROTOCOL_HEADERS);
+        if (headers != null) {
+            return new MetadataMap<String, String>((Map<String, List<String>>)headers, false, true, true);
+        }
+        return (MultivaluedMap<String, String>)(MultivaluedMap<?, ?>)r.getHeaders();
     }
 
     

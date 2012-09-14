@@ -43,13 +43,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -66,8 +64,6 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.phase.Phase;
 
 /**
  * Proxy-based client implementation
@@ -532,8 +528,6 @@ public class ClientProxyImpl extends AbstractClient implements
         
         Object[] results = preProcessResult(outMessage);
         if (results != null && results.length == 1) {
-            // this can happen if a connection exception has occurred and
-            // failover feature used this client to invoke on a different address  
             return results[0];
         }
         
@@ -603,38 +597,23 @@ public class ClientProxyImpl extends AbstractClient implements
         throw new ClientException(errorMsg.toString());
     }
     
-    // TODO : what we really need to do is to refactor JAXRSOutInterceptor so that
-    // it can handle both client requests and server responses - it may need to be split into
-    // several interceptors - in fact we need to do the same for JAXRSInInterceptor so that we can do
-    // on onMessage() properly
-    
-    private class BodyWriter extends AbstractOutDatabindingInterceptor {
-
-        public BodyWriter() {
-            super(Phase.WRITE);
-        }
+    private class BodyWriter extends AbstractBodyWriter {
         
-        @SuppressWarnings("unchecked")
-        public void handleMessage(Message outMessage) throws Fault {
+        protected void doWriteBody(Message outMessage, Object body,
+                                 MultivaluedMap<String, Object> headers, 
+                                 OutputStream os) throws Fault {
+            
             
             OperationResourceInfo ori = outMessage.getContent(OperationResourceInfo.class);
-            OutputStream os = outMessage.getContent(OutputStream.class);
-            if ((os == null && outMessage.getContent(XMLStreamWriter.class) == null)
-                || ori == null) {
+            if (ori == null) {
                 return;
             }
-            MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
-            if (objs == null || objs.size() == 0) {
-                return;
-            }
-            MultivaluedMap<String, Object> headers = 
-                (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
+            
             Method method = ori.getMethodToInvoke();
             int bodyIndex = (Integer)outMessage.get("BODY_INDEX");
             Method aMethod = ori.getAnnotatedMethod();
             Annotation[] anns = aMethod == null || bodyIndex == -1 ? new Annotation[0] 
                                                   : aMethod.getParameterAnnotations()[bodyIndex];
-            Object body = objs.get(0);
             try {
                 if (bodyIndex != -1) {
                     Class<?> paramClass = method.getParameterTypes()[bodyIndex];

@@ -208,11 +208,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
-        // Global and name-bound request filters
-        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, false, ori.getNameBindings())) {
-            return;
-        }
-        
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Request path is: " + rawPath);
             LOG.fine("Request HTTP method is: " + httpMethod);

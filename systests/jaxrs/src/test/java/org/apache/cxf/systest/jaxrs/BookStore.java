@@ -62,6 +62,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriBuilder;
@@ -429,8 +430,14 @@ public class BookStore {
     @GET
     @Path("/bookheaders/simple/")
     @CustomHeaderAdded
-    public Book getBookByHeaderSimple(@HeaderParam("BOOK") String header) throws Exception {
-        return doGetBook(header);
+    public Response getBookByHeaderSimple(@HeaderParam("BOOK") String headerBook,
+                                          @HeaderParam("Simple") String headerSimple) throws Exception {
+        
+        ResponseBuilder builder = Response.ok(doGetBook(headerBook));
+        if (headerSimple != null) {
+            builder.header("Simple", headerSimple);
+        }
+        return builder.build();
     }
     
     @GET

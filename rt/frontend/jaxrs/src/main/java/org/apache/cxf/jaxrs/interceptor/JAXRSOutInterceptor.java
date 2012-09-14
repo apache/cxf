@@ -139,11 +139,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
         }
         
-        // TODO: enable or remove, depending on the API clarifications
-        // Global pre-match response filters 
-        // JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori, true);
-        
-        
         List<ProviderInfo<ResponseHandler>> handlers = 
             ProviderFactory.getInstance(message).getResponseHandlers();
         for (ProviderInfo<ResponseHandler> rh : handlers) {
