@@ -1019,14 +1019,14 @@ public class RMTxStore implements RMStore {
     }
 
     
-    private void cacheStatement(Connection con, String sql) 
+    protected void cacheStatement(Connection con, String sql) 
         throws SQLException {
         PreparedStatement stmt = con.prepareStatement(sql);
         cachedStatements.put(sql, stmt);
         statementLocks.put(stmt, new ReentrantLock());
     }
     
-    private void cacheStatements() throws SQLException {
+    protected void cacheStatements() throws SQLException {
         if (connection == null) {
             // if the connection is not held, no statement is cached.
             return;
