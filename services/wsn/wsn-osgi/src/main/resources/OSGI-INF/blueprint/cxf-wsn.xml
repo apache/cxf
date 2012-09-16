@@ -31,7 +31,9 @@
 
     <!-- ActiveMQ connection factory -->
     <bean id="activemq" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <argument value="${cxf.wsn.activemq}" />
+        <property name="brokerURL" value="${cxf.wsn.activemq}" />
+        <property name="userName" value="${cxf.wsn.activemq.username}" />
+        <property name="password" value="${cxf.wsn.activemq.password}" />
     </bean>
 
     <!-- NotificationBroker -->

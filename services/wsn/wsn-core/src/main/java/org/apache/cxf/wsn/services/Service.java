@@ -34,6 +34,9 @@ import org.apache.cxf.wsn.AbstractNotificationBroker;
 public class Service {
     String rootURL = "http://0.0.0.0:9000/wsn";
     String activeMqUrl = "vm:(broker:(tcp://localhost:6000)?persistent=false)";
+    String userName;
+    String password;
+    
     boolean jmxEnable = true;
 
     AbstractCreatePullPoint createPullPointServer;
@@ -43,6 +46,10 @@ public class Service {
         for (int x = 0; x < args.length; x++) {
             if ("-brokerUrl".equals(args[x])) {
                 activeMqUrl = args[++x];
+            } else if ("-userName".equals(args[x])) {
+                userName = args[++x];
+            } else if ("-password".equals(args[x])) {
+                password = args[++x];
             } else if ("-rootUrl".equals(args[x])) {
                 rootURL = args[++x];
             } else if ("-jmxEnable".equals(args[x])) {
@@ -61,7 +68,7 @@ public class Service {
     }
 
     public void start() throws Exception {
-        ActiveMQConnectionFactory activemq = new ActiveMQConnectionFactory(activeMqUrl);
+        ActiveMQConnectionFactory activemq = new ActiveMQConnectionFactory(userName, password, activeMqUrl);
 
         notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
         notificationBrokerServer.setAddress(rootURL + "/NotificationBroker");
