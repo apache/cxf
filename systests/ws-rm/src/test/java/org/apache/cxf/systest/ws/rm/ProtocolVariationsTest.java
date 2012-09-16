@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.ws.rm;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -28,6 +30,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
@@ -36,6 +39,7 @@ import org.apache.cxf.greeter_control.Control;
 import org.apache.cxf.greeter_control.ControlService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
+import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
@@ -192,16 +196,103 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         try {
             greeter.greetMe("one");
-            fail("invalid namespace combination");
+            fail("invalid namespace combination accepted");
         } catch (Exception e) {
             assertTrue(e.getCause() instanceof RMException);
             // verify a partial error text match to exclude an unexpected exception
             // (see UNSUPPORTED_NAMESPACE in Messages.properties)
             final String text = Names200408.WSA_NAMESPACE_NAME + " is not supported";
             assertTrue(e.getCause().getMessage() != null 
-                       && e.getCause().getMessage().indexOf(text) > 0);
+                       && e.getCause().getMessage().indexOf(text) >= 0);
         }
         
+    }
+    
+    @Test
+    public void testInvalidRM11WSA200408OnReceive() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+        
+        // WS-RM 1.0 using the WS-A 1.0 namespace
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
+
+        // rewrite the outgoing message's WS-RM namespace to 1.1
+        TransformOutInterceptor trans = new TransformOutInterceptor();
+        Map<String, String> outElements = new HashMap<String, String>();
+        outElements.put("{" + RM10Constants.NAMESPACE_URI + "}*", "{" + RM11Constants.NAMESPACE_URI + "}*");
+        trans.setOutTransformElements(outElements);
+        
+        client.getOutInterceptors().add(trans);
+        try {
+            greeter.greetMe("one");
+            fail("invalid namespace combination accepted");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof SoapFault);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see WSRM_REQUIRED_EXC in Messages.properties)
+            final String text = "WS-ReliableMessaging is required";
+            assertTrue(e.getCause().getMessage() != null 
+                       && e.getCause().getMessage().indexOf(text) >= 0);
+        }
+    }
+    
+    @Test
+    public void testInvalidWSAOnReceive() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+        
+        // WS-RM 1.0 using the WS-A 1.0 namespace
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
+
+        // rewrite the outgoing message's WS-A namespace to an invalid one
+        TransformOutInterceptor trans = new TransformOutInterceptor();
+        Map<String, String> outElements = new HashMap<String, String>();
+        outElements.put("{" + Names200408.WSA_NAMESPACE_NAME + "}*", "{http://cxf.apache.org/invalid}*");
+        trans.setOutTransformElements(outElements);
+        
+        client.getOutInterceptors().add(trans);
+        try {
+            greeter.greetMe("one");
+            fail("invalid wsa header accepted");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof SoapFault);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see WSA_REQUIRED_EXC in Messages.properties)
+            final String text = "WS-Addressing is required";
+            assertTrue(e.getCause().getMessage() != null 
+                && e.getCause().getMessage().indexOf(text) >= 0);
+        }
+    }
+
+    @Test
+    public void testInvalidWRMOnReceive() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+        
+        // WS-RM 1.0 using the WS-A 1.0 namespace
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
+
+        // rewrite the outgoing message's WS-RM namespace to an invalid one
+        TransformOutInterceptor trans = new TransformOutInterceptor();
+        Map<String, String> outElements = new HashMap<String, String>();
+        outElements.put("{" + RM10Constants.NAMESPACE_URI + "}*", "{http://cxf.apache.org/invalid}*");
+        trans.setOutTransformElements(outElements);
+        
+        client.getOutInterceptors().add(trans);
+        try {
+            greeter.greetMe("one");
+            fail("invalid wsrm header");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof SoapFault);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see WSRM_REQUIRED_EXC in Messages.properties)
+            final String text = "WS-ReliableMessaging is required";
+            assertTrue(e.getCause().getMessage() != null 
+                && e.getCause().getMessage().indexOf(text) >= 0);
+        }
     }
     
     @Test
