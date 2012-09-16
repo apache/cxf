@@ -61,13 +61,23 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     protected void handle(Message message) throws SequenceFault, RMException {
         LOG.entering(getClass().getName(), "handleMessage");
         
+        boolean isServer = RMContextUtils.isServerSide(message);
+        LOG.fine("isServerSide: " + isServer);
+
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         
         // message addressing properties may be null, e.g. in case of a runtime fault 
         // on the server side
         final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         if (null == maps) {
-            return;
+            if (isServer) {
+                org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
+                    "WSA_REQUIRED_EXC", LOG);
+                LOG.log(Level.INFO, msg.toString());
+                throw new RMException(msg);                
+            } else {
+                return;
+            }
         }
 
         String action = null;
@@ -85,18 +95,23 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             message.put(Message.REQUESTOR_ROLE, originalRequestor);
         }
 
-        String rmUri = getManager().getRMNamespace(message);
-        String addrUri = getManager().getAddressingNamespace(message);
+        // get the wsa and wsrm namespaces from the message 
+        String rmUri = rmps.getNamespaceURI();
+        String addrUri = maps.getNamespaceURI();
 
         ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
+        if (null == protocol) {
+            org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
+                "WSRM_REQUIRED_EXC", LOG, rmUri, addrUri);
+            LOG.log(Level.INFO, msg.toString());
+            throw new RMException(msg);
+        }
         RMContextUtils.setProtocolVariation(message, protocol);
         
         // Destination destination = getManager().getDestination(message);
         // RMEndpoint rme = getManager().getReliableEndpoint(message);
         // Servant servant = new Servant(rme);
         
-        boolean isServer = RMContextUtils.isServerSide(message);
-        LOG.fine("isServerSide: " + isServer);
         boolean isApplicationMessage = !RMContextUtils.isRMProtocolMessage(action);
         LOG.fine("isApplicationMessage: " + isApplicationMessage);
         
@@ -172,7 +187,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         if (robust) {
             // set this property to change the acknlowledging behavior
             message.put(RMMessageConstants.DELIVERING_ROBUST_ONEWAY, Boolean.TRUE);
-        } 
+        }
         destination.acknowledge(message);
     }
     
