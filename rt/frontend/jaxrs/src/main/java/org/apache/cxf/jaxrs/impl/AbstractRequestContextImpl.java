@@ -19,9 +19,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -31,20 +28,14 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 
-public abstract class AbstractRequestContextImpl {
+public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl {
 
-    private static final String PROPERTY_KEY = "jaxrs.filter.properties";
-    
     protected HttpHeaders h;
-    protected Message m;
-    private Map<String, Object> props;
     private boolean responseContext;
     public AbstractRequestContextImpl(Message message, boolean responseContext) {
-        this.m = message;
-        this.props = CastUtils.cast((Map<?, ?>)message.get(PROPERTY_KEY));
+        super(message);
         this.h = new HttpHeadersImpl(message);
         this.responseContext = responseContext;
     }
@@ -90,48 +81,10 @@ public abstract class AbstractRequestContextImpl {
         return (String)getProperty(Message.HTTP_REQUEST_METHOD);
     }
 
-    public Object getProperty(String name) {
-        return props == null ? null : props.get(name);
-    }
-
-    public Enumeration<String> getPropertyNames() {
-        final Iterator<String> it = props.keySet().iterator();
-        return new Enumeration<String>() {
-
-            @Override
-            public boolean hasMoreElements() {
-                return it.hasNext();
-            }
-
-            @Override
-            public String nextElement() {
-                return it.next();
-            }
-            
-        };
-    }
-
-
-    public void removeProperty(String name) {
-        if (props != null) {
-            props.remove(name);    
-        }
-    }
-
-
     public void setMethod(String method) throws IllegalStateException {
         checkContext();
         m.put(Message.HTTP_REQUEST_METHOD, method);
 
-    }
-
-    public void setProperty(String name, Object value) {
-        if (props == null) {
-            props = new HashMap<String, Object>();
-            m.put(PROPERTY_KEY, props);
-        }    
-        props.put(name, value);    
-        
     }
 
     protected HttpHeaders getHttpHeaders() {

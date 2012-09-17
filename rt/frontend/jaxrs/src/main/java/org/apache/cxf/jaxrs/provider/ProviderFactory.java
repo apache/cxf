@@ -51,6 +51,8 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -65,8 +67,10 @@ import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
+import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
@@ -105,6 +109,23 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ContextResolver<?>>>(1);
     private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
+    
+    // ParamConverter and ParamConverterProvider is introduced in JAX-RS 2.0
+    // ParameterHandler will have to be deprecated
+    private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
+        new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
+    
+    private List<ProviderInfo<MessageBodyReader<?>>> jaxbReaders = 
+        new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
+    private List<ProviderInfo<MessageBodyWriter<?>>> jaxbWriters = 
+        new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
+    
+    private List<ProviderInfo<ReaderInterceptor>> readerInterceptors = 
+        new ArrayList<ProviderInfo<ReaderInterceptor>>(1);
+    private List<ProviderInfo<WriterInterceptor>> writerInterceptors = 
+        new ArrayList<ProviderInfo<WriterInterceptor>>(1);
+    
+    // Server specific providers
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     
@@ -121,24 +142,8 @@ public final class ProviderFactory {
         new LinkedHashMap<NameKey, ProviderInfo<ContainerRequestFilter>>();
     private Map<NameKey, ProviderInfo<ContainerResponseFilter>> postMatchContainerResponseFilters = 
         new LinkedHashMap<NameKey, ProviderInfo<ContainerResponseFilter>>();
-    
-    // ParamConverter and ParamConverterProvider is introduced in JAX-RS 2.0
-    // ParameterHandler will have to be deprecated
-    private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
-        new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
-    
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
-    
-    private List<ProviderInfo<MessageBodyReader<?>>> jaxbReaders = 
-        new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
-    private List<ProviderInfo<MessageBodyWriter<?>>> jaxbWriters = 
-        new ArrayList<ProviderInfo<MessageBodyWriter<?>>>();
-    
-    private Collection<ProviderInfo<?>> injectedProviders = 
-        new LinkedList<ProviderInfo<?>>();
-    
-    private Bus bus;
     
     // Client-only providers, consider introducing ClientProviderFactory
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters = 
@@ -147,6 +152,13 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
+   
+    // List of injected providers
+    private Collection<ProviderInfo<?>> injectedProviders = 
+        new LinkedList<ProviderInfo<?>>();
+    
+    private Bus bus;
+    
     
     private ProviderFactory(Bus bus) {
         this.bus = bus;
@@ -431,6 +443,75 @@ public final class ProviderFactory {
             }
         }
     }
+        
+    
+    public <T> List<ReaderInterceptor> createMessageBodyReaderInterceptor(Class<T> bodyType,
+                                                            Type parameterType,
+                                                            Annotation[] parameterAnnotations,
+                                                            MediaType mediaType,
+                                                            Message m) {
+        MessageBodyReader<T> mr = createMessageBodyReader(bodyType,
+                                                      parameterType,
+                                                      parameterAnnotations,
+                                                      mediaType,
+                                                      m);
+        if (mr != null) {
+            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr);
+            
+            int size = readerInterceptors.size();
+            List<ReaderInterceptor> interceptors = null;
+            if (size > 0) {
+                interceptors = new ArrayList<ReaderInterceptor>(size + 1);
+                for (ProviderInfo<ReaderInterceptor> p : readerInterceptors) {
+                    InjectionUtils.injectContexts(p.getProvider(), p, m);
+                    interceptors.add(p.getProvider());
+                }
+                interceptors.add(mbrReader);
+            } else {
+                interceptors = Collections.singletonList(mbrReader);
+            }
+            
+            return interceptors;
+        } else {
+            return null;
+        }
+    }
+    
+    public <T> List<WriterInterceptor> createMessageBodyWriterInterceptor(Class<T> bodyType,
+                                                                          Type parameterType,
+                                                                          Annotation[] parameterAnnotations,
+                                                                          MediaType mediaType,
+                                                                          Message m) {
+        MessageBodyWriter<T> mw = createMessageBodyWriter(bodyType,
+                                                      parameterType,
+                                                      parameterAnnotations,
+                                                      mediaType,
+                                                      m);
+        if (mw != null) {
+            
+            @SuppressWarnings({
+                "unchecked", "rawtypes"
+            })
+            WriterInterceptor mbwWriter = new WriterInterceptorMBW((MessageBodyWriter)mw);
+              
+            int size = writerInterceptors.size();
+            List<WriterInterceptor> interceptors = null;
+            if (size > 0) {
+                interceptors = new ArrayList<WriterInterceptor>(size + 1);
+                for (ProviderInfo<WriterInterceptor> p : writerInterceptors) {
+                    InjectionUtils.injectContexts(p.getProvider(), p, m);
+                    interceptors.add(p.getProvider());
+                }
+                interceptors.add(mbwWriter);
+            } else {
+                interceptors = Collections.singletonList(mbwWriter);
+            }
+            
+            return interceptors;
+        } else {
+            return null;
+        }
+    }
     
     
     
@@ -625,6 +706,16 @@ public final class ProviderFactory {
                    null); 
             }
             
+            if (ReaderInterceptor.class.isAssignableFrom(oClass)) {
+                readerInterceptors.add(
+                   new ProviderInfo<ReaderInterceptor>((ReaderInterceptor)o, bus));
+            }
+            
+            if (WriterInterceptor.class.isAssignableFrom(oClass)) {
+                writerInterceptors.add(
+                   new ProviderInfo<WriterInterceptor>((WriterInterceptor)o, bus));
+            }
+            
             if (ClientRequestFilter.class.isAssignableFrom(oClass)) {
                 clientRequestFilters.add(
                    new ProviderInfo<ClientRequestFilter>((ClientRequestFilter)o, bus));
@@ -652,8 +743,13 @@ public final class ProviderFactory {
         sortContextResolvers();
         
         Collections.sort(preMatchContainerRequestFilters, new BindingPriorityComparator(true));
-        mapContainerFilters(postMatchContainerRequestFilters, postMatchRequestFilters);
-        mapContainerFilters(postMatchContainerResponseFilters, postMatchResponseFilters);
+        mapContainerFilters(postMatchContainerRequestFilters, postMatchRequestFilters, true);
+        mapContainerFilters(postMatchContainerResponseFilters, postMatchResponseFilters, false);
+        Collections.sort(readerInterceptors, new BindingPriorityComparator(true));
+        Collections.sort(writerInterceptors, new BindingPriorityComparator(false));
+        
+        Collections.sort(clientRequestFilters, new BindingPriorityComparator(true));
+        Collections.sort(clientResponseFilters, new BindingPriorityComparator(false));
         
         injectContextProxies(messageReaders, messageWriters, contextResolvers, 
             requestHandlers, responseHandlers, exceptionMappers,
@@ -664,9 +760,10 @@ public final class ProviderFactory {
 //CHECKSTYLE:ON
     
     private static <T> void mapContainerFilters(Map<NameKey, ProviderInfo<T>> map,
-                                                List<ProviderInfo<T>> postMatchFilters) {
+                                                List<ProviderInfo<T>> postMatchFilters,
+                                                boolean ascending) {
         
-        Collections.sort(postMatchFilters, new PostMatchFilterComparator(true));
+        Collections.sort(postMatchFilters, new PostMatchFilterComparator(ascending));
         for (ProviderInfo<T> p : postMatchFilters) { 
             List<String> names = AnnotationUtils.getNameBindings(
                 p.getProvider().getClass().getAnnotations());
