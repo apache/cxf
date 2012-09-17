@@ -62,6 +62,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         providers.add(new ClientHeaderRequestFilter());
         providers.add(new ClientHeaderResponseFilter());
         WebClient wc = WebClient.create(address, providers);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Book book = wc.get(Book.class);
         assertEquals(124L, book.getId());
         Response response = wc.getResponse();

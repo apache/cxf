@@ -131,13 +131,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             .getName());
         
         // Global post-match and name-bound response filters
-        if (ori != null) {
-            JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori, false);
-            Response updatedResponse = message.get(Response.class);
-            if (updatedResponse != null) {
-                response = updatedResponse;
-            }
+        JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori);
+        Response updatedResponse = message.get(Response.class);
+        if (updatedResponse != null) {
+            response = updatedResponse;
         }
+        
         
         List<ProviderInfo<ResponseHandler>> handlers = 
             ProviderFactory.getInstance(message).getResponseHandlers();

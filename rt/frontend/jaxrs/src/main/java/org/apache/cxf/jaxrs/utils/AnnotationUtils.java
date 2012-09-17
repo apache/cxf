@@ -130,7 +130,7 @@ public final class AnnotationUtils {
         for (Annotation a : targetAnns) {
             NameBinding nb = a.annotationType().getAnnotation(NameBinding.class);
             if (nb != null) {
-                names.add(a.getClass().getName());
+                names.add(a.annotationType().getName());
             }
         }
         return names;

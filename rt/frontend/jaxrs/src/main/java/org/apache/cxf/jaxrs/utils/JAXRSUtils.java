@@ -1362,15 +1362,13 @@ public final class JAXRSUtils {
     public static void runContainerResponseFilters(ProviderFactory pf,
                                                    Response r,
                                                    Message m, 
-                                                   OperationResourceInfo ori,
-                                                   boolean preMatch) {
-        List<ProviderInfo<ContainerResponseFilter>> containerFilters = preMatch 
-            ? pf.getPreMatchContainerResponseFilters() 
-            : pf.getPostMatchContainerResponseFilters(ori == null ? null : ori.getNameBindings());
+                                                   OperationResourceInfo ori) {
+        List<ProviderInfo<ContainerResponseFilter>> containerFilters =  
+            pf.getContainerResponseFilters(ori == null ? null : ori.getNameBindings());
         if (!containerFilters.isEmpty()) {
             ContainerRequestContext requestContext = 
                 new ContainerRequestContextImpl(m.getExchange().getInMessage(), 
-                                               preMatch,
+                                               false,
                                                true);
             ContainerResponseContext responseContext = 
                 new ContainerResponseContextImpl(r, m, ori);
