@@ -42,6 +42,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 
@@ -52,6 +54,8 @@ import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.WriterInterceptorContextImpl;
+import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -224,26 +228,26 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
         
-        MessageBodyWriter<?> writer = null;
+        List<WriterInterceptor> writers = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
-            writer = ProviderFactory.getInstance(message)
-                .createMessageBodyWriter(targetType, genericType, annotations, type, message);
+            writers = ProviderFactory.getInstance(message)
+                .createMessageBodyWriterInterceptor(targetType, genericType, annotations, type, message);
             
-            if (writer != null) {
+            if (writers != null) {
                 responseType = type;
                 break;
             }
         }
     
         OutputStream outOriginal = message.getContent(OutputStream.class);
-        if (writer == null) {
+        if (writers == null) {
             message.put(Message.CONTENT_TYPE, "text/plain");
             message.put(Message.RESPONSE_CODE, 500);
             writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType.getSimpleName());
             return;
         }
-        boolean enabled = checkBufferingMode(message, writer, firstTry);
+        boolean enabled = checkBufferingMode(message, writers, firstTry);
         Object entity = getEntity(responseObj);
         try {
             responseType = checkFinalContentType(responseType);
@@ -252,21 +256,15 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
-            long size = getSize(writer, entity, targetType, genericType, annotations, responseType);
-            if (size > 0) {
-                LOG.fine("Setting ContentLength to " + size + " as requested by " 
-                         + writer.getClass().getName());
-                responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
-            }
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
-            }
             try {
-                writeTo(writer, entity, targetType, genericType, 
+                writeTo(writers, 
+                        entity, 
+                        targetType, 
+                        genericType, 
                         annotations, 
-                        responseType, 
-                        responseHeaders, 
-                        message.getContent(OutputStream.class));
+                        responseType,
+                        responseHeaders,
+                        message);
                 
                 if (isResponseRedirected(message)) {
                     return;
@@ -292,27 +290,33 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     //CHECKSTYLE:OFF
-    private static <T> void writeTo(MessageBodyWriter<?> mwriter, 
-                                    T entity,
-                                    Class<?> type, Type genericType,
-                                    Annotation[] annotations, 
-                                    MediaType mediaType,
-                                    MultivaluedMap<String, Object> httpHeaders, 
-                                    OutputStream entityStream) 
+    private static void writeTo(List<WriterInterceptor> writers, 
+                                Object entity,
+                                Class<?> type, Type genericType,
+                                Annotation[] annotations, 
+                                MediaType mediaType,
+                                MultivaluedMap<String, Object> httpHeaders,
+                                Message message) 
         throws WebApplicationException, IOException {
-        @SuppressWarnings("unchecked")
-        MessageBodyWriter<T> writer = (MessageBodyWriter<T>)mwriter;
-        writer.writeTo(entity, type, genericType, annotations, mediaType,
+        
+        OutputStream entityStream = message.getContent(OutputStream.class);
+        if (writers.size() > 1) {
+            WriterInterceptor first = writers.remove(0);
+            WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,
+                                                                                type, 
+                                                                            genericType, 
+                                                                            annotations, 
+                                                                            mediaType,
+                                                                            entityStream,
+                                                                            message,
+                                                                            writers);
+            
+            first.aroundWriteTo(context);
+        } else {
+            MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(0)).getMBW();
+            writer.writeTo(entity, type, genericType, annotations, mediaType,
                            httpHeaders, entityStream);
-    }
-
-    private static <T> long getSize(MessageBodyWriter<?> mwriter, T entity, 
-                                    Class<?> targetType, 
-                                    Type genericType,
-                                    Annotation[] annotations, MediaType responseType) {
-        @SuppressWarnings("unchecked")
-        MessageBodyWriter<T> writer = (MessageBodyWriter<T>)mwriter;
-        return writer.getSize(entity, targetType, genericType, annotations, responseType);
+        }
     }
     //CHECKSTYLE:ON
 
@@ -325,10 +329,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         return GenericEntity.class.isAssignableFrom(o.getClass()) ? ((GenericEntity<?>)o).getEntity() : o; 
     }
     
-    private boolean checkBufferingMode(Message m, MessageBodyWriter<?> w, boolean firstTry) {
+    private boolean checkBufferingMode(Message m, List<WriterInterceptor> writers, boolean firstTry) {
         if (!firstTry) {
             return false;
         }
+        WriterInterceptor last = writers.get(writers.size() - 1);
+        MessageBodyWriter<Object> w = ((WriterInterceptorMBW)last).getMBW();
         Object outBuf = m.getContextualProperty(OUT_BUFFERING);
         boolean enabled = MessageUtils.isTrue(outBuf);
         boolean configurableProvider = w instanceof AbstractConfigurableProvider;

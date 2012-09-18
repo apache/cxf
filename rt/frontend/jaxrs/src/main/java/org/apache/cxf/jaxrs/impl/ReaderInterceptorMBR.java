@@ -25,12 +25,21 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 
+import org.apache.cxf.message.Message;
+
 public class ReaderInterceptorMBR implements ReaderInterceptor {
 
     private MessageBodyReader<?> reader;
+    private Message m;
     
-    public ReaderInterceptorMBR(MessageBodyReader<?> reader) {
+    public ReaderInterceptorMBR(MessageBodyReader<?> reader,
+                                Message m) {
         this.reader = reader;
+        this.m = m;
+    }
+    
+    public MessageBodyReader<?> getMBR() {
+        return reader;
     }
     
     @SuppressWarnings({
@@ -40,7 +49,8 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
     public Object aroundReadFrom(ReaderInterceptorContext c) throws IOException, WebApplicationException {
         return reader.readFrom((Class)c.getType(), c.getGenericType(),
                                c.getAnnotations(), c.getMediaType(),
-                               c.getHeaders(), c.getInputStream());
+                               new HttpHeadersImpl(m).getRequestHeaders(),
+                               c.getInputStream());
     }
 
 }

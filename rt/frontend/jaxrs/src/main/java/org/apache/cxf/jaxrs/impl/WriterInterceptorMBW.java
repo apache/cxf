@@ -19,22 +19,37 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
+import org.apache.cxf.common.logging.LogUtils;
+
 public class WriterInterceptorMBW implements WriterInterceptor {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(WriterInterceptorMBW.class);
+    
     private MessageBodyWriter<Object> writer;
     
     public WriterInterceptorMBW(MessageBodyWriter<Object> writer) {
         this.writer = writer;
     }
 
+    public MessageBodyWriter<Object> getMBW() {
+        return writer;
+    }
+    
     @Override
     public void aroundWriteTo(WriterInterceptorContext c) throws IOException, WebApplicationException {
+        
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
+        }
+        
         writer.writeTo(c.getEntity(), 
                        c.getType(), 
                        c.getGenericType(), 

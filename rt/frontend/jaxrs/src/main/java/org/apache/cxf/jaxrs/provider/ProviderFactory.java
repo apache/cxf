@@ -456,7 +456,7 @@ public final class ProviderFactory {
                                                       mediaType,
                                                       m);
         if (mr != null) {
-            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr);
+            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, m);
             
             int size = readerInterceptors.size();
             List<ReaderInterceptor> interceptors = null;
