@@ -60,6 +60,10 @@ public abstract class AbstractAtomProvider<T extends Element>
         }
     }
 
+    protected Writer createWriter(String writerName) {
+        return ATOM_ENGINE.getWriterFactory().getWriter(writerName);
+    }
+    
     public T readFrom(Class<T> clazz, Type t, Annotation[] a, MediaType mt, 
                          MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
