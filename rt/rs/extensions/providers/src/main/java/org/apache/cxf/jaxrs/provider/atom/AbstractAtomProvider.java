@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -34,10 +36,12 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.writer.Writer;
+import org.apache.cxf.common.logging.LogUtils;
 
 public abstract class AbstractAtomProvider<T extends Element> 
     implements MessageBodyWriter<T>, MessageBodyReader<T> {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractAtomProvider.class);
     private static final Abdera ATOM_ENGINE = new Abdera();
         
     private boolean formattedOutput;
@@ -50,16 +54,31 @@ public abstract class AbstractAtomProvider<T extends Element>
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         if (MediaType.APPLICATION_JSON_TYPE.isCompatible(mt)) {
-            Writer w = ATOM_ENGINE.getWriterFactory().getWriter("json");
+            Writer w = createWriter("json");
+            if (w == null) {
+                throw new WebApplicationException(415);
+            }
             element.writeTo(w, os);   
         } else if (formattedOutput) {
-            Writer w = ATOM_ENGINE.getWriterFactory().getWriter("prettyxml");
-            element.writeTo(w, os);
+            Writer w = createWriter("prettyxml");
+            if (w != null) {
+                element.writeTo(w, os);
+            } else {
+                element.writeTo(os);
+            }
         } else {
             element.writeTo(os);
         }
     }
 
+    protected Writer createWriter(String writerName) {
+        Writer w = ATOM_ENGINE.getWriterFactory().getWriter(writerName);
+        if (w == null) {
+            LOG.fine("Atom writer \"" + writerName + "\" is not available");
+        }
+        return w;
+    }
+    
     public T readFrom(Class<T> clazz, Type t, Annotation[] a, MediaType mt, 
                          MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
