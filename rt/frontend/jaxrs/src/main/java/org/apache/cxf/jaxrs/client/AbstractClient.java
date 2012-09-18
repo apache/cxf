@@ -48,8 +48,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -393,24 +393,37 @@ public abstract class AbstractClient implements Client, Retryable {
         return rb;
     }
     
-    protected <T> void writeBody(T o, Message outMessage, Class<?> cls, Type type, Annotation[] anns, 
-        MultivaluedMap<String, Object> headers, OutputStream os) {
+    protected <T> void writeBody(T o, Message outMessage, Class<?> cls, Type type, Annotation[] anns,
+                                 OutputStream os) {
         
         if (o == null) {
             return;
         }
         @SuppressWarnings("unchecked")
+        MultivaluedMap<String, Object> headers = 
+            (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
+        
+        @SuppressWarnings("unchecked")
         Class<T> theClass = (Class<T>)cls;
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type").toString()); 
         
-        MessageBodyWriter<T> mbw = ProviderFactory.getInstance(outMessage)
-            .createMessageBodyWriter(theClass, type, anns, contentType, outMessage);
-        if (mbw != null) {
+        List<WriterInterceptor> writers = ProviderFactory.getInstance(outMessage)
+            .createMessageBodyWriterInterceptor(theClass, type, anns, contentType, outMessage);
+        if (writers != null) {
             try {
-                mbw.writeTo(o, theClass, type, anns, contentType, headers, os);
-                if (os != null) {
-                    os.flush();
+                JAXRSUtils.writeMessageBody(writers, 
+                                            o, 
+                                            theClass, 
+                                            type, 
+                                            anns, 
+                                            contentType,
+                                            headers,
+                                            outMessage);
+                
+                OutputStream realOs = outMessage.get(OutputStream.class);
+                if (realOs != null) {
+                    realOs.flush();
                 }
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_WRITER_PROBLEM", cls, contentType, ex, null);
@@ -436,9 +449,10 @@ public abstract class AbstractClient implements Client, Retryable {
     @SuppressWarnings("unchecked")
     protected <T> T readBody(Response r, Message outMessage, Class<T> cls, 
                              Type type, Annotation[] anns) {
+        Message responseMessage = outMessage.getExchange().getInMessage();
+        
         InputStream inputStream = (InputStream)r.getEntity();
         if (inputStream == null) {
-            Message responseMessage = outMessage.getExchange().getInMessage();
             if (responseMessage == null) {
                 responseMessage = outMessage.getExchange().getInFaultMessage();    
             }    
@@ -464,16 +478,15 @@ public abstract class AbstractClient implements Client, Retryable {
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader<T> mbr 
-            = ProviderFactory.getInstance(outMessage).createMessageBodyReader(
+        List<ReaderInterceptor> readers 
+            = ProviderFactory.getInstance(outMessage).createMessageBodyReaderInterceptor(
                 cls, type, anns, contentType, outMessage);
-        if (mbr != null) {
+        if (readers != null) {
             try {
-                MultivaluedMap<String, String> m 
-                    = (MultivaluedMap<String, String>)
-                        ((MultivaluedMap<?, ?>)new MetadataMap<String, Object>(r.getMetadata(),
-                            true, true));
-                return mbr.readFrom(cls, type, anns, contentType, m, inputStream);
+                responseMessage.put(Message.PROTOCOL_HEADERS, r.getMetadata());
+                return (T)JAXRSUtils.readFromMessageBodyReader(readers, cls, type, 
+                                                            anns, inputStream, contentType, 
+                                                            responseMessage);
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
             }
@@ -908,7 +921,6 @@ public abstract class AbstractClient implements Client, Retryable {
             super(Phase.WRITE);
         }
         
-        @SuppressWarnings("unchecked")
         public void handleMessage(Message outMessage) throws Fault {
             
             MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
@@ -924,15 +936,11 @@ public abstract class AbstractClient implements Client, Retryable {
                 }
             }
             
-            MultivaluedMap<String, Object> headers = 
-                (MultivaluedMap<String, Object>)outMessage.get(Message.PROTOCOL_HEADERS);
-            
             Object body = objs.get(0);
             
-            doWriteBody(outMessage, body, headers, os);
+            doWriteBody(outMessage, body, os);
         }
         
-        protected abstract void doWriteBody(Message outMessage, Object body,
-                                 MultivaluedMap<String, Object> headers, OutputStream os) throws Fault;
+        protected abstract void doWriteBody(Message outMessage, Object body, OutputStream os) throws Fault;
     }
 }

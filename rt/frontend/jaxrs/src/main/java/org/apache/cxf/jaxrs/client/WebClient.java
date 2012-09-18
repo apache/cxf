@@ -852,8 +852,7 @@ public class WebClient extends AbstractClient {
     
     private class BodyWriter extends AbstractBodyWriter {
 
-        protected void doWriteBody(Message outMessage, Object body,
-                                   MultivaluedMap<String, Object> headers, 
+        protected void doWriteBody(Message outMessage, Object body, 
                                    OutputStream os) throws Fault {    
             
             Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);
@@ -868,10 +867,7 @@ public class WebClient extends AbstractClient {
                 writeBody(body, outMessage, 
                           requestClass == null || !isAssignable ? body.getClass() : requestClass,
                           requestType == null || !isAssignable ? body.getClass() : requestType, 
-                          new Annotation[]{}, headers, os);
-                if (os != null) {
-                    os.flush();
-                }
+                          new Annotation[]{}, os);
             } catch (Exception ex) {
                 throw new Fault(ex);
             }

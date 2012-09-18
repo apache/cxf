@@ -35,7 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -43,7 +42,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 
@@ -54,7 +52,6 @@ import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.impl.WriterInterceptorContextImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -257,7 +254,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
             try {
-                writeTo(writers, 
+                JAXRSUtils.writeMessageBody(writers, 
                         entity, 
                         targetType, 
                         genericType, 
@@ -289,36 +286,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
-    //CHECKSTYLE:OFF
-    private static void writeTo(List<WriterInterceptor> writers, 
-                                Object entity,
-                                Class<?> type, Type genericType,
-                                Annotation[] annotations, 
-                                MediaType mediaType,
-                                MultivaluedMap<String, Object> httpHeaders,
-                                Message message) 
-        throws WebApplicationException, IOException {
-        
-        OutputStream entityStream = message.getContent(OutputStream.class);
-        if (writers.size() > 1) {
-            WriterInterceptor first = writers.remove(0);
-            WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,
-                                                                                type, 
-                                                                            genericType, 
-                                                                            annotations, 
-                                                                            mediaType,
-                                                                            entityStream,
-                                                                            message,
-                                                                            writers);
-            
-            first.aroundWriteTo(context);
-        } else {
-            MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(0)).getMBW();
-            writer.writeTo(entity, type, genericType, annotations, mediaType,
-                           httpHeaders, entityStream);
-        }
-    }
-    //CHECKSTYLE:ON
 
     private boolean isResponseNull(Object o) {
         return o == null || GenericEntity.class.isAssignableFrom(o.getClass()) 

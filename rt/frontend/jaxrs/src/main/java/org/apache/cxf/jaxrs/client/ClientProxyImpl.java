@@ -599,8 +599,7 @@ public class ClientProxyImpl extends AbstractClient implements
     
     private class BodyWriter extends AbstractBodyWriter {
         
-        protected void doWriteBody(Message outMessage, Object body,
-                                 MultivaluedMap<String, Object> headers, 
+        protected void doWriteBody(Message outMessage, Object body, 
                                  OutputStream os) throws Fault {
             
             
@@ -623,10 +622,10 @@ public class ClientProxyImpl extends AbstractClient implements
                     writeBody(body, outMessage,
                               isAssignable ? paramClass : body.getClass(),
                               isAssignable ? paramType : body.getClass(),
-                              anns, headers, os);
+                              anns, os);
                 } else {
                     writeBody(body, outMessage, body.getClass(), body.getClass(), 
-                              anns, headers, os);
+                              anns, os);
                 }
             } catch (Exception ex) {
                 throw new Fault(ex);
