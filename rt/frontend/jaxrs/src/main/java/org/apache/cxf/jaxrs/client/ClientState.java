@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.client;
 import java.net.URI;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 
@@ -60,16 +60,16 @@ public interface ClientState {
     URI getBaseURI();
     
     /**
-     * Sets the responseBuilder
-     * @param responseBuilder responseBuilder
+     * Sets Response
+     * @param response response
      */
-    void setResponseBuilder(ResponseBuilder responseBuilder);
+    void setResponse(Response response);
     
     /**
-     * Gets the responseBuilder
-     * @return responseBuilder
+     * Gets Response
+     * @return response
      */
-    ResponseBuilder getResponseBuilder();
+    Response getResponse();
     
     /**
      * Sets the request headers

@@ -44,11 +44,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
-import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.ReaderInterceptor;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public final class ResponseImpl extends Response {
@@ -290,7 +291,11 @@ public final class ResponseImpl extends Response {
     public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns) throws MessageProcessingException,
         IllegalStateException {
         
-        checkEntityIsAvailable();
+        checkEntityIsClosed();
+        
+        if (!hasEntity()) {
+            return null;
+        }
         
         if (cls.isAssignableFrom(entity.getClass())) {
             T response = cls.cast(entity);
@@ -300,17 +305,22 @@ public final class ResponseImpl extends Response {
         
         if (responseMessage != null && entity instanceof InputStream) {
             MediaType mediaType = getMediaType();
-            MessageBodyReader<T> mbr 
-                = ProviderFactory.getInstance(responseMessage).createMessageBodyReader(
-                    cls, t, anns, mediaType, responseMessage);
-            if (mbr != null) {
+            
+            List<ReaderInterceptor> readers = ProviderFactory.getInstance(responseMessage)
+                .createMessageBodyReaderInterceptor(cls, t, anns, mediaType, 
+                                                    responseMessage.getExchange().getOutMessage());
+            if (readers != null) {
                 try {
-                    T response = mbr.readFrom(cls, t, anns, mediaType, getStringHeaders(), 
-                                        InputStream.class.cast(entity));
-                    closeIfNotBufferred(cls);
-                    return response;
+                    responseMessage.put(Message.PROTOCOL_HEADERS, this.getMetadata());
+                    return cls.cast(JAXRSUtils.readFromMessageBodyReader(readers, cls, t, 
+                                                                anns, 
+                                                                InputStream.class.cast(entity), 
+                                                                mediaType, 
+                                                                responseMessage));
                 } catch (Exception ex) {
                     throw new MessageProcessingException(ex);
+                } finally {
+                    closeIfNotBufferred(cls);
                 }
             }
         }
@@ -341,19 +351,22 @@ public final class ResponseImpl extends Response {
     }
 
     public void close() throws MessageProcessingException {
-        if (!entityClosed && entity instanceof InputStream) {
-            try {
-                ((InputStream)entity).close();
-                entity = null;
-                entityClosed = true;
-            } catch (IOException ex) {
-                throw new MessageProcessingException(ex);
+        if (!entityClosed) {
+            if (entity instanceof InputStream) {
+                try {
+                    ((InputStream)entity).close();
+                    entity = null;
+                } catch (IOException ex) {
+                    throw new MessageProcessingException(ex);
+                }
             }
+            entityClosed = true;
+            
         }
         
     }
     
-    private void checkEntityIsAvailable() {
+    private void checkEntityIsClosed() {
         if (entityClosed) {
             throw new IllegalStateException("Entity is not available");
         }

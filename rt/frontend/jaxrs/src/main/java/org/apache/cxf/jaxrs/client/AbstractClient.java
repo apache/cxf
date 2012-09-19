@@ -265,14 +265,7 @@ public abstract class AbstractClient implements Client, Retryable {
      * {@inheritDoc}
      */
     public Response getResponse() {
-        if (state.getResponseBuilder() == null) {
-            return null;
-        }
-        try {
-            return state.getResponseBuilder().clone().build();
-        } catch (CloneNotSupportedException ex) {
-            throw new ClientException(ex);
-        }
+        return state.getResponse();
     }
     
     /**
@@ -303,7 +296,7 @@ public abstract class AbstractClient implements Client, Retryable {
     }
 
     protected void resetResponse() {
-        state.setResponseBuilder(null);
+        state.setResponse(null);
     }
     
     protected void resetBaseAddress(URI uri) {
@@ -333,9 +326,7 @@ public abstract class AbstractClient implements Client, Retryable {
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
         Response response = exchange.get(Response.class);
         if (response != null) {
-            ResponseBuilder rb = Response.fromResponse(response);
-            state.setResponseBuilder(rb);
-            return rb.clone();
+            return Response.fromResponse(response);
         }
         
         Integer status = getResponseCode(exchange);
@@ -345,9 +336,7 @@ public abstract class AbstractClient implements Client, Retryable {
             ? exchange.getInMessage() : exchange.getInFaultMessage();
         // if there is no response message, we just send the response back directly
         if (responseMessage == null) {
-            ResponseBuilder rb = currentResponseBuilder.clone();
-            state.setResponseBuilder(currentResponseBuilder);
-            return rb;
+            return currentResponseBuilder;
         }
                 
         @SuppressWarnings("unchecked")
@@ -388,9 +377,7 @@ public abstract class AbstractClient implements Client, Retryable {
         InputStream mStream = responseMessage.getContent(InputStream.class);
         currentResponseBuilder.entity(mStream);
         
-        ResponseBuilder rb = currentResponseBuilder.clone();
-        state.setResponseBuilder(currentResponseBuilder);
-        return rb;
+        return currentResponseBuilder;
     }
     
     protected <T> void writeBody(T o, Message outMessage, Class<?> cls, Type type, Annotation[] anns,
@@ -449,6 +436,11 @@ public abstract class AbstractClient implements Client, Retryable {
     @SuppressWarnings("unchecked")
     protected <T> T readBody(Response r, Message outMessage, Class<T> cls, 
                              Type type, Annotation[] anns) {
+        
+        if (cls == Response.class) {
+            return cls.cast(r);
+        }
+        
         Message responseMessage = outMessage.getExchange().getInMessage();
         
         InputStream inputStream = (InputStream)r.getEntity();
@@ -460,7 +452,7 @@ public abstract class AbstractClient implements Client, Retryable {
                 || responseMessage.getContent(XMLStreamReader.class) == null
                     && responseMessage.getContent(Reader.class) == null) {
             
-                return cls == Response.class ? cls.cast(r) : null;
+                return null;
             }
         }
         
@@ -468,11 +460,7 @@ public abstract class AbstractClient implements Client, Retryable {
         if (status < 200 || status == 204 || status >= 300) {
             Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
             if (length == null || Integer.parseInt(length.toString()) == 0 || status >= 300) {
-                if (cls == Response.class) {
-                    return cls.cast(r);
-                } else {
-                    return null;
-                }
+                return null;
             }
         }
         
@@ -490,8 +478,6 @@ public abstract class AbstractClient implements Client, Retryable {
             } catch (Exception ex) {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
             }
-        } else if (cls == Response.class) {
-            return cls.cast(r);
         } else {
             reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, null);
         }

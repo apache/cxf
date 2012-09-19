@@ -835,11 +835,16 @@ public class WebClient extends AbstractClient {
                     entity = currentResponse.getEntity();
                 }
             }
+            rb = Response.fromResponse(currentResponse);
+            
             rb.entity(entity instanceof Response 
                       ? ((Response)entity).getEntity() : entity);
             
             Response r = rb.build();
             ((ResponseImpl)r).setMessage(outMessage);
+            
+            getState().setResponse(r);
+            
             return r;
         } catch (Throwable ex) {
             throw (ex instanceof ClientException) ? (ClientException)ex

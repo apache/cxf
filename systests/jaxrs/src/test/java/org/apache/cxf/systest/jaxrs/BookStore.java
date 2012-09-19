@@ -431,13 +431,39 @@ public class BookStore {
     @Path("/bookheaders/simple/")
     @CustomHeaderAdded
     public Response getBookByHeaderSimple(@HeaderParam("BOOK") String headerBook,
-                                          @HeaderParam("Simple") String headerSimple) throws Exception {
+        @HeaderParam("Simple") String headerSimple) throws Exception {
+        
+        ResponseBuilder builder = getBookByHeaderSimpleBuilder(headerBook, headerSimple);
+        return builder.build();
+    }
+    
+    @POST
+    @Path("/bookheaders/simple/")
+    @CustomHeaderAdded
+    public Response echoBookByHeaderSimple(Book book,
+        @HeaderParam("BOOK") String headerBook,
+        @HeaderParam("Simple") String headerSimple,
+        @HeaderParam("ServerReaderInterceptor") String serverInterceptorHeader,
+        @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader) throws Exception {
+        
+        ResponseBuilder builder = getBookByHeaderSimpleBuilder(headerBook, headerSimple);
+        if (serverInterceptorHeader != null) {
+            builder.header("ServerReaderInterceptor", serverInterceptorHeader);
+        }
+        if (clientInterceptorHeader != null) {
+            builder.header("ClientWriterInterceptor", clientInterceptorHeader);
+        }
+        return builder.build();
+    }
+    
+    private ResponseBuilder getBookByHeaderSimpleBuilder(@HeaderParam("BOOK") String headerBook,
+        @HeaderParam("Simple") String headerSimple) throws Exception {
         
         ResponseBuilder builder = Response.ok(doGetBook(headerBook));
         if (headerSimple != null) {
             builder.header("Simple", headerSimple);
         }
-        return builder.build();
+        return builder;
     }
     
     @GET

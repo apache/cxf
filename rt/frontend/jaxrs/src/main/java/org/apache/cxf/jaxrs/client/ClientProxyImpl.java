@@ -564,6 +564,7 @@ public class ClientProxyImpl extends AbstractClient implements
         try {
             Response r = setResponseBuilder(outMessage, outMessage.getExchange()).build();
             ((ResponseImpl)r).setMessage(outMessage);
+            getState().setResponse(r);
             
             Method method = outMessage.getExchange().get(Method.class);
             checkResponse(method, r, outMessage);

@@ -35,6 +35,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.impl.AbstractRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 
 
 public class ClientRequestContextImpl extends AbstractRequestContextImpl
@@ -59,8 +60,11 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     
     @Override
     public Object getEntity() {
-        // TODO Auto-generated method stub
-        return null;
+        MessageContentsList objs = MessageContentsList.getContentsList(m);
+        if (objs == null || objs.size() == 0) {
+            return null;
+        }
+        return objs.get(0);
     }
 
     @Override
@@ -71,14 +75,15 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public Class<?> getEntityClass() {
-        // TODO Auto-generated method stub
-        return null;
+        Object entity = getEntity();
+        return entity == null ? null : entity.getClass();
     }
 
     @Override
     public Type getEntityType() {
-        // TODO Auto-generated method stub
-        return null;
+        Object entity = getEntity();
+        //TODO: deal with generic entities
+        return entity == null ? null : entity.getClass();
     }
     
     @Override
@@ -88,8 +93,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
-        // TODO Auto-generated method stub
-        return false;
+        return getEntity() != null;
     }
     
     @Override
@@ -99,6 +103,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
             headers.putSingle(HttpHeaders.CONTENT_TYPE, mt);
             m.put(Message.CONTENT_TYPE, mt.toString());
         }
+        m.put(List.class, entity == null ? new MessageContentsList() : new MessageContentsList(entity));
     }
 
     

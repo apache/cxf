@@ -29,12 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.NameBinding;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.ReaderInterceptorContext;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -59,6 +64,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new PreMatchContainerRequestFilter());
         providers.add(new PostMatchContainerResponseFilter());
         providers.add(new PostMatchContainerResponseFilter2());
+        providers.add(new CustomReaderInterceptor());
+        providers.add(new CustomWriterInterceptor());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -129,6 +136,27 @@ public class BookServer20 extends AbstractBusTestServerBase {
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
     public @interface CustomHeaderAdded { 
+        
+    }
+    
+    public static class CustomReaderInterceptor implements ReaderInterceptor {
+
+        @Override
+        public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException,
+            WebApplicationException {
+            context.getHeaders().add("ServerReaderInterceptor", "serverRead");
+            return context.proceed();
+        }
+        
+    }
+    
+    public static class CustomWriterInterceptor implements WriterInterceptor {
+
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
+            context.getHeaders().add("ServerWriterInterceptor", "serverWrite");
+            context.proceed();
+        }
         
     }
 }

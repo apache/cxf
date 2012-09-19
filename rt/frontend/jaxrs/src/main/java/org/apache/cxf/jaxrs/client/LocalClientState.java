@@ -20,9 +20,8 @@ package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
 
-import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -37,7 +36,7 @@ public class LocalClientState implements ClientState {
     
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>(false, true);
     private MultivaluedMap<String, String> templates;
-    private ResponseBuilder responseBuilder;
+    private Response response;
     private URI baseURI;
     private UriBuilder currentBuilder;
     
@@ -58,11 +57,8 @@ public class LocalClientState implements ClientState {
     public LocalClientState(LocalClientState cs) {
         this.requestHeaders = new MetadataMap<String, String>(cs.requestHeaders);
         this.templates = cs.templates == null ? null : new MetadataMap<String, String>(cs.templates);
-        try {
-            this.responseBuilder = cs.responseBuilder != null ? cs.responseBuilder.clone() : null;
-        } catch (CloneNotSupportedException ex) {
-            throw new ClientException(ex);
-        }
+        this.response = cs.response;
+        
         this.baseURI = cs.baseURI;
         this.currentBuilder = cs.currentBuilder != null ? cs.currentBuilder.clone() : null;
     }
@@ -85,12 +81,12 @@ public class LocalClientState implements ClientState {
         return baseURI;
     }
     
-    public void setResponseBuilder(ResponseBuilder responseBuilder) {
-        this.responseBuilder = responseBuilder;
+    public void setResponse(Response r) {
+        this.response = r;
     }
     
-    public ResponseBuilder getResponseBuilder() {
-        return responseBuilder;
+    public Response getResponse() {
+        return response;
     }
     
     public void setRequestHeaders(MultivaluedMap<String, String> requestHeaders) {
@@ -117,7 +113,7 @@ public class LocalClientState implements ClientState {
     
     public void reset() {
         requestHeaders.clear();
-        responseBuilder = null;
+        response = null;
         currentBuilder = UriBuilder.fromUri(baseURI);
         templates = null;
     }

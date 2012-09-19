@@ -25,7 +25,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -73,12 +73,12 @@ public class ThreadLocalClientState implements ClientState {
         return getState().getBaseURI();
     }
     
-    public void setResponseBuilder(ResponseBuilder responseBuilder) {
-        getState().setResponseBuilder(responseBuilder);
+    public void setResponse(Response response) {
+        getState().setResponse(response);
     }
     
-    public ResponseBuilder getResponseBuilder() {
-        return getState().getResponseBuilder();
+    public Response getResponse() {
+        return getState().getResponse();
     }
     
     public void setRequestHeaders(MultivaluedMap<String, String> requestHeaders) {

@@ -23,12 +23,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.ReaderInterceptorContext;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -69,6 +74,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("OK", response.getHeaderString("Response"));
         assertEquals("custom", response.getHeaderString("Custom"));
         assertEquals("simple", response.getHeaderString("Simple"));
+        assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
         assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
     }
     
@@ -79,16 +85,42 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         providers.add(new ClientCacheRequestFilter());
         providers.add(new ClientHeaderResponseFilter());
         WebClient wc = WebClient.create(address, providers);
-        Response r = wc.get();
+        Book theBook = new Book("Echo", 123L);
+        Response r = wc.post(theBook);
         assertEquals(201, r.getStatus());
         assertEquals("http://localhost/redirect", r.getHeaderString(HttpHeaders.LOCATION));
+        Book responseBook = r.readEntity(Book.class);
+        assertSame(theBook, responseBook);
+    }
+    
+    @Test
+    public void testPostBook() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new ClientHeaderRequestFilter());
+        providers.add(new ClientHeaderResponseFilter());
+        providers.add(new ClientReaderInterceptor());
+        providers.add(new ClientWriterInterceptor());
+        WebClient wc = WebClient.create(address, providers);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Book book = wc.post(new Book("Book", 126L), Book.class);
+        assertEquals(124L, book.getId());
+        Response response = wc.getResponse();
+        assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("custom", response.getHeaderString("Custom"));
+        assertEquals("simple", response.getHeaderString("Simple"));
+        assertEquals("serverRead", response.getHeaderString("ServerReaderInterceptor"));
+        assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("clientWrite", response.getHeaderString("ClientWriterInterceptor"));
+        assertEquals("clientRead", response.getHeaderString("ClientReaderInterceptor"));
+        assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
     }
     
     private static class ClientCacheRequestFilter implements ClientRequestFilter {
 
         @Override
         public void filter(ClientRequestContext context) throws IOException {
-            context.abortWith(Response.status(201).build());
+            context.abortWith(Response.status(201).entity(context.getEntity()).build());
         }
     }
     
@@ -107,6 +139,27 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
                            ClientResponseContext respContext) throws IOException {
             respContext.getHeaders().putSingle(HttpHeaders.LOCATION, "http://localhost/redirect");
             
+        }
+        
+    }
+    
+    public static class ClientReaderInterceptor implements ReaderInterceptor {
+
+        @Override
+        public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException,
+            WebApplicationException {
+            context.getHeaders().add("ClientReaderInterceptor", "clientRead");
+            return context.proceed();
+        }
+        
+    }
+    
+    public static class ClientWriterInterceptor implements WriterInterceptor {
+
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
+            context.getHeaders().add("ClientWriterInterceptor", "clientWrite");
+            context.proceed();
         }
         
     }
