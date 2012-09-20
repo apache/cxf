@@ -1096,21 +1096,26 @@ public class SourceGenerator {
                 String clsName = getSchemaClassName(packageName, gInfo, actualValue, 
                                                     info.getTypeClassNames());
                 
-                if (clsName == null) {
+                if (clsName != null) {
                     clsName = schemaTypeMap.get("{" + namespace + "}" + actualValue);
                 }
                 if (clsName != null) {
-                    addImport(imports, clsName);
-                    int index = clsName.lastIndexOf(".");
-                    
-                    if (index != -1) {
-                        clsName = clsName.substring(index + 1);
-                    } 
-                    return clsName;      
+                    return addImportsAndGetSimpleName(imports, clsName);
                 }
+                
             }
         }
         return defaultValue;
+    }
+    
+    private String addImportsAndGetSimpleName(Set<String> imports, String clsName) {
+        addImport(imports, clsName);
+        int index = clsName.lastIndexOf(".");
+        
+        if (index != -1) {
+            clsName = clsName.substring(index + 1);
+        }
+        return clsName;
     }
     
     private String getElementRefName(Element repElement,
@@ -1130,7 +1135,7 @@ public class SourceGenerator {
             // try mediaTypesMap first
             String mediaType = repElement.getAttribute("mediaType");
             if (!StringUtils.isEmpty(mediaType) && mediaTypesMap.containsKey(mediaType)) {
-                return mediaTypesMap.get(mediaType);
+                return addImportsAndGetSimpleName(imports, mediaTypesMap.get(mediaType));
             }
             
             Element param = DOMUtils.getFirstChildWithName(repElement, getWadlNamespace(), "param");
