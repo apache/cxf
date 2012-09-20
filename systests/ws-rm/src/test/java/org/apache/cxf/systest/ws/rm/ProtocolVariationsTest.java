@@ -289,7 +289,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getCause() instanceof SoapFault);
             // verify a partial error text match to exclude an unexpected exception
             // (see WSRM_REQUIRED_EXC in Messages.properties)
-            final String text = "WS-ReliableMessaging is required";
+            //because the ws-rm namespace isn't correct, can't detect it's a ws-rm message
+            //so can't understand ws-rm header
+            final String text = "MustUnderstand headers: " 
+                                + "[{http://cxf.apache.org/invalid}Sequence] are not understood.";
             assertTrue(e.getCause().getMessage() != null 
                 && e.getCause().getMessage().indexOf(text) >= 0);
         }
