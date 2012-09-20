@@ -1033,6 +1033,8 @@ public final class InjectionUtils {
                 }
                 if (isPrimitive(value.getClass())) {
                     values.putSingle(propertyName, value);
+                } else if (value.getClass().isEnum()) {
+                    values.putSingle(propertyName, value.toString());
                 } else if (isSupportedCollectionOrArray(value.getClass())) {
                     List<Object> theValues = null;
                     if (value.getClass().isArray()) {
