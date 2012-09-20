@@ -378,10 +378,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
 
         protected synchronized HttpResponse getHttpResponse() throws IOException {
             while (httpResponse == null) {
-                try {
-                    wait(csPolicy.getReceiveTimeout());
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
+                if (exception == null) { //already have an exception, skip waiting
+                    try {
+                        wait(csPolicy.getReceiveTimeout());
+                    } catch (InterruptedException e) {
+                        throw new IOException(e);
+                    }
                 }
                 if (httpResponse == null) {
                     outbuf.shutdown();
@@ -489,7 +491,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             return new HttpsURLConnectionInfo(url, method, cipherSuite, localCerts, principal, serverCerts, peer);
         }
         
-        protected synchronized int getResponseCode() throws IOException {
+        protected int getResponseCode() throws IOException {
             return getHttpResponse().getStatusLine().getStatusCode();
         }
         

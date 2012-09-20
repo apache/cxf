@@ -35,8 +35,17 @@ import org.apache.http.ProtocolException;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.RequestAddCookies;
+import org.apache.http.client.protocol.RequestAuthCache;
+import org.apache.http.client.protocol.RequestClientConnControl;
+import org.apache.http.client.protocol.RequestDefaultHeaders;
+import org.apache.http.client.protocol.RequestProxyAuthentication;
+import org.apache.http.client.protocol.RequestTargetAuthentication;
+import org.apache.http.client.protocol.ResponseProcessCookies;
 import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
+import org.apache.http.impl.client.TargetAuthenticationStrategy;
 import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;
 import org.apache.http.nio.conn.ClientAsyncConnectionManager;
 import org.apache.http.nio.conn.scheme.AsyncScheme;
@@ -49,16 +58,43 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.params.SyncBasicHttpParams;
+import org.apache.http.protocol.BasicHttpProcessor;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.RequestContent;
+import org.apache.http.protocol.RequestExpectContinue;
+import org.apache.http.protocol.RequestTargetHost;
+import org.apache.http.protocol.RequestUserAgent;
 
 public class CXFAsyncRequester {
 
     private final ClientAsyncConnectionManager caConMan;
+
+    // these have per-instance Logger instances that have sync methods to setup.
+    private final TargetAuthenticationStrategy targetAuthenticationStrategy = new TargetAuthenticationStrategy();
+    private final ProxyAuthenticationStrategy proxyAuthenticationStrategy = new ProxyAuthenticationStrategy();
+    private final BasicHttpProcessor httpproc;
     
     public CXFAsyncRequester(
             ClientAsyncConnectionManager caConMan) {
         super();
         this.caConMan = caConMan;
+        
+        httpproc = new BasicHttpProcessor();
+        httpproc.addInterceptor(new RequestDefaultHeaders());
+        // Required protocol interceptors
+        httpproc.addInterceptor(new RequestContent());
+        httpproc.addInterceptor(new RequestTargetHost());
+        // Recommended protocol interceptors
+        httpproc.addInterceptor(new RequestClientConnControl());
+        httpproc.addInterceptor(new RequestUserAgent());
+        httpproc.addInterceptor(new RequestExpectContinue());
+        // HTTP state management interceptors
+        httpproc.addInterceptor(new RequestAddCookies());
+        httpproc.addInterceptor(new ResponseProcessCookies());
+        // HTTP authentication interceptors
+        httpproc.addInterceptor(new RequestAuthCache());
+        httpproc.addInterceptor(new RequestTargetAuthentication());
+        httpproc.addInterceptor(new RequestProxyAuthentication());        
     }
 
     public <T> Future<T> execute(
@@ -116,6 +152,10 @@ public class CXFAsyncRequester {
                 HttpConnectionParams.setSocketBufferSize(params, 16332);
                 return params;
             }
+            @Override
+            protected BasicHttpProcessor createHttpProcessor() {
+                return httpproc;
+            }            
         };
         context.setAttribute(ClientContext.SCHEME_REGISTRY, reg);
         //CXF handles redirects ourselves
@@ -129,6 +169,9 @@ public class CXFAsyncRequester {
                 return null;
             }
         });
+        dhac.setTargetAuthenticationStrategy(targetAuthenticationStrategy);
+        dhac.setProxyAuthenticationStrategy(proxyAuthenticationStrategy);
+        
         dhac.execute(requestProducer, responseConsumer, context, callback);
 
         return future;
