@@ -46,6 +46,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -226,7 +227,13 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                 message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
             }
             while (node != null) {
-                Header holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
+                Header holder = null;
+                if (node.getLocalName().equals("Sequence")) {
+                    holder = new SoapHeader(new QName(node.getNamespaceURI(), node.getLocalName()), node);
+                    ((SoapHeader)holder).setMustUnderstand(true);
+                } else {
+                    holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
+                }
                 header.add(holder);
                 node = node.getNextSibling();
             }
