@@ -54,6 +54,8 @@ import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.transform.TransformInInterceptor;
 import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
@@ -512,12 +514,18 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                               BookStoreJaxrsJaxws.class);
+        
+        WebClient.getConfig(proxy).getOutInterceptors().add(new LoggingOutInterceptor());
+        WebClient.getConfig(proxy).getInInterceptors().add(new LoggingInInterceptor());
+        
         BookSubresource bs = proxy.getBookSubresource("139");
         OrderBean order = new OrderBean();
         order.setId(123L);
         order.setWeight(100);
+        order.setCustomerTitle(OrderBean.Title.MS);
         OrderBean order2 = bs.addOrder(order);
         assertEquals(Long.valueOf(123L), Long.valueOf(order2.getId()));
+        assertEquals(OrderBean.Title.MS, order2.getCustomerTitle());
     }
     
     @Test
