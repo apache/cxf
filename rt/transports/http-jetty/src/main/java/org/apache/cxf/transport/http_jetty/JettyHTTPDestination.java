@@ -18,7 +18,11 @@
  */
 package org.apache.cxf.transport.http_jetty;
 
+import java.io.FilterInputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -41,6 +45,7 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -55,6 +60,7 @@ import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 import org.eclipse.jetty.http.Generator;
 import org.eclipse.jetty.io.AbstractConnection;
+import org.eclipse.jetty.server.AbstractHttpConnection.Output;
 import org.eclipse.jetty.server.Request;
 import org.springframework.util.ClassUtils;
 
@@ -368,6 +374,63 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             }
         }
     }
+    
+    protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
+        OutputStream out = super.flushHeaders(outMessage, getStream);
+        if (out instanceof Output) {
+            out = new JettyOutputStream((Output)out);
+        }
+        return out;
+    }
+    static class JettyOutputStream extends FilterOutputStream implements CopyingOutputStream {
+        final Output out;
+        public JettyOutputStream(Output o) {
+            super(o);
+            out = o;
+        }
+
+        @Override
+        public int copyFrom(InputStream in) throws IOException {
+            CountingInputStream c = new CountingInputStream(in);
+            out.sendContent(c);
+            return c.getCount();
+        }
+    }
+    static class CountingInputStream extends FilterInputStream {
+        int count;
+        public CountingInputStream(InputStream in) {
+            super(in);
+        }
+        public int getCount() {
+            return count;
+        }
+        
+        @Override
+        public int read() throws IOException {
+            int i = super.read();
+            if (i != -1) {
+                ++count;
+            }
+            return i;
+        }
+        @Override
+        public int read(byte[] b) throws IOException {
+            int i = super.read(b);
+            if (i != -1) {
+                count += i;
+            }
+            return i;
+        }
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            int i = super.read(b, off, len);
+            if (i != -1) {
+                count += i;
+            }
+            return i;
+        }
+    }
+    
  
     public ServerEngine getEngine() {
         return engine;

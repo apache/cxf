@@ -30,9 +30,11 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import org.apache.cxf.io.CopyingOutputStream;
+
 public final class IOUtils {
     public static final Charset UTF8_CHARSET = Charset.forName("utf-8");
-    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     private IOUtils() {
 
@@ -100,13 +102,16 @@ public final class IOUtils {
 
     public static int copy(final InputStream input, final OutputStream output)
         throws IOException {
+        if (output instanceof CopyingOutputStream) {
+            return ((CopyingOutputStream)output).copyFrom(input);
+        }
         return copy(input, output, DEFAULT_BUFFER_SIZE);
     }
 
     public static int copyAndCloseInput(final InputStream input,
             final OutputStream output) throws IOException {
         try {
-            return copy(input, output, DEFAULT_BUFFER_SIZE);
+            return copy(input, output);
         } finally {
             input.close();
         }

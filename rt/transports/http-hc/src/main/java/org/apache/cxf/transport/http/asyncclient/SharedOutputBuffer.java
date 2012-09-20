@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.http.asyncclient;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Condition;
@@ -171,6 +172,54 @@ public class SharedOutputBuffer extends ExpandableBuffer {
             this.lock.unlock();
         }
     }
+    public int copy(InputStream in) throws IOException {
+        this.lock.lock();
+        int total = 0;
+        try {
+            if (this.shutdown || this.endOfStream) {
+                throw new IllegalStateException("Buffer already closed for writing");
+            }
+            setInputMode();
+            int i = 0;
+            boolean yielded = false;
+            while (i != -1) {
+                if (!this.buffer.hasRemaining()) {
+                    flushContent();
+                    setInputMode();
+                }
+                i = in.available();
+                if (i == 0 && !yielded) {
+                    //nothing avail right now, we'll attempt an
+                    //output, but not really force a flush.
+                    if (buffer.position() != 0 && this.ioctrl != null) {
+                        this.ioctrl.requestOutput();
+                    }
+                    try {
+                        condition.awaitNanos(1);
+                    } catch (InterruptedException e) {
+                        //ignore
+                    }
+                    setInputMode();
+                    yielded = true;
+                } else {
+                    int p = this.buffer.position();
+                    i = in.read(this.buffer.array(), this.buffer.position(), this.buffer.remaining());
+                    yielded = false;
+                    if (i != -1) {
+                        total += i;
+                        buffer.position(p + i);
+                    }
+                    /*
+                    System.out.println("p: " + p + "  " + i + " " + this.buffer.position() 
+                                       + " " + this.buffer.hasRemaining());
+                                       */
+                }
+            }
+        } finally {
+            this.lock.unlock();
+        }
+        return total;
+    }
 
     public void write(final byte[] b, int off, int len) throws IOException {
         if (b == null) {
@@ -269,5 +318,6 @@ public class SharedOutputBuffer extends ExpandableBuffer {
             this.lock.unlock();
         }
     }
+
 
 }

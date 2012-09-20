@@ -51,6 +51,10 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
         };
     }
     
+    public void setSize(int i) {
+        count = i;
+    }
+    
     public byte[] toByteArray() {
         if (count != buf.length) {
             buf = super.toByteArray();

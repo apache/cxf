@@ -50,9 +50,11 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
+import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -647,7 +649,7 @@ public abstract class AbstractHTTPDestination
      * Wrapper stream responsible for flushing headers and committing outgoing
      * HTTP-level response.
      */
-    private class WrappedOutputStream extends AbstractWrappedOutputStream {
+    private class WrappedOutputStream extends AbstractWrappedOutputStream implements CopyingOutputStream {
 
         protected HttpServletResponse response;
         private Message outMessage;
@@ -658,6 +660,19 @@ public abstract class AbstractHTTPDestination
             response = resp;
         }
 
+        
+        @Override
+        public int copyFrom(InputStream in) throws IOException {
+            if (!written) {
+                onFirstWrite();
+                written = true;
+            }
+            if (wrappedStream != null) {
+                return IOUtils.copy(in, wrappedStream);
+            }
+            return IOUtils.copy(in, this, IOUtils.DEFAULT_BUFFER_SIZE);
+        }
+        
         /**
          * Perform any actions required on stream flush (freeze headers,
          * reset output stream ... etc.)
@@ -699,6 +714,7 @@ public abstract class AbstractHTTPDestination
             }
             */
         }
+
     }
 
     protected boolean contextMatchOnExact() {
