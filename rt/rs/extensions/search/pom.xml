@@ -36,6 +36,9 @@
     <properties>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
+        <cxf.osgi.import>
+            org.apache.cxf.jaxrs.impl.tl
+        </cxf.osgi.import>
     </properties>
 
     <dependencies>
