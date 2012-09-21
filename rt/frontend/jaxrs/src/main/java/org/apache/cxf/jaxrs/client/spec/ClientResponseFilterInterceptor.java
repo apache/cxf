@@ -41,7 +41,7 @@ import org.apache.cxf.phase.Phase;
 public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterceptor {
 
     public ClientResponseFilterInterceptor() {
-        super(Phase.UNMARSHAL);
+        super(Phase.PRE_PROTOCOL_FRONTEND);
     }
     
     public void handleMessage(Message inMessage) throws Fault {

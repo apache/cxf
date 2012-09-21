@@ -22,18 +22,23 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
+import javax.xml.ws.Holder;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -55,11 +60,21 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestBook(address);
     }
+    @Test
+    public void testGetBookAsync() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        doTestBookAsync(address);
+    }
     
     @Test
     public void testGetBookWrongPath() {
         String address = "http://localhost:" + PORT + "/wrongpath";
         doTestBook(address);
+    }
+    @Test
+    public void testGetBookWrongPathAsync() throws Exception {
+        String address = "http://localhost:" + PORT + "/wrongpath";
+        doTestBookAsync(address);
     }
     
     private void doTestBook(String address) {
@@ -69,6 +84,31 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient wc = WebClient.create(address, providers);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Book book = wc.get(Book.class);
+        assertEquals(124L, book.getId());
+        Response response = wc.getResponse();
+        assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("custom", response.getHeaderString("Custom"));
+        assertEquals("simple", response.getHeaderString("Simple"));
+        assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
+    }
+    private void doTestBookAsync(String address) throws InterruptedException, ExecutionException {
+        List<Object> providers = new ArrayList<Object>();
+        providers.add(new ClientHeaderRequestFilter());
+        providers.add(new ClientHeaderResponseFilter());
+        WebClient wc = WebClient.create(address, providers);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        
+        final Holder<Book> holder = new Holder<Book>();
+        Future<Book> future = wc.get(new InvocationCallback<Book>() {
+            public void completed(Book response) {
+                holder.value = response;
+            }
+            public void failed(ClientException error) {
+            }
+        });
+        Book book = future.get();
+        assertSame(book, holder.value);
         assertEquals(124L, book.getId());
         Response response = wc.getResponse();
         assertEquals("OK", response.getHeaderString("Response"));

@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.client;
 
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
@@ -28,9 +29,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientException;
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -56,6 +59,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 
 
 /**
@@ -74,10 +79,36 @@ public class WebClient extends AbstractClient {
     
     protected WebClient(URI baseAddress) {
         super(baseAddress);
+        cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
     }
     
     protected WebClient(ClientState state) {
         super(state);
+        cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
+    }
+    
+    
+    class ClientAsyncResponseInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ClientAsyncResponseInterceptor() {
+            super(Phase.UNMARSHAL);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+            if (message.getExchange().isSynchronous()) {
+                return;
+            }
+            handleAsyncResponse(message);
+        }
+
+        @Override
+        public void handleFault(Message message) {
+            if (message.getExchange().isSynchronous()) {
+                return;
+            }
+            handleAsyncFault(message);
+        }
+
     }
     
     /**
@@ -468,6 +499,10 @@ public class WebClient extends AbstractClient {
         return invoke("GET", null, responseClass);
     }
     
+    public <T> Future<T> get(InvocationCallback<T> callback) {
+        return doInvokeAsync("GET", null, null, null, callback);
+    }
+    
     /**
      * Updates the current URI path
      * @param path new relative path segment
@@ -746,7 +781,100 @@ public class WebClient extends AbstractClient {
         }
         return r;
     }
+    
+    private ParameterizedType findCallbackType(Class<?> cls) {
+        if (cls == null || cls == Object.class) {
+            return null;
+        }
+        for (Type c2 : cls.getGenericInterfaces()) {
+            if (c2 instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType)c2;
+                if (InvocationCallback.class.equals(pt.getRawType())) {
+                    return pt;
+                }
+            }
+        }
+        return findCallbackType(cls.getSuperclass());
+    }
+    private Type getCallbackType(InvocationCallback<?> callback) {
+        Class<?> cls = callback.getClass();
+        ParameterizedType t = findCallbackType(cls);
+        for (Type tp : t.getActualTypeArguments()) {
+            return tp;
+        }
+        return null;
+    }
+    protected <T> Future<T> doInvokeAsync(String httpMethod, 
+                                          Object body, 
+                                          Class<?> requestClass,
+                                          Type inGenericType,
+                                          InvocationCallback<T> callback) {
+        MultivaluedMap<String, String> headers = getHeaders();
+        boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
+        if (contentTypeNotSet) {
+            String ct = "*/*";
+            if (body != null) { 
+                ct = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
+                                          : MediaType.APPLICATION_XML;
+            }
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
+        }
+        Type outGenericType = getCallbackType(callback);
+        Class<?> responseClass = outGenericType instanceof Class ? (Class<?>) outGenericType : null;
+        if (responseClass != null && responseClass != Response.class 
+            && headers.getFirst(HttpHeaders.ACCEPT) == null) {
+            headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
+        }
+        resetResponse();
+        URI uri = getCurrentURI();
+        Exchange exchange = null;
+        Map<String, Object> invContext = null;
+        
+        Message m = createMessage(body, httpMethod, headers, uri, exchange, 
+                invContext, false);
+        
+        m.getExchange().setSynchronous(false);
+        
+        Map<String, Object> reqContext = getRequestContext(m);
+        reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
+        reqContext.put(REQUEST_CLASS, requestClass);
+        reqContext.put(REQUEST_TYPE, inGenericType);
+        reqContext.put(RESPONSE_CLASS, responseClass);
+        reqContext.put(RESPONSE_TYPE, outGenericType);
+        
+        if (body != null) {
+            m.getInterceptorChain().add(new BodyWriter());
+        }
+        setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
+        
+        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, responseClass, outGenericType);
+        m.getExchange().put(JaxrsClientCallback.class, cb);
+        try {
+            m.getInterceptorChain().doIntercept(m);
+        } catch (Exception ex) {
+            m.setContent(Exception.class, ex);
+        }
+        
+        return cb.createFuture();
+    }
 
+    private void handleAsyncResponse(Message message) {
+        JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
+        Response r = handleResponse(message.getExchange().getOutMessage(),
+                                    cb.getResponseClass(),
+                                    cb.getOutGenericType());
+        
+        if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
+            cb.handleResponse(message, new Object[] {r});
+        } else {
+            cb.handleResponse(message, new Object[] {r.getEntity()});
+        }
+    }
+    public void handleAsyncFault(Message message) {
+    }
+
+
+    
     @Override
     protected Object retryInvoke(URI newRequestURI, 
                                  MultivaluedMap<String, String> headers,
@@ -795,6 +923,11 @@ public class WebClient extends AbstractClient {
         } catch (Exception ex) {
             m.setContent(Exception.class, ex);
         }
+        return doResponse(m, responseClass, outGenericType);
+    }
+    protected Response doResponse(Message m, 
+                                  Class<?> responseClass, 
+                                  Type outGenericType) {
         try {
             Object[] results = preProcessResult(m);
             if (results != null && results.length == 1) {
