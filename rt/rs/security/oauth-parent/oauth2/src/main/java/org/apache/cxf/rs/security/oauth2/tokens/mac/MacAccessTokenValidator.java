@@ -89,7 +89,7 @@ public class MacAccessTokenValidator implements AccessTokenValidator {
         try {
             HmacAlgorithm hmacAlgo = HmacAlgorithm.toHmacAlgorithm(macAccessToken.getMacAlgorithm());
             byte[] serverMacData = HmacUtils.computeHmac(
-                macAccessToken.getMacSecret(), hmacAlgo, normalizedString); 
+                macAccessToken.getMacKey(), hmacAlgo, normalizedString); 
                                                          
             byte[] clientMacData = Base64Utility.decode(clientMacString);
             boolean validMac = Arrays.equals(serverMacData, clientMacData);

@@ -274,8 +274,8 @@ public final class OAuthClientUtils {
             }
             MacAuthorizationScheme macAuthData = new MacAuthorizationScheme(httpProps, token);
             String macAlgo = token.getParameters().get(OAuthConstants.MAC_TOKEN_ALGORITHM);
-            String macSecret = token.getParameters().get(OAuthConstants.MAC_TOKEN_SECRET);
-            sb.append(macAuthData.toAuthorizationHeader(macAlgo, macSecret));
+            String macKey = token.getParameters().get(OAuthConstants.MAC_TOKEN_KEY);
+            sb.append(macAuthData.toAuthorizationHeader(macAlgo, macKey));
         } else {
             throw new ClientWebApplicationException(new OAuthServiceException("Unsupported token type"));
         }

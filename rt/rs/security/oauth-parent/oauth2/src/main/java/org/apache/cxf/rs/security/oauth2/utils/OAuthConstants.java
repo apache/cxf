@@ -50,13 +50,14 @@ public final class OAuthConstants {
     
     // MAC token parameters
     // Set by Access Token Service
-    public static final String MAC_TOKEN_SECRET = "secret";
-    public static final String MAC_TOKEN_ALGORITHM = "algorithm";
+    public static final String MAC_TOKEN_KEY = "mac_key";
+    public static final String MAC_TOKEN_ALGORITHM = "mac_algorithm";
     public static final String MAC_TOKEN_ALGO_HMAC_SHA_1 = "hmac-sha-1";
     public static final String MAC_TOKEN_ALGO_HMAC_SHA_256 = "hmac-sha-256";
     
     // Set in Authorization header
     public static final String MAC_TOKEN_ID = "id";
+    public static final String MAC_TOKEN_TIMESTAMP = "ts";
     public static final String MAC_TOKEN_EXTENSION = "ext";
     public static final String MAC_TOKEN_NONCE = "nonce";
     public static final String MAC_TOKEN_SIGNATURE = "mac";

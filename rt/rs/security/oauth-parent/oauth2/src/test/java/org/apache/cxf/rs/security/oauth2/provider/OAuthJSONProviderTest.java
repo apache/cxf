@@ -107,7 +107,7 @@ public class OAuthJSONProviderTest extends Assert {
         token.setRefreshToken("5678");
         token.setApprovedScope("read");
         Map<String, String> params = new LinkedHashMap<String, String>();
-        params.put(OAuthConstants.MAC_TOKEN_SECRET, "test_mac_secret");
+        params.put(OAuthConstants.MAC_TOKEN_KEY, "test_mac_secret");
         params.put(OAuthConstants.MAC_TOKEN_ALGORITHM, OAuthConstants.MAC_TOKEN_ALGO_HMAC_SHA_1);
         params.put("my_parameter", "abc");
         
@@ -127,11 +127,11 @@ public class OAuthJSONProviderTest extends Assert {
     public void testReadMacClientAccessToken() throws Exception {
         String response = "{" + "\"access_token\":\"1234\"," + "\"token_type\":\"mac\","
             + "\"refresh_token\":\"5678\"," + "\"expires_in\":12345," + "\"scope\":\"read\","
-            + "\"secret\":\"adijq39jdlaska9asud\"," + "\"algorithm\":\"hmac-sha-256\","
+            + "\"mac_key\":\"adijq39jdlaska9asud\"," + "\"mac_algorithm\":\"hmac-sha-256\","
             + "\"my_parameter\":\"abc\"" + "}";
         ClientAccessToken macToken = doReadClientAccessToken(response, "mac", null);
         assertEquals("adijq39jdlaska9asud", 
-                     macToken.getParameters().get(OAuthConstants.MAC_TOKEN_SECRET));
+                     macToken.getParameters().get(OAuthConstants.MAC_TOKEN_KEY));
         assertEquals("hmac-sha-256",
                      macToken.getParameters().get(OAuthConstants.MAC_TOKEN_ALGORITHM));
     }
