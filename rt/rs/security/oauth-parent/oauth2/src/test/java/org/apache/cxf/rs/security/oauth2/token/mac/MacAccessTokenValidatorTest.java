@@ -78,7 +78,7 @@ public class MacAccessTokenValidatorTest extends Assert {
         
         return new MacAuthorizationScheme(props, macAccessToken)
             .toAuthorizationHeader(macAccessToken.getMacAlgorithm(),
-                                   macAccessToken.getMacSecret());
+                                   macAccessToken.getMacKey());
     }
     
     private static HttpServletRequest mockHttpRequest() {

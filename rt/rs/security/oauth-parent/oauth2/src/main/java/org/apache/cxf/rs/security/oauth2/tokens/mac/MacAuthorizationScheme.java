@@ -40,14 +40,14 @@ public class MacAuthorizationScheme {
         this.props = props;
         this.macKey = token.getTokenKey();
         this.timestamp = Long.toString(System.currentTimeMillis());
-        this.nonce = generateNonce(token.getIssuedAt());
+        this.nonce = generateNonce();
     }
     
     public MacAuthorizationScheme(HttpRequestProperties props,
                                   Map<String, String> schemeParams) {
         this.props = props;
         this.macKey = schemeParams.get(OAuthConstants.MAC_TOKEN_ID);
-        this.timestamp = schemeParams.get(OAuthConstants.MAC_TOKEN_EXTENSION);
+        this.timestamp = schemeParams.get(OAuthConstants.MAC_TOKEN_TIMESTAMP);
         this.nonce = schemeParams.get(OAuthConstants.MAC_TOKEN_NONCE);
     }
     
@@ -73,8 +73,7 @@ public class MacAuthorizationScheme {
         addParameter(sb, OAuthConstants.MAC_TOKEN_ID, macKey, false);
         addParameter(sb, OAuthConstants.MAC_TOKEN_NONCE, nonce, false);
         addParameter(sb, OAuthConstants.MAC_TOKEN_SIGNATURE, signature, false);
-        // lets pass a timestamp via an extension parameter
-        addParameter(sb, OAuthConstants.MAC_TOKEN_EXTENSION, timestamp, false);
+        addParameter(sb, OAuthConstants.MAC_TOKEN_TIMESTAMP, timestamp, false);
         
         
         return sb.toString();
@@ -95,13 +94,13 @@ public class MacAuthorizationScheme {
         }
         
         
-        String value = nonce + SEPARATOR
+        String value = timestamp + SEPARATOR 
+            + nonce + SEPARATOR
             + props.getHttpMethod().toUpperCase() + SEPARATOR
             + requestURI + SEPARATOR 
             + props.getHostName() + SEPARATOR 
             + props.getPort() + SEPARATOR
-            + "" + SEPARATOR
-            + timestamp + SEPARATOR;
+            + "" + SEPARATOR;
 
         return value;
     }
@@ -110,16 +109,12 @@ public class MacAuthorizationScheme {
         return query;
     }
     
-    private static String generateNonce(long issuedAt) {
-        long ageInSecs = System.currentTimeMillis() / 1000 - issuedAt;
-        if (ageInSecs == 0) {
-            ageInSecs = 1;
-        }
+    private static String generateNonce() {
         byte[] randomBytes = new byte[20];
         new SecureRandom().nextBytes(randomBytes);
         String random = Base64Utility.encode(randomBytes);
         
-        return Long.toString(ageInSecs) + ":" + random;
+        return random;
     }
 
 }
