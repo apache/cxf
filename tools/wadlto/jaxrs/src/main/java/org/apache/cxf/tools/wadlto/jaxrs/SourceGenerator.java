@@ -1096,7 +1096,7 @@ public class SourceGenerator {
                 String clsName = getSchemaClassName(packageName, gInfo, actualValue, 
                                                     info.getTypeClassNames());
                 
-                if (clsName != null) {
+                if (clsName == null) {
                     clsName = schemaTypeMap.get("{" + namespace + "}" + actualValue);
                 }
                 if (clsName != null) {
