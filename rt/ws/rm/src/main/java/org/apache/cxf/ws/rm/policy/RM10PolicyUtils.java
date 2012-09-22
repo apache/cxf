@@ -21,7 +21,9 @@ package org.apache.cxf.ws.rm.policy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -37,6 +39,7 @@ import org.apache.cxf.ws.rmp.v200502.RMAssertion.InactivityTimeout;
  * 
  */
 public final class RM10PolicyUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(RM10PolicyUtils.class); 
     
     /**
      * Prevents instantiation.
@@ -58,6 +61,8 @@ public final class RM10PolicyUtils {
             if (ais != null) {
                 mergedAsserts.addAll(ais);
             }
+
+            //REVISIT this class shouldn't be picking RMP200702 assertions (see below)
             ais = aim.get(RM11Constants.WSRMP_RMASSERTION_QNAME);
             if (ais != null) {
                 mergedAsserts.addAll(ais);
@@ -78,9 +83,15 @@ public final class RM10PolicyUtils {
         RMAssertion compatible = defaultValue;
         Collection<AssertionInfo> ais = collectRMAssertions(message.get(AssertionInfoMap.class));
         for (AssertionInfo ai : ais) {
-            JaxbAssertion<RMAssertion> ja = getAssertion(ai);
-            RMAssertion rma = ja.getData();
-            compatible = null == defaultValue ? rma : intersect(compatible, rma);
+            //REVISIT this class can't handle RMP200702 assertions, so guard against CCE 
+            if (ai.getAssertion() instanceof JaxbAssertion 
+                && ((JaxbAssertion<?>)ai.getAssertion()).getData() instanceof RMAssertion) {
+                JaxbAssertion<RMAssertion> ja = getAssertion(ai);
+                RMAssertion rma = (RMAssertion)ja.getData(); 
+                compatible = null == defaultValue ? rma : intersect(compatible, rma);
+            } else {
+                LOG.warning("Ignoring unexpected assertion class: " + ai.getAssertion());
+            }
         }
         return compatible;
     }
