@@ -1,4 +1,5 @@
 org.apache.cxf.ws.rm.RMManager::true
 org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider::true
 org.apache.cxf.ws.rm.policy.RMAssertionBuilder::true
+org.apache.cxf.ws.rm.policy.RM11AssertionBuilder::true:true
 
