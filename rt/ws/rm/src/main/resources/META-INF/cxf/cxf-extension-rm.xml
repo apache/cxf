@@ -39,4 +39,9 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <constructor-arg ref="cxf"/>
         <constructor-arg value="org.apache.cxf.ws.rm.policy.RMAssertionBuilder"/>
     </bean>
+    <bean id="org.apache.cxf.ws.rm.policy.RM11AssertionBuilder"
+        class="org.apache.cxf.bus.spring.OldSpringSupport" lazy-init="true">
+        <constructor-arg ref="cxf"/>
+        <constructor-arg value="org.apache.cxf.ws.rm.policy.RM11AssertionBuilder"/>
+    </bean>
 </beans>
