@@ -60,10 +60,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestBook(address);
     }
+    
     @Test
     public void testGetBookAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
-        doTestBookAsync(address);
+        doTestBookAsync(address, false);
+    }
+    
+    @Test
+    public void testGetBookAsyncInvoker() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        doTestBookAsync(address, true);
     }
     
     @Test
@@ -74,7 +81,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testGetBookWrongPathAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/wrongpath";
-        doTestBookAsync(address);
+        doTestBookAsync(address, false);
     }
     
     private void doTestBook(String address) {
@@ -92,7 +99,10 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
         assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
     }
-    private void doTestBookAsync(String address) throws InterruptedException, ExecutionException {
+    
+    private void doTestBookAsync(String address, boolean asyncInvoker) 
+        throws InterruptedException, ExecutionException {
+        
         List<Object> providers = new ArrayList<Object>();
         providers.add(new ClientHeaderRequestFilter());
         providers.add(new ClientHeaderResponseFilter());
@@ -100,13 +110,15 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         
         final Holder<Book> holder = new Holder<Book>();
-        Future<Book> future = wc.get(new InvocationCallback<Book>() {
+        final InvocationCallback<Book> callback = new InvocationCallback<Book>() {
             public void completed(Book response) {
                 holder.value = response;
             }
             public void failed(ClientException error) {
             }
-        });
+        };
+        
+        Future<Book> future = asyncInvoker ? wc.async().get(callback) : wc.get(callback);
         Book book = future.get();
         assertSame(book, holder.value);
         assertEquals(124L, book.getId());
