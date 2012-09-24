@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.service.factory.FactoryBeanListener;
@@ -93,7 +94,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * @param app
      */
     public void setApplication(Application app) {
-        appProvider = new ProviderInfo<Application>(app, getBus());    
+        appProvider = new ProviderInfo<Application>(app, getBus());
+        for (ClassResourceInfo cri : getServiceFactory().getClassResourceInfo()) {
+            cri.setNameBindings(AnnotationUtils.getNameBindings(app.getClass().getAnnotations()));
+        }
     }
     
     /**

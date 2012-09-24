@@ -19,7 +19,12 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,12 +36,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
+import javax.ws.rs.NameBinding;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.After;
@@ -48,7 +56,7 @@ public class ClassResourceInfoTest extends Assert {
     @Path("/bar")
     @Produces("test/bar")
     @Consumes("test/foo")
-    static class TestClass {
+    public static class TestClass {
         @Context UriInfo u;
         @Context HttpHeaders h;
         @Resource HttpServletRequest req;
@@ -73,6 +81,16 @@ public class ClassResourceInfoTest extends Assert {
         @GET
         public void getIt() { 
             
+        }
+      
+        @Path("/same")
+        public TestClass2 getThis() { 
+            return this;
+        }
+        
+        @Path("sub")
+        public TestClass3 getTestClass3() { 
+            return new TestClass3();
         }
     }
     
@@ -99,7 +117,7 @@ public class ClassResourceInfoTest extends Assert {
     
     @Test
     public void testGetHttpContexts() {
-        ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
+        ClassResourceInfo c = new ClassResourceInfo(TestClass.class, false);
         List<Field> fields = c.getContextFields();
         assertEquals("Only root classes should check these fields", 0, fields.size());
         
@@ -190,5 +208,44 @@ public class ClassResourceInfoTest extends Assert {
         Set<String> methods = c.getAllowedMethods();
         assertEquals(2, methods.size());
         assertTrue(methods.contains("HEAD") && methods.contains("GET"));
+    }
+    
+    @Test
+    public void testSubresourceInheritProduces() {
+        ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
+                                  TestClass2.class, TestClass2.class, true, true);
+        assertEquals("test/bar", c.getProduceMime().get(0).toString());
+        ClassResourceInfo sub = c.getSubResource(TestClass2.class, TestClass3.class);
+        assertNotNull(sub);
+        assertEquals("test/bar", sub.getProduceMime().get(0).toString());
+        sub = c.getSubResource(TestClass2.class, TestClass2.class);
+        assertNotNull(sub);
+        assertEquals("test/bar", sub.getProduceMime().get(0).toString());
+    }
+    
+    @Test
+    public void testNameBindings() {
+        Application app = new TestApplication();
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, true, true);
+        ClassResourceInfo cri = bean.getServiceFactory().getClassResourceInfo().get(0);
+        List<String> names = cri.getNameBindings();
+        assertEquals(Collections.singletonList(CustomNameBinding.class.getName()), names);
+    }
+    
+    @Target({ ElementType.TYPE, ElementType.METHOD })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @NameBinding
+    public @interface CustomNameBinding { 
+        
+    }
+    
+    @CustomNameBinding
+    public class TestApplication extends Application {
+        @Override
+        public Set<Class<?>> getClasses() {
+            Set<Class<?>> classes = new HashSet<Class<?>>();
+            classes.add(TestClass.class);
+            return classes;
+        }
     }
 }

@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -102,7 +103,15 @@ public class OperationResourceInfo {
     }
     
     public List<String> getNameBindings() {
-        return nameBindings;
+        List<String> criNames = classResourceInfo.getNameBindings();
+        if (criNames.isEmpty()) {
+            return nameBindings;
+        } else {
+            List<String> all = new ArrayList<String>(criNames.size() + nameBindings.size());
+            all.addAll(criNames);
+            all.addAll(nameBindings);
+            return all;
+        }
     }
     
     private void checkOneway() {
