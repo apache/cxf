@@ -161,6 +161,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-transports-http-hc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-transports-udp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
         </dependency>
@@ -329,6 +339,17 @@
             <artifactId>cxf-services-wsn-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.ws-discovery</groupId>
+            <artifactId>cxf-services-ws-discovery-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.services.ws-discovery</groupId>
+            <artifactId>cxf-services-ws-discovery-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
 
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
