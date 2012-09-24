@@ -92,7 +92,7 @@ For JAX-RS support:
 - commons-codec.jar (Needed for Abdera)
 - jaxen.jar (Needed for Abdera)
 - axiom* (Needed for Abdera)
-- jsr311-api.jar
+- javax.ws.rs-apijar
 - jettison.jar (Needed for JSON services only)
 - oauth*.jar (Needed for OAuth support)
 
@@ -100,6 +100,16 @@ For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
 - spring-jms.jar
 - spring-tx.jar
+
+For the UDP transport
+- mina-core.jar
+
+For the Async HTTP client transport
+- commons-codec.jar
+- httpasyncclient.jar
+- httpcore.jar
+- httpclient.jar
+- httpcore-nio-4.2.2.jar
 
 For CORBA support:
 - antlr.jar
@@ -120,5 +130,11 @@ For the WS-Notification Service:
 
 For the CXF Security Token Service:
  - cxf-services-sts-core.jar
+
+For the WS-Discovery Service
+ - cxf-ws-discovery-api.jar
+ - cxf-ws-discovery-service.jar
+
+
 
 
