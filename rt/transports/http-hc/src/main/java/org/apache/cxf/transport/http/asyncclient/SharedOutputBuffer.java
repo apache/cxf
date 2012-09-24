@@ -255,6 +255,33 @@ public class SharedOutputBuffer extends ExpandableBuffer {
             this.lock.unlock();
         }
     }
+    
+    public int write(ByteBuffer b) throws IOException {
+        if (b == null) {
+            return 0;
+        }
+        this.lock.lock();
+        try {
+            if (this.shutdown || this.endOfStream) {
+                throw new IllegalStateException("Buffer already closed for writing");
+            }
+            setInputMode();
+            
+            if (!this.buffer.hasRemaining()) {
+                flushContent();
+                setInputMode();
+            }
+            int c = b.limit() - b.position();
+            largeWrapper = b;
+            while (largeWrapper.hasRemaining()) {
+                flushContent();
+            }
+            largeWrapper = null;
+            return c;
+        } finally {
+            this.lock.unlock();
+        }
+    }
 
     public void write(final byte[] b) throws IOException {
         if (b == null) {
@@ -319,5 +346,6 @@ public class SharedOutputBuffer extends ExpandableBuffer {
         }
     }
 
+    
 
 }

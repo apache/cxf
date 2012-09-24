@@ -30,6 +30,8 @@ import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.security.cert.Certificate;
@@ -186,7 +188,8 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
     }
     
     
-    public class AsyncWrappedOutputStream extends WrappedOutputStream implements CopyingOutputStream {
+    public class AsyncWrappedOutputStream extends WrappedOutputStream 
+        implements CopyingOutputStream, WritableByteChannel {
         final HTTPClientPolicy csPolicy;
 
         CXFHttpRequest entity;
@@ -264,7 +267,33 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             outbuf.writeCompleted();
         }
         
-        
+        public boolean isOpen() {
+            return true;
+        }
+
+        public int write(ByteBuffer src) throws IOException {
+            int total = 0;
+            if (buffer != null) {
+                int pos = buffer.size();
+                int len = this.threshold - pos;
+                if (len > src.remaining()) {
+                    len = src.remaining();
+                }
+                src.get(buffer.getRawBytes(), pos, len);
+                buffer.setSize(buffer.size() + len);
+                total += len;
+                if (buffer.size() >= threshold) {
+                    thresholdReached();
+                    unBuffer();
+                }
+            }
+            if (cachingForRetransmission) {
+                wrappedStream.write(src.array(), src.position(), src.remaining());
+                return src.remaining() + total;
+            }
+            return outbuf.write(src) + total;
+        }
+
         public int copyFrom(InputStream in) throws IOException {
             int count = 0;
             if (buffer != null) {
@@ -638,6 +667,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 sessionLock.notifyAll();
             }
         }
+
     }
 
 
