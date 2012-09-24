@@ -383,6 +383,16 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Does HTTP Async POST invocation and returns Future.
+     * Shortcut for async().get(InvocationCallback)
+     * @param callback invocation callback 
+     * @return the future
+     */
+    public <T> Future<T> post(Object body, InvocationCallback<T> callback) {
+        return doInvokeAsyncCallback("POST", body, body.getClass(), getClass(), callback);
+    }
+    
+    /**
      * Does HTTP invocation and returns a collection of typed objects 
      * @param httpMethod HTTP method 
      * @param body request body, can be null
