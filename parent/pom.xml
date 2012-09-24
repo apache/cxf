@@ -102,7 +102,7 @@
         <cxf.specs.jaxws.api.version>1.1</cxf.specs.jaxws.api.version>
 
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jetty.version>8.1.4.v20120524</cxf.jetty.version>
+        <cxf.jetty.version>8.1.7.v20120910</cxf.jetty.version>
         <cxf.jetty.osgi.version>[7.2,8.2)</cxf.jetty.osgi.version>
 	    <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
         <cxf.msv.version>2011.1</cxf.msv.version>
@@ -660,7 +660,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.8.2</version>
+                <version>1.8.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
