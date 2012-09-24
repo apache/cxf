@@ -488,7 +488,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> get(InvocationCallback<T> callback) {
-        return doInvokeAsync("GET", null, null, null, callback);
+        return doInvokeAsyncCallback("GET", null, null, null, callback);
     }
     
     /**
@@ -780,14 +780,25 @@ public class WebClient extends AbstractClient {
         return null;
     }
     
+    protected <T> Future<T> doInvokeAsyncCallback(String httpMethod, 
+                                                  Object body, 
+                                                  Class<?> requestClass,
+                                                  Type inType,
+                                                  InvocationCallback<T> callback) {
+        
+        Type outType = getCallbackType(callback);
+        Class<?> respClass = outType instanceof Class ? (Class<?>) outType : null;
+        
+        return doInvokeAsync(httpMethod, body, requestClass, inType, respClass, outType, callback);
+    }
+    
     protected <T> Future<T> doInvokeAsync(String httpMethod, 
                                           Object body, 
                                           Class<?> requestClass,
                                           Type inType,
+                                          Class<?> respClass,
+                                          Type outType,
                                           InvocationCallback<T> callback) {
-        
-        Type outType = getCallbackType(callback);
-        Class<?> respClass = outType instanceof Class ? (Class<?>) outType : null;
         
         MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
         resetResponse();
@@ -1059,206 +1070,178 @@ public class WebClient extends AbstractClient {
 
         @Override
         public Future<Response> get() {
-            // TODO Auto-generated method stub
-            return null;
+            return get(Response.class);
         }
 
         @Override
         public <T> Future<T> get(Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("GET", responseType);
         }
 
         @Override
         public <T> Future<T> get(GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("GET", responseType);
         }
 
         @Override
         public <T> Future<T> get(InvocationCallback<T> callback) {
-            return doInvokeAsync("GET", null, null, null, callback);
+            return method("GET", callback);
         }
 
         @Override
         public Future<Response> put(Entity<?> entity) {
-            // TODO Auto-generated method stub
-            return null;
+            return put(entity, Response.class);
         }
 
         @Override
         public <T> Future<T> put(Entity<?> entity, Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("PUT", entity, responseType);
         }
 
         @Override
         public <T> Future<T> put(Entity<?> entity, GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("PUT", entity, responseType);
         }
 
         @Override
         public <T> Future<T> put(Entity<?> entity, InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("PUT", entity, callback);
         }
 
         @Override
         public Future<Response> post(Entity<?> entity) {
-            // TODO Auto-generated method stub
-            return null;
+            return post(entity, Response.class);
         }
 
         @Override
         public <T> Future<T> post(Entity<?> entity, Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("POST", entity, responseType);
         }
 
         @Override
         public <T> Future<T> post(Entity<?> entity, GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("POST", entity, responseType);
         }
 
         @Override
         public <T> Future<T> post(Entity<?> entity, InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("POST", entity, callback);
         }
 
         @Override
         public Future<Response> delete() {
-            // TODO Auto-generated method stub
-            return null;
+            return delete(Response.class);
         }
 
         @Override
         public <T> Future<T> delete(Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("DELETE", responseType);
         }
 
         @Override
         public <T> Future<T> delete(GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("DELETE", responseType);
         }
 
         @Override
         public <T> Future<T> delete(InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("DELETE", callback);
         }
 
         @Override
         public Future<Response> head() {
-            // TODO Auto-generated method stub
-            return null;
+            return method("HEAD");
         }
 
         @Override
         public Future<Response> head(InvocationCallback<Response> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("HEAD", callback);
         }
 
         @Override
         public Future<Response> options() {
-            // TODO Auto-generated method stub
-            return null;
+            return options(Response.class);
         }
 
         @Override
         public <T> Future<T> options(Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("OPTIONS", responseType);
         }
 
         @Override
         public <T> Future<T> options(GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("OPTIONS", responseType);
         }
 
         @Override
         public <T> Future<T> options(InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("OPTIONS", callback);
         }
 
         @Override
         public Future<Response> trace() {
-            // TODO Auto-generated method stub
-            return null;
+            return trace(Response.class);
         }
 
         @Override
         public <T> Future<T> trace(Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("TRACE", responseType);
         }
 
         @Override
         public <T> Future<T> trace(GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("TRACE", responseType);
         }
 
         @Override
         public <T> Future<T> trace(InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return method("TRACE", callback);
         }
 
         @Override
         public Future<Response> method(String name) {
-            // TODO Auto-generated method stub
-            return null;
+            return method(name, Response.class);
         }
 
         @Override
         public <T> Future<T> method(String name, Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return doInvokeAsync(name, null, null, null, responseType, responseType, null);
         }
 
         @Override
         public <T> Future<T> method(String name, GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return doInvokeAsync(name, null, null, null, responseType.getRawType(),
+                                 responseType.getType(), null);
         }
 
         @Override
         public <T> Future<T> method(String name, InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return doInvokeAsyncCallback(name, null, null, null, callback);
         }
 
         @Override
         public Future<Response> method(String name, Entity<?> entity) {
-            // TODO Auto-generated method stub
-            return null;
+            return method(name, entity, Response.class);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, Class<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return doInvokeAsync(name, entity.getEntity(), entity.getClass(), entity.getClass(), 
+                                 responseType, responseType, null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-            // TODO Auto-generated method stub
-            return null;
+            return doInvokeAsync(name, entity.getEntity(), entity.getClass(), entity.getClass(), 
+                                 responseType.getRawType(), responseType.getType(), null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
-            // TODO Auto-generated method stub
-            return null;
+            return doInvokeAsync(name, entity.getEntity(), entity.getClass(), entity.getClass(), 
+                                 Response.class, Response.class, callback);
         }
         
     }
+    
 }

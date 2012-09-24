@@ -69,6 +69,16 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testGetBookAsyncNoCallback() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        WebClient wc = createWebClient(address);
+        Future<Book> future = wc.async().get(Book.class);
+        Book book = future.get();
+        assertEquals(124L, book.getId());
+        validateResponse(wc);
+    }
+    
+    @Test
     public void testGetBookAsyncResponse() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBookAsyncResponse(address, false);
