@@ -520,11 +520,7 @@ public class ClientProxyImpl extends AbstractClient implements
         reqContext.put("BODY_INDEX", bodyIndex);
         
         // execute chain    
-        try {
-            outMessage.getInterceptorChain().doIntercept(outMessage);
-        } catch (Exception ex) {
-            outMessage.setContent(Exception.class, ex);
-        }
+        doRunInterceptorChain(outMessage);
         
         Object[] results = preProcessResult(outMessage);
         if (results != null && results.length == 1) {

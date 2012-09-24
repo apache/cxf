@@ -576,6 +576,14 @@ public abstract class AbstractClient implements Client, Retryable {
         return newRequestURI;
     }
     
+    protected void doRunInterceptorChain(Message m) {
+        try {
+            m.getInterceptorChain().doIntercept(m);
+        } catch (Exception ex) {
+            m.setContent(Exception.class, ex);
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     public Object[] invoke(BindingOperationInfo oi, Object[] params, Map<String, Object> context,
                            Exchange exchange) throws Exception {

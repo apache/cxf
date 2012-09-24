@@ -747,20 +747,7 @@ public class WebClient extends AbstractClient {
                                 Class<?> responseClass, 
                                 Type outGenericType) {
         
-        MultivaluedMap<String, String> headers = getHeaders();
-        boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
-        if (contentTypeNotSet) {
-            String ct = "*/*";
-            if (body != null) { 
-                ct = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
-                                          : MediaType.APPLICATION_XML;
-            }
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
-        }
-        if (responseClass != null && responseClass != Response.class 
-            && headers.getFirst(HttpHeaders.ACCEPT) == null) {
-            headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
-        }
+        MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
         Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
                                          responseClass, outGenericType, null, null);
@@ -796,8 +783,29 @@ public class WebClient extends AbstractClient {
     protected <T> Future<T> doInvokeAsync(String httpMethod, 
                                           Object body, 
                                           Class<?> requestClass,
-                                          Type inGenericType,
+                                          Type inType,
                                           InvocationCallback<T> callback) {
+        
+        Type outType = getCallbackType(callback);
+        Class<?> respClass = outType instanceof Class ? (Class<?>) outType : null;
+        
+        MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
+        resetResponse();
+
+        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
+                                    respClass, outType, null, null);
+        
+        m.getExchange().setSynchronous(false);
+        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, respClass, outType);
+        m.getExchange().put(JaxrsClientCallback.class, cb);
+        
+        doRunInterceptorChain(m);
+        
+        return cb.createFuture();
+    }
+
+    
+    private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
         MultivaluedMap<String, String> headers = getHeaders();
         boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;
         if (contentTypeNotSet) {
@@ -808,45 +816,14 @@ public class WebClient extends AbstractClient {
             }
             headers.putSingle(HttpHeaders.CONTENT_TYPE, ct);
         }
-        Type outGenericType = getCallbackType(callback);
-        Class<?> responseClass = outGenericType instanceof Class ? (Class<?>) outGenericType : null;
+        
         if (responseClass != null && responseClass != Response.class 
             && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
-        resetResponse();
-        URI uri = getCurrentURI();
-        Exchange exchange = null;
-        Map<String, Object> invContext = null;
-        
-        Message m = createMessage(body, httpMethod, headers, uri, exchange, 
-                invContext, false);
-        
-        m.getExchange().setSynchronous(false);
-        
-        Map<String, Object> reqContext = getRequestContext(m);
-        reqContext.put(Message.HTTP_REQUEST_METHOD, httpMethod);
-        reqContext.put(REQUEST_CLASS, requestClass);
-        reqContext.put(REQUEST_TYPE, inGenericType);
-        reqContext.put(RESPONSE_CLASS, responseClass);
-        reqContext.put(RESPONSE_TYPE, outGenericType);
-        
-        if (body != null) {
-            m.getInterceptorChain().add(new BodyWriter());
-        }
-        setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
-        
-        JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, responseClass, outGenericType);
-        m.getExchange().put(JaxrsClientCallback.class, cb);
-        try {
-            m.getInterceptorChain().doIntercept(m);
-        } catch (Exception ex) {
-            m.setContent(Exception.class, ex);
-        }
-        
-        return cb.createFuture();
+        return headers;
     }
-
+    
     private void handleAsyncResponse(Message message) {
         JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
         Response r = handleResponse(message.getExchange().getOutMessage(),
@@ -859,11 +836,11 @@ public class WebClient extends AbstractClient {
             cb.handleResponse(message, new Object[] {r.getEntity()});
         }
     }
-    public void handleAsyncFault(Message message) {
+    private void handleAsyncFault(Message message) {
     }
 
 
-    
+    //TODO: retry invocation will not work in case of async request failures for the moment
     @Override
     protected Object retryInvoke(URI newRequestURI, 
                                  MultivaluedMap<String, String> headers,
@@ -885,12 +862,29 @@ public class WebClient extends AbstractClient {
                                            MultivaluedMap<String, String> headers, 
                                            Object body, 
                                            Class<?> requestClass,
-                                           Type inGenericType,
-                                           Class<?> responseClass, 
-                                           Type outGenericType,
+                                           Type inType,
+                                           Class<?> respClass, 
+                                           Type outType,
                                            Exchange exchange,
                                            Map<String, Object> invContext) {
     //CHECKSTYLE:ON    
+        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
+                                    respClass, outType, exchange, invContext);
+        doRunInterceptorChain(m);
+        return doResponse(m, respClass, outType);
+    }
+    
+    //CHECKSTYLE:OFF
+    private Message finalizeMessage(String httpMethod, 
+                                   MultivaluedMap<String, String> headers, 
+                                   Object body, 
+                                   Class<?> requestClass,
+                                   Type inGenericType,
+                                   Class<?> responseClass, 
+                                   Type outGenericType,
+                                   Exchange exchange,
+                                   Map<String, Object> invContext) {
+   //CHECKSTYLE:ON    
         URI uri = getCurrentURI();
         Message m = createMessage(body, httpMethod, headers, uri, exchange, 
                 invContext, false);
@@ -906,14 +900,9 @@ public class WebClient extends AbstractClient {
             m.getInterceptorChain().add(new BodyWriter());
         }
         setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
-        
-        try {
-            m.getInterceptorChain().doIntercept(m);
-        } catch (Exception ex) {
-            m.setContent(Exception.class, ex);
-        }
-        return doResponse(m, responseClass, outGenericType);
+        return m;
     }
+    
     protected Response doResponse(Message m, 
                                   Class<?> responseClass, 
                                   Type outGenericType) {
