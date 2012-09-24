@@ -89,6 +89,11 @@ public class Java2WSMojo extends AbstractMojo {
     private Boolean quiet;
 
     /**
+     * @parameter
+     */
+    private String address;
+
+    /**
      * @parameter  expression="${project.compileClasspathElements}"
      * @required
      */
@@ -323,6 +328,12 @@ public class Java2WSMojo extends AbstractMojo {
         // quiet arg
         if (quiet != null && quiet.booleanValue()) {
             args.add("-quiet");
+        }
+
+        // address arg
+        if (address != null) {
+            args.add("-address");
+            args.add(address);
         }
 
         if (argline != null) {
