@@ -33,17 +33,26 @@ import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 public class WSDiscoveryServerListener implements ServerLifeCycleListener {
     static WSDiscoveryServiceImpl staticService;
     
-    WSDiscoveryServiceImpl service;
+    final Bus bus;
+    volatile WSDiscoveryServiceImpl service;
+    
     
     public WSDiscoveryServerListener(Bus bus) {
-        service = bus.getExtension(WSDiscoveryServiceImpl.class);
+        this.bus = bus;
+    }
+    
+    private synchronized WSDiscoveryServiceImpl getService() {
         if (service == null) {
-            service = getStaticService();
-            bus.setExtension(service, WSDiscoveryServiceImpl.class);
+            service = bus.getExtension(WSDiscoveryServiceImpl.class);
+            if (service == null) {
+                service = getStaticService();
+                bus.setExtension(service, WSDiscoveryServiceImpl.class);
+            }
         }
+        return service;
     }
 
-    private WSDiscoveryServiceImpl getStaticService() {
+    private static WSDiscoveryServiceImpl getStaticService() {
         if (staticService == null) {
             Bus bus = BusFactory.newInstance().createBus();
             staticService = new WSDiscoveryServiceImpl(bus);
@@ -56,7 +65,7 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
         if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
             return;
         }
-        service.serverStarted(server);
+        getService().serverStarted(server);
     }
 
     public void stopServer(Server server) {
@@ -64,6 +73,6 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
         if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
             return;
         }
-        service.serverStopped(server);
+        getService().serverStopped(server);
     }
 }

@@ -32,6 +32,10 @@
         <version>2.7.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    
+    <properties>
+        <cxf.osgi.import>org.apache.cxf.ws.discovery.listeners</cxf.osgi.import>
+    </properties>
 
 	<dependencies>
         <dependency>

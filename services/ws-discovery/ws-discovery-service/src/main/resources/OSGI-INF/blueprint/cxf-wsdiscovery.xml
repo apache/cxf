@@ -18,10 +18,15 @@
 
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
 
+    <cxf:bus name="cxf"/>
+
     <!-- Single discovery service to avoid lots of UDP packets, particularly on probes -->
-    <bean id="discoveryService" class="org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl"/>
+    <bean id="discoveryService" class="org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl">
+        <argument ref="cxf" />
+    </bean>
 
     <service ref="discoveryService" interface="org.apache.cxf.ws.discovery.WSDiscoveryService" />
 
