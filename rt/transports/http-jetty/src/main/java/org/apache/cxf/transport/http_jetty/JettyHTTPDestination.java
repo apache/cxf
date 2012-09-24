@@ -377,11 +377,21 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
         OutputStream out = super.flushHeaders(outMessage, getStream);
-        if (out instanceof Output) {
-            out = new JettyOutputStream((Output)out);
+        return wrapOutput(out);
+    }
+    
+    private OutputStream wrapOutput(OutputStream out) {
+        try {
+            if (out instanceof Output) {
+                out = new JettyOutputStream((Output)out);
+            }
+        } catch (Throwable t) {
+            //ignore
         }
         return out;
     }
+    
+    
     static class JettyOutputStream extends FilterOutputStream implements CopyingOutputStream {
         final Output out;
         public JettyOutputStream(Output o) {
