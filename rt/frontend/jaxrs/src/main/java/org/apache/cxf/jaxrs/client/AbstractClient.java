@@ -103,14 +103,9 @@ public abstract class AbstractClient implements Client, Retryable {
     protected ClientConfiguration cfg = new ClientConfiguration();
     private ClientState state;
     
-    protected AbstractClient(URI baseURI) {
-        this.state = new LocalClientState(baseURI);
-    }
-    
     protected AbstractClient(ClientState initialState) {
         this.state = initialState;
     }
-    
     /**
      * {@inheritDoc}
      */

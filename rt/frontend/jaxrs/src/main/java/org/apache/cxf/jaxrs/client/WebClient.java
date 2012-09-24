@@ -80,9 +80,8 @@ public class WebClient extends AbstractClient {
         this(URI.create(baseAddress));
     }
     
-    protected WebClient(URI baseAddress) {
-        super(baseAddress);
-        cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
+    protected WebClient(URI baseURI) {
+        this(new LocalClientState(baseURI));
     }
     
     protected WebClient(ClientState state) {
@@ -384,7 +383,7 @@ public class WebClient extends AbstractClient {
     
     /**
      * Does HTTP Async POST invocation and returns Future.
-     * Shortcut for async().get(InvocationCallback)
+     * Shortcut for async().post(Entity, InvocationCallback)
      * @param callback invocation callback 
      * @return the future
      */
