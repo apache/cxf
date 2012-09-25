@@ -63,7 +63,12 @@ public class SchemaHandler {
         bus = b;
     }
     
+    @Deprecated
     public void setSchemas(List<String> locations) {
+        setSchemaLocations(locations);
+    }
+    
+    public void setSchemaLocations(List<String> locations) {
         schema = createSchema(locations, catalogLocation, 
                               bus == null ? BusFactory.getThreadDefaultBus() : bus);
     }
