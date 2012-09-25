@@ -24,13 +24,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -52,12 +55,14 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -532,8 +537,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         return createSecurityContext(p, null);
     }
     
-    protected SecurityContext createSecurityContext(final Principal p, final List<String> roles) {
-        return new SecurityContext() {
+    protected LoginSecurityContext createSecurityContext(final Principal p, final List<String> roles) {
+        final Set<Principal> userRoles;
+        if (roles != null) {
+            userRoles = new HashSet<Principal>();
+            for (String role : roles) {
+                userRoles.add(new SimplePrincipal(role));
+            }
+        } else {
+            userRoles = null;
+        }
+        
+        return new LoginSecurityContext() {
             public Principal getUserPrincipal() {
                 return p;
             }
@@ -542,6 +557,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     return false;
                 }
                 return roles.contains(role);
+            }
+            public Subject getSubject() {
+                return null;
+            }
+            public Set<Principal> getUserRoles() {
+                return userRoles;
             }
         };
     }
