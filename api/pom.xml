@@ -46,31 +46,9 @@
         </dependency>
 
         <dependency>
-<<<<<<< HEAD
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-utilities</artifactId>
             <version>${project.version}</version>
-=======
-            <groupId>${cxf.asm.groupId}</groupId>
-            <artifactId>${cxf.asm.artifactId}</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <optional>true</optional>
->>>>>>> 463bc3a... Merged revisions 1389552 via  git cherry-pick from
         </dependency>
 
         <dependency>
