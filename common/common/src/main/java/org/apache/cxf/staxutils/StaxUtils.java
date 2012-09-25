@@ -140,16 +140,23 @@ public final class StaxUtils {
             innerElementCountThreshold = -1;
         }
         XMLInputFactory xif = createXMLInputFactory(true);
-        if (!xif.getClass().getName().contains("ctc.wstx")) {
-            xif = null;
+        String xifClassName = xif.getClass().getName();
+        if (xifClassName.contains("ctc.wstx") || xifClassName.contains("xml.xlxp")
+                || xifClassName.contains("xml.xlxp2") || xifClassName.contains("bea.core")) {
+            SAFE_INPUT_FACTORY = xif;
+        } else {
+            SAFE_INPUT_FACTORY = null;
         }
-        SAFE_INPUT_FACTORY = xif;
         
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        if (!xof.getClass().getName().contains("ctc.wstx")) {
-            xof = null;
+        String xofClassName = xof.getClass().getName();
+        if (xofClassName.contains("ctc.wstx") || xofClassName.contains("xml.xlxp")
+                || xofClassName.contains("xml.xlxp2") || xofClassName.contains("bea.core")) {
+            SAFE_OUTPUT_FACTORY = xof;
+        } else {
+            SAFE_OUTPUT_FACTORY = null;
         }
-        SAFE_OUTPUT_FACTORY = xof;
+        
     }
     
     private StaxUtils() {
