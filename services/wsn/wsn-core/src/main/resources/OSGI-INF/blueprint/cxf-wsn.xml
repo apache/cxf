@@ -26,12 +26,16 @@
             <cm:property name="cxf.wsn.activemq" value="vm:localhost"/>
             <cm:property name="cxf.wsn.rootUrl" value="http://0.0.0.0:8182" />
             <cm:property name="cxf.wsn.context" value="/wsn" />
+            <cm:property name="cxf.wsn.activemq.username" value="user" />
+            <cm:property name="cxf.wsn.activemq.password" value="password" />
         </cm:default-properties>
     </cm:property-placeholder>
 
     <!-- ActiveMQ connection factory -->
     <bean id="activemq" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <argument value="${cxf.wsn.activemq}" />
+        <property name="brokerURL" value="${cxf.wsn.activemq}" />
+        <property name="userName" value="${cxf.wsn.activemq.username}" />
+        <property name="password" value="${cxf.wsn.activemq.password}" />
     </bean>
 
     <!-- NotificationBroker -->
