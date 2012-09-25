@@ -18,5 +18,6 @@
     under the License.
 -->
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <rewriteSystem systemIdStartString="http://www.w3.org/2006/03/addressing" rewritePrefix="classpath:/schemas/wsdl"/>
     <rewriteSystem systemIdStartString="http://www.w3.org/2005/08/addressing" rewritePrefix="classpath:/schemas/wsdl"/>
 </catalog>
