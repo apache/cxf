@@ -35,6 +35,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -72,6 +73,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
+import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
@@ -1520,7 +1522,7 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
-    public void testPerRequestHttpContextFields() throws Exception {
+    public void testPerRequestContextFields() throws Exception {
         
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         cri.setResourceProvider(new PerRequestResourceProvider(Customer.class));
@@ -1544,7 +1546,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @SuppressWarnings("unchecked")
     @Test
-    public void testSingletonHttpContextFields() throws Exception {
+    public void testSingletonContextFields() throws Exception {
         
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         Customer c = new Customer();
@@ -1569,6 +1571,8 @@ public class JAXRSUtilsTest extends Assert {
                    ((ThreadLocalProxy<HttpHeaders>)c.getHeaders()).get().getClass());
         assertSame(RequestImpl.class, 
                    ((ThreadLocalProxy<Request>)c.getRequest()).get().getClass());
+        assertSame(ResourceInfoImpl.class, 
+                   ((ThreadLocalProxy<ResourceInfo>)c.getResourceInfo()).get().getClass());
         assertSame(SecurityContextImpl.class, 
                    ((ThreadLocalProxy<SecurityContext>)c.getSecurityContext()).get().getClass());
         assertSame(ProvidersImpl.class, 

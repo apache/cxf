@@ -755,7 +755,8 @@ public final class ProviderFactory {
             requestHandlers, responseHandlers, exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
             postMatchContainerResponseFilters.values(),
-            responseExceptionMappers, clientRequestFilters, clientResponseFilters);
+            responseExceptionMappers, clientRequestFilters, clientResponseFilters,
+            readerInterceptors, writerInterceptors);
     }
 //CHECKSTYLE:ON
     

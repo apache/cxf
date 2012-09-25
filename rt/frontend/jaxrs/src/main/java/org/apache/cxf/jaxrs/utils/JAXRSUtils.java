@@ -67,6 +67,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -110,6 +111,7 @@ import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorContextImpl;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
+import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
@@ -876,17 +878,19 @@ public final class JAXRSUtils {
         } else if (HttpHeaders.class.isAssignableFrom(clazz)
             || ProtocolHeaders.class.isAssignableFrom(clazz)) {
             o = createHttpHeaders(contextMessage, clazz);
-        } else if (Request.class.isAssignableFrom(clazz)) {
-            o = new RequestImpl(contextMessage);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
             SecurityContext customContext = contextMessage.get(SecurityContext.class);
             o = customContext == null ? new SecurityContextImpl(contextMessage) : customContext;
+        } else if (MessageContext.class.isAssignableFrom(clazz)) {
+            o = new MessageContextImpl(m);
+        } else if (ResourceInfo.class.isAssignableFrom(clazz)) {
+            o = new ResourceInfoImpl(contextMessage);
+        } else if (Request.class.isAssignableFrom(clazz)) {
+            o = new RequestImpl(contextMessage);
         } else if (Providers.class.isAssignableFrom(clazz)) {
             o = new ProvidersImpl(contextMessage);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {
             o = createContextResolver(genericType, contextMessage);
-        } else if (MessageContext.class.isAssignableFrom(clazz)) {
-            o = new MessageContextImpl(m);
         } else if (Application.class.isAssignableFrom(clazz)) {
             ProviderInfo<?> providerInfo = 
                 (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());

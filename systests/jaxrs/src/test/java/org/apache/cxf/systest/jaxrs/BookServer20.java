@@ -35,6 +35,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -140,12 +142,16 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     
     public static class CustomReaderInterceptor implements ReaderInterceptor {
-
+        @Context
+        private ResourceInfo ri;
         @Override
         public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException,
             WebApplicationException {
-            context.getHeaders().add("ServerReaderInterceptor", "serverRead");
+            if (ri.getResourceClass() == BookStore.class) {
+                context.getHeaders().add("ServerReaderInterceptor", "serverRead");
+            }
             return context.proceed();
+            
         }
         
     }

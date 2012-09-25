@@ -43,6 +43,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
@@ -120,6 +121,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     private UriInfo uriInfo;
     @Context private CustomerContext customerContext;
     @Context private HttpHeaders headers;
+    @Context private ResourceInfo resourceInfo;
     @Context private Request request;
     @Context private SecurityContext sContext;
     @Context private Providers bodyWorkers;
@@ -277,6 +279,10 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     
     public HttpHeaders getHeaders() {
         return headers;
+    }
+    
+    public ResourceInfo getResourceInfo() {
+        return resourceInfo;
     }
     
     public Request getRequest() {
