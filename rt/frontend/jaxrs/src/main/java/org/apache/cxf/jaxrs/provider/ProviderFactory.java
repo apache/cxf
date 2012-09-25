@@ -1110,11 +1110,11 @@ public final class ProviderFactory {
         boolean schemasMethodAvailable = false;
         for (ProviderInfo<MessageBodyReader<?>> r : messageReaders) {
             schemasMethodAvailable = 
-                injectProviderProperty(r.getProvider(), "setSchemas", List.class, schemas);
+                injectProviderProperty(r.getProvider(), "setSchemaLocations", List.class, schemas);
         }
         if (!schemasMethodAvailable) {
             for (ProviderInfo<MessageBodyReader<?>> r : jaxbReaders) {
-                injectProviderProperty(r.getProvider(), "setSchemas", List.class, schemas);
+                injectProviderProperty(r.getProvider(), "setSchemaLocations", List.class, schemas);
             }
         }
     }

@@ -265,7 +265,7 @@ http://cxf.apache.org/schemas/core.xsd">
   </bean>
   
   <bean id="schemaHolder" class="org.apache.cxf.jaxrs.utils.schemas.SchemaHandler">
-      <property name="schemas" ref="theSchemas"/>
+      <property name="schemaLocations" ref="theSchemas"/>
   </bean>
   
   <util:list id="theSchemas">

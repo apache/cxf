@@ -66,7 +66,6 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
-import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.DepthExceededStaxException;
@@ -129,14 +128,6 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     
     public void setProduceMediaTypes(List<String> types) {
         super.setProduceMediaTypes(types);
-    }
-    
-    public void setSchemas(List<String> locations) {
-        super.setSchemaLocations(locations);
-    }
-    
-    public void setSchemaHandler(SchemaHandler handler) {
-        super.setSchema(handler.getSchema());
     }
     
     public void setMarshallerProperties(Map<String, Object> marshallProperties) {

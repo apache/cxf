@@ -111,8 +111,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     private Map<Class<?>, JAXBContext> classContexts = new HashMap<Class<?>, JAXBContext>();
     
     private MessageContext mc;
+    
     private Schema schema;
     private String catalogLocation;
+    private Map<String, SchemaHandler> schemaHandlers;
+    
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
     private List<String> jaxbElementClassNames = Collections.emptyList();
@@ -370,6 +373,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         return unmarshalAsJaxbElement && type != Response.class;
     }
     
+    @Deprecated
+    public void setSchemas(List<String> locations) {
+        setSchemaLocations(locations);
+    }
+    
     public void setSchemaLocations(List<String> locations) {
         schema = SchemaHandler.createSchema(locations, catalogLocation, getBus());    
     }
@@ -378,7 +386,15 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         this.catalogLocation = name;
     }
     
-    public void setSchema(Schema s) {
+    public void setSchemaHandler(SchemaHandler handler) {
+        setSchema(handler.getSchema());
+    }
+    
+    public void setSchemaHandlers(Map<String, SchemaHandler> handlers) {
+        schemaHandlers = handlers;
+    }
+    
+    protected void setSchema(Schema s) {
         schema = s;    
     }
     
@@ -490,8 +506,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         JAXBContext context = isCollection ? getCollectionContext(cls) 
                                            : getJAXBContext(cls, genericType);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        if (schema != null) {
-            unmarshaller.setSchema(schema);
+        Schema theSchema = getSchema(cls);
+        if (theSchema != null) {
+            unmarshaller.setSchema(theSchema);
         }
         if (eventHandler != null) {
             unmarshaller.setEventHandler(eventHandler);
@@ -521,18 +538,21 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         if (marshallerListener != null) {
             marshaller.setListener(marshallerListener);
         }
-        validateObjectIfNeeded(marshaller, obj);
+        validateObjectIfNeeded(marshaller, cls, obj);
         return marshaller;
     }
     
-    protected void validateObjectIfNeeded(Marshaller marshaller, Object obj) 
+    protected void validateObjectIfNeeded(Marshaller marshaller, Class<?> cls, Object obj) 
         throws JAXBException {
-        if (validateOutput && schema != null) {
-            marshaller.setEventHandler(eventHandler);
-            marshaller.setSchema(schema);
-            if (validateBeforeWrite) {
-                marshaller.marshal(obj, new DefaultHandler());
-                marshaller.setSchema(null);
+        if (validateOutput) {
+            Schema theSchema = getSchema(cls);
+            if (theSchema != null) {
+                marshaller.setEventHandler(eventHandler);
+                marshaller.setSchema(theSchema);
+                if (validateBeforeWrite) {
+                    marshaller.marshal(obj, new DefaultHandler());
+                    marshaller.setSchema(null);
+                }
             }
         }
     }
@@ -556,7 +576,21 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     }
     
     protected Schema getSchema() {
-        return schema;
+        return getSchema(null);
+    }
+    
+    protected Schema getSchema(Class<?> cls) {
+        // deal with the typical default case first
+        if (schema == null && schemaHandlers == null) {
+            return null;
+        }
+        
+        if (schema != null) {
+            return schema;
+        } else {
+            SchemaHandler handler = schemaHandlers.get(cls.getName());
+            return handler != null ? handler.getSchema() : null; 
+        }
     }
 
     
