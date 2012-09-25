@@ -563,7 +563,7 @@ public class SchemaJavascriptBuilder {
                 utils.appendLine("item = [];");
                 utils.startDo();
                 valueTarget = "arrayItem";
-                utils.appendLine("var arrayItem;");
+                utils.appendLine("var arrayItem = null;");
             }
         }
 
