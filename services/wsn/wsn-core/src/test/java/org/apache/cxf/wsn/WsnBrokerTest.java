@@ -26,6 +26,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +58,7 @@ public abstract class WsnBrokerTest extends TestCase {
     private JaxwsCreatePullPoint createPullPointServer;
     private NotificationBroker notificationBroker;
     private CreatePullPoint createPullPoint;
+    private ClassLoader loader;
 
     private int port1 = 8182;
     private int port2;
@@ -65,9 +68,11 @@ public abstract class WsnBrokerTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
+        loader = Thread.currentThread().getContextClassLoader();
         String impl = getProviderImpl();
         Thread.currentThread()
             .setContextClassLoader(new FakeClassLoader(impl));
+        WSNHelper.setClassLoader(false);
     
         System.setProperty("javax.xml.ws.spi.Provider", impl);
 
@@ -105,6 +110,8 @@ public abstract class WsnBrokerTest extends TestCase {
             createPullPointServer.destroy();
         }
         System.clearProperty("javax.xml.ws.spi.Provider");
+        Thread.currentThread()
+            .setContextClassLoader(loader);
     }
 
     public void testBroker() throws Exception {
@@ -273,6 +280,13 @@ public abstract class WsnBrokerTest extends TestCase {
             } else {
                 return super.getResourceAsStream(name);
             }
+        }
+        @Override
+        public Enumeration<URL> getResources(String name) throws IOException {
+            if ("META-INF/services/javax.xml.ws.spi.Provider".equals(name)) {
+                return Collections.emptyEnumeration();
+            }
+            return super.getResources(name);
         }
     }
 

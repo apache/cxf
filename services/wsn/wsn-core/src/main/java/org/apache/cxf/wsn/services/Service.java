@@ -22,7 +22,6 @@ package org.apache.cxf.wsn.services;
 import java.lang.management.ManagementFactory;
 
 import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.wsn.AbstractCreatePullPoint;
@@ -82,14 +81,9 @@ public class Service {
             
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             
-            ObjectName nbServerName = 
-                new ObjectName("org.apache.cxf.service.mbeans:type=WSNotificationBroker");
+            mbs.registerMBean(notificationBrokerServer, notificationBrokerServer.getMBeanName());
             
-            ObjectName cpServerName = new ObjectName("org.apache.cxf.service.mbeans:type=CreatePullPoint");
-            
-            mbs.registerMBean(notificationBrokerServer, nbServerName);
-            
-            mbs.registerMBean(createPullPointServer, cpServerName);
+            mbs.registerMBean(createPullPointServer, createPullPointServer.getMBeanName());
        
         }
     }

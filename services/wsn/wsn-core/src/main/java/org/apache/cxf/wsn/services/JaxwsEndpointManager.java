@@ -18,31 +18,77 @@
  */
 package org.apache.cxf.wsn.services;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPBinding;
+import javax.xml.ws.spi.Provider;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.apache.cxf.wsn.AbstractEndpoint;
 import org.apache.cxf.wsn.EndpointManager;
 import org.apache.cxf.wsn.EndpointRegistrationException;
+import org.apache.cxf.wsn.util.WSNHelper;
 
 public class JaxwsEndpointManager implements EndpointManager {
+    protected MBeanServer mbeanServer;
+    
 
-    public Object register(String address, Object service) throws EndpointRegistrationException {
+
+    public void setMBeanServer(MBeanServer s) {
+        mbeanServer = s;
+    }
+    
+    
+    public Endpoint register(String address, Object service) throws EndpointRegistrationException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(JaxwsEndpointManager.class.getClassLoader());
-            Endpoint endpoint = Endpoint.create(service);
+            if (WSNHelper.setClassLoader()) {
+                Thread.currentThread().setContextClassLoader(JaxwsEndpointManager.class.getClassLoader());
+            }
+            String bindingId = SOAPBinding.SOAP11HTTP_BINDING;
+            if (isCXF()) {
+                bindingId = SOAPBinding.SOAP12HTTP_BINDING;
+            }
+            Endpoint endpoint = Endpoint.create(bindingId, service);
             endpoint.publish(address);
+            
+            try {
+                if (mbeanServer != null 
+                    && service instanceof AbstractEndpoint) {
+                    ObjectName on = ((AbstractEndpoint)service).getMBeanName();
+                    if (on != null) {
+                        mbeanServer.registerMBean(service, on);
+                    }
+                }
+            } catch (Exception ex) {
+                //ignore for now
+            }
             return endpoint;
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
 
-    public void unregister(Object endpoint) throws EndpointRegistrationException {
-        ((Endpoint) endpoint).stop();
+    private boolean isCXF() {
+        return Provider.provider().getClass().getName().contains(".cxf");
+    }
+    public void unregister(Endpoint endpoint, Object service) throws EndpointRegistrationException {
+        try {
+            if (mbeanServer != null 
+                && service instanceof AbstractEndpoint) {
+                ObjectName on = ((AbstractEndpoint)service).getMBeanName();
+                if (on != null) {
+                    mbeanServer.unregisterMBean(on);
+                }
+            }
+        } catch (Exception ex) {
+            //ignore for now
+        }
+        endpoint.stop();
     }
 
-    public W3CEndpointReference getEpr(Object endpoint) {
-        return ((Endpoint) endpoint).getEndpointReference(W3CEndpointReference.class);
+    public W3CEndpointReference getEpr(Endpoint endpoint) {
+        return endpoint.getEndpointReference(W3CEndpointReference.class);
     }
 }
