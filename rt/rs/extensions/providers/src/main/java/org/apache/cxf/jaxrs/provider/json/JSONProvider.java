@@ -68,7 +68,6 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
-import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -172,14 +171,6 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     
     public void setProduceMediaTypes(List<String> types) {
         super.setProduceMediaTypes(types);
-    }
-    
-    public void setSchemas(List<String> locations) {
-        super.setSchemaLocations(locations);
-    }
-    
-    public void setSchemaHandler(SchemaHandler handler) {
-        super.setSchema(handler.getSchema());
     }
     
     public void setSerializeAsArray(boolean asArray) {
