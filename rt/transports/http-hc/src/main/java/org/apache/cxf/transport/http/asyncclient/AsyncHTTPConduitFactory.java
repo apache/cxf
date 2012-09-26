@@ -70,7 +70,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     public static final String TCP_NODELAY = "org.apache.cxf.transport.http.async.TCP_NODELAY";
     public static final String SO_KEEPALIVE = "org.apache.cxf.transport.http.async.SO_KEEPALIVE";
     public static final String SO_LINGER = "org.apache.cxf.transport.http.async.SO_LINGER";
-    public static final String SO_TIMEOUT = "org.apache.cxf.transport.http.async.SO_LINGER";
+    public static final String SO_TIMEOUT = "org.apache.cxf.transport.http.async.SO_TIMEOUT";
 
     //ConnectionPool
     public static final String MAX_CONNECTIONS = "org.apache.cxf.transport.http.async.MAX_CONNECTIONS";
