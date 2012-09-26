@@ -149,7 +149,7 @@ public abstract class AbstractHTTPDestination
         return bus;
     }
 
-    private AuthorizationPolicy getAuthorizationPolicyFromMessage(String credentials) {
+    private AuthorizationPolicy getAuthorizationPolicyFromMessage(String credentials, Principal pp) {
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
@@ -166,12 +166,28 @@ public abstract class AbstractHTTPDestination
                 AuthorizationPolicy policy = new AuthorizationPolicy();
                 policy.setUserName(username);
                 policy.setPassword(password);
+                policy.setAuthorizationType(authType);
                 return policy;
             } catch (Base64Exception ex) {
                 // Invalid authentication => treat as not authenticated
             }
+        } else if (pp != null) {
+            AuthorizationPolicy policy = new PrincipalAuthorizationPolicy(pp);
+            policy.setUserName(pp.getName());
+            policy.setAuthorization(credentials);
+            policy.setAuthorizationType(authType);
+            return policy;
         }
         return null;
+    }
+    public static final class PrincipalAuthorizationPolicy extends AuthorizationPolicy {
+        final Principal principal;
+        public PrincipalAuthorizationPolicy(Principal p) {
+            principal = p;
+        }
+        public Principal getPrincipal() {
+            return principal;
+        }
     }
     
     /** 
@@ -250,6 +266,7 @@ public abstract class AbstractHTTPDestination
                 super.cacheInput();
             }
         };
+        
         inMessage.setContent(DelegatingInputStream.class, in);
         inMessage.setContent(InputStream.class, in);
         inMessage.put(HTTP_REQUEST, req);
@@ -303,8 +320,8 @@ public abstract class AbstractHTTPDestination
         }
         inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
         inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
+        final Principal pp = req.getUserPrincipal(); 
         inMessage.put(SecurityContext.class, new SecurityContext() {
-            private Principal pp = req.getUserPrincipal(); 
             public Principal getUserPrincipal() {
                 return pp;
             }
@@ -313,10 +330,11 @@ public abstract class AbstractHTTPDestination
             }
         });
         
+        
         Headers headers = new Headers(inMessage);
         headers.copyFromRequest(req);
         String credentials = headers.getAuthorization();
-        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials);
+        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials, pp);
         inMessage.put(AuthorizationPolicy.class, authPolicy);
         
         propogateSecureSession(req, inMessage);
