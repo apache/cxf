@@ -26,9 +26,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.xml.bind.JAXBElement;
@@ -284,7 +284,14 @@ public abstract class WsnBrokerTest extends TestCase {
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {
             if ("META-INF/services/javax.xml.ws.spi.Provider".equals(name)) {
-                return Collections.emptyEnumeration();
+                return new Enumeration<URL>() {
+                    public boolean hasMoreElements() {
+                        return false;
+                    }
+                    public URL nextElement() {
+                        throw new NoSuchElementException();
+                    }
+                };
             }
             return super.getResources(name);
         }
