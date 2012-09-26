@@ -32,6 +32,10 @@ public class ResourceInfoImpl implements ResourceInfo {
     public ResourceInfoImpl(Message m) {
         this.ori = m.getExchange().get(OperationResourceInfo.class);
     }
+    public ResourceInfoImpl(OperationResourceInfo ori) {
+        this.ori = ori;
+    }
+    
     @Override
     public Method getResourceMethod() {
         return ori == null ? null : ori.getMethodToInvoke();

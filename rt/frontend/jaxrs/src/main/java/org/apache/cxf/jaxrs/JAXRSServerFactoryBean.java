@@ -183,7 +183,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                                           null,
                                           null);
             
+            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
             applyFeatures();
+            
+            
             
             if (start) {
                 server.start();

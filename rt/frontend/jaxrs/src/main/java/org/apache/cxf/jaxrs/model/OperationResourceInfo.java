@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.model;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -47,7 +47,7 @@ public class OperationResourceInfo {
     private String defaultParamValue;
     private List<Parameter> parameters;
     private boolean oneway; 
-    private List<String> nameBindings = Collections.emptyList();
+    private List<String> nameBindings = new LinkedList<String>();
 
     public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
         this(mInvoke, mInvoke, cri);
@@ -100,6 +100,10 @@ public class OperationResourceInfo {
         checkMediaTypes(consumeMediaTypes, produceMediaTypes);
         parameters = params;
         this.oneway = oneway;
+    }
+    
+    public void addNameBindings(List<String> names) {
+        nameBindings.addAll(names);
     }
     
     public List<String> getNameBindings() {

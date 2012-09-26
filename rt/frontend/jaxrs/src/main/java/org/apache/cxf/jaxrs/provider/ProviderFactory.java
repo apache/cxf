@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,8 +44,11 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Configurable;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -69,9 +73,11 @@ import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
+import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -81,6 +87,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ProviderFactory {
+    private static final Class<?>[] FILTER_INTERCEPTOR_CLASSES = 
+        new Class<?>[] {ContainerRequestFilter.class,
+                        ContainerResponseFilter.class,
+                        ReaderInterceptor.class,
+                        WriterInterceptor.class};
     private static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
     private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
     private static final ProviderFactory SHARED_FACTORY = getInstance();
@@ -138,12 +149,14 @@ public final class ProviderFactory {
     // ContainerRequestFilter & ContainerResponseFilter are introduced in JAX-RS 2.0
     private List<ProviderInfo<ContainerRequestFilter>> preMatchContainerRequestFilters = 
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
+    //TODO: consider using List as a value type for postmatching filters
     private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters = 
         new LinkedHashMap<NameKey, ProviderInfo<ContainerRequestFilter>>();
     private Map<NameKey, ProviderInfo<ContainerResponseFilter>> postMatchContainerResponseFilters = 
         new LinkedHashMap<NameKey, ProviderInfo<ContainerResponseFilter>>();
     private RequestPreprocessor requestPreprocessor;
     private ProviderInfo<Application> application;
+    private List<DynamicFeature> dynamicFeatures = new LinkedList<DynamicFeature>();
     
     // Client-only providers, consider introducing ClientProviderFactory
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters = 
@@ -716,6 +729,10 @@ public final class ProviderFactory {
                    new ProviderInfo<WriterInterceptor>((WriterInterceptor)o, bus));
             }
             
+            if (DynamicFeature.class.isAssignableFrom(oClass)) {
+                dynamicFeatures.add((DynamicFeature)o);
+            }
+            
             if (ClientRequestFilter.class.isAssignableFrom(oClass)) {
                 clientRequestFilters.add(
                    new ProviderInfo<ClientRequestFilter>((ClientRequestFilter)o, bus));
@@ -769,9 +786,9 @@ public final class ProviderFactory {
             List<String> names = AnnotationUtils.getNameBindings(
                 p.getProvider().getClass().getAnnotations());
             names = names.isEmpty() ? Collections.singletonList(DEFAULT_FILTER_NAME_BINDING) : names;
-            //TODO:  Would it be faster to have a single NameKey to keep all the names ?
             for (String name : names) {
-                map.put(new NameKey(name), p);
+                map.put(new NameKey(name, AnnotationUtils.getBindingPriority(p.getProvider().getClass())), 
+                        p);
             }
         }
         
@@ -781,14 +798,17 @@ public final class ProviderFactory {
                                                ProviderInfo<T> p,
                                                List<ProviderInfo<T>> preMatchFilters) {
         T filter = p.getProvider();
-        if (preMatchFilters != null
-            && AnnotationUtils.getAnnotation(filter.getClass().getAnnotations(), 
-                                             PreMatching.class) != null) {
+        if (preMatchFilters != null && isPrematching(filter.getClass())) {
             preMatchFilters.add(p);
         } else {
             postMatchFilters.add(p);
         }
         
+    }
+    
+    private static boolean isPrematching(Class<?> filterCls) {
+        return AnnotationUtils.getAnnotation(filterCls.getAnnotations(), 
+                                      PreMatching.class) != null;
     }
     
     static void injectContextValues(ProviderInfo<?> pi, Message m) {
@@ -804,11 +824,15 @@ public final class ProviderFactory {
                 if (ProviderFactory.SHARED_FACTORY == this && isJaxbBasedProvider(pi.getProvider())) {
                     continue;
                 }
-                if (pi.contextsAvailable()) {
-                    InjectionUtils.injectContextProxies(pi, pi.getProvider());
-                    injectedProviders.add(pi);
-                }
+                injectContextProxiesIntoProvider(pi);
             }
+        }
+    }
+    
+    void injectContextProxiesIntoProvider(ProviderInfo<?> pi) {
+        if (pi.contextsAvailable()) {
+            InjectionUtils.injectContextProxies(pi, pi.getProvider());
+            injectedProviders.add(pi);
         }
     }
     
@@ -1095,6 +1119,30 @@ public final class ProviderFactory {
         }
     }
     
+    public void applyDynamicFeatures(List<ClassResourceInfo> list) {
+        if (dynamicFeatures.size() > 0) {
+            for (ClassResourceInfo cri : list) {
+                doApplyDynamicFeatures(cri);
+            }
+        }
+    }
+    
+    private void doApplyDynamicFeatures(ClassResourceInfo cri) {
+        Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+        for (OperationResourceInfo ori : oris) {
+            for (DynamicFeature feature : dynamicFeatures) {
+                Configurable methodConfigurable = new MethodConfigurable(ori);
+                feature.configure(new ResourceInfoImpl(ori), methodConfigurable);
+            }
+        }
+        Collection<ClassResourceInfo> subs = cri.getSubResources();
+        for (ClassResourceInfo sub : subs) {
+            if (sub != cri) {
+                doApplyDynamicFeatures(sub);    
+            }
+        }
+    }
+    
     private boolean injectProviderProperty(Object provider, String mName, Class<?> pClass, 
                                         Object pValue) {
         try {
@@ -1248,8 +1296,7 @@ public final class ProviderFactory {
         }
         
         private int getBindingPriorityValue(ProviderInfo<?> p) {
-            BindingPriority b = p.getProvider().getClass().getAnnotation(BindingPriority.class);
-            return b == null ? BindingPriority.USER : b.value();
+            return AnnotationUtils.getBindingPriority(p.getProvider().getClass());
         }
     }
     
@@ -1275,12 +1322,240 @@ public final class ProviderFactory {
     
     private static class NameKey { 
         private String name;
-        public NameKey(String name) {
+        private int bindingPriority;
+        public NameKey(String name, int priority) {
             this.name = name;
+            this.bindingPriority = priority;
         }
         
         public String getName() {
             return name;
+        }
+        
+        public int getPriority() {
+            return bindingPriority;
+        }
+    }
+    
+    private class MethodConfigurable implements Configurable {
+        
+        private OperationResourceInfo ori;
+        private String nameBinding;
+        private boolean bindingSet;
+        
+        public MethodConfigurable(OperationResourceInfo ori) {
+            this.ori = ori;
+            nameBinding = DEFAULT_FILTER_NAME_BINDING 
+                + ori.getClassResourceInfo().getServiceClass().getName()
+                + "."
+                + ori.getMethodToInvoke().getName();
+        }
+        
+        @Override
+        public Configurable register(Object provider) {
+            return register(provider, AnnotationUtils.getBindingPriority(provider.getClass()));
+        }
+
+        @Override
+        public Configurable register(Object provider, int bindingPriority) {
+            return doRegister(provider, bindingPriority, FILTER_INTERCEPTOR_CLASSES);
+        }
+        
+        @Override
+        public <T> Configurable register(Object provider, Class<? super T>... contracts) {
+            return register(provider, BindingPriority.USER, contracts);
+        }
+        
+        @Override
+        public <T> Configurable register(Object provider, int bindingPriority, Class<? super T>... contracts) {
+            return doRegister(provider, bindingPriority, contracts);
+        }
+        
+        @Override
+        public Configurable register(Class<?> providerClass) {
+            return register(providerClass, AnnotationUtils.getBindingPriority(providerClass));
+        }
+
+        @Override
+        public Configurable register(Class<?> providerClass, int bindingPriority) {
+            return doRegister(createProvider(providerClass), bindingPriority, 
+                              FILTER_INTERCEPTOR_CLASSES);
+        }
+
+        @Override
+        public <T> Configurable register(Class<T> providerClass, Class<? super T>... contracts) {
+            return register(providerClass, BindingPriority.USER, contracts);
+        }
+
+        @Override
+        public <T> Configurable register(Class<T> providerClass, int bindingPriority,
+                                         Class<? super T>... contracts) {
+            return doRegister(createProvider(providerClass), bindingPriority, contracts);
+        }
+        
+        private Configurable doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
+        
+            if (provider instanceof Feature) {
+                ((Feature)provider).configure(this);
+                return this;
+            }
+            
+            boolean setIsNeeded = false;
+            for (Class<?> contract : contracts) {
+                if (contract == ContainerRequestFilter.class && provider instanceof ContainerRequestFilter) {
+                    if (isPrematching(provider.getClass())) {
+                        addToInterceptors(preMatchContainerRequestFilters, provider, bindingPriority, true);
+                    } else {
+                        postMatchContainerRequestFilters = 
+                            addToPostMatching(postMatchContainerRequestFilters, provider, bindingPriority, true);
+                        setIsNeeded = true;
+                    }
+                }
+                if (contract == ContainerResponseFilter.class && provider instanceof ContainerResponseFilter) {
+                    postMatchContainerResponseFilters = 
+                        addToPostMatching(postMatchContainerResponseFilters, provider, bindingPriority, false);
+                    setIsNeeded = true;    
+                }
+                if (contract == ReaderInterceptor.class && provider instanceof ReaderInterceptor) {
+                    addToInterceptors(readerInterceptors, provider, bindingPriority, true);
+                }
+                if (contract == WriterInterceptor.class && provider instanceof WriterInterceptor) {
+                    addToInterceptors(writerInterceptors, provider, bindingPriority, false);
+                }
+            }
+            
+            if (setIsNeeded && !bindingSet) {
+                ori.addNameBindings(Collections.singletonList(nameBinding));
+                bindingSet = true;
+            }
+
+            return this;
+        }
+        
+        @SuppressWarnings("unchecked")
+        private <T> void addToInterceptors(List<ProviderInfo<T>> providers, Object provider, 
+                                           int priority, boolean asc) {
+            int size = providers.size();
+            if (size > 0) {
+                for (int i = 0; i < size; i++) {
+                    int providerPriority = AnnotationUtils.getBindingPriority(
+                        providers.get(i).getProvider().getClass());
+                    if (asc) {
+                        if (priority < providerPriority || i + 1 == size) {
+                            int index = priority < providerPriority ? i : i + 1;
+                            providers.add(index, (ProviderInfo<T>)newProvider(provider));
+                            break;
+                        }
+                    } else if (priority > providerPriority || i + 1 == size) {
+                        int index = priority > providerPriority ? i : i + 1; 
+                        providers.add(index, (ProviderInfo<T>)newProvider(provider));
+                        break;
+                    }
+                }
+            } else {
+                providers.add((ProviderInfo<T>)newProvider(provider));
+            }
+        }
+        
+        private <T> ProviderInfo<T> newProvider(T provider) {
+            ProviderInfo<T> newProvider = new ProviderInfo<T>(provider, bus);
+            injectContextProxiesIntoProvider(newProvider);
+            return newProvider;
+        }
+        
+        @SuppressWarnings("unchecked")
+        private <T> Map<NameKey, ProviderInfo<T>> addToPostMatching(
+            Map<NameKey, ProviderInfo<T>> map, Object provider, int priority, boolean asc) {
+            Map<NameKey, ProviderInfo<T>> newMap = new LinkedHashMap<NameKey, ProviderInfo<T>>();
+            
+            Iterator<Map.Entry<NameKey, ProviderInfo<T>>> it = map.entrySet().iterator();
+            if (it.hasNext()) {
+                boolean added = false;
+                while (it.hasNext()) {
+                    Map.Entry<NameKey, ProviderInfo<T>> entry = it.next();
+                    int providerPriority = entry.getKey().getPriority();
+                    // this surely can be collapsed further
+                    if (!added && asc && (priority < providerPriority || !it.hasNext())) {
+                        addNewProvider(newMap, entry, provider, priority, providerPriority >= priority);
+                        added = true;
+                    } else if (!added && !asc && (priority > providerPriority || !it.hasNext())) {
+                        addNewProvider(newMap, entry, provider, priority, priority > providerPriority);
+                        added = true;
+                    } else {
+                        newMap.put(entry.getKey(), entry.getValue());
+                    }   
+                }
+            } else {
+                newMap.put(new NameKey(nameBinding, priority), (ProviderInfo<T>)newProvider(provider));
+            }
+            return newMap;
+            
+                
+        }
+        
+        @SuppressWarnings("unchecked")
+        private <T> void addNewProvider(Map<NameKey, ProviderInfo<T>> newMap, 
+                                        Map.Entry<NameKey, ProviderInfo<T>> entry,
+                                        Object provider, 
+                                        int priority,
+                                        boolean first) {
+            if (first) {
+                newMap.put(new NameKey(nameBinding, priority), (ProviderInfo<T>)newProvider(provider));
+                newMap.put(entry.getKey(), entry.getValue());
+            } else {
+                newMap.put(entry.getKey(), entry.getValue());
+                newMap.put(new NameKey(nameBinding, priority), (ProviderInfo<T>)newProvider(provider));
+            }
+        }
+        
+        @Override
+        public Collection<Feature> getFeatures() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Set<Class<?>> getProviderClasses() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Set<Object> getProviderInstances() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Map<String, Object> getProperties() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Object getProperty(String name) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Configurable setProperties(Map<String, ?> properties) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Configurable setProperty(String name, Object value) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        private Object createProvider(Class<?> cls) {
+            try {
+                return cls.newInstance();
+            } catch (Throwable ex) {
+                throw new RuntimeException(ex); 
+            }
         }
     }
 }

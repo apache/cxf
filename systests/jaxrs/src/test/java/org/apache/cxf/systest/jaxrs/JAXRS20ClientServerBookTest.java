@@ -195,6 +195,8 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     private void validateResponse(WebClient wc) {
         Response response = wc.getResponse();
         assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("OK2", response.getHeaderString("Response2"));
+        assertEquals("Dynamic", response.getHeaderString("DynamicResponse"));
         assertEquals("custom", response.getHeaderString("Custom"));
         assertEquals("simple", response.getHeaderString("Simple"));
         assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));

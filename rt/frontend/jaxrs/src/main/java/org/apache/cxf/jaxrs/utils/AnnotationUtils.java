@@ -33,6 +33,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BindingPriority;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -124,6 +125,10 @@ public final class AnnotationUtils {
         return classes;
     }
 
+    public static int getBindingPriority(Class<?> providerCls) {
+        BindingPriority b = providerCls.getAnnotation(BindingPriority.class);
+        return b == null ? BindingPriority.USER : b.value();
+    }
     public static List<String> getNameBindings(Annotation[] targetAnns) {
         if (targetAnns.length == 0) {
             return Collections.emptyList();
