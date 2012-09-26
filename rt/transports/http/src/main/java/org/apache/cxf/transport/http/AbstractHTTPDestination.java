@@ -169,9 +169,10 @@ public abstract class AbstractHTTPDestination
                 policy.setAuthorizationType(authType);
                 return policy;
             } catch (Base64Exception ex) {
-                // Invalid authentication => treat as not authenticated
+                // Invalid authentication => treat as not authenticated or use the Principal
             }
-        } else if (pp != null) {
+        } 
+        if (pp != null) {
             AuthorizationPolicy policy = new PrincipalAuthorizationPolicy(pp);
             policy.setUserName(pp.getName());
             policy.setAuthorization(credentials);
