@@ -61,6 +61,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.http.URLConnectionHTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduitFactory.UseAsyncPolicy;
 import org.apache.cxf.transport.https.AliasedX509ExtendedKeyManager;
 import org.apache.cxf.transport.https.CertificateHostnameVerifier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
@@ -115,7 +116,10 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         
         Object o = message.getContextualProperty(USE_ASYNC);
         if (o == null) {
-            switch (factory.getUseAsyncPolicy()) {
+            o = factory.getUseAsyncPolicy();
+        }
+        if (o instanceof UseAsyncPolicy) {
+            switch ((UseAsyncPolicy)o) {
             case ALWAYS:
                 o = true;
                 break;

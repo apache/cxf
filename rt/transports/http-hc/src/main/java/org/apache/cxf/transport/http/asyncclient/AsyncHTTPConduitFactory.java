@@ -22,6 +22,7 @@ package org.apache.cxf.transport.http.asyncclient;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -76,6 +77,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     public static final String MAX_CONNECTIONS = "org.apache.cxf.transport.http.async.MAX_CONNECTIONS";
     public static final String MAX_PER_HOST_CONNECTIONS 
         = "org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS";
+    public static final String CONNECTION_TTL = "org.apache.cxf.transport.http.async.CONNECTION_TTL";
     
     //AsycClient specific props
     public static final String THREAD_COUNT = "org.apache.cxf.transport.http.async.ioThreadCount";
@@ -99,6 +101,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     UseAsyncPolicy policy;
     int maxConnections = 5000;
     int maxPerRoute = 1000;
+    int connectionTTL = 60000;
     
     
     public AsyncHTTPConduitFactory(Map<String, Object> conf) {
@@ -152,6 +155,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         }
         
         maxConnections = getInt(s.get(MAX_CONNECTIONS), maxConnections);
+        connectionTTL = getInt(s.get(CONNECTION_TTL), connectionTTL);
         maxPerRoute = getInt(s.get(MAX_PER_HOST_CONNECTIONS), maxPerRoute);
         if (connectionManager != null) {
             connectionManager.setMaxTotal(maxConnections);
@@ -301,7 +305,8 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         registry.register(new AsyncScheme("http", 80, null));
         registry.register(new AsyncScheme("https", 443, null));
 
-        connectionManager = new PoolingClientAsyncConnectionManager(ioReactor, registry) {
+        connectionManager = new PoolingClientAsyncConnectionManager(ioReactor, registry, 
+                                                                    connectionTTL, TimeUnit.MILLISECONDS) {
             @Override
             protected ClientAsyncConnectionFactory createClientAsyncConnectionFactory() {
                 final HttpResponseFactory responseFactory = new DefaultHttpResponseFactory();

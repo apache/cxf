@@ -29,6 +29,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.frontend.ClientProxy;
@@ -57,7 +58,8 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void start() throws Exception {
         Bus b = createStaticBus();
-        new AsyncHTTPConduitFactory(b);
+        b.setProperty(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
+        BusFactory.setThreadDefaultBus(b);
         ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                               new org.apache.hello_world_soap_http.GreeterImpl() {
                 public String greetMeLater(long cnt) {
