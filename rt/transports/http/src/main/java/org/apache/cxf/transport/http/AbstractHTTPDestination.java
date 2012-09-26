@@ -163,7 +163,8 @@ public abstract class AbstractHTTPDestination
                 // Below line for systems that blank out password after authentication;
                 // see CXF-1495 for more info
                 String password = (authInfo.length > 1) ? authInfo[1] : "";
-                AuthorizationPolicy policy = new AuthorizationPolicy();
+                AuthorizationPolicy policy = pp == null 
+                    ? new AuthorizationPolicy() : new PrincipalAuthorizationPolicy(pp);
                 policy.setUserName(username);
                 policy.setPassword(password);
                 policy.setAuthorizationType(authType);
