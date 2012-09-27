@@ -77,6 +77,9 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             if (helper == null) {
                 helper = getWrapperHelper(message, messageInfo, wrappedMsgInfo, wrapped, parts.get(0));
             }
+            if (helper == null) {
+                return;
+            }
             
             try {
                 MessageContentsList newObjs = new MessageContentsList();
