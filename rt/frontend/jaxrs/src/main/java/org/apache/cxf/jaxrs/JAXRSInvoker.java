@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,6 +43,7 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain.State;
+import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -76,16 +78,28 @@ public class JAXRSInvoker extends AbstractInvoker {
 
     public Object invoke(Exchange exchange, Object request) {
         Response response = exchange.get(Response.class);
+        if (response == null) {
+            AsyncResponse asyncResp = exchange.get(AsyncResponse.class);
+            if (asyncResp != null) {
+                AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
+                Object asyncObj = asyncImpl.getResponseObject();
+                if (!(asyncObj instanceof Response)) {
+                    if (asyncObj instanceof Throwable) {
+                        return handleFault(new Fault((Throwable)asyncObj), exchange.getInMessage(), null, null);    
+                    } else {
+                        response = Response.ok().entity(asyncObj).build();
+                    }
+                } else {
+                    response = (Response)asyncObj;
+                }
+            }
+        }
         if (response != null) {
-            // this means a blocking request filter provided a Response
-            // or earlier exception has been converted to Response
-
-            //TODO: should we remove response from exchange ?
-            //      or should we rather ignore content list and have
-            //      Response set here for all cases and extract it
-            //      in the out interceptor instead of dealing with the contents list ?
             return new MessageContentsList(response);
         }
+        
+        
+        
         ResourceProvider provider = getResourceProvider(exchange);
         Object rootInstance = getServiceObject(exchange);
         Object serviceObject = getActualServiceObject(exchange, rootInstance);
@@ -174,32 +188,15 @@ public class JAXRSInvoker extends AbstractInvoker {
                 contextLoader = ClassLoaderUtils
                     .setThreadContextClassloader(resourceObject.getClass().getClassLoader());
             }
+            AsyncResponse asyncResponse = inMessage.get(AsyncResponse.class);
+            if (asyncResponse != null) {
+                inMessage.put(AsyncResponse.class, null);
+                AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResponse;
+                asyncImpl.suspend();
+            }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
         } catch (Fault ex) {
-            String errorMessage = ex.getCause().getMessage();
-            if (errorMessage != null 
-                && errorMessage.contains(PROXY_INVOCATION_ERROR_FRAGMENT)) {
-                org.apache.cxf.common.i18n.Message errorM =
-                    new org.apache.cxf.common.i18n.Message("PROXY_INVOCATION_FAILURE",
-                                                           BUNDLE,
-                                                           methodToInvoke,
-                                                           cri.getServiceClass().getName());
-                LOG.severe(errorM.toString());
-            }
-            Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), 
-                                                                     exchange.getInMessage());
-            if (excResponse == null) {
-                providerFactory.clearThreadLocalProxies();
-                ClassResourceInfo criRoot =
-                    (ClassResourceInfo)exchange.get(JAXRSUtils.ROOT_RESOURCE_CLASS);
-                if (criRoot != null) {
-                    criRoot.clearThreadLocalProxies();
-                }
-                exchange.put(Message.PROPOGATE_EXCEPTION, 
-                             JAXRSUtils.propogateException(exchange.getInMessage()));
-                throw ex;
-            }
-            return new MessageContentsList(excResponse);
+            return handleFault(ex, inMessage, cri, methodToInvoke);
         } finally {
             exchange.put(LAST_SERVICE_OBJECT, resourceObject);
             if (contextLoader != null) {
@@ -269,6 +266,33 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
 
         return result;
+    }
+    
+    private Object handleFault(Fault ex, Message inMessage, 
+                               ClassResourceInfo cri, Method methodToInvoke) {
+        String errorMessage = ex.getCause().getMessage();
+        if (errorMessage != null && cri != null 
+            && errorMessage.contains(PROXY_INVOCATION_ERROR_FRAGMENT)) {
+            org.apache.cxf.common.i18n.Message errorM =
+                new org.apache.cxf.common.i18n.Message("PROXY_INVOCATION_FAILURE",
+                                                       BUNDLE,
+                                                       methodToInvoke,
+                                                       cri.getServiceClass().getName());
+            LOG.severe(errorM.toString());
+        }
+        Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
+        if (excResponse == null) {
+            ProviderFactory.getInstance(inMessage).clearThreadLocalProxies();
+            ClassResourceInfo criRoot =
+                (ClassResourceInfo)inMessage.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+            if (criRoot != null) {
+                criRoot.clearThreadLocalProxies();
+            }
+            inMessage.getExchange().put(Message.PROPOGATE_EXCEPTION, 
+                                        JAXRSUtils.propogateException(inMessage));
+            throw ex;
+        }
+        return new MessageContentsList(excResponse);
     }
 
     @SuppressWarnings("unchecked")

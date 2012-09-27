@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -164,11 +165,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                   Response response, 
                                   OperationResourceInfo ori,
                                   boolean firstTry) {
+        final Exchange exchange = message.getExchange();
         int status = response.getStatus();
         Object responseObj = response.getEntity();
         if (status == 200 && !isResponseNull(responseObj) && firstTry 
             && ori != null && JAXRSUtils.headMethodPossible(ori.getHttpMethod(), 
-                (String)message.getExchange().getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
+                (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
             LOG.info(new org.apache.cxf.common.i18n.Message("HEAD_WITHOUT_ENTITY", BUNDLE).toString());
             responseObj = null;
         }
@@ -200,7 +202,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         
-        Object ignoreWritersProp = message.getExchange().get(JAXRSUtils.IGNORE_MESSAGE_WRITERS);
+        Object ignoreWritersProp = exchange.get(JAXRSUtils.IGNORE_MESSAGE_WRITERS);
         boolean ignoreWriters = 
             ignoreWritersProp == null ? false : Boolean.valueOf(ignoreWritersProp.toString());
         if (ignoreWriters) {
@@ -215,9 +217,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             invoked = ori == null ? null : ori.getAnnotatedMethod() == null
                 ? ori.getMethodToInvoke() : ori.getAnnotatedMethod();
         }
-        
-        Class<?> targetType = getRawResponseClass(invoked, responseObj);
-        Type genericType = getGenericResponseType(invoked, responseObj, targetType);
+        boolean asyncResponse = exchange.get(AsyncResponse.class) != null;
+        Class<?> targetType = getRawResponseClass(invoked, responseObj, asyncResponse);
+        Type genericType = getGenericResponseType(invoked, responseObj, targetType, asyncResponse);
         if (genericType instanceof TypeVariable) {
             genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
                                                        (TypeVariable<?>)genericType);
@@ -413,21 +415,22 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
     }
     
-    private Class<?> getRawResponseClass(Method invoked, Object targetObject) {
+    private Class<?> getRawResponseClass(Method invoked, Object targetObject, boolean async) {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             return ((GenericEntity<?>)targetObject).getRawType();
         } else {
             Class<?> targetClass = targetObject.getClass();
-            Class<?> responseClass = invoked == null 
+            Class<?> responseClass = async || invoked == null 
                 || !invoked.getReturnType().isAssignableFrom(targetClass) ? targetClass : invoked.getReturnType(); 
             return ClassHelper.getRealClassFromClass(responseClass);
         }
     }
     
-    private Type getGenericResponseType(Method invoked, Object targetObject, Class<?> targetType) {
+    private Type getGenericResponseType(Method invoked, Object targetObject, Class<?> targetType, 
+                                        boolean async) {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             return ((GenericEntity<?>)targetObject).getType();
-        } else if (invoked == null || !invoked.getReturnType().isAssignableFrom(targetType)) {
+        } else if (async || invoked == null || !invoked.getReturnType().isAssignableFrom(targetType)) {
             // when a method has been invoked it is still possible that either an ExceptionMapper
             // or a ResponseHandler filter overrides a response entity; if it happens then 
             // the Type is the class of the response object, unless this new entity is assignable

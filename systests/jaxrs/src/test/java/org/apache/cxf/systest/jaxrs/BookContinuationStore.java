@@ -27,26 +27,17 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-
-import org.apache.cxf.continuations.Continuation;
-import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.jaxrs.ext.MessageContext;
+import javax.ws.rs.container.AsyncResponse;
 
 @Path("/bookstore")
 public class BookContinuationStore {
 
     private Map<String, String> books = new HashMap<String, String>();
-    private Map<String, Continuation> suspended = 
-        new HashMap<String, Continuation>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
-    
-    @Resource
-    private MessageContext context;
     
     public BookContinuationStore() {
         init();
@@ -54,10 +45,8 @@ public class BookContinuationStore {
     
     @GET
     @Path("/books/{id}")
-    public String getBookDescription(@PathParam("id") String id) {
-        
-        return handleContinuationRequest(id);
-        
+    public void getBookDescription(@PathParam("id") String id, AsyncResponse async) {
+        handleContinuationRequest(id, async);
     }
     
     @Path("/books/subresources/")
@@ -69,78 +58,25 @@ public class BookContinuationStore {
     
     @GET
     @Path("{id}")
-    public String handleContinuationRequest(@PathParam("id") String id) {
-        Continuation continuation = getContinuation(id);
-        if (continuation == null) {
-            throw new RuntimeException("Failed to get continuation");
-        }
-        synchronized (continuation) {
-            if (continuation.isNew()) {
-                continuation.setObject(id);
-                suspendInvocation(id, continuation);
-            } else {
-                String savedId = continuation.getObject().toString();
-                if (!savedId.equals(id)) {
-                    throw new RuntimeException("SavedId is wrong");
-                }
-                return books.get(savedId);
-            }
-        }
-        // unreachable
-        return null;
+    public void handleContinuationRequest(@PathParam("id") String id, AsyncResponse response) {
+        resumeSuspended(id, response);
     }
     
-    private void resumeRequest(final String name) {
-        
-        Continuation suspendedCont = null;
-        synchronized (suspended) {
-            suspendedCont = suspended.get(name);
-        }
-        
-        if (suspendedCont != null) {
-            synchronized (suspendedCont) {
-                suspendedCont.resume();
-            }
-        }
-    }
     
-    private void suspendInvocation(final String name, Continuation cont) {
-        
-        //System.out.println("Suspending invocation for " + name);
-        
-        try {
-            cont.suspend(500000);    
-        } finally {
-            synchronized (suspended) {
-                suspended.put(name, cont);
-            }
-            executor.execute(new Runnable() {
-                public void run() {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        // ignore
-                    }       
-                    resumeRequest(name);
-                }
-            });
-        }
-    }
     
-    private Continuation getContinuation(String name) {
+    private void resumeSuspended(final String id, final AsyncResponse response) {
         
-        //System.out.println("Getting continuation for " + name);
-        
-        synchronized (suspended) {
-            Continuation suspendedCont = suspended.remove(name);
-            if (suspendedCont != null) {
-                return suspendedCont;
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }       
+                response.resume(books.get(id));
             }
-        }
+        });
         
-        ContinuationProvider provider = 
-            (ContinuationProvider)context.get(ContinuationProvider.class.getName());
-        return provider.getContinuation();
     }
     
     private void init() {
