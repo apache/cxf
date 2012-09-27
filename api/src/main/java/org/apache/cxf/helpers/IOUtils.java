@@ -125,6 +125,24 @@ public final class IOUtils {
             input.close();
         }
     }
+    
+    public static void copyAndCloseInput(final Reader input,
+                                        final Writer output) throws IOException {
+        try {
+            copy(input, output, DEFAULT_BUFFER_SIZE);
+        } finally {
+            input.close();
+        }
+    }
+
+    public static void copyAndCloseInput(final Reader input,
+            final Writer output, int bufferSize) throws IOException {
+        try {
+            copy(input, output, bufferSize);
+        } finally {
+            input.close();
+        }
+    }    
 
     public static int copy(final InputStream input, final OutputStream output,
             int bufferSize) throws IOException {
@@ -156,9 +174,6 @@ public final class IOUtils {
         int n = 0;
         n = input.read(buffer);
         while (-1 != n) {
-            if (n == 0) {
-                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
-            }
             output.write(buffer, 0, n);
             n = input.read(buffer);
         }

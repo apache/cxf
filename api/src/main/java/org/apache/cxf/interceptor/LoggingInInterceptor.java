@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.interceptor;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -28,6 +27,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -136,10 +136,8 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 bos.setThreshold(threshold);
             }
             try {
-                IOUtils.copy(is, bos);
-
+                IOUtils.copyAndCloseInput(is, bos);
                 bos.flush();
-                is.close();
 
                 message.setContent(InputStream.class, bos.getInputStream());
                 if (bos.getTempFile() != null) {
@@ -160,17 +158,22 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             Reader reader = message.getContent(Reader.class);
             if (reader != null) {
                 try {
-                    BufferedReader r = new BufferedReader(reader, limit);
-                    r.mark(limit);
-                    char b[] = new char[limit];
-                    int i = r.read(b);
-                    buffer.getPayload().append(b, 0, i);
-                    r.reset();
-                    message.setContent(Reader.class, r);
+                    CachedWriter writer = new CachedWriter();
+                    IOUtils.copyAndCloseInput(reader, writer);
+                    message.setContent(Reader.class, writer.getReader());
+                    
+                    if (writer.getTempFile() != null) {
+                        //large thing on disk...
+                        buffer.getMessage().append("\nMessage (saved to tmp file):\n");
+                        buffer.getMessage().append("Filename: " + writer.getTempFile().getAbsolutePath() + "\n");
+                    }
+                    if (writer.size() > limit) {
+                        buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
+                    }
+                    writer.writeCacheTo(buffer.getPayload(), limit);
                 } catch (Exception e) {
                     throw new Fault(e);
                 }
-                
             }
         }
         log(logger, formatLoggingMessage(buffer));
