@@ -99,9 +99,7 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
             List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml2.core.Attribute attribute : attributes) {
                 
-                URI attributeNamespace = URI.create(attribute.getNameFormat());
-                String desiredRole = attributeNamespace.relativize(claimURI).toString();
-                if (attribute.getName().equals(desiredRole)
+                if (attribute.getName().equals(claimURI.toString())
                     && attribute.getAttributeValues() != null && !attribute.getAttributeValues().isEmpty()) {
                     return true;
                 }
