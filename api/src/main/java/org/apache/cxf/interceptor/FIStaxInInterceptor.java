@@ -37,7 +37,7 @@ import org.apache.cxf.phase.Phase;
  */
 public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String FI_GET_SUPPORTED = "org.apache.cxf.fastinfoset.get.supported";
-
+    
     public FIStaxInInterceptor() {
         this(Phase.POST_STREAM);
     }
@@ -70,6 +70,8 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
             && message.getContent(InputStream.class) != null
             && message.getContent(XMLStreamReader.class) == null) {
             message.setContent(XMLStreamReader.class, getParser(message.getContent(InputStream.class)));
+            //add the StaxInEndingInterceptor which will close the reader
+            message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
             
             ct = ct.replace("fastinfoset", "xml");
             if (ct.contains("application/xml")) {

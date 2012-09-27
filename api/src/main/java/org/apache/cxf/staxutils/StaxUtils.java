@@ -1588,5 +1588,25 @@ public final class StaxUtils {
         writer.flush();
         return sw.toString();
     }
+    
+    public static void close(XMLStreamReader reader) {
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+    }
+    
+    public static void close(XMLStreamWriter writer) {
+        if (writer != null) {
+            try {
+                writer.close();
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+    }
 
 }

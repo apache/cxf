@@ -46,9 +46,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
+    
     private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);    
 
-    private static Map<Object, XMLInputFactory> factories = new HashMap<Object, XMLInputFactory>();
+    private static Map<Object, XMLInputFactory> factories = new HashMap<Object, XMLInputFactory>();        
 
     public StaxInInterceptor() {
         super(Phase.POST_STREAM);
@@ -126,6 +127,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         message.setContent(XMLStreamReader.class, xreader);
+        message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
     }
 
     public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
