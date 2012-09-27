@@ -424,8 +424,7 @@ public abstract class AbstractClient implements Client, Retryable {
             Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
             return (WebApplicationException)ctr.newInstance(r);
         } catch (Exception ex2) {
-            ex2.printStackTrace();
-            return new WebApplicationException(r);
+            return new WebApplicationException(ex2, r);
         }
     }
     
