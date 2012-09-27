@@ -28,6 +28,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
 
@@ -45,9 +46,12 @@ public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> 
         try {
             XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
             if (xtw != null) {
-                xtw.writeEndDocument();
-                xtw.flush();
-                xtw.close();
+                try {
+                    xtw.writeEndDocument();
+                    xtw.flush();
+                } finally {
+                    StaxUtils.close(xtw);
+                }                
             }
        
             OutputStream os = (OutputStream)message.get(outStreamHolder);

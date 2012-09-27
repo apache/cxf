@@ -43,6 +43,7 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -227,8 +228,10 @@ public class WSDLManagerImpl implements WSDLManager {
         Definition def = null;
         if (src.getByteStream() != null || src.getCharacterStream() != null) {
             Document doc;
+            XMLStreamReader xmlReader = null;
             try {
-                doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
+                xmlReader = StaxUtils.createXMLStreamReader(src);
+                doc = StaxUtils.read(xmlReader, true);
                 if (src.getSystemId() != null) {
                     try {
                         doc.setDocumentURI(new String(src.getSystemId()));
@@ -238,6 +241,8 @@ public class WSDLManagerImpl implements WSDLManager {
                 }
             } catch (Exception e) {
                 throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
+            } finally {
+                StaxUtils.close(xmlReader);
             }
             def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
         } else {

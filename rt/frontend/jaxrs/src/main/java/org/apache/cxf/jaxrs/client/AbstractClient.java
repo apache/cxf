@@ -58,6 +58,7 @@ import org.apache.cxf.endpoint.Retryable;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -791,6 +792,8 @@ public abstract class AbstractClient implements Client, Retryable {
         exchange.put(MessageObserver.class, new ClientMessageObserver(cfg));
         exchange.put(Endpoint.class, cfg.getConduitSelector().getEndpoint());
         exchange.put("org.apache.cxf.http.no_io_exceptions", true);
+        //REVISIT - when response handling is actually put onto the in chain, this will likely not be needed
+        exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
         m.setExchange(exchange);
         return exchange;
     }
