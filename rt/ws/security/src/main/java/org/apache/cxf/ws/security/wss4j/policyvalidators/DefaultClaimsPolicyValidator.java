@@ -101,7 +101,7 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
                 
                 URI attributeNamespace = URI.create(attribute.getNameFormat());
                 String desiredRole = attributeNamespace.relativize(claimURI).toString();
-                if (attribute.getName().equals(desiredRole)
+                if ((attribute.getName().equals(claimURI.toString()) || attribute.getName().equals(desiredRole))
                     && attribute.getAttributeValues() != null && !attribute.getAttributeValues().isEmpty()) {
                     return true;
                 }
