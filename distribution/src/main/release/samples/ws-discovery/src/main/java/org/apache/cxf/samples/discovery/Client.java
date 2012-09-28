@@ -35,7 +35,7 @@ public final class Client {
 
     public static void main(String[] args) throws Exception {
 
-        //USe ws-discovery to find references to services that implement the Greeter portType
+        //Use WS-Discovery to find references to services that implement the Greeter portType
         WSDiscoveryClient client = new WSDiscoveryClient();
         List<EndpointReference> references 
             = client.probe(new QName("http://cxf.apache.org/hello_world/discovery", "Greeter"));

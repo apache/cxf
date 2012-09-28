@@ -83,6 +83,7 @@ public class WSDiscoveryClient implements Closeable {
     Dispatch<Object> dispatch;
     ObjectFactory factory = new ObjectFactory();
     Bus bus;
+    int defaultProbeTimeout = 1000;
     
     public WSDiscoveryClient() {
     }
@@ -91,6 +92,13 @@ public class WSDiscoveryClient implements Closeable {
     }
     public WSDiscoveryClient(String address) {
         resetDispatch(address);
+    }
+    
+    public void setDefaultProbeTimeout(int i) {
+        defaultProbeTimeout = i;
+    }
+    public int getDefaultProbeTimeout() {
+        return defaultProbeTimeout;
     }
     
     public String getAddress() {
@@ -244,7 +252,7 @@ public class WSDiscoveryClient implements Closeable {
         if (type != null) {
             p.getTypes().add(type);
         }
-        ProbeMatchesType pmt = probe(p, 1000);
+        ProbeMatchesType pmt = probe(p, defaultProbeTimeout);
         List<EndpointReference> er = new ArrayList<EndpointReference>();
         for (ProbeMatchType pm : pmt.getProbeMatch()) {
             for (String add : pm.getXAddrs()) {
@@ -262,7 +270,7 @@ public class WSDiscoveryClient implements Closeable {
     
     
     public ProbeMatchesType probe(ProbeType params) {
-        return probe(params, 1000);
+        return probe(params, defaultProbeTimeout);
     }    
     public ProbeMatchesType probe(ProbeType params, int timeout) {
         Dispatch<Object> disp = this.getDispatchInternal(false);
@@ -287,11 +295,9 @@ public class WSDiscoveryClient implements Closeable {
                             }
                         }
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        // ?
                     } catch (ExecutionException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        // ?
                     }
                 }
             };
