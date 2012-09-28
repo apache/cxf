@@ -72,10 +72,12 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     public WSDiscoveryServiceImpl(Bus b) {
         bus = b;
         client = new WSDiscoveryClient();
+        update(bus.getProperties());
     }
     public WSDiscoveryServiceImpl() {
         bus = BusFactory.newInstance().createBus();
         client = new WSDiscoveryClient();
+        update(bus.getProperties());
     }
     public WSDiscoveryServiceImpl(Bus b, Map<String, Object> props) {
         bus = b;
@@ -83,9 +85,14 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         update(props);
     }
     
-    public final void update(Map<String, Object> props) {
+    public final synchronized void update(Map<String, Object> props) {
         String address = (String)props.get("org.apache.cxf.service.ws-discovery.address");
         client.setAddress(address);
+        if (udpEndpoint != null && !client.isAdHoc()) {
+            udpEndpoint.stop();
+            udpEndpoint = null;
+            started = false;
+        }
     }
     public WSDiscoveryClient getClient() {
         return client;
