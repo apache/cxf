@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.ClientException;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -222,8 +223,7 @@ public class ClientProxyImpl extends AbstractClient implements
         int requestBodyParam = 0;
         int multipartParam = 0;
         for (Parameter p : parameters) {
-            if (p.getType() == ParameterType.CONTEXT) {
-                // ignore
+            if (isIgnorableParameter(ori, p)) {
                 continue;
             }
             if (p.getType() == ParameterType.REQUEST_BODY) {
@@ -244,6 +244,20 @@ public class ClientProxyImpl extends AbstractClient implements
             }
         }
         return map;
+    }
+    
+    private static boolean isIgnorableParameter(OperationResourceInfo ori, Parameter p) {
+        if (p.getType() == ParameterType.CONTEXT) {
+            return true;
+        }
+        if (p.getType() == ParameterType.REQUEST_BODY) { 
+            Method m = ori.getAnnotatedMethod();
+            if (m != null 
+                && m.getParameterTypes()[p.getIndex()] == AsyncResponse.class) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private static int getBodyIndex(MultivaluedMap<ParameterType, Parameter> map, 
