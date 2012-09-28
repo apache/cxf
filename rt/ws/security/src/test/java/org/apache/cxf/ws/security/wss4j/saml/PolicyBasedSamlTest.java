@@ -40,7 +40,7 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
                 "wsse-request-clean.xml",
                 "saml_assertion_policy.xml",
                 null,
-                Arrays.asList(SP12Constants.SAML_TOKEN),
+                Arrays.asList(SP12Constants.SAML_TOKEN, SP12Constants.SUPPORTING_TOKENS),
                 new ArrayList<CoverageType>());
         //
         // This should pass as the policy wants a SAML1 assertion and it is in the request
@@ -72,7 +72,7 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
                 "wsse-request-clean.xml",
                 "saml2_assertion_policy.xml",
                 null,
-                Arrays.asList(SP12Constants.SAML_TOKEN),
+                Arrays.asList(SP12Constants.SAML_TOKEN, SP12Constants.SUPPORTING_TOKENS),
                 new ArrayList<CoverageType>());
         //
         // This should pass as the policy wants a SAML2 assertion and it is in the request
