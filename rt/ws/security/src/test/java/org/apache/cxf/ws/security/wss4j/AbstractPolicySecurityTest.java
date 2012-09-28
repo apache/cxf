@@ -40,6 +40,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.Binding;
@@ -198,6 +199,21 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
                     }
                 }
             }
+            
+            /*
+            // Check that the things that weren't asserted are expected
+            Set<QName> assertions = aim.keySet();
+            for (QName assertionType : assertions) {
+                Collection<AssertionInfo> ais = aim.get(assertionType);
+                for (AssertionInfo ai : ais) {
+                    if (!ai.isAsserted() && ((notAssertedInAssertions == null)
+                        || (!notAssertedInAssertions.contains(assertionType)))) {
+                        throw new Exception("Assertion: " + assertionType + " is not asserted: "
+                            + ai.getErrorMessage());
+                    }
+                }
+            }
+            */
             
             if (notAssertedInAssertions != null) {
                 for (QName assertionType : notAssertedInAssertions) {
