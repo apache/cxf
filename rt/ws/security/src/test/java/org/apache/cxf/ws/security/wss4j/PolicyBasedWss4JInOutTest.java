@@ -202,6 +202,12 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.ENCRYPTED_ELEMENTS,
                 null,
                 CoverageType.ENCRYPTED);
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_elements_policy3.xml",
+                Arrays.asList(SP12Constants.ENCRYPTED_ELEMENTS),
+                Arrays.asList(SP12Constants.SYMMETRIC_BINDING, SP12Constants.PROTECTION_TOKEN),
+                Arrays.asList(CoverageType.ENCRYPTED));
         
         this.runAndValidate(
                 "wsse-request-clean.xml",

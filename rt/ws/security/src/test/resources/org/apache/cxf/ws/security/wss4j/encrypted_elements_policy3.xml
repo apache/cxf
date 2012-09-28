@@ -19,7 +19,7 @@
           </sp:ProtectionToken>
           <sp:AlgorithmSuite>
             <wsp:Policy>
-              <sp:Basic128Rsa15 />
+              <sp:Basic128 />
             </wsp:Policy>
           </sp:AlgorithmSuite>
           <sp:Layout>
