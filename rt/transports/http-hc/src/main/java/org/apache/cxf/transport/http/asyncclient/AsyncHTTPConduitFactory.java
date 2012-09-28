@@ -399,7 +399,6 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         DefaultHttpAsyncClient dhac = new DefaultHttpAsyncClient(connectionManager) {
             @Override
             protected HttpParams createHttpParams() {
-                super.createHttpParams();
                 HttpParams params = new SyncBasicHttpParams();
                 HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
                 HttpConnectionParams.setTcpNoDelay(params, true);
