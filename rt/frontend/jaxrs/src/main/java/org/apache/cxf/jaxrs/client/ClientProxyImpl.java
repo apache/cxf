@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.HttpHeaders;
@@ -310,7 +311,11 @@ public class ClientProxyImpl extends AbstractClient implements
     
     private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
         ProviderFactory pf = ProviderFactory.getInstance(message);
-        for (Class<?> exType : m.getExceptionTypes()) {
+        Class<?>[] exTypes = m.getExceptionTypes();
+        if (exTypes.length == 0) {
+            exTypes = new Class[]{WebApplicationException.class};
+        }
+        for (Class<?> exType : exTypes) {
             ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
             if (mapper != null) {
                 return mapper;
