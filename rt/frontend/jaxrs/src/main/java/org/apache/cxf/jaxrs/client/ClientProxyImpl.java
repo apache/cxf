@@ -298,7 +298,11 @@ public class ClientProxyImpl extends AbstractClient implements
     
     private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
         ProviderFactory pf = ProviderFactory.getInstance(message);
-        for (Class<?> exType : m.getExceptionTypes()) {
+        Class<?>[] exTypes = m.getExceptionTypes();
+        if (exTypes.length == 0) {
+            exTypes = new Class[]{ServerWebApplicationException.class};
+        }
+        for (Class<?> exType : exTypes) {
             ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
             if (mapper != null) {
                 return mapper;
