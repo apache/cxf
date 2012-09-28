@@ -37,10 +37,23 @@ import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseFactory;
+import org.apache.http.HttpVersion;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.RequestAuthCache;
+import org.apache.http.client.protocol.RequestClientConnControl;
+import org.apache.http.client.protocol.RequestDefaultHeaders;
+import org.apache.http.client.protocol.RequestProxyAuthentication;
+import org.apache.http.client.protocol.RequestTargetAuthentication;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
+import org.apache.http.impl.client.TargetAuthenticationStrategy;
 import org.apache.http.impl.nio.DefaultHttpClientIODispatch;
+import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;
 import org.apache.http.impl.nio.conn.DefaultClientAsyncConnection;
 import org.apache.http.impl.nio.conn.PoolingClientAsyncConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
@@ -58,7 +71,16 @@ import org.apache.http.nio.reactor.ssl.SSLIOSession;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.SyncBasicHttpParams;
+import org.apache.http.protocol.BasicHttpProcessor;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.RequestContent;
+import org.apache.http.protocol.RequestExpectContinue;
+import org.apache.http.protocol.RequestTargetHost;
+import org.apache.http.protocol.RequestUserAgent;
 
 /**
  * 
@@ -91,9 +113,9 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     public static enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER
     };
+        
     
     final IOReactorConfig config = new IOReactorConfig();
-    volatile CXFAsyncRequester requester;
     volatile ConnectingIOReactor ioReactor;
     volatile PoolingClientAsyncConnectionManager connectionManager;
     
@@ -102,19 +124,47 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     int maxConnections = 5000;
     int maxPerRoute = 1000;
     int connectionTTL = 60000;
+
     
+    // these have per-instance Logger instances that have sync methods to setup.
+    private final TargetAuthenticationStrategy targetAuthenticationStrategy = new TargetAuthenticationStrategy();
+    private final ProxyAuthenticationStrategy proxyAuthenticationStrategy = new ProxyAuthenticationStrategy();
+    private final BasicHttpProcessor httpproc;
     
-    public AsyncHTTPConduitFactory(Map<String, Object> conf) {
+    AsyncHTTPConduitFactory() {
         super();
+        httpproc = new BasicHttpProcessor();
+        httpproc.addInterceptor(new RequestDefaultHeaders());
+        // Required protocol interceptors
+        httpproc.addInterceptor(new RequestContent());
+        httpproc.addInterceptor(new RequestTargetHost());
+        // Recommended protocol interceptors
+        httpproc.addInterceptor(new RequestClientConnControl());
+        httpproc.addInterceptor(new RequestUserAgent());
+        httpproc.addInterceptor(new RequestExpectContinue());
+        // HTTP authentication interceptors
+        httpproc.addInterceptor(new RequestAuthCache());
+        httpproc.addInterceptor(new RequestTargetAuthentication());
+        httpproc.addInterceptor(new RequestProxyAuthentication());        
+
+    }
+    public AsyncHTTPConduitFactory(Map<String, Object> conf) {
+        this();
         config.setTcpNoDelay(true);
         setProperties(conf);
     }
     
     
     public AsyncHTTPConduitFactory(Bus b) {
+        this();
         addListener(b);
         config.setTcpNoDelay(true);
         setProperties(b.getProperties());
+    }
+    
+    
+    public BasicHttpProcessor getDefaultHttpProcessor() {
+        return httpproc;
     }
     
     public UseAsyncPolicy getUseAsyncPolicy() {
@@ -133,7 +183,6 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         shutdown(ioReactor2, connectionManager2);
     }
     private synchronized void resetVars() {
-        requester = null;
         ioReactor = null;
         connectionManager = null;
     }
@@ -248,7 +297,6 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
             shutdown(ioReactor, connectionManager);
             connectionManager = null;
             ioReactor = null;
-            requester = null;
         }
         isShutdown = true;
     }
@@ -274,7 +322,7 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
     
     
     public synchronized void setupNIOClient() throws IOReactorException {
-        if (requester != null) {
+        if (connectionManager != null) {
             return;
         }
         // Create client-side I/O reactor
@@ -341,15 +389,43 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
         };
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         connectionManager.setMaxTotal(maxConnections);
-        requester = new CXFAsyncRequester(connectionManager);
     }
     
-    public CXFAsyncRequester getRequester() throws IOException {
-        if (requester == null) {
+    public DefaultHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
+        if (connectionManager == null) {
             setupNIOClient();
         }
-
-        return requester;
+        
+        DefaultHttpAsyncClient dhac = new DefaultHttpAsyncClient(connectionManager) {
+            @Override
+            protected HttpParams createHttpParams() {
+                super.createHttpParams();
+                HttpParams params = new SyncBasicHttpParams();
+                HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+                HttpConnectionParams.setTcpNoDelay(params, true);
+                HttpConnectionParams.setSocketBufferSize(params, 16332);
+                HttpConnectionParams.setConnectionTimeout(params, (int)c.getClient().getConnectionTimeout());
+                return params;
+            }
+            @Override
+            protected BasicHttpProcessor createHttpProcessor() {
+                return httpproc;
+            }            
+        };
+        //CXF handles redirects ourselves
+        dhac.setRedirectStrategy(new RedirectStrategy() {
+            public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)
+                throws ProtocolException {
+                return false;
+            }
+            public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context)
+                throws ProtocolException {
+                return null;
+            }
+        });
+        dhac.setTargetAuthenticationStrategy(targetAuthenticationStrategy);
+        dhac.setProxyAuthenticationStrategy(proxyAuthenticationStrategy);
+        return dhac;
     }
 
 
