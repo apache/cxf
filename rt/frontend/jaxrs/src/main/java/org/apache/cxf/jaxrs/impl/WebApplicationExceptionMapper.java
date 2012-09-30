@@ -34,17 +34,17 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 
 /**
  * Default exception mapper for {@link WebApplicationException}.
- * This class interacts with {@link FaultListener}. If the service has a {@link FaultListener},
- * then this mapper calls it to determine whether to log the exception. In theory, {@link FaultListener}
- * objects could take other actions, but since they cannot produce a {@link Response}, they
- * are practically limited to controlling logging.
+ * This class interacts with {@link FaultListener}.  
+ * If {@link FaultListener} is available and has indicated that it handled the exception then
+ * no more logging is done, otherwise a message is logged at WARN (default) or FINE level
+ * which can be controlled with a printStackTrace property  
  */
 public class WebApplicationExceptionMapper 
     implements ExceptionMapper<WebApplicationException> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WebApplicationExceptionMapper.class);
     private static final String ERROR_MESSAGE_START = "WebApplicationException has been caught, status: ";
-    private boolean printStackTrace;
+    private boolean printStackTrace = true;
     
     public Response toResponse(WebApplicationException ex) {
         
@@ -59,28 +59,12 @@ public class WebApplicationExceptionMapper
             flogger = (FaultListener)PhaseInterceptorChain.getCurrentMessage()
                 .getContextualProperty(FaultListener.class.getName());
         }
-        if (flogger != null || LOG.isLoggable(Level.FINE)) {
-            String errorMessage = buildErrorMessage(r, ex);
-
-            if (flogger != null) {
-                if (flogger.faultOccurred(ex, errorMessage, msg)) {
-                    LOG.log(Level.INFO, errorMessage, ex);
-                }
-            } else {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, errorMessage, ex);
-                    /*
-                     * only print a stack trace if we are logging FINE.
-                     * If there is a listener, let it print the stack trace if
-                     * wants one.
-                     */
-                    if (printStackTrace) {
-                        LOG.fine(getStackTrace(ex));
-                    }
-                }
-            }
+        if (flogger == null
+            || !flogger.faultOccurred(ex, buildErrorMessage(r, ex), msg)) {
+            Level level = printStackTrace ? Level.WARNING : Level.FINE;
+            LOG.log(level, getStackTrace(ex));
         }
-
+        
         return r;
     }
 
@@ -106,9 +90,11 @@ public class WebApplicationExceptionMapper
     }
 
     /**
-     * Control whether this mapper logs backtraces. If there is no {@link FaultListener},
-     * and this is <tt>true</tt>, this mapper will log the stack trace at FINE.
-     * @param printStackTrace whether to log stack trace.
+     * Control whether to log at WARN or FINE level.
+     * Note this property is ignored if a registered {@link FaultListener} 
+     * has handled the exception
+     * @param printStackTrace if set to true then WARN level is used (default),
+     *        otherwise - FINE level.
      */
     public void setPrintStackTrace(boolean printStackTrace) {
         this.printStackTrace = printStackTrace;
