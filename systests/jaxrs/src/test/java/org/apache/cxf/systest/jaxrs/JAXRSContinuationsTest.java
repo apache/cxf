@@ -24,8 +24,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -47,6 +51,14 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testDefaultTimeout() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/defaulttimeout");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = wc.get();
+        assertEquals(503, r.getStatus());
+    }
+    
+    @Test
     public void testContinuation() throws Exception {
         
         doTestContinuation("books");
@@ -56,6 +68,12 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
     public void testContinuationSubresource() throws Exception {
         
         doTestContinuation("books/subresources");
+    }
+    
+    @Test
+    public void testContinuationWithTimeHandler() throws Exception {
+        
+        doTestContinuation("books/timeouthandler");
     }
     
     private void doTestContinuation(String pathSegment) throws Exception {
@@ -94,7 +112,7 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
             int result = httpclient.executeMethod(get);
             assertEquals(200, result);
             assertEquals("Book description for id " + id + " is wrong",
-                         expected, get.getResponseBodyAsString());
+                         expected, IOUtils.toString(get.getResponseBodyAsStream()));
         } finally {
             // Release current connection to the connection pool once you are done
             get.releaseConnection();

@@ -25,20 +25,24 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 
 public class AsyncResponseImpl implements AsyncResponse {
     
     private Continuation cont;
-    private Object responseObject;
-    private long timeout = 5000;
+    private long timeout = AsyncResponse.NO_TIMEOUT;
     private Message inMessage;
-    private boolean suspended;
     private boolean cancelled;
+    private boolean done;
+    private boolean newTimeoutRequested;
+    private boolean resumedByApplication;
+    private TimeoutHandler timeoutHandler;
     public AsyncResponseImpl(Message inMessage) {
         ContinuationProvider provider = 
             (ContinuationProvider)inMessage.get(ContinuationProvider.class.getName());
@@ -58,55 +62,68 @@ public class AsyncResponseImpl implements AsyncResponse {
         doResume(response);
     }
     
-    private void doResume(Object response) throws IllegalStateException {
-        responseObject = response;
+    private synchronized void doResume(Object response) throws IllegalStateException {
+        checkCancelled();
+        checkSuspended();
         inMessage.getExchange().put(AsyncResponse.class, this);
-        suspended = false;
+        cont.setObject(response);
+        resumedByApplication = true;
         cont.resume();
     }
     
     @Override
     public void cancel() {
-        cancel(-1);
+        doCancel(null);
     }
 
     @Override
-    //TODO: has to be long
     public void cancel(int retryAfter) {
-        cancelled = true;
-        doResume(Response.status(503).header(HttpHeaders.RETRY_AFTER, Integer.toString(retryAfter)).build());
+        doCancel(Integer.toString(retryAfter));
     }
 
     @Override
     public void cancel(Date retryAfter) {
-        cancel((int)(retryAfter.getTime() - new Date().getTime()));
+        doCancel(HttpUtils.getHttpDateFormat().format(retryAfter));
+    }
+    
+    private synchronized void doCancel(String retryAfterHeader) {
+        checkSuspended();
+        cancelled = true;
+        ResponseBuilder rb = Response.status(503);
+        if (retryAfterHeader != null) {
+            rb.header(HttpHeaders.RETRY_AFTER, retryAfterHeader);
+        }
+        doResume(rb.build());
     }
 
     @Override
-    public boolean isSuspended() {
-        return suspended;
+    public synchronized boolean isSuspended() {
+        return cont.isPending();
     }
 
     @Override
-    public boolean isCancelled() {
+    public synchronized boolean isCancelled() {
         return cancelled;
     }
 
     @Override
-    public boolean isDone() {
-        // TODO Auto-generated method stub
-        return false;
+    public synchronized boolean isDone() {
+        return done;
     }
 
     @Override
-    public void setTimeout(long time, TimeUnit unit) throws IllegalStateException {
-        // TODO Auto-generated method stub
+    public synchronized void setTimeout(long time, TimeUnit unit) throws IllegalStateException {
+        checkCancelled();
+        checkSuspended();
+        inMessage.getExchange().put(AsyncResponse.class, this);
+        timeout = unit.convert(time, TimeUnit.MILLISECONDS);
+        newTimeoutRequested = true;
+        cont.resume();
     }
 
     @Override
     public void setTimeoutHandler(TimeoutHandler handler) {
-        // TODO Auto-generated method stub
-        
+        timeoutHandler = handler;
     }
 
     @Override
@@ -133,13 +150,49 @@ public class AsyncResponseImpl implements AsyncResponse {
         return null;
     }
     
+    private void checkCancelled() {
+        if (cancelled) {
+            throw new IllegalStateException();
+        }
+    }
+    
+    private void checkSuspended() {
+        if (!cont.isPending()) {
+            throw new IllegalStateException();
+        }
+    }
+    
     // these methods are called by the runtime, not part of AsyncResponse    
-    public void suspend() {
-        cont.setObject(this);
+    public synchronized void suspend() {
+        checkCancelled();
         cont.suspend(timeout);
     }
     
-    public Object getResponseObject() {
-        return responseObject;
+    public synchronized Object getResponseObject() {
+        // it may have to be set to true only after a continuation-specific onComplete event
+        done = true;
+        return cont.getObject();
+    }
+    
+    public synchronized boolean isResumedByApplication() {
+        return resumedByApplication;
+    }
+    
+    public synchronized boolean handleTimeout() {
+        if (!resumedByApplication) {
+            if (newTimeoutRequested) {
+                newTimeoutRequested = false;
+                suspend();
+                return true;
+            } else if (timeoutHandler != null) {
+                suspend();
+                timeoutHandler.handleTimeout(this);
+                return true;
+            } else {
+                done = true;
+            }
+        }
+        return false;
+        
     }
 }

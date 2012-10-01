@@ -82,15 +82,22 @@ public class JAXRSInvoker extends AbstractInvoker {
             AsyncResponse asyncResp = exchange.get(AsyncResponse.class);
             if (asyncResp != null) {
                 AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
-                Object asyncObj = asyncImpl.getResponseObject();
-                if (!(asyncObj instanceof Response)) {
+                
+                if (asyncImpl.isResumedByApplication()) {
+                    Object asyncObj = asyncImpl.getResponseObject();
                     if (asyncObj instanceof Throwable) {
-                        return handleFault(new Fault((Throwable)asyncObj), exchange.getInMessage(), null, null);    
-                    } else {
+                        return handleFault(new Fault((Throwable)asyncObj), 
+                                           exchange.getInMessage(), null, null);    
+                    } else if (!(asyncObj instanceof Response)) {
                         response = Response.ok().entity(asyncObj).build();
+                    } else {
+                        response = (Response)asyncObj;
                     }
+                } else if (asyncImpl.handleTimeout()) {
+                    return null;
                 } else {
-                    response = (Response)asyncObj;
+                    return handleFault(new Fault(new WebApplicationException(503)), 
+                                       exchange.getInMessage(), null, null);
                 }
             }
         }
