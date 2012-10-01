@@ -40,11 +40,14 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
 import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
-import org.junit.Before;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -93,8 +96,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
                    launchServer(JettyDigestServer.class, true));
     }
 
-    @Before
-    public void setUp() throws Exception {
+    private HTTPConduit setupClient(boolean async) throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         greeter = new SOAPService(wsdl, SERVICE_NAME).getPort(Greeter.class);
         BindingProvider bp = (BindingProvider)greeter;
@@ -102,12 +104,26 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
         ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor()); 
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    ADDRESS);
-        bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
-        bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
         HTTPConduit cond = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
-        cond.setAuthSupplier(new DigestAuthSupplier());
-        
         HTTPClientPolicy client = new HTTPClientPolicy();
+        cond.setClient(client);
+        if (async) {
+            if (cond instanceof AsyncHTTPConduit) {
+                AsyncHTTPConduit acond = (AsyncHTTPConduit)cond;
+                acond.getClient().setAllowChunking(false);
+                acond.getClient().setAutoRedirect(true);
+                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd");
+                acond.getHttpAsyncClient().getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+            } else {
+                fail("Not an async conduit");
+            }
+        } else {
+            bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
+            bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
+            cond.setAuthSupplier(new DigestAuthSupplier());
+        }
+        
         ClientProxy.getClient(greeter).getOutInterceptors()
             .add(new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM_ENDING) {
                 
@@ -119,18 +135,36 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
                 }
             });
         client.setAllowChunking(false);
-        cond.setClient(client);
+        return cond;
     }
 
     @Test
-    public void testDigestAuth() throws Exception { 
+    public void testDigestAuth() throws Exception {
+        //CXF will handle the auth stuff within it's conduit implementation
+        doTest(false);
+    }
+    @Test
+    public void testDigestAuthAsyncClient() throws Exception {
+        //We'll let HTTP async handle it.  Useful for things like NTLM 
+        //which async client can handle but we cannot.
+        doTest(true);
+    }
+    
+    private void doTest(boolean async) throws Exception {
+        HTTPConduit cond = setupClient(async);
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
         assertEquals("Hello Bob", greeter.greetMe("Bob"));
 
         try {
             BindingProvider bp = (BindingProvider)greeter;
-            bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "blah");
-            bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "foo");
+            if (async) {
+                AsyncHTTPConduit acond = (AsyncHTTPConduit)cond;
+                UsernamePasswordCredentials creds = new UsernamePasswordCredentials("blah", "foo");
+                acond.getHttpAsyncClient().getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+            } else {
+                bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "blah");
+                bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "foo");
+            }
             greeter.greetMe("Alice");
             fail("Password was wrong, should have failed");
         } catch (WebServiceException wse) {

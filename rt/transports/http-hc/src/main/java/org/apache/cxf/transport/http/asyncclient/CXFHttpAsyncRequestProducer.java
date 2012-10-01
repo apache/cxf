@@ -19,9 +19,12 @@
 
 package org.apache.cxf.transport.http.asyncclient;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.ByteBuffer;
 
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -34,6 +37,9 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
 
     private final CXFHttpRequest request;
     private final SharedOutputBuffer buf;
+    private volatile CachedOutputStream content;
+    private volatile ByteBuffer buffer;
+    private volatile FileInputStream fis;
     
     public CXFHttpAsyncRequestProducer(final CXFHttpRequest request, final SharedOutputBuffer buf) {
         super();
@@ -61,10 +67,40 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
     }
     
     public void produceContent(final ContentEncoder enc, final IOControl ioc) throws IOException {
-        buf.produceContent(enc, ioc);
+        if (content != null) {
+            if (buffer == null) {
+                if (content.getTempFile() == null) {
+                    buffer = ByteBuffer.wrap(content.getBytes());
+                } else {
+                    fis = (FileInputStream)content.getInputStream();
+                    buffer = ByteBuffer.allocate(8 * 1024);
+                }
+            }
+            int i = -1;
+            if (!buffer.hasRemaining() && fis != null) {
+                buffer.reset();
+                i = fis.getChannel().read(buffer);
+                buffer.flip();
+            }
+            enc.write(buffer);
+            if (!buffer.hasRemaining() && i == -1) {
+                enc.complete();
+            }
+        } else {
+            buf.produceContent(enc, ioc);
+        }
     }
     
     public void requestCompleted(final HttpContext context) {
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException io) {
+                //ignore
+            }
+            fis = null;
+        }
+        buffer = null;
     }
     
     public void failed(final Exception ex) {
@@ -72,15 +108,27 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
     }
     
     public boolean isRepeatable() {
-        return false;
+        return request.getOutputStream().retransmitable();
     }
     
     public void resetRequest() throws IOException {
+        if (request.getOutputStream().retransmitable()) {
+            content = request.getOutputStream().getCachedStream();
+        }
     }
 
     @Override
     public void close() throws IOException {
         buf.close();
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException io) {
+                //ignore
+            }
+            fis = null;
+        }
+        buffer = null;
     }
     
 }

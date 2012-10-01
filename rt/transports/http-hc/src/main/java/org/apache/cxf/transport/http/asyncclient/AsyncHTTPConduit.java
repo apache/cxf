@@ -56,6 +56,7 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -169,8 +170,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             httpRequestMethod = "POST";
             message.put(Message.HTTP_REQUEST_METHOD, httpRequestMethod);
         }
-        CXFHttpRequest e = new CXFHttpRequest(httpRequestMethod);
-        BasicHttpEntity entity = new BasicHttpEntity();
+        final CXFHttpRequest e = new CXFHttpRequest(httpRequestMethod);
+        BasicHttpEntity entity = new BasicHttpEntity() {
+            public boolean isRepeatable() {
+                return e.getOutputStream().retransmitable();
+            }
+        };
         entity.setChunked(true);
         entity.setContentType((String)message.get(Message.CONTENT_TYPE));
         e.setURI(uri);
@@ -246,6 +251,14 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             inbuf = new SharedInputBuffer(16320, allocator);
             outbuf = new SharedOutputBuffer(16320, allocator);
         }
+        
+        public boolean retransmitable() {
+            return cachedStream != null;
+        }
+        public CachedOutputStream getCachedStream() {
+            return cachedStream;
+        }
+
         
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
