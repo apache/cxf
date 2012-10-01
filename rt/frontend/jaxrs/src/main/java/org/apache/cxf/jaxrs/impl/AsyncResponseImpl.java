@@ -22,18 +22,20 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.continuations.Continuation;
+import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 
-public class AsyncResponseImpl implements AsyncResponse {
+public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     
     private Continuation cont;
     private long timeout = AsyncResponse.NO_TIMEOUT;
@@ -43,13 +45,17 @@ public class AsyncResponseImpl implements AsyncResponse {
     private boolean newTimeoutRequested;
     private boolean resumedByApplication;
     private TimeoutHandler timeoutHandler;
+    
+    private CompletionCallback completionCallback;
+    
     public AsyncResponseImpl(Message inMessage) {
+        inMessage.put(AsyncResponse.class, this);
+        inMessage.getExchange().put(ContinuationCallback.class, this);
+        this.inMessage = inMessage;
+        
         ContinuationProvider provider = 
             (ContinuationProvider)inMessage.get(ContinuationProvider.class.getName());
         cont = provider.getContinuation();
-        inMessage.put(AsyncResponse.class, this);
-        this.inMessage = inMessage;
-       
     }
     
     @Override
@@ -128,26 +134,43 @@ public class AsyncResponseImpl implements AsyncResponse {
 
     @Override
     public boolean register(Class<?> callback) throws NullPointerException {
-        // TODO Auto-generated method stub
-        return false;
+        return register(callback, CompletionCallback.class)[0];
     }
 
     @Override
     public boolean[] register(Class<?> callback, Class<?>... callbacks) throws NullPointerException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return register(callback.newInstance(), CompletionCallback.class);    
+        } catch (Throwable t) {
+            return new boolean[]{false};
+        }
+        
     }
 
     @Override
     public boolean register(Object callback) throws NullPointerException {
-        // TODO Auto-generated method stub
-        return false;
+        return register(callback, CompletionCallback.class)[0];
     }
 
+    //TODO: API bug, has to be Class<?>...
     @Override
     public boolean[] register(Object callback, Object... callbacks) throws NullPointerException {
-        // TODO Auto-generated method stub
-        return null;
+        boolean[] result = new boolean[callbacks.length];
+        
+        for (int i = 0; i < callbacks.length; i++) {
+            Object interf = callbacks[i];
+            if (interf == null) {
+                throw new NullPointerException();
+            }
+            Class<?> cls = (Class<?>)interf;
+            if (cls == CompletionCallback.class) {
+                completionCallback = (CompletionCallback)callback;
+                result[i] = true;
+            } else {
+                result[i] = false;
+            }
+        }
+        return result;
     }
     
     private void checkCancelled() {
@@ -193,6 +216,21 @@ public class AsyncResponseImpl implements AsyncResponse {
             }
         }
         return false;
+        
+    }
+
+    @Override
+    public void onComplete() {
+        if (completionCallback != null) {
+            completionCallback.onComplete();
+        }
+    }
+
+    @Override
+    public void onError(Throwable error) {
+        if (completionCallback != null) {
+            completionCallback.onError(error);
+        }
         
     }
 }

@@ -31,6 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.TimeoutHandler;
 
 @Path("/bookstore")
@@ -47,6 +48,7 @@ public class BookContinuationStore {
     @GET
     @Path("/books/defaulttimeout")
     public void getBookDescriptionWithHandler(AsyncResponse async) {
+        async.register(new CompletionCallbackImpl());
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
     }
     
@@ -112,6 +114,22 @@ public class BookContinuationStore {
         @Override
         public void handleTimeout(AsyncResponse asyncResponse) {
             asyncResponse.resume(books.get(id));
+        }
+        
+    }
+    
+    private class CompletionCallbackImpl implements CompletionCallback {
+
+        @Override
+        public void onComplete() {
+            System.out.println("CompletionCallbackImpl: onComplete");
+            
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // TODO Auto-generated method stub
+            
         }
         
     }
