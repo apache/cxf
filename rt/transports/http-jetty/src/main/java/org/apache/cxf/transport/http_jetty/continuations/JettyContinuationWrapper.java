@@ -60,6 +60,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
 
     public void resume() {
         isResumed = true;
+        isPending = false;
         continuation.resume();
     }
 
@@ -106,10 +107,12 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public void onComplete(org.eclipse.jetty.continuation.Continuation cont) {
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
         isPending = false;
+        //REVISIT: isResumed = false;
     }
 
     public void onTimeout(org.eclipse.jetty.continuation.Continuation cont) {
         isPending = false;
+        //isResumed = true;
     }
     
 }

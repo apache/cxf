@@ -99,6 +99,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         public void resume() {
             isResumed = true;
+            isPending = false;
             redispatch();
         }
 
@@ -131,6 +132,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             inMessage.getExchange().getInMessage()
                 .remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
             isPending = false;
+            //REVISIT: isResumed = false;
         }
         public void onError(AsyncEvent event) throws IOException {
         }
@@ -138,6 +140,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         public void onTimeout(AsyncEvent event) throws IOException {
             isPending = false;
+            //REVISIT: isResumed = true;
             redispatch();
         }
         
