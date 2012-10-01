@@ -29,7 +29,9 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -133,8 +135,8 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
     
     
     protected boolean shouldValidate(Message m) {
-        Object en = m.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        return Boolean.TRUE.equals(en) || "true".equals(en);
+        SchemaValidationType type = ServiceUtils.getSchemaValidationType(m);
+        return type.equals(SchemaValidationType.BOTH) || type.equals(SchemaValidationType.OUT);
     }
     
     protected boolean writeToOutputStream(Message m, BindingInfo info, Service s) {

@@ -27,6 +27,8 @@ import javax.jws.WebService;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.types.ComplexStruct;
 import org.apache.schema_validation.types.OccuringStruct;
+import org.apache.schema_validation.types.SomeRequest;
+import org.apache.schema_validation.types.SomeResponse;
 
 @WebService(serviceName = "SchemaValidationService", 
             portName = "SoapPort",
@@ -64,4 +66,15 @@ public class SchemaValidationImpl implements SchemaValidation {
         return occuringStruct;
     }
 
+    @Override
+    public SomeResponse doSomething(SomeRequest in) {
+        SomeResponse response = new SomeResponse();
+        if (in.getId().equals("1234567890")) {
+            response.setTransactionId("aaaaaaaaaaxxx"); // invalid transaction id
+        } else {
+            response.setTransactionId("aaaaaaaaaa");
+        }
+        
+        return response;
+    }
 }
