@@ -17,8 +17,8 @@ located), the maven pom.xml file can be used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install (builds the demo)
-  mvn -Pservice  (from one ore more command line windows)
-  Mvn -Pclient  (from a second command line window)
+  mvn -Pservice  (from one or more command line windows)
+  mvn -Pclient  (from a second command line window)
 
 The "service" profiles will startup a simple "Greeter" service on a random
 port.  Because it is a random port, there is no way for the clients to
@@ -31,7 +31,7 @@ that are available.  It will then iterate through all of them and call
 the greetMe method.   
 
 You can run multiple instances of the service in separate command line
-windows.   The client will detect them all via WS-Discovery and call
-off to all of them.
+windows.   The client will detect them all via WS-Discovery and make calls
+to each of them.
 
 
