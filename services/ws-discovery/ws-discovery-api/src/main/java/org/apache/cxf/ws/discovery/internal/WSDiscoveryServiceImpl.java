@@ -87,7 +87,9 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     
     public final synchronized void update(Map<String, Object> props) {
         String address = (String)props.get("org.apache.cxf.service.ws-discovery.address");
-        client.setAddress(address);
+        if (address != null) {
+            client.setAddress(address);
+        }
         if (udpEndpoint != null && !client.isAdHoc()) {
             udpEndpoint.stop();
             udpEndpoint = null;
