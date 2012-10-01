@@ -50,7 +50,6 @@ public class BookContinuationStore {
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
     }
     
-    //Not currently invoked
     @GET
     @Path("/books/timeouthandler/{id}")
     public void getBookDescriptionWithHandler(@PathParam("id") String id, AsyncResponse async) {
