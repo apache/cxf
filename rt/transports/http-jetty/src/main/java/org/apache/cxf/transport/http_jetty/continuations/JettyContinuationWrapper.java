@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.continuations.Continuation;
+import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.eclipse.jetty.continuation.ContinuationListener;
@@ -36,6 +37,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     
     private Message message;
     private org.eclipse.jetty.continuation.Continuation continuation;
+    private ContinuationCallback callback;
     
     public JettyContinuationWrapper(HttpServletRequest request, 
                                     HttpServletResponse resp, 
@@ -48,6 +50,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
             request.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                                  message.getExchange().getInMessage());
             continuation.addContinuationListener(this);
+            callback = message.getExchange().get(ContinuationCallback.class);
         }
     }
 
@@ -108,6 +111,9 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
         isPending = false;
         //REVISIT: isResumed = false;
+        if (callback != null) {
+            callback.onComplete();
+        }
     }
 
     public void onTimeout(org.eclipse.jetty.continuation.Continuation cont) {
