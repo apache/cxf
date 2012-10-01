@@ -23,8 +23,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
@@ -33,12 +33,20 @@ import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
+/**
+ * Default exception mapper for {@link WebApplicationException}.
+ * This class interacts with {@link FaultListener}.  
+ * If {@link FaultListener} is available and has indicated that it handled the exception then
+ * no more logging is done, otherwise a message is logged at WARN (default) or FINE level
+ * which can be controlled with a printStackTrace property  
+ */
 public class WebApplicationExceptionMapper 
     implements ExceptionMapper<WebApplicationException> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WebApplicationExceptionMapper.class);
     private static final String ERROR_MESSAGE_START = "WebApplicationException has been caught, status: ";
-    private boolean printStackTrace;
+    private boolean printStackTrace = true;
+    private boolean addMessageToResponse;
     
     public Response toResponse(WebApplicationException ex) {
         
@@ -46,6 +54,8 @@ public class WebApplicationExceptionMapper
         if (r == null) {
             r = Response.serverError().build();
         }
+        boolean doAddMessage = r.getEntity() != null ? false : addMessageToResponse;
+        
         
         Message msg = PhaseInterceptorChain.getCurrentMessage();
         FaultListener flogger = null;
@@ -53,23 +63,21 @@ public class WebApplicationExceptionMapper
             flogger = (FaultListener)PhaseInterceptorChain.getCurrentMessage()
                 .getContextualProperty(FaultListener.class.getName());
         }
-        if (flogger != null || LOG.isLoggable(Level.FINE)) {
-            String errorMessage = buildErrorMessage(r, ex);
-            
-            boolean doDefault = 
-                flogger != null ? flogger.faultOccurred(ex, errorMessage, msg) : true;
-            if (doDefault && LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, errorMessage, ex);
-            }
-        }
-        if (printStackTrace) {
-            LOG.warning(getStackTrace(ex));
+        String errorMessage = doAddMessage || flogger != null 
+            ? buildErrorMessage(r, ex) : null; 
+        if (flogger == null
+            || !flogger.faultOccurred(ex, errorMessage, msg)) {
+            Level level = printStackTrace ? Level.WARNING : Level.FINE;
+            LOG.log(level, getStackTrace(ex));
         }
         
+        if (doAddMessage) {
+            r = Response.fromResponse(r).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();
+        }
         return r;
     }
 
-    private String buildErrorMessage(Response r, WebApplicationException ex) {
+    protected String buildErrorMessage(Response r, WebApplicationException ex) {
         StringBuilder sb = new StringBuilder();
         sb.append(ERROR_MESSAGE_START).append(r.getStatus());
         
@@ -89,9 +97,26 @@ public class WebApplicationExceptionMapper
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
-    
+
+    /**
+     * Control whether to log at WARN or FINE level.
+     * Note this property is ignored if a registered {@link FaultListener} 
+     * has handled the exception
+     * @param printStackTrace if set to true then WARN level is used (default),
+     *        otherwise - FINE level.
+     */
     public void setPrintStackTrace(boolean printStackTrace) {
         this.printStackTrace = printStackTrace;
+    }
+
+    /**
+     * Controls whether to add an error message to Response or not,
+     * @param addMessageToResponse add a message to Response, ignored
+     *        if the captuted WebApplicationException has 
+     *        a Response with a non-null entity
+     */
+    public void setAddMessageToResponse(boolean addMessageToResponse) {
+        this.addMessageToResponse = addMessageToResponse;
     }
 
     
