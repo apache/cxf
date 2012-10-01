@@ -32,6 +32,7 @@ import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.annotations.SchemaValidation;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentation.Placement;
 import org.apache.cxf.annotations.WSDLDocumentationCollection;
@@ -255,9 +256,20 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
     }
 
+    /**
+     * @param endpoint
+     * @param annotation
+     */
+    @SuppressWarnings("deprecation")
     private void addSchemaValidationSupport(Endpoint endpoint, SchemaValidation annotation) {
         if (annotation != null) {
-            endpoint.put(Message.SCHEMA_VALIDATION_ENABLED, annotation.enabled());
+            // if someone has gone to the effort of specifying enabled=false, then we need to
+            // handle that, otherwise we use the new SchemaValidationType type only
+            if (!annotation.enabled()) {
+                endpoint.put(Message.SCHEMA_VALIDATION_ENABLED, SchemaValidationType.NONE);
+            } else {
+                endpoint.put(Message.SCHEMA_VALIDATION_ENABLED, annotation.type());
+            }
         }
     }
 

@@ -32,6 +32,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface SchemaValidation {
+    public enum SchemaValidationType {
+        IN, OUT, BOTH, NONE
+    }
+    
+    @Deprecated
     boolean enabled() default true;
+    
+    SchemaValidationType type() default SchemaValidationType.BOTH;
 }
 

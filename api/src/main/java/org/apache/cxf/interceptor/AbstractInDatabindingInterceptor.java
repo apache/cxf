@@ -31,12 +31,13 @@ import javax.xml.validation.Schema;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -103,7 +104,8 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     }
 
     private void setSchemaInMessage(Service service, Message message, DataReader<?> reader) {
-        if (MessageUtils.getContextualBoolean(message, Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE)) {
+        SchemaValidationType type = ServiceUtils.getSchemaValidationType(message);
+        if (type.equals(SchemaValidationType.BOTH) || type.equals(SchemaValidationType.IN)) {
             //all serviceInfos have the same schemas
             Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
                                                              message.getExchange().getBus());

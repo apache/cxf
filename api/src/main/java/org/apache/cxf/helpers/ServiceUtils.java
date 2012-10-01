@@ -26,11 +26,40 @@ import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
+import org.apache.cxf.message.Message;
+
 public final class ServiceUtils {
     
     private ServiceUtils() {
     }
-
+    
+    /**
+     * Determines the appropriate SchemaValidationType to return based on either
+     * a Boolean (for backwards compatibility) or the selected Schema Validation Type.
+     * 
+     * @param message
+     * @return
+     */
+    public static SchemaValidationType getSchemaValidationType(Message message) {
+        Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        if (obj instanceof SchemaValidationType) {
+            return (SchemaValidationType)obj;
+        } else if (obj != null) { 
+            String value = obj.toString().toUpperCase(); // handle boolean values as well
+            if ("TRUE".equals(value)) {
+                return SchemaValidationType.BOTH;
+            } else if ("FALSE".equals(value)) {
+                return SchemaValidationType.NONE;
+            } else if (value.length() > 0) {
+                return SchemaValidationType.valueOf(value);
+            }
+        }
+        
+        // fall through default value
+        return SchemaValidationType.NONE;
+    }
+    
     /**
      * Generates a suitable service name from a given class. The returned name
      * is the simple name of the class, i.e. without the package name.
