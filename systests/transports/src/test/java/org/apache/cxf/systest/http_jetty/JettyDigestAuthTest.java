@@ -45,7 +45,7 @@ import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
-import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 
 import org.junit.BeforeClass;
@@ -109,12 +109,10 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
         cond.setClient(client);
         if (async) {
             if (cond instanceof AsyncHTTPConduit) {
-                AsyncHTTPConduit acond = (AsyncHTTPConduit)cond;
-                acond.getClient().setAllowChunking(false);
-                acond.getClient().setAutoRedirect(true);
-                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials("ffang", "pswd");
-                acond.getHttpAsyncClient().getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+                bp.getRequestContext().put(Credentials.class.getName(), creds);
+                bp.getRequestContext().put(AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
+                client.setAutoRedirect(true);
             } else {
                 fail("Not an async conduit");
             }
@@ -151,16 +149,15 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
     }
     
     private void doTest(boolean async) throws Exception {
-        HTTPConduit cond = setupClient(async);
+        setupClient(async);
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
         assertEquals("Hello Bob", greeter.greetMe("Bob"));
 
         try {
             BindingProvider bp = (BindingProvider)greeter;
             if (async) {
-                AsyncHTTPConduit acond = (AsyncHTTPConduit)cond;
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials("blah", "foo");
-                acond.getHttpAsyncClient().getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+                bp.getRequestContext().put(Credentials.class.getName(), creds);
             } else {
                 bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "blah");
                 bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "foo");

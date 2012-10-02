@@ -468,10 +468,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
             ctx.setAttribute(ClientContext.SCHEME_REGISTRY, reg);
             connectionFuture = new BasicFuture<Boolean>(callback);
-            getHttpAsyncClient().execute(new CXFHttpAsyncRequestProducer(entity, outbuf),
-                                         new CXFHttpAsyncResponseConsumer(inbuf, responseCallback),
-                                         ctx,
-                                         callback);
+            DefaultHttpAsyncClient c = getHttpAsyncClient();
+            Credentials creds = (Credentials)outMessage.getContextualProperty(Credentials.class.getName());
+            if (creds != null) {
+                c.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+            }
+            c.execute(new CXFHttpAsyncRequestProducer(entity, outbuf),
+                      new CXFHttpAsyncResponseConsumer(inbuf, responseCallback),
+                      ctx,
+                      callback);
         }
         
         protected synchronized void setHttpResponse(HttpResponse r) {
