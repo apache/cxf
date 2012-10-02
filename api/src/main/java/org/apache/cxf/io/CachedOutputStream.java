@@ -28,9 +28,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -306,21 +308,23 @@ public class CachedOutputStream extends OutputStream {
         } else {
             // read the file
             FileInputStream fin = new FileInputStream(tempFile);
-            byte bytes[] = new byte[1024];
-            int x = fin.read(bytes);
+            Reader reader = new InputStreamReader(fin, charsetName);
+            char bytes[] = new char[1024];
+            long x = reader.read(bytes);
             while (x != -1) {
                 if ((count + x) > limit) {
                     x = limit - count;
                 }
-                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, x));
+                out.append(bytes, 0, (int)x);
                 count += x;
 
                 if (count >= limit) {
                     x = -1;
                 } else {
-                    x = fin.read(bytes);
+                    x = reader.read(bytes);
                 }
             }
+            reader.close();
             fin.close();
         }
     }
@@ -341,12 +345,14 @@ public class CachedOutputStream extends OutputStream {
         } else {
             // read the file
             FileInputStream fin = new FileInputStream(tempFile);
-            byte bytes[] = new byte[1024];
-            int x = fin.read(bytes);
+            Reader reader = new InputStreamReader(fin, charsetName);
+            char bytes[] = new char[1024];
+            int x = reader.read(bytes);
             while (x != -1) {
-                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, x));
-                x = fin.read(bytes);
+                out.append(bytes, 0, x);
+                x = reader.read(bytes);
             }
+            reader.close();
             fin.close();
         }
     }
