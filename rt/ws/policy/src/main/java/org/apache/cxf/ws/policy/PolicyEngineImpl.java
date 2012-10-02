@@ -111,7 +111,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
                     return;
                 }
             }
-            fblm.addListener(new PolicyAnnotationListener());
+            fblm.addListener(new PolicyAnnotationListener(bus));
         }
     }
 
