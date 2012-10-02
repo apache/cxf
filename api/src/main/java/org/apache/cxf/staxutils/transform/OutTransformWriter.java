@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 
@@ -86,6 +87,10 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeNamespace(String prefix, String uri) throws XMLStreamException {
+        if (StringUtils.isEmpty(prefix) || "xmlns".equals(prefix)) {
+            writeDefaultNamespace(uri);
+            return;
+        }
         if (matchesDropped(true)) {
             return;
         }
