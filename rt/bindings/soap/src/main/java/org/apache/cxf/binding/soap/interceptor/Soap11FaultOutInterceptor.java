@@ -92,6 +92,12 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                 writer.writeEndElement();
                 prepareStackTrace(message, fault);
     
+                if (fault.getRole() != null) {
+                    writer.writeStartElement("faultactor");
+                    writer.writeCharacters(fault.getRole());
+                    writer.writeEndElement();
+                }
+    
                 if (fault.hasDetails()) {
                     Element detail = fault.getDetail();
                     writer.writeStartElement("detail");
@@ -103,12 +109,6 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                     }
     
                     // Details
-                    writer.writeEndElement();
-                }
-    
-                if (fault.getRole() != null) {
-                    writer.writeStartElement("faultactor");
-                    writer.writeCharacters(fault.getRole());
                     writer.writeEndElement();
                 }
     
