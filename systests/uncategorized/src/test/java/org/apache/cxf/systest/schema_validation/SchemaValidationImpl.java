@@ -66,7 +66,6 @@ public class SchemaValidationImpl implements SchemaValidation {
         return occuringStruct;
     }
 
-    @Override
     public SomeResponse doSomething(SomeRequest in) {
         SomeResponse response = new SomeResponse();
         if (in.getId().equals("1234567890")) {
