@@ -51,6 +51,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ParamConverter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
@@ -70,6 +71,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
+import org.apache.cxf.jaxrs.provider.ProviderFactory.LegacyParamConverter;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -482,8 +484,9 @@ public class ProviderFactoryTest extends Assert {
         ProviderFactory pf = ProviderFactory.getInstance();
         ParameterHandler<Customer> h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
-        ParameterHandler<Customer> h2 = pf.createParameterHandler(Customer.class);
-        assertSame(h2, h);
+        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class);
+        
+        assertSame(((LegacyParamConverter<Customer>)h2).getHandler(), h);
     }
     
     @Test

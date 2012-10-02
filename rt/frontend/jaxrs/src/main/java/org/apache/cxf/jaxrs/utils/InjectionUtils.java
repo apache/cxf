@@ -61,6 +61,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -69,7 +70,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
@@ -401,7 +401,7 @@ public final class InjectionUtils {
                                                     Message message) {
         T result = null;
         if (message != null) {
-            ParameterHandler<T> pm = ProviderFactory.getInstance(message)
+            ParamConverter<T> pm = ProviderFactory.getInstance(message)
                 .createParameterHandler(pClass);
             if (pm != null) {
                 result = pm.fromString(value);

@@ -55,6 +55,8 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 
@@ -121,10 +123,8 @@ public final class ProviderFactory {
     private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     
-    // ParamConverter and ParamConverterProvider is introduced in JAX-RS 2.0
-    // ParameterHandler will have to be deprecated
-    private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
-        new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
+    private ParamConverterProvider newParamConverter;
+    private LegacyParamConverterProvider legacyParamConverter; 
     
     private List<ProviderInfo<MessageBodyReader<?>>> jaxbReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
@@ -158,7 +158,13 @@ public final class ProviderFactory {
     private ProviderInfo<Application> application;
     private List<DynamicFeature> dynamicFeatures = new LinkedList<DynamicFeature>();
     
-    // Client-only providers, consider introducing ClientProviderFactory
+    // List of injected providers
+    private Collection<ProviderInfo<?>> injectedProviders = 
+        new LinkedList<ProviderInfo<?>>();
+    
+    
+    //TODO: Client-only providers, consider introducing ClientProviderFactory,
+    //      will make it easier to split the client API into a separate module
     private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters = 
         new ArrayList<ProviderInfo<ClientRequestFilter>>(1);
     private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters = 
@@ -166,10 +172,6 @@ public final class ProviderFactory {
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
    
-    // List of injected providers
-    private Collection<ProviderInfo<?>> injectedProviders = 
-        new LinkedList<ProviderInfo<?>>();
-    
     private Bus bus;
     
     
@@ -370,19 +372,16 @@ public final class ProviderFactory {
         return (ExceptionMapper<T>) candidates.get(0);
     }
     
-    @SuppressWarnings("unchecked")
-    public <T> ParameterHandler<T> createParameterHandler(Class<?> paramType) {
+    public <T> ParamConverter<T> createParameterHandler(Class<T> paramType) {
         
-        List<ParameterHandler<?>> candidates = new LinkedList<ParameterHandler<?>>();
-        
-        for (ProviderInfo<ParameterHandler<?>> em : paramHandlers) {
-            handleMapper(candidates, em, paramType, null, ParameterHandler.class, true);
-        }
-        if (candidates.size() == 0) {
+        if (newParamConverter != null) {
+            return newParamConverter.getConverter(paramType, null, null);
+        } else if (legacyParamConverter != null) {
+            return legacyParamConverter.getConverter(paramType, null, null);
+        } else {
             return null;
         }
-        Collections.sort(candidates, new ClassComparator());
-        return (ParameterHandler<T>) candidates.get(0);
+        
     }
     
     @SuppressWarnings("unchecked")
@@ -751,9 +750,18 @@ public final class ProviderFactory {
                 responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper<?>>((ResponseExceptionMapper<?>)o, bus)); 
             }
             
-            if (ParameterHandler.class.isAssignableFrom(oClass)) {
-                paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o, bus)); 
+            if (ParamConverterProvider.class.isAssignableFrom(oClass)) {
+                newParamConverter = (ParamConverterProvider)o;
             }
+            
+            if (ParameterHandler.class.isAssignableFrom(oClass)) {
+                if (legacyParamConverter == null) {
+                    legacyParamConverter = new LegacyParamConverterProvider();
+                }
+                legacyParamConverter.add(o, bus);
+            }
+            
+            
         }
         sortReaders();
         sortWriters();
@@ -1104,7 +1112,9 @@ public final class ProviderFactory {
         postMatchContainerRequestFilters.clear();
         postMatchContainerResponseFilters.clear();
         preMatchContainerRequestFilters.clear();
-        paramHandlers.clear();
+        if (legacyParamConverter != null) {
+            legacyParamConverter.clear();
+        }
         responseExceptionMappers.clear();
         clientRequestFilters.clear();
         clientResponseFilters.clear();
@@ -1556,6 +1566,62 @@ public final class ProviderFactory {
             } catch (Throwable ex) {
                 throw new RuntimeException(ex); 
             }
+        }
+    }
+    
+    private static class LegacyParamConverterProvider implements ParamConverterProvider {
+
+        // ParamConverter and ParamConverterProvider is introduced in JAX-RS 2.0
+        // ParameterHandler will have to be deprecated
+        private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
+            new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
+        
+        @SuppressWarnings({
+            "unchecked", "rawtypes"
+        })
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
+            List<ParameterHandler<?>> candidates = new LinkedList<ParameterHandler<?>>();
+            
+            for (ProviderInfo<ParameterHandler<?>> em : paramHandlers) {
+                handleMapper(candidates, em, rawType, null, ParameterHandler.class, true);
+            }
+            if (candidates.size() == 0) {
+                return null;
+            }
+            Collections.sort(candidates, new ClassComparator());
+            return new LegacyParamConverter((ParameterHandler<T>) candidates.get(0));
+        }
+        
+        public void clear() {
+            paramHandlers.clear();
+        }
+        
+        public void add(Object o, Bus bus) {
+            paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o, bus));
+        }
+    }
+    
+    static class LegacyParamConverter<T> implements ParamConverter<T> {
+
+        private ParameterHandler<T> handler;
+        public LegacyParamConverter(ParameterHandler<T> handler) {
+            this.handler = handler;
+        }
+        
+        @Override
+        public T fromString(String value) throws IllegalArgumentException {
+            return handler.fromString(value);
+        }
+
+        @Override
+        public String toString(Object value) throws IllegalArgumentException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        ParameterHandler<T> getHandler() {
+            return handler;
         }
     }
 }
