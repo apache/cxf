@@ -34,9 +34,11 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
@@ -61,6 +63,12 @@ import org.apache.neethi.Constants;
  */
 public class PolicyAnnotationListener implements FactoryBeanListener {
     private static final String EXTRA_POLICIES = PolicyAnnotationListener.class.getName() + ".EXTRA_POLICIES";
+    
+    private Bus bus;
+    
+    public PolicyAnnotationListener(Bus bus) {
+        this.bus = bus;
+    }
     
     public void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object... args) {
         switch (ev) {
@@ -337,59 +345,103 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private Element addPolicy(ServiceInfo service, Policy p, Class<?> cls, String defName) {
         String uri = p.uri();
         String ns = Constants.URI_POLICY_NS;
+        
         if (p.includeInWSDL()) {
-            ExtendedURIResolver resolver = new ExtendedURIResolver();
-            InputSource src = resolver.resolve(uri, "classpath:");
-            if (src != null) {
-                try {
-                    Document doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src));
-                    if (service.getDescription() == null && cls != null) {
-                        service.setDescription(new DescriptionInfo());
-                        service.getDescription().setBaseURI(cls.getResource("/").toString());
-                    }
-                    
-                    uri = doc.getDocumentElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                                                  PolicyConstants.WSU_ID_ATTR_NAME);
-                    if (StringUtils.isEmpty(uri)) {
-                        uri = defName; 
-                        Attr att = doc.createAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                                         "wsu:" + PolicyConstants.WSU_ID_ATTR_NAME);
-                        att.setNodeValue(defName);
-                        doc.getDocumentElement().setAttributeNodeNS(att);
-                    }
-                    ns = doc.getDocumentElement().getNamespaceURI();
-                    Object exts[] = service.getDescription().getExtensors().get();
-                    exts = exts == null ? new Object[0] : exts;
-                    for (Object o : exts) {
-                        if (o instanceof UnknownExtensibilityElement) {
-                            UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
-                            String uri2 = uee.getElement()
-                                    .getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                                    PolicyConstants.WSU_ID_ATTR_NAME);
-                            if (uri.equals(uri2)) {
-                                return null;
-                            }
-                        }
-                    }
-                    UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-                    uee.setElement(doc.getDocumentElement());
-                    uee.setRequired(true);
-                    uee.setElementType(DOMUtils.getElementQName(doc.getDocumentElement()));
-                    service.getDescription().addExtensor(uee);
-                    
-                    uri = "#" + uri;
-                } catch (XMLStreamException e) {
-                    //ignore
-                }
+            Element element = loadPolicy(uri, defName);
+            if (element == null) {
+                return null;
             }
+            
+            // might have been updated on load policy
+            uri = getPolicyId(element);
+            ns = element.getNamespaceURI();
+            
+            if (service.getDescription() == null && cls != null) {
+                service.setDescription(new DescriptionInfo());
+                service.getDescription().setBaseURI(cls.getResource("/").toString());
+            }
+
+            // if not already added to service add it, otherwise ignore 
+            // and just create the policy reference.
+            if (!isExistsPolicy(service, uri)) {
+                UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
+                uee.setElement(element);
+                uee.setRequired(true);
+                uee.setElementType(DOMUtils.getElementQName(element));
+                service.getDescription().addExtensor(uee);
+            }
+            
+            uri = "#" + uri;
         }
+        
         Document doc = DOMUtils.createDocument();
-        Element el = doc.createElementNS(ns,
-                                         "wsp:" + Constants.ELEM_POLICY_REF);
+        Element el = doc.createElementNS(ns, "wsp:" + Constants.ELEM_POLICY_REF);
         Attr att = doc.createAttributeNS(null, "URI");
         att.setValue(uri);
         el.setAttributeNodeNS(att);
         return el;
     }
 
+    private String getPolicyId(Element element) {
+        return element.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                     PolicyConstants.WSU_ID_ATTR_NAME);
+    }
+    
+    private boolean isExistsPolicy(ServiceInfo service, String uri) {
+        Object exts[] = service.getDescription().getExtensors().get();
+        exts = exts == null ? new Object[0] : exts;
+        for (Object o : exts) {
+            if (o instanceof UnknownExtensibilityElement) {
+                UnknownExtensibilityElement uee = (UnknownExtensibilityElement)o;
+                String uri2 = getPolicyId(uee.getElement());
+                if (uri.equals(uri2)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Element loadPolicy(String uri, String defName) {
+        if (!uri.startsWith("#")) {
+            return loadRemotePolicy(uri, defName);
+        } else {
+            return loadLocalPolicy(uri);
+        }
+    }
+        
+    private Element loadRemotePolicy(String uri, String defName) {
+        ExtendedURIResolver resolver = new ExtendedURIResolver();
+        InputSource src = resolver.resolve(uri, "classpath:");
+        
+        if (null == src) {
+            return null;
+        }
+        
+        try {
+            Document doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src));
+            uri = getPolicyId(doc.getDocumentElement());
+            if (StringUtils.isEmpty(uri)) {
+                uri = defName; 
+                Attr att = doc.createAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                                 "wsu:" + PolicyConstants.WSU_ID_ATTR_NAME);
+                att.setNodeValue(defName);
+                doc.getDocumentElement().setAttributeNodeNS(att);
+            }
+            
+            return doc.getDocumentElement();
+        } catch (XMLStreamException e) {
+            return null;
+        }
+    }
+    
+    private Element loadLocalPolicy(String uri) {
+        PolicyBean pb = bus.getExtension(ConfiguredBeanLocator.class)
+            .getBeanOfType(uri.substring(1), PolicyBean.class);
+        if (null != pb) {
+            return pb.getElement(); 
+        } else {
+            return null;
+        }
+    }
 }
