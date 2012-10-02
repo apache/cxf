@@ -30,6 +30,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -41,6 +42,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
 import org.apache.cxf.common.classloader.JAXBClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils;
@@ -60,6 +62,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
 
     private Set<Class<?>> classes;
     private Collection<Object> typeReferences;
+    private Set<Class<?>> globalAdapters = new HashSet<Class<?>>();
 
     public JAXBContextInitializer(ServiceInfo serviceInfo,
                                   Set<Class<?>> classes,
@@ -185,7 +188,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (xjta != null) {
             inspectTypeAdapter(xjta.value());
         }
-        
+        if (clazz.getPackage() != null) {
+            XmlJavaTypeAdapters adapt = clazz.getPackage().getAnnotation(XmlJavaTypeAdapters.class);
+            if (adapt != null) {
+                for (XmlJavaTypeAdapter a: adapt.value()) {
+                    globalAdapters.add(a.type());
+                }
+                for (XmlJavaTypeAdapter a: adapt.value()) {
+                    inspectTypeAdapter(a.value());
+                }
+            }
+        }
     }
 
     private void addType(Type cls) {
@@ -193,6 +206,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     }
     private void addType(Type cls, boolean allowArray) {
         if (cls instanceof Class) {
+            if (globalAdapters.contains(cls)) {
+                return;
+            }
             if (((Class<?>)cls).isArray() && !allowArray) {
                 addClass(((Class<?>)cls).getComponentType());
             } else {
