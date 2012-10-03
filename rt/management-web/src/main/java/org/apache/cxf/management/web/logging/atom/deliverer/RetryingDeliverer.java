@@ -81,7 +81,7 @@ public final class RetryingDeliverer implements Deliverer {
             cal = Calendar.getInstance();
             cal.add(Calendar.SECOND, sleep);
             if (timeout == 0 || timeoutDate.after(cal.getTime())) {
-                Thread.sleep(sleep * 1000);
+                Thread.sleep((long)sleep * 1000L);
             } else {
                 pauser.reset();
                 return false;

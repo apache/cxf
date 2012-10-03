@@ -92,6 +92,9 @@ public class Phase implements Comparable<Object> {
         return priority;
     }
     public boolean equals(Object o) {
+        if (!(o instanceof Phase)) {
+            return false;
+        }
         Phase p = (Phase)o;
         
         return p.priority == priority

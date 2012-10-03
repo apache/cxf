@@ -71,7 +71,7 @@ final class AtomPushEngine {
         Validate.notNull(record, "record is null");
         if (isValid()) {
             if (batchSize > 1 && batchTime > 0 && timer == null) {
-                createTimerTask(batchTime * 60 * 1000);
+                createTimerTask((long)batchTime * 60L * 1000L);
             }
             queue.add(record);
             if (queue.size() >= batchSize) {

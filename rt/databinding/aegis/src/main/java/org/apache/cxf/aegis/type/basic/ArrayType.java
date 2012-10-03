@@ -277,32 +277,32 @@ public class ArrayType extends AegisType {
             } else if (Integer.TYPE.equals(arrayType)) {
                 int[] objects = (int[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Integer(objects[i]), writer, context, type, name, ns);
+                    writeValue(Integer.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             } else if (Long.TYPE.equals(arrayType)) {
                 long[] objects = (long[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Long(objects[i]), writer, context, type, name, ns);
+                    writeValue(Long.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             } else if (Short.TYPE.equals(arrayType)) {
                 short[] objects = (short[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Short(objects[i]), writer, context, type, name, ns);
+                    writeValue(Short.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             } else if (Double.TYPE.equals(arrayType)) {
                 double[] objects = (double[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Double(objects[i]), writer, context, type, name, ns);
+                    writeValue(Double.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             } else if (Float.TYPE.equals(arrayType)) {
                 float[] objects = (float[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Float(objects[i]), writer, context, type, name, ns);
+                    writeValue(Float.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             } else if (Byte.TYPE.equals(arrayType)) {
                 byte[] objects = (byte[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Byte(objects[i]), writer, context, type, name, ns);
+                    writeValue(Byte.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             } else if (Boolean.TYPE.equals(arrayType)) {
                 boolean[] objects = (boolean[])values;
@@ -312,7 +312,7 @@ public class ArrayType extends AegisType {
             } else if (Character.TYPE.equals(arrayType)) {
                 char[] objects = (char[])values;
                 for (i = 0, n = objects.length; i < n; i++) {
-                    writeValue(new Character(objects[i]), writer, context, type, name, ns);
+                    writeValue(Character.valueOf(objects[i]), writer, context, type, name, ns);
                 }
             }
         } finally {

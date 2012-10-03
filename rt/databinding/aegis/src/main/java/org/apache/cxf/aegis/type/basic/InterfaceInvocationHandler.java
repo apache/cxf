@@ -107,19 +107,19 @@ class InterfaceInvocationHandler implements InvocationHandler {
         Object prop = readProperty(attrName);
         if (prop == null && method.getReturnType().isPrimitive()) {
             if (method.getReturnType() == int.class) {
-                prop = new Integer(0);
+                prop = Integer.valueOf(0);
             } else if (method.getReturnType() == boolean.class) {
                 prop = Boolean.FALSE;
             } else if (method.getReturnType() == long.class) {
-                prop = new Long(0);
+                prop = Long.valueOf(0);
             } else if (method.getReturnType() == double.class) {
-                prop = new Double(0);
+                prop = Double.valueOf(0);
             } else if (method.getReturnType() == short.class) {
-                prop = new Short((short)0);
+                prop = Short.valueOf((short)0);
             } else if (method.getReturnType() == byte.class) {
-                prop = new Byte((byte)0);
+                prop = Byte.valueOf((byte)0);
             } else if (method.getReturnType() == char.class) {
-                prop = new Character((char)0);
+                prop = Character.valueOf((char)0);
             }
         }
         return prop;
@@ -155,7 +155,7 @@ class InterfaceInvocationHandler implements InvocationHandler {
     }
 
     protected Integer proxyHashCode(Object proxy) {
-        return new Integer(System.identityHashCode(proxy));
+        return Integer.valueOf(System.identityHashCode(proxy));
     }
 
     protected Boolean proxyEquals(Object proxy, Object other) {

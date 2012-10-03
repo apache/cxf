@@ -114,7 +114,11 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
     
     // Required by JCA Spec 
     public boolean equals(Object other) {
-        if (!this.getClass().isAssignableFrom(other.getClass())) {
+        if (other != null && !this.getClass().isAssignableFrom(other.getClass())) {
+            return false;
+        }
+
+        if (!(other instanceof CXFConnectionSpec)) {
             return false;
         }
         

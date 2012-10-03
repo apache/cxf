@@ -38,7 +38,7 @@ public class SequenceMonitor {
         if (0 == firstCheck) {
             firstCheck = now + monitorInterval;
         }
-        receiveTimes.add(new Long(now));
+        receiveTimes.add(Long.valueOf(now));
     }
 
     public int getMPM() {

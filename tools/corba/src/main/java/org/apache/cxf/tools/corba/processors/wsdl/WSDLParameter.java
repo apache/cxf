@@ -437,9 +437,7 @@ public final class WSDLParameter {
                 if (corbaTypeImpl == null) {
                     XmlSchemaObject schemaObj = getSchemaObject(wsdlToCorbaBinding, typeName);
                     XmlSchemaAnnotation annotation = null;
-                    if (schemaObj instanceof XmlSchemaType) {
-                        schemaType = (XmlSchemaType)schemaObj;
-                    } else if (schemaObj instanceof XmlSchemaElement) {
+                    if (schemaObj instanceof XmlSchemaElement) {
                         XmlSchemaElement el = (XmlSchemaElement)schemaObj;
                         schemaType = el.getSchemaType();
                         annotation = ((XmlSchemaElement)schemaObj).getAnnotation();

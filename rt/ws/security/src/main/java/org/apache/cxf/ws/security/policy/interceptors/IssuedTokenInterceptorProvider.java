@@ -431,6 +431,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     mapSecurityProps(message, ctx);
                 
                     client.setMessage(message);
+
+                    if (maps != null) {
+                        client.setAddressingNamespace(maps.getNamespaceURI());
+                    }
                     
                     client.setTrust(getTrust10(aim));
                     client.setTrust(getTrust13(aim));
