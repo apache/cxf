@@ -46,14 +46,4 @@ public class Server11Restricted extends AbstractServerRestricted {
         }
     }
     
-    public static void main(String args[]) throws Exception {
-        new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server/server.xml");
-        new Server11Restricted("http://localhost:" + PORT);
-        System.out.println("Server ready...");
-
-        Thread.sleep(60 * 60 * 10000);
-        System.out.println("Server exiting");
-        System.exit(0);
-    }
-    
 }

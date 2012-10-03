@@ -100,7 +100,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
@@ -140,7 +140,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
@@ -192,7 +192,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
@@ -243,7 +243,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
@@ -299,7 +299,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);

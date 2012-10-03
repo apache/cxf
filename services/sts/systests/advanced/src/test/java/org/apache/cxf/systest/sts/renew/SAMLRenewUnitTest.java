@@ -70,10 +70,10 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Request the token
         SecurityToken token = 
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 5, true);
+            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
-        Thread.sleep(5000);
+        Thread.sleep(2100);
         
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
@@ -107,10 +107,10 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Request the token
         SecurityToken token = 
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 5, true);
+            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
-        Thread.sleep(5000);
+        Thread.sleep(2100);
         
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
@@ -144,10 +144,10 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Request the token
         SecurityToken token = 
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 5, false);
+            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, false);
         assertNotNull(token);
         // Sleep to expire the token
-        Thread.sleep(5000);
+        Thread.sleep(2100);
         
         // Renew the token - this will fail as we didn't send a Renewing @OK attribute
         try {
@@ -206,10 +206,10 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         
         // Request the token
         SecurityToken token = 
-            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 5, true);
+            requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
-        Thread.sleep(5000);
+        Thread.sleep(2100);
         
         // Renew the token
         token.setIssuerAddress("http://www.apache.org");

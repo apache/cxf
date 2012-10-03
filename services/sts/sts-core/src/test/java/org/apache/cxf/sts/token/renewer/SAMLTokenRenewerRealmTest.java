@@ -92,7 +92,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         
         Element samlToken = createSAMLAssertion(providerParameters, "A", 50, true, true);
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         
@@ -165,7 +165,7 @@ public class SAMLTokenRenewerRealmTest extends org.junit.Assert {
         
         Element samlToken = createSAMLAssertion(providerParameters, "B", 50, true, true);
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         

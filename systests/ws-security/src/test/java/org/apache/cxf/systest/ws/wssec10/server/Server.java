@@ -50,13 +50,5 @@ public class Server extends AbstractBusTestServerBase {
         setBus(busLocal);
     }
 
-    public static void main(String args[]) throws Exception {
-        new Server().run();
-        System.out.println("Server ready...");
-
-        Thread.sleep(60 * 60 * 1000);
-        System.out.println("Server exiting");
-        System.exit(0);
-    }
 }
 
