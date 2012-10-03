@@ -25,8 +25,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
@@ -44,8 +47,17 @@ public class Compiler {
     private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
     private File classpathTmpFile;
+    private List<String> errors = new LinkedList<String>();
+    private List<String> warnings = new LinkedList<String>();
     
     public Compiler() {
+    }
+    
+    public List<String> getErrors() {
+        return errors;
+    }
+    public List<String> getWarnings() {
+        return warnings;
     }
     
     public void setMaxMemory(long l) {
@@ -181,7 +193,28 @@ public class Compiler {
         
         List<String> args = new ArrayList<String>();
         addArgs(args);
-        CompilationTask task = compiler.getTask(null, fileManager, null, args, null, fileList);
+        DiagnosticListener<JavaFileObject> listener = new DiagnosticListener<JavaFileObject>() {
+            public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+                switch (diagnostic.getKind()) {
+                case ERROR:
+                    errors.add(diagnostic.toString());
+                    if (verbose) {
+                        System.err.println(diagnostic.toString());
+                    }
+                    break;
+                case WARNING:
+                case MANDATORY_WARNING:
+                    warnings.add(diagnostic.toString());
+                    if (verbose) {
+                        System.err.println(diagnostic.toString());
+                    }
+                    break;
+                default:
+                    break;
+                }   
+            }
+        };
+        CompilationTask task = compiler.getTask(null, fileManager, listener , args, null, fileList);
         Boolean ret = task.call();
         try {
             fileManager.close();
@@ -189,6 +222,7 @@ public class Compiler {
             System.err.print("[ERROR] IOException during compiling.");
             e.printStackTrace();
         }
+        
         return ret;
     }
 
