@@ -173,12 +173,12 @@ public final class JMSUtils {
                 inMessage.put(messageType, messageProperties);
             }
             messageProperties.setJMSCorrelationID(message.getJMSCorrelationID());
-            messageProperties.setJMSDeliveryMode(new Integer(message.getJMSDeliveryMode()));
-            messageProperties.setJMSExpiration(new Long(message.getJMSExpiration()));
+            messageProperties.setJMSDeliveryMode(Integer.valueOf(message.getJMSDeliveryMode()));
+            messageProperties.setJMSExpiration(Long.valueOf(message.getJMSExpiration()));
             messageProperties.setJMSMessageID(message.getJMSMessageID());
-            messageProperties.setJMSPriority(new Integer(message.getJMSPriority()));
+            messageProperties.setJMSPriority(Integer.valueOf(message.getJMSPriority()));
             messageProperties.setJMSRedelivered(Boolean.valueOf(message.getJMSRedelivered()));
-            messageProperties.setJMSTimeStamp(new Long(message.getJMSTimestamp()));
+            messageProperties.setJMSTimeStamp(Long.valueOf(message.getJMSTimestamp()));
             messageProperties.setJMSType(message.getJMSType());
 
             if (message.getJMSReplyTo() != null) {

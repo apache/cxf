@@ -31,13 +31,13 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class ByteType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return new Byte(reader.getValue().trim());
+        return Byte.valueOf(reader.getValue().trim());
     }
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
         int intValue = ((Number)object).intValue();
         byte byteValue = (byte)(intValue & 0xff);
-        writer.writeValueAsByte(new Byte(byteValue));
+        writer.writeValueAsByte(Byte.valueOf(byteValue));
     }
 }

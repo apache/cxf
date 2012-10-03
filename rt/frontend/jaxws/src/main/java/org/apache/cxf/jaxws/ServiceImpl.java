@@ -164,7 +164,6 @@ public class ServiceImpl extends ServiceDelegate {
             for (Port port : wsdlports.values()) {
                 QName name = new QName(serviceName.getNamespaceURI(), port.getName());
                 
-                String tpId = null;
                 String address = null;
                 String bindingID = null;
                 List<? extends ExtensibilityElement> extensions 
@@ -182,9 +181,6 @@ public class ServiceImpl extends ServiceDelegate {
                 extensions = CastUtils.cast(port.getExtensibilityElements());
                 if (!extensions.isEmpty()) {
                     ExtensibilityElement e = extensions.get(0);
-                    if (tpId == null) {
-                        tpId = e.getElementType().getNamespaceURI();
-                    }
                     if (e instanceof SoapAddress) {
                         address = ((SoapAddress)e).getLocationURI();
                     } else if (e instanceof AddressType) {

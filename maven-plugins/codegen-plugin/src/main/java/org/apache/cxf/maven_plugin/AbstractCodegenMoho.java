@@ -400,7 +400,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         for (Artifact a : pluginArtifacts) {
             File file = a.getFile();
             if (file == null) {
-                throw new MojoExecutionException("Unable to find " + file + " for artifact " + a.getGroupId()
+                throw new MojoExecutionException("Unable to find file for artifact " + a.getGroupId()
                                                  + ":" + a.getArtifactId() + ":" + a.getVersion());
             }
             artifactsPath.add(file.toURI());

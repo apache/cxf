@@ -257,6 +257,7 @@ public class SoapTcpOutputStream extends AbstractThresholdOutputStream {
                     try {
                         SoapTcpFrame frame = SoapTcpUtils.readMessageFrame(inStream);
                         baos.write(frame.getPayload());
+                        frameType = frame.getHeader().getFrameType();
                     } catch (IOException e) {
                         break;
                     }

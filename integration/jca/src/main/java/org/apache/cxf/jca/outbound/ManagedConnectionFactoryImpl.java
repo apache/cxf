@@ -111,7 +111,11 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
     
     // equals method is required by JCA 1.5 because on properties
     public boolean equals(Object o) {
-        if (!this.getClass().isAssignableFrom(o.getClass())) {
+        if (o != null && !this.getClass().isAssignableFrom(o.getClass())) {
+            return false;
+        }
+
+        if (!(o instanceof ManagedConnectionFactoryImpl)) {
             return false;
         }
         

@@ -269,7 +269,7 @@ public class RMManager {
             rma.setBaseRetransmissionInterval(bri);
         }
         if (null == bri.getMilliseconds()) {
-            bri.setMilliseconds(new Long(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL));
+            bri.setMilliseconds(Long.valueOf(RetransmissionQueue.DEFAULT_BASE_RETRANSMISSION_INTERVAL));
         }
 
         rmAssertion = rma;
@@ -465,7 +465,7 @@ public class RMManager {
         if (reliableEndpoints.size() > 0) {
             LOG.log(Level.FINE,
                     "Shutting down RMManager with {0} remaining endpoints.",
-                    new Object[] {new Integer(reliableEndpoints.size())});
+                    new Object[] {Integer.valueOf(reliableEndpoints.size())});
             for (RMEndpoint rme : reliableEndpoints.values()) {            
                 rme.shutdown();
             }

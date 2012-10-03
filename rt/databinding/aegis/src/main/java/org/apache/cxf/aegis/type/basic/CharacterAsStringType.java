@@ -45,7 +45,7 @@ public class CharacterAsStringType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         Integer readInteger = (Integer)intType.readObject(reader, context);
-        return new Character((char)readInteger.intValue());
+        return Character.valueOf((char)readInteger.intValue());
     }
 
     /** {@inheritDoc}*/

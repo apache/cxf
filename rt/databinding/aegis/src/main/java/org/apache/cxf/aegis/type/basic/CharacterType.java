@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class CharacterType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return new Character(reader.getValueAsCharacter());
+        return Character.valueOf(reader.getValueAsCharacter());
     }
 
     @Override
