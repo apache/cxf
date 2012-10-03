@@ -319,7 +319,7 @@ public class ScopedNameVisitor extends VisitorBase {
         ModuleToNSMapper mapper = wsdlVisitor.getModuleToNSMapper();
         WSDLSchemaManager manager = wsdlVisitor.getManager();
         
-        Scope scopedName = scope;
+        Scope scopedName = new Scope(scope, node);
         String name = node.toString();
         if (isFullyScopedName(node)) {
             scopedName = getFullyScopedName(new Scope(), node);
