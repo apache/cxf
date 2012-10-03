@@ -1,0 +1,11 @@
+module org
+{
+   module bash
+   {
+       struct foo
+       {
+           string bar;
+       };
+   };
+};
+
