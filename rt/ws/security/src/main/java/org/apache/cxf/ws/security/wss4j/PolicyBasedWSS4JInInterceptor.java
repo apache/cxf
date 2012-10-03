@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -91,6 +90,7 @@ import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.message.token.Timestamp;
@@ -100,7 +100,6 @@ import org.apache.ws.security.util.WSSecurityUtil;
  * 
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
-    public static final String PROPERTIES_CACHE = "ws-security.properties.cache";
     public static final PolicyBasedWSS4JInInterceptor INSTANCE 
         = new PolicyBasedWSS4JInInterceptor();
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
@@ -112,24 +111,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         super(true);
     }
     
-    protected static Map<Object, Properties> getPropertiesCache(SoapMessage message) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            Map<Object, Properties> o = 
-                CastUtils.cast((Map<?, ?>)message.getContextualProperty(PROPERTIES_CACHE));
-            if (o == null) {
-                o = new ConcurrentHashMap<Object, Properties>(16, 0.75f, 2);
-                info.setProperty(PROPERTIES_CACHE, o);
-            }
-            return o;
-        }
-    }
-
     private static Properties getProps(Object o, String propsKey, URL propsURL, SoapMessage message) {
-        Properties properties = getPropertiesCache(message).get(propsKey);
-        if (properties != null) {
-            return properties;
-        }
+        Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
         } else if (propsURL != null) {
@@ -143,9 +126,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
         
-        if (properties != null) {
-            getPropertiesCache(message).put(propsKey, properties);
-        }
         return properties;
     }
     
@@ -210,7 +190,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
 
     private String checkAsymmetricBinding(
         AssertionInfoMap aim, String action, SoapMessage message
-    ) {
+    ) throws WSSecurityException {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
         if (ais == null || ais.isEmpty()) {
             return action;
@@ -227,34 +207,25 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        if (s != null) {
-            URL propsURL = getPropertiesFileURL(s, message);
-            String propsKey = s.toString();
-            if (propsURL != null) {
-                propsKey = propsURL.getPath();
-            }
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-            if (s instanceof Crypto) {
-                message.put("RefId-" + propsKey, (Crypto)s);
-            } else {
-                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
-            }
-            if (e == null) {
-                e = s;
-            }
+        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto signCrypto = null;
+        if (e != null && e.equals(s)) {
+            signCrypto = encrCrypto;
+        } else {
+            signCrypto = getSignatureCrypto(s, message);
         }
-        if (e != null) {
-            URL propsURL = getPropertiesFileURL(e, message);
-            String propsKey = e.toString();
-            if (propsURL != null) {
-                propsKey = propsURL.getPath();
-            }
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-            if (e instanceof Crypto) {
-                message.put("RefId-" + propsKey, (Crypto)e);
-            } else {
-                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
-            }
+        
+        if (signCrypto != null) {
+            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put("RefId-" + signCrypto.hashCode(), signCrypto);
+        }
+        
+        if (encrCrypto != null) {
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
+            message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
+        } else if (signCrypto != null) {
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
      
         return action;
@@ -262,7 +233,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     
     private String checkTransportBinding(
         AssertionInfoMap aim, String action, SoapMessage message
-    ) {
+    ) throws WSSecurityException {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais == null || ais.isEmpty()) {
             return action;
@@ -279,34 +250,25 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        if (s != null) {
-            URL propsURL = getPropertiesFileURL(s, message);
-            String propsKey = s.toString();
-            if (propsURL != null) {
-                propsKey = propsURL.getPath();
-            }
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-            if (s instanceof Crypto) {
-                message.put("RefId-" + propsKey, (Crypto)s);
-            } else {
-                message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
-            }
-            if (e == null) {
-                e = s;
-            }
+        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto signCrypto = null;
+        if (e != null && e.equals(s)) {
+            signCrypto = encrCrypto;
+        } else {
+            signCrypto = getSignatureCrypto(s, message);
         }
-        if (e != null) {
-            URL propsURL = getPropertiesFileURL(e, message);
-            String propsKey = e.toString();
-            if (propsURL != null) {
-                propsKey = propsURL.getPath();
-            }
-            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-            if (e instanceof Crypto) {
-                message.put("RefId-" + propsKey, (Crypto)e);
-            } else {
-                message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
-            }
+        
+        if (signCrypto != null) {
+            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put("RefId-" + signCrypto.hashCode(), signCrypto);
+        }
+        
+        if (encrCrypto != null) {
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
+            message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
+        } else if (signCrypto != null) {
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
 
         return action;
@@ -314,7 +276,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     
     private String checkSymmetricBinding(
         AssertionInfoMap aim, String action, SoapMessage message
-    ) {
+    ) throws WSSecurityException {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
         if (ais == null || ais.isEmpty()) {
             return action;
@@ -331,69 +293,95 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
         }
         
-        if (e != null && s == null) {
-            s = e;
-        } else if (s != null && e == null) {
-            e = s;
+        Crypto encrCrypto = getEncryptionCrypto(e, message);
+        Crypto signCrypto = null;
+        if (e != null && e.equals(s)) {
+            signCrypto = encrCrypto;
+        } else {
+            signCrypto = getSignatureCrypto(s, message);
         }
         
         if (isRequestor(message)) {
-            if (e != null) {
-                URL propsURL = getPropertiesFileURL(e, message);
-                String propsKey = e.toString();
-                if (propsURL != null) {
-                    propsKey = propsURL.getPath();
-                }
-                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-                if (e instanceof Crypto) {
-                    message.put("RefId-" + propsKey, (Crypto)e);
-                } else {
-                    message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
-                }
+            Crypto crypto = encrCrypto;
+            if (crypto == null) {
+                crypto = signCrypto;
             }
-            if (s != null) {
-                URL propsURL = getPropertiesFileURL(s, message);
-                String propsKey = s.toString();
-                if (propsURL != null) {
-                    propsKey = propsURL.getPath();
-                }
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-                if (s instanceof Crypto) {
-                    message.put("RefId-" + propsKey, (Crypto)s);
-                } else {
-                    message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
-                }
+            if (crypto != null) {
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put("RefId-" + crypto.hashCode(), crypto);
+            }
+            
+            crypto = signCrypto;
+            if (crypto == null) {
+                crypto = encrCrypto;
+            }
+            if (crypto != null) {
+                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put("RefId-" + crypto.hashCode(), crypto);
             }
         } else {
-            if (s != null) {
-                URL propsURL = getPropertiesFileURL(s, message);
-                String propsKey = s.toString();
-                if (propsURL != null) {
-                    propsKey = propsURL.getPath();
-                }
-                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + propsKey);
-                if (s instanceof Crypto) {
-                    message.put("RefId-" + propsKey, (Crypto)s);
-                } else {
-                    message.put("RefId-" + propsKey, getProps(s, propsKey, propsURL, message));
-                }
+            Crypto crypto = signCrypto;
+            if (crypto == null) {
+                crypto = encrCrypto;
             }
-            if (e != null) {
-                URL propsURL = getPropertiesFileURL(e, message);
-                String propsKey = e.toString();
-                if (propsURL != null) {
-                    propsKey = propsURL.getPath();
-                }
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + propsKey);
-                if (e instanceof Crypto) {
-                    message.put("RefId-" + propsKey, (Crypto)e);
-                } else {
-                    message.put("RefId-" + propsKey, getProps(e, propsKey, propsURL, message));
-                }
+            if (crypto != null) {
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put("RefId-" + crypto.hashCode(), crypto);
+            }
+            
+            crypto = encrCrypto;
+            if (crypto == null) {
+                crypto = signCrypto;
+            }
+            if (crypto != null) {
+                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put("RefId-" + crypto.hashCode(), crypto);
             }
         }
         
         return action;
+    }
+    
+    private Crypto getEncryptionCrypto(Object e, SoapMessage message) throws WSSecurityException {
+        Crypto encrCrypto = null;
+        if (e instanceof Crypto) {
+            encrCrypto = (Crypto)e;
+        } else if (e != null) {
+            URL propsURL = getPropertiesFileURL(e, message);
+            String propsKey = e.toString();
+            if (propsURL != null) {
+                propsKey = propsURL.getPath();
+            }
+            Properties props = getProps(e, propsKey, propsURL, message);
+            encrCrypto = CryptoFactory.getInstance(props);
+            
+            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
+            }
+        }
+        return encrCrypto;
+    }
+    
+    private Crypto getSignatureCrypto(Object s, SoapMessage message) throws WSSecurityException {
+        Crypto signCrypto = null;
+        if (s instanceof Crypto) {
+            signCrypto = (Crypto)s;
+        } else if (s != null) {
+            URL propsURL = getPropertiesFileURL(s, message);
+            String propsKey = s.toString();
+            if (propsURL != null) {
+                propsKey = propsURL.getPath();
+            }
+            Properties props = getProps(s, propsKey, propsURL, message);
+            signCrypto = CryptoFactory.getInstance(props);
+            
+            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
+            }
+        }
+        return signCrypto;
     }
     
     private boolean assertXPathTokens(AssertionInfoMap aim, 
@@ -482,7 +470,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return true;
     }
     
-    protected void computeAction(SoapMessage message, RequestData data) {
+    protected void computeAction(SoapMessage message, RequestData data) throws WSSecurityException {
         String action = getString(WSHandlerConstants.ACTION, message);
         if (action == null) {
             action = "";
