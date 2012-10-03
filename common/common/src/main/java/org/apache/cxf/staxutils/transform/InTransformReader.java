@@ -441,7 +441,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public char[] getTextCharacters() {
-        if (currentEvent != null && currentEvent != null) {
+        if (currentEvent != null && currentEvent.getValue() != null) {
             return currentEvent.getValue().toCharArray();
         }
         char[] superChars = super.getTextCharacters();
@@ -454,7 +454,7 @@ public class InTransformReader extends DepthXMLStreamReader {
 
     public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) 
         throws XMLStreamException {
-        if (currentEvent != null && currentEvent != null) {
+        if (currentEvent != null && currentEvent.getValue() != null) {
             int len = currentEvent.getValue().length() - sourceStart;
             if (len > length) {
                 len = length;
