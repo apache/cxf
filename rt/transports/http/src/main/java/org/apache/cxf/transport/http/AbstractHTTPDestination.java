@@ -154,11 +154,18 @@ public abstract class AbstractHTTPDestination
             String authEncoded = credentials.split(" ")[1];
             try {
                 String authDecoded = new String(Base64Utility.decode(authEncoded));
-                String authInfo[] = authDecoded.split(":");
-                String username = (authInfo.length > 0) ? authInfo[0] : "";
-                // Below line for systems that blank out password after authentication;
-                // see CXF-1495 for more info
-                String password = (authInfo.length > 1) ? authInfo[1] : "";
+                int idx = authDecoded.indexOf(':');
+                String username = null;
+                String password = null;
+                if (idx == -1) {
+                    username = authDecoded;
+                } else {
+                    username = authDecoded.substring(0, idx);
+                    if (idx < (authDecoded.length() - 1)) {
+                        password = authDecoded.substring(idx + 1);
+                    }
+                }
+                
                 AuthorizationPolicy policy = pp == null 
                     ? new AuthorizationPolicy() : new PrincipalAuthorizationPolicy(pp);
                 policy.setUserName(username);
