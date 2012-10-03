@@ -45,7 +45,7 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
             elemType = elem;
         }
         
-        dims.add(0, Integer.valueOf(size));            
+        dims.add(0, new Integer(size));            
     }
 
     public void write(PrintWriter pw) {

@@ -196,13 +196,13 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             // for values < 0 + 256 
             // This means that we can directly write out the chars in the normal
             // range 0-127 even when using UTF-8
-            obj = Character.valueOf((char)(byteValue.byteValue() < 0 
+            obj = new Character((char)(byteValue.byteValue() < 0 
                                          ? byteValue.byteValue() + UNSIGNED_MAX
                                          : byteValue.byteValue()));
             break;
         case TCKind._tk_wchar:
             // A wide char is mapped to a string, we need it as a character
-            obj = Character.valueOf(data.charAt(0));
+            obj = new Character(data.charAt(0));
             break;
         case TCKind._tk_octet:
             obj = new Short(data).byteValue();

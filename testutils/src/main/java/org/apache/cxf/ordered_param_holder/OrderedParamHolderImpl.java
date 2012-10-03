@@ -32,7 +32,7 @@ public class OrderedParamHolderImpl implements OrderedParamHolder {
 
     public void orderedParamHolder(Holder<ComplexStruct> part3, Holder<Integer> part2, Holder<String> part1) {
         // TODO Auto-generated method stub
-        part2.value = Integer.valueOf(part2.value.intValue() + 1);
+        part2.value = new Integer(part2.value.intValue() + 1);
         part1.value = "return " + part1.value;
         part3.value.elem1 = "return " + part3.value.elem1;
         part3.value.elem2 = "return " + part3.value.elem2;

@@ -73,7 +73,7 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
         throws ResourceException {
         
         LOG.log(Level.FINE, "MATCHING_CONNECTIONS",
-            new Object[] {Integer.valueOf(aMCSet.size()), crInfo, subject});
+            new Object[] {new Integer(aMCSet.size()), crInfo, subject});
 
         for (Iterator iterator = aMCSet.iterator(); iterator.hasNext();) {
             AbstractManagedConnectionImpl conn = (AbstractManagedConnectionImpl)iterator.next();

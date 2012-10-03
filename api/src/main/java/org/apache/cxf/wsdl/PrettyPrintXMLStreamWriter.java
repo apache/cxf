@@ -257,17 +257,17 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
 
     static {
-        WSDL_INDENT_MAP.put(Definition.class, Integer.valueOf(DEFAULT_INDENT_LEVEL));
-        WSDL_INDENT_MAP.put(Binding.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-        WSDL_INDENT_MAP.put(BindingFault.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(BindingInput.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(BindingOutput.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(BindingOperation.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(Message.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-        WSDL_INDENT_MAP.put(Operation.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(Port.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 3));
-        WSDL_INDENT_MAP.put(Service.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
-        WSDL_INDENT_MAP.put(Types.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(Definition.class, new Integer(DEFAULT_INDENT_LEVEL));
+        WSDL_INDENT_MAP.put(Binding.class, new Integer(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(BindingFault.class, new Integer(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(BindingInput.class, new Integer(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(BindingOutput.class, new Integer(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(BindingOperation.class, new Integer(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(Message.class, new Integer(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(Operation.class, new Integer(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(Port.class, new Integer(DEFAULT_INDENT_LEVEL * 3));
+        WSDL_INDENT_MAP.put(Service.class, new Integer(DEFAULT_INDENT_LEVEL * 2));
+        WSDL_INDENT_MAP.put(Types.class, new Integer(DEFAULT_INDENT_LEVEL * 2));
     }
 
     class CurrentElement {

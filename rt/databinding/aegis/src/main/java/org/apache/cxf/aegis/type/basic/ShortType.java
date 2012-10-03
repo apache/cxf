@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class ShortType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return Short.valueOf(reader.getValue().trim());
+        return new Short(reader.getValue().trim());
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ShortType extends AegisType {
         if (object instanceof Short) {
             writer.writeValueAsShort((Short)object);
         } else {
-            writer.writeValueAsShort(Short.valueOf(((Number)object).shortValue()));
+            writer.writeValueAsShort(new Short(((Number)object).shortValue()));
         }
     }
 }

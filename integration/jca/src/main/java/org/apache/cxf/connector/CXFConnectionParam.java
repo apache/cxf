@@ -121,7 +121,7 @@ public class CXFConnectionParam {
 
     private boolean areEquals(Object obj1, Object obj2) {
         if (obj1 == null) {
-            return null == obj2; 
+            return obj1 == obj2; 
         } else {
             return obj1.equals(obj2);
         }            

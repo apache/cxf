@@ -31,7 +31,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class IntType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return Integer.valueOf(reader.getValueAsInt());
+        return new Integer(reader.getValueAsInt());
     }
 
     @Override
@@ -39,7 +39,7 @@ public class IntType extends AegisType {
         if (object instanceof Integer) {
             writer.writeValueAsInt((Integer)object);
         } else {
-            writer.writeValueAsInt(Integer.valueOf(((Number)object).intValue()));
+            writer.writeValueAsInt(new Integer(((Number)object).intValue()));
         }
     }
 }

@@ -159,7 +159,7 @@ public class ForkedCommand extends Thread {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Waiting " + timeout + " seconds for process to complete");
                 }
-                join((long)timeout * 1000L);
+                join(timeout * 1000);
             } else {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Waiting for process to complete");

@@ -252,7 +252,7 @@ public class JAXBDataBinding extends AbstractDataBinding
     @SuppressWarnings("unchecked")
     public <T> DataWriter<T> createWriter(Class<T> c) {
 
-        Integer mtomThresholdInt = Integer.valueOf(getMtomThreshold());
+        Integer mtomThresholdInt = new Integer(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
             DataWriterImpl<XMLStreamWriter> r
                 = new DataWriterImpl<XMLStreamWriter>(this);

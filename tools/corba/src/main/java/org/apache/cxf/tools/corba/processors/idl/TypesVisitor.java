@@ -60,7 +60,7 @@ public class TypesVisitor extends VisitorBase {
         } else if (SimpleTypeSpecVisitor.accept(node)) {
             // type_spec - simple_type_spec
             visitor = new SimpleTypeSpecVisitor(getScope(), definition, schema, wsdlVisitor, identifierNode);
-        } else {
+        } else if (visitor == null) {
             // REVISIT: !!!!!
             // This is ugly. It should be done in the SimpleTypeSpecVisitor.accept(node) method.
             // More precisely, that accept method should contained an ORed 

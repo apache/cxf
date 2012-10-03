@@ -41,17 +41,17 @@ public class PrimitiveTypesVisitor implements Visitor {
     private static final List<Integer> PRIMITIVE_TYPES = new ArrayList<Integer>();
 
     static {
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_float));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_double));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_long));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_short));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_unsigned));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_char));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_wchar));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_boolean));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_any));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_octet));
-        PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_any));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_float));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_double));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_long));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_short));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_unsigned));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_char));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_wchar));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_boolean));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_any));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_octet));
+        PRIMITIVE_TYPES.add(new Integer(IDLTokenTypes.LITERAL_any));
     }
 
     private XmlSchemaType schemaType;

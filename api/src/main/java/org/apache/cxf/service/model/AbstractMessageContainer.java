@@ -75,7 +75,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
      */
     public MessagePartInfo addMessagePart(QName name) {
         if (name == null) {
-            throw new IllegalArgumentException("Invalid name [null]");
+            throw new IllegalArgumentException("Invalid name [" + name + "]");
         }
 
         MessagePartInfo part = new MessagePartInfo(name, this);
@@ -193,7 +193,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     
     public MessagePartInfo addOutOfBandMessagePart(QName name) {
         if (name == null) {
-            throw new IllegalArgumentException("Invalid name [null]");
+            throw new IllegalArgumentException("Invalid name [" + name + "]");
         }
 
         MessagePartInfo part = new MessagePartInfo(name, this);

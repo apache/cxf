@@ -44,7 +44,7 @@ public class SoapTcpMessageDecoder extends ProtocolDecoderAdapter { //Cumulative
         if (tempBuffer == null) {
             tempBuffer = new byte[SoapTcpOutputStream.CHUNK_SIZE];
             bufferDataLength = buffer.limit();
-            for (bufferPosition = Integer.valueOf(0); bufferPosition < bufferDataLength; bufferPosition++) {
+            for (bufferPosition = new Integer(0); bufferPosition < bufferDataLength; bufferPosition++) {
                 tempBuffer[bufferPosition] = buffer.get();
             }
             session.setAttribute("tempBuffer", tempBuffer);

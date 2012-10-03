@@ -258,7 +258,7 @@ public class JCABusFactory {
                         LOG.info("ejbServicePropertiesFile modified, initializing/updating servants");
                         initializeServantsFromProperties(loadProperties(propsFile.toURI().toURL()));
                     }
-                    Thread.sleep((long)pollIntervalSeconds * 1000L);
+                    Thread.sleep(pollIntervalSeconds * 1000);
                 } catch (Exception e) {
                     LOG.info("MonitorThread: failed to initialiseServantsFromProperties "
                               + "with properties absolute path=" + propsFile.getAbsolutePath());

@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class LongType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return Long.valueOf(reader.getValueAsLong());
+        return new Long(reader.getValueAsLong());
     }
 
     @Override
@@ -37,7 +37,7 @@ public class LongType extends AegisType {
         if (object instanceof Long) {
             writer.writeValueAsLong((Long)object);
         } else {
-            writer.writeValueAsLong(Long.valueOf(((Number)object).longValue()));
+            writer.writeValueAsLong(new Long(((Number)object).longValue()));
         }
     }
 }

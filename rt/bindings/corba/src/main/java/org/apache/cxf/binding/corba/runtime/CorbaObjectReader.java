@@ -159,7 +159,7 @@ public class CorbaObjectReader {
 
     public Character readChar() throws CorbaBindingException {
         try {
-            return Character.valueOf(stream.read_char());
+            return new Character(stream.read_char());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read character");
             throw new CorbaBindingException("CorbaObjectReader: readChar MARSHAL exception", ex);
@@ -168,7 +168,7 @@ public class CorbaObjectReader {
 
     public Character readWChar() throws CorbaBindingException {
         try {
-            return Character.valueOf(stream.read_wchar());
+            return new Character(stream.read_wchar());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read wide character");
             throw new CorbaBindingException("CorbaObjectReader: readWChar MARSHAL exception", ex);
@@ -177,7 +177,7 @@ public class CorbaObjectReader {
 
     public Byte readOctet() throws CorbaBindingException {
         try {
-            return Byte.valueOf(stream.read_octet());
+            return new Byte(stream.read_octet());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read octet");
             throw new CorbaBindingException("CorbaObjectReader: readOctet MARSHAL exception", ex);
@@ -186,7 +186,7 @@ public class CorbaObjectReader {
 
     public Short readShort() throws CorbaBindingException {
         try {
-            return Short.valueOf(stream.read_short());
+            return new Short(stream.read_short());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read short");
             throw new CorbaBindingException("CorbaObjectReader: readShort MARSHAL exception", ex);
@@ -207,7 +207,7 @@ public class CorbaObjectReader {
     }
 
     public Integer readLong() throws CorbaBindingException {
-        Integer result = Integer.valueOf(stream.read_long());
+        Integer result = new Integer(stream.read_long());
         try {
             return result;
         } catch (org.omg.CORBA.MARSHAL ex) {
@@ -229,7 +229,7 @@ public class CorbaObjectReader {
 
     public Long readLongLong() throws CorbaBindingException {
         try {
-            return Long.valueOf(stream.read_longlong());
+            return new Long(stream.read_longlong());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read long long");
             throw new CorbaBindingException("CorbaObjectReader: readLongLong MARSHAL exception", ex);
@@ -258,7 +258,7 @@ public class CorbaObjectReader {
 
     public Float readFloat() throws CorbaBindingException {
         try {
-            return Float.valueOf(stream.read_float());
+            return new Float(stream.read_float());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read float");
             throw new CorbaBindingException("CorbaObjectReader: readFloat MARSHAL exception", ex);
@@ -267,7 +267,7 @@ public class CorbaObjectReader {
 
     public Double readDouble() throws CorbaBindingException {
         try {
-            return Double.valueOf(stream.read_double());
+            return new Double(stream.read_double());
         } catch (org.omg.CORBA.MARSHAL ex) {
             LOG.log(Level.SEVERE, "CorbaObjectReader: could not read double");
             throw new CorbaBindingException("CorbaObjectReader: readDouble MARSHAL exception", ex);
