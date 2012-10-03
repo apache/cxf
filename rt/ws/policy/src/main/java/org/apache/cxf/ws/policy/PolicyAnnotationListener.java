@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy;
 
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -358,7 +359,10 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             
             if (service.getDescription() == null && cls != null) {
                 service.setDescription(new DescriptionInfo());
-                service.getDescription().setBaseURI(cls.getResource("/").toString());
+                URL u = cls.getResource("/");
+                if (u != null) {
+                    service.getDescription().setBaseURI(u.toString());
+                }
             }
 
             // if not already added to service add it, otherwise ignore 
