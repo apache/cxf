@@ -206,7 +206,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
@@ -282,7 +282,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
@@ -359,7 +359,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
-        Thread.sleep(1000);
+        Thread.sleep(100);
         
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
@@ -418,7 +418,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
-        Thread.sleep(2000);
+        Thread.sleep(1500);
         
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();

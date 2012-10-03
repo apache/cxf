@@ -116,17 +116,6 @@ public class Server extends AbstractBusTestServerBase {
         ep.publish(url);
     }
     
-    public static void main(String args[]) throws Exception {
-        new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/server/server.xml");
-        new Server("http://localhost:" + PORT + "/");
-        System.out.println("Server ready...");
-
-        Thread.sleep(60 * 60 * 10000);
-        System.out.println("Server exiting");
-        System.exit(0);
-    }
-    
-    
     @WebService(targetNamespace = "http://WSSec/wssc", 
                 serviceName = "PingService", 
                 portName = "SecureConversation_MutualCertificate10SignEncrypt_IPingService", 

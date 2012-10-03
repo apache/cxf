@@ -74,8 +74,7 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testRenewExpiredSAML1Token() throws Exception {
-
+    public void testRenewExpiredTokens() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SAMLRenewTest.class.getResource("cxf-client.xml");
 
@@ -85,95 +84,50 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
         
         URL wsdl = SAMLRenewTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSaml1Port");
-        DoubleItPortType transportPort = 
-            service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
         
-        // Make initial successful invocation
-        doubleIt(transportPort, 25);
+        QName saml1PortQName = new QName(NAMESPACE, "DoubleItTransportSaml1Port");
+        DoubleItPortType saml1Port = 
+            service.getPort(saml1PortQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT);
         
-        // Now sleep to expire the token
+        QName saml1BearerPortQName = new QName(NAMESPACE, "DoubleItTransportSaml1BearerPort");
+        DoubleItPortType saml1BearerPort = 
+            service.getPort(saml1BearerPortQName, DoubleItPortType.class);
+        updateAddressPort(saml1BearerPort, PORT);
+        
+        QName saml2PortQName = new QName(NAMESPACE, "DoubleItTransportSaml2Port");
+        DoubleItPortType saml2Port = 
+            service.getPort(saml2PortQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT);
+        
+        // Make initial successful invocation(s)
+        doubleIt(saml1Port, 25);
+        doubleIt(saml1BearerPort, 30);
+        doubleIt(saml2Port, 35);
+        
+        // Now sleep to expire the token(s)
         Thread.sleep(8 * 1000);
-        
-        BindingProvider p = (BindingProvider)transportPort;
-        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
-        stsClient.setTtl(300);
         
         // The IssuedTokenInterceptorProvider should renew the token 
-        doubleIt(transportPort, 30);
-        
-        bus.shutdown(true);
-    }
-    
-    @org.junit.Test
-    public void testRenewExpiredSAML1BearerToken() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
-        URL wsdl = SAMLRenewTest.class.getResource("DoubleIt.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSaml1BearerPort");
-        DoubleItPortType transportPort = 
-            service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
-        
-        // Make initial successful invocation
-        doubleIt(transportPort, 25);
-        
-        // Now sleep to expire the token
-        Thread.sleep(8 * 1000);
-        
-        BindingProvider p = (BindingProvider)transportPort;
+        BindingProvider p = (BindingProvider)saml1Port;
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
         stsClient.setTtl(300);
+        doubleIt(saml1Port, 25);
         
         try {
             // The IssuedTokenInterceptorProvider should renew the token - but it should fail on 
             // lack of Proof-of-Possession
-            doubleIt(transportPort, 30);
+            doubleIt(saml1BearerPort, 30);
             fail("Expected failure on no Proof-of-Possession");
         } catch (Exception ex) {
             // expected
         }
         
-        bus.shutdown(true);
-    }
-    
-    @org.junit.Test
-    public void testRenewExpiredSAML2Token() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = SAMLRenewTest.class.getResource("cxf-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
-        URL wsdl = SAMLRenewTest.class.getResource("DoubleIt.wsdl");
-        Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSaml2Port");
-        DoubleItPortType transportPort = 
-            service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
-        
-        // Make initial successful invocation
-        doubleIt(transportPort, 25);
-        
-        // Now sleep to expire the token
-        Thread.sleep(8 * 1000);
-        
-        BindingProvider p = (BindingProvider)transportPort;
-        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
-        stsClient.setTtl(300);
-        
         // The IssuedTokenInterceptorProvider should renew the token 
-        doubleIt(transportPort, 30);
+        p = (BindingProvider)saml2Port;
+        stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        stsClient.setTtl(300);
+        doubleIt(saml2Port, 35);
         
         bus.shutdown(true);
     }
