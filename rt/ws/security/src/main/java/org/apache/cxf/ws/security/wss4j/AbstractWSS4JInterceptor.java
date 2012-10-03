@@ -22,11 +22,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
@@ -57,7 +57,8 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
     }
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
+    private Map<String, Crypto> cryptoMap = new ConcurrentHashMap<String, Crypto>();
     private Set<String> before = new HashSet<String>();
     private Set<String> after = new HashSet<String>();
     private String phase;
@@ -212,6 +213,50 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         } finally {
             Thread.currentThread().setContextClassLoader(orig);
         }
+    }
+    
+    // TODO Remove once we pick up WSS4J 1.6.8
+    @Override
+    protected Crypto loadCrypto(
+        String cryptoPropertyFile,
+        String cryptoPropertyRefId,
+        RequestData requestData
+    ) throws WSSecurityException {
+        Object mc = requestData.getMsgContext();
+        Crypto crypto = null;
+        
+        //
+        // Try the Property Ref Id first
+        //
+        String refId = getString(cryptoPropertyRefId, mc);
+        if (refId != null) {
+            crypto = cryptoMap.get(refId);
+            if (crypto == null) {
+                Object obj = getProperty(mc, refId);
+                if (obj instanceof Properties) {
+                    crypto = CryptoFactory.getInstance((Properties)obj);
+                    cryptoMap.put(refId, crypto);
+                } else if (obj instanceof Crypto) {
+                    crypto = (Crypto)obj;
+                    cryptoMap.put(refId, crypto);
+                }
+            }
+        }
+        
+        //
+        // Now try loading the properties file
+        //
+        if (crypto == null) {
+            String propFile = getString(cryptoPropertyFile, mc);
+            if (propFile != null) {
+                crypto = cryptoMap.get(propFile);
+                if (crypto == null) {
+                    crypto = loadCryptoFromPropertiesFile(propFile, requestData);
+                    cryptoMap.put(propFile, crypto);
+                }
+            } 
+        }
+        return crypto;
     }
 
 }

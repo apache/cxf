@@ -404,7 +404,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * @param msg
      * @param reqData
      */
-    protected void computeAction(SoapMessage msg, RequestData reqData) {
+    protected void computeAction(SoapMessage msg, RequestData reqData) throws WSSecurityException {
         //
         // Try to get Crypto Provider from message context properties. 
         // It gives a possibility to use external Crypto Provider 
