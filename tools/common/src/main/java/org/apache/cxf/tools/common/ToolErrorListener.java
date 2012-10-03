@@ -49,14 +49,14 @@ public class ToolErrorListener {
     List<ErrorInfo> errors = new LinkedList<ErrorInfo>();
     
     public void addError(String file, int line, int column, String message) {
-        addError(file, line, column, null);
+        addError(file, line, column, null, null);
     }
     public void addError(String file, int line, int column, String message, Throwable t) {
         errors.add(new ErrorInfo(file, line, column, message, t));
     }
 
     public void addWarning(String file, int line, int column, String message) {
-        addWarning(file, line, column, null);
+        addWarning(file, line, column, null, null);
     }
     public void addWarning(String file, int line, int column, String message, Throwable t) {
         if (file != null) {
