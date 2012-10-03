@@ -35,7 +35,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.cxf.tools.corba.common.ToolTestBase;
 import org.apache.cxf.tools.corba.utils.TestUtils;
@@ -394,5 +399,27 @@ public class IDLToWSDLTest extends ToolTestBase {
         } catch (Exception e) {
             assertTrue(e.getMessage().indexOf("can't resolve type for const myConst") >= 0);
         }
+    }
+
+    public void testCXF4541() throws Exception {
+        File input = new File(getClass().getResource("/idl/missing_struct_member.idl").toURI());
+        String[] args = new String[] {
+            "-mns[org::bash=http://www.bash.org]",
+            "-o", output.toString(),
+            input.toString()
+        };
+        IDLToWSDL.run(args);
+        File fs = new File(output, "org_bash.xsd");
+        assertTrue(fs.getName() + " was not created.", fs.exists());
+        Document doc = StaxUtils.read(new FileInputStream(fs));
+        NodeList l = doc.getDocumentElement().getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "element");
+        for (int x = 0; x < l.getLength(); x++) {
+            Element el = (Element)l.item(x);
+            if ("bar".equals(el.getAttribute("name"))
+                && el.getAttribute("type").contains("string")) {
+                return;
+            }
+        }
+        fail("Did not find foo element");
     }
 }
