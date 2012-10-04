@@ -23,7 +23,14 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.xml.namespace.QName;
 
@@ -118,15 +125,22 @@ public class MapType extends AegisType {
     protected Map<Object, Object> instantiateMap() {
         Map<Object, Object> map = null;
 
-        if (getTypeClass().equals(Map.class)) {
+        Class<?> cls = getTypeClass();
+        if (cls.equals(Map.class)) {
             map = new HashMap<Object, Object>();
-        } else if (getTypeClass().equals(Hashtable.class)) {
+        } else if (cls.equals(Hashtable.class)) {
             map = new Hashtable<Object, Object>();
-        } else if (getTypeClass().isInterface()) {
+        } else if (cls.equals(ConcurrentMap.class)) {
+            map = new ConcurrentHashMap<Object, Object>();
+        } else if (cls.equals(ConcurrentNavigableMap.class)) {
+            map = new ConcurrentSkipListMap<Object, Object>();
+        } else if (cls.equals(SortedMap.class) || cls.equals(NavigableMap.class)) {
+            map = new TreeMap<Object, Object>();
+        } else if (cls.isInterface()) {
             map = new HashMap<Object, Object>();
         } else {
             try {
-                map = (Map<Object, Object>)getTypeClass().newInstance();
+                map = (Map<Object, Object>)cls.newInstance();
             } catch (Exception e) {
                 throw new DatabindingException("Could not create map implementation: "
                                                + getTypeClass().getName(), e);
