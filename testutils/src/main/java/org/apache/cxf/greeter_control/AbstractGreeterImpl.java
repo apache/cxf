@@ -53,11 +53,15 @@ public class AbstractGreeterImpl implements Greeter {
     }
 
     public void resetLastOnewayArg() {
-        lastOnewayArg = null;
+        synchronized (this) {
+            lastOnewayArg = null;
+        }
     }
 
     public void useLastOnewayArg(Boolean use) {
-        useLastOnewayArg = use;
+        synchronized (this) {
+            useLastOnewayArg = use;
+        }
     }
 
     public void setThrowAlways(boolean t) {

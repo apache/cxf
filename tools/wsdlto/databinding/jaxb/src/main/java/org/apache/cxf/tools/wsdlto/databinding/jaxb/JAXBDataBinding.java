@@ -358,7 +358,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 // keep parseArguments happy, supply dummy required command-line
                 // opts
                 opts.addGrammar(new InputSource("null"));
-                opts.parseArguments(args.toArray(new String[] {}));
+                opts.parseArguments(args.toArray(new String[args.size()]));
             } catch (BadCommandLineException e) {
                 String msg = "XJC reported 'BadCommandLineException' for -xjc argument:";
                 for (String arg : args) {

@@ -76,7 +76,8 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }
-            Predicate[] preds = predStack.pop().toArray(new Predicate[0]);
+            List<Predicate> predsList = predStack.pop();
+            Predicate[] preds = predsList.toArray(new Predicate[predsList.size()]);
             Predicate newPred;
             if (sc instanceof OrSearchCondition) {
                 newPred = builder.or(preds);
@@ -93,7 +94,8 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
     
     public CriteriaQuery<T> getCriteriaQuery() {
         if (!criteriaFinalized) {
-            cq.where(predStack.pop().toArray(new Predicate[0]));
+            List<Predicate> predsList = predStack.pop();
+            cq.where(predsList.toArray(new Predicate[predsList.size()]));
             criteriaFinalized = true;
         }
         return cq;

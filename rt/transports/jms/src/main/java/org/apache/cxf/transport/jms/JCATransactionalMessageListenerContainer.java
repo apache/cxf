@@ -74,7 +74,9 @@ public class JCATransactionalMessageListenerContainer extends DefaultMessageList
         } catch (Exception ex) {
             throw new JMSException(ex.getMessage());
         } finally {
-            ep.release();
+            if (ep != null) {
+                ep.release();
+            }
             JmsUtils.closeMessageConsumer(mc);
             JmsUtils.closeSession(xa);
             JmsUtils.closeSession(s);

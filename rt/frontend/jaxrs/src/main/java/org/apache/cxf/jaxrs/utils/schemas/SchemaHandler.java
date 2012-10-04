@@ -138,7 +138,7 @@ public class SchemaHandler {
                     }
                 }
             }
-            s = factory.newSchema(sources.toArray(new Source[]{}));
+            s = factory.newSchema(sources.toArray(new Source[sources.size()]));
         } catch (Exception ex) {
             LOG.warning("Validation will be disabled, failed to create schema : " + ex.getMessage());
         }

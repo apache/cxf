@@ -91,7 +91,7 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             XMLOutputFactory factory = new MappedXMLOutputFactory(nstojns);
             XMLStreamWriter xsw = factory.createXMLStreamWriter(os);
             xsw.writeStartDocument();
-            if (obj instanceof XmlObject) {
+            if (obj != null) {
 
                 XmlObject xObj = obj;
                 XMLBeanStreamSerializer ser = new XMLBeanStreamSerializer();

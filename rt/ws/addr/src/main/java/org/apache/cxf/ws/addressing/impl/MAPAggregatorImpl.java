@@ -968,7 +968,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             ei.setAddress(address);
             destination = factory.getDestination(ei);
             Conduit conduit = ContextUtils.getConduit(null, message);
-            if (conduit instanceof Observable) {
+            if (conduit != null) {
                 MessageObserver ob = ((Observable)conduit).getMessageObserver();
                 ob = new InterposedMessageObserver(bus, ob);
                 destination.setMessageObserver(ob);

@@ -84,15 +84,17 @@ public class Stax2DOM {
             throw new ToolException(e);
         } finally {
             try {
-                try {
-                    //on woodstox, calling closeCompletely will allow any 
-                    //cached things like dtds and such to be completely
-                    //closed and cleaned up.
-                    reader.getClass().getMethod("closeCompletely").invoke(reader);
-                } catch (Throwable t) {
-                    //ignore
+                if (reader != null) {
+                    try {
+                        //on woodstox, calling closeCompletely will allow any 
+                        //cached things like dtds and such to be completely
+                        //closed and cleaned up.
+                        reader.getClass().getMethod("closeCompletely").invoke(reader);
+                    } catch (Throwable t) {
+                        //ignore
+                    }
+                    reader.close();
                 }
-                reader.close();
             } catch (XMLStreamException e) {
                 // throw or change do nothing.
                 throw new ToolException(e);

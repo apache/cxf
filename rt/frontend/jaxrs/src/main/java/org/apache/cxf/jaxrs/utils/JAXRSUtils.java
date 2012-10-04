@@ -193,7 +193,7 @@ public final class JAXRSUtils {
                 Method m = provider.getClass().getMethod(methodName, new Class[]{});
                 List<String> types = (List<String>)m.invoke(provider, new Object[]{});
                 if (types != null) {
-                    values =  types.size() > 0 ? types.toArray(new String[]{})
+                    values = types.size() > 0 ? types.toArray(new String[types.size()])
                                                : new String[]{"*/*"};
                 }
             } catch (Exception ex) {
@@ -600,7 +600,7 @@ public final class JAXRSUtils {
         
         Method method = ori.getMethodToInvoke();
         Class<?>[] parameterTypes = method.getParameterTypes();
-        Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[]{});  
+        Parameter[] paramsInfo = ori.getParameters().toArray(new Parameter[ori.getParameters().size()]);  
         Method annotatedMethod = ori.getAnnotatedMethod();
         Type[] genericParameterTypes = annotatedMethod == null ? method.getGenericParameterTypes() 
                                       : annotatedMethod.getGenericParameterTypes();

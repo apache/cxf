@@ -133,7 +133,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
                 soapEndpoints.add(sd);
             }
         }
-        return soapEndpoints.toArray(new AbstractDestination[]{});
+        return soapEndpoints.toArray(new AbstractDestination[soapEndpoints.size()]);
     }
     
     private AbstractDestination[] getRestEndpoints(AbstractDestination[] destinations,
@@ -146,7 +146,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
                 restfulDests.add(sd);
             }
         }
-        return restfulDests.toArray(new AbstractDestination[]{});
+        return restfulDests.toArray(new AbstractDestination[restfulDests.size()]);
     }
     
 

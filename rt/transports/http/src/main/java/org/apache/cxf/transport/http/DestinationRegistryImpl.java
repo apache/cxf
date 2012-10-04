@@ -119,7 +119,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
             }
         });
 
-        return dest2.toArray(new AbstractDestination[]{});
+        return dest2.toArray(new AbstractDestination[dest2.size()]);
     }
 
     public Set<String> getDestinationsPaths() {

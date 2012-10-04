@@ -126,16 +126,16 @@ public class ModelMBeanInfoSupporter {
     public ModelMBeanInfo buildModelMBeanInfo(Descriptor desc)  {        
         
         ModelMBeanOperationInfo[] ops = 
-            operations.values().toArray(new ModelMBeanOperationInfo[0]);        
+            operations.values().toArray(new ModelMBeanOperationInfo[operations.values().size()]);        
         
         ModelMBeanAttributeInfo[] atts = 
-            attributes.values().toArray(new ModelMBeanAttributeInfo[0]);
+            attributes.values().toArray(new ModelMBeanAttributeInfo[attributes.values().size()]);
         
         ModelMBeanConstructorInfo[] cons = 
-            constructors.values().toArray(new ModelMBeanConstructorInfo[0]);
+            constructors.values().toArray(new ModelMBeanConstructorInfo[constructors.values().size()]);
         
         ModelMBeanNotificationInfo[] notifs = 
-            notifications.values().toArray(new ModelMBeanNotificationInfo[0]);
+            notifications.values().toArray(new ModelMBeanNotificationInfo[notifications.values().size()]);
                 
         return new ModelMBeanInfoSupport("javax.management.modelmbean.ModelMBeanInfo",
                                          "description",

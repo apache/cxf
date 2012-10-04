@@ -123,7 +123,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                     values.add(val);
                 }
             }
-            return values.toArray(new String[]{});
+            return values.toArray(new String[values.size()]);
         } else {
             String separator = getSeparator();
             return c.split(separator);

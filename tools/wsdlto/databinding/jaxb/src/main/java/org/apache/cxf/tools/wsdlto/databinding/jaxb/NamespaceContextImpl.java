@@ -39,6 +39,7 @@ public class NamespaceContextImpl implements NamespaceContext {
         docFact.setNamespaceAware(true);
         try {
             document = docFact.newDocumentBuilder().parse(file);
+            element = document.getDocumentElement();
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -46,7 +47,6 @@ public class NamespaceContextImpl implements NamespaceContext {
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
-        element = document.getDocumentElement();
     }
 
     public String getNamespaceURI(String prefix) {

@@ -111,7 +111,7 @@ public abstract class JAXBDataBase {
             }
             
         }
-        return annoList.toArray(new Annotation[]{});       
+        return annoList.toArray(new Annotation[annoList.size()]);       
     }
 
     public Integer getMtomThreshold() {

@@ -279,8 +279,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 collectionContextClasses.add(CollectionWrapper.class);
                 collectionContextClasses.add(type);
             }
-            return JAXBContext.newInstance(collectionContextClasses.toArray(new Class[]{}), 
-                                                        cProperties);
+            return JAXBContext.newInstance(
+                collectionContextClasses.toArray(new Class[collectionContextClasses.size()]), cProperties);
         }
     }
     

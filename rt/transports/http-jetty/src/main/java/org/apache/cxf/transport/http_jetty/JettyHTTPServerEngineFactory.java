@@ -351,8 +351,8 @@ public class JettyHTTPServerEngineFactory {
     public void postShutdown() {
         // shut down the jetty server in the portMap
         // To avoid the CurrentModificationException, 
-        // do not use portMap.vaules directly       
-        JettyHTTPServerEngine[] engines = portMap.values().toArray(new JettyHTTPServerEngine[0]);
+        // do not use portMap.values directly       
+        JettyHTTPServerEngine[] engines = portMap.values().toArray(new JettyHTTPServerEngine[portMap.values().size()]);
         for (JettyHTTPServerEngine engine : engines) {
             engine.shutdown();
         }

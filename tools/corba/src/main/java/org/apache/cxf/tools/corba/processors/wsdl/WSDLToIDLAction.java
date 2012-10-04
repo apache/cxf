@@ -524,7 +524,7 @@ public class WSDLToIDLAction {
         } else if (corbaTypeImpl instanceof Const) {
             result = createConst(corbaTypeImpl, scope, local);        
         } else {
-            result = checkAnon(corbaTypeImpl, scope, local);                                    
+            result = checkAnon(corbaTypeImpl, scope, local);
         } 
         
         if (result == null

@@ -1358,7 +1358,7 @@ public class SourceGenerator {
                                        .getEntityResolver());
         if (compilerArgs.size() > 0) {
             compiler.getOptions().addGrammar(new InputSource("null"));
-            compiler.getOptions().parseArguments(compilerArgs.toArray(new String[] {}));
+            compiler.getOptions().parseArguments(compilerArgs.toArray(new String[compilerArgs.size()]));
         }
         addSchemas(schemaElements, compiler);
         for (InputSource is : bindingFiles) {

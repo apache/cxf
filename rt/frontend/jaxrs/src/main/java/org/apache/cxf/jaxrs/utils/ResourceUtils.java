@@ -553,7 +553,7 @@ public final class ResourceUtils {
             types.getAllTypes().put(type, type);
             
             Class<?> genCls = InjectionUtils.getActualType(genericType);
-            if (genCls != type && genCls instanceof Class && genCls != Object.class 
+            if (genCls != type && genCls != null && genCls != Object.class 
                 && !InjectionUtils.isSupportedCollectionOrArray(genCls)) {
                 types.getAllTypes().put(genCls, genCls);
             }

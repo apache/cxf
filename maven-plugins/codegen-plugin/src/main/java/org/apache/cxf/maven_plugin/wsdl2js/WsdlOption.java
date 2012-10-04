@@ -87,7 +87,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
                 options.add(String.format("%s=%s", upp.getPrefix(), upp.getUri()));
             }
         }
-        if (catalog != null && !"".equals(catalog)) {
+        if (catalog != null) {
             options.add("-catalog");
             options.add(catalog.getAbsolutePath());
         }

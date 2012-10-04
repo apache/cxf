@@ -59,7 +59,7 @@ class CglibProxyHelper extends ProxyHelper {
             Enhancer enhancer = new Enhancer();
             enhancer.setClassLoader(loader);
             enhancer.setSuperclass(superClass);
-            enhancer.setInterfaces(theInterfaces.toArray(new Class[]{}));
+            enhancer.setInterfaces(theInterfaces.toArray(new Class[theInterfaces.size()]));
             enhancer.setCallback(new MethodInterceptor() {
 
                 public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) 

@@ -73,7 +73,7 @@ public class PlugInClassLoader extends SecureClassLoader {
         while (i.hasNext()) {            
             LOG.config("get Filter " + propFile + "::" + (String)i.next());            
         }    
-        return filtersProps.keySet().toArray(new String[] {});
+        return filtersProps.keySet().toArray(new String[filtersProps.keySet().size()]);
     }
 
     private static Properties getProperties(ClassLoader parent, String propsFileName) throws IOException {
@@ -119,7 +119,7 @@ public class PlugInClassLoader extends SecureClassLoader {
             }
         }
 
-        return urlList.toArray(new String[] {});
+        return urlList.toArray(new String[urlList.size()]);
     }
 
     protected Class<?> findClass(String name) throws ClassNotFoundException {

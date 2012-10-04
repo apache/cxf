@@ -173,8 +173,8 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                 KeyGenerator keyGen = getKeyGenerator(symEncAlgo);
                 symmetricKey = keyGen.generateKey();
             } 
+            return symmetricKey.getEncoded();
         }
-        return symmetricKey.getEncoded();
     }
     
     private X509Certificate getReceiverCertificateFromCrypto(Crypto crypto, String user) throws Exception {

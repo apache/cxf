@@ -78,7 +78,7 @@ public class EprMetaData {
             b.append("@");
             b.append(candidateWsdlDef.getDocumentBaseURI());
             b.append('}');
-            ret =  b.toString();
+            ret = b.toString();
         }
         return ret;
     }

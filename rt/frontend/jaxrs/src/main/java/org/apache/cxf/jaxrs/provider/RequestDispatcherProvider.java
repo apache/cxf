@@ -350,7 +350,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
         
         public void setParameters(String name, List<String> values) {
-            doSetParameters(name, values.toArray(new String[]{}));
+            doSetParameters(name, values.toArray(new String[values.size()]));
         }
         
         private void doSetParameters(String name, String[] values) {

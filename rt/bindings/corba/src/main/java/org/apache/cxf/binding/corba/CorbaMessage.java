@@ -91,7 +91,7 @@ public class CorbaMessage extends AbstractWrappedMessage {
     }
     
     public CorbaStreamable[] getStreamableArguments() {
-        return this.arguments.toArray(new CorbaStreamable[0]);
+        return this.arguments.toArray(new CorbaStreamable[this.arguments.size()]);
     }
 
 

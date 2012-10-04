@@ -178,7 +178,7 @@ public class LdapClaimsHandler implements ClaimsHandler {
         }
 
         String[] searchAttributes = null;
-        searchAttributes = searchAttributeList.toArray(new String[] {});
+        searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
 
         AttributesMapper mapper = 
             new AttributesMapper() {
