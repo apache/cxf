@@ -54,6 +54,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.NamespaceContext;
@@ -370,8 +372,8 @@ public final class JAXBEncoderDecoder {
                         if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
                             writeArrayObject(marshaller, writer, fname, f.get(elValue));
                         } else {
-                            writeObject(marshaller, writer, new JAXBElement(fname, String.class, 
-                                                                            f.get(elValue)));
+                            Object o = getFieldValue(f, elValue);
+                            writeObject(marshaller, writer, new JAXBElement(fname, String.class, o));
                         }
                     }
                 }
@@ -385,8 +387,8 @@ public final class JAXBEncoderDecoder {
                     if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
                         writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
                     } else {
-                        writeObject(marshaller, writer, new JAXBElement(mname, String.class, 
-                                                                        m.invoke(elValue)));
+                        Object o = getMethodValue(m, elValue);
+                        writeObject(marshaller, writer, new JAXBElement(mname, String.class, o));
                     }
                 }
             }
@@ -497,7 +499,8 @@ public final class JAXBEncoderDecoder {
 
                             f.set(obj, o);
                         } else {
-                            f.set(obj, getElementValue(u.unmarshal(reader, f.getType())));
+                            Object o = getElementValue(u.unmarshal(reader, getFieldType(f)));
+                            setFieldValue(f, obj, o);
                         }
                     } else {
                         throw new NoSuchFieldException("No accessible field " + q.getLocalPart());
@@ -534,8 +537,8 @@ public final class JAXBEncoderDecoder {
 
                         m2.invoke(obj, o);
                     } else {
-                        Object o = getElementValue(u.unmarshal(reader, m.getReturnType()));
-                        m2.invoke(obj, o);
+                        Object o = getElementValue(u.unmarshal(reader, getMethodReturnType(m)));
+                        setMethodValue(m, m2, obj, o);
                     }
                 }
             }
@@ -543,6 +546,46 @@ public final class JAXBEncoderDecoder {
         } catch (Exception e) {
             throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
         }
+    }
+
+    private static Class<?> getFieldType(final Field f) {
+        XmlJavaTypeAdapter adapter = JAXBContextInitializer.getFieldXJTA(f);
+        Class<?> adapterType = JAXBContextInitializer.getTypeFromXmlAdapter(adapter);
+        return adapterType != null ? adapterType : f.getType();
+    }
+
+    private static Class<?> getMethodReturnType(final Method m) {
+        XmlJavaTypeAdapter adapter = JAXBContextInitializer.getMethodXJTA(m);
+        Class<?> adapterType = JAXBContextInitializer.getTypeFromXmlAdapter(adapter);
+        return adapterType != null ? adapterType : m.getReturnType(); 
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static Object getFieldValue(Field f, Object target) throws Exception {
+        XmlJavaTypeAdapter adapterAnnotation = JAXBContextInitializer.getFieldXJTA(f);
+        XmlAdapter adapter = JAXBContextInitializer.getXmlAdapter(adapterAnnotation);
+        return adapter != null ? adapter.marshal(f.get(target)) : f.get(target); 
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static Object getMethodValue(Method m, Object target) throws Exception {
+        XmlJavaTypeAdapter adapterAnnotation = JAXBContextInitializer.getMethodXJTA(m);
+        XmlAdapter adapter = JAXBContextInitializer.getXmlAdapter(adapterAnnotation);
+        return adapter != null ? adapter.marshal(m.invoke(target)) : m.invoke(target); 
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static void setFieldValue(Field f, Object target, Object value) throws Exception {
+        XmlJavaTypeAdapter xjta = JAXBContextInitializer.getFieldXJTA(f);
+        XmlAdapter adapter = JAXBContextInitializer.getXmlAdapter(xjta);
+        f.set(target, adapter != null ? adapter.unmarshal(value) : value);
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static void setMethodValue(Method getter, Method setter, Object target, Object value) throws Exception {
+        XmlJavaTypeAdapter xjta = JAXBContextInitializer.getMethodXJTA(getter);
+        XmlAdapter adapter = JAXBContextInitializer.getXmlAdapter(xjta);
+        setter.invoke(target, adapter != null ? adapter.unmarshal(value) : value);
     }
 
     private static void writeObject(Marshaller u, Object source, Object mObj) throws Fault, JAXBException {
