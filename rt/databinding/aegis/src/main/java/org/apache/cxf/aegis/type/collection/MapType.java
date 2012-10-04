@@ -29,8 +29,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentNavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import javax.xml.namespace.QName;
 
@@ -132,9 +130,7 @@ public class MapType extends AegisType {
             map = new Hashtable<Object, Object>();
         } else if (cls.equals(ConcurrentMap.class)) {
             map = new ConcurrentHashMap<Object, Object>();
-        } else if (cls.equals(ConcurrentNavigableMap.class)) {
-            map = new ConcurrentSkipListMap<Object, Object>();
-        } else if (cls.equals(SortedMap.class) || cls.equals(NavigableMap.class)) {
+        } else if (cls.equals(SortedMap.class)) {
             map = new TreeMap<Object, Object>();
         } else if (cls.isInterface()) {
             map = new HashMap<Object, Object>();
