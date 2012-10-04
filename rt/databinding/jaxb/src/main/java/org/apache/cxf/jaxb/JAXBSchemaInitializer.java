@@ -523,7 +523,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         for (Field f : cls.getDeclaredFields()) {
             if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
                 //map field
-                Type type = f.getGenericType();
+                Type type = getFieldType(f);
                 JAXBBeanInfo beanInfo = getBeanInfo(type);
                 if (beanInfo != null) {
                     addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
@@ -532,8 +532,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
         for (Method m : cls.getMethods()) {
             if (JAXBContextInitializer.isMethodAccepted(m, accessType)) {
-                //map field
-                Type type = m.getGenericReturnType();
+                //map method
+                Type type = getMethodReturnType(m);
                 JAXBBeanInfo beanInfo = getBeanInfo(type);
                 if (beanInfo != null) {
                     int idx = m.getName().startsWith("get") ? 3 : 2;
@@ -555,6 +555,18 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
         schemas.addCrossImports();
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
+    }
+    
+    private static Type getFieldType(final Field f) {
+        XmlJavaTypeAdapter adapter = JAXBContextInitializer.getFieldXJTA(f);
+        Class<?> adapterType = JAXBContextInitializer.getTypeFromXmlAdapter(adapter);
+        return adapterType != null ? adapterType : f.getGenericType();
+    }
+
+    private static Type getMethodReturnType(final Method m) {
+        XmlJavaTypeAdapter adapter = JAXBContextInitializer.getMethodXJTA(m);
+        Class<?> adapterType = JAXBContextInitializer.getTypeFromXmlAdapter(adapter);
+        return adapterType != null ? adapterType : m.getGenericReturnType(); 
     }
 
     static boolean isArray(Type cls) {
