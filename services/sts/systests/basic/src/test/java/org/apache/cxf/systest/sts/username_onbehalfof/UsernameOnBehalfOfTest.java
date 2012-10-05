@@ -25,7 +25,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -34,7 +36,6 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
-import org.apache.cxf.ws.security.trust.delegation.WSSUsernameCallbackHandler;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -167,10 +168,8 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         doubleIt(bearerPort, 25);
         
         // Change the STSClient so that it can no longer find the STS
-        STSClient stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
         BindingProvider p = (BindingProvider)bearerPort;
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
+        clearSTSClient(p);
         
         // This invocation should be successful as the token is cached
         doubleIt(bearerPort, 25);
@@ -186,10 +185,8 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         }
         
         // Change the STSClient so that it can no longer find the STS
-        stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
         p = (BindingProvider)bearerPort2;
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
+        clearSTSClient(p);
         
         // This should fail as the cache is not being used
         try {
@@ -269,10 +266,8 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         }
         
         // Change the STSClient so that it can no longer find the STS
-        STSClient stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
         BindingProvider p = (BindingProvider)bearerPort;
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
+        clearSTSClient(p);
         
         // Make a successful invocation
         ((BindingProvider)bearerPort).getRequestContext().put(
@@ -361,9 +356,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         doubleIt(bearerPort, 25);
         
         // Change the STSClient so that it can no longer find the STS
-        STSClient stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
+        clearSTSClient(p);
         
         // Make a successful invocation - should work as token is cached
         ((BindingProvider)bearerPort).getRequestContext().put(
@@ -443,10 +436,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         doubleIt(bearerPort, 25);
         
         // Change the STSClient so that it can no longer find the STS
-        stsClient = new STSClient(bus);
-        stsClient.setOnBehalfOf(new WSSUsernameCallbackHandler());
-        stsClient.setEnableAppliesTo(false);
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
+        clearSTSClient(p);
         
         // This should work
         doubleIt(bearerPort, 25);
@@ -463,6 +453,13 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         }
         
         bus.shutdown(true);
+    }
+    
+    private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {
+        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        stsClient.getClient().destroy();
+        stsClient.setWsdlLocation(null);
+        stsClient.setLocation(null);
     }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {

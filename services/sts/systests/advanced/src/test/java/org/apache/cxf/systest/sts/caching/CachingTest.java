@@ -332,9 +332,9 @@ public class CachingTest extends AbstractBusClientServerTestBase {
     
     private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        stsClient.getClient().destroy();
         stsClient.setWsdlLocation(null);
         stsClient.setLocation(null);
-        stsClient.getClient().destroy();
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
