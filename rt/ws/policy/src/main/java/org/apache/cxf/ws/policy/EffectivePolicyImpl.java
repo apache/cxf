@@ -223,7 +223,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         PolicyInterceptorProvider pp = reg.get(qn);
         if (pp != null) {
             List<Interceptor<? extends org.apache.cxf.message.Message>> i = null;
-            if (useIn & !fault) {
+            if (useIn && !fault) {
                 i = pp.getInInterceptors();
             } else if (!useIn && !fault) {
                 i = pp.getOutInterceptors();
