@@ -19,32 +19,35 @@
 package org.apache.cxf.rs.security.saml.authorization;
 
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.cxf.common.security.SimplePrincipal;
+import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.rs.security.saml.assertion.Claims;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
-import org.apache.cxf.security.SecurityContext;
 
-public class SAMLSecurityContext implements SecurityContext {
+public class JAXRSSAMLSecurityContext extends SAMLSecurityContext {
     
-    private SubjectPrincipal p;
-    private Claims claims; 
-    private Claim rolesClaim;
+    private Claims claims;
     
-    public SAMLSecurityContext(Subject subject, List<Claim> claims) {
+    public JAXRSSAMLSecurityContext(Subject subject, List<Claim> claims) {
         this(new SubjectPrincipal(subject.getName(), subject), new Claims(claims));
     }
     
-    public SAMLSecurityContext(SubjectPrincipal p, Claims claims) {
+    public JAXRSSAMLSecurityContext(SubjectPrincipal p, Claims claims) {
         this(p, claims, Claim.DEFAULT_ROLE_NAME, Claim.DEFAULT_NAME_FORMAT);
     }
     
-    public SAMLSecurityContext(SubjectPrincipal p, 
+    public JAXRSSAMLSecurityContext(SubjectPrincipal p, 
                                Claims cs,
                                String roleClaimNameQualifier,
                                String roleClaimNameFormat) {
-        this.p = p;
+        super(p);
+        
+        Claim rolesClaim = null;
         for (Claim c : cs.getClaims()) {
             if (c.getName().equals(roleClaimNameQualifier)
                 && c.getNameFormat().equals(roleClaimNameFormat)) {
@@ -53,26 +56,22 @@ public class SAMLSecurityContext implements SecurityContext {
             }
         }
         this.claims = cs;
-        
-    }
-    
-    public Principal getUserPrincipal() {
-        return p;
-    }
 
-    public boolean isUserInRole(String role) {
-        if (rolesClaim == null) {
-            return false;
-        }
-        for (String r : rolesClaim.getValues()) {
-            if (r.equals(role)) {
-                return true;
+        Set<Principal> userRoles;
+        if (rolesClaim != null) {
+            userRoles = new HashSet<Principal>();
+            for (String role : rolesClaim.getValues()) {
+                userRoles.add(new SimplePrincipal(role));
             }
+        } else {
+            userRoles = null;
         }
-        return false;
+        
+        setUserRoles(userRoles);
     }
     
     public Claims getClaims() {
         return claims;
     }
+
 }

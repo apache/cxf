@@ -67,13 +67,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     
     public void handleMessage(Message message) throws Fault {
         SecurityContext sc = message.get(SecurityContext.class);
-        if (!(sc instanceof SAMLSecurityContext)) {
+        if (!(sc instanceof JAXRSSAMLSecurityContext)) {
             throw new AccessDeniedException("Security Context is unavailable or unrecognized");
         }
         
         Method method = getTargetMethod(message);
         
-        if (authorize((SAMLSecurityContext)sc, method)) {
+        if (authorize((JAXRSSAMLSecurityContext)sc, method)) {
             return;
         }
         
@@ -98,7 +98,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         throw new AccessDeniedException("Method is not available : Unauthorized");
     }
 
-    protected boolean authorize(SAMLSecurityContext sc, Method method) {
+    protected boolean authorize(JAXRSSAMLSecurityContext sc, Method method) {
         List<ClaimBean> list = claims.get(method.getName());
         org.apache.cxf.rs.security.saml.assertion.Claims actualClaims = sc.getClaims();
         

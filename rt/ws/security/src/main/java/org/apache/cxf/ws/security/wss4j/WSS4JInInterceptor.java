@@ -30,9 +30,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
-import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -59,10 +56,10 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -492,7 +489,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     }
                     receivedAssertion = o.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                     roles = SAMLUtils.parseRolesInAssertion(receivedAssertion, roleAttributeName);
-                    msg.put(SecurityContext.class, createSecurityContext(p, roles));
+                    SAMLSecurityContext context = createSecurityContext(p, roles);
+                    context.setIssuer(SAMLUtils.getIssuer(receivedAssertion));
+                    context.setAssertionElement(SAMLUtils.getAssertionElement(receivedAssertion));
+                    msg.put(SecurityContext.class, context);
                 } else {
                     msg.put(SecurityContext.class, createSecurityContext(p));
                 }
@@ -534,10 +534,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
     
     protected SecurityContext createSecurityContext(final Principal p) {
-        return createSecurityContext(p, null);
+        return new SecurityContext() {
+
+            public Principal getUserPrincipal() {
+                return p;
+            }
+
+            public boolean isUserInRole(String arg0) {
+                return false;
+            }
+        };
     }
     
-    protected LoginSecurityContext createSecurityContext(final Principal p, final List<String> roles) {
+    protected SAMLSecurityContext createSecurityContext(final Principal p, final List<String> roles) {
         final Set<Principal> userRoles;
         if (roles != null) {
             userRoles = new HashSet<Principal>();
@@ -548,23 +557,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             userRoles = null;
         }
         
-        return new LoginSecurityContext() {
-            public Principal getUserPrincipal() {
-                return p;
-            }
-            public boolean isUserInRole(String role) {
-                if (roles == null) {
-                    return false;
-                }
-                return roles.contains(role);
-            }
-            public Subject getSubject() {
-                return null;
-            }
-            public Set<Principal> getUserRoles() {
-                return userRoles;
-            }
-        };
+        return new SAMLSecurityContext(p, userRoles);
     }
     
     private String getAction(SoapMessage msg, SoapVersion version) {

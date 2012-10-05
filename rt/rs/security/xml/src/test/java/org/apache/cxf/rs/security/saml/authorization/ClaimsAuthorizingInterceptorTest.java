@@ -206,7 +206,7 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         throws Exception {
         List<org.apache.cxf.rs.security.saml.assertion.Claim> claims =
             new ArrayList<org.apache.cxf.rs.security.saml.assertion.Claim>(Arrays.asList(claim));
-        SecurityContext sc = new SAMLSecurityContext(
+        SecurityContext sc = new JAXRSSAMLSecurityContext(
                 new Subject("user"), claims);
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());

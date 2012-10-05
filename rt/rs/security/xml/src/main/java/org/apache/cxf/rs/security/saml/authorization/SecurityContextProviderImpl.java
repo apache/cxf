@@ -54,7 +54,7 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
         SubjectPrincipal subjectPrincipal = 
             new SubjectPrincipal(subjectPrincipalName, subject);
         
-        SecurityContext sc = new SAMLSecurityContext(subjectPrincipal,
+        SecurityContext sc = new JAXRSSAMLSecurityContext(subjectPrincipal,
                 claims,
                 defaultRoleName == null ? Claim.DEFAULT_ROLE_NAME : defaultRoleName,
                 defaultNameFormat == null ? Claim.DEFAULT_NAME_FORMAT : defaultNameFormat);

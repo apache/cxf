@@ -44,6 +44,14 @@ final class SAMLUtils {
         }
     }
     
+    public static String getIssuer(Object assertion) {
+        return ((AssertionWrapper)assertion).getIssuerString();
+    }
+    
+    public static Element getAssertionElement(Object assertion) {
+        return ((AssertionWrapper)assertion).getElement();
+    }
+    
     //
     // these methods are moved from previous WSS4JInInterceptor
     //
