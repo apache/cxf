@@ -75,7 +75,7 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
                 Claim c = new Claim();
                 c.setClaimType(claim.getClaimType());
                 c.setPrincipal(parameters.getPrincipal());
-                c.setValue(endpointClaims.get(claim.getClaimType().toString()));
+                c.addValue(endpointClaims.get(claim.getClaimType().toString()));
                 claimsColl.add(c);
             } else {
                 if (LOG.isLoggable(Level.FINER)) {

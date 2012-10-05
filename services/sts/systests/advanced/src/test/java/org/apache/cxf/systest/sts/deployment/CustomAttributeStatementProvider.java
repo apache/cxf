@@ -20,7 +20,6 @@ package org.apache.cxf.systest.sts.deployment;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
                 attributeBean.setSimpleName(name);
                 attributeBean.setQualifiedName(namespace);
             }
-            attributeBean.setAttributeValues(Collections.singletonList(claim.getValue()));
+            attributeBean.setAttributeValues(claim.getValues());
             attributeList.add(attributeBean);
         }
         attrBean.setSamlAttributes(attributeList);

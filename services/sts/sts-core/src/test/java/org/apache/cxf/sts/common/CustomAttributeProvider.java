@@ -180,7 +180,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         } else {
             attributeBean.setSimpleName(claim.getClaimType().toString());
         }
-        attributeBean.setAttributeValues(Collections.singletonList(claim.getValue()));
+        attributeBean.setAttributeValues(claim.getValues());
 
         return attributeBean;
     }

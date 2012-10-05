@@ -186,7 +186,7 @@ public class ClaimsManager {
                     if (LOG.isLoggable(Level.FINEST)) {
                         LOG.finest(" [" + value + "]");
                     }
-                    c.setValue(value);
+                    c.addValue(value);
                     collection.add(c);
                     break;                    
                 }
@@ -225,7 +225,7 @@ public class ClaimsManager {
                     if (LOG.isLoggable(Level.FINEST)) {
                         LOG.finest(" [" + value + "]");
                     }
-                    c.setValue(value);
+                    c.addValue(value);
                     collection.add(c);
                     break;
                 }

@@ -64,18 +64,18 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     if (requestClaim instanceof CustomRequestClaim) {
                         CustomRequestClaim customClaim = (CustomRequestClaim) requestClaim;
                         String customName = customClaim.getClaimValue() + "@" + customClaim.getScope();
-                        claim.setValue(customName);
+                        claim.addValue(customName);
                     } else {
-                        claim.setValue("alice");
+                        claim.addValue("alice");
                     }
                 } else if (ClaimTypes.LASTNAME.equals(requestClaim.getClaimType())) {
-                    claim.setValue("doe");
+                    claim.addValue("doe");
                 } else if (ClaimTypes.EMAILADDRESS.equals(requestClaim.getClaimType())) {
-                    claim.setValue("alice@cxf.apache.org");
+                    claim.addValue("alice@cxf.apache.org");
                 } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
                     String requestedRole = requestClaim.getClaimValue();
                     if (isUserInRole(parameters.getPrincipal(), requestedRole)) {
-                        claim.setValue(requestedRole);
+                        claim.addValue(requestedRole);
                     } else {
                         continue;
                     }

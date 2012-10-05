@@ -56,9 +56,9 @@ public class CustomUserClaimsHandler implements ClaimsHandler {
                 if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
                     
                     if (parameters.getPrincipal().getName().equalsIgnoreCase("alice")) {
-                        claim.setValue("aliceClaim");
+                        claim.addValue("aliceClaim");
                     } else if (parameters.getPrincipal().getName().equalsIgnoreCase("bob")) {
-                        claim.setValue("bobClaim");
+                        claim.addValue("bobClaim");
                     }
                 }                
                 claimCollection.add(claim);
