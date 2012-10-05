@@ -81,8 +81,6 @@ public class Server {
 
         // Check to make sure that the SOAP Body and Timestamp were signed
         DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
-        coverageChecker.setSignBody(true);
-        coverageChecker.setSignTimestamp(true);
         bus.getInInterceptors().add(coverageChecker);
 
         BusFactory.setDefaultBus(bus);
