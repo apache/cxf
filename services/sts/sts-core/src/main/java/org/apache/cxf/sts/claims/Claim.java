@@ -77,17 +77,29 @@ public class Claim implements Serializable {
         this.values.addAll(values);
     }
 
-    public void setValue(String value) {
-        this.values.clear();
-        this.values.add(value);
-    }
-    
     public void addValue(String s) {
         this.values.add(s);
     }
     
     public List<String> getValues() {
         return values;
+    }
+
+    @Deprecated
+    public void setValue(String value) {
+        this.values.clear();
+        if (value != null) {
+            this.values.add(value);
+        }
+    }
+    @Deprecated
+    public String getValue() {
+        if (this.values.size() == 0) {
+            return null;
+        } else if (this.values.size() == 1) {
+            return this.values.get(0);
+        }
+        throw new IllegalStateException("Claim has multiple values");
     }
 
 }
