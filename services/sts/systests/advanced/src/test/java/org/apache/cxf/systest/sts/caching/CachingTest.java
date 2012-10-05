@@ -30,9 +30,11 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
@@ -110,7 +112,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         BindingProvider p = (BindingProvider)transportSaml1Port;
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, new STSClient(bus));
+        clearSTSClient(p);
         
         // This should succeed as the token is cached
         doubleIt(transportSaml1Port, 30);
@@ -158,7 +160,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         BindingProvider p = (BindingProvider)transportSaml1Port;
-        p.getRequestContext().put(SecurityConstants.STS_CLIENT, new STSClient(bus));
+        clearSTSClient(p);
         
         // This should fail as it can't get the token
         try {
@@ -327,6 +329,13 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
 
         return stsClient.requestSecurityToken(endpointAddress);
+    }
+    
+    private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {
+        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        stsClient.setWsdlLocation(null);
+        stsClient.setLocation(null);
+        stsClient.getClient().destroy();
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
