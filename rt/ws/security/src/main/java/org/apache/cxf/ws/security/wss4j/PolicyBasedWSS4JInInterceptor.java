@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -408,15 +409,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 
                 if (xpaths != null) {
-                    for (String xPath : xpaths) {
-                        try {
-                            CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
-                                    namespaces, xPath, type, scope);
-                        } catch (WSSecurityException e) {
-                            ai.setNotAsserted("No " + type 
-                                    + " element found matching XPath " + xPath);
-                            return false;
-                        }
+                    try {
+                        CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
+                                namespaces, xpaths, type, scope);
+                    } catch (WSSecurityException e) {
+                        ai.setNotAsserted("No " + type 
+                                + " element found matching one of the XPaths " 
+                                + Arrays.toString(xpaths.toArray()));
+                        return false;
                     }
                 }
             }
