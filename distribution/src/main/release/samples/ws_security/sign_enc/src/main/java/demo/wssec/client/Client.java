@@ -73,7 +73,8 @@ public final class Client {
             outProps.put("signatureKeyIdentifier", "DirectReference");
             outProps.put("signatureParts",
                          "{Element}{" + WSU_NS + "}Timestamp;"
-                         + "{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body");
+                         + "{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
+                         + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
 
             bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
