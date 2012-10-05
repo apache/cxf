@@ -82,6 +82,7 @@ public final class Client {
 
             // Check to make sure that the SOAP Body and Timestamp were signed
             DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
+            coverageChecker.setSignAddressingHeaders(false);
             bus.getInInterceptors().add(coverageChecker);
 
             GreeterService service = new GreeterService();

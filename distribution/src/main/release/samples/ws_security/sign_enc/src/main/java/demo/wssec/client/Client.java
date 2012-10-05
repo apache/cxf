@@ -98,6 +98,7 @@ public final class Client {
             coverageChecker.setSignBody(true);
             coverageChecker.setSignTimestamp(true);
             coverageChecker.setEncryptBody(true);
+            coverageChecker.setSignAddressingHeaders(false);
             bus.getInInterceptors().add(coverageChecker);
 
             GreeterService service = new GreeterService();
