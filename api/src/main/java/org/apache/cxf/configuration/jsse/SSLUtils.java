@@ -192,7 +192,15 @@ public final class SSLUtils {
                              new Object[]{trustStoreLocation, e.getMessage()});
             } 
         } else {
-            trustedCertStore.load(new FileInputStream(trustStoreLocation), null);
+            FileInputStream trustStoreInputStream = null;
+            try {
+                trustStoreInputStream = new FileInputStream(trustStoreLocation);
+                trustedCertStore.load(trustStoreInputStream, null);
+            } finally {
+                if (trustStoreInputStream != null) {
+                    trustStoreInputStream.close();
+                }
+            }
         }
         
         TrustManagerFactory tmf  = 

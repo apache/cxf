@@ -122,7 +122,15 @@ public final class TLSParameterJaxBUtils {
                     : KeyStore.getInstance(type, provider);
 
         if (kst.isSetFile()) {
-            keyStore.load(new FileInputStream(kst.getFile()), password);
+            FileInputStream kstInputStream = null;
+            try {
+                kstInputStream = new FileInputStream(kst.getFile());
+                keyStore.load(kstInputStream, password);
+            } finally {
+                if (kstInputStream != null) {
+                    kstInputStream.close();
+                }
+            }
         } else if (kst.isSetResource()) {
             final java.io.InputStream is = getResourceAsStream(kst.getResource());
             if (is == null) {
@@ -137,10 +145,16 @@ public final class TLSParameterJaxBUtils {
         } else {
             String loc = SSLUtils.getKeystore(null, LOG);
             InputStream ins = null;
-            if (loc != null) {
-                ins = new FileInputStream(loc);
+            try {
+                if (loc != null) {
+                    ins = new FileInputStream(loc);
+                }
+                keyStore.load(ins, password);
+            } finally {
+                if (ins != null) {
+                    ins.close();
+                }
             }
-            keyStore.load(ins, password);
         }
         return keyStore;
     }

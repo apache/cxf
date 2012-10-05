@@ -230,7 +230,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         QName qn = a.getName();
         
         List<Interceptor<? extends org.apache.cxf.message.Message>> i = null;
-        if (useIn & !fault) {
+        if (useIn && !fault) {
             i = reg.getInInterceptorsForAssertion(qn);
         } else if (!useIn && !fault) {
             i = reg.getOutInterceptorsForAssertion(qn);

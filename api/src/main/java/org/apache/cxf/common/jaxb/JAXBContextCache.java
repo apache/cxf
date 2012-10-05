@@ -167,33 +167,32 @@ public final class JAXBContextCache {
                 }
             }
         }
-        if (context == null) {
-            try {
-                context = createContext(classes, map, typeRefs);
-            } catch (JAXBException ex) {
-                // load jaxb needed class and try to create jaxb context 
-                boolean added = addJaxbObjectFactory(ex, classes);
-                while (cachedContextAndSchemas == null && added) {
-                    try {
-                        context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
-                            public JAXBContext run() throws Exception {
-                                return JAXBContext.newInstance(classes
-                                                              .toArray(new Class[classes.size()]), null);
-                            }
-                        });
-                    } catch (PrivilegedActionException e) {
-                        throw ex;
-                    }
-                }
-                if (context == null) {
+
+        try {
+            context = createContext(classes, map, typeRefs);
+        } catch (JAXBException ex) {
+            // load jaxb needed class and try to create jaxb context 
+            boolean added = addJaxbObjectFactory(ex, classes);
+            while (cachedContextAndSchemas == null && added) {
+                try {
+                    context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
+                        public JAXBContext run() throws Exception {
+                            return JAXBContext.newInstance(classes
+                                                          .toArray(new Class[classes.size()]), null);
+                        }
+                    });
+                } catch (PrivilegedActionException e) {
                     throw ex;
                 }
             }
-            cachedContextAndSchemas = new CachedContextAndSchemas(context, classes);
-            synchronized (JAXBCONTEXT_CACHE) {
-                if (typeRefs == null || typeRefs.isEmpty()) {
-                    JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
-                }
+            if (context == null) {
+                throw ex;
+            }
+        }
+        cachedContextAndSchemas = new CachedContextAndSchemas(context, classes);
+        synchronized (JAXBCONTEXT_CACHE) {
+            if (typeRefs == null || typeRefs.isEmpty()) {
+                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
             }
         }
 

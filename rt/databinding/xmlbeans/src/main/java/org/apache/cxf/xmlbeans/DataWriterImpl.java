@@ -195,7 +195,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                 } else {
                     StaxUtils.copy(reader, output, true);
                 }
-            } else if (obj == null && needToRender(obj, part)) {
+            } else if (needToRender(obj, part)) {
                 output.writeStartElement(part.getConcreteName().getNamespaceURI(),
                                          part.getConcreteName().getLocalPart());
                 output.writeEndElement();

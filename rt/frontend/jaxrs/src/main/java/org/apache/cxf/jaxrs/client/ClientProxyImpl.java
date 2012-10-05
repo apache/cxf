@@ -287,10 +287,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 }
             } 
                         
-            if (t == null) {
-                t = convertToWebApplicationException(r);
-            }
-
+            t = convertToWebApplicationException(r);
             
             if (inMessage.getExchange().get(Message.RESPONSE_CODE) == null) {
                 throw t;
