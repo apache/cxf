@@ -33,7 +33,6 @@
 	</parent>
 
 	<properties>
-		<cxf.version>${project.version}</cxf.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -162,7 +161,7 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-bundle-jaxrs</artifactId>
-			<version>${cxf.version}</version>
+			<version>${project.version}</version>
 			<exclusions>
 				<!-- CXF's dependency tree includes JARs that are not OSGI bundles; we'll import the correct lines later -->
 				<exclusion>

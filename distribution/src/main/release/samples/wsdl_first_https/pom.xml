@@ -31,7 +31,6 @@
     </parent>
 
     <properties>
-        <cxf.version>${project.version}</cxf.version>
         <wsdl.location>${basedir}/src/main/config/hello_world.wsdl</wsdl.location>
     </properties>
 
@@ -209,17 +208,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
