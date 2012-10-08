@@ -388,10 +388,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     private boolean assertXPathTokens(AssertionInfoMap aim, 
                                    QName name, 
                                    Collection<WSDataRef> refs,
-                                   SoapMessage msg,
                                    Element soapEnvelope,
                                    CoverageType type,
-                                   CoverageScope scope) throws SOAPException {
+                                   CoverageScope scope,
+                                   final XPath xpath) throws SOAPException {
         Collection<AssertionInfo> ais = aim.get(name);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
@@ -409,9 +409,12 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 
                 if (xpaths != null) {
+                    if (namespaces != null) {
+                        xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+                    }
                     try {
                         CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
-                                namespaces, xpaths, type, scope);
+                                xpath, xpaths, type, scope);
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted("No " + type 
                                 + " element found matching one of the XPaths " 
@@ -586,12 +589,19 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             );
         }
         Element soapEnvelope = soapHeader.getOwnerDocument().getDocumentElement();
-        check &= assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, soapEnvelope,
-                CoverageType.SIGNED, CoverageScope.ELEMENT);
-        check &= assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, msg, soapEnvelope,
-                CoverageType.ENCRYPTED, CoverageScope.ELEMENT);
-        check &= assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, msg, 
-                soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT);
+        if (containsXPathPolicy(aim)) {
+            // XPathFactory and XPath are not thread-safe so we must recreate them
+            // each request.
+            final XPathFactory factory = XPathFactory.newInstance();
+            final XPath xpath = factory.newXPath();
+            
+            check &= assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, soapEnvelope,
+                    CoverageType.SIGNED, CoverageScope.ELEMENT, xpath);
+            check &= assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, soapEnvelope,
+                    CoverageType.ENCRYPTED, CoverageScope.ELEMENT, xpath);
+            check &= assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, 
+                    soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT, xpath);
+        }
         
         check &= assertHeadersExists(aim, msg, soapHeader);
         return check;
@@ -800,6 +810,22 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             if (ais != null && ais.size() > 0) {
                 return false;
             }
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean containsXPathPolicy(AssertionInfoMap aim) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_ELEMENTS);
+        if (ais != null && ais.size() > 0) {
+            return true;
+        }
+        ais = aim.get(SP12Constants.ENCRYPTED_ELEMENTS);
+        if (ais != null && ais.size() > 0) {
+            return true;
+        }
+        ais = aim.get(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (ais != null && ais.size() > 0) {
             return true;
         }
         return false;

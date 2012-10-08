@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +31,8 @@ import java.util.Vector;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Element;
 
@@ -37,6 +40,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
@@ -164,42 +168,54 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         
         CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
         
-        for (XPathExpression xPathExpression : this.xPaths) {
-            Collection<WSDataRef> refsToCheck = null;
+        if (this.xPaths != null && !this.xPaths.isEmpty()) {
+            // XPathFactory and XPath are not thread-safe so we must recreate them
+            // each request.
+            final XPathFactory factory = XPathFactory.newInstance();
+            final XPath xpath = factory.newXPath();
             
-            switch (xPathExpression.getType()) {
-            case SIGNED:
-                refsToCheck = signed;
-                break;
-            case ENCRYPTED:
-                refsToCheck = encrypted;
-                break;
-            default:
-                throw new IllegalStateException("Unexpected crypto type: " 
-                        + xPathExpression.getType());
+            if (this.prefixMap != null) {
+                xpath.setNamespaceContext(new MapNamespaceContext(this.prefixMap));
             }
-                    
-            try {
-                SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
-                Element documentElement = null;
-                if (saajDoc != null && saajDoc.getSOAPPart() != null) {
-                    documentElement = saajDoc.getSOAPPart().getEnvelope();
+            
+            for (XPathExpression xPathExpression : this.xPaths) {
+                Collection<WSDataRef> refsToCheck = null;
+                
+                switch (xPathExpression.getType()) {
+                case SIGNED:
+                    refsToCheck = signed;
+                    break;
+                case ENCRYPTED:
+                    refsToCheck = encrypted;
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected crypto type: " 
+                            + xPathExpression.getType());
                 }
-                CryptoCoverageUtil.checkCoverage(
-                        documentElement,
-                        refsToCheck,
-                        this.prefixMap, 
-                        xPathExpression.getXPath(),
-                        xPathExpression.getType(),
-                        xPathExpression.getScope());
-            } catch (WSSecurityException e) {
-                throw new SoapFault("No " + xPathExpression.getType()
-                        + " element found matching XPath "
-                        + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
-            } catch (SOAPException e) {
-                throw new SoapFault("No " + xPathExpression.getType()
-                        + " element found matching XPath "
-                        + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
+                        
+                try {
+                    SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
+                    Element documentElement = null;
+                    if (saajDoc != null && saajDoc.getSOAPPart() != null) {
+                        documentElement = saajDoc.getSOAPPart().getEnvelope();
+                    }
+                    
+                    CryptoCoverageUtil.checkCoverage(
+                            documentElement,
+                            refsToCheck,
+                            xpath, 
+                            Arrays.asList(xPathExpression.getXPath()),
+                            xPathExpression.getType(),
+                            xPathExpression.getScope());
+                } catch (WSSecurityException e) {
+                    throw new SoapFault("No " + xPathExpression.getType()
+                            + " element found matching XPath "
+                            + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
+                } catch (SOAPException e) {
+                    throw new SoapFault("No " + xPathExpression.getType()
+                            + " element found matching XPath "
+                            + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
+                }
             }
         }
     }
