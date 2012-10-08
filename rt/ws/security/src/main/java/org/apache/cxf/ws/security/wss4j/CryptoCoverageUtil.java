@@ -256,6 +256,23 @@ public final class CryptoCoverageUtil {
             xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
         }
         
+        checkCoverage(soapEnvelope, refs, xpath, xPaths, type, scope);
+    }
+    
+    /**
+     * Checks that the references provided refer to the required
+     * signed/encrypted elements as defined by the XPath expressions in {@code
+     * xPaths}.
+     */
+    public static void checkCoverage(
+            Element soapEnvelope,
+            final Collection<WSDataRef> refs,
+            final XPath xpath,
+            Collection<String> xPaths,
+            CoverageType type,
+            CoverageScope scope
+    ) throws WSSecurityException {
+        
         // For each XPath
         for (String xpathString : xPaths) {
             // Get the matching nodes
