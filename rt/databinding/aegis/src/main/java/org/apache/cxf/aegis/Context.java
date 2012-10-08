@@ -43,6 +43,7 @@ public class Context {
     public Context(AegisContext aegisContext) {
         this.globalContext = aegisContext;
         this.properties = new HashMap<Class<?>, Object>();
+        this.namedProperties = new HashMap<String, Object>();
     }
 
     public TypeMapping getTypeMapping() {

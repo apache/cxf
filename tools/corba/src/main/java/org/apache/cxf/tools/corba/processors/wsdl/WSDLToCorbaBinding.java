@@ -263,7 +263,7 @@ public class WSDLToCorbaBinding {
         // jwsdl model should have all other bindings in it.
         String pfx = definition.getPrefix(CorbaConstants.NU_WSDL_CORBA);
         if (pfx == null) {
-            pfx = new String("corba");
+            pfx = "corba";
             def.addNamespace(pfx, CorbaConstants.NU_WSDL_CORBA);
         }
 
@@ -322,7 +322,7 @@ public class WSDLToCorbaBinding {
 
         String corbaPrefix = definition.getPrefix(CorbaConstants.NU_WSDL_CORBA);
         if (corbaPrefix == null) {
-            corbaPrefix = new String("corba");
+            corbaPrefix = "corba";
             def.addNamespace(corbaPrefix, CorbaConstants.NU_WSDL_CORBA);
         }
 

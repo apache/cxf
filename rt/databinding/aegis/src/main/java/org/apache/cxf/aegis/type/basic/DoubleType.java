@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 public class DoubleType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return new Double(reader.getValueAsDouble());
+        return Double.valueOf(reader.getValueAsDouble());
     }
 
     @Override
@@ -37,7 +37,7 @@ public class DoubleType extends AegisType {
         if (object instanceof Double) {
             writer.writeValueAsDouble((Double)object);
         } else {
-            writer.writeValueAsDouble(new Double(((Number)object).doubleValue()));
+            writer.writeValueAsDouble(Double.valueOf(((Number)object).doubleValue()));
         }
     }
 }

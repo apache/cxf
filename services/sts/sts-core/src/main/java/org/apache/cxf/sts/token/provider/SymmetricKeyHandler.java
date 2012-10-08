@@ -114,7 +114,7 @@ public class SymmetricKeyHandler {
                 if (((long)secretValue.length * 8L) < signatureProperties.getMinimumKeySize()
                     || ((long)secretValue.length * 8L) > signatureProperties.getMaximumKeySize()) {
                     LOG.log(
-                        Level.WARNING, "Received secret of length " + secret.length 
+                        Level.WARNING, "Received secret of length " + secretValue.length 
                         + " bits is not accepted" 
                     );
                     LOG.log(Level.WARNING, "User Entropy rejected");

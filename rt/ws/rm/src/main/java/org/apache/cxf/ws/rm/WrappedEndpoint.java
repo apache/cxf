@@ -121,7 +121,7 @@ public class WrappedEndpoint implements Endpoint {
     }
 
     public Object get(Object key) {
-        if (MAPAggregator.USING_ADDRESSING == key) {
+        if (MAPAggregator.USING_ADDRESSING.equals(key)) {
             return usingAddressing;
         }
         return wrappedEndpoint.get(key);
@@ -136,7 +136,7 @@ public class WrappedEndpoint implements Endpoint {
     }
 
     public Object put(String key, Object value) {
-        if (MAPAggregator.USING_ADDRESSING == key) {
+        if (MAPAggregator.USING_ADDRESSING.equals(key)) {
             usingAddressing = (Boolean)value;
             return null;
         }

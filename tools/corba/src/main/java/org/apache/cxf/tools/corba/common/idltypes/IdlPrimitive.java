@@ -54,92 +54,92 @@ public final class IdlPrimitive extends IdlDefnImplBase implements IdlType {
 
         switch (type) {
         case LONG:
-            name = new String("long");
-            wsdlName = new String("long");
+            name = "long";
+            wsdlName = "long";
 
             break;
 
         case ULONG:
-            name = new String("unsigned long");
-            wsdlName = new String("ulong");
+            name = "unsigned long";
+            wsdlName = "ulong";
 
             break;
 
         case LONGLONG:
-            name = new String("long long");
-            wsdlName = new String("longlong");
+            name = "long long";
+            wsdlName = "longlong";
 
             break;
 
         case ULONGLONG:
-            name = new String("unsigned long long");
-            wsdlName = new String("ulonglong");
+            name = "unsigned long long";
+            wsdlName = "ulonglong";
 
             break;
 
         case SHORT:
-            name = new String("short");
-            wsdlName = new String("short");
+            name = "short";
+            wsdlName = "short";
 
             break;
 
         case USHORT:
-            name = new String("unsigned short");
-            wsdlName = new String("ushort");
+            name = "unsigned short";
+            wsdlName = "ushort";
 
             break;
 
         case FLOAT:
-            name = new String("float");
-            wsdlName = new String("float");
+            name = "float";
+            wsdlName = "float";
 
             break;
 
         case DOUBLE:
-            name = new String("double");
-            wsdlName = new String("double");
+            name = "double";
+            wsdlName = "double";
 
             break;
 
         case LONGDOUBLE:
-            name = new String("long double");
-            wsdlName = new String("longdouble");
+            name = "long double";
+            wsdlName = "longdouble";
 
             break;
 
         case CHAR:
-            name = new String("char");
-            wsdlName = new String("char");
+            name = "char";
+            wsdlName = "char";
 
             break;
 
         case WCHAR:
-            name = new String("wchar");
-            wsdlName = new String("wchar");
+            name = "wchar";
+            wsdlName = "wchar";
 
             break;
 
         case BOOLEAN:
-            name = new String("boolean");
-            wsdlName = new String("boolean");
+            name = "boolean";
+            wsdlName = "boolean";
 
             break;
 
         case OCTET:
-            name = new String("octet");
-            wsdlName = new String("octet");
+            name = "octet";
+            wsdlName = "octet";
 
             break;
 
         case ANY:
-            name = new String("any");
-            wsdlName = new String("any");
+            name = "any";
+            wsdlName = "any";
 
             break;
 
         case DATETIME:
-            name = new String("TimeBase::UtcT");
-            wsdlName = new String("dateTime");
+            name = "TimeBase::UtcT";
+            wsdlName = "dateTime";
 
             break;
             

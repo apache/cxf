@@ -30,7 +30,7 @@ public class FloatType extends AegisType {
 
     @Override
     public Object readObject(MessageReader reader, Context context) {
-        return new Float(reader.getValueAsFloat());
+        return Float.valueOf(reader.getValueAsFloat());
     }
 
     @Override
@@ -38,7 +38,7 @@ public class FloatType extends AegisType {
         if (object instanceof Float) {
             writer.writeValueAsFloat((Float)object);
         } else {
-            writer.writeValueAsFloat(new Float(((Number)object).floatValue()));
+            writer.writeValueAsFloat(Float.valueOf(((Number)object).floatValue()));
         }
     }
 }
