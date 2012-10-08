@@ -121,6 +121,24 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="ContentEncryptedElements"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509ContentEncryptedElements" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItContentEncryptedElementsPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="Asymmetric"
        address="http://localhost:${testutil.ports.Server}/DoubleItX509Asymmetric" 
        serviceName="s:DoubleItService"
