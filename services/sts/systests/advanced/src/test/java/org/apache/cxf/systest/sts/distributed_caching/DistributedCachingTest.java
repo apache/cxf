@@ -96,6 +96,7 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
         // Transport port
         doubleIt(transportPort, 25);
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
     
@@ -118,6 +119,7 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
         // Transport port
         doubleIt(transportPort, 25);
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
     
@@ -140,6 +142,7 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
         // Transport port
         doubleIt(transportPort, 25);
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
 

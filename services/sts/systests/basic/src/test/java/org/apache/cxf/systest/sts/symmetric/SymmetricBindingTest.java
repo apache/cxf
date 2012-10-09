@@ -101,6 +101,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
 
         TokenTestUtils.verifyToken(symmetricSaml1Port);
         
+        ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
 
@@ -128,12 +129,11 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
 
         TokenTestUtils.verifyToken(symmetricSaml2Port);
         
+        ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
     
-    // TODO Re-enable this when we pick up WSS4J 1.6.7
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenSAML1Encrypted() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SymmetricBindingTest.class.getResource("cxf-client.xml");
@@ -154,6 +154,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
 
         doubleIt(symmetricSaml1Port, 25);
 
+        ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
 

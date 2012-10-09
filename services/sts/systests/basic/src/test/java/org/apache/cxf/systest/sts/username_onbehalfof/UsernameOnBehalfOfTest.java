@@ -114,6 +114,8 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         );
         doubleIt(bearerPort, 25);
         
+        ((java.io.Closeable)bearerPort).close();
+        
         DoubleItPortType bearerPort2 = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(bearerPort2, PORT);
@@ -131,6 +133,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)bearerPort2).close();
         bus.shutdown(true);
     }
     
@@ -183,6 +186,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         // This invocation should be successful as the token is cached
         doubleIt(bearerPort, 25);
         
+        ((java.io.Closeable)bearerPort).close();
         // 
         // Proxy no. 2
         //
@@ -222,6 +226,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)bearerPort2).close();
         bus.shutdown(true);
     }
     
@@ -316,6 +321,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             //
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     
@@ -411,6 +417,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             //
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     
@@ -474,6 +481,7 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             //
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     

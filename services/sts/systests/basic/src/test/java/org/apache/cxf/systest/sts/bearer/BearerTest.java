@@ -111,6 +111,7 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml2Port, 45);
         
+        ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
     
@@ -160,6 +161,7 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml2Port, 50);
         
+        ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
     

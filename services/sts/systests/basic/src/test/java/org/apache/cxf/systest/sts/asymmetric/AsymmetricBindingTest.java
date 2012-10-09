@@ -99,6 +99,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         }
         
         doubleIt(asymmetricSaml1Port, 25);
+        
+        ((java.io.Closeable)asymmetricSaml1Port).close();
         bus.shutdown(true);
     }
 
@@ -125,6 +127,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         doubleIt(asymmetricSaml2Port, 30);
 
         TokenTestUtils.verifyToken(asymmetricSaml2Port);
+        
+        ((java.io.Closeable)asymmetricSaml2Port).close();
         bus.shutdown(true);
     }
 
@@ -149,6 +153,8 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         }
         
         doubleIt(asymmetricSaml1EncryptedPort, 40);
+        
+        ((java.io.Closeable)asymmetricSaml1EncryptedPort).close();
         bus.shutdown(true);
     }
 

@@ -110,6 +110,7 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
 
         doubleIt(transportPort, 25);
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
     
@@ -140,6 +141,7 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
             // expected
         }
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
     

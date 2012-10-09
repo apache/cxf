@@ -93,6 +93,7 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
 
         doubleIt(transportSaml2Port, 25);
         
+        ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
     
