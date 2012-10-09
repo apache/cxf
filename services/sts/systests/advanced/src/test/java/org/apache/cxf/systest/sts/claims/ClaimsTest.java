@@ -88,6 +88,7 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportClaimsPort, 25);
         
+        ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
     
@@ -115,6 +116,7 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
     
@@ -137,6 +139,7 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportClaimsPort, 25);
         
+        ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
     

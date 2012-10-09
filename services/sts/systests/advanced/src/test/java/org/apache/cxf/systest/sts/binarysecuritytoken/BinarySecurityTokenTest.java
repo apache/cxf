@@ -87,6 +87,7 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
         
         doubleIt(asymmetricBSTPort, 25);
         
+        ((java.io.Closeable)asymmetricBSTPort).close();
         bus.shutdown(true);
     }
     
@@ -116,6 +117,7 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
                 || message.contains("Validation of security token failed"));
         }
         
+        ((java.io.Closeable)asymmetricBSTPort).close();
         bus.shutdown(true);
     }
     

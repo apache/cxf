@@ -88,6 +88,7 @@ public class TransformationTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportUTPort, 25);
         
+        ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
     

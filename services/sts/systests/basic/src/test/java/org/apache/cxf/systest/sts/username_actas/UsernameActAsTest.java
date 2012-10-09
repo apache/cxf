@@ -110,6 +110,8 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         );
         doubleIt(bearerPort, 25);
         
+        ((java.io.Closeable)bearerPort).close();
+        
         DoubleItPortType bearerPort2 = 
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(bearerPort2, PORT);
@@ -128,6 +130,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)bearerPort2).close();
         bus.shutdown(true);
     }
     
@@ -214,6 +217,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     
@@ -304,6 +308,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
             //
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     
@@ -395,6 +400,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
             //
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     
@@ -454,6 +460,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
             //
         }
         
+        ((java.io.Closeable)bearerPort).close();
         bus.shutdown(true);
     }
     

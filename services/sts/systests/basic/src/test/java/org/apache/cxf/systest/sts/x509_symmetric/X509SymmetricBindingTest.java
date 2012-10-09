@@ -100,6 +100,7 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
 
         doubleIt(symmetricSaml1Port, 25);
         
+        ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
 
@@ -127,6 +128,7 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
 
         TokenTestUtils.verifyToken(symmetricSaml2Port);
         
+        ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
     
@@ -152,6 +154,7 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         
         doubleIt(symmetricSaml2Port, 30);
 
+        ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
 

@@ -114,6 +114,7 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
         // even though its STSClient is disabled after the first invocation
         doubleIt(transportPort, 30);
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
     
