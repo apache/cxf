@@ -83,6 +83,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -109,6 +110,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -135,6 +137,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -161,6 +164,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -187,6 +191,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -213,6 +218,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -239,6 +245,7 @@ public class UsernameTokenDerivedTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     

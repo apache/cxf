@@ -78,6 +78,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -100,6 +101,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -122,6 +124,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -144,6 +147,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -165,6 +169,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -186,6 +191,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -207,6 +213,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(utPort, PORT);
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -235,6 +242,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error));
         }
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -271,6 +279,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error));
         }
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     

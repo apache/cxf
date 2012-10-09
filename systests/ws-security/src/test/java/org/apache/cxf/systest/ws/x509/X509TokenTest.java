@@ -21,9 +21,6 @@ package org.apache.cxf.systest.ws.x509;
 
 import java.net.URL;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
@@ -38,9 +35,7 @@ import org.apache.cxf.systest.ws.x509.server.Intermediary;
 import org.apache.cxf.systest.ws.x509.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
 
 /**
@@ -54,21 +49,19 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
-    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
-            "Server failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Server.class, true)
+                "Server failed to launch",
+                // run the server in the same process
+                // set this to false to fork
+                launchServer(Server.class, true)
         );
         assertTrue(
-            "Intermediary failed to launch",
-            // run the server in the same process
-            // set this to false to fork
-            launchServer(Intermediary.class, true)
+                "Intermediary failed to launch",
+                // run the server in the same process
+                // set this to false to fork
+                launchServer(Intermediary.class, true)
         );
     }
     
@@ -80,9 +73,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testKeyIdentifier() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -99,14 +89,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testKeyIdentifierJaxwsClient() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/jaxws-client.xml");
@@ -128,14 +116,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testIntermediary() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/intermediary-client.xml");
@@ -153,14 +139,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testIssuerSerial() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -177,14 +161,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testThumbprint() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -201,14 +183,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testContentEncryptedElements() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -225,14 +205,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricIssuerSerial() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -249,14 +227,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricThumbprint() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -273,14 +249,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricProtectTokens() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -297,14 +271,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testSymmetricProtectTokens() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -321,14 +293,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportEndorsing() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -345,14 +315,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportEndorsingSP11() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -369,14 +337,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportSignedEndorsing() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -393,14 +359,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportEndorsingEncrypted() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -417,14 +381,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportSignedEndorsingEncrypted() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -441,14 +403,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricSignature() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -465,14 +425,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricSignatureSP11() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -489,14 +447,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricEncryption() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -513,14 +469,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricSignatureReplay() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -551,14 +505,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error));
         }
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportSupportingSigned() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -574,13 +526,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportSupportingSignedCertConstraints() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -612,13 +564,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
     
         x509Port.doubleIt(25);
+        
+        ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testTransportKVT() throws Exception {
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -635,26 +587,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         updateAddressPort(x509Port, PORT2);
         x509Port.doubleIt(25);
         
+        ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
-    }
-    
-    private boolean checkUnrestrictedPoliciesInstalled() {
-        try {
-            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
-
-            SecretKey key192 = new SecretKeySpec(
-                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
-                            "AES");
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key192);
-            c.doFinal(data);
-            return true;
-        } catch (Exception e) {
-            //
-        }
-        return false;
     }
     
 }

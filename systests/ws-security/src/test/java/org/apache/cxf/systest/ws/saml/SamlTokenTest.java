@@ -21,9 +21,6 @@ package org.apache.cxf.systest.ws.saml;
 
 import java.net.URL;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
@@ -36,9 +33,7 @@ import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
 
 /**
@@ -51,8 +46,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
-    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -109,15 +102,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml1Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testSaml2OverSymmetric() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -168,6 +159,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -179,9 +171,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSaml2OverSymmetricSupporting() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -207,16 +196,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains("Assertion fails sender-vouches requirements"));
         }
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSaml2OverAsymmetric() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
-        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -254,6 +240,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -280,6 +267,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml1Port).close();
         bus.shutdown(true);
     }
     
@@ -306,15 +294,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml1Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testAsymmetricSamlInitiator() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -337,15 +323,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testSaml2OverSymmetricSignedElements() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -366,6 +350,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -395,6 +380,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -425,6 +411,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -454,16 +441,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
 
     @org.junit.Test
     public void testSaml2OverAsymmetricSignedEncrypted() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
-        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -484,16 +468,13 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
     public void testSaml2OverAsymmetricEncrypted() throws Exception {
 
-        if (!unrestrictedPoliciesInstalled) {
-            return;
-        }
-        
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = SamlTokenTest.class.getResource("client/client.xml");
 
@@ -516,6 +497,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -546,6 +528,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
@@ -574,26 +557,9 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error));
         }
         
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     
     
-    private boolean checkUnrestrictedPoliciesInstalled() {
-        try {
-            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
-
-            SecretKey key192 = new SecretKeySpec(
-                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
-                            "AES");
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key192);
-            c.doFinal(data);
-            return true;
-        } catch (Exception e) {
-            //
-        }
-        return false;
-    }
 }
