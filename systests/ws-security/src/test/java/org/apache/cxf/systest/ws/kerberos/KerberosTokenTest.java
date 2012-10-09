@@ -21,9 +21,6 @@ package org.apache.cxf.systest.ws.kerberos;
 
 import java.net.URL;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -32,9 +29,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.kerberos.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
-
 import org.junit.BeforeClass;
 
 /**
@@ -50,6 +45,7 @@ import org.junit.BeforeClass;
  * See here for more information:
  * http://coheigea.blogspot.com/2011/10/using-kerberos-with-web-services-part.html
  */
+@org.junit.Ignore
 public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
@@ -57,7 +53,8 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private boolean unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
+    private static boolean unrestrictedPoliciesInstalled = 
+            SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -76,7 +73,6 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverTransport() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -96,11 +92,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverSymmetric() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -125,11 +121,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverSymmetricSupporting() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -154,11 +150,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetric() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -183,11 +179,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverTransportEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -207,11 +203,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetricEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -231,11 +227,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverSymmetricProtection() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -255,12 +251,12 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverSymmetricDerivedProtection() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -280,11 +276,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetricSignedEndorsing() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -309,11 +305,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverAsymmetricSignedEncrypted() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -338,11 +334,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverSymmetricEndorsingEncrypted() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -367,11 +363,11 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKerberosOverSymmetricSignedEndorsingEncrypted() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -396,26 +392,9 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         int result = kerberosPort.doubleIt(25);
         assertTrue(result == 50);
         
+        ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
     
     
-    private boolean checkUnrestrictedPoliciesInstalled() {
-        try {
-            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
-
-            SecretKey key192 = new SecretKeySpec(
-                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
-                            "AES");
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key192);
-            c.doFinal(data);
-            return true;
-        } catch (Exception e) {
-            //
-        }
-        return false;
-    }
 }

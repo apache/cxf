@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.ws.wssec11;
 
+import java.io.IOException;
+
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec11.server.Server11;
 import org.apache.cxf.systest.ws.wssec11.server.Server11Restricted;
@@ -34,7 +36,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
     
     static {
-        unrestrictedPoliciesInstalled = checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     };
 
     @BeforeClass
@@ -68,7 +70,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
     }
 
     @Test
-    public void testClientServer() {
+    public void testClientServer() throws IOException {
         if ((!unrestrictedPoliciesInstalled)
                 && (WSSecurity11Common.isIBMJDK16())) {
             System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");

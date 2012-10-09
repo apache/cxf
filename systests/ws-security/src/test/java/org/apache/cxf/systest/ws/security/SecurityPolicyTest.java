@@ -236,6 +236,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         assertEquals(10, pt.doubleIt(5));
+        ((java.io.Closeable)pt).close();
         
         portQName = new QName(NAMESPACE, "DoubleItPortEncryptThenSign");
         pt = service.getPort(portQName, DoubleItPortType.class);
@@ -247,6 +248,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(5);
+        ((java.io.Closeable)pt).close();
 
         portQName = new QName(NAMESPACE, "DoubleItPortSign");
         pt = service.getPort(portQName, DoubleItPortType.class);
@@ -258,6 +260,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(5);
+        ((java.io.Closeable)pt).close();
 
         portQName = new QName(NAMESPACE, "DoubleItPortSignThenEncrypt");
         pt = service.getPort(portQName, DoubleItPortType.class);
@@ -274,6 +277,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       POLICY_SIGNENC_PROVIDER_ADDRESS);
         int x = pt.doubleIt(5);
         assertEquals(10, x);
+        ((java.io.Closeable)pt).close();
         
         portQName = new QName(NAMESPACE, "DoubleItPortHttps");
         pt = service.getPort(portQName, DoubleItPortType.class);
@@ -290,6 +294,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "bob");
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.PASSWORD, "pwd");
         pt.doubleIt(25);
+        ((java.io.Closeable)pt).close();
         
         try {
             portQName = new QName(NAMESPACE, "DoubleItPortHttp");
@@ -304,6 +309,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             }
         }
         
+        ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
     
@@ -333,6 +339,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("bob.properties"));
         //This should work as it should be properly signed.
         assertEquals(10, pt.doubleIt(5));
+        ((java.io.Closeable)pt).close();
         
         //Try sending a message with the "TimestampOnly" policy into affect to the 
         //service running the "signed only" policy.  This SHOULD fail as the
@@ -348,6 +355,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             assertTrue(ex.getMessage().contains("policy alternatives"));
         }
         
+        ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
     
@@ -478,6 +486,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("alice.properties"));
         assertEquals(10, pt.doubleIt(5));
+        
         ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
@@ -509,6 +518,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleIt di = new DoubleIt();
         di.setNumberToDouble(5);
         assertEquals(10, pt.doubleIt(di, 1).getDoubledNumber());
+        
         ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
@@ -551,6 +561,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Certificate revocation")
                        || errorMessage.contains("Error during certificate path validation"));
         }
+        
         ((java.io.Closeable)pt).close();
         bus.shutdown(true);
     }
@@ -570,8 +581,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         EndpointInfo ei = ep.getServer().getEndpoint().getEndpointInfo();
         setCryptoProperties(ei, "bob.properties", "revocation.properties");
         ei.setProperty(SecurityConstants.ENABLE_REVOCATION, Boolean.TRUE);
-
-        
         
         SpringBusFactory bf = new SpringBusFactory();
 
@@ -602,6 +611,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        || errorMessage.contains("Certificate revocation")
                        || errorMessage.contains("Error during certificate path validation"));
         }
+        
         ((java.io.Closeable)pt).close();
         ep.stop();
         epBus.shutdown(true);

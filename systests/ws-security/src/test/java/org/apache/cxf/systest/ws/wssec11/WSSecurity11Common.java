@@ -20,12 +20,10 @@
 package org.apache.cxf.systest.ws.wssec11;
 
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -34,7 +32,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssec11.server.Server11;
 import org.apache.cxf.systest.ws.wssec11.server.Server12;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 
 import wssec.wssec11.IPingService;
 import wssec.wssec11.PingService11;
@@ -49,7 +46,7 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
 
     public void runClientServer(
         String[] argv, boolean unrestrictedPoliciesInstalled, boolean wssecurity12
-    ) {
+    ) throws IOException {
         
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
@@ -84,6 +81,8 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
             
             final String output = port.echo(INPUT);
             assertEquals(INPUT, output);
+            
+            ((java.io.Closeable)port).close();
         }
         
         bus.shutdown(true);
@@ -99,26 +98,6 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         }
     }
 
-    
-    public static boolean checkUnrestrictedPoliciesInstalled() {
-        boolean unrestrictedPoliciesInstalled = false;
-        try {
-            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
-
-            SecretKey key192 = new SecretKeySpec(
-                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
-                            "AES");
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key192);
-            c.doFinal(data);
-            unrestrictedPoliciesInstalled = true;
-        } catch (Exception e) {
-            return unrestrictedPoliciesInstalled;
-        }
-        return unrestrictedPoliciesInstalled;
-    }
     
     public static boolean isIBMJDK16() {
         String fullVersion = System.getProperty("java.fullversion");
