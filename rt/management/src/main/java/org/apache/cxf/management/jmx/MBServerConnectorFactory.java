@@ -45,7 +45,6 @@ public final class MBServerConnectorFactory {
     
     private static final Logger LOG = LogUtils.getL7dLogger(MBServerConnectorFactory.class);
 
-    private static MBServerConnectorFactory factory;
     private static MBeanServer server;
 
     private static String serviceUrl = DEFAULT_SERVICE_URL;
@@ -57,6 +56,16 @@ public final class MBServerConnectorFactory {
     private static boolean daemon;
 
     private static JMXConnectorServer connectorServer;
+
+    private static class MBServerConnectorFactoryHolder {
+        private static final MBServerConnectorFactory INSTANCE = 
+            new MBServerConnectorFactory();
+    }
+
+    private static class MBeanServerHolder {
+        private static final MBeanServer INSTANCE = 
+            MBeanServerFactory.createMBeanServer(); 
+    }
     
     private MBServerConnectorFactory() {
         
@@ -87,10 +96,7 @@ public final class MBServerConnectorFactory {
     }
     
     public static MBServerConnectorFactory getInstance() {
-        if (factory == null) {
-            factory = new MBServerConnectorFactory();
-        } 
-        return factory;        
+        return MBServerConnectorFactoryHolder.INSTANCE;
     }  
     
     public void setMBeanServer(MBeanServer ms) {
@@ -116,9 +122,7 @@ public final class MBServerConnectorFactory {
 
     public void createConnector() throws IOException {
         
-        if (server == null) {
-            server = MBeanServerFactory.createMBeanServer(); 
-        }
+        server = MBeanServerHolder.INSTANCE;
         
         // Create the JMX service URL.
         JMXServiceURL url = new JMXServiceURL(serviceUrl);       

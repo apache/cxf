@@ -35,7 +35,6 @@ import org.apache.cxf.tools.java2wsdl.processor.internal.jaxws.WrapperUtil;
 import org.apache.cxf.tools.util.AnnotationUtil;
 
 public final class FrontendFactory {
-    private static FrontendFactory instance;
     private Class<?> serviceClass;
     private List<Method> wsMethods;
     
@@ -44,6 +43,11 @@ public final class FrontendFactory {
         = new Class[] {SOAPBinding.class,
                        WebService.class,
                        WebServiceProvider.class};
+
+    private static final class FrontendFactoryHolder {
+        private static final FrontendFactory INSTANCE = 
+            new FrontendFactory();
+    }
 
     public enum Style {
         Jaxws,
@@ -54,10 +58,7 @@ public final class FrontendFactory {
     }
 
     public static FrontendFactory getInstance() {
-        if (instance == null) {
-            instance = new FrontendFactory();
-        }
-        return instance;
+        return FrontendFactoryHolder.INSTANCE;
     }
 
     private boolean isJaxws() {

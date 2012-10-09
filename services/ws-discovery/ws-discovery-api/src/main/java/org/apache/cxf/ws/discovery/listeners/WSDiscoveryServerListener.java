@@ -31,10 +31,16 @@ import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
  * 
  */
 public class WSDiscoveryServerListener implements ServerLifeCycleListener {
-    static WSDiscoveryServiceImpl staticService;
-    
     final Bus bus;
     volatile WSDiscoveryServiceImpl service;
+
+    private static final class WSDiscoveryServiceImplHolder {
+        private static final WSDiscoveryServiceImpl INSTANCE;
+        static {
+            Bus bus = BusFactory.newInstance().createBus();
+            INSTANCE = new WSDiscoveryServiceImpl(bus);
+        }
+    }
     
     
     public WSDiscoveryServerListener(Bus bus) {
@@ -53,11 +59,7 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
     }
 
     private static WSDiscoveryServiceImpl getStaticService() {
-        if (staticService == null) {
-            Bus bus = BusFactory.newInstance().createBus();
-            staticService = new WSDiscoveryServiceImpl(bus);
-        }
-        return staticService;
+        return WSDiscoveryServiceImplHolder.INSTANCE;
     }
 
     public void startServer(Server server) {
