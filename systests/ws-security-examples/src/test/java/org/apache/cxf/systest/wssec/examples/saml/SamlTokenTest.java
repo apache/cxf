@@ -94,6 +94,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -119,6 +120,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -144,6 +146,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -169,6 +172,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -194,6 +198,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -220,6 +225,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -245,6 +251,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -270,6 +277,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -295,6 +303,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     
@@ -321,6 +330,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     

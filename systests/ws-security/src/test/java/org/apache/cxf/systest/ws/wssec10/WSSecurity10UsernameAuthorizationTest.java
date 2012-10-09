@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.ws.wssec10;
 
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -66,7 +67,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     }
 
     @Test
-    public void testClientServerUTOnlyAuthorized() {
+    public void testClientServerUTOnlyAuthorized() throws IOException {
 
         String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
@@ -75,11 +76,12 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         final String output = port.echo(INPUT);
         assertEquals(INPUT, output);
         
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
     @Test
-    public void testClientServerUTOnlyUnauthorized() {
+    public void testClientServerUTOnlyUnauthorized() throws IOException {
 
         String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
@@ -92,11 +94,12 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
             assertEquals("Unauthorized", ex.getMessage());
         }
         
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
     @Test
-    public void testClientServerComplexPolicyAuthorized() {
+    public void testClientServerComplexPolicyAuthorized() throws IOException {
 
         String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
@@ -105,11 +108,12 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         final String output = port.echo(INPUT);
         assertEquals(INPUT, output);
         
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
     @Test
-    public void testClientServerComplexPolicyUnauthorized() {
+    public void testClientServerComplexPolicyUnauthorized() throws IOException {
 
         String configName = "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
@@ -122,6 +126,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
             assertEquals("Unauthorized", ex.getMessage());
         }
         
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     

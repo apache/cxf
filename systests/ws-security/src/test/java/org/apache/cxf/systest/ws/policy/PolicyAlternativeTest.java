@@ -83,6 +83,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -113,6 +114,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -138,6 +140,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         
         utPort.doubleIt(25);
         
+        ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
     
@@ -168,6 +171,9 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
+        
+        ((java.io.Closeable)transportPort).close();
+        bus.shutdown(true);
     }
     
     /**
@@ -198,6 +204,9 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
+        
+        ((java.io.Closeable)transportPort).close();
+        bus.shutdown(true);
     }
     
 }

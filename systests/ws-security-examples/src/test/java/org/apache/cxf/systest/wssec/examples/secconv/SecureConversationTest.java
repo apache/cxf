@@ -83,6 +83,7 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         
         samlPort.doubleIt(25);
         
+        ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
     

@@ -32,11 +32,9 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.wssec10.server.Server;
-import org.apache.cxf.systest.ws.wssec11.WSSecurity11Common;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -55,7 +53,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     private static boolean unrestrictedPoliciesInstalled;
     
     static {
-        unrestrictedPoliciesInstalled = WSSecurity11Common.checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     };    
 
     @BeforeClass
@@ -119,6 +117,8 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
             http.setClient(httpClientPolicy);
             final String output = port.echo(INPUT);
             assertEquals(INPUT, output);
+            
+            cl.destroy();
         }
         
         bus.shutdown(true);
