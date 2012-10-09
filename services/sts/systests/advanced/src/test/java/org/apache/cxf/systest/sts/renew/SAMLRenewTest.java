@@ -129,6 +129,9 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
         stsClient.setTtl(300);
         doubleIt(saml2Port, 35);
         
+        ((java.io.Closeable)saml1Port).close();
+        ((java.io.Closeable)saml1BearerPort).close();
+        ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
     

@@ -130,6 +130,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
             // Expected
         }
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
     
@@ -170,6 +171,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
             // Expected
         }
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
     
@@ -220,6 +222,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         tok.setToken(storedToken);
         doubleIt(transportSaml1Port, 35);
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
     
@@ -257,6 +260,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         p.getRequestContext().put(SecurityConstants.USERNAME, "alice");
         doubleIt(transportUTPort, 35);
         
+        ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
     
@@ -296,6 +300,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         p.getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES, "clientKeystore.properties");
         doubleIt(bstPort, 35);
         
+        ((java.io.Closeable)bstPort).close();
         bus.shutdown(true);
     }
     

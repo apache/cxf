@@ -98,6 +98,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml1Port, 25);
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
 
@@ -123,6 +124,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml2Port, 30);
         
+        ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
     
@@ -159,6 +161,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
 
@@ -184,6 +187,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml1Port, 40);
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
     
@@ -219,6 +223,7 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
             // expected
         }
         
+        ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
 

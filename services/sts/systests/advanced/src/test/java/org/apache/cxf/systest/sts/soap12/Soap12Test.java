@@ -101,6 +101,7 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         
         doubleIt(transportSaml2Port, 30);
         
+        ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
     

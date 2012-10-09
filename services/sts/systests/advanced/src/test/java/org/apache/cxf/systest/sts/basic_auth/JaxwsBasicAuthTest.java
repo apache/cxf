@@ -87,6 +87,7 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
         
         doubleIt(port, 25);
         
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
@@ -116,6 +117,7 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
                 || message.contains("Validation of security token failed"));
         }
         
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 

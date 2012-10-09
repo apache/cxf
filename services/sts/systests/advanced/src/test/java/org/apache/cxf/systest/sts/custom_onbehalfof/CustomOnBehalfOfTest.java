@@ -94,6 +94,7 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
         );
         doubleIt(transportPort, 25);
         
+        ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
 
