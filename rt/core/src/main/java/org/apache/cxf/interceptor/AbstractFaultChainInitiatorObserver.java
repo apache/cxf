@@ -47,7 +47,9 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
 
     public AbstractFaultChainInitiatorObserver(Bus bus) {
         this.bus = bus;
-        loader = bus.getExtension(ClassLoader.class);
+        if (bus != null) {
+            loader = bus.getExtension(ClassLoader.class);
+        }
     }
 
     public void onMessage(Message message) {

@@ -45,6 +45,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -771,12 +772,10 @@ public class WadlGeneratorTest extends Assert {
     
     
     private Message mockMessage(String baseAddress, String pathInfo, String query,
-                                List<ClassResourceInfo> cris) {
+                                List<ClassResourceInfo> cris) throws Exception {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         e.put(Service.class, new JAXRSServiceImpl(cris));
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        e.put(Endpoint.class, endpoint);
         m.setExchange(e);
         control.reset();
         ServletDestination d = control.createMock(ServletDestination.class);
@@ -784,8 +783,10 @@ public class WadlGeneratorTest extends Assert {
         epr.setAddress(baseAddress);
         d.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(epr).anyTimes();
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(epr).anyTimes();
+
+        Endpoint endpoint = new EndpointImpl(null, null, epr);
+        e.put(Endpoint.class, endpoint);
+
         e.setDestination(d);
         BindingInfo bi = control.createMock(BindingInfo.class);
         epr.setBinding(bi);
