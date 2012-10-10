@@ -118,7 +118,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
-    private List<String> jaxbElementClassNames = Collections.emptyList();
+    private List<String> jaxbElementClassNames;
     private Map<String, Object> cProperties;
     private Map<String, Object> uProperties;
     
@@ -226,19 +226,34 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
         
-        boolean asJaxbElement = jaxbElementClassNames.contains(cls.getName());
+        Class<?> jaxbElementCls = jaxbElementClassNames == null ? null : getJaxbElementClass(cls);
+        boolean asJaxbElement = jaxbElementCls != null;
         if (!asJaxbElement && isXmlRoot(cls)) {
             return obj;
         }
-        
+        if (jaxbElementCls == null) {
+            jaxbElementCls = cls;
+        }
         QName name = null;
-        String expandedName = jaxbElementClassMap.get(cls.getName());
+        String expandedName = jaxbElementClassMap.get(jaxbElementCls.getName());
         if (expandedName != null) {
             name = JAXRSUtils.convertStringToQName(expandedName);
         } else if (marshalAsJaxbElement || asJaxbElement) {
-            name = getJaxbQName(cls, genericType, obj, false);
+            name = getJaxbQName(jaxbElementCls, genericType, obj, false);
         }
-        return name != null ? new JAXBElement<Object>(name, (Class)cls, null, obj) : obj;
+        return name != null ? new JAXBElement<Object>(name, (Class)jaxbElementCls, null, obj) : obj;
+    }
+    
+    protected Class<?> getJaxbElementClass(Class<?> cls) {
+        if (cls == Object.class) {
+            return null;
+        }
+        if (jaxbElementClassNames.contains(cls.getName())) {
+            return cls;    
+        } else {
+            return getJaxbElementClass(cls.getSuperclass());
+        }
+        
     }
     
     public void setCollectionWrapperName(String wName) {

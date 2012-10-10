@@ -126,6 +126,12 @@ public class BookStore {
     }
     
     @GET
+    @Path("object")
+    public Object getBookAsObject() {
+        return new Book("Book as Object", 125L);
+    }
+    
+    @GET
     @Path("/default")
     @Produces("application/xml")
     public Book getDefaultBook() {

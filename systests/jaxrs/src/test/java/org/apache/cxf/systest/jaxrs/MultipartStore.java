@@ -444,6 +444,26 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/filesform/singlefile")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookFilesFormSingleFile(@Multipart("owner") String name, 
+                                     @Multipart("file") List<Book> books) 
+        throws Exception {
+        if (books.size() != 1) {
+            throw new WebApplicationException();
+        }
+        Book b = books.get(0);
+        if (!"CXF in Action - 1".equals(b.getName())
+            || !"Larry".equals(name)) {
+            throw new WebApplicationException();
+        }
+        b.setId(124);
+        b.setName("CXF in Action - 2");
+        return Response.ok(b).build();
+    }
+    
+    @POST
     @Path("/books/filesform/mixup")
     @Produces("text/xml")
     @Consumes("multipart/form-data")
