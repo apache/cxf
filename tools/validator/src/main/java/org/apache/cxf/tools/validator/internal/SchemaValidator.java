@@ -252,7 +252,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
                 try {
                     String s = file.toURI().toURL().toString();
                     xsdUrls.add(s);
-                    if (s.indexOf("http-conf") > 0) {
+                    if (s.contains("http-conf")) {
                         xsdUrls.add(0, s);
                     }
                 } catch (MalformedURLException e) {

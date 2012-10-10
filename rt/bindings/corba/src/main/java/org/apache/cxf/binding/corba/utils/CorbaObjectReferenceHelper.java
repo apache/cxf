@@ -148,7 +148,7 @@ public final class CorbaObjectReferenceHelper {
     }
 
     public static String extractTypeIdFromIOR(String url) {        
-        String ret = new String();
+        String ret = "";
         byte data[] = DatatypeConverter.parseHexBinary(url.substring(4));
         if (data.length > 0) {
             // parse out type_id from IOR CDR encapsulation

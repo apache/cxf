@@ -527,8 +527,7 @@ public class WSDLToIDLAction {
             result = checkAnon(corbaTypeImpl, scope, local);
         } 
         
-        if (result == null
-            && corbaTypeImpl instanceof Object) {
+        if (result == null && corbaTypeImpl != null) {
             result = createInterface(corbaTypeImpl, scope, local);            
         }
         

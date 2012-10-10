@@ -226,7 +226,7 @@ public final class AttachmentUtil {
                 }
             }
             if (!StringUtils.isEmpty(fileName)) {
-                if (fileName.indexOf("\"") > 0) {
+                if (fileName.contains("\"")) {
                     fileName = fileName.substring(fileName.indexOf("\"") + 1, fileName.lastIndexOf("\""));
                 } else {
                     fileName = fileName.substring(fileName.indexOf("=") + 1);

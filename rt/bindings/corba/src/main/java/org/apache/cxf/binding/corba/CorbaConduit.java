@@ -147,10 +147,6 @@ public class CorbaConduit implements Conduit {
         }
     }
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public EndpointReferenceType getTarget() {
         return target;
     }
