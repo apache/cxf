@@ -195,23 +195,35 @@ public class MultipartProvider extends AbstractConfigurableProvider
         } else if (Attachment.class.isAssignableFrom(c)) {
             return multipart;
         } else {
+            boolean isCollection = Collection.class.isAssignableFrom(c);
+            boolean isRecursive = false;
             if (mediaTypeSupported(multipart.getContentType())) {
                 mc.put("org.apache.cxf.multipart.embedded", true);
                 mc.put("org.apache.cxf.multipart.embedded.ctype", multipart.getContentType());
                 mc.put("org.apache.cxf.multipart.embedded.input", 
                        multipart.getDataHandler().getInputStream());
                 anns = new Annotation[]{};
+                isRecursive = true;
             }
-            MessageBodyReader<Object> r = 
-                mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
-            if (r != null) {
-                InputStream is = multipart.getDataHandler().getInputStream();
-                is = decodeIfNeeded(multipart, is);
-                return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), 
-                                  is);
+            if (isCollection && !isRecursive) {
+                c = convertTypeToClass(t);
+                return Collections.singletonList(fromAttachment(multipart, c, c, anns));
+            } else {
+                MessageBodyReader<Object> r = 
+                    mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
+                if (r != null) {
+                    InputStream is = multipart.getDataHandler().getInputStream();
+                    is = decodeIfNeeded(multipart, is);
+                    return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), is);
+                }
             }
         }
         return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> Class<T> convertTypeToClass(Type t) {
+        return (Class<T>)InjectionUtils.getActualType(t, 0);
     }
     
     private InputStream decodeIfNeeded(Attachment multipart, InputStream is) {
