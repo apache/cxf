@@ -73,11 +73,11 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             "http://schemas.xmlsoap.org/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap12/",
-            "http://schemas.xmlsoap.org/soap/http/",
+            "http://schemas.xmlsoap.org/soap/http",
             "http://schemas.xmlsoap.org/wsdl/soap/http",
             "http://www.w3.org/2010/soapjms/",
-            "http://www.w3.org/2003/05/soap/bindings/HTTP/",
-            "http://schemas.xmlsoap.org/soap/http");
+            "http://www.w3.org/2003/05/soap/bindings/HTTP/"
+            );
     public static final Set<String> DEFAULT_PREFIXES 
         = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
             "soap.udp", "soap.tcp"
