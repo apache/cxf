@@ -628,13 +628,9 @@ public class ClientProxyImpl extends AbstractClient implements
                                                   : aMethod.getParameterAnnotations()[bodyIndex];
             try {
                 if (bodyIndex != -1) {
-                    Class<?> paramClass = method.getParameterTypes()[bodyIndex];
                     Type paramType = method.getGenericParameterTypes()[bodyIndex];
                     
-                    boolean isAssignable = paramClass.isAssignableFrom(body.getClass());
-                    writeBody(body, outMessage,
-                              isAssignable ? paramClass : body.getClass(),
-                              isAssignable ? paramType : body.getClass(),
+                    writeBody(body, outMessage, body.getClass(), paramType,
                               anns, os);
                 } else {
                     writeBody(body, outMessage, body.getClass(), body.getClass(), 

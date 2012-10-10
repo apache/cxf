@@ -218,7 +218,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 ? ori.getMethodToInvoke() : ori.getAnnotatedMethod();
         }
         boolean asyncResponse = exchange.get(AsyncResponse.class) != null;
-        Class<?> targetType = getRawResponseClass(invoked, responseObj, asyncResponse);
+        Class<?> targetType = getRawResponseClass(responseObj);
         Type genericType = getGenericResponseType(invoked, responseObj, targetType, asyncResponse);
         if (genericType instanceof TypeVariable) {
             genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
@@ -415,14 +415,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
     }
     
-    private Class<?> getRawResponseClass(Method invoked, Object targetObject, boolean async) {
+    private Class<?> getRawResponseClass(Object targetObject) {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             return ((GenericEntity<?>)targetObject).getRawType();
         } else {
             Class<?> targetClass = targetObject.getClass();
-            Class<?> responseClass = async || invoked == null 
-                || !invoked.getReturnType().isAssignableFrom(targetClass) ? targetClass : invoked.getReturnType(); 
-            return ClassHelper.getRealClassFromClass(responseClass);
+            return ClassHelper.getRealClassFromClass(targetClass);
         }
     }
     
