@@ -54,6 +54,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -161,7 +162,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         in.setElem3(45);
 
         try {            
-            ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
+            ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             MyComplexStruct out = greeter.sendReceiveData(in); 
             assertNotNull("no response received from service", out);
             assertEquals(in.getElem1(), out.getElem1());

@@ -133,10 +133,8 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         }
     }
     
-    
     protected boolean shouldValidate(Message m) {
-        SchemaValidationType type = ServiceUtils.getSchemaValidationType(m);
-        return type.equals(SchemaValidationType.BOTH) || type.equals(SchemaValidationType.OUT);
+        return ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, m);
     }
     
     protected boolean writeToOutputStream(Message m, BindingInfo info, Service s) {

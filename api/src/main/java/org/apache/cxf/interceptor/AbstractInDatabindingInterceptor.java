@@ -104,8 +104,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     }
 
     private void setSchemaInMessage(Service service, Message message, DataReader<?> reader) {
-        SchemaValidationType type = ServiceUtils.getSchemaValidationType(message);
-        if (type.equals(SchemaValidationType.BOTH) || type.equals(SchemaValidationType.IN)) {
+        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
             //all serviceInfos have the same schemas
             Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
                                                              message.getExchange().getBus());

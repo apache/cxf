@@ -265,21 +265,24 @@ public class ConfiguredEndpointTest extends Assert {
         BusFactory.setDefaultBus(cf.createBus(null, properties));
         initializeBus();
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, CXFBusFactory.class.getName());
-        doTestConfiguredServerEndpoint();
+        //doTestConfiguredServerEndpoint();
     }
     
     @Test
     public void testSpringConfiguredServerEndpoint() {
+        // FIXME - duplicating the config file just for one value is ugly, must be a better
+        // way.
+        doTestConfiguredServerEndpoint("true", "org/apache/cxf/jaxws/configured-endpoints.xml");
+        doTestConfiguredServerEndpoint("BOTH", "org/apache/cxf/jaxws/schemavalidationtype-configured-endpoints.xml");
+    }
+    
+    private void doTestConfiguredServerEndpoint(Object expectedValidionValue, String configFile) {
         SpringBusFactory sf = new SpringBusFactory();
         factory = sf;
         BusFactory.setDefaultBus(null);
-        BusFactory.setDefaultBus(sf.createBus("org/apache/cxf/jaxws/configured-endpoints.xml"));
+        BusFactory.setDefaultBus(sf.createBus(configFile));
         initializeBus();
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, SpringBusFactory.class.getName());
-        doTestConfiguredServerEndpoint();
-    }
-    
-    private void doTestConfiguredServerEndpoint() {
         
         Object implementor = new GreeterImpl(); 
         EndpointImpl ei = (EndpointImpl)(javax.xml.ws.Endpoint.create(implementor));
@@ -287,8 +290,8 @@ public class ConfiguredEndpointTest extends Assert {
         
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)ei.getEndpoint();
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-        assertTrue("Unexpected value for property validating", 
-                   Boolean.valueOf((String) ei.getProperties().get(Message.SCHEMA_VALIDATION_ENABLED)));
+        assertEquals("Unexpected value for property validating", 
+                     expectedValidionValue, ei.getProperties().get(Message.SCHEMA_VALIDATION_ENABLED));
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         assertEquals("Unexpected number of interceptors.", 5, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-in", 

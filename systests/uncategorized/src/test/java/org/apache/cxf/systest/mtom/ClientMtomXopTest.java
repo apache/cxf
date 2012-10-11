@@ -32,6 +32,7 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
@@ -46,6 +47,7 @@ import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.jaxws.binding.soap.SOAPBindingImpl;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 import org.apache.cxf.mtom_xop.TestMtomImpl;
@@ -94,7 +96,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
-
     @Test
     public void testMtomXop() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
@@ -118,59 +119,69 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                                                                                 fileSize);
             }
             
-            ((BindingProvider)mtomPort).getRequestContext().put("schema-validation-enabled",
-                                                                Boolean.TRUE);
-            param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-            name = new Holder<String>("call detail");
-            mtomPort.testXop(name, param);
-            assertEquals("name unchanged", "return detail + call detail", name.value);
-            assertNotNull(param.value);
+            Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
             
-            in = param.value.getInputStream();
-            bytes = IOUtils.readBytesFromStream(in);
-            assertEquals(data.length, bytes.length);
-            in.close();
-
-            param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-            name = new Holder<String>("call detail");
-            mtomPort.testXop(name, param);
-            assertEquals("name unchanged", "return detail + call detail", name.value);
-            assertNotNull(param.value);
-            
-            in = param.value.getInputStream();
-            bytes = IOUtils.readBytesFromStream(in);
-            assertEquals(data.length, bytes.length);
-            in.close();
-            ((BindingProvider)mtomPort).getRequestContext().put("schema-validation-enabled",
-                                                                Boolean.FALSE);
-            SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
-            SAAJInInterceptor saajIn = new SAAJInInterceptor();
-            param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-            name = new Holder<String>("call detail");
-            mtomPort.testXop(name, param);
-            assertEquals("name unchanged", "return detail + call detail", name.value);
-            assertNotNull(param.value);
-            
-            in = param.value.getInputStream();
-            bytes = IOUtils.readBytesFromStream(in);
-            assertEquals(data.length, bytes.length);
-            in.close();
-            
-            ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn); 
-            ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut); 
-            param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-            name = new Holder<String>("call detail");
-            mtomPort.testXop(name, param);
-            assertEquals("name unchanged", "return detail + call detail", name.value);
-            assertNotNull(param.value);
-            
-            in = param.value.getInputStream();
-            bytes = IOUtils.readBytesFromStream(in);
-            assertEquals(data.length, bytes.length);
-            in.close();
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                    validationType);
                 
-            ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajIn); 
-            ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajOut); 
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+                
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+           
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+                
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+            }
+            
+            validationTypes = new Object[]{Boolean.FALSE, SchemaValidationType.OUT, SchemaValidationType.NONE};
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                validationType);
+                SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
+                SAAJInInterceptor saajIn = new SAAJInInterceptor();
+                
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+                
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+                
+                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn); 
+                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut); 
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+                
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+                    
+                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajIn); 
+                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajOut); 
+            }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {
@@ -186,7 +197,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             throw ex;
         }
     }
-    
+
     @Test
     public void testMtomWithFileName() throws Exception {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
@@ -196,15 +207,16 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                         
             URL fileURL = getClass().getClassLoader().getResource("me.bmp");
             
-            ((BindingProvider)mtomPort).getRequestContext().put("schema-validation-enabled",
-                                                                Boolean.TRUE);
-            param.value = new DataHandler(fileURL);
-            name = new Holder<String>("have name");
-            mtomPort.testXop(name, param);
-            assertEquals("can't get file name", "return detail + me.bmp", name.value);
-            assertNotNull(param.value);
-                      
-           
+            Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                    validationType);
+                param.value = new DataHandler(fileURL);
+                name = new Holder<String>("have name");
+                mtomPort.testXop(name, param);
+                assertEquals("can't get file name", "return detail + me.bmp", name.value);
+                assertNotNull(param.value);
+            }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         } catch (Exception ex) {

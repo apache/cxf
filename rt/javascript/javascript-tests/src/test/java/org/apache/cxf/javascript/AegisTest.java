@@ -24,12 +24,15 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AegisServiceImpl;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.mozilla.javascript.Context;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -60,7 +63,7 @@ public class AegisTest extends JavascriptRhinoTest {
     public void before() throws Exception {
         setupRhino("aegis-service", 
                    "/org/apache/cxf/javascript/AegisTests.js",
-                   true);
+                   SchemaValidationType.BOTH);
         implementor = (AegisServiceImpl)rawImplementor;
         implementor.reset();
     }

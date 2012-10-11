@@ -34,6 +34,7 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -72,7 +73,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
             
             ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put("schema-validation-enabled",
+            properties.put(Message.SCHEMA_VALIDATION_ENABLED,
                            shouldValidate());
             ep.setProperties(properties);
             ep.publish(address);
@@ -116,7 +117,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", 
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, 
                                                            shouldValidate());
         LOG.fine("Created greeter client.");
        

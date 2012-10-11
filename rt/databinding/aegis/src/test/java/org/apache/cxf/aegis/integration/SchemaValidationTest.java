@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.ArrayService;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -39,7 +40,7 @@ import org.junit.Test;
  * 
  */
 public class SchemaValidationTest extends AbstractAegisTest {
-
+    private Server server;
     private ArrayService arrayService;
 
     @Before
@@ -47,13 +48,21 @@ public class SchemaValidationTest extends AbstractAegisTest {
         super.setUp();
         setEnableJDOM(true);
         arrayService = new ArrayService();
-        Server server = createService(ArrayService.class, 
+        server = createService(ArrayService.class, 
                                       arrayService, "Array", new QName("urn:Array", "Array"));
-        server.getEndpoint().getService().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE); 
     }
     
     @Test
     public void testInvalidArray() throws Exception {
+        assertTrue(testInvalidArray(Boolean.TRUE));
+        assertTrue(testInvalidArray(SchemaValidationType.BOTH));
+        assertTrue(testInvalidArray(SchemaValidationType.IN));
+        assertFalse(testInvalidArray(SchemaValidationType.OUT));
+        assertFalse(testInvalidArray(Boolean.FALSE));
+    }
+    
+    private boolean testInvalidArray(Object validationType) throws Exception {
+        server.getEndpoint().getService().put(Message.SCHEMA_VALIDATION_ENABLED, validationType); 
         Node r = invoke("Array", "/org/apache/cxf/aegis/integration/invalidArrayMessage.xml");
         assertNotNull(r);
         StringWriter out = new StringWriter();
@@ -61,6 +70,6 @@ public class SchemaValidationTest extends AbstractAegisTest {
         StaxUtils.writeNode(r, writer, true);
         writer.flush();
         String m = out.toString();
-        assertTrue(m.contains("Fault"));
+        return m.contains("Fault");
     }
 }

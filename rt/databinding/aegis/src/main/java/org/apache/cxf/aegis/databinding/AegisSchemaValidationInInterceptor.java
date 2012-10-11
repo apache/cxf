@@ -25,9 +25,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.message.Message;
@@ -61,8 +63,7 @@ public class AegisSchemaValidationInInterceptor extends AbstractPhaseInterceptor
     }
     
     private void setSchemaInMessage(Message message, XMLStreamReader reader) throws XMLStreamException  {
-        Object en = message.getContextualProperty(org.apache.cxf.message.Message.SCHEMA_VALIDATION_ENABLED);
-        if (Boolean.TRUE.equals(en) || "true".equals(en)) {
+        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
             StaxValidationManager mgr = bus.getExtension(StaxValidationManager.class);
             if (mgr != null) {
                 mgr.setupValidation(reader, service);

@@ -51,7 +51,8 @@ public class RPCClientTest extends JavascriptRhinoTest {
     @Before
     public void before() throws Exception {
         setupRhino("rpc-service-endpoint", 
-                   "/org/apache/cxf/javascript/RPCTests.js", false); 
+                   "/org/apache/cxf/javascript/RPCTests.js", 
+                   Boolean.FALSE); 
         implementor = (SimpleRPCImpl)rawImplementor;
         implementor.resetLastValues();
     }

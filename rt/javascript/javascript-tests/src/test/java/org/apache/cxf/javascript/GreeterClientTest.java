@@ -22,6 +22,7 @@ package org.apache.cxf.javascript;
 import java.io.File;
 import java.net.URL;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.javascript.JavascriptTestUtilities.CountDownNotifier;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
@@ -50,7 +51,7 @@ public class GreeterClientTest extends JavascriptRhinoTest {
     void before() throws Exception {
         setupRhino("greeter-service-endpoint",  
                    "/org/apache/cxf/javascript/GreeterTests.js",
-                   true);
+                   SchemaValidationType.BOTH);
     }
     
     private Void sayHiCaller(Context context) {

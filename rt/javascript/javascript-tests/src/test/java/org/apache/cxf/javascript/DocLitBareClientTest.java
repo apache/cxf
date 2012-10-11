@@ -21,6 +21,7 @@ package org.apache.cxf.javascript;
 
 import java.util.logging.Logger;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
@@ -61,7 +62,7 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
     public void before() throws Exception {
         setupRhino("dlb-service-endpoint", 
                    "/org/apache/cxf/javascript/DocLitBareTests.js",
-                   true);
+                   SchemaValidationType.BOTH);
         implementor = (SimpleDocLitBareImpl)rawImplementor;
         implementor.resetLastValues();
     }

@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -83,15 +84,46 @@ public class ReadHeaderInterceptorTest extends TestBase {
 
     @Test
     public void testNoClosingEnvTage() throws Exception {
+        assertTrue(testNoClosingEnvTag(Boolean.TRUE));
+    }
+    
+    @Test
+    public void testNoClosingEnvTagValidationTypeBoth() throws Exception {
+        assertTrue(testNoClosingEnvTag(SchemaValidationType.BOTH));
+    }
+    
+    @Test
+    public void testNoClosingEnvTagValidationTypeIn() throws Exception {
+        assertTrue(testNoClosingEnvTag(SchemaValidationType.IN));
+    }
+    
+    @Test
+    public void testNoClosingEnvTagValidationTypeOut() throws Exception {
+        assertFalse(testNoClosingEnvTag(SchemaValidationType.OUT));
+    }
+    
+    @Test
+    public void testNoClosingEnvTagValidationTypeNone() throws Exception {
+        assertFalse(testNoClosingEnvTag(SchemaValidationType.NONE));
+    }
+    
+    @Test
+    public void testNoClosingEnvTagValidationTypeFalse() throws Exception {
+        assertFalse(testNoClosingEnvTag(Boolean.FALSE));
+    }
+    
+    private boolean testNoClosingEnvTag(Object validationType) {
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
         InputStream in = getClass().getResourceAsStream("test-no-endenv.xml");
         assertNotNull(in);
-        soapMessage.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
+        
+        soapMessage.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
         soapMessage.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(in));
 
         soapMessage.getInterceptorChain().doIntercept(soapMessage);
-        assertNotNull(soapMessage.getContent(Exception.class));
+        return soapMessage.getContent(Exception.class) != null;
     }
+    
     @Test
     public void testHandleHeader() {
         try {
