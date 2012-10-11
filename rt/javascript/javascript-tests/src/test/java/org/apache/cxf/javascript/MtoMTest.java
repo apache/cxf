@@ -22,6 +22,7 @@ package org.apache.cxf.javascript;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
@@ -57,7 +58,7 @@ public class MtoMTest extends JavascriptRhinoTest {
     public void before() throws Exception {
         setupRhino("mtom-service-endpoint", 
                    "/org/apache/cxf/javascript/MtoMTests.js",
-                   false);
+                   SchemaValidationType.NONE);
         implementor = (MtoMImpl)rawImplementor;
         implementor.reset();
     }

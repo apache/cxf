@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
@@ -36,7 +37,7 @@ public class XMLServer extends AbstractBusTestServerBase {
         Object implementor = new HWDOMSourcePayloadXMLBindingProvider();
         Endpoint ep = Endpoint.create(implementor);
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("schema-validation-enabled", Boolean.TRUE);
+        map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
         ep.setProperties(map);
         ep.publish(ADDRESS);
     }

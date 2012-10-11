@@ -47,7 +47,7 @@ public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
 
     public void setupRhino(String serviceEndpointBean, 
                            String testsJavascript,
-                           boolean validation) throws Exception {
+                           Object validationType) throws Exception {
         testUtilities.setBus(getBean(Bus.class, "cxf"));
         testUtilities.initializeRhino();
         serverFactoryBean = getBean(ServerFactoryBean.class, serviceEndpointBean);
@@ -62,9 +62,8 @@ public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
         serviceInfo = serviceInfos.get(0);
         testUtilities.loadJavascriptForService(serviceInfo);
         testUtilities.readResourceIntoRhino(testsJavascript);
-        if (validation) {
-            endpoint.getService().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
-        }
+        
+        endpoint.getService().put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
     }
     
     protected String getAddress() {

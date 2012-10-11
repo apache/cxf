@@ -25,9 +25,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -83,10 +85,9 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             
             try {
                 MessageContentsList newObjs = new MessageContentsList();
-                Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
                 // set the validate option for XMLBeans Wrapper Helper
-                if (Boolean.TRUE.equals(en) || "true".equals(en)) {
-                    try {                        
+                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
+                    try {
                         Class<?> xmlBeanWrapperHelperClass = 
                             Class.forName("org.apache.cxf.xmlbeans.XmlBeansWrapperHelper");
                         if (xmlBeanWrapperHelperClass.isInstance(helper)) {

@@ -62,7 +62,7 @@ public class AnyTest extends JavascriptRhinoTest {
     public void before() throws Exception {
         setupRhino("any-service-endpoint", 
                    "/org/apache/cxf/javascript/AnyTests.js",
-                   true);
+                   Boolean.TRUE);
         implementor = (AnyImpl)rawImplementor;
         implementor.reset();
     }

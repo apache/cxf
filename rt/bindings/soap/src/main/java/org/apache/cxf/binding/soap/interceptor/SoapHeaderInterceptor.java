@@ -33,11 +33,13 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.DocLiteralInInterceptor;
@@ -45,7 +47,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -108,9 +109,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         for (SoapHeaderInfo header : headers) {
             MessagePartInfo mpi = header.getPart();
             try {
-                if (MessageUtils.getContextualBoolean(message,
-                                                 org.apache.cxf.message.Message.SCHEMA_VALIDATION_ENABLED,
-                                                 Boolean.FALSE)) {
+                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
                     validateHeader(message, mpi, schema);
                 }
             } catch (Fault f) {

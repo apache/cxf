@@ -39,6 +39,7 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.MessageFlow;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -103,7 +104,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             String address = "http://localhost:" + port + "/SoapContext/GreeterPort";
             ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put("schema-validation-enabled", Boolean.TRUE);
+            properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
             LOG.info("Published greeter endpoint.");
@@ -152,7 +153,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         GreeterService gs = new GreeterService();
         greeter = gs.getGreeterPort();
         updateAddressPort(greeter, getPort());
-        ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
         out = new OutMessageRecorder();
         in = new InMessageRecorder();
 

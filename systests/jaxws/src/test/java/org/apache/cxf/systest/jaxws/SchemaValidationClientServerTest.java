@@ -35,6 +35,7 @@ import org.apache.cxf.jaxws.schemavalidation.CkResponseType;
 import org.apache.cxf.jaxws.schemavalidation.RequestIdType;
 import org.apache.cxf.jaxws.schemavalidation.Service;
 import org.apache.cxf.jaxws.schemavalidation.ServicePortType;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.BeforeClass;
@@ -55,7 +56,7 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             address = "http://localhost:" + PORT + "/schemavalidation";
             Endpoint ep = Endpoint.create(implementor);
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("schema-validation-enabled", Boolean.TRUE);
+            map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(map);
             ((EndpointImpl)ep).setWsdlLocation("wsdl_systest_jaxws/schemaValidation.wsdl");
             ((EndpointImpl)ep).setServiceName(new QName(
@@ -99,7 +100,7 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
         CkRequestType request = new CkRequestType();
         request.setRequest(requestId);
-        ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
         CkResponseType response = greeter.ckR(request); 
         assertEquals(response.getProduct().get(0).getAction().getStatus(), 4);
         

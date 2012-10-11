@@ -31,6 +31,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -65,7 +66,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put("schema-validation-enabled", Boolean.TRUE);
+            properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
             LOG.info("Published server endpoint.");
@@ -92,7 +93,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
 
         DocLitBare greeter = service.getSoapPort();
         updateAddressPort(greeter, PORT);
-        ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);
        

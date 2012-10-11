@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
@@ -46,8 +48,9 @@ public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInter
     }
     
     public void handleMessage(Message message) throws Fault {
-        Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        if ((Boolean.TRUE.equals(en) || "true".equals(en)) && message.getAttachments() != null) {
+        // This assumes that this interceptor is only use in IN / IN Fault chains.
+        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message) 
+            && message.getAttachments() != null) {
             Collection<AttachmentDataSource> dss = new ArrayList<AttachmentDataSource>();
             for (Attachment at : message.getAttachments()) {
                 if (at.getDataHandler().getDataSource() instanceof AttachmentDataSource) {

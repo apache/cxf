@@ -36,6 +36,7 @@ import org.w3c.dom.Node;
 //import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -50,8 +51,8 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.ServiceUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -232,9 +233,8 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                         hel = DOMUtils.getNextElement(hel);
                     }
                 }
-                if (MessageUtils.getContextualBoolean(message, 
-                                                      SoapMessage.SCHEMA_VALIDATION_ENABLED,
-                                                      false)) {
+
+                if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
                     message.getInterceptorChain().add(new CheckClosingTagsInterceptor());
                 }
             }
