@@ -31,6 +31,8 @@ public class OAuthContext {
     private UserSubject subject;
     private List<OAuthPermission> permissions;
     private String tokenGrantType;
+    private String clientId;
+    private String tokenKey;
     
     public OAuthContext(UserSubject subject, 
                         List<OAuthPermission> perms,
@@ -66,5 +68,35 @@ public class OAuthContext {
         return tokenGrantType;
     }
     
-
+    /**
+      * Returns the client which obtained the access token
+      * @return the client id
+    */
+    public String getClientId() {
+        return clientId;
+    }
+    
+    /**
+     * Sets the client which obtained the access token
+     * @param clientId
+    */
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+    
+    /**
+     * Returns the access token the client is using now during the current request
+     * @return the token
+     */
+    public String getTokenKey() {
+        return tokenKey;
+    }
+    
+    /**
+     * Sets the access token the client is using now during the current request
+     * @param tokenKey
+     */
+    public void setTokenKey(String tokenKey) {
+        this.tokenKey = tokenKey;
+    }
 }

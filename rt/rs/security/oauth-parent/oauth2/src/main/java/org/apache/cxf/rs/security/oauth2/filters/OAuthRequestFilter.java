@@ -79,9 +79,14 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         m.put(SecurityContext.class, sc);
         
         // Also set the OAuthContext
-        m.setContent(OAuthContext.class, new OAuthContext(accessTokenV.getTokenSubject(),
-                                                          matchingPermissions,
-                                                          accessTokenV.getTokenGrantType()));
+        OAuthContext oauthContext = new OAuthContext(accessTokenV.getTokenSubject(),
+                                                     matchingPermissions,
+                                                     accessTokenV.getTokenGrantType());
+        
+        oauthContext.setClientId(accessTokenV.getClientId());
+        oauthContext.setTokenKey(accessTokenV.getTokenKey());
+        
+        m.setContent(OAuthContext.class, oauthContext);
         
         return null;
     }

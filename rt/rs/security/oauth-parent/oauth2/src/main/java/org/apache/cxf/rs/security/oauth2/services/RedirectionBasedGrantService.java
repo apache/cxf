@@ -41,6 +41,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.provider.SessionAuthenticityTokenProvider;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -53,6 +54,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private String supportedResponseType;
     private String supportedGrantType;
     private boolean isClientConfidential;
+    private SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider;
+    
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType,
                                            boolean isConfidential) {
@@ -234,6 +237,10 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
     }
     
+    public void setSessionAuthenticityTokenProvider(SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider) {
+        this.sessionAuthenticityTokenProvider = sessionAuthenticityTokenProvider;
+    }
+    
     private UserSubject createUserSubject(SecurityContext securityContext) {
         return OAuthUtils.createSubject(securityContext);
     }
@@ -279,22 +286,33 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     
     private void addAuthenticityTokenToSession(OAuthAuthorizationData secData) {
-        HttpSession session = getMessageContext().getHttpServletRequest().getSession();
-        String value = UUID.randomUUID().toString();
-        secData.setAuthenticityToken(value);
-        session.setAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN, value);
+        final String sessionToken;
+        if (this.sessionAuthenticityTokenProvider != null) {
+            sessionToken = this.sessionAuthenticityTokenProvider.createSessionToken(getMessageContext());
+        } else {
+            HttpSession session = getMessageContext().getHttpServletRequest().getSession();
+            sessionToken = UUID.randomUUID().toString();
+            session.setAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN, sessionToken);
+        }
+        secData.setAuthenticityToken(sessionToken);
     }
     
     private boolean compareRequestAndSessionTokens(String requestToken) {
-        HttpSession session = getMessageContext().getHttpServletRequest().getSession();
-        String sessionToken = (String)session.getAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
-        
+        final String sessionToken;
+        if (this.sessionAuthenticityTokenProvider != null) {
+            sessionToken = sessionAuthenticityTokenProvider.removeSessionToken(getMessageContext());
+        } else {
+            HttpSession session = getMessageContext().getHttpServletRequest().getSession();
+            sessionToken = (String)session.getAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
+            if (sessionToken != null) {
+                session.removeAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);    
+            }
+        }
         if (StringUtils.isEmpty(sessionToken)) {
             return false;
+        } else {
+            return requestToken.equals(sessionToken);
         }
-        
-        session.removeAttribute(OAuthConstants.SESSION_AUTHENTICITY_TOKEN);
-        return requestToken.equals(sessionToken);
     }
     
 }
