@@ -36,6 +36,7 @@
     <properties>
         <hibernate.em.version>4.1.0.Final</hibernate.em.version>
         <hsqldb.version>1.8.0.10</hsqldb.version>
+        <cxf.lucene.version>4.0.0-BETA</cxf.lucene.version>
         <cxf.osgi.import>
             org.apache.cxf.jaxrs.impl.tl
         </cxf.osgi.import>
@@ -58,6 +59,25 @@
             <version>${cxf.geronimo.jpa.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${cxf.lucene.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${cxf.lucene.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${cxf.lucene.version}</version>
+            <scope>test</scope>
         </dependency>        
         <dependency>
             <groupId>org.easymock</groupId>
@@ -73,7 +93,7 @@
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.10</version>
+			<version>${hsqldb.version}</version>
 			<scope>test</scope>
 		</dependency>
     </dependencies>
