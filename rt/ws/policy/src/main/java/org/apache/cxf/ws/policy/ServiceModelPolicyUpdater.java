@@ -44,16 +44,20 @@
 package org.apache.cxf.ws.policy;
 
 import java.util.Collection;
+
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.Extensible;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -71,14 +75,24 @@ public class ServiceModelPolicyUpdater {
     public void addPolicyAttachments(Collection<PolicyAttachment> attachments) {
         for (PolicyAttachment pa : attachments) {
             boolean policyUsed = false;
-            String policyId = pa.getPolicy().getId();
-
-            // Add wsp:PolicyReference to wsdl:binding/wsdl:operation
+            
             for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
+                BindingMessageInfo inputMessage = boi.getInput();
+                BindingMessageInfo outputMessage = boi.getOutput();
+                
                 if (pa.appliesTo(boi)) {
-                    addPolicyRef(boi, policyId);
+                    // Add wsp:PolicyReference to wsdl:binding/wsdl:operation
+                    addPolicyRef(boi, pa.getPolicy());
                     // Add it to wsdl:portType/wsdl:operation too
-                    addPolicyRef(ei.getInterface().getOperation(boi.getName()), policyId);
+                    // FIXME - since the appliesTo is for BindingOperationInfo, I think its dodgy
+                    // that the policy ref should also be associated with the port type
+                    addPolicyRef(ei.getInterface().getOperation(boi.getName()), pa.getPolicy());
+                    policyUsed = true;
+                } else if (pa.appliesTo(inputMessage)) {
+                    addPolicyRef(inputMessage, pa.getPolicy());
+                    policyUsed = true;
+                } else if (pa.appliesTo(outputMessage)) {
+                    addPolicyRef(outputMessage, pa.getPolicy());
                     policyUsed = true;
                 }
             }
@@ -90,14 +104,14 @@ public class ServiceModelPolicyUpdater {
         }
     }
 
-    private void addPolicyRef(Extensible ext, String policyId) {
+    private void addPolicyRef(Extensible ext, Policy p) {
         Document doc = DOMUtils.createDocument();
-        Element el = doc.createElementNS(Constants.URI_POLICY_13_NS, Constants.ELEM_POLICY_REF);
+        Element el = doc.createElementNS(p.getNamespace(), Constants.ELEM_POLICY_REF);
         el.setPrefix(Constants.ATTR_WSP);
-        el.setAttribute(Constants.ATTR_URI, "#" + policyId);
+        el.setAttribute(Constants.ATTR_URI, "#" + p.getId());
 
         UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-        uee.setElementType(new QName(Constants.URI_POLICY_13_NS, Constants.ELEM_POLICY_REF));
+        uee.setElementType(new QName(p.getNamespace(), Constants.ELEM_POLICY_REF));
         uee.setElement(el);
         uee.setRequired(true);
 
@@ -109,15 +123,26 @@ public class ServiceModelPolicyUpdater {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             p.serialize(writer);
             Element policyEl = writer.getDocument().getDocumentElement();
-
+            
+            // FIXME - overwrite the Id to include the namespace prefix, for some reason neethi does not do this!
+            Attr idAttr = policyEl.getAttributeNode(Constants.ATTR_ID);
+            if (null != idAttr) {
+                idAttr.setPrefix(Constants.ATTR_WSU);
+            }
+            
             // Remove xmlns:xmlns attribute which Xerces chokes on
             policyEl.removeAttribute("xmlns:xmlns");
 
             UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-            uee.setElementType(new QName(Constants.URI_POLICY_13_NS, Constants.ELEM_POLICY));
+            uee.setElementType(new QName(p.getNamespace(), Constants.ELEM_POLICY));
             uee.setElement(policyEl);
 
-            ei.getService().addExtensor(uee);
+            if (ei.getService().getDescription() == null) {
+                DescriptionInfo description = new DescriptionInfo();
+                description.setName(ei.getService().getName());
+                ei.getService().setDescription(description);
+            }
+            ei.getService().getDescription().addExtensor(uee);
         } catch (XMLStreamException ex) {
             throw new RuntimeException("Could not serialize policy", ex);
         } catch (ParserConfigurationException e) {

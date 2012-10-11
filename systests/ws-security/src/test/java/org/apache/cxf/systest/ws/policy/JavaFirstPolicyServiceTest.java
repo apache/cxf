@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.policy.server.JavaFirstPolicyServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -58,13 +59,46 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     @org.junit.Test
-    public void testJavaFirstWsdl() throws Exception {
-        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT2
-                                                         + "/JavaFirstPolicyService?wsdl");
-        InputStream is = connection.getInputStream();
-        String wsdlContents = IOUtils.toString(is);
+    public void testJavaFirstAttachmentWsdl() throws Exception {
+        Document doc = loadWsdl("JavaFirstAttachmentPolicyService");
 
-        Document doc = DOMUtils.readXml(new StringReader(wsdlContents));
+        Element binding = DOMUtils.getFirstChildWithName(doc.getDocumentElement(), WSDL_NAMESPACE, "binding");
+        assertNotNull(binding);
+        
+        List<Element> operationMessages = DOMUtils.getChildrenWithName(binding, WSDL_NAMESPACE, "operation");
+        assertEquals(4, operationMessages.size());
+        
+        Element doOperationLevelPolicy = getOperationElement("doOperationLevelPolicy", operationMessages);
+        assertEquals("#UsernameToken", 
+                     getOperationPolicyReferenceId(doOperationLevelPolicy, Constants.URI_POLICY_13_NS));
+        
+        Element doInputMessagePolicy = getOperationElement("doInputMessagePolicy", operationMessages);
+        assertEquals("#UsernameToken", 
+                     getMessagePolicyReferenceId(doInputMessagePolicy, Type.INPUT, Constants.URI_POLICY_13_NS));
+        assertNull(getMessagePolicyReferenceId(
+                                               doInputMessagePolicy, Type.OUTPUT, Constants.URI_POLICY_13_NS));
+        
+        Element doOutputMessagePolicy = getOperationElement("doOutputMessagePolicy", operationMessages);
+        assertEquals("#UsernameToken", 
+                     getMessagePolicyReferenceId(doOutputMessagePolicy, Type.OUTPUT, Constants.URI_POLICY_13_NS));
+        assertNull(getMessagePolicyReferenceId(
+                                               doOutputMessagePolicy, Type.INPUT, Constants.URI_POLICY_13_NS));
+        
+        Element doNoPolicy = getOperationElement("doNoPolicy", operationMessages);
+        assertNull(getMessagePolicyReferenceId(doNoPolicy, Type.INPUT, Constants.URI_POLICY_13_NS));
+        assertNull(getMessagePolicyReferenceId(doNoPolicy, Type.OUTPUT, Constants.URI_POLICY_13_NS));
+        
+        // ensure that the policies are attached to the wsdl:definitions
+        List<Element> policyMessages = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
+                                                                    Constants.URI_POLICY_13_NS, "Policy");
+        assertEquals(1, policyMessages.size());
+        
+        assertEquals("UsernameToken", getPolicyId(policyMessages.get(0)));
+    }
+    
+    @org.junit.Test
+    public void testJavaFirstWsdl() throws Exception {
+        Document doc = loadWsdl("JavaFirstPolicyService");
 
         Element portType = DOMUtils.getFirstChildWithName(doc.getDocumentElement(), WSDL_NAMESPACE, "portType");
         assertNotNull(portType);
@@ -72,16 +106,20 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         List<Element> operationMessages = DOMUtils.getChildrenWithName(portType, WSDL_NAMESPACE, "operation");
         assertEquals(5, operationMessages.size());
         
-        Element operationOne = getOperationMessage("doOperationOne", operationMessages);
-        assertEquals("#InternalTransportAndUsernamePolicy", getPolicyReferenceId(operationOne));
-        Element operationTwo = getOperationMessage("doOperationTwo", operationMessages);
-        assertEquals("#TransportAndUsernamePolicy", getPolicyReferenceId(operationTwo));
-        Element operationThree = getOperationMessage("doOperationThree", operationMessages);
-        assertEquals("#InternalTransportAndUsernamePolicy", getPolicyReferenceId(operationThree));
-        Element operationFour = getOperationMessage("doOperationFour", operationMessages);
-        assertEquals("#TransportAndUsernamePolicy", getPolicyReferenceId(operationFour));
-        Element operationPing = getOperationMessage("doPing", operationMessages);
-        assertNull(getPolicyReferenceId(operationPing));
+        Element operationOne = getOperationElement("doOperationOne", operationMessages);
+        assertEquals("#InternalTransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationOne, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationTwo = getOperationElement("doOperationTwo", operationMessages);
+        assertEquals("#TransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationTwo, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationThree = getOperationElement("doOperationThree", operationMessages);
+        assertEquals("#InternalTransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationThree, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationFour = getOperationElement("doOperationFour", operationMessages);
+        assertEquals("#TransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationFour, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationPing = getOperationElement("doPing", operationMessages);
+        assertNull(getMessagePolicyReferenceId(operationPing, Type.INPUT, Constants.URI_POLICY_NS));
         
         List<Element> policyMessages = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
                                                                     Constants.URI_POLICY_NS, "Policy");
@@ -91,13 +129,22 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         assertEquals("TransportAndUsernamePolicy", getPolicyId(policyMessages.get(0)));
         assertEquals("InternalTransportAndUsernamePolicy", getPolicyId(policyMessages.get(1)));
     }
+
+    private Document loadWsdl(String serviceName) throws Exception {
+        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT2
+                                                         + "/" + serviceName + "?wsdl");
+        InputStream is = connection.getInputStream();
+        String wsdlContents = IOUtils.toString(is);
+
+        return DOMUtils.readXml(new StringReader(wsdlContents));
+    }
     
     private String getPolicyId(Element element) {
         return element.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                      PolicyConstants.WSU_ID_ATTR_NAME);
     }
     
-    private Element getOperationMessage(String operationName, List<Element> operationMessages) {
+    private Element getOperationElement(String operationName, List<Element> operationMessages) {
         Element operationElement = null;
         for (Element operation : operationMessages) {
             if (operationName.equals(operation.getAttribute("name"))) {
@@ -109,10 +156,21 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         return operationElement;
     }
     
-    private String getPolicyReferenceId(Element operationMessage) {
-        Element inputMessage = DOMUtils.getFirstChildWithName(operationMessage, WSDL_NAMESPACE, "input");
-        assertNotNull(inputMessage);
-        Element policyReference = DOMUtils.getFirstChildWithName(inputMessage, Constants.URI_POLICY_NS, 
+    private String getMessagePolicyReferenceId(Element operationElement, Type type, String policyNamespace) {
+        Element messageElement = DOMUtils.getFirstChildWithName(operationElement, WSDL_NAMESPACE, 
+                                                              type.name().toLowerCase());
+        assertNotNull(messageElement);
+        Element policyReference = DOMUtils.getFirstChildWithName(messageElement, policyNamespace, 
+                                                                 "PolicyReference");
+        if (policyReference != null) {
+            return policyReference.getAttribute("URI");
+        } else {
+            return null;
+        }
+    }
+    
+    private String getOperationPolicyReferenceId(Element operationElement, String policyNamespace) {
+        Element policyReference = DOMUtils.getFirstChildWithName(operationElement, policyNamespace, 
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttribute("URI");
