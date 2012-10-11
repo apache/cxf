@@ -331,23 +331,22 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
 
         public int copyFrom(InputStream in) throws IOException {
             int count = 0;
-            if (buffer != null) {
-                while (buffer != null) {
-                    int pos = buffer.size();
-                    int i = in.read(buffer.getRawBytes(), pos,
-                                    this.threshold - pos);
-                    if (i > 0) {
-                        buffer.setSize(pos + i);
-                        if (buffer.size() >= threshold) {
-                            thresholdReached();
-                            unBuffer();
-                        }
-                        count += i;
-                    } else {
-                        return count;
+            while (buffer != null) {
+                int pos = buffer.size();
+                int i = in.read(buffer.getRawBytes(), pos,
+                                this.threshold - pos);
+                if (i > 0) {
+                    buffer.setSize(pos + i);
+                    if (buffer.size() >= threshold) {
+                        thresholdReached();
+                        unBuffer();
                     }
+                    count += i;
+                } else {
+                    return count;
                 }
             }
+           
             if (cachingForRetransmission) {
                 count += IOUtils.copy(in, wrappedStream);
             } else {

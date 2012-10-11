@@ -698,7 +698,7 @@ public class ParameterProcessor extends AbstractProcessor {
             for (MessagePartInfo part : outputParts) {
                 if (!parameterList.contains(part.getName().getLocalPart())) {
                     MessagePartInfo inpart = inputMessage.getMessagePart(part.getName());
-                    if (inpart == null || (inpart != null && !isSamePart(inpart, part))) {
+                    if (inpart == null || !isSamePart(inpart, part)) {
                         outputUnlistedParts.add(part);
                     }
                 }

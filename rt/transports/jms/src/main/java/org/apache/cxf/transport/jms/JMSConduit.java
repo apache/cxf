@@ -432,7 +432,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
     protected static boolean isSetReplyTo(Message message) {         
         Boolean ret = (Boolean)message.get(JMSConstants.JMS_SET_REPLY_TO);
-        return ret == null || (ret != null && ret.booleanValue());
+        return ret == null || ret.booleanValue();
     }
 
     @Override

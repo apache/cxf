@@ -94,7 +94,7 @@ public class SourceSequence extends AbstractSequence {
      * @return the identifier of the rm source
      */
     public String getEndpointIdentifier() {
-        return source.getName().toString();
+        return source.getName();
     }
 
     /**

@@ -47,7 +47,7 @@ public final class IdlConst extends IdlDefnImplBase implements IdlType {
 
     public void write(PrintWriter pw) {
         pw.println(indent() + "const " + base.fullName(scopeName()) + " " 
-                   + localName() + " = "  + value.toString() + ";");
+                   + localName() + " = "  + value + ";");
     }
     
 }

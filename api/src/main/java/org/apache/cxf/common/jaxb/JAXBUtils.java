@@ -343,7 +343,7 @@ public final class JAXBUtils {
         boolean conventionalIdentifier = isConventionalIdentifier(buf, type); 
         if (legalIdentifier && conventionalIdentifier) {
             if (JAXBUtils.isJavaKeyword(name) && type == IdentifierType.VARIABLE) {
-                name = normalizePackageNamePart(name.toString());
+                name = normalizePackageNamePart(name);
             }
             return name;
         }

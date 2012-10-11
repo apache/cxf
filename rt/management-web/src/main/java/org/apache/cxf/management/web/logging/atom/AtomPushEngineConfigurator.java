@@ -201,7 +201,7 @@ final class AtomPushEngineConfigurator {
     }
 
     private <T extends Enum<T>> T parseEnum(String value, T defaultValue, Class<T> enumClass) {
-        if (value == null | "".equals(value)) {
+        if (value == null || "".equals(value)) {
             return defaultValue;
         }
         try {

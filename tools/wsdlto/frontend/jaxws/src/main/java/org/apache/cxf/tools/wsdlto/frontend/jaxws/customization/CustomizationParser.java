@@ -101,7 +101,7 @@ public final class CustomizationParser {
             if (wsdlNode == null) {
                 throw new ToolException(new Message("MISSING_WSDL", LOG, wsdlURL));
             }
-            customizedElements.put(wsdlURL.toString(), wsdlNode);
+            customizedElements.put(wsdlURL, wsdlNode);
             bindingFiles = (String[])env.get(ToolConstants.CFG_BINDING);
             if (bindingFiles == null) {
                 return;
@@ -498,7 +498,7 @@ public final class CustomizationParser {
                 targetNode = getTargetNode(wsdlURI);
                 String resolvedLoc = wsdlURI;
                 if (targetNode == null && env.get(ToolConstants.CFG_CATALOG) != null) {
-                    resolvedLoc = resolveByCatalog(wsdlURI.toString());
+                    resolvedLoc = resolveByCatalog(wsdlURI);
                     targetNode = getTargetNode(resolvedLoc);
                 }
                 if (targetNode == null) {

@@ -73,7 +73,7 @@ public class XPathProvider<T> implements MessageBodyReader<T> {
     public boolean isReadable(Class<?> cls, Type genericType, Annotation[] annotations, MediaType mediaType) {
         
         return globalExpression != null && (className == null 
-            || className != null && className.equals(cls.getName()))  
+            || className.equals(cls.getName()))  
             || classExpressions != null && classExpressions.containsKey(cls.getName());
     }
 

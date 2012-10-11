@@ -55,7 +55,6 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     private Invoker invoker;
     private Executor executor;
-    private Map<String, Object> properties;
     private boolean enableStatic;
     private QName serviceName;
     
@@ -257,10 +256,6 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
 
         setService(service);
         sendEvent(Event.SERVICE_SET, service);
-
-        if (properties != null) {
-            service.putAll(properties);
-        }
     }
 
     protected Invoker createInvoker() {

@@ -27,7 +27,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -213,6 +213,7 @@ public class BootstrapStorage {
             setArrayKeys(Arrays.asList(SUBSCRIPTIONS_ARRAY));
 
             // Removes namespace from output
+/*
             setOutTransformElements(new HashMap<String, String>() {
                 private static final long serialVersionUID = -1341932955817405356L;
 
@@ -220,8 +221,12 @@ public class BootstrapStorage {
                     put("{" + LOGGING_NAMESPACE + "}*", "*");
                 }
             });
+*/
+            setOutTransformElements(Collections.singletonMap(
+                "{" + LOGGING_NAMESPACE + "}*", "*"));
 
             // Adds namespace to input
+/*
             setInTransformElements(new HashMap<String, String>() {
                 private static final long serialVersionUID = -1509522821399368946L;
 
@@ -229,6 +234,9 @@ public class BootstrapStorage {
                     put("*", "{" + LOGGING_NAMESPACE + "}*");
                 }
             });
+*/
+            setInTransformElements(Collections.singletonMap(
+                "*", "{" + LOGGING_NAMESPACE + "}*"));
         }
     }
 }

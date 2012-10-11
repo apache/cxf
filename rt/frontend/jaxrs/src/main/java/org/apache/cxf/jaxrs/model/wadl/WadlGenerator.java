@@ -1433,7 +1433,7 @@ public class WadlGenerator implements RequestHandler {
                         }
                         if (!locs.containsKey(loc)) {
                             locs.put(loc, ui.getBaseUriBuilder().path(
-                                 loc.toString()).build().toString());
+                                 loc).build().toString());
                         }
                     }
                 } catch (Exception ex) {

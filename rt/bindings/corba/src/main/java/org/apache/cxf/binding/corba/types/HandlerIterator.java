@@ -38,25 +38,23 @@ public class HandlerIterator implements Iterator<CorbaObjectHandler> {
     }
     
     public boolean hasNext() {
-        if (next == null) {
-            while (next == null && count < params.length) {
-                int mode = params[count].getMode();
-                int value = org.omg.CORBA.ARG_OUT.value;
-                if (isServer) {
-                    value = org.omg.CORBA.ARG_IN.value;
-                }
-                if (mode == value
-                    || mode == org.omg.CORBA.ARG_INOUT.value) {
-                    next = params[count].getObject();
-                }
-                if (!isServer 
-                    && mode == org.omg.CORBA.ARG_INOUT.value
-                    && next instanceof CorbaPrimitiveHandler) {
-                    CorbaPrimitiveHandler prim = (CorbaPrimitiveHandler)next;
-                    prim.clear();
-                }
-                count++;
+        while (next == null && count < params.length) {
+            int mode = params[count].getMode();
+            int value = org.omg.CORBA.ARG_OUT.value;
+            if (isServer) {
+                value = org.omg.CORBA.ARG_IN.value;
             }
+            if (mode == value
+                || mode == org.omg.CORBA.ARG_INOUT.value) {
+                next = params[count].getObject();
+            }
+            if (!isServer 
+                && mode == org.omg.CORBA.ARG_INOUT.value
+                && next instanceof CorbaPrimitiveHandler) {
+                CorbaPrimitiveHandler prim = (CorbaPrimitiveHandler)next;
+                prim.clear();
+            }
+            count++;
         }
         return next != null;
     }

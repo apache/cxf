@@ -143,7 +143,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
             message.put(SecurityContext.class, createSecurityContext(subject)); 
         } catch (LoginException ex) {
             String errorMessage = "Unauthorized : " + ex.getMessage();
-            LOG.fine(errorMessage.toString());
+            LOG.fine(errorMessage);
             if (reportFault) {
                 throw new AuthenticationException(errorMessage);
             } else {
