@@ -216,9 +216,6 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         for (String confirmationMethod : confirmationMethods) {
             if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
                 XMLSignature sig = message.getContent(XMLSignature.class);
-                if (tlsCerts == null || sig == null) {
-                    return false;
-                }
                 SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
                 if (!compareCredentials(subjectKeyInfo, sig, tlsCerts)) {
                     return false;
@@ -253,6 +250,10 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         } else if (tlsCerts != null && tlsCerts.length > 0 && subjectPublicKey != null
             && tlsCerts[0].getPublicKey().equals(subjectPublicKey)) {
             return true;
+        }
+        
+        if (sig == null) {
+            return false;
         }
         
         //
