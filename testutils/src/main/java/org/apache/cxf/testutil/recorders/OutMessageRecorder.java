@@ -22,7 +22,6 @@ package org.apache.cxf.testutil.recorders;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -87,9 +86,6 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
             // bytes were already copied after flush
             try {
                 byte bytes[] = cos.getBytes();
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("outbound: " + bytes);
-                }
                 synchronized (outbound) {
                     outbound.add(bytes);    
                 }

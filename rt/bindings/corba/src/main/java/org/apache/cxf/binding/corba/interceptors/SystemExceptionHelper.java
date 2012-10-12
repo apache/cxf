@@ -113,7 +113,7 @@ public final class SystemExceptionHelper
         int index = -1;
 
         while (left < right) {
-            int m = (left + right) / 2;
+            int m = (left + right) >>> 1;
             int res = arr[m].compareTo(value);
             if (res == 0) {
                 index = m;

@@ -86,13 +86,21 @@ public class RandomValueProvider implements DefaultValueProvider {
     public BigDecimal getBigDecimalValue(String path) {
         String s = Long.toString(random.nextLong());
         s += ".";
-        s += Long.toString(Math.abs(random.nextLong()));
+        long nextLong = random.nextLong();
+        if (nextLong == Long.MIN_VALUE) {
+            nextLong++;
+        }
+        s += Long.toString(Math.abs(nextLong));
         return new BigDecimal(s);
     }
     
     public BigInteger getBigIntegerValue(String path) {
         String s = Long.toString(random.nextLong());
-        s += Long.toString(Math.abs(random.nextLong()));
+        long nextLong = random.nextLong();
+        if (nextLong == Long.MIN_VALUE) {
+            nextLong++;
+        }
+        s += Long.toString(Math.abs(nextLong));
         return new BigInteger(s);
     }
 

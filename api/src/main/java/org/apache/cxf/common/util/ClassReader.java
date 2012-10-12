@@ -326,7 +326,8 @@ public class ClassReader extends ByteArrayInputStream {
             case CONSTANT_NAME_AND_TYPE:
 
                 readShort(); // class index or (12) name index
-                // fall through
+                readShort(); // string index or class index
+                break;
 
             case CONSTANT_CLASS:
             case CONSTANT_STRING:
@@ -342,7 +343,8 @@ public class ClassReader extends ByteArrayInputStream {
                 // see jvm spec section 4.4.5 - double and long cpool
                 // entries occupy two "slots" in the cpool table.
                 i++;
-                // fall through
+                readInt(); // value
+                break;
 
             case CONSTANT_INTEGER:
             case CONSTANT_FLOAT:

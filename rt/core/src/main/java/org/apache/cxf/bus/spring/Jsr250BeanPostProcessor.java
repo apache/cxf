@@ -87,11 +87,11 @@ public class Jsr250BeanPostProcessor
                 } catch (NoSuchBeanDefinitionException t) {
                     //ignore - no resource manager
                 }
-                if (resourceManager == null && m == null) {
+                if (m == null) {
                     b = (Bus)context.getBean("cxf");
                     m = b.getExtension(ResourceManager.class);
                 }
-                if (resourceManager == null && m != null) {
+                if (m != null) {
                     resourceManager = m;
                     if (!(b instanceof SpringBus)) {
                         resourceManager
