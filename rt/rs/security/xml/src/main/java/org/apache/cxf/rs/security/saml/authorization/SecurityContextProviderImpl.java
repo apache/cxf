@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.saml.authorization;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Claim;
@@ -35,7 +38,12 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
             AssertionWrapper wrapper) {
         Claims claims = getClaims(wrapper);
         Subject subject = getSubject(message, wrapper, claims);
-        return doGetSecurityContext(message, subject, claims);
+        SecurityContext securityContext = doGetSecurityContext(message, subject, claims);
+        if (securityContext instanceof SAMLSecurityContext) {
+            Element assertionElement = wrapper.getElement();
+            ((SAMLSecurityContext)securityContext).setAssertionElement(assertionElement);
+        }
+        return securityContext;
     }
 
     protected Claims getClaims(AssertionWrapper wrapper) {
