@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
@@ -90,14 +91,18 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                                 //old wildcard
                                 n = "." + n.replaceAll("\\.", "\\."); 
                             }
-                            Matcher matcher = Pattern.compile(n).matcher("");
-                            List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
-                            if (m == null) {
-                                m = new ArrayList<MatcherHolder>();
-                                wildCardBeanDefinitions.put(className, m);
+                            try {
+                                Matcher matcher = Pattern.compile(n).matcher("");
+                                List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
+                                if (m == null) {
+                                    m = new ArrayList<MatcherHolder>();
+                                    wildCardBeanDefinitions.put(className, m);
+                                }
+                                MatcherHolder holder = new MatcherHolder(orig, matcher);
+                                m.add(holder);
+                            } catch (PatternSyntaxException npe) { 
+                                //not a valid patter, we'll ignore
                             }
-                            MatcherHolder holder = new MatcherHolder(orig, matcher);
-                            m.add(holder);
                         } else {
                             LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n); 
                         }
