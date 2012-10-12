@@ -44,6 +44,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
 
     //private Analyzer analyzer;
     private String contentsFieldName;
+    private Map<String, String> contentsFieldMap;
     private Stack<List<Query>> queryStack = new Stack<List<Query>>();
     public LuceneQueryVisitor() {
         this(Collections.<String, String>emptyMap());
@@ -65,6 +66,10 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
         super(fieldsMap);
         this.contentsFieldName = contentsFieldName;
         queryStack.push(new ArrayList<Query>());
+    }
+    
+    public void setContentsFieldMap(Map<String, String> map) {
+        this.contentsFieldMap = map;
     }
     
     public void visit(SearchCondition<T> sc) {
@@ -135,7 +140,8 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
             String strValue = value.toString();
             int wildCardIndex = strValue.indexOf('*'); 
             
-            if (contentsFieldName == null) {
+            String theContentsFieldName = getContentsFieldName(name);
+            if (theContentsFieldName == null) {
                 Term term = new Term(name, strValue);
                 
                 if (wildCardIndex == -1) {
@@ -145,14 +151,14 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
                 } 
             } else if (wildCardIndex == -1) {
                 PhraseQuery pquery = new PhraseQuery();
-                pquery.add(new Term(contentsFieldName, name));
-                pquery.add(new Term(contentsFieldName, strValue));
+                pquery.add(new Term(theContentsFieldName, name));
+                pquery.add(new Term(theContentsFieldName, strValue));
                 query = pquery;
             } else {
                 BooleanQuery pquery = new BooleanQuery();
-                pquery.add(new TermQuery(new Term(contentsFieldName, name)),
+                pquery.add(new TermQuery(new Term(theContentsFieldName, name)),
                            BooleanClause.Occur.MUST);
-                pquery.add(new WildcardQuery(new Term(contentsFieldName, strValue)),
+                pquery.add(new WildcardQuery(new Term(theContentsFieldName, strValue)),
                            BooleanClause.Occur.MUST);
                 query = pquery;                
             }
@@ -160,6 +166,17 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
             query = createRangeQuery(cls, name, value, ConditionType.EQUALS);
         }
         return query;
+    }
+    
+    private String getContentsFieldName(String name) {
+        String fieldName = null;
+        if (contentsFieldMap != null) {
+            fieldName = contentsFieldMap.get(name); 
+        }
+        if (fieldName == null) {
+            fieldName = contentsFieldName;
+        }
+        return fieldName;
     }
     
     private Query createRangeQuery(Class<?> cls, String name, Object value,
