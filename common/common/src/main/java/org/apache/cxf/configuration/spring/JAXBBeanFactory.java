@@ -60,6 +60,8 @@ public final class JAXBBeanFactory {
             return obj;
         } catch (JAXBException e) {
             throw new RuntimeException(e);
+        } finally {
+            StaxUtils.close(data);
         }
     }
 

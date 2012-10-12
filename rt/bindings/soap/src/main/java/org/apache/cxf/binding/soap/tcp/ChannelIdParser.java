@@ -58,6 +58,8 @@ public final class ChannelIdParser {
             }
         } catch (XMLStreamException e) {
             e.printStackTrace();
+        } finally {
+            StaxUtils.close(streamReader);
         }
         
         return 0;

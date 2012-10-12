@@ -125,13 +125,14 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             return;
         }
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
-
+        boolean closeNeeded = false;
         if (xmlReader == null) {
             InputStream in = (InputStream)message.getContent(InputStream.class);
             if (in == null) {
                 throw new RuntimeException("Can't find input stream in message");
             }
             xmlReader = StaxUtils.createXMLStreamReader(in);
+            closeNeeded = true;
         }
 
         try {
@@ -235,6 +236,10 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             }
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("XML_STREAM_EXC", LOG), e, message.getVersion().getSender());
+        } finally {
+            if (closeNeeded) {
+                StaxUtils.close(xmlReader);
+            }
         }
     }
 }

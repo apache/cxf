@@ -156,6 +156,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
         }
         
+        XMLStreamReader reader = null;
         try {
             
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
@@ -168,7 +169,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (JAXBElement.class.isAssignableFrom(type) 
                 || !isCollection && (unmarshalAsJaxbElement  
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
-                XMLStreamReader reader = getStreamReader(is, type, mt);
+                reader = getStreamReader(is, type, mt);
                 reader = TransformUtils.createNewReaderIfNeeded(reader, is);
                 if (JAXBElement.class.isAssignableFrom(type) && type == theType) {
                     response = unmarshaller.unmarshal(reader);
@@ -198,6 +199,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         } catch (Exception e) {
             LOG.warning(getStackTrace(e));
             throw new WebApplicationException(e, Response.status(400).build());        
+        } finally {
+            StaxUtils.close(reader);
         }
         // unreachable
         return null;
@@ -207,7 +210,13 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         throws JAXBException {
         XMLStreamReader reader = getStreamReader(is, type, mt);
         if (reader != null) {
-            return unmarshalFromReader(unmarshaller, reader, mt);
+            try {
+                return unmarshalFromReader(unmarshaller, reader, mt);
+            } catch (JAXBException e) {
+                throw e;
+            } finally {
+                StaxUtils.close(reader);
+            }
         }
         return unmarshalFromInputStream(unmarshaller, is, mt);
     }
@@ -244,7 +253,12 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
         // Try to create the read before unmarshalling the stream
-        return unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(is));
+        XMLStreamReader xmlReader = StaxUtils.createXMLStreamReader(is);
+        try {
+            return unmarshaller.unmarshal(xmlReader);
+        } finally {
+            StaxUtils.close(xmlReader);
+        }
     }
 
     protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 

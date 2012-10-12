@@ -209,12 +209,14 @@ public class JSONProvider extends AbstractJAXBProvider  {
             }
         }
         
+        XMLStreamReader reader = null;
         try {
             InputStream realStream = getInputStream(type, genericType, is);
             if (Document.class.isAssignableFrom(type)) {
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-                copyReaderToWriter(createReader(type, realStream, false), writer);
-                return writer.getDocument();
+                reader = createReader(type, realStream, false);
+                copyReaderToWriter(reader, writer);
+                return type.cast(writer.getDocument());
             }
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
@@ -255,6 +257,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             throw e;
         } catch (Exception e) {
             throw new WebApplicationException(e, Response.status(400).build());
+        } finally {
+            StaxUtils.close(reader);
         }
         // unreachable
         return null;
@@ -348,11 +352,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
             }
             throw new IOException(sb.toString());
         }
+        XMLStreamWriter writer = null;
         try {
             
             String enc = HttpUtils.getSetEncoding(m, headers, "UTF-8");
             if (Document.class.isAssignableFrom(cls)) {
-                XMLStreamWriter writer = createWriter(obj, cls, genericType, enc, os, false);
+                writer = createWriter(obj, cls, genericType, enc, os, false);
                 copyReaderToWriter(StaxUtils.createXMLStreamReader((Document)obj), writer);
                 return;
             }
@@ -375,6 +380,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             handleXMLStreamException(e, false); 
         } catch (Exception e) {
             throw new WebApplicationException(e);
+        } finally {
+            StaxUtils.close(writer);
         }
     }
 

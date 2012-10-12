@@ -242,13 +242,16 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             }
         } else {
             ByteArrayOutputStream bwriter = new ByteArrayOutputStream();
-            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bwriter);
+            XMLStreamWriter writer = null;
             try {
-                StaxUtils.copy((Source)o, writer);
+                writer = StaxUtils.createXMLStreamWriter(bwriter);
+                StaxUtils.copy(o, writer);
                 writer.flush();
                 ds = new ByteDataSource(bwriter.toByteArray(), ct);
             } catch (XMLStreamException e1) {
                 throw new Fault(e1);
+            } finally {
+                StaxUtils.close(writer);
             }
         }
         return ds;

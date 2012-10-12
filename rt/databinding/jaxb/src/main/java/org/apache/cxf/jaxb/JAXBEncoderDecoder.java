@@ -397,6 +397,8 @@ public final class JAXBEncoderDecoder {
             writer.flush();
         } catch (Exception e) {
             throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
+        } finally {
+            StaxUtils.close(writer);
         }
     }
 

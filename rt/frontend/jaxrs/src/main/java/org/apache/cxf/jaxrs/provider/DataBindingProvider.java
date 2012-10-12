@@ -65,13 +65,16 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
     public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
                       MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
+        XMLStreamReader reader = null;
         try {
-            XMLStreamReader reader = createReader(clazz, genericType, is);
+            reader = createReader(clazz, genericType, is);
             DataReader<XMLStreamReader> dataReader = binding.createReader(XMLStreamReader.class);
             Object o = dataReader.read(null, reader, clazz);
             return o == null ? null : clazz.cast(o);
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
+        } finally {
+            StaxUtils.close(reader);
         }
     }
 
@@ -94,11 +97,14 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
     public void writeTo(T o, Class<?> clazz, Type genericType, Annotation[] annotations, 
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
+        XMLStreamWriter writer = null;
         try {
-            XMLStreamWriter writer = createWriter(clazz, genericType, os);
+            writer = createWriter(clazz, genericType, os);
             writeToWriter(writer, o);
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
+        } finally {
+            StaxUtils.close(writer);
         }
     }
     

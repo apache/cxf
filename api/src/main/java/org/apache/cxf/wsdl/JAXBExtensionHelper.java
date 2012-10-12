@@ -273,6 +273,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
      */
     public ExtensibilityElement unmarshall(Class parent, QName qname, Element element, Definition wsdl,
                                            ExtensionRegistry registry) throws WSDLException {
+        XMLStreamReader reader = null;
         try {
             Unmarshaller u = getContext().createUnmarshaller();
         
@@ -280,7 +281,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             if (namespace == null) {
                 o = u.unmarshal(element);
             } else {
-                XMLStreamReader reader = StaxUtils.createXMLStreamReader(element);
+                reader = StaxUtils.createXMLStreamReader(element);
                 reader = new MappingReaderDelegate(reader);
                 o = u.unmarshal(reader);
             }
@@ -298,6 +299,8 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             throw new WSDLException(WSDLException.PARSER_ERROR,
                                     "Error reading element " + qname,
                                     ex);
+        } finally {
+            StaxUtils.close(reader);
         }
     }
     

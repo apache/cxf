@@ -323,9 +323,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (writer instanceof CachingXmlEventWriter) {
             CachingXmlEventWriter cache = (CachingXmlEventWriter)writer;
             if (cache.getEvents().size() != 0) {
-                XMLStreamWriter origWriter = StaxUtils.createXMLStreamWriter(osOriginal);
-                for (XMLEvent event : cache.getEvents()) {
-                    StaxUtils.writeEvent(event, origWriter);
+                XMLStreamWriter origWriter = null;
+                try {
+                    origWriter = StaxUtils.createXMLStreamWriter(osOriginal);
+                    for (XMLEvent event : cache.getEvents()) {
+                        StaxUtils.writeEvent(event, origWriter);
+                    }
+                } finally {
+                    StaxUtils.close(origWriter);
                 }
             }
             m.setContent(XMLStreamWriter.class, null);

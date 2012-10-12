@@ -51,7 +51,7 @@ public class XMLBeanStreamSerializer {
     public void serialize(XmlObject xObj, XMLStreamWriter writer) throws IOException, XMLStreamException {
 
         File tmpFile = null;
-
+        XMLStreamReader rdr = null;
         try {
 
             // create tmp file
@@ -61,7 +61,7 @@ public class XMLBeanStreamSerializer {
             xObj.save(tmpFile);
 
             InputStream tmpIn = new FileInputStream(tmpFile);
-            XMLStreamReader rdr = StaxUtils.createXMLStreamReader(tmpIn);
+            rdr = StaxUtils.createXMLStreamReader(tmpIn);
 
             while (rdr.hasNext()) {
 
@@ -124,6 +124,7 @@ public class XMLBeanStreamSerializer {
 
                 tmpFile.delete();
             }
+            StaxUtils.close(rdr);
         }
     }
 }

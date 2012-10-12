@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
@@ -324,12 +325,16 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     }
 
     public EndpointReference readEndpointReference(Source eprInfoset) {
+        XMLStreamReader reader = null;
         try {
             Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
-            return (EndpointReference)unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(eprInfoset));
+            reader = StaxUtils.createXMLStreamReader(eprInfoset);
+            return (EndpointReference)unmarshaller.unmarshal(reader);
         } catch (JAXBException e) {
             throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
                                           e);
+        } finally {
+            StaxUtils.close(reader);
         }
     }
 
