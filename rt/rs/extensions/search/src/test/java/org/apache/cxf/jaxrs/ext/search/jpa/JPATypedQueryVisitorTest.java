@@ -59,14 +59,17 @@ public class JPATypedQueryVisitorTest extends Assert {
             em.getTransaction().begin();
             Book b1 = new Book();
             b1.setId(9);
+            b1.setName("num9");
             em.persist(b1);
             assertTrue(em.contains(b1));
             Book b2 = new Book();
             b2.setId(10);
+            b2.setName("num10");
             em.persist(b2);
             assertTrue(em.contains(b2));
             Book b3 = new Book();
             b3.setId(11);
+            b3.setName("num11");
             em.persist(b3);
             assertTrue(em.contains(b3));
             
@@ -97,14 +100,83 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     @Test
-    public void testSimpleQuery() throws Exception {
-        SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse("id=lt=10,id=gt=10");
-        JPATypedQueryVisitor<Book> jpa = new JPATypedQueryVisitor<Book>(em, Book.class);
-        filter.accept(jpa);
-        TypedQuery<Book> query = jpa.getQuery();
-        List<Book> books = query.getResultList();
+    public void testOrQuery() throws Exception {
+        List<Book> books = queryBooks("id=lt=10,id=gt=10");
         assertEquals(2, books.size());
         assertTrue(9 == books.get(0).getId() && 11 == books.get(1).getId()
             || 11 == books.get(0).getId() && 9 == books.get(1).getId());
+    }
+    
+    @Test
+    public void testOrQueryNoMatch() throws Exception {
+        List<Book> books = queryBooks("id==7,id==5");
+        assertEquals(0, books.size());
+    }
+    
+    @Test
+    public void testAndQuery() throws Exception {
+        List<Book> books = queryBooks("id==10;name==num10");
+        assertEquals(1, books.size());
+        assertTrue(10 == books.get(0).getId() && "num10".equals(books.get(0).getName()));
+    }
+    
+    @Test
+    public void testAndQueryNoMatch() throws Exception {
+        List<Book> books = queryBooks("id==10;name==num9");
+        assertEquals(0, books.size());
+    }
+    
+    @Test
+    public void testEqualsQuery() throws Exception {
+        List<Book> books = queryBooks("id==10");
+        assertEquals(1, books.size());
+        assertTrue(10 == books.get(0).getId());
+    }
+    
+    @Test
+    public void testEqualsWildcard() throws Exception {
+        List<Book> books = queryBooks("name==num1*");
+        assertEquals(2, books.size());
+        assertTrue(10 == books.get(0).getId() && 11 == books.get(1).getId()
+            || 11 == books.get(0).getId() && 10 == books.get(1).getId());
+    }
+    
+    @Test
+    public void testGreaterQuery() throws Exception {
+        List<Book> books = queryBooks("id=gt=10");
+        assertEquals(1, books.size());
+        assertTrue(11 == books.get(0).getId());
+    }
+    
+    @Test
+    public void testGreaterEqualQuery() throws Exception {
+        List<Book> books = queryBooks("id=ge=10");
+        assertEquals(2, books.size());
+        assertTrue(10 == books.get(0).getId() && 11 == books.get(1).getId()
+            || 11 == books.get(0).getId() && 10 == books.get(1).getId());
+    }
+    
+    @Test
+    public void testLessEqualQuery() throws Exception {
+        List<Book> books = queryBooks("id=le=10");
+        assertEquals(2, books.size());
+        assertTrue(9 == books.get(0).getId() && 10 == books.get(1).getId()
+            || 9 == books.get(0).getId() && 10 == books.get(1).getId());
+    }
+    
+    @Test
+    public void testNotEqualsQuery() throws Exception {
+        List<Book> books = queryBooks("id!=10");
+        assertEquals(2, books.size());
+        assertTrue(9 == books.get(0).getId() && 11 == books.get(1).getId()
+            || 11 == books.get(0).getId() && 9 == books.get(1).getId());
+    }
+    
+    private List<Book> queryBooks(String expression) throws Exception {
+        SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse(expression);
+        JPATypedQueryVisitor<Book> jpa = new JPATypedQueryVisitor<Book>(em, Book.class);
+        filter.accept(jpa);
+        TypedQuery<Book> query = jpa.getQuery();
+        return query.getResultList();
     }
 }
