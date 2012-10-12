@@ -18,10 +18,13 @@
  */
 package org.apache.cxf.ws.security.policy.builders;
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
@@ -49,6 +52,8 @@ import org.apache.neethi.builders.AssertionBuilder;
  */
 public class HttpsTokenBuilder implements AssertionBuilder<Element> {
     
+    private static final Logger LOG = LogUtils.getL7dLogger(HttpsTokenBuilder.class);
+    
     PolicyBuilder builder;
     public HttpsTokenBuilder(PolicyBuilder b) {
         builder = b;
@@ -74,21 +79,19 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
         } else {
             Element polEl = PolicyConstants.findPolicyElement(element);
             if (polEl == null) {
-                throw new IllegalArgumentException(
-                    "sp:HttpsToken/wsp:Policy must have a value"
-                );
-            }
-            
-            Element child = DOMUtils.getFirstElement(polEl);
-            if (child != null) {
-                if (SP12Constants.HTTP_BASIC_AUTHENTICATION.equals(DOMUtils.getElementQName(child))) {
-                    httpsToken.setHttpBasicAuthentication(true);
-                } else if (SP12Constants.HTTP_DIGEST_AUTHENTICATION
-                        .equals(DOMUtils.getElementQName(child))) {
-                    httpsToken.setHttpDigestAuthentication(true);
-                } else if (SP12Constants.REQUIRE_CLIENT_CERTIFICATE
-                        .equals(DOMUtils.getElementQName(child))) {
-                    httpsToken.setRequireClientCertificate(true);
+                LOG.warning("sp:HttpsToken/wsp:Policy should have a value!");
+            } else {
+                Element child = DOMUtils.getFirstElement(polEl);
+                if (child != null) {
+                    if (SP12Constants.HTTP_BASIC_AUTHENTICATION.equals(DOMUtils.getElementQName(child))) {
+                        httpsToken.setHttpBasicAuthentication(true);
+                    } else if (SP12Constants.HTTP_DIGEST_AUTHENTICATION
+                            .equals(DOMUtils.getElementQName(child))) {
+                        httpsToken.setHttpDigestAuthentication(true);
+                    } else if (SP12Constants.REQUIRE_CLIENT_CERTIFICATE
+                            .equals(DOMUtils.getElementQName(child))) {
+                        httpsToken.setRequireClientCertificate(true);
+                    }
                 }
             }
         }
