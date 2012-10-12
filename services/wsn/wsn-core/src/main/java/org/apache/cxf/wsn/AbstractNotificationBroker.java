@@ -251,7 +251,9 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
             throw new SubscribeCreationFailedFault("Unable to register new endpoint", fault, e);
         } finally {
             if (!success && subscription != null) {
-                subscriptions.remove(subscription);
+                if (subscription.getAddress() != null) {
+                    subscriptions.remove(subscription.getAddress());
+                }
                 try {
                     subscription.unsubscribe();
                 } catch (UnableToDestroySubscriptionFault e) {
