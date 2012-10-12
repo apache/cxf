@@ -154,13 +154,15 @@ public final class CustomizationParser {
             return null;
         }
         
+        XMLStreamReader reader = null;
         try {
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(uri, ins);
+            reader = StaxUtils.createXMLStreamReader(uri, ins);
             doc = StaxUtils.read(reader, true);
         } catch (Exception e) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
             throw new ToolException(msg, e);
         } finally {
+            StaxUtils.close(reader);
             try {
                 ins.close();
             } catch (IOException ex) {
@@ -478,14 +480,17 @@ public final class CustomizationParser {
     private void addBinding(String bindingFile) throws XMLStreamException {
 
         Element root = null;
+        XMLStreamReader xmlReader = null;
         try {
             URIResolver resolver = new URIResolver(bindingFile);
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), 
+            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), 
                                                                      resolver.getInputStream());
-            root = StaxUtils.read(reader, true).getDocumentElement();
+            root = StaxUtils.read(xmlReader, true).getDocumentElement();
         } catch (Exception e1) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {bindingFile});
             throw new ToolException(msg, e1);
+        } finally {
+            StaxUtils.close(xmlReader);
         }
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(root);
         StaxUtils.toNextTag(reader);

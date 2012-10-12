@@ -174,6 +174,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             }
             try {
                 writer.flush();
+                writer.close();
             } catch (XMLStreamException e) {
                 //ignore
             }

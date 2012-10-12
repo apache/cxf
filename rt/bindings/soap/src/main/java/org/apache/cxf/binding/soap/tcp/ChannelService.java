@@ -37,8 +37,9 @@ public final class ChannelService {
     }
     
     public static void service(IoSession session, SoapTcpMessage message) {
+        XMLStreamReader xmlReader = null;
         try {
-            XMLStreamReader xmlReader
+            xmlReader
                 = StaxUtils.createXMLStreamReader(message.getContentAsStream(), "UTF-8");
             while (xmlReader.hasNext()) {
                 xmlReader.next();
@@ -77,6 +78,8 @@ public final class ChannelService {
             }
         } catch (XMLStreamException e) {
             e.printStackTrace();
+        } finally {
+            StaxUtils.close(xmlReader);
         }
     }
     

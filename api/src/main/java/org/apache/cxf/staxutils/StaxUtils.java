@@ -458,6 +458,7 @@ public final class StaxUtils {
             } catch (XMLStreamException ex) {
                 //ignore
             }
+            StaxUtils.close(writer);
         }
     }
     public static void copy(Source source, XMLStreamWriter writer) throws XMLStreamException {
@@ -1576,19 +1577,29 @@ public final class StaxUtils {
 
     public static String toString(Document doc) throws XMLStreamException {
         StringWriter sw = new StringWriter(1024);
-        XMLStreamWriter writer = createXMLStreamWriter(sw);
-        copy(doc, writer);
-        writer.flush();
+        XMLStreamWriter writer = null;
+        try {
+            writer = createXMLStreamWriter(sw);
+            copy(doc, writer);
+            writer.flush();
+        } finally {
+            StaxUtils.close(writer);
+        }
         return sw.toString();
     }
     public static String toString(Element el) throws XMLStreamException {
         StringWriter sw = new StringWriter(1024);
-        XMLStreamWriter writer = createXMLStreamWriter(sw);
-        copy(el, writer);
-        writer.flush();
+        XMLStreamWriter writer = null;
+        try {
+            writer = createXMLStreamWriter(sw);
+            copy(el, writer);
+            writer.flush();
+        } finally {
+            StaxUtils.close(writer);
+        }        
         return sw.toString();
     }
-    
+
     public static void close(XMLStreamReader reader) {
         if (reader != null) {
             try {

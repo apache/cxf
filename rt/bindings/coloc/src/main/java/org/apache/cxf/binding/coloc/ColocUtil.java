@@ -259,7 +259,14 @@ public final class ColocUtil {
         DataReader<XMLStreamReader> reader =
             message.getExchange().getService().getDataBinding().createReader(XMLStreamReader.class);
         MessagePartInfo mpi = getMessageInfo(message).getMessagePart(0);
-        Object wrappedObject = reader.read(mpi, StaxUtils.createXMLStreamReader(source));
+        XMLStreamReader streamReader = null;
+        Object wrappedObject = null;
+        try {
+            streamReader = StaxUtils.createXMLStreamReader(source);
+            wrappedObject = reader.read(mpi, streamReader);
+        } finally {
+            StaxUtils.close(streamReader);
+        }
         MessageContentsList parameters = new MessageContentsList();
         parameters.put(mpi, wrappedObject);
 
