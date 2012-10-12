@@ -335,9 +335,10 @@ public abstract class AbstractBeanDefinitionParser
                                             String propertyName, 
                                             Class<?> c) {
         try {
+            XMLStreamWriter xmlWriter = null;
             try {
                 StringWriter writer = new StringWriter();
-                XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);
+                xmlWriter = StaxUtils.createXMLStreamWriter(writer);
                 StaxUtils.copy(data, xmlWriter);
                 xmlWriter.flush();
     
@@ -363,6 +364,8 @@ public abstract class AbstractBeanDefinitionParser
                 if (obj != null) {
                     bean.addPropertyValue(propertyName, obj);
                 }
+            } finally {
+                StaxUtils.close(xmlWriter);
             }
         } catch (JAXBException e) {
             throw new RuntimeException("Could not parse configuration.", e);
@@ -402,6 +405,8 @@ public abstract class AbstractBeanDefinitionParser
             xmlWriter.flush();
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
+        } finally {
+            StaxUtils.close(xmlWriter);
         }
 
         BeanDefinitionBuilder jaxbbean 
@@ -431,6 +436,8 @@ public abstract class AbstractBeanDefinitionParser
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            StaxUtils.close(data);
         }
     }
     

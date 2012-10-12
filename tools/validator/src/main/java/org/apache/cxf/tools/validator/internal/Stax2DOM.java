@@ -56,13 +56,16 @@ public class Stax2DOM {
 
     public Document getDocument(URL url) throws ToolException {
         InputStream input = null;
+        XMLStreamReader reader = null;
         try {
             input = url.openStream();
             StreamSource src = new StreamSource(input, url.toExternalForm());
-            return StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
+            reader = StaxUtils.createXMLStreamReader(src);
+            return StaxUtils.read(reader, true);
         } catch (Exception e) {
             throw new ToolException(e);
         } finally {
+            StaxUtils.close(reader);
             if (input != null) {
                 try {
                     input.close();

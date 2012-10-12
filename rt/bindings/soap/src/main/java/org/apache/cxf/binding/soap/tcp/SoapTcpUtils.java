@@ -168,6 +168,8 @@ public final class SoapTcpUtils {
                 }
             } catch (XMLStreamException e) {
                 e.printStackTrace();
+            } finally {
+                StaxUtils.close(xmlReader);
             }
         }
         return false;

@@ -639,6 +639,7 @@ public final class EndpointReferenceUtils {
             Map<String, byte[]> schemaSourcesMap = new LinkedHashMap<String, byte[]>();
             Map<String, Source> schemaSourcesMap2 = new LinkedHashMap<String, Source>();
 
+            XMLStreamWriter writer = null;
             try {
                 for (SchemaInfo si : serviceInfo.getSchemas()) {
                     Element el = si.getElement();
@@ -655,7 +656,7 @@ public final class EndpointReferenceUtils {
                     DOMSource ds = new DOMSource(el, baseURI);   
                     schemaSourcesMap2.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
                     LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
-                    XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+                    writer = StaxUtils.createXMLStreamWriter(out);
                     StaxUtils.copy(el, writer);
                     writer.flush();
                     schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), out.toByteArray());
@@ -712,6 +713,7 @@ public final class EndpointReferenceUtils {
                         unsetReadonly(nd);
                     }
                 }
+                StaxUtils.close(writer);
             }
             serviceInfo.setProperty(Schema.class.getName(), schema);
         }

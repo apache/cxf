@@ -345,14 +345,16 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             if (findDispatchOp && !payloadOPMap.isEmpty()) {
                 String payloadElementName = null;              
                 if (obj instanceof javax.xml.transform.Source) {
+                    XMLStreamReader reader = null;
                     try {
-                        XMLStreamReader reader = StaxUtils
-                            .createXMLStreamReader((javax.xml.transform.Source)obj);
+                        reader = StaxUtils.createXMLStreamReader((javax.xml.transform.Source)obj);
                         Document document = StaxUtils.read(reader);
                         createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
                         payloadElementName = getPayloadElementName(document.getDocumentElement());
                     } catch (Exception e) {                        
                         // ignore, we are trying to get the operation name
+                    } finally {
+                        StaxUtils.close(reader);
                     }
                 }
                 if (obj instanceof SOAPMessage) {
@@ -478,6 +480,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         DataWriter<XMLStreamWriter> dbwriter = dataBinding.createWriter(XMLStreamWriter.class);
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter resultWriter = StaxUtils.createXMLStreamWriter(stringWriter);
+        DepthXMLStreamReader reader = null;
         try {
             dbwriter.write(object, resultWriter);
             resultWriter.flush();
@@ -485,7 +488,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 ByteArrayInputStream binput = new ByteArrayInputStream(stringWriter.getBuffer().toString()
                     .getBytes());
                 XMLStreamReader xmlreader = StaxUtils.createXMLStreamReader(binput);
-                DepthXMLStreamReader reader = new DepthXMLStreamReader(xmlreader);
+                reader = new DepthXMLStreamReader(xmlreader);
 
                 StaxUtils.skipToStartOfElement(reader);
 
@@ -494,6 +497,9 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             }
         } catch (XMLStreamException e) {
             // ignore
+        } finally {
+            StaxUtils.close(reader);
+            StaxUtils.close(resultWriter);
         }
         return null;
     }

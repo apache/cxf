@@ -28,6 +28,7 @@ import java.util.ListIterator;
 
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -421,9 +422,10 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         if (null == src) {
             return null;
         }
-        
+        XMLStreamReader reader = null;
         try {
-            Document doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src));
+            reader = StaxUtils.createXMLStreamReader(src);
+            Document doc = StaxUtils.read(reader);
             uri = getPolicyId(doc.getDocumentElement());
             if (StringUtils.isEmpty(uri)) {
                 uri = defName; 
@@ -436,6 +438,8 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             return doc.getDocumentElement();
         } catch (XMLStreamException e) {
             return null;
+        } finally {
+            StaxUtils.close(reader);
         }
     }
     

@@ -78,6 +78,8 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new WSDLQueryException(new org.apache.cxf.common.i18n.Message("COULD_NOT_PROVIDE_WSDL",
                                                                                 LOG,
                                                                                 base), e);
+        } finally {
+            StaxUtils.close(writer);
         }
     }
 

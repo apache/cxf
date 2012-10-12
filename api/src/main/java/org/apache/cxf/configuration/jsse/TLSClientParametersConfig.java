@@ -155,6 +155,8 @@ public final class TLSClientParametersConfig {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            StaxUtils.close(data);
         }
     }
     
