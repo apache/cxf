@@ -741,6 +741,7 @@ public class RMTxStore implements RMStore {
         for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
             try {
                 stmt.executeUpdate(MessageFormat.format(SET_SCHEMA_STMT_STRS[i], schemaName));
+                ex0 = null;
                 break;
             } catch (SQLException ex) {
                 ex.setNextException(ex0);

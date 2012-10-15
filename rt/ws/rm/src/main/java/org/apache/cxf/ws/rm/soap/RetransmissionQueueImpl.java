@@ -615,14 +615,14 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         /**
          * Cancel further resend (although no ACK has been received).
          */
-        protected void cancel() {
+        protected synchronized void cancel() {
             if (null != nextTask) {
                 nextTask.cancel();
                 releaseSavedMessage();
             }
         }
 
-        protected void suspend() {
+        protected synchronized void suspend() {
             suspended = true;
             pending = false;
             //TODO release the message and later reload it upon resume
@@ -632,7 +632,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
         }
 
-        protected void resume() {
+        protected synchronized void resume() {
             suspended = false;
             next = new Date(System.currentTimeMillis());
             attempted();
