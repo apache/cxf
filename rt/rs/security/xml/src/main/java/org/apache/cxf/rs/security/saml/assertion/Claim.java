@@ -26,7 +26,7 @@ public class Claim {
     public static final String DEFAULT_ROLE_NAME = 
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"; 
     public static final String DEFAULT_NAME_FORMAT = 
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims";
+        "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified";
     
     private String nameFormat;
     private String name;

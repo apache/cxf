@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Claim {
     
-    String format() default "http://schemas.xmlsoap.org/ws/2005/05/identity/claims";
+    String format() default "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified";
     String name() default "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
     String[] value();
     
