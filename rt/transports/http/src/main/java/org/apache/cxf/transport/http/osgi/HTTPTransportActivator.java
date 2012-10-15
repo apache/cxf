@@ -525,6 +525,8 @@ public class HTTPTransportActivator
                     p.setAllowChunking(Boolean.parseBoolean(v.trim()));
                 } else if ("ChunkingThreshold".equals(k)) {
                     p.setChunkingThreshold(Integer.parseInt(v.trim()));
+                } else if ("ChunkLength".equals(k)) {
+                    p.setChunkLength(Integer.parseInt(v.trim()));
                 } else if ("Connection".equals(k)) {
                     p.setConnection(ConnectionType.valueOf(v));
                 } else if ("DecoupledEndpoint".equals(k)) {

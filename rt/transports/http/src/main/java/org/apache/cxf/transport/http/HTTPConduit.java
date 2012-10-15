@@ -511,7 +511,6 @@ public abstract class HTTPConduit
             isChunking = true;
             chunkThreshold = csPolicy.getChunkingThreshold();
         }
-
         cookies.writeToMessageHeaders(message);
 
         // The trust decision is relegated to after the "flushing" of the

@@ -174,7 +174,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         @Override
         public void thresholdReached() {
             if (chunking) {
-                connection.setChunkedStreamingMode(-1);
+                connection.setChunkedStreamingMode(
+                    URLConnectionHTTPConduit.this.getClient().getChunkLength());
             }
         }
         @Override
