@@ -884,11 +884,12 @@ public class RMTxStore implements RMStore {
     }
     
     protected void verifyTable(Connection con, String tableName, String[][] tableCols) {
+        List<String[]> newCols = new ArrayList<String[]>();
+        ResultSet rs = null;
         try {
             DatabaseMetaData metadata = con.getMetaData();
-            ResultSet rs = metadata.getColumns(null, null, tableName, "%");
+            rs = metadata.getColumns(null, null, tableName, "%");
             Set<String> dbCols = new HashSet<String>();
-            List<String[]> newCols = new ArrayList<String[]>(); 
             while (rs.next()) {
                 dbCols.add(rs.getString(4));
             }
@@ -897,12 +898,26 @@ public class RMTxStore implements RMStore {
                     newCols.add(col);
                 }
             }
-            if (newCols.size() > 0) {
-                // need to add the new columns
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");
+        } catch (SQLException ex) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Table " + tableName + " cannot be verified.");
+            }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    // ignore
                 }
+            }
+        }
+        if (newCols.size() > 0) {
+            // need to add the new columns
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");
+            }
                 
+            try { 
                 for (String[] newCol : newCols) {
                     Statement st = con.createStatement();
                     try {
@@ -916,11 +931,8 @@ public class RMTxStore implements RMStore {
                         st.close();
                     }
                 }
-            }
-            
-        } catch (SQLException ex) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Table " + tableName + " cannot be verified.");
+            } catch (SQLException ex) {
+                LOG.log(Level.WARNING, "Table " + tableName + " cannot be altered.", ex);
             }
         }
     }
@@ -953,6 +965,7 @@ public class RMTxStore implements RMStore {
         for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
             try {
                 stmt.executeUpdate(MessageFormat.format(SET_SCHEMA_STMT_STRS[i], schemaName));
+                ex0 = null;
                 break;
             } catch (SQLException ex) {
                 ex.setNextException(ex0);
