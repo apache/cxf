@@ -73,7 +73,6 @@ public abstract class AbstractEndpointSelectionInterceptor extends AbstractPhase
      * 
      * @param message
      * @param eps
-     * @return
      */
     protected abstract Endpoint selectEndpoint(Message message, Set<Endpoint> eps);
 }

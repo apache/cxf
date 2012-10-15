@@ -64,7 +64,6 @@ public @interface UseAsyncMethod {
      * it will use the non-async method.  If you ALWAYS 
      * want the async method called, set this to true.  However,
      * that can cause threads to block.
-     * @return
      */
     boolean always() default false;
 }

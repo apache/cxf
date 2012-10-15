@@ -61,7 +61,7 @@ public abstract class AbstractBindingFactory extends AbstractBaseBindingFactory
      * Copies extensors from the Binding to BindingInfo.
      * @param service
      * @param binding
-     * @return
+     * @param ns
      */
     public BindingInfo createBindingInfo(ServiceInfo service, Binding binding, String ns) {
 

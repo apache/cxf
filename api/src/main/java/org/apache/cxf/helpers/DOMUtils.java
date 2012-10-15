@@ -93,7 +93,6 @@ public final class DOMUtils {
      * 
      * @param e
      * @param attributeName
-     * @return
      */
     public static String getAttributeValueEmptyNull(Element e, String attributeName) {
         Attr node = e.getAttributeNode(attributeName);
@@ -319,7 +318,6 @@ public final class DOMUtils {
      * 
      * @param parent
      * @param q
-     * @return
      */
     public static Element getFirstChildWithName(Element parent, QName q) {
         String ns = q.getNamespaceURI();
@@ -333,7 +331,6 @@ public final class DOMUtils {
      * @param parent
      * @param ns
      * @param lp
-     * @return
      */
     public static Element getFirstChildWithName(Element parent, String ns, String lp) {
         for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
@@ -354,7 +351,6 @@ public final class DOMUtils {
      * @param parent
      * @param ns
      * @param localName
-     * @return
      */
     public static List<Element> getChildrenWithName(Element parent, String ns, String localName) {
         List<Element> r = new ArrayList<Element>();
@@ -396,7 +392,6 @@ public final class DOMUtils {
      * 
      * @param parent
      * @param type
-     * @return
      */
     public static Node getChild(Node parent, int type) {
         Node n = parent.getFirstChild();

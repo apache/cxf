@@ -30,7 +30,6 @@ public interface Factory {
     /**
      * Creates the object that will be used for the invoke 
      * @param e 
-     * @return
      * @throws Throwable
      */
     Object create(Exchange e) throws Throwable;

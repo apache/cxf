@@ -43,7 +43,7 @@ public interface ResourceResolver {
     /**
      * Resolve a resource given its name and return an InputStream to it.
      *
-     * @param resourceName name of the resource to resolve.
+     * @param name name of the resource to resolve.
      * @return an InputStream for the resource or null if it could not be found.
      */
     InputStream getAsStream(String name);

@@ -56,7 +56,7 @@ public class NSStack {
      * the current scope as well as from any nested scopes.
      *
      * @param prefix the prefix to be used for this namespace
-     * @param URI the namespace name of this namespace.
+     * @param uri the namespace name of this namespace.
      */
     public synchronized void add(String prefix, String uri) {
         top.add(new NSDecl(prefix, uri));
@@ -69,7 +69,7 @@ public class NSStack {
      * If the namespace name is already declared and in scope, then the
      * previously declared prefix is returned.
      *
-     * @param URI the namespace name of this namespace
+     * @param uri the namespace name of this namespace
      * @return the unique prefix created or previously declared
      *         for this namespace
      */
@@ -89,7 +89,7 @@ public class NSStack {
      * Return the prefix associated with the given namespace name by
      * looking thru all the namespace declarations that are in scope.
      *
-     * @param URI the namespace name for whom a declared prefix is desired
+     * @param uri the namespace name for whom a declared prefix is desired
      * @return the prefix or null if namespace name not found
      */
     public synchronized String getPrefix(String uri) {

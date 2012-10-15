@@ -175,7 +175,7 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     }
 
     /**
-     * @param the list of features <b>already</b> activated for this endpoint.
+     * @param features the list of features <b>already</b> activated for this endpoint.
      */
     public void initializeActiveFeatures(List<? extends Feature> features) {
         activeFeatures = CastUtils.cast(features);

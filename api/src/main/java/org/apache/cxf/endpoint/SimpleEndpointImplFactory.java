@@ -39,10 +39,9 @@ public class SimpleEndpointImplFactory implements EndpointImplFactory {
     }
 
     /**
-     * Avoid the need to contruct these objects over and over
+     * Avoid the need to construct these objects over and over
      * in cases where the code knows that it needs the basic
      * case.
-     * @return
      */
     public static EndpointImplFactory getSingleton() {
         return singleton;

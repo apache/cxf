@@ -125,14 +125,12 @@ public class LoggingFeature extends AbstractFeature {
     
     /**
      * Retrieve the value set with {@link #setLimit(int)}.
-     * @return
      */
     public int getLimit() {
         return limit;
     }
     
     /**
-     * @return
      */
     public boolean isPrettyLogging() {
         return prettyLogging;

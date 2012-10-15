@@ -46,7 +46,7 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
      * The supplied id is endcoded using a reference parameter.
      * This requires the ws-a interceptors to propagate the reference parameters
      * on subsequent invokes using the returned reference.
-     * @param the id to encode in the new reference
+     * @param id the id to encode in the new reference
      * @return the new reference with the id encoded as a reference parameter
      * @see org.apache.cxf.transport.MultiplexDestination#getAddressWithId(java.lang.String)
       
@@ -71,7 +71,7 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
      * Obtain id from reference parameters of the ws-a to address
      * Requires the existance of ws-a interceptors on dispatch path to provide access 
      * to the ws-a headers
-     * @param the current invocation or message context
+     * @param contextMap the current invocation or message context
      * @return the id from the reference parameters of the  ws-a-to address or null if not found
      * @see org.apache.cxf.transport.MultiplexDestination#getId(java.util.Map)
      */

@@ -129,8 +129,6 @@ public interface AddressingProperties extends AddressingType {
      * Used to specify a different WS-Addressing namespace URI, 
      * so as to cause MAPs to be exposed (i.e. encoded in externalized
      * message with a different WS-Addressing version).
-     * 
-     * @return WS-Addressing namespace URI
      */
     void exposeAs(String uri);
     

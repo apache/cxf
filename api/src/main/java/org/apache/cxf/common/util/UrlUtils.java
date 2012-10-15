@@ -48,7 +48,6 @@ public final class UrlUtils {
      * Decodes using URLDecoder - use when queries or form post values are decoded
      * @param value value to decode
      * @param enc encoding
-     * @return
      */
     public static String urlDecode(String value, String enc) {
         try {
@@ -67,7 +66,6 @@ public final class UrlUtils {
      * URL path segments may contain '+' symbols which should not be decoded into ' '
      * This method replaces '+' with %2B and delegates to URLDecoder
      * @param value value to decode
-     * @return
      */
     public static String pathDecode(String value) {
         // TODO: we actually need to do a proper URI analysis here according to

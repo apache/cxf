@@ -33,7 +33,6 @@ public interface EndpointImplFactory {
      * @param bus
      * @param service
      * @param endpointInfo
-     * @return
      */
     EndpointImpl newEndpointImpl(Bus bus, Service service, 
                                  EndpointInfo endpointInfo) throws EndpointException;

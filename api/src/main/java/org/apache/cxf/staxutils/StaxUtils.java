@@ -228,7 +228,6 @@ public final class StaxUtils {
     /**
      * Return a new factory so that the caller can set sticky parameters.
      * @param nsAware
-     * @return
      */
     public static XMLInputFactory createXMLInputFactory(boolean nsAware) {
         XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -1247,8 +1246,6 @@ public final class StaxUtils {
     /**
      * @param in
      * @param encoding
-     * @param ctx
-     * @return
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in, String encoding) {
         if (encoding == null) {
@@ -1267,7 +1264,6 @@ public final class StaxUtils {
 
     /**
      * @param in
-     * @return
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in) {
         XMLInputFactory factory = getXMLInputFactory();
@@ -1362,7 +1358,6 @@ public final class StaxUtils {
 
     /**
      * @param reader
-     * @return
      */
     public static XMLStreamReader createXMLStreamReader(Reader reader) {
         XMLInputFactory factory = getXMLInputFactory();
@@ -1409,7 +1404,6 @@ public final class StaxUtils {
     /**
      * Create a unique namespace uri/prefix combination.
      * 
-     * @param nsUri
      * @return The namespace with the specified URI. If one doesn't exist, one
      *         is created.
      * @throws XMLStreamException

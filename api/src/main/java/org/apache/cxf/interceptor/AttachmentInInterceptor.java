@@ -38,12 +38,6 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final List<String> TYPES = Collections.singletonList("multipart/related");
 
-    /**
-     * contruct the soap message with attachments from mime input stream
-     * 
-     * @param messageParam
-     */
-    
     public AttachmentInInterceptor() {
         super(Phase.RECEIVE);
     }

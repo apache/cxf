@@ -183,9 +183,7 @@ public final class ContextUtils {
      * @param maps the MAPs to store
      * @param message the current message
      * @param isOutbound true if the message is outbound
-     * @param isRequestor true if the current messaging role is that of
-     * requestor
-     * @param handler true if HANDLER scope, APPLICATION scope otherwise
+     * @param isRequestor true if the current messaging role is that of requestor
      */
     public static void storeMAPs(AddressingProperties maps,
                                  Message message,
@@ -200,9 +198,7 @@ public final class ContextUtils {
      * @param maps the MAPs to store
      * @param message the current message
      * @param isOutbound true if the message is outbound
-     * @param isRequestor true if the current messaging role is that of
-     * requestor
-     * @param handler true if HANDLER scope, APPLICATION scope otherwise
+     * @param isRequestor true if the current messaging role is that of requestor
      * @param isProviderContext true if the binding provider request context 
      */
     public static void storeMAPs(AddressingProperties maps,
@@ -343,7 +339,7 @@ public final class ContextUtils {
      * is considered empty, whereas a zero length action suppresses
      * the propagation of the Action property).
      *
-     * @param ref the MAPs Action under test
+     * @param maps the MAPs Action under test
      * @return true if the Action is empty
      */
     public static boolean hasEmptyAction(AddressingProperties maps) {
@@ -405,7 +401,7 @@ public final class ContextUtils {
      * Retrieve MAP fault name from the message.
      *
      * @param message the current message
-     * @returned the retrieved fault name
+     * @return the retrieved fault name
      */
     public static String retrieveMAPFaultName(Message message) {
         return (String)message.get(MAP_FAULT_NAME_PROPERTY);
@@ -426,7 +422,7 @@ public final class ContextUtils {
      * Retrieve MAP fault reason from the message.
      *
      * @param message the current message
-     * @returned the retrieved fault reason
+     * @return the retrieved fault reason
      */
     public static String retrieveMAPFaultReason(Message message) {
         return (String)message.get(MAP_FAULT_REASON_PROPERTY);
@@ -449,7 +445,7 @@ public final class ContextUtils {
      * Retrieve indication that a partial response has been sent.
      *
      * @param message the current message
-     * @returned the retrieved indication that a partial response
+     * @return the retrieved indication that a partial response
      * has been sent
      */
     public static boolean retrievePartialResponseSent(Message message) {
@@ -474,7 +470,7 @@ public final class ContextUtils {
      * supported
      *
      * @param message the current message
-     * @returned the retrieved indication 
+     * @return the retrieved indication 
      */
     public static boolean retrieveDeferUncorrelatedMessageAbort(Message message) {
         Boolean ret = message.getExchange() != null 
@@ -500,7 +496,7 @@ public final class ContextUtils {
      * occur.
      *
      * @param message the current message
-     * @returned the retrieved indication 
+     * @return the retrieved indication 
      */
     public static boolean retrieveDeferredUncorrelatedMessageAbort(Message message) {
         Boolean ret = message.getExchange() != null 
@@ -514,7 +510,7 @@ public final class ContextUtils {
      * is required.
      * 
      * @param message the current message
-     * @returned the retrieved indication that an async post-response service
+     * @return the retrieved indication that an async post-response service
      * invocation is required.
      */
     public static boolean retrieveAsyncPostResponseDispatch(Message message) {
@@ -593,7 +589,7 @@ public final class ContextUtils {
     /**
      * Create a Binding specific Message.
      * 
-     * @param message the current message
+     * @param exchange the current exchange
      * @return the Method from the BindingOperationInfo
      */
     public static Message createMessage(Exchange exchange) {

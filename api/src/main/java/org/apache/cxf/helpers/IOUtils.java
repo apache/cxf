@@ -45,7 +45,6 @@ public final class IOUtils {
      * non-standard default encodings.
      * @param bytes
      * @param charsetName
-     * @return
      */
     public static String newStringFromBytes(byte[] bytes, String charsetName) {
         try {
@@ -62,7 +61,6 @@ public final class IOUtils {
     /**
      * Use this function instead of new String(byte[]) to avoid surprises from non-standard default encodings.
      * @param bytes
-     * @return
      */
     public static String newStringFromBytes(byte[] bytes) {
         return newStringFromBytes(bytes, UTF8_CHARSET.name());        
@@ -75,7 +73,6 @@ public final class IOUtils {
      * @param charsetName
      * @param start
      * @param length
-     * @return
      */
     public static String newStringFromBytes(byte[] bytes, String charsetName, int start, int length) {
         try {
@@ -94,7 +91,6 @@ public final class IOUtils {
      * @param bytes
      * @param start
      * @param length
-     * @return
      */
     public static String newStringFromBytes(byte[] bytes, int start, int length) {
         return newStringFromBytes(bytes, UTF8_CHARSET.name(), start, length);
@@ -241,7 +237,6 @@ public final class IOUtils {
      * represents it. Closes the in stream.
      * 
      * @param in
-     * @return
      * @throws IOException
      */
     public static ByteArrayInputStream loadIntoBAIS(InputStream in)

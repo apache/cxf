@@ -173,7 +173,7 @@ public class ClientImpl
     /**
      * Create a Client that uses a specific EndpointImpl.
      * @param bus
-     * @param service
+     * @param svc
      * @param port
      * @param endpointImplFactory
      */

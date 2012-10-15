@@ -135,7 +135,6 @@ public final class XmlSchemaUtils {
     /**
      * Retrieve the string values for an enumeration.
      * @param type
-     * @return
      */
     public static List<String> enumeratorValues(XmlSchemaSimpleType type) {
         XmlSchemaSimpleTypeContent content = type.getContent();
@@ -153,7 +152,6 @@ public final class XmlSchemaUtils {
      * Is there an import for a particular namespace in a schema?
      * @param schema
      * @param namespaceUri
-     * @return
      */
     public static boolean schemaImportsNamespace(XmlSchema schema, String namespaceUri) {
         List<XmlSchemaExternal> externals =  schema.getExternals();
@@ -224,7 +222,6 @@ public final class XmlSchemaUtils {
      *
      * @param name
      * @param referencingURI
-     * @return
      */
     public static XmlSchemaElement findElementByRefName(SchemaCollection xmlSchemaCollection,
                                                          QName name,
@@ -358,7 +355,6 @@ public final class XmlSchemaUtils {
      * schema.
      * @param element
      * @param schema
-     * @return
      */
     public static QName getElementQualifiedName(XmlSchemaElement element, XmlSchema schema) {
         if (element.getQName() != null) {
@@ -375,7 +371,6 @@ public final class XmlSchemaUtils {
      * a type.
      *
      * @param element
-     * @return
      */
     public static XmlSchemaType getElementType(SchemaCollection xmlSchemaCollection,
                                                String referencingURI,
@@ -425,7 +420,6 @@ public final class XmlSchemaUtils {
      * return the 'Annotated'. If it's not one of those, or it's a group,
      * throw. We're not ready for groups yet.
      * @param object
-     * @return
      */
     public static XmlSchemaAnnotated getObjectAnnotated(XmlSchemaObject object, QName contextName) {
 
@@ -448,7 +442,6 @@ public final class XmlSchemaUtils {
      * If the object is an element or an any, return the particle. If it's not a particle, or it's a group,
      * throw. We're not ready for groups yet.
      * @param object
-     * @return
      */
     public static XmlSchemaParticle getObjectParticle(XmlSchemaObject object, QName contextName) {
 
@@ -564,7 +557,7 @@ public final class XmlSchemaUtils {
      *                it, or in a part)
      * @param localSchema the schema of the complex type containing the
      *                reference, only used for the 'odd case'.
-     * @param elementSchema the schema for the element.
+     * @param attributeSchema the schema for the element.
      * @return if the element needs to be qualified.
      */
     public static boolean isAttributeQualified(XmlSchemaAttribute attribute,

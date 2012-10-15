@@ -66,10 +66,9 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
     }
 
     /**
-     * Get the system propery via the AccessController, but if a SecurityException is 
+     * Get the system property via the AccessController, but if a SecurityException is 
      * raised, just return null;
      * @param name
-     * @return
      */
     public static String getPropertyOrNull(String name) {
         try {

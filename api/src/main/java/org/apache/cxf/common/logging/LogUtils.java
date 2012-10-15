@@ -170,7 +170,7 @@ public final class LogUtils {
      * Get a Logger with an associated resource bundle.
      *
      * @param cls the Class to contain the Logger
-     * @param name the resource name
+     * @param resourcename the resource name
      * @return an appropriate Logger 
      */
     public static Logger getLogger(Class<?> cls, String resourcename) {
@@ -181,7 +181,7 @@ public final class LogUtils {
      * Get a Logger with an associated resource bundle.
      *
      * @param cls the Class to contain the Logger (to find resources)
-     * @param name the resource name
+     * @param resourcename the resource name
      * @param loggerName the full name for the logger
      * @return an appropriate Logger 
      */
@@ -205,7 +205,7 @@ public final class LogUtils {
      * Get a Logger with an associated resource bundle.
      *
      * @param cls the Class to contain the Logger
-     * @param name the resource name
+     * @param resourcename the resource name
      * @return an appropriate Logger 
      */
     public static Logger getL7dLogger(Class<?> cls, String resourcename) {
@@ -216,7 +216,7 @@ public final class LogUtils {
      * Get a Logger with an associated resource bundle.
      *
      * @param cls the Class to contain the Logger (to find resources)
-     * @param name the resource name
+     * @param resourcename the resource name
      * @param loggerName the full name for the logger
      * @return an appropriate Logger 
      */

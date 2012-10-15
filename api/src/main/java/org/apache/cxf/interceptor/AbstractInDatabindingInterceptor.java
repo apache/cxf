@@ -135,7 +135,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
      * @param name
      * @param client
      * @param index
-     * @return
      */
     protected MessagePartInfo findMessagePart(Exchange exchange, Collection<OperationInfo> operations,
                                               QName name, boolean client, int index,
@@ -246,7 +245,6 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
      * @param exchange
      * @param name
      * @param client
-     * @return
      */
     protected BindingOperationInfo getBindingOperationInfo(Exchange exchange, QName name,
                                                               boolean client) {

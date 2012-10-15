@@ -203,7 +203,7 @@ public final class JAXBUtils {
      * Generates a Java package name from a URI according to the
      * algorithm outlined in Appendix D of JAXB (2.0+).
      * 
-     * @param namespaceURI the namespace URI.
+     * @param uri the namespace URI.
      * @return the package name.
      */
     public static String nameSpaceURIToPackage(URI uri) {

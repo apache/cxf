@@ -161,7 +161,6 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * 
      * @param op
      * @param class1
-     * @return
      */
     public FaultInfo getFaultForClass(BindingOperationInfo op, Class<?> class1) {
         for (BindingFaultInfo bfi : op.getFaults()) {

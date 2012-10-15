@@ -115,10 +115,6 @@ public final class AttachmentUtil {
         }
     }
     
-    /**
-     * @param ns
-     * @return
-     */
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
         String cid = "cxf.apache.org";

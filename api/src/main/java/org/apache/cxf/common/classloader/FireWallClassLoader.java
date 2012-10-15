@@ -31,7 +31,7 @@ import java.security.SecureClassLoader;
  * provide the requested resource, the child class loader will be consulted for
  * the request. <I>Note: the parent class loader must not be confused by the
  * superclass of a certain class loader (e.g. SecureClassLoader). The parent
- * classloader is identified at constuction time and passed in as an constructor
+ * classloader is identified at construction time and passed in as an constructor
  * argument.</I>
  * <P>
  * Consulting the parent classloader first can be inconvenient for certain
@@ -64,7 +64,7 @@ import java.security.SecureClassLoader;
  * requests.
  * <P>
  * A very common set of filters would be a set that allows nothing through
- * except the classes used by the JDK. The {@link JDKFireWallClassLoaderFactory}
+ * except the classes used by the JDK. The JDKFireWallClassLoaderFactory
  * factory class can create such FireWallClassLoader.
  * <P>
  * The FireWallClassLoader does not load any classes.

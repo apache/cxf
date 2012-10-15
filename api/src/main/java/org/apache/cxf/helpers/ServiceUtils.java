@@ -40,7 +40,6 @@ public final class ServiceUtils {
      * 
      * @param message
      * @param type
-     * @return
      */
     public static boolean isSchemaValidationEnabled(SchemaValidationType type, Message message) {
         SchemaValidationType messageType = getSchemaValidationType(message);
@@ -58,7 +57,6 @@ public final class ServiceUtils {
      * visible for easier testing
      * 
      * @param message
-     * @return
      */
     static SchemaValidationType getSchemaValidationType(Message message) {
         Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
@@ -175,7 +173,6 @@ public final class ServiceUtils {
      * Method makePackageName
      * 
      * @param namespace
-     * @return
      */
     public static String makePackageName(String namespace) {
 

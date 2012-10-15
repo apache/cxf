@@ -184,7 +184,6 @@ public final class ReflectionUtil {
      * @param beanInfo Bean in question
      * @param beanClass class for bean in question
      * @param propertyDescriptors raw descriptors
-     * @return 
      */
     public static PropertyDescriptor[] getPropertyDescriptorsAvoidSunBug(Class<?> refClass, 
                                                                   BeanInfo beanInfo,
@@ -274,7 +273,6 @@ public final class ReflectionUtil {
      * 
      * @param m method to examine
      * @param annotationType the annotation type to look for.
-     * @return
      */
     public static <T extends Annotation> T getAnnotationForMethodOrContainingClass(Method m,
                                                                                    Class<T> annotationType) {

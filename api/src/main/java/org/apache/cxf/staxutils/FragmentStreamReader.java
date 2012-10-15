@@ -129,7 +129,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     /**
      * Set whether or not the FragmentStreamReader should move past the END_ELEMENT
      * when it is done parsing.
-     * @param advanceAtEnd
+     * @param a
      */
     public void setAdvanceAtEnd(boolean a) {
         this.advanceAtEnd = a;

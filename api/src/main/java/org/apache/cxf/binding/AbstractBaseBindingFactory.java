@@ -69,8 +69,6 @@ public abstract class AbstractBaseBindingFactory implements BindingFactory {
      * createBindingInfo(Service service, String binding, Object config) to actually
      * create the BindingInfo.  Can return a subclass which can then process
      * the extensors within the subclass.
-     * @param service
-     * @return
      */
     public BindingInfo createBindingInfo(ServiceInfo service, String namespace, Object config) {
         return new BindingInfo(service, namespace);

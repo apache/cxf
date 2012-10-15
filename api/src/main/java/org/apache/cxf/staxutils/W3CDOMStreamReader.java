@@ -80,8 +80,6 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     /**
      * Get the document associated with this stream.
-     * 
-     * @return
      */
     public Document getDocument() {
         return document;
