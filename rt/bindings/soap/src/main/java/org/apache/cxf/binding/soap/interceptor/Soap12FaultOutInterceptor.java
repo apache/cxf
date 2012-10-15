@@ -113,6 +113,12 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 writer.writeEndElement();
                 writer.writeEndElement();
 
+                if (fault.getRole() != null) {
+                    writer.writeStartElement(defaultPrefix, "Role", ns);
+                    writer.writeCharacters(fault.getRole());
+                    writer.writeEndElement();
+                }
+
                 prepareStackTrace(message, fault);
                 
                 if (fault.hasDetails()) {
@@ -126,12 +132,6 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                     }
 
                     // Details
-                    writer.writeEndElement();
-                }
-
-                if (fault.getRole() != null) {
-                    writer.writeStartElement(defaultPrefix, "Role", ns);
-                    writer.writeCharacters(fault.getRole());
                     writer.writeEndElement();
                 }
 
