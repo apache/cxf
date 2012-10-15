@@ -239,7 +239,11 @@
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
-
+                <xs:attribute name="ChunkLength" type="ptp:ParameterizedInt" use="optional" default="-1">
+                    <xs:annotation>
+                        <xs:documentation>Specifies the chunk length for a HttpURLConnection. This value is used in java.net.HttpURLConnection.setChunkedStreamingMode(int chunklen). chunklen indicates the number of bytes to write in each chunk. If chunklen is less than or equal to zero, a default value will be used.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute name="Accept" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
