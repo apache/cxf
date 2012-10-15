@@ -55,7 +55,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	     <sec:UserName>Betty</sec:UserName>
 	     <sec:Password>password</sec:Password>
 	  </http:authorization>
-      <http:client AutoRedirect="true" Connection="Keep-Alive"/>
+      <http:client AutoRedirect="true" Connection="Keep-Alive" ChunkLength="10240"/>
 
    </http:conduit>    
 </beans>

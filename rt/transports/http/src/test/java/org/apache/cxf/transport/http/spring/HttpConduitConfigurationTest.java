@@ -38,6 +38,7 @@ import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -106,6 +107,8 @@ public class HttpConduitConfigurationTest extends Assert {
         assertNotNull(csfs);
         assertEquals(5, csfs.getInclude().size());
         assertEquals(1, csfs.getExclude().size());
+        HTTPClientPolicy clientPolicy = conduit.getClient();
+        assertEquals(10240, clientPolicy.getChunkLength());
     }
 
     
