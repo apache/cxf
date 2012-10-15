@@ -142,6 +142,7 @@ public abstract class AbstractResponseContextImpl {
     }
     
     public void setStatus(int status) {
+        m.getExchange().put(Message.RESPONSE_CODE, status);
         m.put(Message.RESPONSE_CODE, status);
         ((ResponseImpl)r).setStatus(status);
         updateMessageResponse();

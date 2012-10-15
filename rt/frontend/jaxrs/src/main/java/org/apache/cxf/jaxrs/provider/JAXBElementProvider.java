@@ -141,7 +141,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
-        if (isPayloadEmpty()) {
+        if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
             } else {
