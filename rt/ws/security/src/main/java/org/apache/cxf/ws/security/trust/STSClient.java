@@ -1548,6 +1548,10 @@ public class STSClient implements Configurable, InterceptorProvider {
         claims = rstClaims;
     }
     
+    public Element getClaims() {
+        return claims;
+    }
+    
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         if (client != null) {
             return client.getOutFaultInterceptors();
