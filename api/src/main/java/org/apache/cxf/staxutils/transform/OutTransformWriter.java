@@ -108,13 +108,11 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         
         if (defaultNamespace != null && defaultNamespace.equals(uri)) {
             super.writeDefaultNamespace(uri);
-            namespaceContext.addPrefix("", uri);
         } else {
             if (prefix.length() == 0) {
                 prefix = namespaceContext.findUniquePrefix(uri);
             }
             super.writeNamespace(prefix, uri);
-            namespaceContext.addPrefix(prefix, uri);
         }
         writtenUris.get(0).add(uri);
     }
@@ -137,7 +135,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         super.writeDefaultNamespace(uri);
-        namespaceContext.addPrefix("", uri);
+
         writtenUris.get(0).add(uri);
     }
 
@@ -365,13 +363,13 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                 namespaceContext.addPrefix(prefix, qname.getNamespaceURI());    
             }
             
-        } 
+        }
         if (isDefaultNamespaceRedefined(qname.getNamespaceURI())) {
             prefix = "";
         }
+        
         super.writeStartElement(prefix, qname.getLocalPart(), qname.getNamespaceURI());
-        if (writeNs 
-            || !qname.getNamespaceURI().equals(namespaceContext.getNamespaceURI(prefix))) {
+        if (writeNs) {
             this.writeNamespace(prefix, qname.getNamespaceURI());
         }
     }
