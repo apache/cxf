@@ -170,6 +170,7 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
     protected WSUsernameTokenPrincipal getPrincipal(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
         
+        boolean bspCompliant = isWsiBSPCompliant(message);
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
         if (utWithCallbacks) {
@@ -188,21 +189,23 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                     return (Validator)validator;
                 }
             };
-            data.setWssConfig(WSSConfig.getNewInstance());
+            WSSConfig config = WSSConfig.getNewInstance();
+            config.setWsiBSPCompliant(bspCompliant);
+            data.setWssConfig(config);
             List<WSSecurityEngineResult> results = 
                 p.handleToken(tokenElement, data, wsDocInfo);
             return (WSUsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         } else {
-            WSUsernameTokenPrincipal principal = parseTokenAndCreatePrincipal(tokenElement);
+            WSUsernameTokenPrincipal principal = parseTokenAndCreatePrincipal(tokenElement, bspCompliant);
             WSS4JTokenConverter.convertToken(message, principal);
             return principal;
         }
     }
     
-    protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement) 
+    protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
         throws WSSecurityException {
         org.apache.ws.security.message.token.UsernameToken ut = 
-            new org.apache.ws.security.message.token.UsernameToken(tokenElement);
+            new org.apache.ws.security.message.token.UsernameToken(tokenElement, false, bspCompliant);
         
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
         principal.setNonce(ut.getNonce());
@@ -211,6 +214,12 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         principal.setPasswordType(ut.getPasswordType());
 
         return principal;
+    }
+    
+    protected boolean isWsiBSPCompliant(final SoapMessage message) {
+        String bspc = (String)message.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
+        // Default to WSI-BSP compliance enabled
+        return !("false".equals(bspc) || "0".equals(bspc));
     }
     
     protected SecurityContext createSecurityContext(final Principal p, Subject subject) {
