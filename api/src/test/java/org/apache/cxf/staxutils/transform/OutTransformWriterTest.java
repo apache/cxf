@@ -115,9 +115,9 @@ public class OutTransformWriterTest extends Assert {
         String xmlPI = "<?xml version='1.0' encoding='UTF-8'?>";
         String start = "<testBean xmlns=\"http://testbeans.com/v2\"";
         String expected1 = xmlPI + start
-            + " xmlns:ps2=\"http://testbeans.com/v3\"><ps2:bean/></testBean>";
+            + " xmlns:ps1=\"http://testbeans.com/v3\"><ps1:bean/></testBean>";
         String expected2 = xmlPI + start
-            + "><ps2:bean xmlns:ps2=\"http://testbeans.com/v3\"/></testBean>";
+            + "><ps1:bean xmlns:ps1=\"http://testbeans.com/v3\"/></testBean>";
         String out = os.toString();
         assertTrue("Output \"" + out + "\" does not match expected values",
                 expected1.equals(out) || expected2.equals(out));
