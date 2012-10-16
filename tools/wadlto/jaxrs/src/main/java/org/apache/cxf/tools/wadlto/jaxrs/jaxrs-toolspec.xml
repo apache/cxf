@@ -183,6 +183,13 @@ Examples:
                 <switch>noTypes</switch>
             </option>
             
+            <option id="noVoidForEmptyResponses" maxOccurs="1">
+                <annotation>
+                   Use JAX-RS Response return type for methods with no response representation
+                </annotation>
+                <switch>noVoidForEmptyResponses</switch>
+            </option>
+            
             <option id="noAddressBinding" maxOccurs="1">
                 <annotation>
                     Specifies that the generator should not use the address jaxb binding file to map wsa:EndpointReferenceType 
