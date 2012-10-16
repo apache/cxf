@@ -195,10 +195,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         jaxbElementClassMap = map;
     }
     
-    protected boolean isPayloadEmpty() {
-        return mc != null ? isPayloadEmpty(mc.getHttpHeaders()) : false;     
-    }
-    
     protected void reportEmptyContentLength() {
         String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
         LOG.warning(message);
