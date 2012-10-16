@@ -402,7 +402,8 @@ public class AsyncHTTPConduitFactory implements BusLifeCycleListener, HTTPCondui
                 HttpParams params = new SyncBasicHttpParams();
                 HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
                 HttpConnectionParams.setTcpNoDelay(params, true);
-                HttpConnectionParams.setSocketBufferSize(params, 16332);
+                int bufSize = c.getClient().getChunkLength() > 0 ? c.getClient().getChunkLength() : 16332;
+                HttpConnectionParams.setSocketBufferSize(params, bufSize);
                 HttpConnectionParams.setConnectionTimeout(params, (int)c.getClient().getConnectionTimeout());
                 return params;
             }

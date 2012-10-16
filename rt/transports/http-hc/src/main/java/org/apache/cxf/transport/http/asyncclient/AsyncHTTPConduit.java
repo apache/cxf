@@ -248,8 +248,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             entity = message.get(CXFHttpRequest.class);
             basicEntity = (BasicHttpEntity)entity.getEntity();
             HeapByteBufferAllocator allocator = new HeapByteBufferAllocator();
-            inbuf = new SharedInputBuffer(16320, allocator);
-            outbuf = new SharedOutputBuffer(16320, allocator);
+            int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
+            inbuf = new SharedInputBuffer(bufSize, allocator);
+            outbuf = new SharedOutputBuffer(bufSize, allocator);
         }
         
         public boolean retransmitable() {
@@ -711,8 +712,9 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             
             //reset the buffers
             HeapByteBufferAllocator allocator = new HeapByteBufferAllocator();
-            inbuf = new SharedInputBuffer(16320, allocator);
-            outbuf = new SharedOutputBuffer(16320, allocator);
+            int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
+            inbuf = new SharedInputBuffer(bufSize, allocator);
+            outbuf = new SharedOutputBuffer(bufSize, allocator);
             try {
                 this.url = new URI(newURL);
                 setupConnection(outMessage, this.url, csPolicy);
