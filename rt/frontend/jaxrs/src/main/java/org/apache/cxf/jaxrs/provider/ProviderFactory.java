@@ -181,13 +181,14 @@ public final class ProviderFactory {
         Message responseMessage = isRequestor ? m.getExchange().getInMessage() 
                                               : m.getExchange().getOutMessage();
         if (responseMessage != null) {
-            if (!responseMessage.containsKey(Message.CONTENT_TYPE)) {
+            Object ctProperty = responseMessage.get(Message.CONTENT_TYPE);
+            if (ctProperty == null) {
                 List<MediaType> accepts = requestHeaders.getAcceptableMediaTypes();
                 if (accepts.size() > 0) {
                     mt = accepts.get(0);
                 }
             } else {
-                mt = MediaType.valueOf(responseMessage.get(Message.CONTENT_TYPE).toString());
+                mt = MediaType.valueOf(ctProperty.toString());
             }
         } else {
             mt = requestHeaders.getMediaType();

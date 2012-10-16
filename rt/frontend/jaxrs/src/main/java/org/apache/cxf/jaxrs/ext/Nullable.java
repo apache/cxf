@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * injected instead  
  * 
  */
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Nullable {
 }

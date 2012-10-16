@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.provider;
 import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -148,16 +149,25 @@ public abstract class AbstractConfigurableProvider {
     
     protected boolean isPayloadEmpty(HttpHeaders headers) {
         if (headers != null) {
-            List<String> values = headers.getRequestHeader(HttpHeaders.CONTENT_LENGTH);
-            if (values.size() == 1) {
+            return isPayloadEmpty(headers.getRequestHeaders());
+        } else {
+            return false;
+        }
+    }
+    
+    protected boolean isPayloadEmpty(MultivaluedMap<String, String> headers) {
+        if (headers != null) {
+            String value = headers.getFirst(HttpHeaders.CONTENT_LENGTH);
+            if (value != null) {
                 try {
-                    Long len = Long.valueOf(values.get(0));
+                    Long len = Long.valueOf(value);
                     return len <= 0;
                 } catch (NumberFormatException ex) {
                     // ignore
                 }
             }
         }
+        
         return false;
     }
 }

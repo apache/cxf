@@ -194,7 +194,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         
-        if (isPayloadEmpty()) {
+        if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
             } else {

@@ -1063,6 +1063,37 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(444L, book.getId());
     }
     
+    @Test(expected = ClientException.class)
+    public void testEmptyJSON() {
+        doTestEmptyResponse("application/json");
+    }
+    
+    @Test(expected = ClientException.class)
+    public void testEmptyJAXB() {
+        doTestEmptyResponse("application/xml");
+    }
+    
+    private void doTestEmptyResponse(String mt) {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/emptybook");
+        WebClient.getConfig(wc).getInInterceptors().add(new ReplaceStatusInterceptor());
+        wc.accept(mt);
+        wc.get(Book.class);
+    }
+    
+    @Test(expected = ClientException.class)
+    public void testEmptyResponseProxy() {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());
+        store.getEmptyBook();
+    }
+    
+    @Test
+    public void testEmptyResponseProxyNullable() {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());
+        assertNull(store.getEmptyBookNullable());
+    }
+    
     @Test
     public void testFormattedJSON() {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
@@ -1889,4 +1920,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    public static class ReplaceStatusInterceptor extends AbstractPhaseInterceptor<Message> {
+        public ReplaceStatusInterceptor() {
+            super(Phase.READ);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            message.getExchange().put(Message.RESPONSE_CODE, 200);
+        }
+    }
+    
 }
