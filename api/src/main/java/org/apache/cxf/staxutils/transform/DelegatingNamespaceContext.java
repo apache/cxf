@@ -82,7 +82,9 @@ class DelegatingNamespaceContext implements NamespaceContext {
             }
         }
         String ns = nc.getNamespaceURI(prefix);
-        addPrefix(prefix, ns);
+        if (ns != null) {
+            addPrefix(prefix, ns);
+        }
         return ns;
     }
 
@@ -100,7 +102,9 @@ class DelegatingNamespaceContext implements NamespaceContext {
             return prefixes.get(0).get(actualNs);
         }
         String prefix = nc.getPrefix(actualNs);
-        addPrefix(prefix, actualNs);
+        if (prefix != null) {
+            addPrefix(prefix, actualNs);
+        }
         return prefix;
     }
 
