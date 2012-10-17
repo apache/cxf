@@ -973,7 +973,7 @@ public class DynamicClientFactory {
         }
         return clone;
     }
-    public class LocationFilterReader extends StreamReaderDelegate implements XMLStreamReader {
+    public class LocationFilterReader extends StreamReaderDelegate {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;

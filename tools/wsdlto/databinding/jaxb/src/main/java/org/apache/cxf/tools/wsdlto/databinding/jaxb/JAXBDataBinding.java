@@ -124,7 +124,7 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerExcep
 public class JAXBDataBinding implements DataBindingProfile {
 
 
-    public class LocationFilterReader extends StreamReaderDelegate implements XMLStreamReader {
+    public class LocationFilterReader extends StreamReaderDelegate {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;

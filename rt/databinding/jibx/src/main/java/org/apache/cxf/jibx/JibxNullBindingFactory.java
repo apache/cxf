@@ -19,14 +19,13 @@
 
 package org.apache.cxf.jibx;
 
-import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.impl.BindingFactoryBase;
 
 /**
  * Dummy binding factory for conversion of simple value conversion which do not require a real JiBX binding.
  * This code was take from Axis2 JiBX code generation tool.
  */
-public final class JibxNullBindingFactory extends BindingFactoryBase implements IBindingFactory {
+public final class JibxNullBindingFactory extends BindingFactoryBase {
 
     private static final String[] EMPTY_ARRAY = new String[0];
     private static JibxNullBindingFactory instance;

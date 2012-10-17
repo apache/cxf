@@ -45,7 +45,6 @@ import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.AttributeKey;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -211,7 +210,7 @@ public class UDPDestination extends AbstractDestination {
     }
     
     
-    class UDPIOHandler extends StreamIoHandler implements IoHandler {
+    class UDPIOHandler extends StreamIoHandler {
         
         
         @Override

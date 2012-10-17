@@ -42,7 +42,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
-import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.AbstractPolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.LocalDocumentReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
@@ -55,8 +54,7 @@ import org.springframework.core.io.Resource;
  * 
  */
 @NoJSR250Annotations
-public class ExternalAttachmentProvider extends AbstractPolicyProvider
-    implements PolicyProvider {
+public class ExternalAttachmentProvider extends AbstractPolicyProvider {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ExternalAttachmentProvider.class);
     

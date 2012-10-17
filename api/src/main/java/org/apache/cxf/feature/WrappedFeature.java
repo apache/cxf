@@ -32,7 +32,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * If you're simply adding interceptors to a Server, Client, or Bus, this allows you to add
  * them easily.
  */
-public class WrappedFeature extends AbstractFeature implements Feature {
+public class WrappedFeature extends AbstractFeature {
     final Feature wrapped;
     public WrappedFeature(Feature f) {
         wrapped = f;

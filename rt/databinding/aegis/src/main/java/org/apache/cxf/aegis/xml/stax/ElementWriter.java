@@ -31,7 +31,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class ElementWriter extends AbstractMessageWriter implements MessageWriter {
+public class ElementWriter extends AbstractMessageWriter {
     private XMLStreamWriter writer;
 
     private String namespace;

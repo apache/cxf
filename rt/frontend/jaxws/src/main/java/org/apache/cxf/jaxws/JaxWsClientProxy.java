@@ -21,7 +21,6 @@ package org.apache.cxf.jaxws;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -62,7 +61,7 @@ import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implements
-    InvocationHandler, BindingProvider {
+    BindingProvider {
 
     public static final String THREAD_LOCAL_REQUEST_CONTEXT = "thread.local.request.context";
     

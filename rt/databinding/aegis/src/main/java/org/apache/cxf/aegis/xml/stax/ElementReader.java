@@ -39,7 +39,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class ElementReader extends AbstractMessageReader implements MessageReader {
+public class ElementReader extends AbstractMessageReader {
     private static final Pattern QNAME_PATTERN = Pattern.compile("([^:]+):([^:]+)");
 
     private DepthXMLStreamReader root;

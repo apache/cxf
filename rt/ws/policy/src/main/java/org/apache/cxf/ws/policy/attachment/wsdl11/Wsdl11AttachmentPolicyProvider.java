@@ -46,7 +46,6 @@ import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.policy.PolicyConstants;
-import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.AbstractPolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.LocalServiceModelReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
@@ -61,8 +60,7 @@ import org.apache.neethi.PolicyReference;
  * 
  */
 @NoJSR250Annotations
-public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider 
-    implements PolicyProvider {
+public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(Wsdl11AttachmentPolicyProvider.class);
 
     public Wsdl11AttachmentPolicyProvider() {
