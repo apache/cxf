@@ -61,6 +61,7 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
@@ -519,7 +520,7 @@ public class RMManagerTest extends Assert {
         InterfaceInfo ii = control.createMock(InterfaceInfo.class);
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);          
         Conduit conduit = control.createMock(Conduit.class);        
-        setUpRecoverReliableEndpoint(endpoint, conduit, null, null, null);
+        setUpRecoverReliableEndpoint(endpoint, conduit, null, null, null, null);
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
         control.verify();
@@ -528,7 +529,7 @@ public class RMManagerTest extends Assert {
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);
         SourceSequence ss = control.createMock(SourceSequence.class);
         DestinationSequence ds = control.createMock(DestinationSequence.class);
-        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, null);
+        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, null, null);
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
         control.verify();
@@ -536,10 +537,16 @@ public class RMManagerTest extends Assert {
         control.reset();
         setUpEndpointForRecovery(endpoint, ei, si, bi, ii);  
         RMMessage m = control.createMock(RMMessage.class);
-        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, m);        
+        Capture<Message> mc = new Capture<Message>();
+        setUpRecoverReliableEndpoint(endpoint, conduit, ss, ds, m, mc);        
         control.replay();
         manager.recoverReliableEndpoint(endpoint, conduit, ProtocolVariation.RM10WSA200408);
-        control.verify();        
+        control.verify();
+        
+        Message msg = mc.getValue();
+        assertNotNull(msg);
+        assertNotNull(msg.getExchange());
+        assertSame(msg, msg.getExchange().getOutMessage());
     }
     
     Endpoint setUpEndpointForRecovery(Endpoint endpoint, 
@@ -558,7 +565,7 @@ public class RMManagerTest extends Assert {
     void setUpRecoverReliableEndpoint(Endpoint endpoint,
                                       Conduit conduit, 
                                       SourceSequence ss, 
-                                      DestinationSequence ds, RMMessage m)  {                
+                                      DestinationSequence ds, RMMessage m, Capture<Message> mc)  {                
         RMStore store = control.createMock(RMStore.class);
         RetransmissionQueue queue = control.createMock(RetransmissionQueue.class);
         manager.setStore(store);
@@ -628,10 +635,14 @@ public class RMManagerTest extends Assert {
         }
         EasyMock.expect(m.getCachedOutputStream()).andReturn(cos);
 
-        queue.addUnacknowledged(EasyMock.isA(Message.class));
+        if (mc != null) {
+            queue.addUnacknowledged(EasyMock.capture(mc));
+        } else {
+            queue.addUnacknowledged(EasyMock.isA(Message.class));
+        }
         EasyMock.expectLastCall();
         queue.start();
-        EasyMock.expectLastCall(); 
+        EasyMock.expectLastCall();
     }
     
     @Test
