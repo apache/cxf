@@ -552,6 +552,7 @@ public class RMManager {
             Message message = new MessageImpl();
             Exchange exchange = new ExchangeImpl();
             message.setExchange(exchange);
+            exchange.setOutMessage(message);
             if (null != conduit) {
                 exchange.setConduit(conduit);
                 message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
