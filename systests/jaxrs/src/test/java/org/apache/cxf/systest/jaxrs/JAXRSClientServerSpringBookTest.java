@@ -81,20 +81,22 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     @Test
     public void testPostGeneratedBook() throws Exception {
-        String baseAddress = "http://localhost:" + PORT + "/the/generated/bookstore/books/1";
+        String baseAddress = "http://localhost:" + PORT + "/the/generated";
         JAXBElementProvider provider = new JAXBElementProvider();
         provider.setJaxbElementClassMap(Collections.singletonMap(
                                           "org.apache.cxf.systest.jaxrs.codegen.schema.Book", 
                                           "{http://superbooks}thebook"));
         
-        WebClient wc = WebClient.create(baseAddress,
-                                        Collections.singletonList(provider));
-        wc.type("application/xml");
+        org.apache.cxf.systest.jaxrs.codegen.service.BookStore bookStore = 
+            JAXRSClientFactory.create(baseAddress, 
+                org.apache.cxf.systest.jaxrs.codegen.service.BookStore.class,
+                Collections.singletonList(provider));
         
         org.apache.cxf.systest.jaxrs.codegen.schema.Book book = 
             new org.apache.cxf.systest.jaxrs.codegen.schema.Book();
         book.setId(123);
-        Response r = wc.post(book);
+        bookStore.addBook(123, book);
+        Response r = WebClient.client(bookStore).getResponse();
         assertEquals(204, r.getStatus());
     }
     

@@ -18,7 +18,8 @@
   under the License.
 -->
 <application xmlns="http://wadl.dev.java.net/2009/02" xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-  xmlns:prefix1="http://superbooks">
+  xmlns:prefix1="http://superbooks"
+  xmlns:ch="http://superchapters">
 
  <grammars>
    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
@@ -35,6 +36,8 @@
             <xs:element ref="ch:thechapter"/>
         </xs:sequence>
       </xs:complexType>
+      
+      <xs:element name="bookchapter" type="ch:chapter"/>
     </xs:schema>
  </grammars>
  <resources base="http://localhost:8080/baz">
@@ -48,6 +51,13 @@
        <representation mediaType="application/xml" element="prefix1:thebook"/>
       </request>
      </method>
+     
+     <method name="PUT" id="addChapter">
+      <request>
+       <representation mediaType="application/xml" element="prefix1:bookchapter"/>
+      </request>
+     </method>
+     
     </resource>
    </resource>
 </resources>

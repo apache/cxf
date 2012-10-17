@@ -153,6 +153,11 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setInheritResourceParams(context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS));
         sg.setSkipSchemaGeneration(context.optionSet(WadlToolConstants.CFG_NO_TYPES));
         
+        boolean noVoidForEmptyResponses = context.optionSet(WadlToolConstants.CFG_NO_VOID_FOR_EMPTY_RESPONSES);
+        if (noVoidForEmptyResponses) {
+            sg.setUseVoidForEmptyResponses(false);
+        }
+        
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
             ? SourceGenerator.CODE_TYPE_GRAMMAR : SourceGenerator.CODE_TYPE_PROXY;
