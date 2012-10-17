@@ -286,7 +286,6 @@ public class OutTransformWriterTest extends Assert {
     }
 
     @Test
-    @org.junit.Ignore
     public void testRemoveOneNamespace() throws Exception {
         Map<String, String> inMap = new HashMap<String, String>();
         inMap.put("{http://cxf.apache.org/vgop/serviceorder/v1_0}result", "result"); 
