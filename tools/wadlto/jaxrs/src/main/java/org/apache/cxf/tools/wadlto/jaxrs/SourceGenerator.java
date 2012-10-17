@@ -177,6 +177,7 @@ public class SourceGenerator {
     private boolean generateEnums;
     private boolean skipSchemaGeneration;
     private boolean inheritResourceParams;
+    private boolean useVoidForEmptyResponses = true;
     
     private Map<String, String> properties; 
     
@@ -191,7 +192,7 @@ public class SourceGenerator {
     private Map<String, String> mediaTypesMap = Collections.emptyMap();
     private Bus bus;
     private boolean supportMultipleXmlReps;
-    
+        
     private SchemaCollection schemaCollection = new SchemaCollection();
     
     public SourceGenerator() {
@@ -210,6 +211,9 @@ public class SourceGenerator {
         this.wadlNamespace = ns;
     }
     
+    public void setUseVoidForEmptyResponses(boolean use) {
+        this.useVoidForEmptyResponses = use;
+    }
     public String getWadlNamespace() {
         return wadlNamespace;
     }
@@ -381,8 +385,7 @@ public class SourceGenerator {
         for (Element el : elementEls) {
             String type = el.getAttribute("type");
             if (type.length() > 0) {
-                String[] pair = type.split(":");
-                elementTypeMap.put(el.getAttribute("name"), pair.length == 1 ? pair[0] : pair[1]);
+                elementTypeMap.put(el.getAttribute("name"), type);
             }
         }
         Element includeEl = DOMUtils.getFirstChildWithName(schemaEl, 
@@ -826,8 +829,13 @@ public class SourceGenerator {
             repElements = CastUtils.cast(Collections.emptyList(), Element.class);
         }
         
-        if (repElements.size() == 0) {    
-            sbCode.append("void ");
+        if (repElements.size() == 0) {
+            if (useVoidForEmptyResponses) {
+                sbCode.append("void ");
+            } else {
+                addImport(imports, Response.class.getName());
+                sbCode.append("Response ");
+            }
             return false;
         }
         String elementName = getElementRefName(
@@ -1150,10 +1158,22 @@ public class SourceGenerator {
                                       Set <String> typeClassNames) {
         String clsName = matchClassName(typeClassNames, packageName, localName);
         if (clsName == null && gInfo != null) {
-            String elementTypeName = gInfo.getElementTypeMap().get(localName);
-            clsName = matchClassName(typeClassNames, packageName, elementTypeName);
-            if (clsName == null && elementTypeName != null && elementTypeName.contains("_")) {
-                clsName = matchClassName(typeClassNames, packageName, elementTypeName.replaceAll("_", ""));
+            String prefixedElementTypeName = gInfo.getElementTypeMap().get(localName);
+            if (prefixedElementTypeName != null) {
+                String[] pair = prefixedElementTypeName.split(":");
+                String elementTypeName = pair.length == 2 ? pair[1] : pair[0];
+                clsName = matchClassName(typeClassNames, packageName, elementTypeName);
+                if (clsName == null && elementTypeName.contains("_")) {
+                    clsName = matchClassName(typeClassNames, packageName, elementTypeName.replaceAll("_", ""));
+                }
+                if (clsName == null && pair.length == 2) {
+                    String namespace = gInfo.getNsMap().get(pair[0]);
+                    if (namespace != null) {
+                        packageName = getPackageFromNamespace(namespace);
+                        clsName = matchClassName(typeClassNames, packageName, elementTypeName);
+                    }
+                }
+                
             }
         }
         if (clsName == null && javaTypeMap != null) {
