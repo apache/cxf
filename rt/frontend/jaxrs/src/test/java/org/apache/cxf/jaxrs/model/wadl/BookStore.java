@@ -205,10 +205,10 @@ public class BookStore {
     }
     
     public static class QueryBean3 {
-        private int a;
+        private boolean a;
         private int b;
         
-        public int getA() {
+        public boolean isA() {
             return a;
         }
         
