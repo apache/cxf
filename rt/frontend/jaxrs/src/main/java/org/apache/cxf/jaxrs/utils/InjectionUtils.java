@@ -499,7 +499,8 @@ public final class InjectionUtils {
                         && m.getParameterTypes().length == 1) {
                         setter = m;
                     } else if (m.getName().equalsIgnoreCase("get" + memberKey)
-                        && m.getReturnType() != Void.TYPE) {
+                        || isBooleanType(m.getReturnType()) 
+                           && m.getName().equalsIgnoreCase("is" + memberKey)) {
                         getter = m;
                     }
                     if (setter != null && getter != null) {
@@ -996,12 +997,25 @@ public final class InjectionUtils {
         return values;
     }
     
+    private static boolean isBooleanType(Class<?> cls) {
+        return boolean.class == cls || Boolean.class == cls;
+    }
+    
     public static void fillInValuesFromBean(Object bean, String baseName, 
                                             MultivaluedMap<String, Object> values) {
         for (Method m : bean.getClass().getMethods()) {
-            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-                && m.getName().length() > 3) {
-                String propertyName = m.getName().substring(3);
+            String methodName = m.getName(); 
+            boolean startsFromGet = methodName.startsWith("get");
+            if ((startsFromGet 
+                || isBooleanType(m.getReturnType()) && methodName.startsWith("is")) 
+                && m.getParameterTypes().length == 0) {
+                
+                int minLen = startsFromGet ? 3 : 2; 
+                if (methodName.length() <= minLen) {
+                    continue;
+                }
+                
+                String propertyName =  methodName.substring(minLen);
                 if (propertyName.length() == 1) {
                     propertyName = propertyName.toLowerCase();
                 } else {
@@ -1047,9 +1061,17 @@ public final class InjectionUtils {
                                                                       boolean checkIgnorable) {
         Map<Parameter, Class<?>> params = new LinkedHashMap<Parameter, Class<?>>();
         for (Method m : beanClass.getMethods()) {
-            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
-                && m.getName().length() > 3) {
-                String propertyName = m.getName().substring(3).toLowerCase();
+            String methodName = m.getName(); 
+            boolean startsFromGet = methodName.startsWith("get");
+            if ((startsFromGet 
+                || isBooleanType(m.getReturnType()) && methodName.startsWith("is")) 
+                && m.getParameterTypes().length == 0) {
+                
+                int minLen = startsFromGet ? 3 : 2; 
+                if (methodName.length() <= minLen) {
+                    continue;
+                }
+                String propertyName = methodName.substring(minLen).toLowerCase();
                 if (m.getReturnType() == Class.class
                     || checkIgnorable && canPropertyBeIgnored(m, propertyName)) {
                     continue;
