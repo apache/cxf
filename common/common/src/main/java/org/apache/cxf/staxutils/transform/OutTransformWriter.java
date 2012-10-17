@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 
@@ -48,6 +49,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private Set<QName> dropElements;
     private Stack<List<ParsingEvent>> pushedAheadEvents = new Stack<List<ParsingEvent>>();
     private Stack<QName> elementsStack = new Stack<QName>();
+    private String replaceNamespace;
     private String replaceText;
     private int currentDepth;
     private int dropDepth;
@@ -86,11 +88,16 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeNamespace(String prefix, String uri) throws XMLStreamException {
+        if (StringUtils.isEmpty(prefix) || "xmlns".equals(prefix)) {
+            writeDefaultNamespace(uri);
+            return;
+        }
         if (matchesDropped(true)) {
             return;
         }
         String value = nsMap.get(uri);
-        if (value != null && value.length() == 0) {
+        if ((value != null && value.length() == 0)
+            || uri.equals(replaceNamespace)) {
             return;
         }
         
@@ -103,11 +110,13 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         
         if (defaultNamespace != null && defaultNamespace.equals(uri)) {
             super.writeDefaultNamespace(uri);
+            namespaceContext.addPrefix("", uri);
         } else {
             if (prefix.length() == 0) {
                 prefix = namespaceContext.findUniquePrefix(uri);
             }
             super.writeNamespace(prefix, uri);
+            namespaceContext.addPrefix(prefix, uri);
         }
         writtenUris.get(0).add(uri);
     }
@@ -120,7 +129,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         String value = nsMap.get(uri);
         if ((value != null && value.length() == 0) 
-            || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))) {
+            || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))
+            || uri.equals(replaceNamespace)) {
             return;
         }
         
@@ -130,7 +140,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         super.writeDefaultNamespace(uri);
-
+        namespaceContext.addPrefix("", uri);
         writtenUris.get(0).add(uri);
     }
 
@@ -247,6 +257,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         pushedAheadEvents.push(pe);
         elementsStack.push(expected);
+        replaceNamespace = expected.getNamespaceURI().equals(theName.getNamespaceURI()) 
+            ? null : theName.getNamespaceURI();
 
         if (appendProp != null && !replaceContent && appendProp.isChild()) {
             // ap-post-*
@@ -355,7 +367,6 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                 }
             } else {
                 prefix = qname.getPrefix();
-                namespaceContext.addPrefix(prefix, qname.getNamespaceURI());    
             }
             
         }
@@ -364,7 +375,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         
         super.writeStartElement(prefix, qname.getLocalPart(), qname.getNamespaceURI());
-        if (writeNs) {
+        if (writeNs 
+            || !qname.getNamespaceURI().equals(namespaceContext.getNamespaceURI(prefix))) {
             this.writeNamespace(prefix, qname.getNamespaceURI());
         }
     }
