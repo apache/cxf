@@ -25,6 +25,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 
 /**
@@ -63,7 +65,7 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
     }
 
     public void startServer(Server server) {
-        QName sn = server.getEndpoint().getEndpointInfo().getInterface().getName();
+        QName sn = getServiceQName(server);
         if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
             return;
         }
@@ -71,10 +73,21 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
     }
 
     public void stopServer(Server server) {
-        QName sn = server.getEndpoint().getEndpointInfo().getInterface().getName();
+        QName sn = getServiceQName(server);
         if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
             return;
         }
         getService().serverStopped(server);
     }
+    
+    private QName getServiceQName(Server server) {
+        EndpointInfo ei = server.getEndpoint().getEndpointInfo();
+        InterfaceInfo ii = ei.getInterface();
+        if (ii != null) {
+            return ii.getName();
+        } else {
+            return ei.getService().getName();
+        }
+    }
+    
 }
