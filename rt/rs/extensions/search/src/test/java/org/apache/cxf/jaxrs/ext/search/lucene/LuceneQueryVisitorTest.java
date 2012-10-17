@@ -22,6 +22,7 @@ import java.util.Collections;
 
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -87,6 +88,14 @@ public class LuceneQueryVisitorTest extends Assert {
     public void testTextContentMatchNotEqual() throws Exception {
         
         Query query = createTermQuery("contents", "ct!=text");
+        doTestNoMatch(query);
+            
+    }
+    
+    @Test
+    public void testTextContentMatchNotEqualPositive() throws Exception {
+        
+        Query query = createTermQuery("contents", "ct!=bar");
         doTestNoMatch(query);
             
     }
@@ -279,7 +288,7 @@ public class LuceneQueryVisitorTest extends Assert {
     private Query createTermQuery(String expression) throws Exception {
         SearchCondition<SearchBean> filter = 
             new FiqlParser<SearchBean>(SearchBean.class).parse(expression);
-        LuceneQueryVisitor<SearchBean> lucene = new LuceneQueryVisitor<SearchBean>();
+        SearchConditionVisitor<SearchBean, Query> lucene = new LuceneQueryVisitor<SearchBean>();
         lucene.visit(filter);
         return lucene.getQuery();
     }

@@ -40,7 +40,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 
-public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
+public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Query> {
 
     //private Analyzer analyzer;
     private String contentsFieldName;

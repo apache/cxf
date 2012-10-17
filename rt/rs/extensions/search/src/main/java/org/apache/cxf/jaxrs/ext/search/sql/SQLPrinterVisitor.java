@@ -28,7 +28,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 
-public class SQLPrinterVisitor<T> extends AbstractSearchConditionVisitor<T> {
+public class SQLPrinterVisitor<T> extends AbstractSearchConditionVisitor<T, String> {
 
     private StringBuilder sb;
     private String table;

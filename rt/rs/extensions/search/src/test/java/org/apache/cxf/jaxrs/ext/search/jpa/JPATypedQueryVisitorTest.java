@@ -28,6 +28,7 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
 import org.junit.After;
@@ -174,7 +175,7 @@ public class JPATypedQueryVisitorTest extends Assert {
     
     private List<Book> queryBooks(String expression) throws Exception {
         SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse(expression);
-        JPATypedQueryVisitor<Book> jpa = new JPATypedQueryVisitor<Book>(em, Book.class);
+        SearchConditionVisitor<Book, TypedQuery<Book>> jpa = new JPATypedQueryVisitor<Book>(em, Book.class);
         filter.accept(jpa);
         TypedQuery<Book> query = jpa.getQuery();
         return query.getResultList();

@@ -38,7 +38,7 @@ public class SQLPrinterVisitorTest extends Assert {
     public void testSQL1() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
-        filter.accept(visitor);
+        filter.accept(visitor.visitor());
         String sql = visitor.getQuery();
         
         assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') AND (level > '10')".equals(sql)

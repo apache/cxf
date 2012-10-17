@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 
-public abstract class AbstractSearchConditionVisitor <T> implements SearchConditionVisitor<T> {
+public abstract class AbstractSearchConditionVisitor <T, E> implements SearchConditionVisitor<T, E> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSearchConditionVisitor.class);
     
@@ -59,5 +59,9 @@ public abstract class AbstractSearchConditionVisitor <T> implements SearchCondit
 
     public void setPrimitiveFieldTypeMap(Map<String, Class<?>> primitiveFieldTypeMap) {
         this.primitiveFieldTypeMap = primitiveFieldTypeMap;
+    }
+    
+    public SearchConditionVisitor<T, E> visitor() {
+        return this;
     }
 }

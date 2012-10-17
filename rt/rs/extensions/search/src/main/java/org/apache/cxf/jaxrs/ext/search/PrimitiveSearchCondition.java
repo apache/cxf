@@ -95,7 +95,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         return SearchUtils.toSQL(this, table, columns);
     }
 
-    public void accept(SearchConditionVisitor<T> visitor) {
+    public void accept(SearchConditionVisitor<T, ?> visitor) {
         visitor.visit(this);    
     }
    

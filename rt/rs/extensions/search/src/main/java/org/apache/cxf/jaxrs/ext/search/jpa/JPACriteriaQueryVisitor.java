@@ -16,23 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
+package org.apache.cxf.jaxrs.ext.search.jpa;
 
-/**
- * Interface for visitors to SearchCondition objects.
- * Custom implementations can use it to convert SearchCondition into
- * specific query language such as SQL, etc
- */
+import java.util.Map;
 
-public interface SearchConditionVisitor<T, E> {
-    /*
-     * Accept a current SearchCondition object 
-     */
-    void visit(SearchCondition<T> sc);
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaQuery;
+
+public class JPACriteriaQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, CriteriaQuery<T>> {
+
+    public JPACriteriaQueryVisitor(EntityManager em, Class<T> tClass) {
+        this(em, tClass, null);
+    }
     
-    /**
-     * Return a built query object 
-     * @return the query
-     */
-    E getQuery();
+    public JPACriteriaQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
+        super(em, tClass, fieldMap);
+    }
+    
+    public CriteriaQuery<T> getQuery() {
+        return getCriteriaQuery();
+    }
+        
 }
