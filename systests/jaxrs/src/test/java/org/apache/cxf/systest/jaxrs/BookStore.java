@@ -120,6 +120,21 @@ public class BookStore {
     }
 
     @GET
+    @Path("emptybook")
+    @Produces({"application/xml", "application/json" })
+    public Book getEmptyBook() {
+        return null;
+    }
+    
+    @GET
+    @Path("emptybook/nillable")
+    @Produces({"application/xml", "application/json" })
+    @Nullable
+    public Book getEmptyBookNullable() {
+        return null;
+    }
+    
+    @GET
     @Path("allCharsButA-B/:@!$&'()*+,;=-._~")
     public Book getWithComplexPath() {
         return new Book("Encoded Path", 125L);
