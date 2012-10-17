@@ -1063,12 +1063,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(444L, book.getId());
     }
     
-    @Test(expected = ClientException.class)
+    @Test(expected = ClientWebApplicationException.class)
     public void testEmptyJSON() {
         doTestEmptyResponse("application/json");
     }
     
-    @Test(expected = ClientException.class)
+    @Test(expected = ClientWebApplicationException.class)
     public void testEmptyJAXB() {
         doTestEmptyResponse("application/xml");
     }
@@ -1080,7 +1080,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.get(Book.class);
     }
     
-    @Test(expected = ClientException.class)
+    @Test(expected = ClientWebApplicationException.class)
     public void testEmptyResponseProxy() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());
