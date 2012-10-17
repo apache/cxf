@@ -76,6 +76,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public static class CustomerBean implements CustomerBeanInterface {
         private String a;
         private Long b;
+        private boolean cb;
         private List<String> c;
         private CustomerBean d;
         private Map<String, List<String>> g;
@@ -112,6 +113,12 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         }
         public Map<String, List<String>> getG() {
             return g;
+        }
+        public boolean isCb() {
+            return cb;
+        }
+        public void setCb(boolean cb) {
+            this.cb = cb;
         }
         
     }

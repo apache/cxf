@@ -1093,6 +1093,30 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testFormParametersBeanWithBoolean() throws Exception {
+        Class<?>[] argType = {Customer.CustomerBean.class};
+        Method m = Customer.class.getMethod("testFormBean", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.REQUEST_URI, "/bar");
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
+        String body = "a=aValue&b=123&cb=true";
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+        
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+        
+        assertEquals("aValue", cb.getA());
+        assertEquals(new Long(123), cb.getB());
+        assertTrue(cb.isCb());
+    }
+    
+    @Test
     public void testFormParametersBean() throws Exception {
         Class<?>[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testFormBean", argType);
@@ -1101,7 +1125,7 @@ public class JAXRSUtilsTest extends Assert {
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
         headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
-        String body = "a=aValue&b=123";
+        String body = "a=aValue&b=123&cb=true";
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
 
         MessageImpl complexMessageImpl = new MessageImpl();
