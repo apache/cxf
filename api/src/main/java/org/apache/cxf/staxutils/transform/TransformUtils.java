@@ -97,7 +97,8 @@ public final class TransformUtils {
                 QName lname = XMLUtils.convertStringToQName(entry.getKey());
                 QName rname = XMLUtils.convertStringToQName(entry.getValue());
                 elementsMap.put(lname, rname);
-                if (nsMap != null && !isEmptyQName(rname)) {
+                if (nsMap != null && !isEmptyQName(rname)
+                    && ("*".equals(lname.getLocalPart()) && "*".equals(rname.getLocalPart()))) {
                     nsMap.put(lname.getNamespaceURI(), rname.getNamespaceURI());
                 }
             }

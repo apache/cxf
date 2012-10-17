@@ -306,6 +306,8 @@ public class InTransformReader extends DepthXMLStreamReader {
         String actualNs = nsMap.get(ns);
         if (actualNs != null) {
             return actualNs;
+        } else if (ns.equals(reader.getNamespaceURI())) {
+            return getNamespaceURI();
         } else {
             return ns;
         }
@@ -320,6 +322,8 @@ public class InTransformReader extends DepthXMLStreamReader {
             } else {
                 return "";
             }
+        } else if (ns.equals(reader.getNamespaceURI())) {
+            return getPrefix();
         } else {
             return namespaceContext.getPrefix(ns);
         }
