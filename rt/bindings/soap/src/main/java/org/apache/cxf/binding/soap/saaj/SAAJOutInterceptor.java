@@ -40,6 +40,7 @@ import org.w3c.dom.Node;
 
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -187,7 +188,8 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                     Iterator<AttachmentPart> it = CastUtils.cast(soapMessage.getAttachments());
                     while (it.hasNext()) {
                         AttachmentPart part = it.next();
-                        AttachmentImpl att = new AttachmentImpl(part.getContentId());
+                        String id = AttachmentUtil.cleanContentId(part.getContentId());
+                        AttachmentImpl att = new AttachmentImpl(id);
                         try {
                             att.setDataHandler(part.getDataHandler());
                         } catch (SOAPException e) {
