@@ -164,7 +164,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             return;
         }
         Boolean bodySet = (Boolean)message.get(BODY_FILLED_IN);
-        if (bodySet != null && bodySet == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(bodySet)) {
             return;
         }
         message.put(BODY_FILLED_IN, Boolean.TRUE);

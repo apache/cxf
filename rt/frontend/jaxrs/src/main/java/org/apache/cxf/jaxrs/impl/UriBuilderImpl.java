@@ -41,7 +41,7 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-public class UriBuilderImpl extends UriBuilder {
+public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     private String scheme;
     private String userInfo;

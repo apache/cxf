@@ -97,7 +97,7 @@ public class FormattedServiceListWriter implements ServiceListWriter {
                      + sd.getEndpointInfo().getInterface().getName().getLocalPart() + "</span>");
         writer.write("<ul>");
         for (OperationInfo oi : sd.getEndpointInfo().getInterface().getOperations()) {
-            if (oi.getProperty("operation.is.synthetic") != Boolean.TRUE) {
+            if (!Boolean.TRUE.equals(oi.getProperty("operation.is.synthetic"))) {
                 writer.write("<li>" + oi.getName().getLocalPart() + "</li>");
             }
         }

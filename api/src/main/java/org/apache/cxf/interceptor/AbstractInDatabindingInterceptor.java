@@ -207,7 +207,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         ex.setOneWay(operation.getOperationInfo().isOneWay());
 
         //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
-        boolean synthetic = operation.getProperty("operation.is.synthetic") == Boolean.TRUE;
+        boolean synthetic = Boolean.TRUE.equals(operation.getProperty("operation.is.synthetic"));
         if (!synthetic) {
             message.put(Message.WSDL_OPERATION, operation.getName());
         }
