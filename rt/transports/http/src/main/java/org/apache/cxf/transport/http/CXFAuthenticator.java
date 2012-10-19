@@ -24,6 +24,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -40,9 +42,15 @@ public class CXFAuthenticator extends Authenticator {
     
     public CXFAuthenticator() {
         try {
-            for (Field f : Authenticator.class.getDeclaredFields()) {
+            for (final Field f : Authenticator.class.getDeclaredFields()) {
                 if (f.getType().equals(Authenticator.class)) {
-                    f.setAccessible(true);
+                    AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                        public Void run() {
+                            f.setAccessible(true);
+                            return null;
+                        }
+                    });
+
                     wrapped = (Authenticator)f.get(null);
                 }
             }
@@ -66,14 +74,24 @@ public class CXFAuthenticator extends Authenticator {
         PasswordAuthentication auth = null;
         if (wrapped != null) {
             try {
-                for (Field f : Authenticator.class.getDeclaredFields()) {
+                for (final Field f : Authenticator.class.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers())) {
-                        f.setAccessible(true);
+                        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                            public Void run() {
+                                f.setAccessible(true);
+                                return null;
+                            }
+                        });
                         f.set(wrapped, f.get(this));
                     }
                 }
-                Method m = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
-                m.setAccessible(true);
+                final Method m = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    public Void run() {
+                        m.setAccessible(true);
+                        return null;
+                    }
+                });
                 auth = (PasswordAuthentication)m.invoke(wrapped);
             } catch (Throwable t) {
                 //ignore

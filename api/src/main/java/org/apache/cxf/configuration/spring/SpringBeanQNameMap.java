@@ -19,6 +19,8 @@
 package org.apache.cxf.configuration.spring;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -83,8 +85,14 @@ public class SpringBeanQNameMap<V>
                 if (ids == null && staticFieldName != null) {
                     Class<?> cls = context.getType(beanNames[i]);
                     try {
-                        Field f = cls.getDeclaredField(staticFieldName);
-                        f.setAccessible(true);
+                        final Field f = cls.getDeclaredField(staticFieldName);
+                        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                            public Void run() {
+                                f.setAccessible(true);
+                                return null;
+                            }
+                        });
+
                         Collection<QName> sids = CastUtils.cast((Collection<?>)f.get(null));
                         if (sids != null) {
                             ids = new ArrayList<QName>(sids);

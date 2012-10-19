@@ -25,6 +25,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -147,8 +149,14 @@ public abstract class AbstractClientServerTestBase extends Assert {
         }
         if (c == null) {
             try {
-                Method m = o.getClass().getDeclaredMethod("getClient");
-                m.setAccessible(true);
+                final Method m = o.getClass().getDeclaredMethod("getClient");
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    public Void run() {
+                        m.setAccessible(true);
+                        return null;
+                    }
+                });
+
                 c = (Client)m.invoke(o);
             } catch (Throwable t) {
                 //ignore
