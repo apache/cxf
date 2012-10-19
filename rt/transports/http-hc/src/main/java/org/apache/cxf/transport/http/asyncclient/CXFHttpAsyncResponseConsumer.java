@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http.asyncclient;
 
 import java.io.IOException;
 
+import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit.AsyncWrappedOutputStream;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.ContentDecoder;
@@ -31,16 +32,21 @@ import org.apache.http.protocol.HttpContext;
 public class CXFHttpAsyncResponseConsumer implements HttpAsyncResponseConsumer<Boolean> {
 
     private final SharedInputBuffer buf;
+    private final AsyncWrappedOutputStream outstream;
     private final CXFResponseCallback responseCallback;
     
     private volatile boolean completed;
     private volatile Exception exception;
+    private volatile HttpResponse response;
     
     public CXFHttpAsyncResponseConsumer(
-            final SharedInputBuffer buf, final CXFResponseCallback responseCallback) {
+            final AsyncWrappedOutputStream asyncWrappedOutputStream,
+            final SharedInputBuffer buf,
+            final CXFResponseCallback responseCallback) {
         super();
-        this.buf = buf;
+        this.outstream = asyncWrappedOutputStream;
         this.responseCallback = responseCallback;
+        this.buf = buf;
     }
 
     @Override
@@ -56,12 +62,14 @@ public class CXFHttpAsyncResponseConsumer implements HttpAsyncResponseConsumer<B
     }
 
     @Override
-    public void responseReceived(final HttpResponse response) throws IOException, HttpException {
+    public void responseReceived(final HttpResponse resp) throws IOException, HttpException {
+        response = resp;
         responseCallback.responseReceived(response);
     }
 
     @Override
     public void consumeContent(final ContentDecoder dec, final IOControl ioc) throws IOException {
+        outstream.retrySetHttpResponse(response);
         buf.consumeContent(dec, ioc);
     }
 

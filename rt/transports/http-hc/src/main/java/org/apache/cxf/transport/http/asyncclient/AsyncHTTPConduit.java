@@ -474,11 +474,16 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                 c.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
             }
             c.execute(new CXFHttpAsyncRequestProducer(entity, outbuf),
-                      new CXFHttpAsyncResponseConsumer(inbuf, responseCallback),
+                      new CXFHttpAsyncResponseConsumer(this, inbuf, responseCallback),
                       ctx,
                       callback);
         }
         
+        protected void retrySetHttpResponse(HttpResponse r) {
+            if (httpResponse == null && isAsync) {
+                setHttpResponse(r);
+            }
+        }
         protected synchronized void setHttpResponse(HttpResponse r) {
             httpResponse = r;
             if (isAsync) {
@@ -487,7 +492,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                     handleResponseOnWorkqueue(false, true);
                     isAsync = false; // don't trigger another start on next block. :-)
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    //ignore, we'll try again on the next consume;
                 }
             }
             notifyAll();
