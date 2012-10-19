@@ -28,6 +28,7 @@ import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamException;
@@ -38,6 +39,7 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.attachment.AttachmentDeserializer;
+import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -158,6 +160,22 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             SOAPMessage soapMessage = (SOAPMessage)o;
             if (soapMessage.countAttachments() > 0) {
                 message.put("write.attachments", Boolean.TRUE);
+            }
+            try {
+                if (message instanceof org.apache.cxf.binding.soap.SoapMessage) {
+                    org.apache.cxf.binding.soap.SoapMessage cxfSoapMessage = 
+                            (org.apache.cxf.binding.soap.SoapMessage)message;
+                    String cxfNamespace = cxfSoapMessage.getVersion().getNamespace();
+                    SOAPHeader soapHeader = soapMessage.getSOAPHeader();
+                    String namespace = soapHeader == null ? null : soapHeader.getNamespaceURI();
+                    if (namespace != null && cxfNamespace != null && !namespace.equals(cxfNamespace) 
+                            && Soap12.SOAP_NAMESPACE.equals(namespace)) {
+                        cxfSoapMessage.setVersion(Soap12.getInstance());
+                        cxfSoapMessage.put(Message.CONTENT_TYPE, cxfSoapMessage.getVersion().getContentType());
+                    }
+                }
+            } catch (SOAPException e) {
+                //ignore
             }
             try {
                 Object enc = soapMessage.getProperty(SOAPMessage.CHARACTER_SET_ENCODING);
