@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -91,11 +92,17 @@ public class SearchContextImpl implements SearchContext {
         // we can use this method as a parser factory, ex
         // we can get parsers capable of parsing XQuery and other languages
         // depending on the properties set by a user
-        Map<String, String> props = new LinkedHashMap<String, String>(2);
+        Map<String, String> props = new LinkedHashMap<String, String>(4);
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, 
                   (String)message.getContextualProperty(SearchUtils.DATE_FORMAT_PROPERTY));
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, 
                   (String)message.getContextualProperty(SearchUtils.TIMEZONE_SUPPORT_PROPERTY));
-        return new FiqlParser<T>(cls, props); 
+        props.put(SearchUtils.LAX_PROPERTY_MATCH, 
+                  (String)message.getContextualProperty(SearchUtils.LAX_PROPERTY_MATCH));
+        
+        Map<String, String> beanProps = 
+            CastUtils.cast((Map<?, ?>)message.getContextualProperty(SearchUtils.BEAN_PROPERTY_MAP));
+        
+        return new FiqlParser<T>(cls, props, beanProps); 
     }
 }

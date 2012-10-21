@@ -18,48 +18,36 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
 
-@Entity(name = "Book")
-public class Book {
-    @Id
-    private int id;
-    private String title;
-    private OwnerAddress address;
-    private OwnerName ownerName;
+@Embeddable
+public class OwnerAddress {
+
+    private String street;
+    private int houseNumber;
+
+
+    public OwnerAddress() {
+        
+    }
     
-    public int getId() {
-        return id;
+    public OwnerAddress(String street) {
+        this.street = street;
+    }
+    
+    public String getStreet() {
+        return street;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
-    public String getTitle() {
-        return title;
+    public int getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setTitle(String name) {
-        this.title = name;
-    }
-
-    @Embedded
-    public OwnerAddress getAddress() {
-        return address;
-    }
-
-    public void setAddress(OwnerAddress address) {
-        this.address = address;
-    }
-
-    public OwnerName getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(OwnerName ownerName) {
-        this.ownerName = ownerName;
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
     }
 }

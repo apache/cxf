@@ -20,7 +20,10 @@ package org.apache.cxf.jaxrs.ext.search.jpa;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -60,17 +63,23 @@ public class JPATypedQueryVisitorTest extends Assert {
             em.getTransaction().begin();
             Book b1 = new Book();
             b1.setId(9);
-            b1.setName("num9");
+            b1.setTitle("num9");
+            b1.setAddress(new OwnerAddress("Street1"));
+            b1.setOwnerName(new OwnerName(new Name("Fred")));
             em.persist(b1);
             assertTrue(em.contains(b1));
             Book b2 = new Book();
             b2.setId(10);
-            b2.setName("num10");
+            b2.setTitle("num10");
+            b2.setAddress(new OwnerAddress("Street2"));
+            b2.setOwnerName(new OwnerName(new Name("Barry")));
             em.persist(b2);
             assertTrue(em.contains(b2));
             Book b3 = new Book();
             b3.setId(11);
-            b3.setName("num11");
+            b3.setTitle("num11");
+            b3.setAddress(new OwnerAddress("Street3"));
+            b3.setOwnerName(new OwnerName(new Name("Bill")));
             em.persist(b3);
             assertTrue(em.contains(b3));
             
@@ -116,14 +125,14 @@ public class JPATypedQueryVisitorTest extends Assert {
     
     @Test
     public void testAndQuery() throws Exception {
-        List<Book> books = queryBooks("id==10;name==num10");
+        List<Book> books = queryBooks("id==10;title==num10");
         assertEquals(1, books.size());
-        assertTrue(10 == books.get(0).getId() && "num10".equals(books.get(0).getName()));
+        assertTrue(10 == books.get(0).getId() && "num10".equals(books.get(0).getTitle()));
     }
     
     @Test
     public void testAndQueryNoMatch() throws Exception {
-        List<Book> books = queryBooks("id==10;name==num9");
+        List<Book> books = queryBooks("id==10;title==num9");
         assertEquals(0, books.size());
     }
     
@@ -135,8 +144,83 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     @Test
+    public void testEqualsAddressQuery() throws Exception {
+        List<Book> books = queryBooks("address==Street1",
+            Collections.singletonMap("address", "address.street"));
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertTrue(9 == book.getId());
+        assertEquals("Street1", book.getAddress().getStreet());
+    }
+    
+    @Test
+    public void testIsMet() throws Exception {
+        SearchCondition<Book> filter = 
+            new FiqlParser<Book>(Book.class,
+                null,                          
+                Collections.singletonMap("address", "address.street")).parse("address==Street1");
+        
+        Book b = new Book();
+        b.setAddress(new OwnerAddress("Street1"));
+        assertTrue(filter.isMet(b));
+        
+        b.setAddress(new OwnerAddress("Street2"));
+        assertFalse(filter.isMet(b));
+    }
+    
+    @Test
+    public void testEqualsAddressQuery2() throws Exception {
+        List<Book> books = queryBooks("street==Street1",
+            null,                          
+            Collections.singletonMap("street", "address.street"));
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertTrue(9 == book.getId());
+        assertEquals("Street1", book.getAddress().getStreet());
+    }
+    
+    @Test
+    public void testEqualsAddressQuery3() throws Exception {
+        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        beanPropertiesMap.put("street", "address.street");
+        beanPropertiesMap.put("housenum", "address.houseNumber");
+        List<Book> books = 
+            queryBooks("street==Street2;housenum=lt=5", null, beanPropertiesMap);
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertTrue(10 == book.getId());
+        assertEquals("Street2", book.getAddress().getStreet());
+        
+    }
+
+    @Test
+    public void testEqualsOwnerNameQuery() throws Exception {
+        List<Book> books = queryBooks("ownerName.name.name==Fred");
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertEquals("Fred", book.getOwnerName().getName().getName());
+    }
+    
+    @Test
+    public void testEqualsOwnerNameQuery2() throws Exception {
+        List<Book> books = queryBooks("ownerName.name==Fred");
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertEquals("Fred", book.getOwnerName().getName().getName());
+    }
+    
+    @Test
+    public void testEqualsOwnerNameQuery3() throws Exception {
+        List<Book> books = queryBooks("ownerName==Fred", null,
+            Collections.singletonMap("ownerName", "ownerName.name.name"));
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertEquals("Fred", book.getOwnerName().getName().getName());
+    }
+    
+    @Test
     public void testEqualsWildcard() throws Exception {
-        List<Book> books = queryBooks("name==num1*");
+        List<Book> books = queryBooks("title==num1*");
         assertEquals(2, books.size());
         assertTrue(10 == books.get(0).getId() && 11 == books.get(1).getId()
             || 11 == books.get(0).getId() && 10 == books.get(1).getId());
@@ -174,8 +258,23 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     private List<Book> queryBooks(String expression) throws Exception {
-        SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse(expression);
-        SearchConditionVisitor<Book, TypedQuery<Book>> jpa = new JPATypedQueryVisitor<Book>(em, Book.class);
+        return queryBooks(expression, null);
+    }
+    
+    private List<Book> queryBooks(String expression, 
+                                  Map<String, String> visitorProps) throws Exception {
+        return queryBooks(expression, visitorProps, null);
+    }
+    
+    private List<Book> queryBooks(String expression, 
+                                  Map<String, String> visitorProps,
+                                  Map<String, String> parserBinProps) throws Exception {
+        SearchCondition<Book> filter = 
+            new FiqlParser<Book>(Book.class,
+                                 visitorProps,
+                                 parserBinProps).parse(expression);
+        SearchConditionVisitor<Book, TypedQuery<Book>> jpa = 
+            new JPATypedQueryVisitor<Book>(em, Book.class, visitorProps);
         filter.accept(jpa);
         TypedQuery<Book> query = jpa.getQuery();
         return query.getResultList();

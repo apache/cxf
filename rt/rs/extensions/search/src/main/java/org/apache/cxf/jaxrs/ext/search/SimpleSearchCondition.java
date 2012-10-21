@@ -68,7 +68,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             throw new IllegalArgumentException("unsupported condition type: " + cType.name());
         }
         this.condition = condition;
-        scts = createConditions(null, cType);
+        scts = createConditions(null, null, cType);
                 
     }
 
@@ -80,7 +80,9 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * @param getters2operators getters names and operators to be used with them during comparison
      * @param condition template object
      */
-    public SimpleSearchCondition(Map<String, ConditionType> getters2operators, T condition) {
+    public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
+                                 Map<String, String> realGetters,
+                                 T condition) {
         if (getters2operators == null) {
             throw new IllegalArgumentException("getters2operators is null");
         }
@@ -98,9 +100,14 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 throw new IllegalArgumentException("unsupported condition type: " + ct.name());
             }
         }
-        scts = createConditions(getters2operators, null);
+        scts = createConditions(getters2operators, realGetters, null);
     }
 
+    public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
+                                 T condition) {
+        this(getters2operators, null, condition);
+    }
+    
     public T getCondition() {
         return condition;
     }
@@ -126,7 +133,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    private List<SearchCondition<T>> createConditions(Map<String, ConditionType> getters2operators, 
+    private List<SearchCondition<T>> createConditions(Map<String, ConditionType> getters2operators,
+                                                      Map<String, String> realGetters,
                                                       ConditionType sharedType) {
         if (isBuiltIn(condition)) {
             return Collections.singletonList(
@@ -148,7 +156,10 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 if (rval == null) {
                     continue;
                 }
-                list.add(new PrimitiveSearchCondition<T>(getter, rval, ct, condition));
+                String realGetter = realGetters != null && realGetters.containsKey(getter) 
+                    ? realGetters.get(getter) : getter;
+                
+                list.add(new PrimitiveSearchCondition<T>(realGetter, rval, ct, condition));
                 
             }
             if (list.isEmpty()) {

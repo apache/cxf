@@ -18,15 +18,13 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 
 public abstract class AbstractSearchConditionVisitor <T, E> implements SearchConditionVisitor<T, E> {
-
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractSearchConditionVisitor.class);
     
     private Map<String, String> fieldMap;
     private Map<String, Class<?>> primitiveFieldTypeMap;
@@ -36,25 +34,50 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     }
     
     protected String getRealPropertyName(String name) {
-        if (fieldMap != null && !fieldMap.isEmpty()) {
-            if (fieldMap.containsKey(name)) {
-                return fieldMap.get(name);
-            } else {
-                LOG.warning("Unrecognized field alias : " + name);
-            }
+        if (fieldMap != null && fieldMap.containsKey(name)) {
+            return fieldMap.get(name);
         }
         return name;
     }
 
-    protected Class<?> getPrimitiveFieldClass(String name, Class<?> defaultCls) {
+    protected Class<?> getPrimitiveFieldClass(String name, Class<?> valueCls) {
+        return getPrimitiveFieldClass(name, valueCls, null).getCls(); 
+    }    
+    
+    protected ClassValue getPrimitiveFieldClass(String name, Class<?> valueCls, Object value) {
+        
+        int index = name.indexOf(".");
+        if (index != -1) {
+            String[] names = name.split("\\.");
+            name = name.substring(index + 1);
+            if (value != null && !InjectionUtils.isPrimitive(valueCls)) {
+                try {
+                    String nextPart = names[1];
+                    if (nextPart.length() == 1) {
+                        nextPart = nextPart.toUpperCase();
+                    } else {
+                        nextPart = Character.toUpperCase(nextPart.charAt(0)) + nextPart.substring(1);
+                    }
+                    Method m = valueCls.getMethod("get" + nextPart, new Class[]{});
+                    value = m.invoke(value, new Object[]{});
+                    valueCls = value.getClass();
+                    
+                } catch (Throwable ex) {
+                    throw new RuntimeException();
+                }
+                return getPrimitiveFieldClass(name, valueCls, value);
+            }
+            
+        }
+        
         Class<?> cls = null;
         if (primitiveFieldTypeMap != null) {
             cls = primitiveFieldTypeMap.get(name);
         }
         if (cls == null) {  
-            cls = defaultCls;
+            cls = valueCls;
         }
-        return cls;
+        return new ClassValue(cls, value);
     }
 
     public void setPrimitiveFieldTypeMap(Map<String, Class<?>> primitiveFieldTypeMap) {
@@ -63,5 +86,27 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     
     public SearchConditionVisitor<T, E> visitor() {
         return this;
+    }
+    
+    protected class ClassValue {
+        private Class<?> cls;
+        private Object value;
+        public ClassValue(Class<?> cls, Object value) {
+            this.cls = cls;
+            this.value = value;
+                
+        }
+        public Class<?> getCls() {
+            return cls;
+        }
+        public void setCls(Class<?> cls) {
+            this.cls = cls;
+        }
+        public Object getValue() {
+            return value;
+        }
+        public void setValue(Object value) {
+            this.value = value;
+        }
     }
 }

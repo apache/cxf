@@ -1136,6 +1136,12 @@ public final class InjectionUtils {
             return PrimitiveUtils.read(value, cls);
         } else {
             try {
+                Constructor<?> c = cls.getConstructor(new Class<?>[]{String.class});
+                return c.newInstance(new Object[]{value});
+            } catch (Throwable ex) {
+                // try valueOf
+            }
+            try {
                 Method m = cls.getMethod("valueOf", new Class[]{String.class});
                 return cls.cast(m.invoke(null, value));
             } catch (Exception ex) {

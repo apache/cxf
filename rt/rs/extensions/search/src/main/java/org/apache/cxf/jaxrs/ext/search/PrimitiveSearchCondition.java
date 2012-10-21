@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     
@@ -75,17 +78,28 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
             return compare(pojo, cType, propertyValue);
         } else {
             Object lValue = getValue(propertyName, pojo);
-            return lValue == null ? false : compare(lValue, cType, propertyValue);
+            Object rValue = getPrimitiveValue(propertyName, propertyValue);
+            return lValue == null ? false : compare(lValue, cType, rValue);
         }
     }
 
     private Object getValue(String getter, T pojo) {
+        String thePropertyName;
+        int index = getter.indexOf(".");
+        if (index != -1) {
+            thePropertyName = getter.substring(0, index).toLowerCase();
+        } else {
+            thePropertyName = getter;
+        }
+        
+        Object value;
         try {
             if (beanspector != null) {
-                return beanspector.swap(pojo).getValue(getter);
+                value = beanspector.swap(pojo).getValue(thePropertyName);
             } else {
-                return ((SearchBean)pojo).get(getter);
+                value = ((SearchBean)pojo).get(getter);
             }
+            return getPrimitiveValue(getter, value);
         } catch (Throwable e) {
             return null;
         }
@@ -173,5 +187,31 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         } else {
             return lval.equals(rval);
         }
+    }
+    
+    protected static Object getPrimitiveValue(String name, Object value) {
+        
+        int index = name.indexOf(".");
+        if (index != -1) {
+            String[] names = name.split("\\.");
+            name = name.substring(index + 1);
+            if (value != null && !InjectionUtils.isPrimitive(value.getClass())) {
+                try {
+                    String nextPart = names[1];
+                    if (nextPart.length() == 1) {
+                        nextPart = nextPart.toUpperCase();
+                    } else {
+                        nextPart = Character.toUpperCase(nextPart.charAt(0)) + nextPart.substring(1);
+                    }
+                    Method m = value.getClass().getMethod("get" + nextPart, new Class[]{});
+                    value = m.invoke(value, new Object[]{});
+                } catch (Throwable ex) {
+                    throw new RuntimeException();
+                }
+            }
+            return getPrimitiveValue(name, value);
+        } 
+        return value;
+        
     }
 }

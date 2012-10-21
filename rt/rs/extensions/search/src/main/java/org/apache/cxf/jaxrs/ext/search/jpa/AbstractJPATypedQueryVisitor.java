@@ -106,9 +106,10 @@ public abstract class AbstractJPATypedQueryVisitor<T, E>
     private Predicate buildPredicate(ConditionType ct, String name, Object value) {
 
         name = super.getRealPropertyName(name);
-        Class<? extends Comparable> clazz = (Class<? extends Comparable>)
-            getPrimitiveFieldClass(name, value.getClass());
+        ClassValue cv = getPrimitiveFieldClass(name, value.getClass(), value); 
         
+        Class<? extends Comparable> clazz = (Class<? extends Comparable>)cv.getCls();
+        value = cv.getValue();    
         
         Path<?> path = getPath(root, name);
         
@@ -119,7 +120,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, E>
             break;
         case EQUALS:
             if (clazz.equals(String.class)) {
-                String theValue = (String)value;
+                String theValue = value.toString();
                 if (theValue.contains("*")) {
                     theValue = ((String)value).replaceAll("\\*", "");
                 }
