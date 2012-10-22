@@ -72,14 +72,14 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
-        return doBuild(false, false, values);
+        return doBuild(false, true, values);
     }
 
     private URI doBuild(boolean fromEncoded, boolean encodePathSlash, Object... values) {
         
         String thePath = buildPath(fromEncoded);
         URITemplate pathTempl = new URITemplate(thePath);
-        thePath = substituteVarargs(pathTempl, values, 0);
+        thePath = substituteVarargs(pathTempl, values, 0, encodePathSlash);
         
         String theQuery = buildQuery(fromEncoded);
         int queryTemplateVarsSize = 0;
@@ -88,7 +88,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             int lengthDiff = values.length - pathTempl.getVariables().size(); 
             if (lengthDiff > 0) {
                 queryTemplateVarsSize = queryTempl.getVariables().size(); 
-                theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
+                theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff, false);
             }
         }
         
@@ -97,7 +97,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             URITemplate fragmentTempl = new URITemplate(theFragment);
             int lengthDiff = values.length - pathTempl.getVariables().size() - queryTemplateVarsSize; 
             if (lengthDiff > 0) {
-                theFragment = substituteVarargs(fragmentTempl, values, values.length - lengthDiff);
+                theFragment = substituteVarargs(fragmentTempl, values, values.length - lengthDiff, false);
             }
         }
         
@@ -140,6 +140,10 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     
     private URI buildURIFromEncoded(String thePath, String theQuery, String theFragment) 
         throws URISyntaxException {
+        return new URI(buildUriString(thePath, theQuery, theFragment));
+    }
+    
+    private String buildUriString(String thePath, String theQuery, String theFragment) {
         StringBuilder b = new StringBuilder();
         if (scheme != null) {
             b.append(scheme).append(":");
@@ -169,7 +173,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         if (theFragment != null) {
             b.append('#').append(theFragment);
         }
-        return new URI(b.toString());
+        return b.toString();
     }
     
     private boolean isSchemeOpaque() {
@@ -200,7 +204,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     @Override
     public URI buildFromMap(Map<String, ?> map) throws IllegalArgumentException,
         UriBuilderException {
-        return doBuildFromMap(map, false, false);
+        return doBuildFromMap(map, false, true);
     }
 
     private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded, 
@@ -208,14 +212,15 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         throws IllegalArgumentException, UriBuilderException {
         try {
             String thePath = buildPath(fromEncoded);
-            thePath = substituteMapped(thePath, map);
+            thePath = substituteMapped(thePath, map, encodePathSlash);
             
             String theQuery = buildQuery(fromEncoded);
             if (theQuery != null) {
-                theQuery = substituteMapped(theQuery, map);
+                theQuery = substituteMapped(theQuery, map, false);
             }
             
-            String theFragment = fragment == null ? null : substituteMapped(fragment, map);
+            String theFragment = fragment == null 
+                ? null : substituteMapped(fragment, map, encodePathSlash);
             
             return buildURI(fromEncoded, thePath, theQuery, theFragment);
         } catch (URISyntaxException ex) {
@@ -223,7 +228,10 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
     
-    private String substituteVarargs(URITemplate templ, Object[] values, int ind) {
+    private String substituteVarargs(URITemplate templ, 
+                                     Object[] values, 
+                                     int ind,
+                                     boolean encodePathSlash) {
         Map<String, String> varValueMap = new HashMap<String, String>();
         
         // vars in set are properly ordered due to linking in hash set
@@ -239,12 +247,15 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             if (oval == null) {
                 throw new IllegalArgumentException("No object for " + var);
             }
-            varValueMap.put(var, oval.toString());
+            String value = oval.toString();
+            varValueMap.put(var, value);
         }
-        return templ.substitute(varValueMap);
+        return templ.substitute(varValueMap, encodePathSlash);
     }
     
-    private String substituteMapped(String path, Map<String, ? extends Object> varValueMap) {
+    private String substituteMapped(String path, 
+                                    Map<String, ? extends Object> varValueMap,
+                                    boolean encodePathSlash) {
     
         URITemplate templ = new URITemplate(path);
         
@@ -254,7 +265,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                                                + " value(s) given for " + uniqueVars.size()
                                                + " unique variable(s)");
         }
-        return templ.substitute(varValueMap);
+        return templ.substitute(varValueMap, encodePathSlash);
     }
 
     @Override
@@ -402,7 +413,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             segments = JAXRSUtils.getPathSegments(path, false, false);
         } else {
             segments = new ArrayList<PathSegment>();
-            segments.add(new PathSegmentImpl(path.replaceAll("/", "%2F"), false));
+            path = path.replaceAll("/", "%2F");
+            segments.add(new PathSegmentImpl(path, false));
         }
         if (!paths.isEmpty() && !matrix.isEmpty()) {
             PathSegment ps = paths.remove(paths.size() - 1);
@@ -745,8 +757,39 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         return doBuildFromMap(map, false, encodePathSlash);
     }
 
+
     @Override
     public String toTemplate() {
+        final String thePath = buildPath(true);
+        final String theQuery = buildQuery(true);
+        return buildUriString(thePath, theQuery, fragment);
+    }
+    
+    public UriBuilder resolveTemplate(String name, Object value) throws IllegalArgumentException {
+        return resolveTemplate(name, value, true);
+    }
+    
+    public UriBuilder resolveTemplate(String name, Object value, boolean encodePathSlash) 
+        throws IllegalArgumentException {
         throw new UnsupportedOperationException();
     }
+    
+    public UriBuilder resolveTemplateFromEncoded(String name, Object value) throws IllegalArgumentException {
+        throw new UnsupportedOperationException();
+    }
+    
+    public UriBuilder resolveTemplates(Map<String, Object> values) throws IllegalArgumentException {
+        return resolveTemplates(values, true);
+    }
+    
+    public UriBuilder resolveTemplates(Map<String, Object> values, boolean encodePathSlash) 
+        throws IllegalArgumentException {
+        throw new UnsupportedOperationException();
+    }
+    
+    public UriBuilder resolveTemplatesFromEncoded(Map<String, Object> values) 
+        throws IllegalArgumentException {
+        throw new UnsupportedOperationException();
+    }
+    
 }

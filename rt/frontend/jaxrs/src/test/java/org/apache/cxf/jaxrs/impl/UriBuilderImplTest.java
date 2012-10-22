@@ -327,7 +327,7 @@ public class UriBuilderImplTest extends Assert {
     public void testBuildValuesPct() throws Exception {
         URI uri = new URI("http://zzz");
         URI newUri = new UriBuilderImpl(uri).path("/{a}").build("foo%25/bar%");
-        assertEquals("URI is not built correctly", new URI("http://zzz/foo%2525/bar%25"), newUri);
+        assertEquals("URI is not built correctly", new URI("http://zzz/foo%2525%2Fbar%25"), newUri);
     }
 
     @Test
@@ -375,7 +375,8 @@ public class UriBuilderImplTest extends Assert {
         map.put("a", "foo%25/bar%");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
         URI newUri = new UriBuilderImpl(uri).path("/{a}").buildFromMap(immutable);
-        assertEquals("URI is not built correctly", new URI("http://zzz/foo%2525/bar%25"), newUri);
+        assertEquals("URI is not built correctly", 
+                     new URI("http://zzz/foo%2525%2Fbar%25"), newUri);
     }
 
     @Test
@@ -936,7 +937,54 @@ public class UriBuilderImplTest extends Assert {
         assertEquals(expected, uri.toString());        
     }
     
+    @Test
+    public void testSegments3() {
+        String path1 = "ab";
+        String[] path2 = {"a1", "{xy}", "3b "};
+        String expected = "ab/a1/x%2Fy/3b%20";
+
+        URI uri = UriBuilder.fromPath(path1).segment(path2).build("x/y");
+        assertEquals(uri.toString(), expected);        
+    }
     
+    public void testToTemplate() {
+        String path1 = "ab";
+        String[] path2 = {"a1", "{xy}", "3b "};
+        String expected = "ab/a1/{xy}/3b ";
+
+        String template = UriBuilder.fromPath(path1).segment(path2).toTemplate();
+        assertEquals(template, expected);        
+    }
+    
+    @Test
+    public void testSegments4() {
+        String path1 = "ab";
+        String[] path2 = {"a1", "{xy}", "3b "};
+        String expected = "ab/a1/x/y/3b%20";
+
+        URI uri = UriBuilder.fromPath(path1).segment(path2).build(new Object[]{"x/y"}, false);
+        assertEquals(uri.toString(), expected);        
+    }
+    
+    @Test
+    public void testPathEncodedSlash() {
+        String path1 = "ab";
+        String path2 = "{xy}";
+        String expected = "ab/x%2Fy";
+
+        URI uri = UriBuilder.fromPath(path1).path(path2).build(new Object[]{"x/y"}, true);
+        assertEquals(uri.toString(), expected);        
+    }
+    
+    @Test
+    public void testPathEncodedSlashNot() {
+        String path1 = "ab";
+        String path2 = "{xy}";
+        String expected = "ab/x/y";
+
+        URI uri = UriBuilder.fromPath(path1).path(path2).build(new Object[]{"x/y"}, false);
+        assertEquals(uri.toString(), expected);        
+    }
     
     @Test
     public void testNullSegment() {

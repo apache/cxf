@@ -248,6 +248,10 @@ public final class URITemplate {
         return sb.toString();
     }
 
+    public String substitute(Map<String, ? extends Object> valuesMap) throws IllegalArgumentException {
+        return this.substitute(valuesMap, false);
+    }
+    
     /**
      * Substitutes template variables with mapped values. Variables are mapped to values; if not all variables
      * are bound result will still contain variables. Note that all variables with the same name are replaced
@@ -260,7 +264,8 @@ public final class URITemplate {
      * @param valuesMap map variables to their values; on each value Object.toString() is called.
      * @return template with bound variables.
      */
-    public String substitute(Map<String, ? extends Object> valuesMap) throws IllegalArgumentException {
+    public String substitute(Map<String, ? extends Object> valuesMap,
+                             boolean encodePathSlash) throws IllegalArgumentException {
         if (valuesMap == null) {
             throw new IllegalArgumentException("valuesMap is null");
         }
@@ -276,7 +281,10 @@ public final class URITemplate {
                                                            + var.getName() + " with pattern "
                                                            + var.getPattern());
                     }
-                    sb.append(value);
+                    if (encodePathSlash) {
+                        sval = sval.replaceAll("/", "%2F");
+                    }
+                    sb.append(sval);
                 } else {
                     throw new IllegalArgumentException("Template variable " + var.getName() 
                         + " has no matching value"); 
