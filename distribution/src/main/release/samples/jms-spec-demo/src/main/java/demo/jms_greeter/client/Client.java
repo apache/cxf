@@ -39,8 +39,6 @@ public final class Client {
 
     public static void main(String[] args) throws Exception {
 
-        args = new String[1];
-        args[0] = "./wsdl/jms_greeter.wsdl";
         if (args.length == 0) {
             System.out.println("please specify wsdl");
             System.exit(1);
