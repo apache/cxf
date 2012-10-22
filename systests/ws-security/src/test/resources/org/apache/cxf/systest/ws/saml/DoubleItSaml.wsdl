@@ -498,6 +498,11 @@
                         </sp:SamlToken>
                     </wsp:Policy>
                 </sp:EndorsingSupportingTokens>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:RequireSignatureConfirmation/>
+                    </wsp:Policy>
+                </sp:Wss11>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
