@@ -167,12 +167,33 @@ public class TestHandler<T extends LogicalMessageContext>
         return ret;
     } 
 
-    private boolean handlePingMessage(boolean outbound, T ctx) { 
+    private boolean checkServerOutBindStopHandler(boolean outbound, T ctx) {
+        if (outbound) {
+            LogicalMessage msg = ctx.getMessage();
+            Object obj = msg.getPayload(jaxbCtx);
+            if (obj instanceof PingResponse) {
+                // only check if we need call for the server response handler false
+                PingResponse origResp = (PingResponse)obj;
+                for (String handler : origResp.getHandlersInfo()) {
+                    if (handler.indexOf("server") == 0 && handler.indexOf(getHandlerId()) > 0
+                        && handler.indexOf("stop") > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
+    private boolean handlePingMessage(boolean outbound, T ctx) {
         LogicalMessage msg = ctx.getMessage();
         addHandlerId(msg, ctx, outbound);
-        return getHandleMessageRet();
-    } 
+        if (checkServerOutBindStopHandler(outbound, ctx)) {
+            return false;
+        } else {
+            return getHandleMessageRet();
+        }
+    }
 
     private void addHandlerId(LogicalMessage msg, T ctx, boolean outbound) { 
 

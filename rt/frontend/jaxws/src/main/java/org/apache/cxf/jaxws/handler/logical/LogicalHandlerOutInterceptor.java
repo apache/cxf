@@ -158,12 +158,13 @@ public class LogicalHandlerOutInterceptor
                                             LogicalHandlerInInterceptor.class.getName());
                             observer.onMessage(responseMsg);
                         }
+                        return;
                     }
                 } else {
                     // server side - abort
-                    //System.out.println("Logical handler server side aborting");
+                    // Even return false, also should try to set the XMLStreamWriter using
+                    // reader or domWriter, or the SOAPMessage's body maybe empty.
                 }
-                return;
             }
             if (origMessage != null) {
                 message.setContent(SOAPMessage.class, origMessage);
@@ -182,8 +183,6 @@ public class LogicalHandlerOutInterceptor
                 throw new Fault(e);
             }
         }
-        
     }
-
     
 }
