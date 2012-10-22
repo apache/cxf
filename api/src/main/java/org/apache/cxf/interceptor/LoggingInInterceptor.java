@@ -28,6 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
+import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -136,10 +137,21 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 bos.setThreshold(threshold);
             }
             try {
-                IOUtils.copyAndCloseInput(is, bos);
+                // use the appropriate input stream and restore it later
+                InputStream bis = is instanceof DelegatingInputStream 
+                    ? ((DelegatingInputStream)is).getInputStream() : is;
+                
+                IOUtils.copyAndCloseInput(bis, bos);
                 bos.flush();
+                bis = bos.getInputStream();
+                
+                // restore the delegating input stream or the input stream
+                if (is instanceof DelegatingInputStream) {
+                    ((DelegatingInputStream)is).setInputStream(bis);
+                } else {
+                    message.setContent(InputStream.class, bis);
+                }
 
-                message.setContent(InputStream.class, bos.getInputStream());
                 if (bos.getTempFile() != null) {
                     //large thing on disk...
                     buffer.getMessage().append("\nMessage (saved to tmp file):\n");
