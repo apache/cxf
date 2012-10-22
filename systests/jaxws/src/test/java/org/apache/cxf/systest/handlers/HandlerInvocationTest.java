@@ -431,6 +431,21 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testLogicHandlerHandleMessageReturnFalseServerOutbound() throws PingException {
+        String[] expectedHandlers = {"server handler1 outbound stop", "soapHandler4", 
+                                     "soapHandler3", "handler2", "handler1", "handler1"};
+
+        List<String> resp = handlerTest.pingWithArgs("server handler1 outbound stop");     
+        
+        assertEquals(expectedHandlers.length, resp.size());
+
+        int i = 0;
+        for (String expected : expectedHandlers) {
+            assertEquals(expected, resp.get(i++));
+        }
+    }
+    
+    @Test
     public void testSOAPHandlerHandleMessageReturnsFalseServerInbound() throws PingException {
         String[] expectedHandlers = {"soapHandler4", "soapHandler3", "soapHandler4"};
         List<String> resp = handlerTest.pingWithArgs("soapHandler3 inbound stop");
