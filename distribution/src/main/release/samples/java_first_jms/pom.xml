@@ -17,13 +17,14 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.apache.cxf.samples</groupId>
-	<artifactId>java_first_jaxws_jms</artifactId>
-	<name>Java First demo using JAX-WS and JMS</name>
-    <description>Java First demo using JAX-WS and JMS</description>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.cxf.samples</groupId>
+    <artifactId>java_first_jms</artifactId>
+    <name>Java First demo using JMS</name>
+    <description>Java First demo using JMS</description>
     <version>2.6.4-SNAPSHOT</version>
 
     <parent>
@@ -32,11 +33,12 @@
 	  <version>2.6.4-SNAPSHOT</version>
 	</parent>
 
-	<properties>
-	  <cxf.version>${project.version}</cxf.version>
-	  <cxf.amq.version>5.3.0</cxf.amq.version>
-      <usingJaxws>-jaxws</usingJaxws>
-	</properties>
+    <properties>
+        <cxf.version>${project.version}</cxf.version>
+        <cxf.amq.version>5.3.0</cxf.amq.version>
+        <useJaxws>-jaxws</useJaxws>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -48,6 +50,7 @@
             </plugin>
         </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>jaxws</id>
@@ -69,8 +72,8 @@
                                 <configuration>
                                     <mainClass>demo.server.ServerJMS</mainClass>
                                     <arguments>
-                                    	<argument>-activemqbroker</argument>
-                                    	<argument>${usingJaxws}</argument>
+                                        <argument>-activemqbroker</argument>
+                                        <argument>${useJaxws}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -96,7 +99,7 @@
                                 <configuration>
                                     <mainClass>demo.client.ClientJMS</mainClass>
                                     <arguments>
-                                    	<argument>${usingJaxws}</argument>
+                                        <argument>${useJaxws}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -108,12 +111,12 @@
     </profiles>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-   			<artifactId>activemq-core</artifactId>
-    		<version>${cxf.amq.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <version>${cxf.amq.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -121,13 +124,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.6.4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>2.6.4-SNAPSHOT</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>
