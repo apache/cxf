@@ -30,11 +30,14 @@
         <artifactId>cxf-samples</artifactId>
         <version>2.6.4-SNAPSHOT</version>
     </parent>
+
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <cxf.xjc-utils.version>2.6.0</cxf.xjc-utils.version>
         <cxf.release.base>${basedir}/../..</cxf.release.base>
+        <wsdl.dir>${basedir}/src/main/config</wsdl.dir>
     </properties>
+
     <build>
         <defaultGoal>install</defaultGoal>
         <resources>
@@ -54,7 +57,7 @@
                         <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
                         <webResources>
                             <resource>
-                                <directory>wsdl</directory>
+                                <directory>${wsdl.dir}</directory>
                                 <targetPath>WEB-INF</targetPath>
                                 <includes>
                                     <include>*.wsdl</include>
@@ -91,9 +94,9 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/CustomerService.wsdl</wsdl>
+                                    <wsdl>${wsdl.dir}/CustomerService.wsdl</wsdl>
                                     <bindingFiles>
-                                        <bindingFile>${basedir}/wsdl/binding.xml</bindingFile>
+                                        <bindingFile>${wsdl.dir}/binding.xml</bindingFile>
                                     </bindingFiles>
                                 </wsdlOption>
                             </wsdlOptions>
@@ -147,7 +150,7 @@
                                 <configuration>
                                     <mainClass>com.example.customerservice.client.CustomerServiceSpringClient</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/CustomerService.wsdl</argument>
+                                        <argument>${wsdl.dir}/CustomerService.wsdl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

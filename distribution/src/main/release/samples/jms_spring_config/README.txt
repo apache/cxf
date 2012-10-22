@@ -1,8 +1,10 @@
 JMS Spring Config Demo
 ======================
 
-This is basically the wsdl first demo adapted to the jms transport. It uses the jms config feature so the jms transport can be
-added to any existing service without changing the wsdl.
+This is basically the wsdl first demo adapted to the JMS transport. It uses the JMS config feature so 
+the JMS transport can be added to any existing service without changing the wsdl (leaving the wsdl:service
+section disregarded.)  While the service is deployed on Tomcat, no http traffic is used to connect 
+with the web service, instead the JMS transport is used.
 
 The Demo consist of three parts:
 
@@ -21,9 +23,8 @@ zero objects would be used. This is mainly to show how custom exceptions can be 
 For any other name the method will return a list of two Customer objects. The number of  objects can be increased to
 test how fast CXF works for larger data.
 
-Now that the service is implemented it needs to be made available. In this example a standalone server is used. 
-This can be done either with the JAX-WS API demonstrated in the class CustomerService or using a spring config as
-demonstrated in the class CustomerServiceSpringServer.
+Now that the service is implemented it needs to be made available. In this example a standalone server is deployed
+via a WAR archive using the Spring config as demonstrated in the class CustomerServiceSpringServer.
 
 Client implementation
 ---------------------
@@ -52,7 +53,7 @@ located), the pom.xml file is used to build and run the demo.
 
 Using either UNIX or Windows:
 
-  mvn install   (builds the demo)
+  mvn clean install   (builds the demo)
   mvn -Pjms.broker (from one command line window)
   mvn -Pserver  (from as second command line window)
   mvn -Pclient  (from a third command line window)
