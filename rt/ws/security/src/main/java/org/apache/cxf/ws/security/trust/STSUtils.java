@@ -31,6 +31,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.BindingInfo;
@@ -82,21 +83,9 @@ public final class STSUtils {
     }
     
     public static STSClient getClient(Message message, String type) {
-        STSClient client = (STSClient)message
-            .getContextualProperty(SecurityConstants.STS_CLIENT);
-        if (client == null) {
-            if (type == null) {
-                type = "";
-            } else {
-                type = "." + type + "-client";
-            }
-            client = new STSClient(message.getExchange().get(Bus.class));
-            Endpoint ep = message.getExchange().get(Endpoint.class);
-            client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
-            client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
-        }
-        return client;
+        return getClient(message, type, null);
     }
+    
     public static STSClient getClient(Message message, String type, IssuedToken itok) {
         STSClient client = (STSClient)message
             .getContextualProperty(SecurityConstants.STS_CLIENT);
@@ -110,10 +99,14 @@ public final class STSUtils {
             Endpoint ep = message.getExchange().get(Endpoint.class);
             client.setEndpointName(ep.getEndpointInfo().getName().toString() + type);
             client.setBeanName(ep.getEndpointInfo().getName().toString() + type);
-            if (itok.getIssuerEpr() != null) {
+            if (MessageUtils.getContextualBoolean(message, SecurityConstants.STS_CLIENT_SOAP12_BINDING, false)) {
+                client.setSoap12();
+            }
+            if ((itok != null) && (itok.getIssuerEpr() != null)) {
                 //configure via mex
-                boolean useEPRWSAAddrAsMEXLocation = !Boolean.valueOf((String)message
-                        .getContextualProperty(SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
+                boolean useEPRWSAAddrAsMEXLocation = !Boolean.valueOf(
+                        (String)message.getContextualProperty(
+                         SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS));
                 client.configureViaEPR(itok.getIssuerEpr(), useEPRWSAAddrAsMEXLocation);
             }
         }
