@@ -21,8 +21,10 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.container.ResumeCallback;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -31,6 +33,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
@@ -41,12 +44,13 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private long timeout = AsyncResponse.NO_TIMEOUT;
     private Message inMessage;
     private boolean cancelled;
-    private boolean done;
+    private volatile boolean done;
     private boolean newTimeoutRequested;
     private boolean resumedByApplication;
     private TimeoutHandler timeoutHandler;
     
     private CompletionCallback completionCallback;
+    private ResumeCallback resumeCallback;
     
     public AsyncResponseImpl(Message inMessage) {
         inMessage.put(AsyncResponse.class, this);
@@ -113,7 +117,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
 
     @Override
-    public synchronized boolean isDone() {
+    public boolean isDone() {
         return done;
     }
 
@@ -147,9 +151,10 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         
     }
 
+    //TODO: API bug, boolean[] needs to be returned...
     @Override
     public boolean register(Object callback) throws NullPointerException {
-        return register(callback, CompletionCallback.class)[0];
+        return register(callback, CompletionCallback.class, ResumeCallback.class)[0];
     }
 
     //TODO: API bug, has to be Class<?>...
@@ -163,8 +168,11 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
                 throw new NullPointerException();
             }
             Class<?> cls = (Class<?>)interf;
-            if (cls == CompletionCallback.class) {
+            if (cls == CompletionCallback.class && callback instanceof CompletionCallback) {
                 completionCallback = (CompletionCallback)callback;
+                result[i] = true;
+            } else if (cls == ResumeCallback.class && callback instanceof ResumeCallback) {
+                resumeCallback = (ResumeCallback)callback;
                 result[i] = true;
             } else {
                 result[i] = false;
@@ -192,9 +200,18 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     public synchronized Object getResponseObject() {
-        // it may have to be set to true only after a continuation-specific onComplete event
-        done = true;
-        return cont.getObject();
+        Object obj = cont.getObject();
+        if (!(obj instanceof Response) && !(obj instanceof Throwable)) {
+            obj = Response.ok().entity(obj).build();    
+        }
+        if (resumeCallback != null) {    
+            if (obj instanceof Response) {
+                resumeCallback.onResume(this, (Response)obj);
+            } else {
+                resumeCallback.onResume(this, (Throwable)obj);
+            }
+        }
+        return obj;
     }
     
     public synchronized boolean isResumedByApplication() {
@@ -211,16 +228,19 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
                 suspend();
                 timeoutHandler.handleTimeout(this);
                 return true;
-            } else {
-                done = true;
+            } else if (resumeCallback != null) {
+                resumeCallback.onResume(this, new WebApplicationException(503));    
             }
         }
         return false;
         
     }
 
+    
+    
     @Override
     public void onComplete() {
+        done = true;
         if (completionCallback != null) {
             completionCallback.onComplete();
         }
@@ -229,7 +249,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     @Override
     public void onError(Throwable error) {
         if (completionCallback != null) {
-            completionCallback.onError(error);
+            Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
+            completionCallback.onError(actualError);
         }
         
     }

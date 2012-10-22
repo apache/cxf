@@ -32,7 +32,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.container.ResumeCallback;
 import javax.ws.rs.container.TimeoutHandler;
+import javax.ws.rs.core.Response;
 
 @Path("/bookstore")
 public class BookContinuationStore {
@@ -48,7 +50,7 @@ public class BookContinuationStore {
     @GET
     @Path("/books/defaulttimeout")
     public void getBookDescriptionWithHandler(AsyncResponse async) {
-        async.register(new CompletionCallbackImpl());
+        async.register(new CallbackImpl());
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
     }
     
@@ -118,18 +120,27 @@ public class BookContinuationStore {
         
     }
     
-    private class CompletionCallbackImpl implements CompletionCallback {
+    private class CallbackImpl implements CompletionCallback, ResumeCallback {
 
         @Override
         public void onComplete() {
-            System.out.println("CompletionCallbackImpl: onComplete");
+            System.out.println("CompletionCallback: onComplete");
             
         }
 
         @Override
         public void onError(Throwable throwable) {
-            // TODO Auto-generated method stub
-            
+            System.out.println("CompletionCallback: onError");
+        }
+
+        @Override
+        public void onResume(AsyncResponse resuming, Response response) {
+            System.out.println("ResumeCallback: onResume");
+        }
+
+        @Override
+        public void onResume(AsyncResponse resuming, Throwable error) {
+            System.out.println("ResumeCallback: onResumeError");
         }
         
     }

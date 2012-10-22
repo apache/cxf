@@ -88,8 +88,6 @@ public class JAXRSInvoker extends AbstractInvoker {
                     if (asyncObj instanceof Throwable) {
                         return handleFault(new Fault((Throwable)asyncObj), 
                                            exchange.getInMessage(), null, null);    
-                    } else if (!(asyncObj instanceof Response)) {
-                        response = Response.ok().entity(asyncObj).build();
                     } else {
                         response = (Response)asyncObj;
                     }
