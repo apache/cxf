@@ -344,6 +344,12 @@ public final class SecurityConstants {
         "ws-security.sts.disable-wsmex-call-using-epr-address";
     
     /**
+     * Switch STS client to send Soap 1.2 messages
+     */
+    public static final String STS_CLIENT_SOAP12_BINDING =
+        "ws-security.sts.client-soap12-binding";
+
+    /**
      * 
      * A Crypto object to be used for the STS. If this is not defined then the 
      * {@link STS_TOKEN_PROPERTIES} is used instead.
