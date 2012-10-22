@@ -46,9 +46,6 @@ public final class ClientJMS {
         for (String arg : args) {
             if ("-jaxws".equals(arg)) {
                 jaxws = true;
-            } else {
-                System.err.println("Invalid argument " + arg);
-                return;
             }
         }
         HelloWorld client = null;
