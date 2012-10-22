@@ -118,9 +118,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
     }
     
-    private static void addSig(List<byte[]> signatureValues, byte[] val) {
-        if (val != null) {
-            signatureValues.add(val);
+    private void addSig(byte[] val) {
+        if (val != null && val.length > 0) {
+            signatures.add(val);
         }
     }
     
@@ -215,7 +215,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
      */
     private void handleEndorsingSupportingTokens() throws Exception {
         Collection<AssertionInfo> ais;
-        List<byte[]> signatureValues = new ArrayList<byte[]>();
         
         ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         if (ais != null) {
@@ -226,7 +225,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             }
             if (sgndSuppTokens != null) {
                 for (Token token : sgndSuppTokens.getTokens()) {
-                    handleEndorsingToken(token, sgndSuppTokens, signatureValues);
+                    handleEndorsingToken(token, sgndSuppTokens);
                 }
             }
         }
@@ -241,7 +240,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             if (endSuppTokens != null) {
                 for (Token token : endSuppTokens.getTokens()) {
-                    handleEndorsingToken(token, endSuppTokens, signatureValues);
+                    handleEndorsingToken(token, endSuppTokens);
                 }
             }
         }
@@ -255,7 +254,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             if (endSuppTokens != null) {
                 for (Token token : endSuppTokens.getTokens()) {
-                    handleEndorsingToken(token, endSuppTokens, signatureValues);
+                    handleEndorsingToken(token, endSuppTokens);
                 }
             }
         }
@@ -269,37 +268,28 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             
             if (endSuppTokens != null) {
                 for (Token token : endSuppTokens.getTokens()) {
-                    handleEndorsingToken(token, endSuppTokens, signatureValues);
+                    handleEndorsingToken(token, endSuppTokens);
                 }
             }
         }
     }
     
     private void handleEndorsingToken(
-        Token token, SupportingToken wrapper, List<byte[]> signatureValues
+        Token token, SupportingToken wrapper
     ) throws Exception {
         if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
             || token instanceof KerberosToken) {
-            addSig(
-                signatureValues, 
-                doIssuedTokenSignature(token, wrapper)
-            );
+            addSig(doIssuedTokenSignature(token, wrapper));
         } else if (token instanceof X509Token
             || token instanceof KeyValueToken) {
-            addSig(
-                signatureValues, 
-                doX509TokenSignature(token, wrapper)
-            );
+            addSig(doX509TokenSignature(token, wrapper));
         } else if (token instanceof SamlToken) {
             AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
             assertionWrapper.toDOM(saaj.getSOAPPart());
             storeAssertionAsSecurityToken(assertionWrapper);
-            addSig(
-                signatureValues, 
-                doIssuedTokenSignature(token, wrapper)
-            );
+            addSig(doIssuedTokenSignature(token, wrapper));
         } else if (token instanceof UsernameToken) {
             // Create a UsernameToken object for derived keys and store the security token
             WSSecUsernameToken usernameToken = addDKUsernameToken((UsernameToken)token, true);
@@ -315,10 +305,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             getTokenStore().add(tempTok);
             message.setContextualProperty(SecurityConstants.TOKEN, tempTok);
             
-            addSig(
-                signatureValues, 
-                doIssuedTokenSignature(token, wrapper)
-            );
+            addSig(doIssuedTokenSignature(token, wrapper));
         }
     }
     
