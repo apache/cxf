@@ -78,7 +78,7 @@
         <module>wsdl_first_https</module>
         <module>ws_addressing</module>
         <module>soap_header</module>
-        <module>jms-spec-demo</module>
+        <module>jms_spec_demo</module>
         <module>wsdl_first_xml_wrapped</module>
         <module>aegis</module>
         <module>jax_server_aegis_client</module>
