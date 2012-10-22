@@ -388,7 +388,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         }
     }
 
-    private JAXBContext getJAXBContext() {
+    private static JAXBContext getJAXBContext() {
         if (jaxbContext == null) {
             try {
                 jaxbContext = JAXBContext.newInstance(W3CEndpointReference.class);

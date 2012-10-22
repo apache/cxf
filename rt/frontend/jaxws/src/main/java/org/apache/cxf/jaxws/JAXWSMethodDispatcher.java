@@ -30,6 +30,7 @@ import javax.xml.ws.Response;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -109,7 +110,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher
                     method = m2;
                 }
                 try {
-                    method.setAccessible(true);
+                    ReflectionUtil.setAccessible(method);
                 } catch (Throwable t) {
                     //ignore
                 }                

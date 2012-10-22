@@ -56,6 +56,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.IOUtils;
@@ -410,7 +411,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     private void setASM(boolean b) throws Exception {
         Field f = ASMHelper.class.getDeclaredField("badASM");
-        f.setAccessible(true);
+        ReflectionUtil.setAccessible(f);
         f.set(null, !b);
     }
     

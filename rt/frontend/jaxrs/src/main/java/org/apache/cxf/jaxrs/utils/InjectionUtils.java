@@ -68,6 +68,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
@@ -160,19 +161,13 @@ public final class InjectionUtils {
     public static void injectFieldValue(final Field f, 
                                         final Object o, 
                                         final Object v) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                f.setAccessible(true);
-                try {
-                    f.set(o, v);
-                } catch (IllegalAccessException ex) {
-                    reportServerError("FIELD_ACCESS_FAILURE", 
-                                      f.getType().getName());
-                }
-                return null;
-            }
-        });
-        
+        ReflectionUtil.setAccessible(f);
+        try {
+            f.set(o, v);
+        } catch (IllegalAccessException ex) {
+            reportServerError("FIELD_ACCESS_FAILURE", 
+                              f.getType().getName());
+        }
     }
 
     public static Object extractFieldValue(final Field f, 

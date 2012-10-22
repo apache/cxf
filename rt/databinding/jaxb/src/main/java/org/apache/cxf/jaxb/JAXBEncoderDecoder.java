@@ -481,7 +481,7 @@ public final class JAXBEncoderDecoder {
                     }
                     Type type = f.getGenericType();
                     if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
-                        f.setAccessible(true);
+                        ReflectionUtil.setAccessible(f);
                         if (JAXBSchemaInitializer.isArray(type)) {
                             Class<?> compType = JAXBSchemaInitializer
                                 .getArrayComponentType(type);
@@ -914,7 +914,7 @@ public final class JAXBEncoderDecoder {
                     //ignore
                 }
                 Field f = ReflectionUtil.getDeclaredField(c.getClass(), "mNamespaces");
-                f.setAccessible(true);
+                ReflectionUtil.setAccessible(f);
                 String ns[] = (String[])f.get(c);
                 for (int x = 0; x < ns.length; x += 2) {
                     if (ns[x] == null) {
@@ -928,7 +928,7 @@ public final class JAXBEncoderDecoder {
             //internal JDK/xerces version
             try {
                 Field f =  ReflectionUtil.getDeclaredField(c.getClass(), "fNamespaceContext");
-                f.setAccessible(true);
+                ReflectionUtil.setAccessible(f);
                 Object c2 = f.get(c);
                 Enumeration<?> enm = (Enumeration<?>)c2.getClass().getMethod("getAllPrefixes").invoke(c2);
                 while (enm.hasMoreElements()) {

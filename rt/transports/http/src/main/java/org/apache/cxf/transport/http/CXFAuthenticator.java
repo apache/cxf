@@ -24,9 +24,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -44,12 +43,7 @@ public class CXFAuthenticator extends Authenticator {
         try {
             for (final Field f : Authenticator.class.getDeclaredFields()) {
                 if (f.getType().equals(Authenticator.class)) {
-                    AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                        public Void run() {
-                            f.setAccessible(true);
-                            return null;
-                        }
-                    });
+                    ReflectionUtil.setAccessible(f);
 
                     wrapped = (Authenticator)f.get(null);
                 }
@@ -76,22 +70,12 @@ public class CXFAuthenticator extends Authenticator {
             try {
                 for (final Field f : Authenticator.class.getDeclaredFields()) {
                     if (!Modifier.isStatic(f.getModifiers())) {
-                        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                            public Void run() {
-                                f.setAccessible(true);
-                                return null;
-                            }
-                        });
+                        ReflectionUtil.setAccessible(f);
                         f.set(wrapped, f.get(this));
                     }
                 }
                 final Method m = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
-                AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                    public Void run() {
-                        m.setAccessible(true);
-                        return null;
-                    }
-                });
+                ReflectionUtil.setAccessible(m);
                 auth = (PasswordAuthentication)m.invoke(wrapped);
             } catch (Throwable t) {
                 //ignore

@@ -25,14 +25,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;
 
 import org.junit.AfterClass;
@@ -150,12 +149,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
         if (c == null) {
             try {
                 final Method m = o.getClass().getDeclaredMethod("getClient");
-                AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                    public Void run() {
-                        m.setAccessible(true);
-                        return null;
-                    }
-                });
+                ReflectionUtil.setAccessible(m);
 
                 c = (Client)m.invoke(o);
             } catch (Throwable t) {

@@ -27,11 +27,12 @@ import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxws.ServiceImpl;
 
 /**
  * A utility that allows access to the 'private' implementation specific delegate
- * of a Service. Usefull when extensions to the JAXWS Service supported methods
+ * of a Service. Useful when extensions to the JAXWS Service supported methods
  * are required.
  */
 public final class ServiceDelegateAccessor {
@@ -57,12 +58,12 @@ public final class ServiceDelegateAccessor {
         ServiceImpl delegate = null;
         try {
             Field delegateField = Service.class.getDeclaredField(DELEGATE_FIELD_NAME);
-            delegateField.setAccessible(true);
+            ReflectionUtil.setAccessible(delegateField);
             delegate = (ServiceImpl)delegateField.get(service);
         } catch (Exception e) {
             try {
                 Field delegateField = Service.class.getDeclaredField(DELEGATE_FIELD_NAME2);
-                delegateField.setAccessible(true);
+                ReflectionUtil.setAccessible(delegateField);
                 delegate = (ServiceImpl)delegateField.get(service);
             } catch (Exception e2) {
                 WebServiceException wse = new WebServiceException("Failed to access Field named "

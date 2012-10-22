@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Interceptor;
@@ -411,19 +412,19 @@ public class PhaseInterceptorChainTest extends Assert {
             b = new SortedArraySet<String>();
         }
         Field f = AbstractPhaseInterceptor.class.getDeclaredField("before");
-        f.setAccessible(true);
+        ReflectionUtil.setAccessible(f);
         f.set(p, b);
         
         f = AbstractPhaseInterceptor.class.getDeclaredField("after");
-        f.setAccessible(true);
+        ReflectionUtil.setAccessible(f);
         f.set(p, a);
 
         f = AbstractPhaseInterceptor.class.getDeclaredField("phase");
-        f.setAccessible(true);
+        ReflectionUtil.setAccessible(f);
         f.set(p, phase);
 
         f = AbstractPhaseInterceptor.class.getDeclaredField("id");
-        f.setAccessible(true);
+        ReflectionUtil.setAccessible(f);
         f.set(p, id);
 
         return p;

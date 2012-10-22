@@ -32,6 +32,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.wsdl.WSDLManager;
 
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
@@ -110,14 +111,14 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                         } else {
                             try {
                                 Field f = e.getClass().getDeclaredField("jmsNamingProperty");
-                                f.setAccessible(true);
+                                ReflectionUtil.setAccessible(f);
                                 List<?> props = (List<?>)f.get(e);
                                 for (Object prop : props) {
                                     f = prop.getClass().getDeclaredField("name");
-                                    f.setAccessible(true);
+                                    ReflectionUtil.setAccessible(f);
                                     if ("java.naming.provider.url".equals(f.get(prop))) {
                                         f = prop.getClass().getDeclaredField("value");
-                                        f.setAccessible(true);
+                                        ReflectionUtil.setAccessible(f);
                                         f.set(prop, url);
                                     }
                                 }

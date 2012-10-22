@@ -97,6 +97,7 @@ import org.apache.cxf.catalog.OASISCatalogManagerHelper;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -470,7 +471,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                                                Options opts) {
         try {
             Field f = schemaCompiler.getClass().getDeclaredField("forest");
-            f.setAccessible(true);
+            ReflectionUtil.setAccessible(f);
             XMLSchemaInternalizationLogic logic = new XMLSchemaInternalizationLogic() {
                 public XMLFilterImpl createExternalReferenceFinder(DOMForest parent) {
                     return new ReferenceFinder(parent, catalog);
@@ -1011,7 +1012,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     //no accessors :-(
                     try {
                         Field f = jdc.getClass().getDeclaredField("enumConstantsByName");
-                        f.setAccessible(true);
+                        ReflectionUtil.setAccessible(f);
                         Map<?, ?> map = (Map<?, ?>)f.get(jdc);
                         Set<String> values = CastUtils.cast(map.keySet());
                         String first = defaultValues.chooseEnumValue(path, values);
@@ -1037,7 +1038,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 JType tp2 = tp.erasure();
                 try {
                     Field f = tp2.getClass().getDeclaredField("_class");
-                    f.setAccessible(true);
+                    ReflectionUtil.setAccessible(f);
                     Class<?> cls = (Class<?>)f.get(tp2);
                     if (List.class.isAssignableFrom(cls)) {
                         found = true;
@@ -1047,7 +1048,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                         writer.write("();");
 
                         f = tp.getClass().getDeclaredField("args");
-                        f.setAccessible(true);
+                        ReflectionUtil.setAccessible(f);
                         List<JClass> lcl = CastUtils.cast((List<?>)f.get(tp));
                         JClass cl = lcl.get(0);
 

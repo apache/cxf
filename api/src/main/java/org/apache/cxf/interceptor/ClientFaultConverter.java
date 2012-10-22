@@ -38,6 +38,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataReader;
@@ -189,7 +190,7 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
                 Field f;
                 try {
                     f = Throwable.class.getDeclaredField("detailMessage");
-                    f.setAccessible(true);
+                    ReflectionUtil.setAccessible(f);
                     f.set(e, fault.getMessage());
                 } catch (Exception e1) {
                     //ignore
@@ -317,8 +318,8 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
             for (Field f : fields) {
                 try {
                     Field beanField = faultBean.getClass().getDeclaredField(f.getName());
-                    beanField.setAccessible(true);                    
-                    f.setAccessible(true);
+                    ReflectionUtil.setAccessible(beanField);
+                    ReflectionUtil.setAccessible(f);
                     f.set(e, beanField.get(faultBean));
                 } catch (NoSuchFieldException e1) {
                     //do nothing
