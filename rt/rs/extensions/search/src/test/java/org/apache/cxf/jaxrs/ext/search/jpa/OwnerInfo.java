@@ -18,19 +18,22 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
+import java.util.Date;
+
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 
 @Embeddable
-public class OwnerName {
+public class OwnerInfo {
 
     private Name name;
+    private Date dateOfBirth;
 
-    public OwnerName() {
+    public OwnerInfo() {
         
     }
     
-    public OwnerName(Name name) {
+    public OwnerInfo(Name name) {
         this.name = name;
     }
     
@@ -41,5 +44,13 @@ public class OwnerName {
 
     public void setName(Name name) {
         this.name = name;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

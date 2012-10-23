@@ -89,8 +89,8 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
 
         public Builder(Map<String, String> properties) {
             parent = null;
-            df = SearchUtils.getDateFormat(properties, FiqlParser.DEFAULT_DATE_FORMAT);
-            timeZoneSupported = SearchUtils.isTimeZoneSupported(properties, Boolean.TRUE);
+            df = SearchUtils.getDateFormat(properties);
+            timeZoneSupported = SearchUtils.isTimeZoneSupported(properties, Boolean.FALSE);
         }
 
         public Builder(Builder parent) {

@@ -28,7 +28,7 @@ public class Book {
     private int id;
     private String title;
     private OwnerAddress address;
-    private OwnerName ownerName;
+    private OwnerInfo ownerInfo;
     
     public int getId() {
         return id;
@@ -55,11 +55,11 @@ public class Book {
         this.address = address;
     }
 
-    public OwnerName getOwnerName() {
-        return ownerName;
+    public OwnerInfo getOwnerInfo() {
+        return ownerInfo;
     }
 
-    public void setOwnerName(OwnerName ownerName) {
-        this.ownerName = ownerName;
+    public void setOwnerInfo(OwnerInfo ownerInfo) {
+        this.ownerInfo = ownerInfo;
     }
 }

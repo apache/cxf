@@ -67,8 +67,6 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     public static final String EQ = "==";
     public static final String NEQ = "!=";
     
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    
     private static final Pattern COMPARATORS_PATTERN; 
     private static final Map<String, ConditionType> OPERATORS_MAP;
 
@@ -317,12 +315,20 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 String nextPart = getMethodNameSuffix(names[1]);
                 Method getterM = valueType.getMethod("get" + nextPart, new Class[]{});   
                 Class<?> returnType = getterM.getReturnType();
-                boolean lastTry = names.length == 2 
-                    && (InjectionUtils.isPrimitive(returnType) || returnType == Date.class);
+                
+                boolean isPrimitive = InjectionUtils.isPrimitive(returnType);
+                boolean lastTry = names.length == 2 && (isPrimitive || returnType == Date.class);
                 
                 Object valueObject = lastTry && ownerBean != null ? ownerBean : valueType.newInstance();
-                Object nextObject = lastTry ? InjectionUtils.convertStringToPrimitive(value, returnType) 
-                    : returnType.newInstance();
+                Object nextObject;
+                
+                if (lastTry) {
+                    nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType) 
+                        : convertToDate(value); 
+                } else {
+                    nextObject = returnType.newInstance();
+                }
+                
                 Method setterM = valueType.getMethod("set" + nextPart, new Class[]{getterM.getReturnType()});
                 setterM.invoke(valueObject, new Object[]{nextObject});
                 
@@ -342,9 +348,9 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     
     private Object convertToDate(String value) throws SearchParseException {
         try {
-            DateFormat df = SearchUtils.getDateFormat(contextProperties, DEFAULT_DATE_FORMAT);
+            DateFormat df = SearchUtils.getDateFormat(contextProperties);
             String dateValue = value;
-            if (SearchUtils.isTimeZoneSupported(contextProperties, Boolean.TRUE)) {
+            if (SearchUtils.isTimeZoneSupported(contextProperties, Boolean.FALSE)) {
                 // zone in XML is "+01:00" in Java is "+0100"; stripping semicolon
                 int idx = value.lastIndexOf(':');
                 if (idx != -1) {
