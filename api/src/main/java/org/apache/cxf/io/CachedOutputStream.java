@@ -89,8 +89,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     public CachedOutputStream() {
-        currentStream = new LoadingByteArrayOutputStream(2048);
-        inmem = true;
+        this(defaultThreshold);
     }
 
     public CachedOutputStream(long threshold) {

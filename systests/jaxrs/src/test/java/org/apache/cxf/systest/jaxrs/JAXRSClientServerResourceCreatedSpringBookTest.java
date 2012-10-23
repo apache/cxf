@@ -97,10 +97,10 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
         IOUtils.copy(in, bos);
+        String str = new String(bos.getBytes()); 
         in.close();
         bos.close();
-        //System.out.println(bos.getOut().toString());        
-        return bos.getOut().toString();        
+        return str;
     }
 
 }

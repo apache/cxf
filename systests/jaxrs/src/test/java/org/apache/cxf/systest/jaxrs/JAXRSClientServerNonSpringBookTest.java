@@ -219,9 +219,10 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     private String getStringFromInputStream(InputStream in) throws Exception {        
         CachedOutputStream bos = new CachedOutputStream();
         IOUtils.copy(in, bos);
+        String str = new String(bos.getBytes()); 
         in.close();
         bos.close();
-        return bos.getOut().toString();        
+        return str;
     }
 
 }
