@@ -47,9 +47,9 @@ public class PlugInClassLoader extends SecureClassLoader {
     private String jarUrls[] = new String[0];
     private final ProtectionDomain protectionDomain;
     
-    private ClassLoader ploader;
+    private final ClassLoader ploader;
 
-    public PlugInClassLoader(ClassLoader p) throws IOException {        
+    public PlugInClassLoader(final ClassLoader p) throws IOException {        
         super(new FireWallClassLoader(p, 
                                       getFilterList(p, FILTERS_PROPS_FILE),
                                       getFilterList(p, NEFILTERS_PROPS_FILE)));

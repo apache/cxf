@@ -641,7 +641,7 @@ public class JettyHTTPServerEngine
                 // Regardless the port has to equal the one
                 // we are configured for.
                 assert porto == port;
-                assert hosto == host;
+                assert hosto == null ? host == null : hosto.equals(host);
                 if (hosto != null) {
                     result.setHost(hosto);
                 }

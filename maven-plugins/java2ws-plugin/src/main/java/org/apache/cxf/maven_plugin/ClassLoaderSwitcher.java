@@ -22,12 +22,12 @@ package org.apache.cxf.maven_plugin;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.logging.Log;
@@ -92,8 +92,7 @@ public class ClassLoaderSwitcher {
         }
 
         origContextClassloader = Thread.currentThread().getContextClassLoader();
-        URLClassLoader loader = new URLClassLoader(urlList.toArray(new URL[urlList.size()]),
-                                                   origContextClassloader);
+        ClassLoader loader = ClassLoaderUtils.getURLClassLoader(urlList, origContextClassloader);
         String newCp = buf.toString();
 
         log.debug("Classpath: " + urlList.toString());

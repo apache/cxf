@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.URIParserUtil;
@@ -70,11 +71,11 @@ public final class AnnotationUtil {
 
     public static synchronized URLClassLoader getClassLoader(ClassLoader parent) {
         URL[] urls = URIParserUtil.pathToURLs(getClassPath());
-        return new URLClassLoader(urls, parent);
+        return (URLClassLoader)ClassLoaderUtils.getURLClassLoader(urls, parent);
     }
 
     private static ClassLoader newLoader(URL[] urls, ClassLoader parent) {
-        return new URLClassLoader(urls, parent);
+        return ClassLoaderUtils.getURLClassLoader(urls, parent);
     }
     public static synchronized Class<?> loadClass(String className, ClassLoader parent) {
         Class<?> clazz = null;

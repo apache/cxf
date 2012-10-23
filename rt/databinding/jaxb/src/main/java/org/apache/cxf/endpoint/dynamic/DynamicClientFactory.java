@@ -368,13 +368,14 @@ public class DynamicClientFactory {
             LOG.log(Level.SEVERE , new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
         FileUtils.removeDir(src);
-        URLClassLoader cl;
+        URL[] urls = null;
         try {
-            cl = new URLClassLoader(new URL[] {classes.toURI().toURL()}, classLoader);
+            urls = new URL[] {classes.toURI().toURL()};
         } catch (MalformedURLException mue) {
             throw new IllegalStateException("Internal error; a directory returns a malformed URL: "
                                             + mue.getMessage(), mue);
         }
+        ClassLoader cl = ClassLoaderUtils.getURLClassLoader(urls, classLoader);
 
         JAXBContext context;
         Map<String, Object> contextProperties = jaxbContextProperties;

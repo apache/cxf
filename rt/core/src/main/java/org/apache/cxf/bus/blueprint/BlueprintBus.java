@@ -19,6 +19,8 @@
 
 package org.apache.cxf.bus.blueprint;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
@@ -58,11 +60,16 @@ public class BlueprintBus extends ExtensionManagerBus {
         }
     }
     
-    public void setBundleContext(BundleContext c) {
+    public void setBundleContext(final BundleContext c) {
         context = c;
-        super.setExtension(new BundleDelegatingClassLoader(c.getBundle(), 
-                                                           this.getClass().getClassLoader()),
-                           ClassLoader.class);
+        ClassLoader bundleClassLoader =
+            AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return new BundleDelegatingClassLoader(c.getBundle(), 
+                                                           this.getClass().getClassLoader());
+                }
+            });
+        super.setExtension(bundleClassLoader, ClassLoader.class);
         super.setExtension(c, BundleContext.class);
     }
     public void setBlueprintContainer(BlueprintContainer con) {
