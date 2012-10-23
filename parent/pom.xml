@@ -1769,6 +1769,12 @@
             </properties>
         </profile>
         <profile>
+            <id>spring3.1</id>
+            <properties>
+                <cxf.spring.version>3.1.2.RELEASE</cxf.spring.version>
+            </properties>
+        </profile>
+        <profile>
             <!-- Profile to clean even if you do not have the cxf plugins in
              your local mavven repo -->
             <id>clean</id>
