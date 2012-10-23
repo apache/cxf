@@ -65,6 +65,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 import com.sun.codemodel.ClassType;
@@ -79,6 +80,7 @@ import com.sun.tools.xjc.Driver;
 import com.sun.tools.xjc.ErrorReceiver;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
+import com.sun.tools.xjc.XJCListener;
 import com.sun.tools.xjc.api.Mapping;
 import com.sun.tools.xjc.api.Property;
 import com.sun.tools.xjc.api.S2JJAXBModel;
@@ -124,9 +126,47 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer;
 import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
 
 public class JAXBDataBinding implements DataBindingProfile {
+    static final String XJCVERSION;
+    static {
+        
+        VersionDetectListener listener = new VersionDetectListener();
+        try {
+            Driver.run(new String[] {"-version"}, listener);
+        } catch (BadCommandLineException e) {
+            //
+        }
+        XJCVERSION = listener.getVersion();
+    }
+    
+    static final class VersionDetectListener extends XJCListener {
+        private String s = "2.1";
+        VersionDetectListener() {
+        }
+        public String getVersion() {
+            return s;
+        }
+        public void error(SAXParseException exception) {
+        }
 
+        public void fatalError(SAXParseException exception) {
+        }
 
-    public class LocationFilterReader extends StreamReaderDelegate implements XMLStreamReader {
+        public void warning(SAXParseException exception) {
+        }
+
+        public void info(SAXParseException exception) {
+        }
+
+        public void message(String msg) {
+            if (msg.contains(" ")) {
+                msg = msg.substring(msg.indexOf(' ')).trim();
+            }
+            if (!StringUtils.isEmpty(msg)) {
+                s = msg;
+            }
+        }
+    }
+    public class LocationFilterReader extends StreamReaderDelegate {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;
@@ -197,6 +237,11 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
 
         private String mapSchemaLocation(String target) {
+            //See http://java.net/jira/browse/JAXB-925
+            if (this.getLocation().getSystemId().startsWith("jar:") 
+                && XJCVERSION.startsWith("2.2")) {
+                return target;
+            }
             return JAXBDataBinding.mapSchemaLocation(target, this.getLocation().getSystemId(), catalog);
         }
 
@@ -458,6 +503,11 @@ public class JAXBDataBinding implements DataBindingProfile {
                     || "include".equals(localName))) {
                 String s = atts.getValue("schemaLocation");
                 if (!StringUtils.isEmpty(s)) {
+                    //See http://java.net/jira/browse/JAXB-925
+                    if (locator.getSystemId().startsWith("jar:") 
+                        && XJCVERSION.startsWith("2.2")) {
+                        return s;
+                    }
                     s = JAXBDataBinding.mapSchemaLocation(s, locator.getSystemId(), catalog);
                 }
                 return s;
