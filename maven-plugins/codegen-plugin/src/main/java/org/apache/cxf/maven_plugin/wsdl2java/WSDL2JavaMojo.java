@@ -71,12 +71,16 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                 errorfiles.add(f);
             }
             if (f == null) {
-                f = new File(file) {
-                    private static final long serialVersionUID = 1L;
-                    public String getAbsolutePath() {
-                        return file;
-                    }
-                };
+                if (file == null) {
+                    f = new File("null");
+                } else {
+                    f = new File(file) {
+                        private static final long serialVersionUID = 1L;
+                        public String getAbsolutePath() {
+                            return file;
+                        }
+                    };
+                }
             }
             buildContext.addMessage(f, line, column, message, BuildContext.SEVERITY_ERROR, t);
         }
