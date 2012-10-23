@@ -100,12 +100,12 @@ public class JPATypedQueryVisitorTest extends Assert {
             if (emFactory != null) {
                 emFactory.close();
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             ex.printStackTrace();    
         } finally {    
             try {
                 connection.createStatement().execute("SHUTDOWN");
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 ex.printStackTrace();
             }
         }
