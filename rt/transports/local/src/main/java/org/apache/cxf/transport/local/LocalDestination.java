@@ -121,6 +121,7 @@ public class LocalDestination extends AbstractDestination {
                 CachedOutputStream stream = new CachedOutputStream();
                 message.setContent(OutputStream.class, stream);
                 message.setContent(CachedOutputStream.class, stream);
+                stream.holdTempFile();
             }
         }
 
@@ -136,6 +137,7 @@ public class LocalDestination extends AbstractDestination {
                 message.setContent(OutputStream.class, stream);
                 MessageImpl.copyContent(message, copy);
                 copy.setContent(InputStream.class, stream.getInputStream());
+                stream.releaseTempFileHold();
                 if (exchange != null && exchange.getInMessage() == null) {
                     exchange.setInMessage(copy);
                 }                
