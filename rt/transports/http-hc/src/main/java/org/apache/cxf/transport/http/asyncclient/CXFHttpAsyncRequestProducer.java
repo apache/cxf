@@ -21,8 +21,11 @@ package org.apache.cxf.transport.http.asyncclient;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.http.HttpException;
@@ -39,7 +42,8 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
     private final SharedOutputBuffer buf;
     private volatile CachedOutputStream content;
     private volatile ByteBuffer buffer;
-    private volatile FileInputStream fis;
+    private volatile InputStream fis;
+    private volatile ReadableByteChannel chan;
     
     public CXFHttpAsyncRequestProducer(final CXFHttpRequest request, final SharedOutputBuffer buf) {
         super();
@@ -72,14 +76,16 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
                 if (content.getTempFile() == null) {
                     buffer = ByteBuffer.wrap(content.getBytes());
                 } else {
-                    fis = (FileInputStream)content.getInputStream();
+                    fis = content.getInputStream();
+                    chan = (fis instanceof FileInputStream) 
+                        ? ((FileInputStream)fis).getChannel() : Channels.newChannel(fis);
                     buffer = ByteBuffer.allocate(8 * 1024);
                 }
             }
             int i = -1;
-            if (!buffer.hasRemaining() && fis != null) {
-                buffer.reset();
-                i = fis.getChannel().read(buffer);
+            buffer.rewind();
+            if (buffer.hasRemaining() && chan != null) {
+                i = chan.read(buffer);
                 buffer.flip();
             }
             enc.write(buffer);
@@ -98,6 +104,7 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
             } catch (IOException io) {
                 //ignore
             }
+            chan = null;
             fis = null;
         }
         buffer = null;
@@ -126,6 +133,7 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
             } catch (IOException io) {
                 //ignore
             }
+            chan = null;
             fis = null;
         }
         buffer = null;
