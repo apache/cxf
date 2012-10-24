@@ -99,6 +99,15 @@
                 <soap:body use="literal"/>
             </output>
         </operation>
+        <operation name="gdocsRequest">
+            <soap:operation soapAction="" style="document"/>
+            <input name="gdocsRequest">
+                <soap:body use="literal"/>
+            </input>
+            <output name="gdocsResponse">
+                <soap:body use="literal"/>
+            </output>
+        </operation>
     </binding>
     <service name="SomethingService">
         <port binding="tns:SomethingServerSOAPBinding" name="SOAPOverHTTPPort">

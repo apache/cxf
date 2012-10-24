@@ -19,7 +19,7 @@
 -->
 <xs:schema version="1.0" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" schemaLocation="./schema4.xsd"/>
+  <xs:include schemaLocation="./schema4.xsd"/>
 
   <xs:element name="sayHi">
     <xs:complexType/>

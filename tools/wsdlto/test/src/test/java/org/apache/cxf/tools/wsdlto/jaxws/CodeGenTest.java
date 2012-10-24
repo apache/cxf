@@ -57,6 +57,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/pizza.wsdl"));
         env.put(ToolConstants.CFG_EXTRA_SOAPHEADER, "TRUE");
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
         processor.setContext(env);
         processor.execute();
 
@@ -116,6 +117,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testHeaderFromAnotherMessage2() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/pizza.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
         processor.setContext(env);
         processor.execute();
 
@@ -149,6 +151,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     public void testHeaderFromAnotherMessage3() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/pizza.wsdl"));
         env.put(ToolConstants.CFG_EXTRA_SOAPHEADER, "FALSE");
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
         processor.setContext(env);
         processor.execute();
 
@@ -367,6 +370,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testAsyncMethodNoService() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_async_noservice.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); //no binding so all the tests that check bindings fail
         processor.setContext(env);
         processor.execute();
 
@@ -870,6 +874,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testHolderHeader() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_holder.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); // testing multiple parts in body
         processor.setContext(env);
         processor.execute();
 
@@ -930,6 +935,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testVoidInOutMethod() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/interoptestdoclit.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
 
@@ -1138,6 +1144,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/swa-mime.wsdl"));
         env.put(ToolConstants.CFG_BINDING, getLocation("/wsdl2java_wsdl/swa-mime-binding.xml"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); // swa-mime puts multple parts in body
         processor.setContext(env);
         processor.execute();
         Class<?> clz = classLoader.loadClass("org.apache.cxf.swa.SwAServiceInterface");
@@ -1156,6 +1163,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testRPCHeader() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/soapheader_rpc.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); // headers must be element, but validation
+                       // doesn't fully process the entire soap:binding information to 
+                       // to figure out which parts are headers and which are body for rpc/lit
         processor.setContext(env);
         processor.execute();
         Class<?> cls = classLoader.loadClass("org.apache.header_test.rpc.TestRPCHeader");
@@ -1228,9 +1238,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
-    public void testWebFaultAnnotaion() throws Exception {
+    public void testWebFaultAnnotation() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/jms_test_rpc_fault.wsdl"));
         env.put(ToolConstants.CFG_SERVICENAME, "HelloWorldService");
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); //testing some technically invalid fault message formats
         processor.setContext(env);
         processor.execute();
         Class<?> cls = classLoader.loadClass("org.apache.cxf.w2j.hello_world_jms.BadRecordLitFault");
@@ -1286,7 +1297,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
     public void testMimeFromCommandLine() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello-mime.wsdl"));
         env.put(ToolConstants.CFG_MIMEMETHODS, new String[0]);
-
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
+        
         processor.setContext(env);
         processor.execute();
 

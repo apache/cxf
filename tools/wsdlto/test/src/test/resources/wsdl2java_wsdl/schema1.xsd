@@ -19,9 +19,9 @@
 -->
 <xs:schema version="1.0" targetNamespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" schemaLocation="./schema2.xsd"/>
+  <xs:include schemaLocation="./schema2.xsd"/>
 
-  <xs:import namespace="http://cxf.apache.org/w2j/hello_world_soap_http/types" schemaLocation="./schema3.xsd"/>
+  <xs:include schemaLocation="./schema3.xsd"/>
 
   <xs:element name="pingMe">
     <xs:complexType/>

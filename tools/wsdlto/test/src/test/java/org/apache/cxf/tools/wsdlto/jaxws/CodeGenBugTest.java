@@ -79,6 +79,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     @Test
     public void testCXF1969() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf1969/report_incident.wsdl"));
+        //wsdl is invalid, but want to test some of the parsing of the invalid parts
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
         processor.setContext(env);
 
         try {
@@ -93,6 +95,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     public void testLogicalOnlyWSDL() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL,
                 getLocation("/wsdl2java_wsdl/cxf-1678/hello_world_logical_only.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); //no binding/service
         processor.setContext(env);
         processor.execute();
 
@@ -381,6 +384,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     @Test
     public void testWsdlNoService() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/helloworld_withnoservice.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL); //no binding/service
         processor.setContext(env);
         processor.execute();
     }
@@ -620,6 +624,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     @Test
     public void testRecursiveImport() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf778/hello_world_recursive.wsdl"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
         assertNotNull("Process recursive import wsdl error ", output);
@@ -694,8 +699,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     public void testNonUniqueBody() throws Exception {
         try {
             env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf939/bug.wsdl"));
-            // env.put(ToolConstants.CFG_VALIDATE_WSDL,
-            // ToolConstants.CFG_VALIDATE_WSDL);
+            env.remove(ToolConstants.CFG_VALIDATE_WSDL);
             processor.setContext(env);
             processor.execute();
         } catch (Exception e) {
@@ -902,6 +906,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, "http://example.org/wsdl");
         env.put(ToolConstants.CFG_CATALOG, getLocation("/wsdl2java_wsdl/cxf1112/jax-ws-catalog.xml"));
         env.put(ToolConstants.CFG_BINDING, getLocation("/wsdl2java_wsdl/cxf1112/binding.xml"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
     }
@@ -911,6 +916,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, "http://example.org/wsdl");
         env.put(ToolConstants.CFG_CATALOG, getLocation("/wsdl2java_wsdl/cxf1112/jax-ws-catalog2.xml"));
         env.put(ToolConstants.CFG_BINDING, getLocation("/wsdl2java_wsdl/cxf1112/binding.xml"));
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
     }
