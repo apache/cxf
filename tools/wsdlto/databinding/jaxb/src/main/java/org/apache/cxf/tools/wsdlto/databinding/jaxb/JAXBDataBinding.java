@@ -639,7 +639,6 @@ public class JAXBDataBinding implements DataBindingProfile {
                     throw new RuntimeException(e);
                 }
                 Element ele = docs[0].getDocumentElement();
-                ele = removeImportElement(ele, key, catalog);
                 if (context.fullValidateWSDL()) {
                     String uri = null;
                     try {
@@ -649,6 +648,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     }
                     validateSchema(ele, uri, catalog);
                 }
+                ele = removeImportElement(ele, key, catalog);
                 try {
                     docs[0].setDocumentURI(key);
                 } catch (Throwable t) {
@@ -714,10 +714,10 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
                 ids.add(key);
                 Element ele = sci.getElement();
-                ele = removeImportElement(ele, key, catalog);
                 if (context.fullValidateWSDL()) {
                     validateSchema(ele, sci.getSystemId(), catalog);
                 }
+                ele = removeImportElement(ele, key, catalog);
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");
                 is.setSystemId(key);
