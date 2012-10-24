@@ -70,7 +70,7 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             result = parseXmlBean(type, r);
 
             xsr.close();
-            result = null;
+            xsr = null;
 
         } catch (XMLStreamException e) {
             throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
