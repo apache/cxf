@@ -98,6 +98,22 @@
         </jaxws:features>
     </jaxws:client>
     
+    <jaxws:client
+        name="{http://www.example.org/contract/DoubleIt}DoubleItClientCertPort" createdFromAPI="true">
+        
+                <jaxws:properties>
+            <entry key="ws-security.username" value="Alice" />
+            <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="#UsernameToken" />
+            </p:policies>
+        </jaxws:features>
+        
+    </jaxws:client>
+    
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSupportingSignedPort" 
                   createdFromAPI="true">
        <jaxws:properties>
