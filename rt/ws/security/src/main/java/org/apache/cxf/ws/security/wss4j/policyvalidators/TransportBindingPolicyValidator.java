@@ -68,7 +68,6 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             // HttpsToken is validated by the HttpsTokenInterceptorProvider
             if (binding.getTransportToken() != null) {
                 assertPolicy(aim, binding.getTransportToken());
-                assertPolicy(aim, binding.getTransportToken().getToken());
             }
             
             // Check the AlgorithmSuite
