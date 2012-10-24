@@ -34,13 +34,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
@@ -180,7 +178,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (anns != null) {
             for (Annotation a : anns) {
                 if (XmlJavaTypeAdapter.class.isAssignableFrom(a.annotationType())) {
-                    Type t = getTypeFromXmlAdapter((XmlJavaTypeAdapter)a);
+                    Type t = Utils.getTypeFromXmlAdapter((XmlJavaTypeAdapter)a);
                     if (t != null) {
                         addType(t);
                     }
@@ -189,7 +187,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         XmlJavaTypeAdapter xjta = clazz.getAnnotation(XmlJavaTypeAdapter.class);
         if (xjta != null) {
-            Type t = getTypeFromXmlAdapter(xjta);
+            Type t = Utils.getTypeFromXmlAdapter(xjta);
             if (t != null) {
                 addType(t);
             }
@@ -201,7 +199,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     globalAdapters.add(a.type());
                 }
                 for (XmlJavaTypeAdapter a: adapt.value()) {
-                    Type t = getTypeFromXmlAdapter(a);
+                    Type t = Utils.getTypeFromXmlAdapter(a);
                     if (t != null) {
                         addType(t);
                     }
@@ -294,7 +292,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     //has an adapter.   We need to inspect the adapter and then
                     //return as the adapter will handle the superclass
                     //and interfaces and such
-                    Type t = getTypeFromXmlAdapter(xjta);
+                    Type t = Utils.getTypeFromXmlAdapter(xjta);
                     if (t != null) {
                         addType(t);
                     }
@@ -314,65 +312,6 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
     }
     
-    static XmlJavaTypeAdapter getFieldXJTA(final Field f) {
-        XmlJavaTypeAdapter adapter = f.getAnnotation(XmlJavaTypeAdapter.class);
-        if (adapter == null) {
-            adapter = f.getType().getAnnotation(XmlJavaTypeAdapter.class);
-        }
-        if (adapter == null) {
-            XmlJavaTypeAdapters adapters = f.getDeclaringClass().getPackage().getAnnotation(XmlJavaTypeAdapters.class);
-            if (adapters != null) {
-                for (XmlJavaTypeAdapter candidate : adapters.value()) {
-                    if (candidate != null && candidate.type().equals(f.getType())) {
-                        adapter = candidate;
-                        break;
-                    }
-                }
-            }
-        }
-        return adapter;
-    }
-
-    static XmlJavaTypeAdapter getMethodXJTA(final Method m) {
-        XmlJavaTypeAdapter adapter = m.getAnnotation(XmlJavaTypeAdapter.class);
-        if (adapter == null) {
-            adapter = m.getReturnType().getAnnotation(XmlJavaTypeAdapter.class);
-        }
-        if (adapter == null) {
-            XmlJavaTypeAdapters adapters = m.getDeclaringClass().getPackage().getAnnotation(XmlJavaTypeAdapters.class);
-            if (adapters != null) {
-                for (XmlJavaTypeAdapter candidate : adapters.value()) {
-                    if (candidate != null && candidate.type().equals(m.getGenericReturnType())) {
-                        adapter = candidate;
-                        break;
-                    }
-                }
-            }
-        }
-        return adapter;
-    }
-
-    static Class<?> getTypeFromXmlAdapter(XmlJavaTypeAdapter xjta) {
-        if (xjta != null) {
-            Class<?> c2 = xjta.value();
-            Type sp = c2.getGenericSuperclass();
-            while (!XmlAdapter.class.equals(c2) && c2 != null) {
-                sp = c2.getGenericSuperclass();
-                c2 = c2.getSuperclass();
-            }
-            if (sp instanceof ParameterizedType) {
-                return (Class<?>)((ParameterizedType)sp).getActualTypeArguments()[0];
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("rawtypes") 
-    static XmlAdapter getXmlAdapter(XmlJavaTypeAdapter adapterAnnotation)
-        throws InstantiationException, IllegalAccessException {
-        return adapterAnnotation != null ? adapterAnnotation.value().newInstance() : null;
-    }
-
     private void walkReferences(Class<?> cls) {
         if (cls == null) {
             return;
@@ -387,11 +326,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         //We'll grab the public field/method types and then add the ObjectFactory stuff
         //as well as look for jaxb.index files in those packages.
 
-        XmlAccessorType accessorType = cls.getAnnotation(XmlAccessorType.class);
-        if (accessorType == null && cls.getPackage() != null) {
-            accessorType = cls.getPackage().getAnnotation(XmlAccessorType.class);
-        }
-        XmlAccessType accessType = accessorType != null ? accessorType.value() : XmlAccessType.PUBLIC_MEMBER;
+        XmlAccessType accessType = Utils.getXmlAccessType(cls);
 
         if (accessType != XmlAccessType.PROPERTY) {   // only look for fields if we are instructed to
             //fields are accessible even if not public, must look at the declared fields
@@ -487,7 +422,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
      * @param annotations the array of annotations from the class member
      * @return true if JAXB annotations are present, false otherwise
      */
-    private static boolean checkJaxbAnnotation(Annotation[] annotations) {
+    static boolean checkJaxbAnnotation(Annotation[] annotations) {
         // must check if there are any jaxb annotations
         Package jaxbAnnotationsPackage = XmlElement.class.getPackage();
         for (Annotation annotation : annotations) {
