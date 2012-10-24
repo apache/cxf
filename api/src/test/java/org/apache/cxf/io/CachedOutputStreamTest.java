@@ -20,7 +20,9 @@ package org.apache.cxf.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,6 +54,81 @@ public class CachedOutputStreamTest extends Assert {
         cos.close();
         //assert tmp file is deleted after close the CachedOutputStream
         assertFalse(tempFile.exists());
+    }
+
+    @Test
+    public void testEncryptAndDecryptWithDeleteOnClose() throws IOException {
+        CachedOutputStream cos = new CachedOutputStream();
+        cos.setThreshold(4);
+        // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
+        cos.setCipherTransformation("DES/CFB8/NoPadding");
+        
+        final String text = "Hello Secret World!";
+        cos.write(text.getBytes("UTF-8"));
+        cos.flush();
+        
+        File tmpfile = cos.getTempFile();
+        assertNotNull(tmpfile);
+        
+        final String enctext = readFromStream(new FileInputStream(tmpfile));
+        assertFalse("text is not encoded", text.equals(enctext));
+
+        InputStream fin = cos.getInputStream();
+
+        assertTrue("file is deleted", tmpfile.exists());
+        
+        final String dectext = readFromStream(fin);
+        assertEquals("text is not decoded correctly", text, dectext);
+
+        // the file is deleted when cos is closed while all the associated inputs are closed
+        assertTrue("file is deleted", tmpfile.exists());
+        cos.close();
+        assertFalse("file is not deleted", tmpfile.exists());
+    }
+
+    @Test
+    public void testEncryptAndDecryptWithDeleteOnInClose() throws IOException {
+        CachedOutputStream cos = new CachedOutputStream();
+        cos.setThreshold(4);
+        // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
+        cos.setCipherTransformation("DES/CFB8/NoPadding");
+        
+        final String text = "Hello Secret World!";
+        cos.write(text.getBytes("UTF-8"));
+        cos.flush();
+        
+        File tmpfile = cos.getTempFile();
+        assertNotNull(tmpfile);
+        
+        final String enctext = readFromStream(new FileInputStream(tmpfile));
+        assertFalse("text is not encoded", text.equals(enctext));
+
+        InputStream fin = cos.getInputStream();
+
+        cos.close();
+        assertTrue("file is deleted", tmpfile.exists());
+        
+        // the file is deleted when cos is closed while all the associated inputs are closed
+        final String dectext = readFromStream(fin);
+        assertEquals("text is not decoded correctly", text, dectext);
+        assertFalse("file is not deleted", tmpfile.exists());
+    }
+
+    private static String readFromStream(InputStream is) throws IOException {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        try {
+            byte[] b = new byte[100];
+            for (;;) {
+                int n = is.read(b, 0, b.length);
+                if (n < 0) {
+                    break;
+                }
+                buf.write(b, 0, n);
+            }
+        } finally {
+            is.close();
+        }
+        return new String(buf.toByteArray(), "UTF-8");
     }
     
     String initTestData(int packetSize) {
