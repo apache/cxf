@@ -607,7 +607,7 @@ public class CachedOutputStream extends OutputStream {
             try {
                 initCiphers();
             } catch (GeneralSecurityException e) {
-                throw new IOException(e.getMessage(), e);
+                throw new IOException(e.getMessage() + e.toString());
             }
             out = new CipherOutputStream(out, enccipher) {
                 boolean closed;
