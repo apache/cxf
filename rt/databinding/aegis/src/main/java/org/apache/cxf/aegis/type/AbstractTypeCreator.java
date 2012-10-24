@@ -133,6 +133,9 @@ public abstract class AbstractTypeCreator implements TypeCreator {
                     type = getTypeMapping().getType(info.getTypeName());
                 }
                 if (type == null) {
+                    type = getTypeMapping().getType(javaClass);
+                }
+                if (type == null) {
                     type = createDefaultType(info);
                 } else {
                     newType = false;
