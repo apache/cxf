@@ -63,7 +63,6 @@
 	</wsdl:message>
 
 	<wsdl:portType name="Greeter">
-		>
 		<wsdl:operation name="greetMe">
 			<wsdl:input name="greetMeRequest" message="tns:greetMeRequest" />
 			<wsdl:output name="greetMeResponse" message="tns:greetMeResponse" />

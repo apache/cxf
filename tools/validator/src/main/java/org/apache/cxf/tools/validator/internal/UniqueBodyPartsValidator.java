@@ -53,7 +53,7 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
             List<BindingOperation> ops = CastUtils.cast(binding.getBindingOperations());
             for (BindingOperation op : ops) {
                 Operation operation = op.getOperation();
-                if (operation.getInput() != null) {
+                if (operation != null && operation.getInput() != null) {
                     Message inMessage = operation.getInput().getMessage();
                     BindingInput bin = op.getBindingInput();
                     Set<String> headers = new HashSet<String>();

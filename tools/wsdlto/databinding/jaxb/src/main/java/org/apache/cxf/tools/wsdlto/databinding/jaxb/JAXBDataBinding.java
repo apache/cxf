@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -646,7 +648,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     } catch (Throwable ex) {
                         //ignore - DOM level 3
                     }
-                    validateSchema(ele, uri, catalog);
+                    validateSchema(ele, uri, catalog, schemaCollection);
                 }
                 ele = removeImportElement(ele, key, catalog);
                 try {
@@ -715,7 +717,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 ids.add(key);
                 Element ele = sci.getElement();
                 if (context.fullValidateWSDL()) {
-                    validateSchema(ele, sci.getSystemId(), catalog);
+                    validateSchema(ele, sci.getSystemId(), catalog, schemaCollection);
                 }
                 ele = removeImportElement(ele, key, catalog);
                 InputSource is = new InputSource((InputStream)null);
@@ -955,8 +957,10 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
 
-    public void validateSchema(Element ele, String uri,
-                               final OASISCatalogManager catalog) throws ToolException {
+    public void validateSchema(Element ele, 
+                               String uri,
+                               final OASISCatalogManager catalog,
+                               final SchemaCollection schemaCollection) throws ToolException {
         SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFact.setResourceResolver(new LSResourceResolver() {
             public LSInput resolveResource(String type,
@@ -965,6 +969,15 @@ public class JAXBDataBinding implements DataBindingProfile {
                                            String systemId,
                                            String baseURI) {
                 String s = JAXBDataBinding.mapSchemaLocation(systemId, baseURI, catalog);
+                //System.out.println(namespaceURI + " " + systemId + " " + baseURI + " " + s);
+                if (s == null) {
+                    XmlSchema sc = schemaCollection.getSchemaByTargetNamespace(namespaceURI);
+                    StringWriter writer = new StringWriter();
+                    sc.write(writer);
+                    InputSource src = new InputSource(new StringReader(writer.toString()));
+                    src.setSystemId(sc.getSourceURI());
+                    return new LSInputSAXWrapper(src);
+                }
                 return new LSInputSAXWrapper(new InputSource(s));
             }
         });
@@ -975,6 +988,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (e.getLocalizedMessage().indexOf("src-resolve.4.2") > -1)  {
                 //Ignore schema resolve error and do nothing
             } else {
+                //e.printStackTrace();
                 throw new ToolException("Schema Error : " + e.getLocalizedMessage(), e);
             }
         }

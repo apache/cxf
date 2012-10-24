@@ -372,6 +372,10 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                                    + binding.getQName() + "> is NOT a SOAP binding");
                 continue;
             }
+            if (binding.getPortType() == null) {
+                //will error later
+                continue;
+            }
 
             for (Iterator<?> ite2 = binding.getPortType().getOperations().iterator(); ite2.hasNext();) {
                 Operation operation = (Operation)ite2.next();

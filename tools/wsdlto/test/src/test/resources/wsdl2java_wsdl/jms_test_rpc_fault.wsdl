@@ -156,10 +156,10 @@
                 <soap:body namespace="http://cxf.apache.org/w2j/hello_world_jms"  use="literal"/>
             </output>
             <fault name="NoSuchCodeLitFault">
-                <soap:fault name="NoSuchCodeLitFault" namespace="http://cxf.apache.org/w2j/hello_world_jms" use="literal"/>
+                <soap:fault name="NoSuchCodeLitFault" use="literal"/>
             </fault>
             <fault name="BadRecordLitFault">
-                <soap:fault name="BadRecordLitFault" namespace="http://cxf.apache.org/w2j/hello_world_jms" use="literal"/>
+                <soap:fault name="BadRecordLitFault" use="literal"/>
             </fault>
         </operation>
     </binding>
