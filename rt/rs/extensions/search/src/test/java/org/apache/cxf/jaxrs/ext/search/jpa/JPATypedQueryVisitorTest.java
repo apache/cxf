@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.ext.search.jpa;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,7 +31,10 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
@@ -155,6 +159,15 @@ public class JPATypedQueryVisitorTest extends Assert {
         List<Book> books = queryBooks("id==10");
         assertEquals(1, books.size());
         assertTrue(10 == books.get(0).getId());
+    }
+    
+    @Test
+    public void testEqualsCriteriaQueryTuple() throws Exception {
+        List<Tuple> books = criteriaQueryBooks("id==10");
+        assertEquals(1, books.size());
+        Tuple tuple = books.get(0);
+        int tupleId = tuple.get("id", Integer.class);
+        assertEquals(10, tupleId);
     }
     
     @Test
@@ -310,5 +323,22 @@ public class JPATypedQueryVisitorTest extends Assert {
         filter.accept(jpa);
         TypedQuery<Book> query = jpa.getQuery();
         return query.getResultList();
+    }
+    
+    private List<Tuple> criteriaQueryBooks(String expression) throws Exception {
+        SearchCondition<Book> filter = 
+            new FiqlParser<Book>(Book.class).parse(expression);
+        JPACriteriaQueryVisitor<Book, Tuple> jpa = 
+            new JPACriteriaQueryVisitor<Book, Tuple>(em, Book.class, Tuple.class);
+        filter.accept(jpa);
+        
+        List<SingularAttribute<Book, ?>> selections = 
+            new ArrayList<SingularAttribute<Book, ?>>();
+        selections.add(Book_.id);
+        
+        jpa.selectTuple(selections);
+        
+        CriteriaQuery<Tuple> cquery = jpa.getQuery();
+        return em.createQuery(cquery).getResultList();
     }
 }

@@ -18,24 +18,15 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import java.util.Map;
+import javax.persistence.metamodel.SingularAttribute;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaQuery;
-
-public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
-
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
-    }
-    
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
-        super(em, tClass, fieldMap);
-    }
-    
-    public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery((CriteriaQuery<T>)getCriteriaQuery());
-    }
+@javax.persistence.metamodel.StaticMetamodel(Book.class)
+//CHECKSTYLE:OFF
+public final class Book_ {
+    private Book_() {
         
+    }
+    public static volatile SingularAttribute<Book, Integer> id;
+    public static volatile SingularAttribute<Book, String> title;
 }
+//CHECKSTYLE:ON
