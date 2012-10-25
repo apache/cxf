@@ -119,7 +119,10 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                                     if ("java.naming.provider.url".equals(f.get(prop))) {
                                         f = prop.getClass().getDeclaredField("value");
                                         ReflectionUtil.setAccessible(f);
-                                        f.set(prop, url);
+                                        String value = (String)f.get(prop);
+                                        if (value == null || !value.startsWith("classpath")) {
+                                            f.set(prop, url);
+                                        }
                                     }
                                 }
                             } catch (Exception ex) {

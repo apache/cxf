@@ -86,9 +86,7 @@ public abstract class AbstractJMSTester extends Assert {
     protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
         assertNotNull(wsdlUrl);
-        if (!"HelloWorldPortSpringICF".equals(portName)) {
-            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlUrl.toString());
-        }
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlUrl.toString());
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlUrl, new QName(ns, serviceName));
 
         Service service = factory.create();
