@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
@@ -86,6 +87,7 @@ import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
 import com.sun.tools.xjc.reader.internalizer.AbstractReferenceFinderImpl;
 import com.sun.tools.xjc.reader.internalizer.DOMForest;
+import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
 import com.sun.tools.xjc.reader.xmlschema.parser.LSInputSAXWrapper;
 import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
@@ -302,7 +304,10 @@ public class JAXBDataBinding implements DataBindingProfile {
         SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
         Bus bus = context.get(Bus.class);
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
-        hackInNewInternalizationLogic(schemaCompiler, catalog);
+
+        Options opts = null;
+        opts = getOptions(schemaCompiler);
+        hackInNewInternalizationLogic(schemaCompiler, catalog, opts);
 
         ClassCollector classCollector = context.get(ClassCollector.class);
 
@@ -318,8 +323,6 @@ public class JAXBDataBinding implements DataBindingProfile {
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
         SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
 
-        Options opts = null;
-        opts = getOptions(schemaCompiler);
 
         List<String> args = new ArrayList<String>();
 
@@ -465,16 +468,27 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
     }
     private void hackInNewInternalizationLogic(SchemaCompiler schemaCompiler,
-                                               final OASISCatalogManager catalog) {
+                                               final OASISCatalogManager catalog,
+                                               Options opts) {
         try {
             Field f = schemaCompiler.getClass().getDeclaredField("forest");
             f.setAccessible(true);
-            DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic() {
+            XMLSchemaInternalizationLogic logic = new XMLSchemaInternalizationLogic() {
                 public XMLFilterImpl createExternalReferenceFinder(DOMForest parent) {
                     return new ReferenceFinder(parent, catalog);
                 }
+            };
+            
+            Constructor<DOMForest> c = null;
+            DOMForest forest = null;
 
-            });
+            try {
+                c = DOMForest.class.getConstructor(InternalizationLogic.class, Options.class);
+                forest = c.newInstance(logic, opts);
+            } catch (Throwable t) {
+                c = DOMForest.class.getConstructor(InternalizationLogic.class);
+                forest = c.newInstance(logic);
+            }
             forest.setErrorHandler((ErrorReceiver)schemaCompiler);
             f.set(schemaCompiler, forest);
         } catch (Throwable ex)  {
