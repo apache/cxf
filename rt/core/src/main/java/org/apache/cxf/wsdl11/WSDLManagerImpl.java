@@ -166,14 +166,15 @@ public class WSDLManagerImpl implements WSDLManager {
      * @see org.apache.cxf.wsdl.WSDLManager#getDefinition(java.net.URL)
      */
     public Definition getDefinition(URL url) throws WSDLException { 
+        String urlString = url.toString();
         synchronized (definitionsMap) {
-            if (definitionsMap.containsKey(url)) {
-                return definitionsMap.get(url);
+            if (definitionsMap.containsKey(urlString)) {
+                return definitionsMap.get(urlString);
             }
         }
-        Definition def = loadDefinition(url.toString());
+        Definition def = loadDefinition(urlString);
         synchronized (definitionsMap) {
-            definitionsMap.put(url, def);
+            definitionsMap.put(urlString, def);
         }
         return def;
     }
