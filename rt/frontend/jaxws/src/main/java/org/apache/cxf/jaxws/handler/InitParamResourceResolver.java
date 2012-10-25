@@ -28,7 +28,7 @@ import org.apache.cxf.resource.ResourceResolver;
 
 public class InitParamResourceResolver implements ResourceResolver {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(InitParamResourceResolver.class, "APIMessages");
+    private static final Logger LOG = LogUtils.getL7dLogger(InitParamResourceResolver.class);
     
     Map<String, String> params;
     
