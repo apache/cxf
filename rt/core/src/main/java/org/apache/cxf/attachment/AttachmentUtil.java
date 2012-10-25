@@ -190,10 +190,7 @@ public final class AttachmentUtil {
         return dataHandlers == null ? new LinkedHashMap<String, DataHandler>() : dataHandlers;
     }
     
-    public static Attachment createAttachment(InputStream stream, InternetHeaders headers) 
-        throws IOException {
-     
-        String id = headers.getHeader("Content-ID", null);
+    public static String cleanContentId(String id) {
         if (id != null) {
             if (id.startsWith("<")) {
                 // strip <>
@@ -204,13 +201,24 @@ public final class AttachmentUtil {
                 id = id.substring(4);
             }
             // urldecode. Is this bad even without cid:? What does decode do with malformed %-signs, anyhow?
-            id = URLDecoder.decode(id, "UTF-8");
+            try {
+                id = URLDecoder.decode(id, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                //ignore, keep id as is
+            }
         }
         if (id == null) {
             //no Content-ID, set cxf default ID
             id = "root.message@cxf.apache.org";
         }
-
+        return id;
+    }
+    
+    
+    public static Attachment createAttachment(InputStream stream, InternetHeaders headers) 
+        throws IOException {
+     
+        String id = cleanContentId(headers.getHeader("Content-ID", null));
 
         AttachmentImpl att = new AttachmentImpl(id);
         

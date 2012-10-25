@@ -54,6 +54,7 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.headers.HeaderManager;
@@ -201,12 +202,14 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                         }
                     }
                     AttachmentPart ap = soapMessage.createAttachmentPart(a.getDataHandler());
-                    ap.setContentId(a.getId());
                     Iterator<String> i = a.getHeaderNames();
                     while (i != null && i.hasNext()) {
                         String h = i.next();
                         String val = a.getHeader(h);
                         ap.addMimeHeader(h, val);
+                    }
+                    if (StringUtils.isEmpty(ap.getContentId())) {
+                        ap.setContentId(a.getId());
                     }
                     soapMessage.addAttachmentPart(ap);
                 }
