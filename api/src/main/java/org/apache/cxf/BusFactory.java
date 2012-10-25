@@ -76,7 +76,7 @@ public abstract class BusFactory {
     protected static Map<Thread, BusHolder> threadBusses = new WeakHashMap<Thread, BusHolder>();
     protected static ThreadLocal<BusHolder> threadBus = new ThreadLocal<BusHolder>();
 
-    private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class, "APIMessages");
+    private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class);
 
     /**
      * Creates a new bus. While concrete <code>BusFactory</code> may offer differently parameterized methods
