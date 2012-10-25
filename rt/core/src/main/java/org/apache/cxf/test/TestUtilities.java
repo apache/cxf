@@ -352,8 +352,8 @@ public class TestUtilities {
 
         public ByteArrayOutputStream getResponseStream() throws Exception {
             synchronized (this) {
-                if (!written) {
-                    wait(1000000000);
+                while (!written) {
+                    wait();
                 }
             }
             return response;
