@@ -143,6 +143,38 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
+
+    /**
+     * The client does not require a client cert so invocation should fail
+     * 
+     * @throws Exception
+     */
+    @org.junit.Test
+    public void testRequireClientCertToken() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = PolicyAlternativeTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItClientCertPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT2);
+        
+        try {
+            utPort.doubleIt(25);
+            fail("Failure expected because no client certificate");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("HttpsToken"));
+        }
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
     
     /**
      * The client uses a Transport binding policy with a Endorsing Supporting X509 Token. The client does
