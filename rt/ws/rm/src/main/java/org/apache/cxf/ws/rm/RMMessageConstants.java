@@ -42,6 +42,9 @@ public final class RMMessageConstants {
     public static final String SAVED_CONTENT =
         "org.apache.cxf.ws.rm.content";
     
+    static final String RM_PROTOCOL_VARIATION = 
+        "org.apache.cxf.ws.rm.protocol";
+
     // keep this constant in the ws-rm package until it finds a general use outside of ws-rm
     static final String DELIVERING_ROBUST_ONEWAY = 
         "org.apache.cxf.oneway.robust.delivering";
