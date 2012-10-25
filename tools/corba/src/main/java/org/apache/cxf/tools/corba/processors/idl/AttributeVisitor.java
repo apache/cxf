@@ -358,7 +358,7 @@ public class AttributeVisitor extends VisitorBase {
      * @return the generated corba:operation.
      */
     private OperationType generateCorbaOperation(Operation op, ParamType param, ArgType arg) {
-        OperationType operation = new OperationType();
+        OperationType operation = null;
         try {
             operation = (OperationType)extReg.createExtension(BindingOperation.class,
                                                               CorbaConstants.NE_CORBA_OPERATION);

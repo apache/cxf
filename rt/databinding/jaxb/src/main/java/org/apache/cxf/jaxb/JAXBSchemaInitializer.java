@@ -326,10 +326,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         SchemaInfo schemaInfo = serviceInfo.getSchema(qn.getNamespaceURI());
         if (schemaInfo != null) {
             el = schemaInfo.getElementByQName(qn);
-            if (el == null) {
-                el = createXsElement(schemaInfo.getSchema(), part, typeName, schemaInfo);
-
-            } else if (!typeName.equals(el.getSchemaTypeName())) {
+            if (el != null && !typeName.equals(el.getSchemaTypeName())) {
                 throw new Fault(new Message("CANNOT_CREATE_ELEMENT", LOG,
                                             qn, typeName, el.getSchemaTypeName()));
             }

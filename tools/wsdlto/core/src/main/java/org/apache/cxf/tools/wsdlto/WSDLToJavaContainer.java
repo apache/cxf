@@ -362,13 +362,12 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
             for (int j = 0; j < pns.length; j++) {
                 int pos = pns[j].indexOf("=");
-                String excludePackagename = pns[j];
                 if (pos != -1) {
                     String ns = pns[j].substring(0, pos);
                     if (ns.equals(ToolConstants.WSA_NAMESPACE_URI)) {
                         env.put(ToolConstants.CFG_NO_ADDRESS_BINDING, ToolConstants.CFG_NO_ADDRESS_BINDING);
                     }
-                    excludePackagename = pns[j].substring(pos + 1);
+                    String excludePackagename = pns[j].substring(pos + 1);
                     env.addExcludeNamespacePackageMap(ns, excludePackagename);
                     env.addNamespacePackageMap(ns, excludePackagename);
                 } else {

@@ -1081,8 +1081,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     protected void checkForElement(ServiceInfo serviceInfo, MessagePartInfo mpi) {
         SchemaInfo si = getOrCreateSchema(serviceInfo, mpi.getElementQName().getNamespaceURI(),
                                           getQualifyWrapperSchema());
-        XmlSchemaElement e = si.getElementByQName(mpi.getElementQName());
-        e = si.getSchema().getElementByName(mpi.getElementQName().getLocalPart());
+        XmlSchemaElement e = si.getSchema().getElementByName(mpi.getElementQName().getLocalPart());
         if (e != null) {
             mpi.setXmlSchema(e);
             return;

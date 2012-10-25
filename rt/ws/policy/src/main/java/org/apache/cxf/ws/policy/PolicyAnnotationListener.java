@@ -432,7 +432,6 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             Document doc = StaxUtils.read(reader);
             uri = getPolicyId(doc.getDocumentElement());
             if (StringUtils.isEmpty(uri)) {
-                uri = defName; 
                 Attr att = doc.createAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                  "wsu:" + PolicyConstants.WSU_ID_ATTR_NAME);
                 att.setNodeValue(defName);

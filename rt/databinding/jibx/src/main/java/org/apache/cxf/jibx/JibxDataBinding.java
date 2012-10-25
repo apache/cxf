@@ -116,8 +116,6 @@ public class JibxDataBinding extends AbstractDataBinding implements WrapperCapab
         List<Method> setMethods = new ArrayList<Method>(partNames.size());
         List<Field> fields = new ArrayList<Field>(partNames.size());
 
-        Method allMethods[] = wrapperType.getMethods();
-
         for (int x = 0; x < partNames.size(); x++) {
             String partName = partNames.get(x);
             if (partName == null) {
@@ -132,7 +130,7 @@ public class JibxDataBinding extends AbstractDataBinding implements WrapperCapab
             Method getMethod = null;
             Method setMethod = null;
 
-            allMethods = wrapperType.getMethods();
+            Method[] allMethods = wrapperType.getMethods();
 
             try {
                 getMethod = wrapperType.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES);

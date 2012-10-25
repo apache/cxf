@@ -164,9 +164,8 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                         es.printStackTrace();
                     }
                 }
-                int i = reader.getEventType();
-                if (i == XMLStreamReader.START_DOCUMENT) {
-                    i = reader.next();
+                if (reader.getEventType() == XMLStreamReader.START_DOCUMENT) {
+                    reader.next();
                 }
                 
                 if (st != null && !st.isDocumentType()

@@ -217,7 +217,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         }
 
         EndpointInfo ei = createEndpointInfo();
-        Endpoint ep = new EndpointImpl(getBus(), getServiceFactory().getService(), ei);
+        Endpoint ep = new EndpointImpl(getBus(), service, ei);
         
         if (properties != null) {
             ep.putAll(properties);

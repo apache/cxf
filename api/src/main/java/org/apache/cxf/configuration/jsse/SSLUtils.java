@@ -170,12 +170,10 @@ public final class SSLUtils {
         throws Exception {
         // ********************** Load Trusted CA file **********************
         
-        TrustManager[] trustStoreManagers = null;
         KeyStore trustedCertStore = KeyStore.getInstance(trustStoreType);
 
         if (pkcs12) {
             //TODO could support multiple trust cas
-            trustStoreManagers = new TrustManager[1];
             
             trustedCertStore.load(null, "".toCharArray());
             CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE);
@@ -207,9 +205,7 @@ public final class SSLUtils {
             TrustManagerFactory.getInstance(trustStoreMgrFactoryAlgorithm);
         tmf.init(trustedCertStore);
         LogUtils.log(log, Level.FINE, "LOADED_TRUST_STORE", trustStoreLocation);
-        trustStoreManagers = tmf.getTrustManagers();
-
-        return trustStoreManagers;
+        return tmf.getTrustManagers();
     }
     
     protected static byte[] loadClientCredential(String fileName) throws IOException {

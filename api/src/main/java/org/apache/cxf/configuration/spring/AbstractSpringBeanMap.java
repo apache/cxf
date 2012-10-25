@@ -230,7 +230,7 @@ abstract class AbstractSpringBeanMap<X, V>
         }
     }
     
-    private class SpringBeanMapWrapper extends ConcurrentHashMap<X, V> implements Map<X, V> {
+    private class SpringBeanMapWrapper extends ConcurrentHashMap<X, V> {
 
         private static final long serialVersionUID = -8693455914470226111L;
 

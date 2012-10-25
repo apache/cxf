@@ -372,10 +372,9 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     
     private Writer createOutputWriter(String name) throws Exception {        
         String outDir = outputDir;
-        String filename = name;               
         int index = name.lastIndexOf(System.getProperty("file.separator"));
         outDir = name.substring(0, index);
-        filename = name.substring(index + 1, name.length());                        
+        String filename = name.substring(index + 1, name.length());                        
         return getOutputWriter(filename, outDir);        
     }
     

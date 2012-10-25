@@ -297,7 +297,6 @@ public class WSDLToCorbaHelper {
 
     private CorbaTypeImpl processLocalElement(XmlSchemaElement element, String uri) throws Exception {
         CorbaTypeImpl membertype = new CorbaTypeImpl();
-        CorbaTypeImpl memtype = new CorbaTypeImpl();
 
         XmlSchemaType schemaType = element.getSchemaType();
         QName schemaName = element.getQName();
@@ -327,7 +326,7 @@ public class WSDLToCorbaHelper {
             if (elName ==  null) {
                 elName = createQNameTargetNamespace(elemName.getLocalPart());
             }
-            memtype = createNillableUnion(elName,
+            CorbaTypeImpl memtype = createNillableUnion(elName,
                                           name,
                                           elemtype.getQName(),
                                           elementQualified);

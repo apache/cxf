@@ -174,7 +174,6 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         Configurer conf = bus.getExtension(Configurer.class);
         if (conf instanceof NullConfigurer) {
             bus.setExtension(new ConfigurerImpl(ctx), Configurer.class);
-            conf = bus.getExtension(Configurer.class);
         } else if (conf instanceof ConfigurerImpl) {
             ((ConfigurerImpl)conf).addApplicationContext(ctx);
         }

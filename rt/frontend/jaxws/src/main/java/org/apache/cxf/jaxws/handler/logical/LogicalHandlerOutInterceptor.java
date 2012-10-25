@@ -84,7 +84,6 @@ public class LogicalHandlerOutInterceptor
             } else {
                 document = XMLUtils.newDocument();
                 message.setContent(Node.class, document);
-                nd = document;
             }
             
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document.createDocumentFragment());

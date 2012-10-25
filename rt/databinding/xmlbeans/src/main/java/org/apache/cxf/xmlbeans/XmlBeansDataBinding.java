@@ -124,8 +124,6 @@ public class XmlBeansDataBinding extends AbstractDataBinding implements WrapperC
         List<Method> setMethods = new ArrayList<Method>(partNames.size());        
         List<Field> fields = new ArrayList<Field>(partNames.size());
         
-        Method allMethods[] = wrapperType.getMethods();
-                        
         for (int x = 0; x < partNames.size(); x++) {
             String partName = partNames.get(x);            
             if (partName == null) {
@@ -140,7 +138,7 @@ public class XmlBeansDataBinding extends AbstractDataBinding implements WrapperC
             Method getMethod = null;
             Method setMethod = null;
             Class<?> valueClass = XmlBeansWrapperHelper.getXMLBeansValueType(wrapperType);
-            allMethods = valueClass.getMethods();
+            Method[] allMethods = valueClass.getMethods();
             
             try {
                 getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES);

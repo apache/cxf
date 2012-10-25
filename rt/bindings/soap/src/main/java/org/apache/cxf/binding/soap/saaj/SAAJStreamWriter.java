@@ -76,7 +76,7 @@ public final class SAAJStreamWriter extends W3CDOMStreamWriter {
                     if (f == null) {
                         Element el = part.createElementNS(namespace, 
                                              StringUtils.isEmpty(prefix) ? local : prefix + ":" + local);
-                        el = (Element)part.getEnvelope().getBody().appendChild(el);
+                        part.getEnvelope().getBody().appendChild(el);
                         f = part.getEnvelope().getBody().getFault();
                         if (f == null) {
                             f = part.getEnvelope().getBody().addFault();
