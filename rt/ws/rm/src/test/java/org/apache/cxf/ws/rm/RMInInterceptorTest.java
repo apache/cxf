@@ -283,7 +283,89 @@ public class RMInInterceptorTest extends Assert {
         control.replay(); 
         // TODO
     }
+
+    @Test
+    public void testProcessInvalidMessage() throws SequenceFault, RMException {
+        interceptor = new RMInInterceptor();
+        
+        Message message = control.createMock(Message.class);
+        Exchange exchange = control.createMock(Exchange.class);
+        org.apache.cxf.transport.Destination destination = 
+            control.createMock(org.apache.cxf.transport.Destination.class);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(exchange.getDestination()).andReturn(destination).anyTimes();
+        EasyMock.expect(exchange.getOutMessage()).andReturn(null).anyTimes();
+        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
+        control.replay();
+
+        try {
+            interceptor.handle(message);
+            fail("must reject the invalid rm message");
+        } catch (Exception e) {
+            assertTrue(e instanceof RMException);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see WSA_REQUIRED_EXC in Messages.properties)
+            final String text = "WS-Addressing is required";
+            assertTrue(e.getMessage() != null 
+                && e.getMessage().indexOf(text) >= 0);
+        }
+        
+        control.reset();
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        AddressingPropertiesImpl maps = control.createMock(AddressingPropertiesImpl.class);
+        EasyMock.expect(maps.getNamespaceURI()).andReturn(Names200408.WSA_NAMESPACE_NAME).anyTimes();
+        EasyMock.expect(message.get(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND)).andReturn(maps);
+        AttributedURIType actionURI = control.createMock(AttributedURIType.class);
+        EasyMock.expect(maps.getAction()).andReturn(actionURI).times(2);
+        EasyMock.expect(actionURI.getValue()).andReturn("foo");
+        EasyMock.expect(message.get(RMMessageConstants.RM_PROPERTIES_INBOUND)).andReturn(rmps);
+        EasyMock.expect(exchange.getDestination()).andReturn(destination).anyTimes();
+        EasyMock.expect(exchange.getOutMessage()).andReturn(null).anyTimes();
+        EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
+
+        control.replay();
+        
+        try {
+            interceptor.handle(message);
+            fail("must reject the invalid rm message");
+        } catch (Exception e) {
+            System.out.println(e);
+            assertTrue(e instanceof RMException);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see WSRM_REQUIRED_EXC in Messages.properties)
+            final String text = "WS-ReliableMessaging is required";
+            assertTrue(e.getMessage() != null 
+                && e.getMessage().indexOf(text) >= 0);
+        }
+    }
     
+    @Test
+    public void testProcessInvalidMessageOnFault() throws SequenceFault, RMException {
+        interceptor = new RMInInterceptor();
+        
+        Message message = control.createMock(Message.class);
+        Exchange exchange = control.createMock(Exchange.class);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        control.replay();
+        
+        try {
+            interceptor.handleFault(message);
+        } catch (Exception e) {
+            fail("unexpected exception thrown from handleFault: " + e);
+        }
+        
+        control.reset();
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY)).andReturn(true).anyTimes();
+        control.replay();
+        
+        try {
+            interceptor.handleFault(message);
+        } catch (Exception e) {
+            fail("unexpected exception thrown from handleFault: " + e);
+        }
+    }
+
     private Message setupInboundMessage(String action, boolean serverSide) throws RMException {
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
