@@ -392,13 +392,12 @@ public class ScopedNameVisitor extends VisitorBase {
                                                     VisitorTypeHolder holder) {
         List<Scope> inheritedList = new ArrayList<Scope>();
         boolean result = false;
-        for (Scope scopeName : scopeList) {
-            inheritedList.add(scopeName);
-        }        
         
         if (scopeList != null) {            
+            for (Scope scopeName : scopeList) {
+                inheritedList.add(scopeName);
+            }        
             for (Scope inheritScope : scopeList) {
-
                 Scope scopedName = new Scope(inheritScope, node);
                 result = findScopeSchemaType(scopedName, schemaRef, wsdlVisitor, holder);
                 if (!result) {

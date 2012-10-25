@@ -260,9 +260,9 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 boolean client = isRequestor(message);
                 BindingMessageInfo bmsg = null; 
 
-                if (client) {
+                if (client && bop != null) {
                     bmsg = bop.getInput();
-                } else if (bop.getOutput() != null) {
+                } else if (bop != null && bop.getOutput() != null) {
                     bmsg = bop.getOutput();  
                 }
                 if (bmsg != null && bmsg.getMessageParts() != null 

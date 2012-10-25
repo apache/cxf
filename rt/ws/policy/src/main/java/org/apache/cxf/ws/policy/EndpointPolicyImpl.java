@@ -146,11 +146,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
    
     void initializePolicy() {
-        policy = engine.getAggregatedServicePolicy(ei.getService());
-        policy = policy.merge(engine.getAggregatedEndpointPolicy(ei));
-        if (!policy.isEmpty()) {
-            policy = policy.normalize(engine == null ? null : engine.getRegistry(),
-                                              true);
+        if (engine != null) {
+            policy = engine.getAggregatedServicePolicy(ei.getService());
+            policy = policy.merge(engine.getAggregatedEndpointPolicy(ei));
+            if (!policy.isEmpty()) {
+                policy = policy.normalize(engine.getRegistry(), true);
+            }
         }
     }
 

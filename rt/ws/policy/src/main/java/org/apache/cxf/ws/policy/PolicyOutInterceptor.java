@@ -98,8 +98,10 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             // add the required interceptors
             EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(ei, boi, conduit);
             msg.put(EffectivePolicy.class, effectivePolicy);
-            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy());
             if (effectivePolicy != null) {
+                PolicyUtils.logPolicy(
+                    LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy()
+                );
                 interceptors.addAll(effectivePolicy.getInterceptors());
                 assertions.addAll(effectivePolicy.getChosenAlternative());
             }
@@ -111,8 +113,10 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             EffectivePolicy effectivePolicy 
                 = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming);
             msg.put(EffectivePolicy.class, effectivePolicy);
-            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy());
             if (effectivePolicy != null) {
+                PolicyUtils.logPolicy(
+                    LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy()
+                );
                 interceptors.addAll(effectivePolicy.getInterceptors());
                 assertions.addAll(effectivePolicy.getChosenAlternative());
             }

@@ -97,16 +97,18 @@ public abstract class AbstractSpnegoAuthSupplier {
                             final GSSContext context) throws GSSException,
         LoginException {
         
+        final byte[] token = new byte[0];
+        if (authPolicy == null) {
+            return context.initSecContext(token, 0, token.length);
+        }
+
         String contextName = authPolicy.getAuthorization();
         if (contextName == null) {
             contextName = "";
         }
         
-        final byte[] token = new byte[0];
-
-        if (authPolicy == null 
-            || (StringUtils.isEmpty(authPolicy.getUserName())
-                && StringUtils.isEmpty(contextName) && loginConfig == null)) {
+        if (StringUtils.isEmpty(authPolicy.getUserName())
+            && StringUtils.isEmpty(contextName) && loginConfig == null) {
             return context.initSecContext(token, 0, token.length);
         }
         

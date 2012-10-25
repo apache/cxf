@@ -64,7 +64,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                                    URI currentURI,
                                    Message message,
                                    String fullHeader) {
-        if (authPolicy.getUserName() == null && authPolicy.getPassword() == null) {
+        if (authPolicy == null || (authPolicy.getUserName() == null && authPolicy.getPassword() == null)) {
             return null;
         }
         
@@ -82,7 +82,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
             }
         }
         HttpAuthHeader authHeader = new HttpAuthHeader(fullHeader);
-        if (authHeader.authTypeIsDigest() && authPolicy != null) {
+        if (authHeader.authTypeIsDigest()) {
             Map<String, String> map = authHeader.getParams();
             if ("auth".equals(map.get("qop"))
                 || !map.containsKey("qop")) {

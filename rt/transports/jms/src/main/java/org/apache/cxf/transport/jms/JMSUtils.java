@@ -513,6 +513,10 @@ public final class JMSUtils {
     private static void setJMSMessageProperties(Message jmsMessage, JMSMessageHeadersType messageProperties)
         throws JMSException {
 
+        if (messageProperties == null) {
+            return;
+        }
+
         if (messageProperties.isSetSOAPJMSTargetService()) {
             jmsMessage.setStringProperty(JMSSpecConstants.TARGETSERVICE_FIELD, messageProperties
                 .getSOAPJMSTargetService());
@@ -546,7 +550,7 @@ public final class JMSUtils {
                 .getSOAPJMSRequestURI());
         }
 
-        if (messageProperties != null && messageProperties.isSetProperty()) {
+        if (messageProperties.isSetProperty()) {
             List<JMSPropertyType> props = messageProperties.getProperty();
             for (int x = 0; x < props.size(); x++) {
                 jmsMessage.setStringProperty(props.get(x).getName(), props.get(x).getValue());

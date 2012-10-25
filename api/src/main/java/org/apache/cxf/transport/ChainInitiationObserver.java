@@ -153,13 +153,13 @@ public class ChainInitiationObserver implements MessageObserver {
     
     protected void setExchangeProperties(Exchange exchange, Message m) {
         exchange.put(Endpoint.class, endpoint);
-        exchange.put(Service.class, endpoint.getService());
         exchange.put(Binding.class, getBinding());
         exchange.put(Bus.class, bus);
         if (exchange.getDestination() == null) {
             exchange.setDestination(m.getDestination());
         }
         if (endpoint != null && endpoint.getService() != null) {
+            exchange.put(Service.class, endpoint.getService());
 
             EndpointInfo endpointInfo = endpoint.getEndpointInfo();
 
@@ -185,7 +185,9 @@ public class ChainInitiationObserver implements MessageObserver {
                 }
                 exchange.put(Message.WSDL_DESCRIPTION, wsdlDescription);
             }
-        }  
+        } else {
+            exchange.put(Service.class, null);
+        }
     }
 
     public Endpoint getEndpoint() {
