@@ -217,7 +217,7 @@ public class JettyHTTPServerEngineFactory {
         }
         JettyHTTPServerEngine ref = retrieveJettyHTTPServerEngine(port);
         if (null == ref) {
-            ref = getOrCreate(this, host, port, tlsParams);
+            getOrCreate(this, host, port, tlsParams);
         } else {
             if (ref.getConnector() != null && ref.getConnector().isRunning()) {
                 throw new IOException("can't set the TLS params on the opened connector");

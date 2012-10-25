@@ -107,21 +107,16 @@ public class ExtensionManagerBus extends CXFBusImpl {
                                   
         setState(BusState.INITIAL);
         
-
-        DestinationFactoryManager dfm = this.getExtension(DestinationFactoryManager.class);
-        if (null == dfm) {
-            dfm = new DestinationFactoryManagerImpl(this);
+        if (null == this.getExtension(DestinationFactoryManager.class)) {
+            new DestinationFactoryManagerImpl(this);
         }
 
-        ConduitInitiatorManager cfm = this.getExtension(ConduitInitiatorManager.class);
-        if (null == cfm) {
-            cfm = new ConduitInitiatorManagerImpl(this);
+        if (null == this.getExtension(ConduitInitiatorManager.class)) {
+            new ConduitInitiatorManagerImpl(this);
         }
         
-        BindingFactoryManager bfm = this.getExtension(BindingFactoryManager.class);
-        if (null == bfm) {
-            bfm = new BindingFactoryManagerImpl(this);
-            extensions.put(BindingFactoryManager.class, bfm);
+        if (null == this.getExtension(BindingFactoryManager.class)) {
+            new BindingFactoryManagerImpl(this);
         }
         extensionManager.load(new String[] {
             ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
