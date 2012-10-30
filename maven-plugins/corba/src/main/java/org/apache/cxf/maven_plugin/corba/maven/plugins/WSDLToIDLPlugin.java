@@ -71,12 +71,17 @@ public class WSDLToIDLPlugin extends AbstractMojo {
     boolean useCompileClasspath;
 
     public void execute() throws MojoExecutionException {
-        outputDir.mkdirs();
-        
+        if (outputDir == null) {
+            throw new MojoExecutionException("The outputDir must be specified");
+        }
+        if (project == null) {
+            throw new MojoExecutionException("The project must be specified");
+        }
         if (wsdltoidlOptions == null) {
             throw new MojoExecutionException("Please specify the wsdltoidl options");
         }
 
+        outputDir.mkdirs();
         
         List<URL> urlList = new ArrayList<URL>();
         StringBuilder buf = new StringBuilder();

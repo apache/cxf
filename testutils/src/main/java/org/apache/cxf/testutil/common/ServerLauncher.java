@@ -93,9 +93,9 @@ public class ServerLauncher {
 
     private boolean waitForServerToStop() {
         synchronized (mutex) {
+            TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
             while (!serverIsStopped) {
                 try {
-                    TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
                     mutex.wait(1000);
                     if (tc.isTimeoutExpired()) {
                         System.out.println("destroying server process");
@@ -108,7 +108,7 @@ public class ServerLauncher {
             }
             if (!inProcess) {
                 //wait for process to end...
-                TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
+                tc = new TimeoutCounter(DEFAULT_TIMEOUT);
                 while (!tc.isTimeoutExpired()) {
                     try {
                         process.exitValue();
@@ -230,8 +230,8 @@ public class ServerLauncher {
             OutputMonitorThread out = launchOutputMonitorThread(process.getInputStream(), System.out);
     
             synchronized (mutex) {
+                TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
                 do {
-                    TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
                     try {
                         mutex.wait(1000);
                         if (tc.isTimeoutExpired()) {

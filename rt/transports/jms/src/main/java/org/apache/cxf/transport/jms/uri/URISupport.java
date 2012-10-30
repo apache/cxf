@@ -82,7 +82,7 @@ public final class URISupport {
 
             if (host != null && host.length() != 0) {
                 sb.append(host);
-            } else {
+            } else if (components != null) {
                 sb.append('(');
                 for (int i = 0; i < components.length; i++) {
                     if (i != 0) {
