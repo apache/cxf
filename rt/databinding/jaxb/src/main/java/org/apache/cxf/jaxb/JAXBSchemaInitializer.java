@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -512,35 +511,25 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         XmlSchemaSequence seq = new XmlSchemaSequence();
         ct.setParticle(seq);
         String namespace = part.getElementQName().getNamespaceURI();
+        XmlAccessType accessType = Utils.getXmlAccessType(cls);
 
-        XmlAccessorType accessorType = cls.getAnnotation(XmlAccessorType.class);
-        if (accessorType == null && cls.getPackage() != null) {
-            accessorType = cls.getPackage().getAnnotation(XmlAccessorType.class);
-        }
-        XmlAccessType accessType = accessorType != null ? accessorType.value() : XmlAccessType.PUBLIC_MEMBER;
-
-
-        for (Field f : cls.getDeclaredFields()) {
-            if (JAXBContextInitializer.isFieldAccepted(f, accessType)) {
-                //map field
-                Type type = getFieldType(f);
-                JAXBBeanInfo beanInfo = getBeanInfo(type);
-                if (beanInfo != null) {
-                    addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
-                }
+        for (Field f : Utils.getFields(cls, accessType)) {
+            //map field
+            Type type = Utils.getFieldType(f);
+            JAXBBeanInfo beanInfo = getBeanInfo(type);
+            if (beanInfo != null) {
+                addElement(schema, seq, beanInfo, new QName(namespace, f.getName()), isArray(type));
             }
         }
-        for (Method m : cls.getMethods()) {
-            if (JAXBContextInitializer.isMethodAccepted(m, accessType)) {
-                //map method
-                Type type = getMethodReturnType(m);
-                JAXBBeanInfo beanInfo = getBeanInfo(type);
-                if (beanInfo != null) {
-                    int idx = m.getName().startsWith("get") ? 3 : 2;
-                    String name = m.getName().substring(idx);
-                    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                    addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type));
-                }
+        for (Method m : Utils.getGetters(cls, accessType)) {
+            //map method
+            Type type = Utils.getMethodReturnType(m);
+            JAXBBeanInfo beanInfo = getBeanInfo(type);
+            if (beanInfo != null) {
+                int idx = m.getName().startsWith("get") ? 3 : 2;
+                String name = m.getName().substring(idx);
+                name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+                addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type));
             }
         }
         // Create element in xsd:sequence for Exception.class
@@ -557,18 +546,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
     
-    private static Type getFieldType(final Field f) {
-        XmlJavaTypeAdapter adapter = JAXBContextInitializer.getFieldXJTA(f);
-        Class<?> adapterType = JAXBContextInitializer.getTypeFromXmlAdapter(adapter);
-        return adapterType != null ? adapterType : f.getGenericType();
-    }
-
-    private static Type getMethodReturnType(final Method m) {
-        XmlJavaTypeAdapter adapter = JAXBContextInitializer.getMethodXJTA(m);
-        Class<?> adapterType = JAXBContextInitializer.getTypeFromXmlAdapter(adapter);
-        return adapterType != null ? adapterType : m.getGenericReturnType(); 
-    }
-
     static boolean isArray(Type cls) {
         if (cls instanceof Class) {
             return ((Class<?>)cls).isArray();
