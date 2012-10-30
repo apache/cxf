@@ -70,6 +70,7 @@ http://cxf.apache.org/schemas/core.xsd">
     <jaxrs:providers>
        <ref bean="jaxbProvider"/>
        <ref bean="jsonProvider"/>
+       <bean class="org.apache.cxf.systest.jaxrs.CustomWebApplicationExceptionMapper"/>
     </jaxrs:providers> 
     
   </jaxrs:server>
@@ -82,6 +83,7 @@ http://cxf.apache.org/schemas/core.xsd">
     <jaxrs:providers>
        <ref bean="jaxbProvider"/>
        <ref bean="jsonProvider"/>
+       <bean class="org.apache.cxf.systest.jaxrs.InternalServerErrorExceptionMapper"/>
     </jaxrs:providers> 
     <jaxrs:features>
        <cxf:logging/>

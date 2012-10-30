@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -67,7 +68,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
         createStaticBus();
     }
     
@@ -79,6 +80,40 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(new Long(1), id);
         Book book = wc.accept("application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
+    }
+    
+    @Test
+    public void testGetBookWebEx() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the/thebooks/bookstore/books/webex"; 
+        doTestGetBookWebEx(address);
+        
+    }
+    
+    @Test
+    public void testGetBookWebEx3() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the/thebooks3/bookstore/books/webex"; 
+        doTestGetBookWebEx(address);
+        
+    }
+    
+    @Test
+    public void testGetBookWebEx4() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the/thebooks3/bookstore/books/webex2"; 
+        doTestGetBookWebEx(address);
+        
+    }
+    
+    private void doTestGetBookWebEx(String address) throws Exception {
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        try {
+            wc.accept("text/plain", "application/json").get(Book.class);
+            fail("InternalServerErrorException is expected");
+        } catch (InternalServerErrorException ex) {
+            String errorMessage = ex.getResponse().readEntity(String.class);
+            assertEquals("Book web exception", errorMessage);
+        }
+        
     }
     
     @Test

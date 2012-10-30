@@ -1353,15 +1353,16 @@ public final class JAXRSUtils {
         ProviderFactory factory = ProviderFactory.getInstance(inMessage);
         ExceptionMapper<T> mapper = factory.createExceptionMapper(ex, inMessage);
         if (mapper != null) {
-            if (ex.getClass() == WebApplicationException.class 
-                && mapper.getClass() != WebApplicationExceptionMapper.class) {
+            if (!WebApplicationExceptionMapper.class.isAssignableFrom(mapper.getClass())
+                && WebApplicationException.class.isAssignableFrom(ex.getClass())) {
+                
                 WebApplicationException webEx = (WebApplicationException)ex;
                 Class<?> exceptionClass = getWebApplicationExceptionClass(webEx.getResponse(), 
                                                                           WebApplicationException.class);
                 if (exceptionClass != WebApplicationException.class) {
                     try {
-                        Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
-                        ex = (T)ctr.newInstance(webEx.getResponse());
+                        Constructor<?> ctr = exceptionClass.getConstructor(Response.class, Throwable.class);
+                        ex = (T)ctr.newInstance(webEx.getResponse(), webEx.getCause());
                     } catch (Exception ex2) {
                         ex2.printStackTrace();
                         return Response.serverError().build();

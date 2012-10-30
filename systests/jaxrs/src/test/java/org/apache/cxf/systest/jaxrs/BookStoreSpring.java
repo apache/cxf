@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -72,6 +73,18 @@ public class BookStoreSpring {
     @PreDestroy
     public void preDestroy() {
         //System.out.println("PreDestroy called");
+    }
+    
+    @GET
+    @Path("/books/webex")
+    public Books getBookWebEx() {
+        throw new WebApplicationException(new RuntimeException("Book web exception")); 
+    }
+    
+    @GET
+    @Path("/books/webex2")
+    public Books getBookWebEx2() {
+        throw new InternalServerErrorException(new RuntimeException("Book web exception")); 
     }
     
     @GET
