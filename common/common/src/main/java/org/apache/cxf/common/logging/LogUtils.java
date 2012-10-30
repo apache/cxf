@@ -228,31 +228,6 @@ public final class LogUtils {
     protected static Logger createLogger(Class<?> cls, 
                                          String name, 
                                          String loggerName) {
-<<<<<<< HEAD:common/common/src/main/java/org/apache/cxf/common/logging/LogUtils.java
-        if (loggerClass != null) {
-            try {
-                Constructor cns = loggerClass.getConstructor(String.class, String.class);
-                if (name == null) {
-                    try {
-                        return (Logger) cns.newInstance(loggerName, BundleUtils.getBundleName(cls));
-                    } catch (InvocationTargetException ite) {
-                        if (ite.getTargetException() instanceof MissingResourceException) {
-                            return (Logger) cns.newInstance(loggerName, null);
-                        } else {
-                            throw ite;
-                        }
-                    } 
-                } else {
-                    try {
-                        return (Logger) cns.newInstance(loggerName, BundleUtils.getBundleName(cls, name));
-                    } catch (InvocationTargetException ite) {
-                        if (ite.getTargetException() instanceof MissingResourceException) {
-                            throw (MissingResourceException)ite.getTargetException();
-                        } else {
-                            throw ite;
-                        }
-                    } 
-=======
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         ClassLoader n = cls.getClassLoader();
         if (n != null) {
@@ -285,7 +260,6 @@ public final class LogUtils {
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
->>>>>>> bb4cfa6... Merged revisions 1402160 via  git cherry-pick from:api/src/main/java/org/apache/cxf/common/logging/LogUtils.java
                 }
             }
             if (name == null) {
