@@ -84,12 +84,17 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private String servletPath;
     private boolean saveParametersAsAttributes;
     private boolean logRedirects;
+    private boolean strictPathCheck;
     
     private MessageContext mc; 
 
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
+    }
+
+    public void setStrictPathCheck(boolean use) {
+        strictPathCheck = use;
     }
     
     public void setUseClassNames(boolean use) {
@@ -118,13 +123,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                                                      getBus()) != null) {
             return true;
         }
-        if (resourcePath != null || classResources.containsKey(type.getName())) {
+        if (resourcePath != null || classResourceSupported(type)) {
             return true;
         }
         if (!resourcePaths.isEmpty()) {
             String path = getRequestPath();
             for (String requestPath : resourcePaths.keySet()) {
-                if (path.endsWith(requestPath)) {
+                boolean result = strictPathCheck ? path.endsWith(requestPath) : path.contains(requestPath);  
+                if (result) {
                     return true;
                 }
             }
@@ -132,12 +138,26 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         return false;
     }
 
+    private boolean classResourceSupported(Class<?> type) {
+        String typeName = type.getName();
+        if (type.isEnum()) {
+            for (String name : classResources.keySet()) {
+                if (name.startsWith(typeName)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return classResources.containsKey(typeName);
+        }
+    }
+    
     public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         
         ServletContext sc = getServletContext();
-        String path = getResourcePath(clazz);
+        String path = getResourcePath(clazz, o);
         RequestDispatcher rd = getRequestDispatcher(sc, clazz, path);
         
         try {
@@ -173,11 +193,17 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
     }
     
-    private String getResourcePath(Class<?> cls) {
+    String getResourcePath(Class<?> cls, Object o) {
         if (useClassNames) {
             return getClassResourceName(cls);     
         }
-        String clsResourcePath = classResources.get(cls.getName());
+        
+        String name = cls.getName();
+        if (cls.isEnum()) {
+            name += "." + o.toString();     
+        }
+        
+        String clsResourcePath = classResources.get(name);
         if (clsResourcePath != null) {
             return clsResourcePath;
         }
