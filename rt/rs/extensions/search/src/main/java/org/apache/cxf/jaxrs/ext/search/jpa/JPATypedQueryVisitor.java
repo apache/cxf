@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaQuery;
 
 public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
 
@@ -35,7 +34,7 @@ public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, 
     }
     
     public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery((CriteriaQuery<T>)getCriteriaQuery());
+        return getTypedQuery();
     }
         
 }

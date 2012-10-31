@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -122,6 +123,10 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     
     public Root<T> getRoot() {
         return root;
+    }
+    
+    public TypedQuery<T1> getTypedQuery() {
+        return em.createQuery(getCriteriaQuery());
     }
     
     public CriteriaQuery<T1> getCriteriaQuery() {
