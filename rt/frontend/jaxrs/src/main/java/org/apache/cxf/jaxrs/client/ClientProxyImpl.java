@@ -397,7 +397,7 @@ public class ClientProxyImpl extends AbstractClient implements
         for (String varName : methodVars) {
             Parameter p = paramsMap.remove(varName);
             if (p != null) {
-                list.add(params[p.getIndex()]);
+                list.add(convertParamValue(params[p.getIndex()]));
             }
         }
         
@@ -407,7 +407,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 for (Iterator<String> it = valuesMap.keySet().iterator(); it.hasNext(); index++) {
                     if (it.next().equals(p.getName()) && index < list.size()) {
                         list.remove(index);
-                        list.add(index, params[p.getIndex()]);
+                        list.add(index, convertParamValue(params[p.getIndex()]));
                         break;
                     }
                 }
@@ -423,23 +423,23 @@ public class ClientProxyImpl extends AbstractClient implements
         return  map.get(key) == null ? Collections.EMPTY_LIST : map.get(key);
     }
     
-    private static void handleQueries(MultivaluedMap<ParameterType, Parameter> map, 
+    private void handleQueries(MultivaluedMap<ParameterType, Parameter> map, 
                                       Object[] params,
                                       UriBuilder ub) {
         List<Parameter> qs = getParameters(map, ParameterType.QUERY);
         for (Parameter p : qs) {
             if (params[p.getIndex()] != null) {
-                addParametersToBuilder(ub, p.getName(), params[p.getIndex()], ParameterType.QUERY);
+                addMatrixQueryParamsToBuilder(ub, p.getName(), ParameterType.QUERY, params[p.getIndex()]);
             }
         }
     }
     
-    private static void handleMatrixes(MultivaluedMap<ParameterType, Parameter> map, Object[] params,
+    private void handleMatrixes(MultivaluedMap<ParameterType, Parameter> map, Object[] params,
                                 UriBuilder ub) {
         List<Parameter> mx = getParameters(map, ParameterType.MATRIX);
         for (Parameter p : mx) {
             if (params[p.getIndex()] != null) {
-                addParametersToBuilder(ub, p.getName(), params[p.getIndex()], ParameterType.MATRIX);
+                addMatrixQueryParamsToBuilder(ub, p.getName(), ParameterType.MATRIX, params[p.getIndex()]);
             }
         }
     }
@@ -457,10 +457,11 @@ public class ClientProxyImpl extends AbstractClient implements
                     Collection<?> c = pValue.getClass().isArray() 
                         ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
                     for (Iterator<?> it = c.iterator(); it.hasNext();) {
-                        FormUtils.addPropertyToForm(form, p.getName(), it.next());
+                        FormUtils.addPropertyToForm(form, p.getName(), convertParamValue(it.next()));
                     }
                 } else { 
-                    FormUtils.addPropertyToForm(form, p.getName(), pValue); 
+                    String name = p.getName();
+                    FormUtils.addPropertyToForm(form, name, name.isEmpty() ? pValue : convertParamValue(pValue)); 
                 }
                 
             }
@@ -489,7 +490,7 @@ public class ClientProxyImpl extends AbstractClient implements
         List<Parameter> hs = getParameters(map, ParameterType.HEADER);
         for (Parameter p : hs) {
             if (params[p.getIndex()] != null) {
-                headers.add(p.getName(), params[p.getIndex()].toString());
+                headers.add(p.getName(), convertParamValue(params[p.getIndex()]));
             }
         }
     }
@@ -505,7 +506,9 @@ public class ClientProxyImpl extends AbstractClient implements
         List<Parameter> cs = getParameters(map, ParameterType.COOKIE);
         for (Parameter p : cs) {
             if (params[p.getIndex()] != null) {
-                headers.add(HttpHeaders.COOKIE, p.getName() + '=' + params[p.getIndex()].toString());
+                headers.add(HttpHeaders.COOKIE, p.getName() 
+                            + '=' 
+                            + convertParamValue(params[p.getIndex()].toString()));
             }
         }
     }

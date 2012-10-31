@@ -506,7 +506,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient path(Object path) {
-        getCurrentBuilder().path(path.toString());
+        getCurrentBuilder().path(convertParamValue(path));
         
         return this;
     }
@@ -530,12 +530,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient query(String name, Object ...values) {
-        if (!"".equals(name)) {
-            getCurrentBuilder().queryParam(name, values);
-        } else {
-            addParametersToBuilder(getCurrentBuilder(), name, values[0], ParameterType.QUERY);
-        }
-        
+        addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.QUERY, values);
         return this;
     }
     
@@ -546,12 +541,7 @@ public class WebClient extends AbstractClient {
      * @return updated WebClient
      */
     public WebClient matrix(String name, Object ...values) {
-        if (!"".equals(name)) {
-            getCurrentBuilder().matrixParam(name, values);
-        } else {
-            addParametersToBuilder(getCurrentBuilder(), name, values[0], ParameterType.MATRIX);
-        }
-        
+        addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.MATRIX, values);
         return this;
     }
     

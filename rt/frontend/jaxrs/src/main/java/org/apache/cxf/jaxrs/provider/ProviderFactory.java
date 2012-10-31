@@ -220,8 +220,12 @@ public final class ProviderFactory {
         return new ProviderFactory(BusFactory.getThreadDefaultBus());
     }
     
-    public static ProviderFactory getInstance(Bus bus) {
+    public static ProviderFactory createInstance(Bus bus) {
         return new ProviderFactory(bus);
+    }
+    
+    public static ProviderFactory getInstance(Bus bus) {
+        return (ProviderFactory)bus.getProperty(ProviderFactory.class.getName());
     }
     
     public static ProviderFactory getInstance(Message m) {

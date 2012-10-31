@@ -317,7 +317,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
     
     protected ProviderFactory setupFactory(Endpoint ep) { 
-        ProviderFactory factory = ProviderFactory.getInstance(getBus()); 
+        ProviderFactory factory = ProviderFactory.createInstance(getBus()); 
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
         }
@@ -329,6 +329,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             factory.setSchemaLocations(schemaLocations);
         }
         ep.put(ProviderFactory.class.getName(), factory);
+        getBus().setProperty(ProviderFactory.class.getName(), factory);
         return factory;
     }
 
