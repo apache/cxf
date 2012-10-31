@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.ResumeCallback;
@@ -50,7 +49,6 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private TimeoutHandler timeoutHandler;
     
     private CompletionCallback completionCallback;
-    private ResumeCallback resumeCallback;
     
     public AsyncResponseImpl(Message inMessage) {
         inMessage.put(AsyncResponse.class, this);
@@ -171,9 +169,6 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
             if (cls == CompletionCallback.class && callback instanceof CompletionCallback) {
                 completionCallback = (CompletionCallback)callback;
                 result[i] = true;
-            } else if (cls == ResumeCallback.class && callback instanceof ResumeCallback) {
-                resumeCallback = (ResumeCallback)callback;
-                result[i] = true;
             } else {
                 result[i] = false;
             }
@@ -204,13 +199,6 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         if (!(obj instanceof Response) && !(obj instanceof Throwable)) {
             obj = Response.ok().entity(obj).build();    
         }
-        if (resumeCallback != null) {    
-            if (obj instanceof Response) {
-                resumeCallback.onResume(this, (Response)obj);
-            } else {
-                resumeCallback.onResume(this, (Throwable)obj);
-            }
-        }
         return obj;
     }
     
@@ -228,8 +216,6 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
                 suspend();
                 timeoutHandler.handleTimeout(this);
                 return true;
-            } else if (resumeCallback != null) {
-                resumeCallback.onResume(this, new WebApplicationException(503));    
             }
         }
         return false;

@@ -32,9 +32,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
-import javax.ws.rs.container.ResumeCallback;
 import javax.ws.rs.container.TimeoutHandler;
-import javax.ws.rs.core.Response;
 
 @Path("/bookstore")
 public class BookContinuationStore {
@@ -120,7 +118,7 @@ public class BookContinuationStore {
         
     }
     
-    private class CallbackImpl implements CompletionCallback, ResumeCallback {
+    private class CallbackImpl implements CompletionCallback {
 
         @Override
         public void onComplete() {
@@ -131,16 +129,6 @@ public class BookContinuationStore {
         @Override
         public void onError(Throwable throwable) {
             System.out.println("CompletionCallback: onError");
-        }
-
-        @Override
-        public void onResume(AsyncResponse resuming, Response response) {
-            System.out.println("ResumeCallback: onResume");
-        }
-
-        @Override
-        public void onResume(AsyncResponse resuming, Throwable error) {
-            System.out.println("ResumeCallback: onResumeError");
         }
         
     }
