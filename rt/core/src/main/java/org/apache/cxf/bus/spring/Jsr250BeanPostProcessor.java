@@ -72,7 +72,7 @@ public class Jsr250BeanPostProcessor
             } else if (bean instanceof Bus) {
                 Bus b = (Bus)bean;
                 ResourceManager m = b.getExtension(ResourceManager.class);
-                if (resourceManager == null && m != null) {
+                if (m != null) {
                     resourceManager = m;
                     if (!(b instanceof SpringBus)) {
                         resourceManager

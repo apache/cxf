@@ -94,7 +94,9 @@ public class WebServiceContextImpl implements WebServiceContext {
             }
             ep.getEndpointInfo().setProperty("URI", wsdlDescription);
         }
-        builder.wsdlDocumentLocation(wsdlDescription.toString());
+        if (wsdlDescription != null) {
+            builder.wsdlDocumentLocation(wsdlDescription.toString());
+        }
         
         /*
         if (ep.getEndpointInfo().getService().getDescription() != null) {

@@ -173,7 +173,7 @@ public final class JAXBContextCache {
         } catch (JAXBException ex) {
             // load jaxb needed class and try to create jaxb context 
             boolean added = addJaxbObjectFactory(ex, classes);
-            while (cachedContextAndSchemas == null && added) {
+            if (added) {
                 try {
                     context = AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>() {
                         public JAXBContext run() throws Exception {
@@ -345,6 +345,8 @@ public final class JAXBContextCache {
                 }
                 line = reader.readLine();
             }
+
+            ins.close();
         } catch (Exception ex) {
             //ignore
         }

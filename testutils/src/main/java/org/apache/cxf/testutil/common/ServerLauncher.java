@@ -116,7 +116,7 @@ public class ServerLauncher {
                     } catch (IllegalThreadStateException ex) {
                         //ignore, process hasn't ended
                         try {
-                            Thread.sleep(1000);
+                            mutex.wait(1000);
                         } catch (InterruptedException ex1) {
                             //ignore
                         }
@@ -231,7 +231,7 @@ public class ServerLauncher {
     
             synchronized (mutex) {
                 TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
-                do {
+                while (!(serverIsReady || serverLaunchFailed)) {
                     try {
                         mutex.wait(1000);
                         if (tc.isTimeoutExpired()) {
@@ -240,7 +240,7 @@ public class ServerLauncher {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                } while (!serverIsReady && !serverLaunchFailed);
+                }
             }
             if (serverLaunchFailed || !serverIsReady) {
                 System.err.println(out.getServerOutput());

@@ -459,7 +459,7 @@ public final class JAXBEncoderDecoder {
                 Field f = Utils.getField(cls, accessType, fieldName);
                 if (f != null) {
                     Type type = f.getGenericType();
-                    f.setAccessible(true);
+                    ReflectionUtil.setAccessible(f);
                     if (JAXBSchemaInitializer.isArray(type)) {
                         Class<?> compType = JAXBSchemaInitializer.getArrayComponentType(type);
                         List<Object> ret = unmarshallArray(u, reader, q, compType, createList(type));
