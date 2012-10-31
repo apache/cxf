@@ -544,15 +544,17 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         
     }
-    
-    private void reportError(String message, Exception ex) {
+    private void reportError(String message, Exception ex, int status) {
         LOG.warning(message);
-        Response response = Response.status(500).type("text/plain").entity(message).build();
+        Response response = Response.status(status).type("text/plain").entity(message).build();
         if (ex == null) {
             throw new WebApplicationException(response);
         } else {
             throw new WebApplicationException(ex, response);
         }
+    }
+    private void reportError(String message, Exception ex) {
+        reportError(message, ex, 500);
     }
     
     private boolean isFeedRequested(MediaType mt) {
@@ -631,7 +633,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             m.invoke(instance, new Object[]{objects});
             
         } catch (Exception ex) {
-            reportError("Object of type " + cls.getName() + " can not be deserialized from Feed", ex);
+            reportError("Object of type " + cls.getName() + " can not be deserialized from Feed", ex, 400);
         }
         return instance;
     }
@@ -650,7 +652,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
                 jaxbProvider.getJAXBContext(cls, cls).createUnmarshaller();
             return cls.cast(um.unmarshal(new StringReader(entry.getContent())));
         } catch (Exception ex) {
-            reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex);
+            reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex, 400);
         }
         return null;
     }
