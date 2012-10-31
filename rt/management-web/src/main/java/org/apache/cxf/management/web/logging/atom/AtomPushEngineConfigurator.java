@@ -128,11 +128,8 @@ final class AtomPushEngineConfigurator {
                     : batch > 1 ? Multiplicity.MANY : Multiplicity.ONE; 
                 Multiplicity mul = parseEnum(multiplicity, defaultMul, Multiplicity.class);
                 Format form = parseEnum(format, Format.CONTENT, Format.class);
-                if (out == Output.FEED) {
-                    c = new StandardConverter(out, mul, form);
-                } else {
-                    c = new StandardConverter(out, mul, form);
-                }
+                c = new StandardConverter(out, mul, form);
+                
                 if (retryPause != null) {
                     int timeout = parseInt(retryTimeout, 0, 0);
                     int pause = parseInt(retryPauseTime, 1, 30);
