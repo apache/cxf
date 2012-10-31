@@ -50,6 +50,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -411,10 +412,29 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testAddBookJaxbJsonImageWebClient() throws Exception {
+    public void testAddBookJaxbJsonImageWebClientMixed() throws Exception {
+        Map<String, String> params = 
+            doTestAddBookJaxbJsonImageWebClient("multipart/mixed");
+        assertEquals(1, params.size());
+        assertNotNull(params.get("boundary"));
+        
+    }
+    
+    @Test
+    public void testAddBookJaxbJsonImageWebClientRelated() throws Exception {
+        Map<String, String> params = 
+            doTestAddBookJaxbJsonImageWebClient("multipart/related");
+        assertEquals(3, params.size());
+        assertNotNull(params.get("boundary"));
+        assertNotNull(params.get("type"));
+        assertNotNull(params.get("start"));
+    }
+    
+    private Map<String, String> doTestAddBookJaxbJsonImageWebClient(String multipartType) throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjsonimage";
         WebClient client = WebClient.create(address);
-        client.type("multipart/mixed").accept("multipart/mixed");
+        WebClient.getConfig(client).getInInterceptors().add(new LoggingInInterceptor());
+        client.type(multipartType).accept(multipartType);
        
         Book jaxb = new Book("jaxb", 1L);
         Book json = new Book("json", 2L);
@@ -441,10 +461,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         String ctString = 
             client.getResponse().getMetadata().getFirst("Content-Type").toString();
         MediaType mt = MediaType.valueOf(ctString);
-        Map<String, String> params = mt.getParameters();
-        assertEquals(1, params.size());
-        assertNotNull(params.get("boundary"));
-        
+        return mt.getParameters();
     }
     
     @Test
