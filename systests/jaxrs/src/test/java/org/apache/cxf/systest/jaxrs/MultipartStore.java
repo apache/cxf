@@ -166,8 +166,8 @@ public class MultipartStore {
     
     @POST
     @Path("/books/jaxbjsonimage")
-    @Consumes("multipart/mixed")
-    @Produces("multipart/mixed")
+    @Consumes({"multipart/mixed", "multipart/related" })
+    @Produces({"multipart/mixed", "multipart/related" })
     public Map<String, Object> addBookJaxbJsonImage(@Multipart("root.message@cxf.apache.org") Book jaxb, 
                                                     @Multipart("1") Book json, 
                                                     @Multipart("2") byte[] image) throws Exception {
