@@ -371,7 +371,7 @@ public class Java2WSMojo extends AbstractMojo {
             getLog().info("Running java2ws in fork mode...");
 
             Commandline cmd = new Commandline();
-            cmd.getShell().setQuotedArgumentsEnabled(false); // for JVM args
+            cmd.getShell().setQuotedArgumentsEnabled(true); // for JVM args
             cmd.setWorkingDirectory(project.getBuild().getDirectory());
             try {
                 cmd.setExecutable(getJavaExecutable().getAbsolutePath());
