@@ -75,6 +75,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private String resourcePath;
     private Map<String, String> resourcePaths = Collections.emptyMap();
     private Map<String, String> classResources = Collections.emptyMap();
+    private Map<? extends Enum<?>, String> enumResources = Collections.emptyMap();
     private boolean useClassNames;
     
     private String scope = REQUEST_SCOPE;
@@ -141,6 +142,11 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private boolean classResourceSupported(Class<?> type) {
         String typeName = type.getName();
         if (type.isEnum()) {
+            for (Object o : enumResources.keySet()) {
+                if (o.getClass().getName().equals(typeName)) {
+                    return true;
+                }
+            }
             for (String name : classResources.keySet()) {
                 if (name.startsWith(typeName)) {
                     return true;
@@ -200,6 +206,10 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         
         String name = cls.getName();
         if (cls.isEnum()) {
+            String enumResource = enumResources.get(o);
+            if (enumResource != null) {
+                return enumResource;
+            }
             name += "." + o.toString();     
         }
         
@@ -336,6 +346,10 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
 
     public void setSaveParametersAsAttributes(boolean saveParametersAsAttributes) {
         this.saveParametersAsAttributes = saveParametersAsAttributes;
+    }
+
+    public void setEnumResources(Map<? extends Enum<?>, String> enumResources) {
+        this.enumResources = enumResources;
     }
 
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
