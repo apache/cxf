@@ -68,6 +68,13 @@ public class JPATypedQueryVisitorTest extends Assert {
             em = emFactory.createEntityManager();
          
             em.getTransaction().begin();
+            
+            Library lib = new Library();
+            lib.setId(1);
+            lib.setAddress("town");
+            em.persist(lib);
+            assertTrue(em.contains(lib));
+                        
             Book b1 = new Book();
             b1.setId(9);
             b1.setTitle("num9");
@@ -76,6 +83,7 @@ public class JPATypedQueryVisitorTest extends Assert {
             info1.setName(new Name("Fred"));
             info1.setDateOfBirth(parseDate("2000-01-01"));
             b1.setOwnerInfo(info1);
+            b1.setLibrary(lib);
             em.persist(b1);
             assertTrue(em.contains(b1));
             Book b2 = new Book();
@@ -86,6 +94,7 @@ public class JPATypedQueryVisitorTest extends Assert {
             info2.setName(new Name("Barry"));
             info2.setDateOfBirth(parseDate("2001-01-01"));
             b2.setOwnerInfo(info2);
+            b2.setLibrary(lib);
             em.persist(b2);
             assertTrue(em.contains(b2));
             Book b3 = new Book();
@@ -96,9 +105,9 @@ public class JPATypedQueryVisitorTest extends Assert {
             info3.setName(new Name("Bill"));
             info3.setDateOfBirth(parseDate("2002-01-01"));
             b3.setOwnerInfo(info3);
+            b3.setLibrary(lib);
             em.persist(b3);
             assertTrue(em.contains(b3));
-            
             
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -228,6 +237,7 @@ public class JPATypedQueryVisitorTest extends Assert {
         assertEquals("Fred", book.getOwnerInfo().getName().getName());
     }
     
+        
     @Test
     public void testEqualsOwnerNameQuery2() throws Exception {
         List<Book> books = queryBooks("ownerInfo.name==Fred");
@@ -243,6 +253,15 @@ public class JPATypedQueryVisitorTest extends Assert {
         assertEquals(1, books.size());
         Book book = books.get(0);
         assertEquals("Fred", book.getOwnerInfo().getName().getName());
+    }
+    
+    @Test
+    public void testFindBookInTownLibrary() throws Exception {
+        List<Book> books = queryBooks("libAddress==town;title==num10", null,
+            Collections.singletonMap("libAddress", "library.address"));
+        assertEquals(1, books.size());
+        Book book = books.get(0);
+        assertEquals("Barry", book.getOwnerInfo().getName().getName());
     }
     
     @Test

@@ -5,6 +5,7 @@
    <persistence-unit name="testUnit" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
     <class>org.apache.cxf.jaxrs.ext.search.jpa.Book</class>
+    <class>org.apache.cxf.jaxrs.ext.search.jpa.Library</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
         <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:books-jpa"/>
