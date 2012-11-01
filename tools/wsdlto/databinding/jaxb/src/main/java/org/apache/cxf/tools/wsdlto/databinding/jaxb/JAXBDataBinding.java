@@ -806,7 +806,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                                                                  (String)context.get(ToolConstants.CFG_ENCODING),
                                                                  context.get(OutputStreamCreator.class));
 
-            if (rawJaxbModelGenCode instanceof S2JJAXBModel) {
+            if (rawJaxbModelGenCode != null) {
                 S2JJAXBModel schem2JavaJaxbModel = rawJaxbModelGenCode;
 
                 ClassCollector classCollector = context.get(ClassCollector.class);

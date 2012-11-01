@@ -142,14 +142,8 @@ public final class TLSClientParametersConfig {
         Unmarshaller u;
         try {
             u = getContext().createUnmarshaller();
-            Object obj = u.unmarshal(data, TLSClientParametersType.class);
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)obj;
-                obj = el.getValue();
-
-            }
-            
-            TLSClientParametersType cpt = (TLSClientParametersType)obj;
+            JAXBElement<TLSClientParametersType> type = u.unmarshal(data, TLSClientParametersType.class);
+            TLSClientParametersType cpt = type.getValue();
             return createTLSClientParametersFromType(cpt);
         } catch (RuntimeException e) {
             throw e;

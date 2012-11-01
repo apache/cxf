@@ -256,10 +256,9 @@ public abstract class AegisType {
     public String toString() {
         StringBuilder sb = new StringBuilder(getClass().getName());
         sb.append("[class=");
-        Type c = getTypeClass();
-        if (c instanceof Class) {
-            Class<?> plainClass = (Class<?>)c;
-            sb.append(plainClass.getName());
+        Class<?> c = getTypeClass();
+        if (c != null) {
+            sb.append(c.getName());
         } else {
             sb.append("<generic or null>");
         }

@@ -451,10 +451,10 @@ public final class WSDLParameter {
             // We need to get annotation information for the schema type we are
             // about to pass in.
             // This is used to produce the correct object reference type.
-            XmlSchemaObject schemaObj = getSchemaObject(wsdlToCorbaBinding, typeName);
+            XmlSchemaElement schemaObj = getSchemaObject(wsdlToCorbaBinding, typeName);
             XmlSchemaAnnotation annotation = null;
-            if (schemaObj instanceof XmlSchemaElement) {
-                annotation = ((XmlSchemaElement)schemaObj).getAnnotation();
+            if (schemaObj != null) {
+                annotation = schemaObj.getAnnotation();
             }
             idltype = getSchemaTypeName(wsdlToCorbaBinding, schemaType, annotation, typeName, nill);
         }

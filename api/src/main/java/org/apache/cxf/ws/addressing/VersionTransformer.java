@@ -438,9 +438,9 @@ public class VersionTransformer {
             return null;
         }
         JAXBContext ctx = getExposedJAXBContext(tns);
-        Object o = ctx.createUnmarshaller().unmarshal(ref, getExposedReferenceType(tns));
-        if (o instanceof JAXBElement) {
-            o = ((JAXBElement<?>)o).getValue();
+        JAXBElement<?> o = ctx.createUnmarshaller().unmarshal(ref, getExposedReferenceType(tns));
+        if (o != null) {
+            return convertToNative(o.getValue());
         }
         return convertToNative(o);
         

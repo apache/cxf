@@ -965,11 +965,10 @@ public final class JAXBEncoderDecoder {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
             while (reader.getName().equals(elName)) {
-                Object obj = u.unmarshal(reader, clazz);
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement<?>)obj).getValue();
+                JAXBElement<?> type = u.unmarshal(reader, clazz);
+                if (type != null) {
+                    ret.add(type.getValue());
                 }
-                ret.add(obj);
                 while (reader.getEventType() != XMLStreamConstants.START_ELEMENT 
                     && reader.getEventType() != XMLStreamConstants.END_ELEMENT) {
                     reader.nextTag();

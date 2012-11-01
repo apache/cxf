@@ -437,7 +437,7 @@ public class WSDLToCorbaHelper {
             }
         }
 
-        if ((type instanceof Struct) && (struct.getMember().size() == 0)) {
+        if ((struct != null) && (struct.getMember().size() == 0)) {
             String msgStr = "Cannot create CORBA Struct" + struct.getName()
                             + "from container with no members";
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(

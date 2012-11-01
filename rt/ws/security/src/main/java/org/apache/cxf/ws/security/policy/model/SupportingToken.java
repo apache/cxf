@@ -32,7 +32,6 @@ import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
 
 public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
 
@@ -328,9 +327,9 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
         }        
         
         ea.addPolicyComponent(all);
-        PolicyComponent pc = p.normalize(builder.getPolicyRegistry(), true);
-        if (pc instanceof Policy) {
-            return (Policy)pc;
+        Policy pc = p.normalize(builder.getPolicyRegistry(), true);
+        if (pc != null) {
+            return pc;
         } else {
             p = new Policy();
             p.addPolicyComponent(pc);
