@@ -28,6 +28,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
@@ -90,6 +91,13 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                             protocolHeaders.remove(key);
                             break;
                         }
+                    }
+                    
+                    if (isRequestor(message)) {
+                        //record the fact that is worked so future requests will 
+                        //automatically be FI enabled
+                        Endpoint ep = message.getExchange().getEndpoint();
+                        ep.put(GZIPOutInterceptor.USE_GZIP_KEY, GZIPOutInterceptor.UseGzip.YES);
                     }
                 } catch (IOException ex) {
                     throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_UNZIP", BUNDLE), ex);
