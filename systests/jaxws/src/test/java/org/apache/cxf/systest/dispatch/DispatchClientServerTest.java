@@ -867,7 +867,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
-        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
+        Service service = Service.create(wsdl, SERVICE_NAME);
         assertNotNull(service);
 
         Dispatch<StAXSource> disp = service.createDispatch(PORT_NAME, StAXSource.class, Service.Mode.PAYLOAD);
@@ -878,11 +878,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         // Test request-response
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq.xml");
-        InputSource inputSource = new InputSource(is);
-        inputSource.setPublicId(getClass()
-                                    .getResource("resources/GreetMeDocLiteralSOAPBodyReq.xml").toString());
-        inputSource.setSystemId(inputSource.getPublicId());
-        StAXSource staxSourceReq = new StAXSource(StaxUtils.createXMLStreamReader(inputSource));
+        StAXSource staxSourceReq = new StAXSource(StaxUtils.createXMLStreamReader(is));
         assertNotNull(staxSourceReq);
         Source resp = disp.invoke(staxSourceReq);
         assertNotNull(resp);
