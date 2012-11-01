@@ -51,7 +51,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
@@ -450,7 +449,15 @@ public final class JMSUtils {
     }
     
     public static String getContentEncoding(org.apache.cxf.message.Message message) {
-        return (String)message.get(GZIPOutInterceptor.GZIP_ENCODING_KEY);
+        Map<String, List<String>> headers 
+            = CastUtils.cast((Map<?, ?>)message.get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
+        if (headers != null) {
+            List<String> l = headers.get("Content-Encoding");
+            if (l != null && !l.isEmpty()) {
+                return l.get(0);
+            }
+        }
+        return null;
     }
 
     public static Message buildJMSMessageFromCXFMessage(JMSConfiguration jmsConfig,

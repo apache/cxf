@@ -57,15 +57,22 @@ public class GZIPFeature extends AbstractFeature {
      */
     int threshold = -1;
     
+    /**
+     * Force GZIP instead of negotiate
+     */
+    boolean force;
+    
+    
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getInInterceptors().add(IN);
-        if (threshold == -1) {
+        if (threshold == -1 && !force) {
             provider.getOutInterceptors().add(OUT);
             provider.getOutFaultInterceptors().add(OUT);
         } else {
             GZIPOutInterceptor out = new GZIPOutInterceptor();
             out.setThreshold(threshold);
+            out.setForce(force);
             remove(provider.getOutInterceptors());
             remove(provider.getOutFaultInterceptors());
             provider.getOutInterceptors().add(out);
@@ -89,5 +96,21 @@ public class GZIPFeature extends AbstractFeature {
     
     public int getThreshold() {
         return threshold;
-    }    
+    }
+    
+    
+    /**
+     * Set if GZIP is always used without negotiation 
+     * @param b
+     */
+    public void setForce(boolean b) {
+        force = b;
+    }
+    
+    /**
+     * Retrieve the value set with {@link #setForce(boolean)}.
+     */
+    public boolean getForce() {
+        return force;
+    }  
 }
