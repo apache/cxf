@@ -112,6 +112,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * compressed.
      */
     private int threshold = 1024;
+    private boolean force;
 
     public GZIPOutInterceptor() {
         super(Phase.PREPARE_SEND);
@@ -169,9 +170,16 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      */
     private UseGzip gzipPermitted(Message message) throws Fault {
         UseGzip permitted = UseGzip.NO;
-        if (Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE))) {
+        if (isRequestor(message)) {
             LOG.fine("Requestor role, so gzip enabled");
-            permitted = UseGzip.YES;
+            Object o = message.getContextualProperty(USE_GZIP_KEY);
+            if (o instanceof UseGzip) {
+                permitted = (UseGzip)o;
+            } else if (o instanceof String) {
+                permitted = UseGzip.valueOf((String)o);
+            } else {
+                permitted = force ? UseGzip.YES : UseGzip.NO;
+            }
             message.put(GZIP_ENCODING_KEY, "gzip");
             addHeader(message, "Accept-Encoding", "gzip;q=1.0, identity; q=0.5, *;q=0"); 
         } else {
@@ -326,6 +334,9 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         } else {
             header.set(0, header.get(0) + "," + value);
         }
+    }
+    public void setForce(boolean force) {
+        this.force = force;
     }    
 
 }
