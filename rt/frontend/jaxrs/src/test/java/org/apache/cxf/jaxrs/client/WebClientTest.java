@@ -254,12 +254,12 @@ public class WebClientTest extends Assert {
     }
     
     @Test
-    public void testWebClientPathParamConverter() {
+    public void testWebClientParamConverter() {
         WebClient wc = WebClient.create("http://foo",
                                         Collections.singletonList(new ParamConverterProviderImpl()));
         wc.path(new ComplexObject());
-        wc.query("param", new ComplexObject());
-        assertEquals("http://foo/complex?param=complex", wc.getCurrentURI().toString());
+        wc.query("param", new ComplexObject(), new ComplexObject());
+        assertEquals("http://foo/complex?param=complex&param=complex", wc.getCurrentURI().toString());
         
     }
     
