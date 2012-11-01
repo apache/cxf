@@ -41,8 +41,15 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     
     public static final String PREFERRED_FORMAT = "source-preferred-format";
 
+    final Class preferred;
+    
     public SourceDataBinding() {
         super();
+        preferred = null;
+    }
+    public SourceDataBinding(Class pref) {
+        super();
+        preferred = pref;
     }
 
     public void initialize(Service service) {
@@ -67,7 +74,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     @SuppressWarnings("unchecked")
     public <T> DataReader<T> createReader(Class<T> cls) {
         if (cls == XMLStreamReader.class) {
-            return (DataReader<T>) new XMLStreamDataReader();
+            return (DataReader<T>) new XMLStreamDataReader(preferred);
         } else if (cls == Node.class) {
             return (DataReader<T>) new NodeDataReader();
         } else {
