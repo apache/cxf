@@ -36,6 +36,16 @@ public class RequestDispatcherProviderTest extends Assert {
         assertEquals("/test.jsp", p.getResourcePath(TestEnum.ONE.getClass(), TestEnum.ONE));
     }
     
+    @Test
+    public void testIsWriteableEnum2() {
+        
+        RequestDispatcherProvider p = new RequestDispatcherProvider();
+        p.setEnumResources(
+            Collections.singletonMap(TestEnum.ONE, "/test.jsp"));
+        assertTrue(p.isWriteable(TestEnum.ONE.getClass(), null, null, null));
+        assertEquals("/test.jsp", p.getResourcePath(TestEnum.ONE.getClass(), TestEnum.ONE));
+    }
+    
     private static enum TestEnum {
         ONE,
         TWO
