@@ -45,6 +45,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
@@ -861,6 +862,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(streamSourceResp3);
         assertTrue("Expected: " + expected, XMLUtils.toString(streamSourceResp3).contains(expected3));
     }
+    
     @Test
     public void testStAXSourcePAYLOAD() throws Exception {
 
@@ -875,7 +877,9 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                                      "http://localhost:" 
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
-
+        QName opQName = new QName("http://apache.org/hello_world_soap_http", "greetMe");
+        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, opQName);
+        
         // Test request-response
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq.xml");
         StAXSource staxSourceReq = new StAXSource(StaxUtils.createXMLStreamReader(is));

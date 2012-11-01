@@ -616,7 +616,7 @@ public class ServiceImpl extends ServiceDelegate {
             if (context != null) {
                 db = new JAXBDataBinding(context);
             } else {
-                db = new SourceDataBinding();
+                db = new SourceDataBinding(type);
             }
             sf = createDispatchService(db);
         } catch (ServiceConstructionException e) {

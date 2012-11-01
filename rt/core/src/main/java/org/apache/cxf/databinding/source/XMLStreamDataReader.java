@@ -59,14 +59,26 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
+
+    private final Class<?> preferred;
     private Schema schema;
     private Message message;
+    
+    public XMLStreamDataReader() {
+        preferred = null;
+    }
+    public XMLStreamDataReader(Class<?> cls) {
+        preferred = cls;
+    }
     
     public Object read(MessagePartInfo part, XMLStreamReader input) {
         return read(null, input, part.getTypeClass());
     }
 
     public Object read(final QName name, XMLStreamReader input, Class<?> type) {
+        if (type == null) {
+            type = preferred;
+        }
         if (Source.class.equals(type) && message != null) {
             //generic Source, find the preferred type
             String s = (String)message.getContextualProperty(SourceDataBinding.PREFERRED_FORMAT);
