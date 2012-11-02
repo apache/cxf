@@ -408,7 +408,7 @@ public class ParameterProcessor extends AbstractProcessor {
         method.setReturn(null);
         boolean qualified = ProcessorUtil.isSchemaFormQualified(context, outputPart.getElementQName());
 
-        if (outputWrapElement.size() == 1 && inputWrapElement != null) {
+        if (outputWrapElement.size() == 1) {
             QName outElement = outputWrapElement.iterator().next();
             boolean sameWrapperChild = false;
             for (QName inElement : inputWrapElement) {

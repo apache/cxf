@@ -101,11 +101,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     @Override
     public String getServiceName() {
         QName service = implInfo.getServiceName();
-        if (service == null) {
-            return null;
-        } else {
-            return service.getLocalPart();
-        }
+        return service.getLocalPart();
     }
 
     @Override
@@ -115,11 +111,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             return ret;
         }
         QName service = implInfo.getServiceName();
-        if (service == null) {
-            return null;
-        } else {
-            return service.getNamespaceURI();
-        }
+        return service.getNamespaceURI();
     }
 
     @Override

@@ -790,7 +790,7 @@ public final class JAXRSUtils {
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
                 FormUtils.populateMapFromString(params, m, body, enc, decode, request);
             } else {
-                if (mt != null && "multipart".equalsIgnoreCase(mt.getType()) 
+                if ("multipart".equalsIgnoreCase(mt.getType()) 
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
                     MultipartBody body = AttachmentUtils.getMultipartBody(mc);
                     FormUtils.populateMapFromMultipart(params, body, m, decode);
@@ -798,7 +798,7 @@ public final class JAXRSUtils {
                     org.apache.cxf.common.i18n.Message errorMsg = 
                         new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE", 
                                                                BUNDLE, 
-                                                               mt == null ? "*/*" : mt.toString());
+                                                               mt.toString());
                     LOG.warning(errorMsg.toString());
                     throw new WebApplicationException(415);
                 }

@@ -52,21 +52,13 @@ public class WebServiceProviderConfiguration extends JaxWsServiceConfiguration {
     @Override
     public String getServiceName() {
         QName service = implInfo.getServiceName();
-        if (service == null) {
-            return null;
-        } else {
-            return service.getLocalPart();
-        }
+        return service.getLocalPart();
     }
 
     @Override
     public String getServiceNamespace() {
         QName service = implInfo.getServiceName();
-        if (service == null) {
-            return null;
-        } else {
-            return service.getNamespaceURI();
-        }
+        return service.getNamespaceURI();
     }
 
     @Override

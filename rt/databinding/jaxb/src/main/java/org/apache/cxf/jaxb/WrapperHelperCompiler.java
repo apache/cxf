@@ -154,9 +154,6 @@ final class WrapperHelperCompiler extends ASMHelper {
     
     private boolean addSignature() {
         String sig = computeSignature();
-        if (sig == null) {
-            return false;
-        }
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
                                           "getSignature", "()Ljava/lang/String;", null, null);
         mv.visitCode();

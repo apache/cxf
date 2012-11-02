@@ -114,13 +114,11 @@ public final class OptionLoader {
         }
         StringBuilder str = new StringBuilder();
 
-        if (arr != null) {
-            for (String s : arr) {
-                if (str.length() > 0) {
-                    str.append(',');
-                }
-                str.append(s);
+        for (String s : arr) {
+            if (str.length() > 0) {
+                str.append(',');
             }
+            str.append(s);
         }
         return str.toString();
     }

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ClassNameProcessor;
@@ -58,11 +57,6 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
         super.process();
 
         JavaModel jmodel = wsdlDefinitionToJavaModel(context.get(ServiceInfo.class));
-
-        if (jmodel == null) {
-            Message msg = new Message("FAIL_TO_CREATE_JAVA_MODEL", LOG);
-            throw new ToolException(msg);
-        }
         context.setJavaModel(jmodel);
     }
 

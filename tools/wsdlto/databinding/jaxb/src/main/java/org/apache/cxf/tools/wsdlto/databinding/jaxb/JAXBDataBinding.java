@@ -806,27 +806,25 @@ public class JAXBDataBinding implements DataBindingProfile {
                                                                  (String)context.get(ToolConstants.CFG_ENCODING),
                                                                  context.get(OutputStreamCreator.class));
 
-            if (rawJaxbModelGenCode != null) {
-                S2JJAXBModel schem2JavaJaxbModel = rawJaxbModelGenCode;
+            S2JJAXBModel schem2JavaJaxbModel = rawJaxbModelGenCode;
 
-                ClassCollector classCollector = context.get(ClassCollector.class);
-                for (JClass cls : schem2JavaJaxbModel.getAllObjectFactories()) {
-                    classCollector.getTypesPackages().add(cls._package().name());
-                }
-
-                JCodeModel jcodeModel = schem2JavaJaxbModel.generateCode(null, null);
-
-                if (!isSuppressCodeGen()) {
-                    jcodeModel.build(fileCodeWriter);
-                }
-
-                context.put(JCodeModel.class, jcodeModel);
-
-                for (String str : fileCodeWriter.getExcludeFileList()) {
-                    context.getExcludeFileList().add(str);
-                }
-                
+            ClassCollector classCollector = context.get(ClassCollector.class);
+            for (JClass cls : schem2JavaJaxbModel.getAllObjectFactories()) {
+                classCollector.getTypesPackages().add(cls._package().name());
             }
+
+            JCodeModel jcodeModel = schem2JavaJaxbModel.generateCode(null, null);
+
+            if (!isSuppressCodeGen()) {
+                jcodeModel.build(fileCodeWriter);
+            }
+
+            context.put(JCodeModel.class, jcodeModel);
+
+            for (String str : fileCodeWriter.getExcludeFileList()) {
+                context.getExcludeFileList().add(str);
+            }
+
             return;
         } catch (IOException e) {
             Message msg = new Message("FAIL_TO_GENERATE_TYPES", LOG);

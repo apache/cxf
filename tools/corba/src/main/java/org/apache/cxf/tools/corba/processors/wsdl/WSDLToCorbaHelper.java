@@ -1168,21 +1168,17 @@ public class WSDLToCorbaHelper {
         CorbaTypeImpl seqtype =
             processSequenceType(seq, defaultName, schematypeName);
 
-        if  (seqtype != null) {
-            MemberType seqmem = new MemberType();
-            seqmem.setName(seqtype.getQName().getLocalPart() + "_f");
-            QName type = createQNameCorbaNamespace(seqtype.getQName().getLocalPart());
-            seqmem.setIdltype(type);
-            seqmem.setAnonschematype(true);
-            if (seqtype.isSetQualified() && seqtype.isQualified()) {
-                seqmem.setQualified(true);
-            }
-            corbaStruct.getMember().add(seqmem);
-            if (!isDuplicate(seqtype)) {
-                typeMappingType.getStructOrExceptionOrUnion().add(seqtype);
-            }
-        } else {
-            LOG.log(Level.WARNING, "Couldnt map Sequence inside extension");
+        MemberType seqmem = new MemberType();
+        seqmem.setName(seqtype.getQName().getLocalPart() + "_f");
+        QName type = createQNameCorbaNamespace(seqtype.getQName().getLocalPart());
+        seqmem.setIdltype(type);
+        seqmem.setAnonschematype(true);
+        if (seqtype.isSetQualified() && seqtype.isQualified()) {
+            seqmem.setQualified(true);
+        }
+        corbaStruct.getMember().add(seqmem);
+        if (!isDuplicate(seqtype)) {
+            typeMappingType.getStructOrExceptionOrUnion().add(seqtype);
         }
 
         return corbaStruct;
@@ -1193,20 +1189,16 @@ public class WSDLToCorbaHelper {
         throws Exception {
 
         CorbaTypeImpl alltype = processAllType(all, defaultName, schematypeName);
-        if (alltype != null) {
-            MemberType allmem = new MemberType();
-            allmem.setName(alltype.getQName().getLocalPart() + "_f");
-            allmem.setIdltype(alltype.getQName());
-            allmem.setAnonschematype(true);
-            if (alltype.isSetQualified() && alltype.isQualified()) {
-                allmem.setQualified(true);
-            }
-            corbaStruct.getMember().add(allmem);
-            if (!isDuplicate(alltype)) {
-                typeMappingType.getStructOrExceptionOrUnion().add(alltype);
-            }
-        } else {
-            LOG.log(Level.WARNING, "Couldnt map All inside extension");
+        MemberType allmem = new MemberType();
+        allmem.setName(alltype.getQName().getLocalPart() + "_f");
+        allmem.setIdltype(alltype.getQName());
+        allmem.setAnonschematype(true);
+        if (alltype.isSetQualified() && alltype.isQualified()) {
+            allmem.setQualified(true);
+        }
+        corbaStruct.getMember().add(allmem);
+        if (!isDuplicate(alltype)) {
+            typeMappingType.getStructOrExceptionOrUnion().add(alltype);
         }
 
         return corbaStruct;
