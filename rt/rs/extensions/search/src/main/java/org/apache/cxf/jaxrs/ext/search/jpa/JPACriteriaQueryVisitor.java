@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -82,7 +83,9 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     private List<Selection<?>> toSelectionsList(List<SingularAttribute<T, ?>> attributes) {
         List<Selection<?>> selections = new ArrayList<Selection<?>>(attributes.size());
         for (SingularAttribute<T, ?> attr : attributes) {
-            selections.add(getRoot().get(attr));
+            Path<?> path = getRoot().get(attr);
+            path.alias(attr.getName());
+            selections.add(path);
         }
         return selections;
     }

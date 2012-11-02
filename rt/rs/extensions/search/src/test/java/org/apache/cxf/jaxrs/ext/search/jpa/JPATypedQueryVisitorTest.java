@@ -64,7 +64,7 @@ public class JPATypedQueryVisitorTest extends Assert {
             fail("Exception during HSQL database init.");
         }
         try {
-            emFactory = Persistence.createEntityManagerFactory("testUnit");
+            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
             em = emFactory.createEntityManager();
          
             em.getTransaction().begin();
@@ -239,6 +239,10 @@ public class JPATypedQueryVisitorTest extends Assert {
     
         
     @Test
+    // "ownerInfo.name" maps to Name class and this 
+    // does not work in OpenJPA, as opposed to Hibernate
+    // "ownerInfo.name.name" will map to primitive type, see
+    // testEqualsOwnerNameQuery3(), which also works in OpenJPA
     public void testEqualsOwnerNameQuery2() throws Exception {
         List<Book> books = queryBooks("ownerInfo.name==Fred");
         assertEquals(1, books.size());

@@ -25,15 +25,13 @@ import javax.persistence.ManyToOne;
 
 @Entity(name = "Book")
 public class Book {
-    @Id
     private int id;
     private String title;
     private OwnerAddress address;
     private OwnerInfo ownerInfo;
-    @ManyToOne
     private Library library;
     
-    
+    @Id
     public int getId() {
         return id;
     }
@@ -67,6 +65,7 @@ public class Book {
         this.ownerInfo = ownerInfo;
     }
 
+    @ManyToOne
     public Library getLibrary() {
         return library;
     }
