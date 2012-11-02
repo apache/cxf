@@ -102,9 +102,9 @@
                             org.apache.cxf.sts.*;version=${project.version}
                         </Export-Package>
                         <Import-Package>
-                            org.apache.cxf.sts.provider.*;version="[2.6,3)",
+                            org.apache.cxf.sts.provider.*;version=${project.version},
                             !org.apache.cxf.sts.*,
-                            org.apache.cxf.*;version="[2.6,3)",
+                            org.apache.cxf.*;version=${project.version},
                             javax.xml.ws*;version="[0.0,3)",
                             org.springframework.ldap*;resolution:=optional,
                             *
