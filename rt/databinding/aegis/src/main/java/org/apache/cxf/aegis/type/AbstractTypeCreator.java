@@ -309,8 +309,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     }
 
     protected QName createMapQName(TypeClassInfo info, AegisType keyType, AegisType valueType) {
-        String name = keyType.getSchemaType().getLocalPart() + '2' + valueType.getSchemaType().getLocalPart()
-                      + "Map";
+        String name = keyType.getSchemaType().getLocalPart() + '2' + valueType.getSchemaType().getLocalPart();
+        
+        
+        Class<?> cls = TypeUtil.getTypeRelatedClass(info.getType());
+        name += cls.getSimpleName();
 
         // TODO: Get namespace from XML?
         return new QName(tm.getMappingIdentifierURI(), name);
