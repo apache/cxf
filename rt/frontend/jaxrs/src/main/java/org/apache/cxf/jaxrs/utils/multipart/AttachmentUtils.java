@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.utils.multipart;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -97,8 +98,7 @@ public final class AttachmentUtils {
                                 attachmentMaxSize).getAllAttachments();
     }
     
-    public static Attachment getMultipart(Class<Object> c, 
-                                          Multipart id, 
+    public static Attachment getMultipart(Multipart id, 
                                           MediaType mt, 
                                           List<Attachment> infos) throws IOException {
         
@@ -124,6 +124,20 @@ public final class AttachmentUtils {
         }
         
         return infos.size() > 0 ? infos.get(0) : null; 
+    }
+    
+    public static List<Attachment> getAllMultiparts(Multipart id, 
+                                              MediaType mt, 
+                                              List<Attachment> infos) throws IOException {
+    
+        List<Attachment> all = new LinkedList<Attachment>();
+        for (Attachment a : infos) {
+            if (matchAttachmentId(a, id, mt)) {
+                checkMediaTypes(a.getContentType(), id.type());
+                all.add(a);    
+            }
+        }
+        return all;
     }
     
     private static boolean matchAttachmentId(Attachment at, Multipart mid, MediaType multipartType) {

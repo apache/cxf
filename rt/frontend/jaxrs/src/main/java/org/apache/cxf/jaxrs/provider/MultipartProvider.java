@@ -136,17 +136,10 @@ public class MultipartProvider extends AbstractConfigurableProvider
         List<Attachment> infos = AttachmentUtils.getAttachments(
                 mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
         
-        if (Collection.class.isAssignableFrom(c) 
+        boolean collectionExpected = Collection.class.isAssignableFrom(c);
+        if (collectionExpected
             && AnnotationUtils.getAnnotation(anns, Multipart.class) == null) {
-            Class<?> actual = getActualType(t, 0);
-            if (Attachment.class.isAssignableFrom(actual)) {
-                return infos;
-            }
-            Collection<Object> objects = new ArrayList<Object>();
-            for (Attachment a : infos) {
-                objects.add(fromAttachment(a, actual, actual, anns));
-            }
-            return objects;
+            return getAttachmentCollection(t, infos, anns);
         }
         if (Map.class.isAssignableFrom(c)) {
             Map<String, Object> map = new LinkedHashMap<String, Object>(infos.size());
@@ -161,10 +154,17 @@ public class MultipartProvider extends AbstractConfigurableProvider
         }
         
         Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
-        Attachment multipart = AttachmentUtils.getMultipart(c, id, mt, infos);
+        Attachment multipart = AttachmentUtils.getMultipart(id, mt, infos);
         if (multipart != null) {
-            return fromAttachment(multipart, c, t, anns);
-        } else if (id != null && !id.required()) {
+            if (collectionExpected && !mediaTypeSupported(multipart.getContentType())) {
+                List<Attachment> allMultiparts = AttachmentUtils.getAllMultiparts(id, mt, infos);
+                return getAttachmentCollection(t, allMultiparts, anns);
+            } else {
+                return fromAttachment(multipart, c, t, anns);
+            }
+        } 
+        
+        if (id != null && !id.required()) {
             /*
              * If user asked for a null, give them a null. 
              */
@@ -173,6 +173,18 @@ public class MultipartProvider extends AbstractConfigurableProvider
         
         throw new WebApplicationException(400);
         
+    }
+    
+    private Object getAttachmentCollection(Type t, List<Attachment> infos, Annotation[] anns) throws IOException {
+        Class<?> actual = getActualType(t, 0);
+        if (Attachment.class.isAssignableFrom(actual)) {
+            return infos;
+        }
+        Collection<Object> objects = new ArrayList<Object>();
+        for (Attachment a : infos) {
+            objects.add(fromAttachment(a, actual, actual, anns));
+        }
+        return objects;
     }
     
     private Class<?> getActualType(Type type, int pos) {
@@ -195,36 +207,24 @@ public class MultipartProvider extends AbstractConfigurableProvider
         } else if (Attachment.class.isAssignableFrom(c)) {
             return multipart;
         } else {
-            boolean isCollection = Collection.class.isAssignableFrom(c);
-            boolean isRecursive = false;
             if (mediaTypeSupported(multipart.getContentType())) {
                 mc.put("org.apache.cxf.multipart.embedded", true);
                 mc.put("org.apache.cxf.multipart.embedded.ctype", multipart.getContentType());
                 mc.put("org.apache.cxf.multipart.embedded.input", 
                        multipart.getDataHandler().getInputStream());
                 anns = new Annotation[]{};
-                isRecursive = true;
             }
-            if (isCollection && !isRecursive) {
-                c = convertTypeToClass(t);
-                return Collections.singletonList(fromAttachment(multipart, c, c, anns));
-            } else {
-                MessageBodyReader<Object> r = 
-                    mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
-                if (r != null) {
-                    InputStream is = multipart.getDataHandler().getInputStream();
-                    is = decodeIfNeeded(multipart, is);
-                    return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), is);
-                }
+            MessageBodyReader<Object> r = 
+                mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
+            if (r != null) {
+                InputStream is = multipart.getDataHandler().getInputStream();
+                is = decodeIfNeeded(multipart, is);
+                return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), is);
             }
         }
         return null;
     }
     
-    @SuppressWarnings("unchecked")
-    private <T> Class<T> convertTypeToClass(Type t) {
-        return (Class<T>)InjectionUtils.getActualType(t, 0);
-    }
     
     private InputStream decodeIfNeeded(Attachment multipart, InputStream is) {
         String value = multipart.getHeader("Content-Transfer-Encoding");
