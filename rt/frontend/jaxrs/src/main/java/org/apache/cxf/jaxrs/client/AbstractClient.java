@@ -617,47 +617,54 @@ public abstract class AbstractClient implements Client, Retryable {
                                                  String paramName, 
                                                  ParameterType pt,
                                                  Object... pValues) {
-        if (pValues == null) {
-            throw new IllegalArgumentException("Null parameters are not supported");
-        }
         if (pt != ParameterType.MATRIX && pt != ParameterType.QUERY) {
             throw new IllegalArgumentException("This method currently deal "
                                                + "with matrix and query parameters only");
         }
         if (!"".equals(paramName)) {
-            for (Object pValue : pValues) {
-                if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
-                    Collection<?> c = pValue.getClass().isArray() 
-                        ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
-                    for (Iterator<?> it = c.iterator(); it.hasNext();) {
-                        addMatrixOrQueryToBuilder(ub, paramName, it.next(), pt);
+            if (pValues != null && pValues.length > 0) {
+                for (Object pValue : pValues) {
+                    if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
+                        Collection<?> c = pValue.getClass().isArray() 
+                            ? Arrays.asList((Object[]) pValue) : (Collection<?>) pValue;
+                        for (Iterator<?> it = c.iterator(); it.hasNext();) {
+                            convertMatrixOrQueryToBuilder(ub, paramName, it.next(), pt);
+                        }
+                    } else { 
+                        convertMatrixOrQueryToBuilder(ub, paramName, pValue, pt); 
                     }
-                } else { 
-                    addMatrixOrQueryToBuilder(ub, paramName, pValue, pt); 
                 }
-            }    
-                    
+            } else {
+                addMatrixOrQueryToBuilder(ub, paramName, pt, pValues);    
+            }
         } else {
             Object pValue = pValues[0];
             MultivaluedMap<String, Object> values = 
                 InjectionUtils.extractValuesFromBean(pValue, "");
             for (Map.Entry<String, List<Object>> entry : values.entrySet()) {
                 for (Object v : entry.getValue()) {
-                    addMatrixOrQueryToBuilder(ub, entry.getKey(), v, pt);
+                    convertMatrixOrQueryToBuilder(ub, entry.getKey(), v, pt);
                 }
             }
         }
     }
 
-    private void addMatrixOrQueryToBuilder(UriBuilder ub, 
+    private void convertMatrixOrQueryToBuilder(UriBuilder ub, 
                                            String paramName, 
                                            Object pValue,
                                            ParameterType pt) {
         Object convertedValue = convertParamValue(pValue);
+        addMatrixOrQueryToBuilder(ub, paramName, pt, convertedValue);
+    }
+    
+    private void addMatrixOrQueryToBuilder(UriBuilder ub, 
+                                           String paramName, 
+                                           ParameterType pt,
+                                           Object... pValue) {
         if (pt == ParameterType.MATRIX) {
-            ub.matrixParam(paramName, convertedValue);
+            ub.matrixParam(paramName, pValue);
         } else {
-            ub.queryParam(paramName, convertedValue);
+            ub.queryParam(paramName, pValue);
         }
     }
     

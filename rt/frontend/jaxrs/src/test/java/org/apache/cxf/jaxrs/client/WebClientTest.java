@@ -97,6 +97,13 @@ public class WebClientTest extends Assert {
     }
     
     @Test 
+    public void testEmptyQuery() {
+        WebClient wc = WebClient.create("http://foo");
+        wc.query("_wadl");
+        assertEquals("http://foo?_wadl", wc.getCurrentURI().toString());
+    }
+    
+    @Test 
     public void testForward() {
         WebClient wc = WebClient.create("http://foo");
         wc.to("http://foo/bar", true);
