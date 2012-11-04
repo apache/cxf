@@ -56,7 +56,7 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
                                    UserSubject userSubject,
                                    ServerAccessToken preAuthorizedToken) {
         ServerAccessToken token = null;
-        if (preAuthorizedToken != null) {
+        if (preAuthorizedToken == null) {
             AccessTokenRegistration reg = new AccessTokenRegistration();
             reg.setClient(client);
             reg.setGrantType(OAuthConstants.IMPLICIT_GRANT);
