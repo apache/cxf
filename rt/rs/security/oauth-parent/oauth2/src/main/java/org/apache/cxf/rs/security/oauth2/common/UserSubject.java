@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class UserSubject {
     
     private String login;
-    private List<String> roles = Collections.emptyList();
+    private List<String> roles = new LinkedList<String>();
     
     public UserSubject() {
         
