@@ -71,9 +71,14 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
    
        // return the code by appending it as a fragment parameter to the redirect URI
         
-        StringBuilder sb = getUriWithFragment(params.getFirst(OAuthConstants.STATE), redirectUri);
+        String state = params.getFirst(OAuthConstants.STATE);
+        StringBuilder sb = getUriWithFragment(state, redirectUri);
+        if (state != null) {
+            sb.append("&");
+        }
         sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
-        sb.append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(token.getTokenType());
+        sb.append("&")
+            .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(token.getTokenType());
         //TODO: token parameters should also be included probably
         //      though it's not obvious the embedded client can deal with
         //      MAC tokens or other sophisticated tokens 
@@ -83,7 +88,11 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String redirectUri,
                                            String error) {
-        StringBuilder sb = getUriWithFragment(params.getFirst(OAuthConstants.STATE), redirectUri);
+        String state = params.getFirst(OAuthConstants.STATE);
+        StringBuilder sb = getUriWithFragment(state, redirectUri);
+        if (state != null) {
+            sb.append("&");
+        }
         sb.append(OAuthConstants.ERROR_KEY).append("=").append(error);
         return Response.seeOther(URI.create(sb.toString())).build();
     }
