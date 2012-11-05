@@ -25,13 +25,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -72,7 +72,7 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             xsr.close();
 
         } catch (XMLStreamException e) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            throw new BadRequestException(e);
         }
 
         return result;
@@ -101,9 +101,9 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             xsw.close();
 
         } catch (XMLStreamException e) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            throw new InternalServerErrorException(e);
         } catch (IOException ioe) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            throw new InternalServerErrorException(ioe);
         }
     }
 }

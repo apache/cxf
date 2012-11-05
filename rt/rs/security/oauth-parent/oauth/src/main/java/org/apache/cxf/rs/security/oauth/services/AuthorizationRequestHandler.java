@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -88,7 +88,7 @@ public class AuthorizationRequestHandler {
                 if (decision != null) {
                     // this is a user decision request, the session has expired or been possibly hijacked
                     LOG.warning("Session authenticity token is missing or invalid");
-                    throw new WebApplicationException(400);
+                    throw new BadRequestException();
                 }
                 // assume it is an initial authorization request
                 addAuthenticityTokenToSession(secData, request);

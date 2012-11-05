@@ -28,7 +28,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
@@ -158,7 +158,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         // to rt/rs/security
         LOG.warning(error);
         Response response = Response.status(401).entity(error).build();
-        throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
+        throw ex != null ? new NotAuthorizedException(ex, response) : new NotAuthorizedException(response);
     }
     
     /**

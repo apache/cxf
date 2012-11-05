@@ -25,6 +25,8 @@ import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -62,7 +64,7 @@ public class DOM4JProvider implements MessageBodyReader<org.dom4j.Document>,
         MessageBodyReader<org.w3c.dom.Document> reader =
             providers.getMessageBodyReader(DOM_DOC_CLS, DOM_DOC_CLS, anns, mt);
         if (reader == null) {
-            throw new WebApplicationException(415);
+            throw new NotSupportedException();
         }
         org.w3c.dom.Document domDoc =
             reader.readFrom(DOM_DOC_CLS, DOM_DOC_CLS, anns, mt, headers, is);
@@ -93,7 +95,7 @@ public class DOM4JProvider implements MessageBodyReader<org.dom4j.Document>,
             MessageBodyWriter<org.w3c.dom.Document> writer =
                 providers.getMessageBodyWriter(DOM_DOC_CLS, DOM_DOC_CLS, anns, mt);
             if (writer == null) {
-                throw new WebApplicationException(406);
+                throw new NotAcceptableException();
             }
             writer.writeTo(domDoc, DOM_DOC_CLS, DOM_DOC_CLS, anns, mt, headers, os);
         }
@@ -104,7 +106,7 @@ public class DOM4JProvider implements MessageBodyReader<org.dom4j.Document>,
         try {
             return DOMUtils.readXml(new StringReader(xml));
         } catch (Exception ex) {
-            throw new javax.ws.rs.WebApplicationException(ex);
+            throw new javax.ws.rs.InternalServerErrorException(ex);
         }
     }
 }

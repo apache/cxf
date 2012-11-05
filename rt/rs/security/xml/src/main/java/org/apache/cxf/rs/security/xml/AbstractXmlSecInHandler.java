@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamReader;
 
@@ -81,7 +81,7 @@ public abstract class AbstractXmlSecInHandler {
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = Response.status(400).entity(error).build();
-        throw ex != null ? new WebApplicationException(ex, response) : new WebApplicationException(response);
+        throw ex != null ? new BadRequestException(response, ex) : new BadRequestException(response);
     }
 
     protected Element getNode(Element parent, String ns, String name, int index) {

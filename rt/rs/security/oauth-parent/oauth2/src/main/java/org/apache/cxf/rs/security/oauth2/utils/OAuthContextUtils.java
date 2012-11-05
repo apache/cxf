@@ -20,7 +20,9 @@ package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.util.List;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -125,7 +127,7 @@ public final class OAuthContextUtils {
     public static OAuthContext getContext(final MessageContext mc) {
         final OAuthContext oauth = mc.getContent(OAuthContext.class);
         if ((oauth == null) || (oauth.getSubject() == null) || (oauth.getSubject().getLogin() == null)) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
+            throw new NotAuthorizedException(Response.status(401).build());
         }
         return oauth;
     }

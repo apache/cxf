@@ -23,7 +23,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -83,7 +83,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                                .build();
                 
             } catch (Exception ex) {
-                throw new WebApplicationException(ex);
+                throw new InternalServerErrorException(ex);
             }
         }
     }
@@ -107,17 +107,17 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         Crypto crypto = getSignatureCrypto();
         if (crypto == null) {
             LOG.fine("No crypto instance of properties file configured for signature");
-            throw new WebApplicationException();
+            throw new InternalServerErrorException();
         }
         String signatureUser = getSignatureUsername();
         if (signatureUser == null) {
             LOG.fine("No user configured for signature");
-            throw new WebApplicationException();
+            throw new InternalServerErrorException();
         }
         CallbackHandler callbackHandler = getCallbackHandler();
         if (callbackHandler == null) {
             LOG.fine("No CallbackHandler configured to supply a password for signature");
-            throw new WebApplicationException();
+            throw new InternalServerErrorException();
         }
         
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);

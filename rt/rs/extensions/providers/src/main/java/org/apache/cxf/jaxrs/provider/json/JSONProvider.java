@@ -38,13 +38,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -248,7 +249,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebApplicationException(e, Response.status(400).build());
+            throw new BadRequestException(e);
         } finally {
             StaxUtils.close(reader);
         }
@@ -320,7 +321,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         
         if (name == null) {
-            throw new WebApplicationException(500);
+            throw new InternalServerErrorException();
         }
         
         return "{\"" + name + "\":";
@@ -371,7 +372,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         } catch (XMLStreamException e) {
             handleXMLStreamException(e, false);
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new InternalServerErrorException(e);
         } finally {
             StaxUtils.close(writer);
         }

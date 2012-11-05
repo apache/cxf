@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -88,7 +88,7 @@ public abstract class AbstractAccessTokenValidator {
     protected AccessTokenValidation getAccessTokenValidation() {
         AccessTokenValidation accessTokenV = null;
         if (dataProvider == null && tokenHandlers.isEmpty()) {
-            throw new WebApplicationException(500);
+            throw new InternalServerErrorException();
         }
         
         // Get the scheme and its data, Bearer only is supported by default

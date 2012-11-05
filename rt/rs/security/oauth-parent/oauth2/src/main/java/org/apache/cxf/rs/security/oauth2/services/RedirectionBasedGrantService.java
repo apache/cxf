@@ -25,12 +25,13 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -194,7 +195,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Make sure the session is valid
         if (!compareRequestAndSessionTokens(params.getFirst(OAuthConstants.SESSION_AUTHENTICITY_TOKEN))) {
-            throw new WebApplicationException(400);     
+            throw new BadRequestException();     
         }
         //TODO: additionally we can check that the Principal that got authenticated
         // in startAuthorization is the same that got authenticated in completeAuthorization
@@ -261,7 +262,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         SecurityContext securityContext =  
             (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
         if (securityContext == null || securityContext.getUserPrincipal() == null) {
-            throw new WebApplicationException(401);
+            throw new NotAuthorizedException(Response.status(401).build());
         }
         checkTransportSecurity();
         return securityContext;

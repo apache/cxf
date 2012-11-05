@@ -31,10 +31,10 @@ import java.util.WeakHashMap;
 import java.util.logging.Handler;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 
@@ -228,7 +228,7 @@ public class AtomPullServer extends AbstractAtomBean {
             list.add(records.get(index));
         }
         if (list.size() != 1) { 
-            throw new WebApplicationException(404);
+            throw new NotFoundException();
         }
         return list;
     }

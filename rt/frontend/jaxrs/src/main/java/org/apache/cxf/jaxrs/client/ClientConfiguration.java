@@ -164,7 +164,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     
     /**
      * Sets the list of in fault interceptors which will deal with the HTTP
-     * faults; the client code may choose to catch {@link ServerWebApplicationException}
+     * faults; the client code may choose to catch {@link WebApplicationException}
      * exceptions instead.
      *  
      * @param interceptors in fault interceptors
@@ -175,7 +175,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
 
     /**
      * Sets the list of out fault interceptors which will deal with the client-side
-     * faults; the client code may choose to catch {@link ClientWebApplicationException}
+     * faults; the client code may choose to catch {@link ClientException}
      * exceptions instead.
      *  
      * @param interceptors out fault interceptors

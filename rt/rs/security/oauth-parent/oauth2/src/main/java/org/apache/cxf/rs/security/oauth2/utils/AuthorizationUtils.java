@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -43,13 +43,13 @@ public final class AuthorizationUtils {
         try {
             authDecoded = new String(Base64Utility.decode(data));
         } catch (Exception ex) {
-            throw new WebApplicationException(401);
+            throw new NotAuthorizedException(ex);
         }
         String authInfo[] = authDecoded.split(":");
         if (authInfo.length == 2) {
             return authInfo;
         }
-        throw new WebApplicationException(401);
+        throw new NotAuthorizedException(Response.status(401).build());
     }
     
     public static String[] getAuthorizationParts(MessageContext mc) {
@@ -86,7 +86,7 @@ public final class AuthorizationUtils {
             rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
         }
         Response r = rb.build();
-        throw new WebApplicationException(r);
+        throw new NotAuthorizedException(r);
     }
 
 }

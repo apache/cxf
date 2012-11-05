@@ -27,9 +27,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -69,7 +70,7 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
             xmlStreamReader = createStreamReader(typeToRead, is);
             return type.cast(aegisReader.read(xmlStreamReader, typeToRead));
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new BadRequestException(e);
         } finally {
             StaxUtils.close(xmlStreamReader);
         }
@@ -114,7 +115,7 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
             xmlStreamWriter.writeEndDocument();
             xmlStreamWriter.close();
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new InternalServerErrorException(e);
         }
     }
     

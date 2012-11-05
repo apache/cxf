@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -56,7 +56,7 @@ public abstract class AbstractAtomProvider<T extends Element>
         if (MediaType.APPLICATION_JSON_TYPE.isCompatible(mt)) {
             Writer w = createWriter("json");
             if (w == null) {
-                throw new WebApplicationException(415);
+                throw new NotSupportedException();
             }
             element.writeTo(w, os);   
         } else if (formattedOutput) {

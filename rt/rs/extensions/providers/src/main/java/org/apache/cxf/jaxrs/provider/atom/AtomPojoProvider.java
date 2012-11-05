@@ -35,8 +35,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -170,7 +173,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
                 atomElement = createEntryFromObject(factory, o, cls);
             }
         } catch (Exception ex) {
-            throw new WebApplicationException(ex);
+            throw new InternalServerErrorException(ex);
         }
         
         try {
@@ -548,9 +551,9 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         LOG.warning(message);
         Response response = Response.status(status).type("text/plain").entity(message).build();
         if (ex == null) {
-            throw new WebApplicationException(response);
+            throw status < 500 ? new ClientErrorException(response) : new ServerErrorException(response);
         } else {
-            throw new WebApplicationException(ex, response);
+            throw status < 500 ? new ClientErrorException(response, ex) : new ServerErrorException(response, ex);
         }
     }
     private void reportError(String message, Exception ex) {

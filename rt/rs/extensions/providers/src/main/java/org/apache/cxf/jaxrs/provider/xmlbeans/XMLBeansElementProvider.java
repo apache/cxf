@@ -27,11 +27,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -40,7 +39,6 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
-
 import org.apache.xmlbeans.XmlObject;
 
 /**
@@ -115,11 +113,11 @@ public class XMLBeansElementProvider extends AbstractConfigurableProvider
             }
 
         } catch (NoSuchMethodException nsme) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            throw new InternalServerErrorException(nsme);
         } catch (InvocationTargetException ite) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            throw new InternalServerErrorException(ite);
         } catch (IllegalAccessException iae) {
-            throw new WebApplicationException(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            throw new InternalServerErrorException(iae);
         }
 
         return result;

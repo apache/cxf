@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -121,7 +121,7 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
             xmlStreamWriter.flush();
             xmlStreamWriter.close();
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new InternalServerErrorException(e);
         }
     }
 

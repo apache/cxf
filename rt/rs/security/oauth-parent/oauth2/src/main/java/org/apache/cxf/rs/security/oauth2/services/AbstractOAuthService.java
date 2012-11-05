@@ -20,7 +20,7 @@ package org.apache.cxf.rs.security.oauth2.services;
 
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -71,7 +71,7 @@ public abstract class AbstractOAuthService {
      * Get the {@link Client} reference
      * @param clientId the provided client id
      * @return Client the client reference 
-     * @throws WebApplicationException if no matching Client is found, 
+     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found, 
      *         the error is returned directly to the end user without 
      *         following the redirect URI if any
      */
@@ -101,7 +101,7 @@ public abstract class AbstractOAuthService {
         if (!mc.getSecurityContext().isSecure()) {
             LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
             if (blockUnsecureRequests) {
-                throw new WebApplicationException(400);    
+                throw new BadRequestException();    
             }
         }
     }
@@ -109,7 +109,7 @@ public abstract class AbstractOAuthService {
     protected void reportInvalidRequestError(String errorDescription) {
         OAuthError error = 
             new OAuthError(OAuthConstants.INVALID_REQUEST, errorDescription);
-        throw new WebApplicationException(
+        throw new BadRequestException(
                   Response.status(400).type(MediaType.APPLICATION_JSON).entity(error).build());
     }
 

@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PreDestroy;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
@@ -282,7 +282,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
             //TODO: Review the possibility of using this filter
             //for validating SAMLResponse too
             reportError("MISSING_ASSERTION_SERVICE_URL");
-            throw new WebApplicationException(500);
+            throw new InternalServerErrorException();
         }
         if (!assertionConsumerServiceAddress.startsWith("http")) {
             String httpBasePath = (String)m.get("http.base.path");
