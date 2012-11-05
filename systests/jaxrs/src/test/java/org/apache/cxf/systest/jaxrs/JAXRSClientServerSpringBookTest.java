@@ -90,13 +90,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     
     @Test
-    public void testGetBookWebEx3() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/thebooks3/bookstore/books/webex"; 
-        doTestGetBookWebEx(address);
-        
-    }
-    
-    @Test
     public void testGetBookWebEx4() throws Exception {
         final String address = "http://localhost:" + PORT + "/the/thebooks3/bookstore/books/webex2"; 
         doTestGetBookWebEx(address);
