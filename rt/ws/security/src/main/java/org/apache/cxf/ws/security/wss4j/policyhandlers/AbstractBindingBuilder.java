@@ -695,10 +695,11 @@ public abstract class AbstractBindingBuilder {
                     // TODO We only support using a KeyIdentifier for the moment
                     SecurityTokenReference secRef = 
                         createSTRForSamlAssertion(doc, assertionWrapper.getId(), saml1, false);
-                    addSupportingElement(secRef.getElement());
+                    Element clone = cloneElement(secRef.getElement());
+                    addSupportingElement(clone);
                     part = new WSEncryptionPart("STRTransform", null, "Element");
                     part.setId(secRef.getID());
-                    part.setElement(secRef.getElement());
+                    part.setElement(clone);
                 }
             } else if (tempTok instanceof WSSecurityTokenHolder) {
                 SecurityToken token = ((WSSecurityTokenHolder)tempTok).getToken();
