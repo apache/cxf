@@ -23,7 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -72,16 +72,16 @@ public class PerRequestResourceProvider implements ResourceProvider {
             return instance;
         } catch (InstantiationException ex) {
             String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated";
-            throw new WebApplicationException(Response.serverError().entity(msg).build());
+            throw new InternalServerErrorException(Response.serverError().entity(msg).build());
         } catch (IllegalAccessException ex) {
             String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated"
                 + " due to IllegalAccessException";
-            throw new WebApplicationException(Response.serverError().entity(msg).build());
+            throw new InternalServerErrorException(Response.serverError().entity(msg).build());
         } catch (InvocationTargetException ex) {
             String msg = "Resource class "
                 + c.getDeclaringClass().getName() + " can not be instantiated"
                 + " due to InvocationTargetException";
-            throw new WebApplicationException(Response.serverError().entity(msg).build());
+            throw new InternalServerErrorException(Response.serverError().entity(msg).build());
         }
         
     }

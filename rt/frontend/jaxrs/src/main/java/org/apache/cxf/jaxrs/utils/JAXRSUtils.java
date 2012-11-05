@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -116,7 +115,6 @@ import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
-import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorContextImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -356,7 +354,7 @@ public final class JAXRSUtils {
             requestType = requestContentType == null
                                 ? ALL_TYPES : MediaType.valueOf(requestContentType);
         } catch (IllegalArgumentException ex) {
-            throw new WebApplicationException(ex, 415);
+            throw new NotSupportedException(ex);
         }
 
         int pathMatched = 0;
@@ -456,7 +454,7 @@ public final class JAXRSUtils {
         }
         Response response = 
             createResponse(resource, message, errorMsg.toString(), status, methodMatched == 0);
-        throw new WebApplicationException(response);
+        throw new ClientErrorException(response);
         
     }    
     
@@ -800,7 +798,7 @@ public final class JAXRSUtils {
                                                                BUNDLE, 
                                                                mt.toString());
                     LOG.warning(errorMsg.toString());
-                    throw new WebApplicationException(415);
+                    throw new NotSupportedException();
                 }
             }
         }
@@ -1348,38 +1346,17 @@ public final class JAXRSUtils {
         return cls == null ? defaultExceptionType : cls;
     }
     
-    @SuppressWarnings("unchecked")
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
-        ProviderFactory factory = ProviderFactory.getInstance(inMessage);
-        ExceptionMapper<T> mapper = factory.createExceptionMapper(ex, inMessage);
+        ExceptionMapper<T>  mapper =
+            ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
-            if (!WebApplicationExceptionMapper.class.isAssignableFrom(mapper.getClass())
-                && WebApplicationException.class.isAssignableFrom(ex.getClass())) {
-                
-                WebApplicationException webEx = (WebApplicationException)ex;
-                Class<?> exceptionClass = getWebApplicationExceptionClass(webEx.getResponse(), 
-                                                                          WebApplicationException.class);
-                if (exceptionClass != WebApplicationException.class) {
-                    try {
-                        Constructor<?> ctr = exceptionClass.getConstructor(Response.class, Throwable.class);
-                        ex = (T)ctr.newInstance(webEx.getResponse(), webEx.getCause());
-                    } catch (Exception ex2) {
-                        ex2.printStackTrace();
-                        return Response.serverError().build();
-                    }
-                }
-            }
-            
             try {
                 return mapper.toResponse(ex);
             } catch (Exception mapperEx) {
                 mapperEx.printStackTrace();
                 return Response.serverError().build();
-            } finally {
-                factory.clearExceptionMapperProxies();
             }
         }
-        
         return null;
         
     }
@@ -1434,7 +1411,7 @@ public final class JAXRSUtils {
                 try {
                     filter.getProvider().filter(context);
                 } catch (IOException ex) {
-                    throw new WebApplicationException(ex);
+                    throw new InternalServerErrorException(ex);
                 }
                 if (m.getExchange().get(Response.class) != null) {
                     return true;

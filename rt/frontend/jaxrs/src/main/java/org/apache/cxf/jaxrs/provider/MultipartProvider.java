@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,7 +39,9 @@ import java.util.logging.Logger;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.internet.MimeUtility;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -172,7 +173,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             return null;
         }
         
-        throw new WebApplicationException(400);
+        throw new BadRequestException();
         
     }
     
@@ -266,7 +267,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     
     private List<Attachment> convertToDataHandlers(Object obj,
                                                    Class<?> type, Type genericType,                          
-                                                   Annotation[] anns, MediaType mt) {
+                                                   Annotation[] anns, MediaType mt)  throws IOException {
         if (Map.class.isAssignableFrom(obj.getClass())) {
             Map<Object, Object> objects = CastUtils.cast((Map<?, ?>)obj);
             List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
@@ -301,7 +302,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         }
     }
     
-    private List<Attachment> getAttachments(List<?> objects, String rootMediaType) {
+    private List<Attachment> getAttachments(List<?> objects, String rootMediaType) throws IOException {
         List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
         for (int i = 0; i < objects.size(); i++) {
             Object value = objects.get(i);
@@ -318,7 +319,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                              Annotation[] anns,
                                              String mimeType,
                                              String mainMediaType,
-                                             int id) {
+                                             int id) throws IOException {
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>)obj.getClass();
         return createDataHandler(obj, cls, genericType, anns, mimeType, mainMediaType, id);
@@ -329,7 +330,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                          Annotation[] anns,
                                          String mimeType,
                                          String mainMediaType,
-                                         int id) {
+                                         int id) throws IOException {
         DataHandler dh = null;
         if (InputStream.class.isAssignableFrom(obj.getClass())) {
             dh = createInputStreamDH((InputStream)obj, mimeType);
@@ -341,11 +342,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             File f = (File)obj;
             ContentDisposition cd = mainMediaType.startsWith(MediaType.MULTIPART_FORM_DATA) 
                 ? new ContentDisposition("form-data;name=file;filename=" + f.getName()) :  null;
-            try {
-                return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
-            } catch (FileNotFoundException ex) {
-                throw new WebApplicationException(ex);
-            }
+            return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
         } else if (Attachment.class.isAssignableFrom(obj.getClass())) {
             Attachment att = (Attachment)obj;
             if (att.getObject() == null) {
@@ -394,7 +391,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                                    BUNDLE,
                                                    cls);
             LOG.severe(message.toString());
-            throw new WebApplicationException(500);
+            throw new InternalServerErrorException();
         }
         
         return new MessageBodyWriterDataHandler<T>(r, obj, cls, genericType, anns, mt);
@@ -459,7 +456,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 writer.writeTo(obj, cls, genericType, anns, contentType, 
                                new MetadataMap<String, Object>(), os);
             } catch (IOException ex) {
-                throw new WebApplicationException();
+                throw new InternalServerErrorException(ex);
             }
         }
         

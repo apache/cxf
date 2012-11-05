@@ -50,6 +50,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
@@ -311,9 +315,9 @@ public final class InjectionUtils {
                 //
                 if (pType == ParameterType.PATH || pType == ParameterType.QUERY
                     || pType == ParameterType.MATRIX) {
-                    throw new WebApplicationException(nfe, Response.Status.NOT_FOUND);
+                    throw new NotFoundException(nfe);
                 }
-                throw new WebApplicationException(nfe, Response.Status.BAD_REQUEST);
+                throw new BadRequestException(nfe);
             }
         }
         
@@ -343,7 +347,7 @@ public final class InjectionUtils {
                 LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                    BUNDLE, 
                                                                    pClass.getName()).toString());
-                throw new WebApplicationException(ex, HttpUtils.getParameterFailureStatus(pType));
+                throw new ServerErrorException(HttpUtils.getParameterFailureStatus(pType), ex);
             }
         }
         if (result == null) {
@@ -414,7 +418,7 @@ public final class InjectionUtils {
         Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                          .type(MediaType.TEXT_PLAIN_TYPE)
                          .entity(errorMessage.toString()).build();
-        throw new WebApplicationException(r);
+        throw new InternalServerErrorException(r);
     }
     
     private static <T> T evaluateFactoryMethod(String value,
@@ -1118,7 +1122,7 @@ public final class InjectionUtils {
             } catch (IllegalAccessException ex) {
                 String msg = "Method " + method.getName() + " can not be invoked"
                     + " due to IllegalAccessException";
-                throw new WebApplicationException(Response.serverError().entity(msg).build());
+                throw new InternalServerErrorException(Response.serverError().entity(msg).build());
             } 
         }
     }

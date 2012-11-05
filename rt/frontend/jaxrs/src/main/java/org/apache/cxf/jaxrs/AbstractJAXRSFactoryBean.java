@@ -28,8 +28,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.NotFoundException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -312,7 +311,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                 new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
                                                        BUNDLE);
             LOG.severe(msg.toString());
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new NotFoundException();
         }
     }
     

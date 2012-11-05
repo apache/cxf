@@ -28,7 +28,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -73,12 +73,12 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             .getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (authHeaders.size() != 1) {
             LOG.fine("No Authorization header is available");
-            throw new WebApplicationException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse());
         }
         String[] authPair = authHeaders.get(0).split(" ");
         if (authPair.length != 2 || !NEGOTIATE_SCHEME.equalsIgnoreCase(authPair[0])) {
             LOG.fine("Negotiate Authorization scheme is expected");
-            throw new WebApplicationException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse());
         }
                 
         byte[] serviceTicket = getServiceTicket(authPair[1]);
@@ -92,7 +92,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             
             GSSName srcName = gssContext.getSrcName();
             if (srcName == null) {
-                throw new WebApplicationException(getFaultResponse());
+                throw new NotAuthorizedException(getFaultResponse());
             }
             
             String complexUserName = srcName.toString();
@@ -114,13 +114,13 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             
         } catch (LoginException e) {
             LOG.fine("Unsuccessful JAAS login for the service principal");
-            throw new WebApplicationException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse());
         } catch (GSSException e) {
             LOG.fine("GSS API exception: " + e.getMessage());
-            throw new WebApplicationException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse());
         } catch (PrivilegedActionException e) {
             LOG.fine("PrivilegedActionException: " + e.getMessage());
-            throw new WebApplicationException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse());
         }
         
         return null;
@@ -163,7 +163,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
         try {
             return Base64Utility.decode(encodedServiceTicket);
         } catch (Base64Exception ex) {
-            throw new WebApplicationException(getFaultResponse());
+            throw new NotAuthorizedException(getFaultResponse());
         }
     }
     

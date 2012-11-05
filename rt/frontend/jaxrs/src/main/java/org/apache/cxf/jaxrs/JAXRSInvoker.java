@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Application;
@@ -94,7 +96,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 } else if (asyncImpl.handleTimeout()) {
                     return null;
                 } else {
-                    return handleFault(new Fault(new WebApplicationException(503)), 
+                    return handleFault(new Fault(new ServiceUnavailableException()), 
                                        exchange.getInMessage(), null, null);
                 }
             }
@@ -233,7 +235,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                                BUNDLE,
                                                                subResourcePath);
                     LOG.severe(errorM.toString());
-                    throw new WebApplicationException(404);
+                    throw new NotFoundException();
                 }
 
                 OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri,
@@ -254,8 +256,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             } catch (IOException ex) {
                 Response resp = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
                 if (resp == null) {
-                    resp = JAXRSUtils.convertFaultToResponse(new WebApplicationException(ex), 
-                                                             exchange.getInMessage());
+                    resp = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
                 }
                 return new MessageContentsList(resp);
             } catch (WebApplicationException ex) {
@@ -372,7 +373,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                        BUNDLE,
                                                        subResourcePath);
             LOG.info(errorM.toString());
-            throw new WebApplicationException(404);
+            throw new NotFoundException();
         }
 
         return result;

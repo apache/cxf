@@ -34,8 +34,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -185,7 +185,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         } catch (Throwable ex) {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
             ex.printStackTrace();
-            throw new WebApplicationException(ex);
+            throw new InternalServerErrorException(ex);
         }
     }
 
@@ -244,7 +244,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                     new org.apache.cxf.common.i18n.Message("RESOURCE_DISPATCH_NOT_FOUND", 
                                                            BUNDLE, servletContextPath).toString();
                 LOG.severe(message);
-                throw new WebApplicationException();
+                throw new InternalServerErrorException();
             }
         }
         return sc; 
@@ -259,7 +259,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 new org.apache.cxf.common.i18n.Message("RESOURCE_PATH_NOT_FOUND", 
                                                        BUNDLE, path).toString();
             LOG.severe(message);
-            throw new WebApplicationException();
+            throw new InternalServerErrorException();
         }
         return rd;
     }

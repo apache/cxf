@@ -37,6 +37,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -203,7 +205,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected void reportEmptyContentLength() {
         String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
         LOG.warning(message);
-        throw new WebApplicationException(400);
+        throw new BadRequestException();
     }
     
     protected <X> X getStreamHandlerFromCurrentMessage(Class<X> staxCls) {
@@ -633,7 +635,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             ? Response.Status.BAD_REQUEST : Response.Status.INTERNAL_SERVER_ERROR; 
         Response r = Response.status(status)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
-        throw new WebApplicationException(t, r);
+        throw read ? new BadRequestException(r, t) : new InternalServerErrorException(r, t);
     }
     
     protected static void handleJAXBException(JAXBException e, boolean read) {
@@ -736,7 +738,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                         ? Integer.valueOf(innerElementCountStr) : -1;
                     return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
                 } catch (Exception ex) {
-                    throw new WebApplicationException(ex);
+                    throw new InternalServerErrorException(ex);
                 }
             }
         }

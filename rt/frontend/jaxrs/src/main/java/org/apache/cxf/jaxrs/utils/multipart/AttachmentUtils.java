@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -116,8 +117,8 @@ public final class AttachmentUtils {
                                                            id.value(),
                                                            mt.toString());
                 LOG.warning(errorMsg.toString());
-                throw new WebApplicationException(
-                          new MultipartReadException(id.value(), id.type(), errorMsg.toString()), 400);
+                throw new BadRequestException(
+                          new MultipartReadException(id.value(), id.type(), errorMsg.toString()));
             } else {
                 return null;
             }
@@ -175,7 +176,7 @@ public final class AttachmentUtils {
     
     private static void checkMediaTypes(MediaType mt1, String mt2) {
         if (!mt1.isCompatible(MediaType.valueOf(mt2))) {                                            
-            throw new WebApplicationException(415);
+            throw new NotSupportedException();
         }
     }
 }

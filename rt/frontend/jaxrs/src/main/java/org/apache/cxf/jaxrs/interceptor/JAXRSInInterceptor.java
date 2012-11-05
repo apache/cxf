@@ -25,6 +25,9 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -143,7 +146,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         try {
             acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
         } catch (IllegalArgumentException ex) {
-            throw new WebApplicationException(406);
+            throw new NotAcceptableException();
         }
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
@@ -161,7 +164,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             LOG.warning(errorMsg.toString());
             Response resp = JAXRSUtils.createResponse(resource, message, errorMsg.toString(), 
                     Response.Status.NOT_FOUND.getStatusCode(), false);
-            throw new WebApplicationException(resp);
+            throw new NotFoundException(resp);
         }
 
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
@@ -226,7 +229,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (IOException ex) {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse == null) {
-                throw new WebApplicationException(ex);
+                throw new InternalServerErrorException(ex);
             } else {
                 message.getExchange().put(Response.class, excResponse);
             }

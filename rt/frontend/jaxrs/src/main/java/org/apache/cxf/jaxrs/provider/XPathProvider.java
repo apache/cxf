@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -83,7 +84,7 @@ public class XPathProvider<T> implements MessageBodyReader<T> {
             : classExpressions.get(cls.getName());
         if (expression == null) {
             // must not happen if isReadable() returned true
-            throw new WebApplicationException(500);
+            throw new InternalServerErrorException();
         }
         XMLSource source = new XMLSource(is);
         return source.getNode(expression, globalNamespaces, cls);

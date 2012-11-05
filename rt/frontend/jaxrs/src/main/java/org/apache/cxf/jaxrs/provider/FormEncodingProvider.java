@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.Produces;
@@ -114,7 +115,7 @@ public class FormEncodingProvider<T> implements
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-            throw new WebApplicationException(e);
+            throw new BadRequestException(e);
         }
     }
 

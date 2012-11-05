@@ -25,7 +25,7 @@ import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -132,7 +132,7 @@ public class Attachment {
                     return mbr.readFrom(cls, cls, new Annotation[]{}, getContentType(), 
                                         headers, getDataHandler().getInputStream());
                 } catch (Exception ex) {
-                    throw new WebApplicationException(ex);
+                    throw new InternalServerErrorException(ex);
                 }
             }
         }

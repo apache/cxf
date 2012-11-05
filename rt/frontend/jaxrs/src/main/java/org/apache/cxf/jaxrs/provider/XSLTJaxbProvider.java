@@ -31,9 +31,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
@@ -175,7 +176,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             return unmarshaller.unmarshal(source);
         } catch (TransformerConfigurationException ex) {
             LOG.warning("Transformation exception : " + ex.getMessage());
-            throw new WebApplicationException(ex);
+            throw new InternalServerErrorException(ex);
         }
     }
     
@@ -190,7 +191,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             writer.close();
             return unmarshalFromInputStream(unmarshaller, out.getInputStream(), mt);
         } catch (Exception ex) {
-            throw new WebApplicationException(ex);
+            throw new BadRequestException(ex);
         }
     }
     
@@ -307,7 +308,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 return null;
             } else {
                 LOG.severe("No template is available");
-                throw new WebApplicationException(500);
+                throw new InternalServerErrorException();
             }
         }
         

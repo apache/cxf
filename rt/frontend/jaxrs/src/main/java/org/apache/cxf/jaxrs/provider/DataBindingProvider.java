@@ -24,9 +24,10 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -72,7 +73,7 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
             Object o = dataReader.read(null, reader, clazz);
             return o == null ? null : clazz.cast(o);
         } catch (Exception ex) {
-            throw new WebApplicationException(ex);
+            throw new BadRequestException(ex);
         } finally {
             StaxUtils.close(reader);
         }
@@ -102,7 +103,7 @@ public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBody
             writer = createWriter(clazz, genericType, os);
             writeToWriter(writer, o);
         } catch (Exception ex) {
-            throw new WebApplicationException(ex);
+            throw new InternalServerErrorException(ex);
         } finally {
             StaxUtils.close(writer);
         }

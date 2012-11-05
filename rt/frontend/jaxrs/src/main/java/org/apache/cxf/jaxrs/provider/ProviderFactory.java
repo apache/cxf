@@ -39,7 +39,6 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.BindingPriority;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -333,40 +332,21 @@ public final class ProviderFactory {
         return null;
     }
     
-    //This method can only be called from providers
     public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(Class<?> exceptionType,
                                                                           Message m) {
-        return createExceptionMapper(null, exceptionType, m);
-    }
-    
-    public <T extends Throwable> ExceptionMapper<T> createExceptionMapper(T ex, 
-                                                                          Message m) {
-        return createExceptionMapper(ex, ex.getClass(), m);
-    }
-    
-    private <T extends Throwable> ExceptionMapper<T> createExceptionMapper(T ex, 
-                                                                           Class<?> exceptionType,
-                                                                           Message m) {
-        
-        ExceptionMapper<T> mapper = doCreateExceptionMapper(ex, exceptionType, m);
+        ExceptionMapper<T> mapper = doCreateExceptionMapper(exceptionType, m);
         if (mapper != null || this == SHARED_FACTORY) {
             return mapper;
         }
         
-        return SHARED_FACTORY.createExceptionMapper(ex, exceptionType, m);
+        return SHARED_FACTORY.createExceptionMapper(exceptionType, m);
     }
     
     @SuppressWarnings("unchecked")
     private <T extends Throwable> ExceptionMapper<T> doCreateExceptionMapper(
-        T exception, Class<?> exceptionType, Message m) {
+        Class<?> exceptionType, Message m) {
         
         List<ExceptionMapper<?>> candidates = new LinkedList<ExceptionMapper<?>>();
-        if (WebApplicationException.class == exceptionType 
-            && exception instanceof WebApplicationException) {
-            exceptionType = 
-                JAXRSUtils.getWebApplicationExceptionClass(((WebApplicationException)exception).getResponse(), 
-                                                           exceptionType);
-        }
         for (ProviderInfo<ExceptionMapper<?>> em : exceptionMappers) {
             handleMapper(candidates, em, exceptionType, m, ExceptionMapper.class, true);
         }

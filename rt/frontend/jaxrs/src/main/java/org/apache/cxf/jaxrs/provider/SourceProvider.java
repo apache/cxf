@@ -26,6 +26,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -165,7 +166,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         try {
             StaxUtils.copy(reader, writer);
         } catch (XMLStreamException e) {
-            throw new WebApplicationException(e);
+            throw new InternalServerErrorException(e);
         } finally {
             try {
                 reader.close();
