@@ -103,10 +103,10 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Predicate buildPredicate(ConditionType ct, String name, Object value) {
 
-        Class<? extends Comparable> clazz = (Class<? extends Comparable>) value
-                        .getClass();
-        
         name = super.getRealPropertyName(name);
+        Class<? extends Comparable> clazz = (Class<? extends Comparable>)
+            getPrimitiveFieldClass(name, value.getClass());
+        
         
         Path<?> path = getPath(root, name);
         

@@ -29,13 +29,14 @@ public abstract class AbstractSearchConditionVisitor <T> implements SearchCondit
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSearchConditionVisitor.class);
     
     private Map<String, String> fieldMap;
+    private Map<String, Class<?>> primitiveFieldTypeMap;
     
     protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
         this.fieldMap = fieldMap;
     }
     
     protected String getRealPropertyName(String name) {
-        if (fieldMap != null) {
+        if (fieldMap != null && !fieldMap.isEmpty()) {
             if (fieldMap.containsKey(name)) {
                 return fieldMap.get(name);
             } else {
@@ -43,5 +44,20 @@ public abstract class AbstractSearchConditionVisitor <T> implements SearchCondit
             }
         }
         return name;
+    }
+
+    protected Class<?> getPrimitiveFieldClass(String name, Class<?> defaultCls) {
+        Class<?> cls = null;
+        if (primitiveFieldTypeMap != null) {
+            cls = primitiveFieldTypeMap.get(name);
+        }
+        if (cls == null) {  
+            cls = defaultCls;
+        }
+        return cls;
+    }
+
+    public void setPrimitiveFieldTypeMap(Map<String, Class<?>> primitiveFieldTypeMap) {
+        this.primitiveFieldTypeMap = primitiveFieldTypeMap;
     }
 }
