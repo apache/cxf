@@ -58,13 +58,17 @@ import org.apache.cxf.service.Service;
  * to handle @OPTIONS,
  * <em>unless</em> that method is annotated as follows:
  * <pre>
- *   @CrossOriginResourceSharing(localPreflight = true)
+ *   @LocalPreflight
  * </pre>
  * or unless the <tt>defaultOptionsMethodsHandlePreflight</tt> property of this class is set to <tt>true</tt>.
  */
 public class CrossOriginResourceSharingFilter implements RequestHandler, ResponseHandler {
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
     private static final Pattern FIELD_COMMA_PATTERN = Pattern.compile(",\\w*");
+    
+    private static final String LOCAL_PREFLIGHT = "local_preflight";
+    private static final String LOCAL_PREFLIGHT_ORIGIN = "local_preflight.origin";
+    private static final String LOCAL_PREFLIGHT_METHOD = "local_preflight.method";
     
     private static final String PREFLIGHT_PASSED = "preflight_passed";
     private static final String PREFLIGHT_FAILED = "preflight_failed";
@@ -159,6 +163,33 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private Response preflightRequest(Message m, CrossOriginResourceSharing corsAnn,
                                       OperationResourceInfo opResInfo, ClassResourceInfo resourceClass) {
 
+        // Validate main CORS preflight properties (origin, method) 
+        // even if Local preflight is requested
+        
+        // 5.2.1 -- must have origin, must have one origin.
+        List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
+        if (headerOriginValues == null || headerOriginValues.size() != 1) {
+            return null;
+        }
+        String origin = headerOriginValues.get(0);
+
+        // 5.2.3 must have access-control-request-method, must be single-valued
+        // we should reject parse errors but we cannot.
+        List<String> requestMethodValues = getHeaderValues(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, false);
+        if (requestMethodValues == null || requestMethodValues.size() != 1) {
+            return createPreflightResponse(m, false);
+        }
+        String requestMethod = requestMethodValues.get(0);
+        
+        /*
+         * Ask JAX-RS runtime to validate that the matching resource method actually exists.
+         */
+        
+        Method method = getPreflightMethod(m, requestMethod);
+        if (method == null) {
+            return null;
+        }
+        
         /*
          * What to do if the resource class indeed has a method annotated with @OPTIONS 
          * that is matched by this request? We go ahead and do this job unless the request
@@ -168,35 +199,12 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         LocalPreflight preflightAnnotation = 
             getAnnotation(opResInfo, LocalPreflight.class);
         if (preflightAnnotation != null || defaultOptionsMethodsHandlePreflight) { 
+            m.put(LOCAL_PREFLIGHT, "true");
+            m.put(LOCAL_PREFLIGHT_ORIGIN, origin);
+            m.put(LOCAL_PREFLIGHT_METHOD, method);
             return null; // let the resource method take all responsibility.
         }
         
-        List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
-        String origin;
-        // 5.2.1 -- must have origin, must have one origin.
-        if (headerOriginValues == null || headerOriginValues.size() != 1) {
-            return null;
-        }
-        origin = headerOriginValues.get(0);
-
-        List<String> requestMethodValues = getHeaderValues(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, false);
-
-        // 5.2.3 must have access-control-request-method, must be single-valued
-        // we should reject parse errors but we cannot.
-        if (requestMethodValues == null || requestMethodValues.size() != 1) {
-            return createPreflightResponse(m, false);
-        }
-        String requestMethod = requestMethodValues.get(0);
-        /*
-         * CORS doesn't send enough information with a preflight to accurately identity the single method
-         * that will handle the request. We ask the JAX-RS runtime to find the matching method which is
-         * expected to have a CrossOriginResourceSharing annotation set.
-         */
-        
-        Method method = getPreflightMethod(m, requestMethod);
-        if (method == null) {
-            return null;
-        }
         CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
         ann = ann == null ? corsAnn : ann;
         
