@@ -21,15 +21,17 @@ package org.apache.cxf.jaxrs.ext.search.jpa;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity(name = "Book")
 public class Book {
-    @Id
     private int id;
     private String title;
     private OwnerAddress address;
     private OwnerInfo ownerInfo;
+    private Library library;
     
+    @Id
     public int getId() {
         return id;
     }
@@ -61,5 +63,14 @@ public class Book {
 
     public void setOwnerInfo(OwnerInfo ownerInfo) {
         this.ownerInfo = ownerInfo;
+    }
+
+    @ManyToOne
+    public Library getLibrary() {
+        return library;
+    }
+
+    public void setLibrary(Library library) {
+        this.library = library;
     }
 }

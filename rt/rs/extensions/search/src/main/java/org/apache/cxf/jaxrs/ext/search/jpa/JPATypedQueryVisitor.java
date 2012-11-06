@@ -34,7 +34,7 @@ public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, 
     }
     
     public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery(getCriteriaQuery());
+        return getTypedQuery();
     }
-     
+        
 }

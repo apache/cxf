@@ -26,11 +26,10 @@ import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 
 public final class SearchUtils {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    //public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public static final String DATE_FORMAT_PROPERTY = "search.date-format";
     public static final String TIMEZONE_SUPPORT_PROPERTY = "search.timezone.support";
     public static final String LAX_PROPERTY_MATCH = "search.lax.property.match";
-    public static final String BEAN_PROPERTY_MAP = "search.lax.property.match";
+    public static final String BEAN_PROPERTY_MAP = "search.bean.property.map";
     
     private SearchUtils() {
         

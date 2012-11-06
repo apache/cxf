@@ -286,27 +286,26 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             Object castedValue = value;
             if (Date.class.isAssignableFrom(valueType)) {
                 castedValue = convertToDate(value);
-            } else {
+            } else if (ownerBean == null || valueType.isPrimitive()) {
                 try {
                     castedValue = InjectionUtils.convertStringToPrimitive(value, valueType);
                 } catch (Exception e) {
-                    boolean throwEx = true;
-                    if (!valueType.isPrimitive()) {
-                        try {
-                            Method setterM = valueType.getMethod("set" + getMethodNameSuffix(setter),
-                                                                 new Class[]{String.class});
-                            setterM.invoke(ownerBean, new Object[]{value});
-                            castedValue = lastCastedValue;
-                            throwEx = false;
-                        } catch (Throwable ex) {
-                            // continue
-                        }
-                    }
-                    if (throwEx) {
-                        throw new SearchParseException("Cannot convert String value \"" + value
+                    throw new SearchParseException("Cannot convert String value \"" + value
                                                  + "\" to a value of class " + valueType.getName(), e);
-                    }
                 }
+            } else {
+                try {
+                    Method setterM = valueType.getMethod("set" + getMethodNameSuffix(setter),
+                                                         new Class[]{String.class});
+                    setterM.invoke(ownerBean, new Object[]{value});
+                } catch (Throwable ex) {
+                    throw new SearchParseException("Cannot convert String value \"" + value
+                                                   + "\" to a value of class " + valueType.getName(), ex);
+                }
+                
+            }
+            if (lastCastedValue != null) {
+                castedValue = lastCastedValue;
             }
             return castedValue;
         } else {
