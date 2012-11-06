@@ -53,6 +53,8 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
                                     <wsdl>${basedir}/wsdl/soap_header.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
