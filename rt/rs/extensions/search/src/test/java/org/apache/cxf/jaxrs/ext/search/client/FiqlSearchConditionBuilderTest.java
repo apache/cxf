@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.ext.search.client;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,18 +29,16 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class FiqlSearchConditionBuilderTest {
+public class FiqlSearchConditionBuilderTest extends Assert {
     private static FiqlSearchConditionBuilder b = new FiqlSearchConditionBuilder();
     private static TimeZone tz;
-    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
     
     @BeforeClass
     public static void beforeClass() {
@@ -73,11 +70,15 @@ public class FiqlSearchConditionBuilderTest {
         assertEquals("foo==123.5", ret);
     }
 
+    private Date parseDate(String format, String value) throws ParseException {
+        return new SimpleDateFormat(format).parse(value);
+    }
+    
     @Test
-    public void testEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-01 12:34 +0000");
+    public void testEqualToDateDefault() throws ParseException {
+        Date d = parseDate(SearchUtils.DEFAULT_DATE_FORMAT, "2011-03-01");
         String ret = b.is("foo").equalTo(d).query();
-        assertEquals("foo==2011-03-01T12:34:00.000+00:00", ret);
+        assertEquals("foo==2011-03-01", ret);
     }
     
     @Test
@@ -87,7 +88,7 @@ public class FiqlSearchConditionBuilderTest {
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
         
-        Date d = df.parse("2011-03-01 12:34 +0000");
+        Date d = parseDate("yyyy-MM-dd HH:mm Z", "2011-03-01 12:34 +0000");
         
         FiqlSearchConditionBuilder bCustom = new FiqlSearchConditionBuilder(props);
         
@@ -115,10 +116,10 @@ public class FiqlSearchConditionBuilderTest {
     }
 
     @Test
-    public void testNotEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-01 12:34 +0000");
+    public void testNotEqualToDateDefault() throws ParseException {
+        Date d = parseDate(SearchUtils.DEFAULT_DATE_FORMAT, "2011-03-01");
         String ret = b.is("foo").notEqualTo(d).query();
-        assertEquals("foo!=2011-03-01T12:34:00.000+00:00", ret);
+        assertEquals("foo!=2011-03-01", ret);
     }
 
     @Test
@@ -196,30 +197,30 @@ public class FiqlSearchConditionBuilderTest {
 
     @Test
     public void testGreaterThanDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33 +0000");
+        Date d = parseDate(SearchUtils.DEFAULT_DATE_FORMAT, "2011-03-02");
         String ret = b.is("foo").after(d).query();
-        assertEquals("foo=gt=2011-03-02T22:33:00.000+00:00", ret);
+        assertEquals("foo=gt=2011-03-02", ret);
     }
 
     @Test
     public void testLessThanDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33 +0000");
+        Date d = parseDate(SearchUtils.DEFAULT_DATE_FORMAT, "2011-03-02");
         String ret = b.is("foo").before(d).query();
-        assertEquals("foo=lt=2011-03-02T22:33:00.000+00:00", ret);
+        assertEquals("foo=lt=2011-03-02", ret);
     }
 
     @Test
     public void testLessOrEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33 +0000");
+        Date d = parseDate(SearchUtils.DEFAULT_DATE_FORMAT, "2011-03-02");
         String ret = b.is("foo").notAfter(d).query();
-        assertEquals("foo=le=2011-03-02T22:33:00.000+00:00", ret);
+        assertEquals("foo=le=2011-03-02", ret);
     }
 
     @Test
     public void testGreaterOrEqualToDate() throws ParseException {
-        Date d = df.parse("2011-03-02 22:33 +0000");
+        Date d = parseDate(SearchUtils.DEFAULT_DATE_FORMAT, "2011-03-02");
         String ret = b.is("foo").notBefore(d).query();
-        assertEquals("foo=ge=2011-03-02T22:33:00.000+00:00", ret);
+        assertEquals("foo=ge=2011-03-02", ret);
     }
 
     @Test

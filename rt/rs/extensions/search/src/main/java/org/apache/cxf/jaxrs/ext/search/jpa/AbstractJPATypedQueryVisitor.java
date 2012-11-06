@@ -36,25 +36,45 @@ import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
-public abstract class AbstractJPATypedQueryVisitor<T, E> 
+public abstract class AbstractJPATypedQueryVisitor<T, T1, E> 
     extends AbstractSearchConditionVisitor<T, E> {
 
     private EntityManager em;
     private Class<T> tClass;
+    private Class<T1> queryClass;
     private Root<T> root;
     private CriteriaBuilder builder;
-    private CriteriaQuery<T> cq;
+    private CriteriaQuery<T1> cq;
     private Stack<List<Predicate>> predStack = new Stack<List<Predicate>>();
     private boolean criteriaFinalized;
     
-    public AbstractJPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
+    protected AbstractJPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
+        this(em, tClass, null, null);
     }
     
-    public AbstractJPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
+    protected AbstractJPATypedQueryVisitor(EntityManager em, Class<T> tClass, Class<T1> queryClass) {
+        this(em, tClass, queryClass, null);
+    }
+    
+    protected AbstractJPATypedQueryVisitor(EntityManager em, 
+                                        Class<T> tClass, 
+                                        Map<String, String> fieldMap) {
+        this(em, tClass, null, fieldMap);
+    }
+    
+    protected AbstractJPATypedQueryVisitor(EntityManager em, 
+                                        Class<T> tClass, 
+                                        Class<T1> queryClass,
+                                        Map<String, String> fieldMap) {
         super(fieldMap);
         this.em = em;
         this.tClass = tClass;
+        this.queryClass = toQueryClass(queryClass, tClass);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static <E> Class<E> toQueryClass(Class<E> queryClass, Class<?> tClass) {
+        return queryClass != null ? queryClass : (Class<E>)tClass;
     }
     
     protected EntityManager getEntityManager() {
@@ -64,7 +84,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, E>
     public void visit(SearchCondition<T> sc) {
         if (builder == null) {
             builder = em.getCriteriaBuilder();
-            cq = builder.createQuery(tClass);
+            cq = builder.createQuery(queryClass);
             root = cq.from(tClass);
             predStack.push(new ArrayList<Predicate>());
         }
@@ -92,7 +112,19 @@ public abstract class AbstractJPATypedQueryVisitor<T, E>
         }
     }
 
-    public CriteriaQuery<T> getCriteriaQuery() {
+    protected CriteriaBuilder getCriteriaBuilder() {
+        return builder;
+    }
+    
+    protected Class<T1> getQueryClass() {
+        return queryClass;
+    }
+    
+    public Root<T> getRoot() {
+        return root;
+    }
+    
+    public CriteriaQuery<T1> getCriteriaQuery() {
         if (!criteriaFinalized) {
             List<Predicate> predsList = predStack.pop();
             cq.where(predsList.toArray(new Predicate[predsList.size()]));
@@ -106,11 +138,15 @@ public abstract class AbstractJPATypedQueryVisitor<T, E>
     private Predicate buildPredicate(ConditionType ct, String name, Object value) {
 
         name = super.getRealPropertyName(name);
-        Class<? extends Comparable> clazz = (Class<? extends Comparable>)
-            getPrimitiveFieldClass(name, value.getClass());
+        ClassValue cv = getPrimitiveFieldClass(name, value.getClass(), value); 
         
+        Class<? extends Comparable> clazz = (Class<? extends Comparable>)cv.getCls();
+        value = cv.getValue();    
         
         Path<?> path = getPath(root, name);
+        if (tClass != queryClass) {
+            path.alias(name);
+        }
         
         Predicate pred = null;
         switch (ct) {
@@ -119,7 +155,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, E>
             break;
         case EQUALS:
             if (clazz.equals(String.class)) {
-                String theValue = (String)value;
+                String theValue = value.toString();
                 if (theValue.contains("*")) {
                     theValue = ((String)value).replaceAll("\\*", "");
                 }

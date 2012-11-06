@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -25,8 +26,9 @@ import javax.persistence.Id;
 public class Book {
     @Id
     private int id;
-    private String name;
-    
+    private String title;
+    private OwnerAddress address;
+    private OwnerInfo ownerInfo;
     
     public int getId() {
         return id;
@@ -36,11 +38,28 @@ public class Book {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
+    }
+
+    @Embedded
+    public OwnerAddress getAddress() {
+        return address;
+    }
+
+    public void setAddress(OwnerAddress address) {
+        this.address = address;
+    }
+
+    public OwnerInfo getOwnerInfo() {
+        return ownerInfo;
+    }
+
+    public void setOwnerInfo(OwnerInfo ownerInfo) {
+        this.ownerInfo = ownerInfo;
     }
 }

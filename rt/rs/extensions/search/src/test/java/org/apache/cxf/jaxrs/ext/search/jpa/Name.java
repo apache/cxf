@@ -18,23 +18,28 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import java.util.Map;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+@Embeddable
+public class Name {
 
-public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
-
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
+    private String name;
+    
+    public Name() {
+        
+    }
+    Name(String name) {
+        this.name = name;
     }
     
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
-        super(em, tClass, fieldMap);
+    @Column(name = "thename")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
     
-    public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery(getCriteriaQuery());
-    }
-     
 }

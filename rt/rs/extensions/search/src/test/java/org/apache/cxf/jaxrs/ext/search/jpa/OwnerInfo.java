@@ -18,23 +18,39 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import java.util.Map;
+import java.util.Date;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 
-public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
+@Embeddable
+public class OwnerInfo {
 
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
+    private Name name;
+    private Date dateOfBirth;
+
+    public OwnerInfo() {
+        
     }
     
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
-        super(em, tClass, fieldMap);
+    public OwnerInfo(Name name) {
+        this.name = name;
     }
     
-    public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery(getCriteriaQuery());
+    @Embedded
+    public Name getName() {
+        return name;
     }
-     
+
+    public void setName(Name name) {
+        this.name = name;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
 }

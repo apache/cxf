@@ -16,25 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search.jpa;
+package org.apache.cxf.jaxrs.ext.search;
 
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-
-public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
-
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
+public class PropertyNotFoundException extends SearchParseException {
+    private static final long serialVersionUID = -3262559013167020058L;
+    private String name;
+    private String value;
+    public PropertyNotFoundException(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getValue() {
+        return value;
     }
     
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
-        super(em, tClass, fieldMap);
-    }
-    
-    public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery(getCriteriaQuery());
-    }
-     
+
 }

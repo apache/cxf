@@ -18,23 +18,36 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import java.util.Map;
+import javax.persistence.Embeddable;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+@Embeddable
+public class OwnerAddress {
 
-public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
+    private String street;
+    private int houseNumber;
 
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
+
+    public OwnerAddress() {
+        
     }
     
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
-        super(em, tClass, fieldMap);
+    public OwnerAddress(String street) {
+        this.street = street;
     }
     
-    public TypedQuery<T> getQuery() {
-        return getEntityManager().createQuery(getCriteriaQuery());
+    public String getStreet() {
+        return street;
     }
-     
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public int getHouseNumber() {
+        return houseNumber;
+    }
+
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
+    }
 }

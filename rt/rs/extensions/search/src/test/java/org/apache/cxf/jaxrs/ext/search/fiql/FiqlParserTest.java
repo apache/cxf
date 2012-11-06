@@ -147,7 +147,7 @@ public class FiqlParserTest extends Assert {
     @Test
     public void testParseDateWithDefaultFormat() throws SearchParseException, ParseException {
         SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00.000+00:00");
-        DateFormat df = new SimpleDateFormat(FiqlParser.DEFAULT_DATE_FORMAT);
+        DateFormat df = new SimpleDateFormat(SearchUtils.DEFAULT_DATE_FORMAT);
         assertTrue(filter.isMet(new Condition("whatever", 15, df.parse("2010-03-11T18:00:00.000+0000"))));
         assertTrue(filter.isMet(new Condition(null, null, df.parse("2010-03-10T22:22:00.000+0000"))));
         assertFalse(filter.isMet(new Condition("blah", null, df.parse("2010-03-12T00:00:00.000+0000"))));
