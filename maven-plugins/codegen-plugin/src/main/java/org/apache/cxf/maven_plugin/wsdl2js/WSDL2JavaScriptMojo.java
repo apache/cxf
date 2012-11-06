@@ -136,7 +136,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         }
 
         try {
-            doneFile.createNewFile();
+            createMarkerFile(wsdlOption, doneFile, wsdlURI);
         } catch (Throwable e) {
             getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
             getLog().debug(e);

@@ -19,7 +19,11 @@
 
 package org.apache.cxf.maven_plugin.wsdl2java;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -238,8 +242,41 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                 }
             }
         }
+        if (!doWork) {
+            URI basedir = project.getBasedir().toURI();
+            String options = wsdlOption.generateCommandLine(null, basedir, wsdlURI, false).toString();
+            DataInputStream reader = null;
+            try {
+                reader = new DataInputStream(new FileInputStream(doneFile));
+                String s = reader.readUTF();
+                if (!options.equals(s)) {
+                    doWork = true;
+                }
+            } catch (Exception ex) {
+                //ignore
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+            }
+        }
         return doWork;
     }
+    
+    protected void createMarkerFile(GenericWsdlOption wsdlOption, File doneFile, URI wsdlURI) throws IOException {
+        doneFile.createNewFile();
+        URI basedir = project.getBasedir().toURI();
+        String options = wsdlOption.generateCommandLine(null, basedir, wsdlURI, false).toString();
+        DataOutputStream writer = new DataOutputStream(new FileOutputStream(doneFile));
+        writer.writeUTF(options);
+        writer.flush();
+        writer.close();
+    }
+    
 
     /**
      * Finds the timestamp for a given URI. Calls {@link #getBaseFileURI(URI)} prior to the timestamp
@@ -407,7 +444,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
 
         try {
-            doneFile.createNewFile();
+            createMarkerFile(wsdlOption, doneFile, wsdlURI);
             buildContext.refresh(doneFile);
         } catch (Throwable e) {
             getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
