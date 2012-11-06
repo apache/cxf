@@ -62,12 +62,10 @@
 						<configuration>
 							<wsdlOptions>
 								<wsdlOption>
-									<wsdl>${basedir}/wsdl/hello_world.wsdl
-									</wsdl>
-									<extraargs>
-										<extraarg>-db</extraarg>
-										<extraarg>xmlbeans</extraarg>
-									</extraargs>
+									<wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
+									<dataBinding>xmlbeans</dataBinding>
+									<frontEnd>jaxws21</frontEnd>
+									<faultSerialVersionUID>1</faultSerialVersionUID>
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
@@ -155,7 +153,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.0.6.RELEASE</version>
         </dependency>
     </dependencies>
 </project>

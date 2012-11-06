@@ -22,11 +22,11 @@ package demo.hw.server;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringServer {
-
+    ClassPathXmlApplicationContext context;
+    
     protected SpringServer() throws Exception {
         System.out.println("Starting Server");
-        ClassPathXmlApplicationContext context 
-            = new ClassPathXmlApplicationContext(new String[] {"/demo/hw/server/server-beans.xml"});
+        context = new ClassPathXmlApplicationContext(new String[] {"/demo/hw/server/server-beans.xml"});
     }
 
     public static void main(String args[]) throws Exception {
