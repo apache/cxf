@@ -53,6 +53,8 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
                                     <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
