@@ -54,31 +54,14 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/wsdl/hello_world_addr_policy.wsdl</wsdl>
+									<frontEnd>jaxws21</frontEnd>
+									<faultSerialVersionUID>1</faultSerialVersionUID>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/main/java/demo/ws_policy/client/client.xml" todir="${basedir}/target/classes/demo/ws_policy/client" />
-                                <copy file="${basedir}/src/main/java/demo/ws_policy/server/server.xml" todir="${basedir}/target/classes/demo/ws_policy/server" />
-                                <copy file="${basedir}/addr-external.xml" todir="${basedir}/target/classes/" />
-                            </tasks>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
