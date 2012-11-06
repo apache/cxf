@@ -54,6 +54,8 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
                                     <wsdl>${wsdl.location}</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
