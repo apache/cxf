@@ -90,6 +90,8 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>src/main/resources/CustomerService.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
                                     <bindingFiles>
                                         <bindingFile>src/main/resources/binding.xml</bindingFile>
                                     </bindingFiles>
