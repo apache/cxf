@@ -33,6 +33,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
@@ -51,6 +52,11 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
     private boolean useUserSubject;
     
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+        
+        if (isCorsRequest(m)) {
+            return null;
+        }
+        
         // Get the access token
         AccessTokenValidation accessTokenV = getAccessTokenValidation(); 
         
@@ -149,5 +155,14 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         };
     }
     
+    protected boolean isCorsRequest(Message m) {
+        //Redirection-based flows (Implicit Grant Flow specifically) may have 
+        //the browser issuing CORS preflight OPTIONS request. 
+        //org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter can be
+        //used to handle preflights but local preflights (to be handled by the service code)
+        // will be blocked by this filter unless CORS filter has done the initial validation
+        // and set a message "local_preflight" property to true
+        return MessageUtils.isTrue(m.get("local_preflight"));
+    }
     
 }
