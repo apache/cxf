@@ -465,7 +465,7 @@ public class AtomPullServer extends AbstractAtomBean {
             return null;
         }
 
-        public void accept(SearchConditionVisitor<LogRecord> visitor) {
+        public void accept(SearchConditionVisitor<LogRecord, ?> visitor) {
         }
     }
     

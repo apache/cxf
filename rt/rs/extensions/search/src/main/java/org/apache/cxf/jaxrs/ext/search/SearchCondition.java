@@ -90,6 +90,6 @@ public interface SearchCondition<T> {
      * a custom expression, for example, into the SQL statement, etc 
      * @param visitor
      */
-    void accept(SearchConditionVisitor<T> visitor);
+    void accept(SearchConditionVisitor<T, ?> visitor);
     
 }

@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -37,7 +36,8 @@ import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
-public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T, TypedQuery<T>> {
+public abstract class AbstractJPATypedQueryVisitor<T, E> 
+    extends AbstractSearchConditionVisitor<T, E> {
 
     private EntityManager em;
     private Class<T> tClass;
@@ -47,14 +47,18 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T, T
     private Stack<List<Predicate>> predStack = new Stack<List<Predicate>>();
     private boolean criteriaFinalized;
     
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
+    public AbstractJPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
         this(em, tClass, null);
     }
     
-    public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
+    public AbstractJPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
         super(fieldMap);
         this.em = em;
         this.tClass = tClass;
+    }
+    
+    protected EntityManager getEntityManager() {
+        return em;
     }
     
     public void visit(SearchCondition<T> sc) {
@@ -76,7 +80,8 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T, T
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }
-            Predicate[] preds = predStack.pop().toArray(new Predicate[0]);
+            List<Predicate> predsList = predStack.pop();
+            Predicate[] preds = predsList.toArray(new Predicate[predsList.size()]);
             Predicate newPred;
             if (sc instanceof OrSearchCondition) {
                 newPred = builder.or(preds);
@@ -87,13 +92,10 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T, T
         }
     }
 
-    public TypedQuery<T> getQuery() {
-        return em.createQuery(getCriteriaQuery());
-    }
-    
     public CriteriaQuery<T> getCriteriaQuery() {
         if (!criteriaFinalized) {
-            cq.where(predStack.pop().toArray(new Predicate[0]));
+            List<Predicate> predsList = predStack.pop();
+            cq.where(predsList.toArray(new Predicate[predsList.size()]));
             criteriaFinalized = true;
         }
         return cq;

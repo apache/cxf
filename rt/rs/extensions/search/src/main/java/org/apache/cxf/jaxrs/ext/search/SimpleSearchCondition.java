@@ -290,7 +290,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    public void accept(SearchConditionVisitor<T> visitor) {
+    public void accept(SearchConditionVisitor<T, ?> visitor) {
         visitor.visit(this);
     }
     
