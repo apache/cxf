@@ -52,7 +52,9 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/hello_world_soap12.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/hello_world_soap12.wsdl</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -82,7 +84,7 @@
                                 <configuration>
                                     <mainClass>demo.hw.server.Server</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world_soap12.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/wsdl/hello_world_soap12.wsdl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -108,7 +110,7 @@
                                 <configuration>
                                     <mainClass>demo.hw.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world_soap12.wsdl</argument>
+                                        <argument>${basedir}/src/main/resources/wsdl/hello_world_soap12.wsdl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
