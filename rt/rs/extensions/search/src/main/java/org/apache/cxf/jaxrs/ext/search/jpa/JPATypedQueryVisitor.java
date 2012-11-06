@@ -117,8 +117,11 @@ public class JPATypedQueryVisitor<T> extends AbstractSearchConditionVisitor<T> {
             break;
         case EQUALS:
             if (clazz.equals(String.class)) {
-                pred = builder.like(path.as(String.class), "%"
-                                    + (String) value + "%");
+                String theValue = (String)value;
+                if (theValue.contains("*")) {
+                    theValue = ((String)value).replaceAll("\\*", "");
+                }
+                pred = builder.like(path.as(String.class), "%" + theValue + "%");
             } else {
                 pred = builder.equal(path.as(clazz), clazz.cast(value));
             }
