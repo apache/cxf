@@ -61,11 +61,12 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
                 busses = Collections.emptyList();
             }
         }
+        System.out.println(String.format(HEADER_FORMAT, 
+                                         "Name", "State", "Address", "BusID"));
         for (Bus b : busses) {
             ServerRegistry reg = b.getExtension(ServerRegistry.class);
             List<Server> servers = reg.getServers();
-            System.out.println(String.format(HEADER_FORMAT, 
-                                             "Name", "State", "Address", "BusID"));
+            
             for (Server serv : servers) {
                 String qname = serv.getEndpoint().getEndpointInfo().getName().getLocalPart();
                 String started = serv.isStarted() ? "Started" : "Stopped";
