@@ -76,7 +76,7 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
         if (useDataSourceContentType) {    
             setContentTypeIfNeeded(type, headers, ds.getContentType());
         }
-        IOUtils.copy(ds.getInputStream(), os);
+        IOUtils.copyAndCloseInput(ds.getInputStream(), os);
     }
     
     private void setContentTypeIfNeeded(MediaType type, 
