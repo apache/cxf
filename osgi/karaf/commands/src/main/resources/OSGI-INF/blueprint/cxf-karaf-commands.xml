@@ -40,9 +40,10 @@
         </command>
     </command-bundle>
 
-
+    <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"  />
     <bean id="cxfController" class="org.apache.cxf.karaf.commands.internal.CXFControllerImpl">
         <property name="bundleContext" ref="blueprintBundleContext"/>
+        <property name="configAdmin" ref="configAdmin"/>
     </bean>
 
 </blueprint>
