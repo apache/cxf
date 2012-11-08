@@ -22,6 +22,7 @@ package org.apache.cxf.karaf.commands;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
  * 
@@ -31,5 +32,7 @@ public interface CXFController {
     List<Bus> getBusses();
 
     Bus getBus(String name);
+    
+    ConfigurationAdmin getConfigAdmin();
 
 }

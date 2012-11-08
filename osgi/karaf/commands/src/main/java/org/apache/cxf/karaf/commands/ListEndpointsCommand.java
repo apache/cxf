@@ -19,15 +19,22 @@
 
 package org.apache.cxf.karaf.commands;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
+import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
  * 
@@ -42,6 +49,10 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
         description = "The CXF bus name where to look for the Endpoints", 
         required = false, multiValued = false)
     String name;
+    
+    @Option(name = "-f", aliases = {"--fulladdress" }, 
+        description = "Display full address of an endpoint ", required = false, multiValued = false)
+    boolean fullAddress;
     
     private CXFController cxfController;
 
@@ -71,10 +82,83 @@ public class ListEndpointsCommand extends OsgiCommandSupport {
                 String qname = serv.getEndpoint().getEndpointInfo().getName().getLocalPart();
                 String started = serv.isStarted() ? "Started" : "Stopped";
                 String address = serv.getEndpoint().getEndpointInfo().getAddress();
+                if (fullAddress) {
+                    address = toFullAddress(address);
+                }
                 String busId = b.getId();
                 System.out.println(String.format(OUTPUT_FORMAT, qname, started, address, busId));
             }
         }
         return null;
-    } 
+    }
+    
+    private String toFullAddress(String address) throws IOException, InvalidSyntaxException {
+        ConfigurationAdmin configAdmin = getConfigurationAdmin();
+        if (address.startsWith("/") && configAdmin != null) {
+            String httpPort = null;
+            String cxfContext = null;
+            httpPort = extractConfigProperty(configAdmin, "org.ops4j.pax.web", "org.osgi.service.http.port");
+            cxfContext = extractConfigProperty(configAdmin, "org.apache.cxf.osgi", "org.apache.cxf.servlet.context");
+            if (StringUtils.isEmpty(cxfContext)) {
+                cxfContext = getCXFOSGiServletContext();
+            }
+            if (StringUtils.isEmpty(httpPort)) {
+                httpPort = getHttpOSGiServicePort();
+            }
+            if (!StringUtils.isEmpty(httpPort) && !StringUtils.isEmpty(cxfContext)) {
+                address = "http://localhost:" + httpPort + cxfContext + address;
+            }
+        }
+        return address;
+    }
+
+    private String extractConfigProperty(ConfigurationAdmin configAdmin, 
+                                         String pid, String propertyName) throws IOException,
+        InvalidSyntaxException {
+        String ret = null;
+        Configuration[] configs = configAdmin.listConfigurations("(service.pid=" + pid + ")");
+        if (configs != null && configs.length > 0) {
+            Configuration configuration = configs[0];
+            if (configuration != null) {
+                ret = (String)configuration.getProperties().get(propertyName);
+            }
+        }
+        return ret;
+    }
+
+    private ConfigurationAdmin getConfigurationAdmin() {
+        return cxfController.getConfigAdmin();
+    }
+    
+    private String getCXFOSGiServletContext() throws InvalidSyntaxException {
+        String ret = null;
+        String filter = "(&(" + "objectclass=" + "javax.servlet.Servlet" 
+            + ")(servlet-name=cxf-osgi-transport-servlet))";
+
+        ServiceReference ref = getBundleContext().getServiceReferences(null, filter)[0];
+        
+        if (ref != null) {
+            ret = (String)ref.getProperty("alias");
+        } 
+        
+        return ret;
+        
+    }
+    
+    private String getHttpOSGiServicePort() throws InvalidSyntaxException {
+        String ret = null;
+        String filter = "(&(" + "objectclass=" + "org.osgi.service.http.HttpService" 
+            + "))";
+
+        ServiceReference ref = getBundleContext().getServiceReferences(null, filter)[0];
+        
+        if (ref != null) {
+            ret = (String)ref.getProperty("org.osgi.service.http.port");
+        } 
+        
+        return ret;
+        
+    }
+
+
 }

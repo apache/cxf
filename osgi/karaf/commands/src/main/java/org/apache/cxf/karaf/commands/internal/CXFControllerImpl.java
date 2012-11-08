@@ -30,6 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.karaf.commands.CXFController;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 
 /**
@@ -38,6 +39,7 @@ public class CXFControllerImpl implements CXFController {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFControllerImpl.class);
 
     private BundleContext bundleContext;
+    private ConfigurationAdmin configAdmin;
 
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -80,6 +82,14 @@ public class CXFControllerImpl implements CXFController {
         }
         LOG.log(Level.INFO, "Cannot retrieve the CXF Bus " + name + ".");
         return null;
+    }
+
+    public ConfigurationAdmin getConfigAdmin() {
+        return configAdmin;
+    }
+
+    public void setConfigAdmin(ConfigurationAdmin configAdmin) {
+        this.configAdmin = configAdmin;
     }
 
 
