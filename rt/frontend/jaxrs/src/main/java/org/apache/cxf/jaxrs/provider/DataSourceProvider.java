@@ -75,7 +75,7 @@ public class DataSourceProvider implements MessageBodyReader, MessageBodyWriter 
         if (useDataSourceContentType) {    
             setContentTypeIfNeeded(type, headers, ds.getContentType());
         }
-        IOUtils.copy(ds.getInputStream(), os);
+        IOUtils.copyAndCloseInput(ds.getInputStream(), os);
     }
     
     @SuppressWarnings("unchecked")
