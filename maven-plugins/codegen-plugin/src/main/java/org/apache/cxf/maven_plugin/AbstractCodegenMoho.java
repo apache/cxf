@@ -434,7 +434,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             URI wsdlURI = getWsdlURI(wsdlOption, basedir);
             File doneFile = getDoneFile(basedir, wsdlURI, getMarkerSuffix());
             try {
-                doneFile.createNewFile();
+                createMarkerFile(wsdlOption, doneFile, wsdlURI);
             } catch (Throwable e) {
                 getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
                 getLog().debug(e);
@@ -570,6 +570,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     protected abstract boolean shouldRun(GenericWsdlOption wsdlOption, File doneFile, URI wsdlURI);
 
+    protected void createMarkerFile(GenericWsdlOption wsdlOption, File doneFile, URI wsdlURI) throws IOException {
+        doneFile.createNewFile();
+    }
    
     private String[] createForkOnceArgs(List<List<String>> wargs) throws MojoExecutionException {
         try {
