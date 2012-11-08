@@ -144,15 +144,15 @@ public class OASISCatalogManager {
         Enumeration<URL> catalogs = classLoader.getResources(name);
         while (catalogs.hasMoreElements()) {
             URL catalogURL = catalogs.nextElement();
-            if (!loadedCatalogs.contains(URI.create(catalogURL.toString()))) {
+            if (!loadedCatalogs.contains(URI.create(replaceWhitespace(catalogURL.toString())))) {
                 ((Catalog)catalog).parseCatalog(catalogURL);
-                loadedCatalogs.add(URI.create(catalogURL.toString()));
+                loadedCatalogs.add(URI.create(replaceWhitespace(catalogURL.toString())));
             }
         }
     }
 
     public final void loadCatalog(URL catalogURL) throws IOException {
-        if (!loadedCatalogs.contains(URI.create(catalogURL.toString())) && catalog != null) {
+        if (!loadedCatalogs.contains(URI.create(replaceWhitespace(catalogURL.toString()))) && catalog != null) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {
                     File file = new File(catalogURL.toURI());
@@ -166,8 +166,15 @@ public class OASISCatalogManager {
 
             ((Catalog)catalog).parseCatalog(catalogURL);
 
-            loadedCatalogs.add(URI.create(catalogURL.toString()));
+            loadedCatalogs.add(URI.create(replaceWhitespace(catalogURL.toString())));
         }
+    }
+    
+    private String replaceWhitespace(String str) {
+        if (str.contains(" ")) {
+            str = str.replace(" ", "%20");
+        }
+        return str;
     }
 
     private static OASISCatalogManager getContextCatalog() {
