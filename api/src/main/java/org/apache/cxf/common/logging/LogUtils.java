@@ -237,22 +237,23 @@ public final class LogUtils {
         if (n != null) {
             Thread.currentThread().setContextClassLoader(n);
         }
+        String bundleName = name;
         try {
             Logger logger = null;
             ResourceBundle b = null;
-            if (name == null) {
+            if (bundleName == null) {
                 //grab the bundle prior to the call to Logger.getLogger(...) so the 
                 //ResourceBundle can be loaded outside the big sync block that getLogger really is
-                name = BundleUtils.getBundleName(cls);
+                bundleName = BundleUtils.getBundleName(cls);
                 try {
                     b = BundleUtils.getBundle(cls);
                 } catch (MissingResourceException rex) {
                     //ignore
                 }
             } else {
-                name = BundleUtils.getBundleName(cls, name);
+                bundleName = BundleUtils.getBundleName(cls, bundleName);
                 try {
-                    b = BundleUtils.getBundle(cls, name);
+                    b = BundleUtils.getBundle(cls, bundleName);
                 } catch (MissingResourceException rex) {
                     //ignore
                 }
@@ -266,7 +267,7 @@ public final class LogUtils {
                     Constructor<?> cns = loggerClass.getConstructor(String.class, String.class);
                     if (name == null) {
                         try {
-                            return (Logger) cns.newInstance(loggerName, BundleUtils.getBundleName(cls));
+                            return (Logger) cns.newInstance(loggerName, bundleName);
                         } catch (InvocationTargetException ite) {
                             if (ite.getTargetException() instanceof MissingResourceException) {
                                 return (Logger) cns.newInstance(loggerName, null);
@@ -276,7 +277,7 @@ public final class LogUtils {
                         } 
                     } else {
                         try {
-                            return (Logger) cns.newInstance(loggerName, BundleUtils.getBundleName(cls, name));
+                            return (Logger) cns.newInstance(loggerName, bundleName);
                         } catch (InvocationTargetException ite) {
                             if (ite.getTargetException() instanceof MissingResourceException) {
                                 throw (MissingResourceException)ite.getTargetException();
@@ -291,7 +292,7 @@ public final class LogUtils {
             }
                 
             try {
-                logger = Logger.getLogger(loggerName, name); //NOPMD
+                logger = Logger.getLogger(loggerName, bundleName); //NOPMD
             } catch (IllegalArgumentException iae) {
                 //likely a mismatch on the bundle name, just return the default
                 logger = Logger.getLogger(loggerName); //NOPMD
