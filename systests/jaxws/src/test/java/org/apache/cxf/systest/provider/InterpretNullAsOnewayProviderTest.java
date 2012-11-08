@@ -52,18 +52,18 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
             NullProviderService servant1 = new NullProviderService();
             Endpoint ep1 = Endpoint.publish(ADDRESS1, servant1);
             assertNotNull("endpoint published", ep1);
+            ep1.getProperties().put("jaxws.provider.interpretNullAsOneway", Boolean.FALSE);
             
             // endpoint interpreting null as oneway
             NullProviderService servant2 = new NullProviderService();
             Endpoint ep2 = Endpoint.publish(ADDRESS2, servant2);
             assertNotNull("endpoint published", ep2);
-            ep2.getProperties().put("jaxws.provider.interpretNullAsOneway", Boolean.TRUE);
+            ep2.getProperties().put("jaxws.provider.interpretNullAsOneway", "false");            
 
             // endpoint interpreting null as oneway
             NullProviderService servant3 = new NullProviderService();
             Endpoint ep3 = Endpoint.publish(ADDRESS3, servant3);
-            assertNotNull("endpoint published", ep3);
-            ep3.getProperties().put("jaxws.provider.interpretNullAsOneway", "true");
+            assertNotNull("endpoint published", ep3);            
         }
     
         public static void main(String[] args) throws Exception { 
@@ -100,13 +100,13 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
     }
     
     @Test
-    public void testInterpretNullAsOneway() throws Exception {
+    public void testNotInterpretNullAsOneway2() throws Exception {
         HttpURLConnection conn = postRequest(ADDRESS2);
-        assertEquals("http 202 must be returned", 202, conn.getResponseCode());
+        assertTrue("Soap fault must be returned", 400 <= conn.getResponseCode());
     }
 
     @Test
-    public void testInterpretNullAsOneway2() throws Exception {
+    public void testInterpretNullAsOneway() throws Exception {
         HttpURLConnection conn = postRequest(ADDRESS3);
         assertEquals("http 202 must be returned", 202, conn.getResponseCode());
     }

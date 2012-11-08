@@ -108,24 +108,35 @@ public class JAXWSMethodInvokerTest extends Assert {
             ex, new MessageContentsList(new Object[]{new StreamSource()}));
         assertNull(obj);
         assertTrue(ex.isOneWay());
+        
+        // request-response with null response, interpretNullAsOneway not set so 
+        // default should be true
+        ex.setOneWay(false);
+        serviceObject.setNullable(true);
+        obj = (MessageContentsList)jaxwsMethodInvoker.invoke(
+            ex, new MessageContentsList(new Object[]{new StreamSource()}));
+        assertNull(obj);
+        assertTrue(ex.isOneWay());
 
         // request-response with null response, interpretNullAsOneway disabled
         ex.setOneWay(false);
         serviceObject.setNullable(true);
+        inMessage.setContextualProperty("jaxws.provider.interpretNullAsOneway", Boolean.FALSE);
         obj = (MessageContentsList)jaxwsMethodInvoker.invoke(
             ex, new MessageContentsList(new Object[]{new StreamSource()}));
         assertEquals(1, obj.size());
         assertNull(obj.get(0));
         assertFalse(ex.isOneWay());
 
-        // request-response with null response, interpretNullAsOneway enabled
+        
+        // request-response with null response, interpretNullAsOneway explicitly enabled
         ex.setOneWay(false);
         serviceObject.setNullable(true);
         inMessage.setContextualProperty("jaxws.provider.interpretNullAsOneway", Boolean.TRUE);
-        obj = (MessageContentsList)jaxwsMethodInvoker.invoke(
-            ex, new MessageContentsList(new Object[]{new StreamSource()}));
+        obj = (MessageContentsList)jaxwsMethodInvoker
+            .invoke(ex, new MessageContentsList(new Object[]{new StreamSource()}));
         assertNull(obj);
-        assertTrue(ex.isOneWay());
+        assertTrue(ex.isOneWay());        
     }
 
     private JAXWSMethodInvoker prepareJAXWSMethodInvoker(Exchange ex, Object serviceObject,
