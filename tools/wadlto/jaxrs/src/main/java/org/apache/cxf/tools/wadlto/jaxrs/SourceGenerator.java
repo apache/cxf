@@ -413,11 +413,13 @@ public class SourceGenerator {
             if (path.length() > 0) {
                 path = path.replaceAll("[\\{\\}_]*", "");
                 String[] split = path.split("/");
+                StringBuilder builder = new StringBuilder(resourceId);
                 for (int i = 0; i < split.length; i++) {
                     if (split[i].length() > 0) {
-                        resourceId += split[i].toUpperCase().charAt(0) + split[i].substring(1);
+                        builder.append(split[i].toUpperCase().charAt(0) + split[i].substring(1));
                     }
                 }
+                resourceId = builder.toString();
             }
             resourceId += DEFAULT_RESOURCE_NAME;    
         }
@@ -1208,19 +1210,19 @@ public class SourceGenerator {
         if (repElements.size() > 1) {
             sbCode.append("{");
         }
-        String mediaTypes = "";
         boolean first = true;
+        StringBuilder mediaTypes = new StringBuilder("");
         for (int i = 0; i < repElements.size(); i++) {
             String mediaType = repElements.get(i).getAttribute("mediaType");
-            if (mediaType != null && !mediaTypes.contains(mediaType)) {
+            if (mediaType != null && (mediaTypes.indexOf(mediaType) < 0)) {
                 if (!first) { 
-                    mediaTypes += ", ";
+                    mediaTypes.append(", ");
                 }
                 first = false;
-                mediaTypes += "\"" + mediaType + "\"";
+                mediaTypes.append("\"" + mediaType + "\"");
             }
         }
-        sbCode.append(mediaTypes);
+        sbCode.append(mediaTypes.toString());
         if (repElements.size() > 1) {
             sbCode.append(" }");
         }

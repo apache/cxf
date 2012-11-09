@@ -101,20 +101,22 @@ public class ServiceProcessor extends AbstractProcessor {
         }
 
     }
-    private String mapName(String packageName, String name) {
-        while (isNameCollision(packageName, name)) {
-            name = name + "_Service";
+    private String mapName(String packageName, final String name) {
+        StringBuilder builder = new StringBuilder(name);
+        while (isNameCollision(packageName, builder.toString())) {
+            builder.append("_Service");
         }
+        String newName = builder.toString();
         ClassCollector collector = context.get(ClassCollector.class);
-        if (collector.isReserved(packageName, name)) {
+        if (collector.isReserved(packageName, newName)) {
             int count = 0;
-            String checkName = name;
+            String checkName = newName;
             while (collector.isReserved(packageName, checkName)) {
-                checkName = name + (++count);
+                checkName = newName + (++count);
             }
-            name = checkName;
+            newName = checkName;
         }
-        return name;
+        return newName;
     }
 
     private boolean isNameCollision(String packageName, String className) {

@@ -175,7 +175,7 @@ public class UriInfoImpl implements UriInfo {
         if (stack != null) {
             List<String> objects = new ArrayList<String>();
             List<String> uris = new LinkedList<String>();
-            String sum = "";
+            StringBuilder sum = new StringBuilder("");
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
                 URITemplate[] paths = {
@@ -185,10 +185,10 @@ public class UriInfoImpl implements UriInfo {
                 for (URITemplate t : paths) {
                     if (t != null) {
                         String v = t.getValue();
-                        sum += "/" + (decode ? HttpUtils.pathDecode(v) : v);
+                        sum.append("/" + (decode ? HttpUtils.pathDecode(v) : v));
                     }
                 }
-                UriBuilder ub = UriBuilder.fromPath(sum);
+                UriBuilder ub = UriBuilder.fromPath(sum.toString());
                 objects.addAll(invocation.getTemplateValues());
                 uris.add(0, ub.build(objects.toArray()).normalize().getPath());
             }

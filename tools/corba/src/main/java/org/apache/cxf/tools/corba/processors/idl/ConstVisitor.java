@@ -63,18 +63,22 @@ public class ConstVisitor extends VisitorBase {
         AST constNameNode = TypesUtils.getCorbaTypeNameNode(constTypeNode);
         AST constValueNode = constNameNode.getNextSibling();
         // build value string
-        String constValue = constValueNode.toString();
+        StringBuilder constValue = new StringBuilder();
+        if (constValueNode.toString() != null) {
+            constValue.append(constValueNode.toString());
+        }
         constValueNode = constValueNode.getFirstChild();
-        if (constValue != null && constValue.length() == 1) {
+        if (constValue.length() == 1) {
             // might be a control char
             byte ch = (byte)constValue.charAt(0);
             if (ch >= 0 && ch <= 31) {
                 // ascii code between 0 and 31 is invisible control code
-                constValue = "\\" + Integer.toOctalString(ch);
+                constValue.deleteCharAt(0);
+                constValue.append("\\" + Integer.toOctalString(ch));
             }
         }
         while (constValueNode != null) {
-            constValue = constValue + constValueNode.toString();
+            constValue.append(constValueNode.toString());
             constValueNode = constValueNode.getFirstChild();
         }
         
@@ -103,7 +107,7 @@ public class ConstVisitor extends VisitorBase {
         // corba:const        
         Const corbaConst = new Const();
         corbaConst.setQName(constQName);
-        corbaConst.setValue(constValue);        
+        corbaConst.setValue(constValue.toString());        
         corbaConst.setType(constSchemaType.getQName());
         corbaConst.setIdltype(constCorbaType.getQName());        
         

@@ -244,10 +244,12 @@ public class WSDLToCorbaBinding {
             setBindingName(bname);
             bqname = new QName(definition.getTargetNamespace(), bname, prefix);
             int count = 0;
+            StringBuilder builder = new StringBuilder(bname);
             while (WSDLToCorbaHelper.queryBinding(definition, bqname)) {
-                bname = bname + count;
-                bqname = new QName(definition.getTargetNamespace(), bname, prefix);
+                builder.append(count);
+                bqname = new QName(definition.getTargetNamespace(), builder.toString(), prefix);
             }
+            bname = builder.toString();
         } else {
             bqname = new QName(definition.getTargetNamespace(), bname, prefix);
             // Check if the Binding with name already exists

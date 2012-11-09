@@ -102,20 +102,21 @@ public class SoapTcpOutputStream extends AbstractThresholdOutputStream {
     private int openChannel(final String targetWsURI, final List<String> supportedMimeTypes,
                             final List<String> supportedParams) throws IOException {
         
-        String openChannelMsg = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+        String initialMessage = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<s:Body><openChannel xmlns=\"http://servicechannel.tcp.transport.ws.xml.sun.com/\""
             + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
             + " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">";
-        openChannelMsg += "<targetWSURI xmlns=\"\">" + targetWsURI + "</targetWSURI>";
+        StringBuilder openChannelMsg = new StringBuilder(initialMessage);
+        openChannelMsg.append("<targetWSURI xmlns=\"\">" + targetWsURI + "</targetWSURI>");
         
         for (String mimeType : supportedMimeTypes) {
-            openChannelMsg += "<negotiatedMimeTypes xmlns=\"\">" + mimeType + "</negotiatedMimeTypes>";
+            openChannelMsg.append("<negotiatedMimeTypes xmlns=\"\">" + mimeType + "</negotiatedMimeTypes>");
         }
         for (String param : supportedParams) {
-            openChannelMsg += "<negotiatedParams xmlns=\"\">" + param + "</negotiatedParams>";
+            openChannelMsg.append("<negotiatedParams xmlns=\"\">" + param + "</negotiatedParams>");
         }
 
-        openChannelMsg += "</openChannel></s:Body></s:Envelope>";
+        openChannelMsg.append("</openChannel></s:Body></s:Envelope>");
         
         SoapTcpFrameContentDescription contentDesc = new SoapTcpFrameContentDescription();
         contentDesc.setContentId(0);
@@ -131,7 +132,7 @@ public class SoapTcpOutputStream extends AbstractThresholdOutputStream {
         frame.setHeader(header);
         frame.setChannelId(0);
         try {
-            frame.setPayload(openChannelMsg.getBytes("UTF-8"));
+            frame.setPayload(openChannelMsg.toString().getBytes("UTF-8"));
             SoapTcpUtils.writeMessageFrame(outStream, frame);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

@@ -45,8 +45,13 @@ public class JMSEndpoint extends JMSEndpointType {
     }
 
     public String getRequestURI() {
-        String requestUri = "jms:" + (jmsVariant == JMSURIConstants.JNDI_TOPIC ? "jndi" : jmsVariant)
-            + ":" + destinationName;
+        StringBuilder requestUri = new StringBuilder("jms:");
+        if (jmsVariant == JMSURIConstants.JNDI_TOPIC) {
+            requestUri.append("jndi");
+        } else {
+            requestUri.append(jmsVariant);
+        }
+        requestUri.append(":" + destinationName);
         boolean first = true;
         for (String key : parameters.keySet()) {
             // now we just skip the MESSAGE_TYPE_PARAMETER_NAME 
@@ -57,13 +62,13 @@ public class JMSEndpoint extends JMSEndpointType {
             }
             String value = parameters.get(key);
             if (first) {
-                requestUri += "?" + key + "=" + value;
+                requestUri.append("?" + key + "=" + value);
                 first = false;
             } else {
-                requestUri += "&" + key + "=" + value;
+                requestUri.append("&" + key + "=" + value);
             }
         }
-        return requestUri;
+        return requestUri.toString();
     }
 
     /**

@@ -411,22 +411,22 @@ public class JAXBDataBinding implements DataBindingProfile {
                 opts.addGrammar(new InputSource("null"));
                 opts.parseArguments(args.toArray(new String[args.size()]));
             } catch (BadCommandLineException e) {
-                String msg = "XJC reported 'BadCommandLineException' for -xjc argument:";
+                StringBuilder msg = new StringBuilder("XJC reported 'BadCommandLineException' for -xjc argument:");
                 for (String arg : args) {
-                    msg = msg + arg + " ";
+                    msg.append(arg + " ");
                 }
-                LOG.log(Level.FINE, msg, e);
+                LOG.log(Level.FINE, msg.toString(), e);
                 if (opts != null) {
                     String pluginUsage = getPluginUsageString(opts);
-                    msg = msg + System.getProperty("line.separator");
+                    msg.append(System.getProperty("line.separator"));
                     if (args.contains("-X")) {
-                        msg = pluginUsage;
+                        throw new ToolException(pluginUsage, e);
                     } else {
-                        msg += pluginUsage;
+                        msg.append(pluginUsage);
                     }
                 }
 
-                throw new ToolException(msg, e);
+                throw new ToolException(msg.toString(), e);
             }
         }
         

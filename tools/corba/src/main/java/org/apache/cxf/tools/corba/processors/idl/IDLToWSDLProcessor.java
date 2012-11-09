@@ -437,12 +437,12 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             if (!isDefaultMapping && !serviceNames.containsKey(ns)) {
                 String[] bindingTokens = bindings[i].getQName().getLocalPart().split("\\.");
                 if (bindingTokens.length > 1) {
-                    String name = "";
+                    StringBuilder name = new StringBuilder("");
                     for (int j = 0; j < bindingTokens.length - 2; j++) {
-                        name += bindingTokens[j] + ".";
+                        name.append(bindingTokens[j] + ".");
                     }
-                    name += bindingTokens[bindingTokens.length - 2] + "CORBAService";
-                    serviceNames.put(ns, name);
+                    name.append(bindingTokens[bindingTokens.length - 2] + "CORBAService");
+                    serviceNames.put(ns, name.toString());
                 } else {
                     serviceNames.put(ns, idl + "CORBAService");
                 }

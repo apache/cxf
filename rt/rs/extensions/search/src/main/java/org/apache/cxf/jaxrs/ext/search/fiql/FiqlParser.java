@@ -412,15 +412,16 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         @Override
         public String toString() {
             String s = operator.equals(AND) ? "AND" : "OR";
-            s += ":[";
+            StringBuilder builder = new StringBuilder(s);
+            builder.append(":[");
             for (int i = 0; i < subnodes.size(); i++) {
-                s += subnodes.get(i);
+                builder.append(subnodes.get(i));
                 if (i < subnodes.size() - 1) {
-                    s += ", ";
+                    builder.append(", ");
                 }
             }
-            s += "]";
-            return s;
+            builder.append("]");
+            return builder.toString();
         }
 
         public SearchCondition<T> build() throws SearchParseException {

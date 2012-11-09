@@ -232,13 +232,13 @@ public class PortTypeVisitor extends VisitorBase {
 
     
     public Binding createBinding(String scopedPortTypeName) {
-        String bname = scopedPortTypeName + "CORBABinding";
+        StringBuilder bname = new StringBuilder(scopedPortTypeName + "CORBABinding");
         QName bqname = new QName(rootDefinition.getTargetNamespace(),
-                                 bname);
+                                 bname.toString());
         int count = 0;
         while (queryBinding(bqname)) {
-            bname = bname + count;
-            bqname = new QName(rootDefinition.getTargetNamespace(), bname);
+            bname.append(count);
+            bqname = new QName(rootDefinition.getTargetNamespace(), bname.toString());
         }
         Binding binding = rootDefinition.createBinding();
         binding.setPortType(portType);

@@ -450,17 +450,17 @@ public class WSDLToIDLAction {
         }
         
         IdlScopeBase scope = root;
-        String dotScopedName = "";
+        StringBuilder dotScopedName = new StringBuilder("");
 
         for (int i = 0; i < name.length - 1; ++i) {
-            dotScopedName += name[i];
+            dotScopedName.append(name[i]);
 
             // If we have the name CORBA, we need to make sure we are not handling the CORBA.Object
             // name which is used for object references.  If so, we don't want to generate a module
             // since it is not a type we need to define in our IDL.  This only happens when the 
             // name is "CORBA", we have a name array of length 2 and we are at the beginning of the
             // name array.
-            if ("CORBA".equals(dotScopedName)
+            if ("CORBA".equals(dotScopedName.toString())
                 && name.length == 2 && i == 0
                 && name[1].equals("Object")) {
                 break;
@@ -474,7 +474,7 @@ public class WSDLToIDLAction {
                 // For example if type is a.b.c and we are about to create
                 // module b,look to see if a.b
                 // is an interface that needs to be processed
-                QName qname = new QName(corbaTypeImpl.getType().getNamespaceURI(), dotScopedName);
+                QName qname = new QName(corbaTypeImpl.getType().getNamespaceURI(), dotScopedName.toString());
 
                 // Check to see if CORBAType exists. If so, create type for it
                 // otherwise
@@ -491,7 +491,7 @@ public class WSDLToIDLAction {
                 }
             }
 
-            dotScopedName += ".";
+            dotScopedName.append(".");
             scope = (IdlScopeBase)idlDef;
         }
 
