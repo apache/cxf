@@ -102,7 +102,10 @@ public class ServiceProcessor extends AbstractProcessor {
 
     }
     private String mapName(String packageName, final String name) {
-        StringBuilder builder = new StringBuilder(name);
+        StringBuilder builder = new StringBuilder();
+        if (name != null) {
+            builder.append(name);
+        }
         while (isNameCollision(packageName, builder.toString())) {
             builder.append("_Service");
         }
