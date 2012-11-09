@@ -20,6 +20,7 @@ package org.apache.cxf.jaxws;
 
 
 import java.lang.reflect.Method;
+import java.util.TreeSet;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -32,6 +33,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.MethodDispatcher;
@@ -88,6 +91,7 @@ public class JAXWSMethodInvokerTest extends Assert {
         
         Exchange ex = new ExchangeImpl();
         Message inMessage = new MessageImpl();
+        inMessage.setInterceptorChain(new PhaseInterceptorChain(new TreeSet<Phase>()));
         ex.setInMessage(inMessage);
         inMessage.setExchange(ex);
         inMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
