@@ -20,6 +20,7 @@
 package org.apache.cxf.aegis.type;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -53,6 +54,7 @@ import javax.xml.namespace.QName;
 public class TypeClassInfo {
     // The general reflection Type.
     private Type type;
+    private Map<String, Type> typeVars;
     private Object[] annotations;
 
     // for collection types we pull out the parameters for convenience.
@@ -109,6 +111,14 @@ public class TypeClassInfo {
 
     public void setType(Type type) {
         this.type = type;
+    }
+    
+    public void setType(Type tp, Map<String, Type> vars) {
+        this.type = tp;
+        this.typeVars = vars;
+    }
+    public Map<String, Type> getTypeVars() {
+        return typeVars;
     }
 
     public QName getTypeName() {
