@@ -26,6 +26,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -106,6 +107,7 @@ public class BookContinuationStore {
     private class TimeoutHandlerImpl implements TimeoutHandler {
 
         private String id;
+        private AtomicInteger timeoutExtendedCounter = new AtomicInteger();
         
         public TimeoutHandlerImpl(String id) {
             this.id = id;
@@ -113,7 +115,11 @@ public class BookContinuationStore {
         
         @Override
         public void handleTimeout(AsyncResponse asyncResponse) {
-            asyncResponse.resume(books.get(id));
+            if (timeoutExtendedCounter.addAndGet(1) < 2) {
+                asyncResponse.setTimeout(1, TimeUnit.SECONDS);
+            } else {
+                asyncResponse.resume(books.get(id));
+            }
         }
         
     }

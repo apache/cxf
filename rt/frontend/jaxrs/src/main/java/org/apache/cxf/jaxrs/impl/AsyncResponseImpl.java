@@ -124,7 +124,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         checkCancelled();
         checkSuspended();
         inMessage.getExchange().put(AsyncResponse.class, this);
-        timeout = unit.convert(time, TimeUnit.MILLISECONDS);
+        timeout = TimeUnit.MILLISECONDS.convert(time, unit);
         newTimeoutRequested = true;
         cont.resume();
     }
