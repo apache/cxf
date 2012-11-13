@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -39,8 +41,11 @@ import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.util.ServiceUtils;
+import org.apache.cxf.common.logging.LogUtils;
 
 public class Java5TypeCreator extends AbstractTypeCreator {
+    private static final Logger LOG = LogUtils.getL7dLogger(Java5TypeCreator.class);
+    
     private AnnotationReader annotationReader;
 
     public Java5TypeCreator() {
@@ -167,6 +172,17 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             paramType = getComponentType(generic.getType(), index);
         }
 
+        if (paramType instanceof WildcardType) {
+            WildcardType wct = (WildcardType)paramType;
+            paramType = wct.getUpperBounds()[0];
+        }
+        if (paramType instanceof TypeVariable) {
+            TypeVariable<?> v = (TypeVariable<?>)paramType;
+            LOG.log(Level.WARNING,
+                    "Could not map TypeVariable named {0} from {1} with initial mapping {2} to "
+                    + "a known class.  Using Object.",
+                    new Object[] {v.getName(), generic.getType().toString(), generic.getTypeVars()});
+        }
         if (paramType == null) {
             return createObjectType();
         }

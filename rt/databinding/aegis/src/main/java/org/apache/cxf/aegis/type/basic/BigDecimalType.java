@@ -19,6 +19,9 @@
 package org.apache.cxf.aegis.type.basic;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.type.AegisType;
@@ -44,6 +47,26 @@ public class BigDecimalType extends AegisType {
 
     @Override
     public void writeObject(final Object object, final MessageWriter writer, final Context context) {
-        writer.writeValue(((BigDecimal)object).toPlainString());
+        BigDecimal d = null;
+        if (object instanceof BigDecimal) {
+            d = (BigDecimal)object;
+        } else if (object instanceof BigInteger) {
+            d = new BigDecimal((BigInteger)object);
+        } else if (object instanceof AtomicInteger || object instanceof Integer) {
+            d = new BigDecimal(((Number)object).intValue());
+        } else if (object instanceof Long || object instanceof AtomicLong) {
+            d = new BigDecimal(((Number)object).longValue());
+        } else if (object instanceof Double) {
+            d = new BigDecimal(((Number)object).doubleValue());
+        } else if (object instanceof Float) {
+            d = new BigDecimal(((Number)object).floatValue());
+        } else if (object instanceof Short) {
+            d = new BigDecimal(((Number)object).shortValue());
+        } else if (object instanceof Byte) {
+            d = new BigDecimal(((Number)object).byteValue());
+        } else {
+            d = new BigDecimal(((Number)object).doubleValue());
+        }
+        writer.writeValue(d.toPlainString());
     }
 }

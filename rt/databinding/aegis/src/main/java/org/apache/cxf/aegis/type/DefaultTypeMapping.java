@@ -256,6 +256,8 @@ public class DefaultTypeMapping implements TypeMapping {
                         new SqlDateType());
         defaultRegister(tm, defaultNillable, java.sql.Date.class, XMLSchemaQNames.XSD_DATE,
                         new SqlDateType());
+        defaultRegister(tm, defaultNillable, Number.class, XMLSchemaQNames.XSD_DECIMAL,
+                        new BigDecimalType());
         
         QName mtomBase64 = XMLSchemaQNames.XSD_BASE64;
         if (enableMtomXmime) {
