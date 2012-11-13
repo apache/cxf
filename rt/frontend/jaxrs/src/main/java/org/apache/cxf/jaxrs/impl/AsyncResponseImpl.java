@@ -40,11 +40,9 @@ import org.apache.cxf.message.Message;
 public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     
     private Continuation cont;
-    private long timeout = AsyncResponse.NO_TIMEOUT;
     private Message inMessage;
     private boolean cancelled;
     private volatile boolean done;
-    private boolean newTimeoutRequested;
     private boolean resumedByApplication;
     private TimeoutHandler timeoutHandler;
     
@@ -124,9 +122,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         checkCancelled();
         checkSuspended();
         inMessage.getExchange().put(AsyncResponse.class, this);
-        timeout = TimeUnit.MILLISECONDS.convert(time, unit);
-        newTimeoutRequested = true;
-        cont.resume();
+        long timeout = TimeUnit.MILLISECONDS.convert(time, unit);
+        cont.suspend(timeout);
     }
 
     @Override
@@ -191,7 +188,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     // these methods are called by the runtime, not part of AsyncResponse    
     public synchronized void suspend() {
         checkCancelled();
-        cont.suspend(timeout);
+        cont.suspend(AsyncResponse.NO_TIMEOUT);
     }
     
     public synchronized Object getResponseObject() {
@@ -207,16 +204,10 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     public synchronized boolean handleTimeout() {
-        if (!resumedByApplication) {
-            if (newTimeoutRequested) {
-                newTimeoutRequested = false;
-                suspend();
-                return true;
-            } else if (timeoutHandler != null) {
-                suspend();
-                timeoutHandler.handleTimeout(this);
-                return true;
-            }
+        if (!resumedByApplication && timeoutHandler != null) {
+            suspend();
+            timeoutHandler.handleTimeout(this);
+            return true;
         }
         return false;
         

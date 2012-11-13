@@ -19,9 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
 import org.junit.BeforeClass;
@@ -38,14 +35,6 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
                    launchServer(BookContinuationServer.class));
                    
                    
-    }
-    
-    @Test
-    public void testDefaultTimeout() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/defaulttimeout");
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
-        Response r = wc.get();
-        assertEquals(503, r.getStatus());
     }
     
     @Test

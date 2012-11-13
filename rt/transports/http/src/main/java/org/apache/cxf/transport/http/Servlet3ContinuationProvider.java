@@ -86,14 +86,18 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         
         public boolean suspend(long timeout) {
-            if (isPending) {
-                return false;
+            if (isPending && timeout != 0) {
+                long currentTimeout = context.getTimeout();
+                timeout = currentTimeout + timeout;
+            } else {
+                isPending = true;
             }
-            context.setTimeout(timeout);
             isNew = false;
+            
             // Need to get the right message which is handled in the interceptor chain
+            context.setTimeout(timeout);
             inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
-            isPending = true;
+            
             return true;
         }
         public void redispatch() {

@@ -33,6 +33,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     volatile boolean isNew;
     volatile boolean isResumed;
     volatile boolean isPending;
+    volatile long pendingTimeout;
     volatile Object obj;
     
     private Message message;
@@ -82,19 +83,25 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public void reset() {
         continuation.complete();
         obj = null;
+        pendingTimeout = 0;
     }
 
 
     public boolean suspend(long timeout) {
-        if (isPending) {
-            return false;
+        if (isPending && timeout != 0) {
+            pendingTimeout += pendingTimeout + timeout;
+        } else {
+            pendingTimeout = timeout;
         }
         isNew = false;
+        
         // Need to get the right message which is handled in the interceptor chain
         message.getExchange().getInMessage().getInterceptorChain().suspend();
-        isPending = true;
-        continuation.setTimeout(timeout);
-        continuation.suspend();
+        continuation.setTimeout(pendingTimeout);
+        if (!isPending) {
+            continuation.suspend();
+            isPending = true;
+        }
         return true;
     }
     
@@ -110,6 +117,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public void onComplete(org.eclipse.jetty.continuation.Continuation cont) {
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
         isPending = false;
+        pendingTimeout = 0;
         //REVISIT: isResumed = false;
         if (callback != null) {
             callback.onComplete();
@@ -118,6 +126,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
 
     public void onTimeout(org.eclipse.jetty.continuation.Continuation cont) {
         isPending = false;
+        pendingTimeout = 0;
         //isResumed = true;
     }
     
