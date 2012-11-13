@@ -25,22 +25,24 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
-public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
-    public static final String PORT = BookContinuationServer.PORT;
+public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTest {
+    public static final String PORT = BookContinuationServlet3Server.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         createStaticBus();
         assertTrue("server did not launch correctly",
-                   launchServer(BookContinuationServer.class));
+                   launchServer(BookContinuationServlet3Server.class));
                    
                    
     }
     
     @Test
+    @Ignore
     public void testDefaultTimeout() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/defaulttimeout");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
@@ -49,6 +51,7 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
     }
     
     @Test
+    @Ignore
     public void testContinuationWithTimeHandler() throws Exception {
         
         doTestContinuation("books/timeouthandler");
@@ -57,5 +60,4 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
     protected String getPort() {
         return PORT;
     }
-    
 }
