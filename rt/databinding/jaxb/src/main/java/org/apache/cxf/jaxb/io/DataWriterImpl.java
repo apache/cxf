@@ -180,13 +180,13 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                                                          getAttachmentMarshaller());
                 }
             }
-        } else if (needToRender(obj, part)) {
-            JAXBEncoderDecoder.marshallNullElement(createMarshaller(obj, part),
+        } else if (needToRender(part)) {
+            JAXBEncoderDecoder.marshallNullElement(createMarshaller(null, part),
                                                    output, part);
         }
     }
 
-    private boolean needToRender(Object obj, MessagePartInfo part) {
+    private boolean needToRender(MessagePartInfo part) {
         if (part != null && part.getXmlSchema() instanceof XmlSchemaElement) {
             XmlSchemaElement element = (XmlSchemaElement)part.getXmlSchema();
             return element.isNillable() && element.getMinOccurs() > 0;

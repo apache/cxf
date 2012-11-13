@@ -391,7 +391,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             for (Artifact a : pluginArtifacts) {
                 File file = a.getFile();
                 if (file == null) {
-                    throw new MojoExecutionException("Unable to find " + file + " for artifact "
+                    throw new MojoExecutionException("Unable to find (null) file for artifact "
                                                      + a.getGroupId() + ":" + a.getArtifactId()
                                                      + ":" + a.getVersion());
                 }

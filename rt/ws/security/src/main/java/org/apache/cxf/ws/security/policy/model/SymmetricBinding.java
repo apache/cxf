@@ -140,9 +140,7 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         if (pc != null) {
             return pc;
         } else {
-            p = new Policy();
-            p.addPolicyComponent(pc);
-            return p;
+            return new Policy();
         }
     }
     

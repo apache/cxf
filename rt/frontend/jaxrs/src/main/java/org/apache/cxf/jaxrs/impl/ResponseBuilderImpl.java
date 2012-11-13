@@ -199,9 +199,9 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
         List<Object> varyValues = metadata.get(HttpHeaders.VARY);
         for (String v : values) {
             if (v == null) {
-                metadata.remove(v);
+                metadata.remove(null);
                 if (varyValues != null) {
-                    varyValues.remove(v);
+                    varyValues.remove(null);
                 }
             } else {
                 addHeader(HttpHeaders.VARY, v);

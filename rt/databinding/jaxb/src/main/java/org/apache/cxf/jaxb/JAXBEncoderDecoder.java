@@ -863,7 +863,7 @@ public final class JAXBEncoderDecoder {
                 while (enm.hasMoreElements()) {
                     String s = (String)enm.nextElement();
                     if (s == null) {
-                        nsMap.put("", c.getNamespaceURI(s));
+                        nsMap.put("", c.getNamespaceURI(null));
                     } else {
                         nsMap.put(s, c.getNamespaceURI(s));
                     }

@@ -65,9 +65,7 @@ public abstract class TokenWrapper extends AbstractSecurityAssertion implements 
             if (pc != null) {
                 return pc;
             } else {
-                p = new Policy();
-                p.addPolicyComponent(pc);
-                return p;
+                return new Policy();
             }
         }
         return null;

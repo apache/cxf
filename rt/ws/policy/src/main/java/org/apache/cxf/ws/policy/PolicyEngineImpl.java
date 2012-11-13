@@ -217,7 +217,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             if (null == effectivePolicy) {
                 EffectivePolicyImpl epi = createOutPolicyInfo();
                 Assertor assertor = PolicyUtils.createAsserter(d);
-                epi.initialise(ei, boi, this, assertor, false, false, incoming);
+                epi.initialise(ei, boi, this, assertor, false, false, null);
                 boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
                 effectivePolicy = epi;
             } 
@@ -242,7 +242,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         if (bfi == null) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
             Assertor assertor = PolicyUtils.createAsserter(d);
-            epi.initialise(ei, boi, bfi, this, assertor);
+            epi.initialise(ei, boi, null, this, assertor);
             return epi;
         }
         bfi = mapToWrappedBindingFaultInfo(bfi);

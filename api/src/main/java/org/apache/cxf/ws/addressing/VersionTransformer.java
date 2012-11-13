@@ -442,7 +442,7 @@ public class VersionTransformer {
         if (o != null) {
             return convertToNative(o.getValue());
         }
-        return convertToNative(o);
+        return convertToNative(null);
         
     }
     /**

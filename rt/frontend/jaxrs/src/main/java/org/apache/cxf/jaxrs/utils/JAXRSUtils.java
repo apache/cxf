@@ -898,7 +898,7 @@ public final class JAXRSUtils {
         } else if (Application.class.isAssignableFrom(clazz)) {
             ProviderInfo<?> providerInfo = 
                 (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
-            o = providerInfo == null ? providerInfo : providerInfo.getProvider();
+            o = providerInfo == null ? null : providerInfo.getProvider();
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
             o = createServletResourceValue(contextMessage, clazz);

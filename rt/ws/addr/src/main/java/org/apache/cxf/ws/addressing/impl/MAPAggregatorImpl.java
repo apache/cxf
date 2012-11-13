@@ -805,7 +805,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             if (maps.getTo() == null) {
                 Conduit conduit = null;
                 if (isOutbound) {
-                    conduit = ContextUtils.getConduit(conduit, message);
+                    conduit = ContextUtils.getConduit(null, message);
                 }
                 String s = (String)message.get(Message.ENDPOINT_ADDRESS);
                 EndpointReferenceType reference = conduit != null

@@ -147,9 +147,7 @@ public class TransportBinding extends Binding {
         if (pc != null) {
             return pc;
         } else {
-            p = new Policy();
-            p.addPolicyComponent(pc);
-            return p;
+            return new Policy();
         }
     }
 }

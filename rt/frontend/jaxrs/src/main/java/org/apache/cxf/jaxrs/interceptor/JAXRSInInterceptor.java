@@ -162,7 +162,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                    message.get(Message.REQUEST_URI),
                                                    rawPath);
             LOG.warning(errorMsg.toString());
-            Response resp = JAXRSUtils.createResponse(resource, message, errorMsg.toString(), 
+            Response resp = JAXRSUtils.createResponse(null, message, errorMsg.toString(), 
                     Response.Status.NOT_FOUND.getStatusCode(), false);
             throw new NotFoundException(resp);
         }

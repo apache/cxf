@@ -262,6 +262,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             if (p == null || p.getDataBinding() == null) {
                 obj = elem;
             } else {
+                dataBinding = p.getDataBinding();
                 obj = p.getDataBinding().createReader(Node.class).read(elem);
             }
             //TODO - add the interceptors

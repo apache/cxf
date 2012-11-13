@@ -60,7 +60,7 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
     public void prepare(Message message) {
         Conduit c = message.get(Conduit.class);
         if (c == null) {
-            getSelectedConduit(message);
+            c = getSelectedConduit(message);
             message.put(Conduit.class, c);
         }
     }

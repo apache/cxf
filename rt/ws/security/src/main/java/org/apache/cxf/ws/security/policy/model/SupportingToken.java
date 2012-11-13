@@ -331,9 +331,7 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
         if (pc != null) {
             return pc;
         } else {
-            p = new Policy();
-            p.addPolicyComponent(pc);
-            return p;
+            return new Policy();
         }
     }
 

@@ -116,7 +116,7 @@ public class SequenceVisitor extends VisitorBase {
                 schemaType = wsdlVisitor.getSequenceOctetType();
             }
         } else {
-            schemaType = generateSchemaType(stype, scopedName, bound, fullyQualifiedName);
+            schemaType = generateSchemaType(null, scopedName, bound, fullyQualifiedName);
         }
 
         CorbaTypeImpl corbaType = null;
