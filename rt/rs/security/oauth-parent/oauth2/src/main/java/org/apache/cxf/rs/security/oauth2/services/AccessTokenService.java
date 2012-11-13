@@ -215,4 +215,24 @@ public class AccessTokenService extends AbstractOAuthService {
     protected Response createErrorResponseFromBean(OAuthError errorBean) {
         return Response.status(400).entity(errorBean).build();
     }
+    
+    /**
+     * Get the {@link Client} reference
+     * @param clientId the provided client id
+     * @return Client the client reference 
+     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found
+     */
+    protected Client getClient(String clientId) {
+        Client client = null;
+        try {
+            client = getValidClient(clientId);
+        } catch (OAuthServiceException ex) {
+            // log it
+        }
+        if (client == null) {
+            reportInvalidRequestError("Client ID is invalid");
+        }
+        return client;
+        
+    }
 }

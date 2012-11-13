@@ -25,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -64,29 +65,20 @@ public abstract class AbstractOAuthService {
         return getMessageContext().getUriInfo().getQueryParameters();
     }
     
-    protected Client getClient(MultivaluedMap<String, String> params) {
-        return getClient(params.getFirst(OAuthConstants.CLIENT_ID));
+    protected Client getValidClient(MultivaluedMap<String, String> params) {
+        return getValidClient(params.getFirst(OAuthConstants.CLIENT_ID));
     }
     /**
      * Get the {@link Client} reference
      * @param clientId the provided client id
      * @return Client the client reference 
-     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found, 
-     *         the error is returned directly to the end user without 
-     *         following the redirect URI if any
+     * @throws {@link OAuthServiceExcepption} if no matching Client is found
      */
-    protected Client getClient(String clientId) {
+    protected Client getValidClient(String clientId) throws OAuthServiceException {
         Client client = null;
         
         if (clientId != null) {
-            try {
-                client = dataProvider.getClient(clientId);
-            } catch (OAuthServiceException ex) {
-                // log it
-            }
-        }
-        if (client == null) {
-            reportInvalidRequestError("Client ID is invalid");
+            client = dataProvider.getClient(clientId);
         }
         return client;
         
@@ -107,10 +99,21 @@ public abstract class AbstractOAuthService {
     }
     
     protected void reportInvalidRequestError(String errorDescription) {
+        reportInvalidRequestError(errorDescription, MediaType.APPLICATION_JSON_TYPE);
+    }
+    
+    protected void reportInvalidRequestError(String errorDescription, MediaType mt) {
         OAuthError error = 
             new OAuthError(OAuthConstants.INVALID_REQUEST, errorDescription);
-        throw new BadRequestException(
-                  Response.status(400).type(MediaType.APPLICATION_JSON).entity(error).build());
+        reportInvalidRequestError(error, mt);
+    }
+    
+    protected void reportInvalidRequestError(OAuthError entity, MediaType mt) {
+        ResponseBuilder rb = Response.status(400);
+        if (mt != null) {
+            rb.type(mt);
+        }
+        throw new BadRequestException(rb.entity(entity).build());
     }
 
     /**

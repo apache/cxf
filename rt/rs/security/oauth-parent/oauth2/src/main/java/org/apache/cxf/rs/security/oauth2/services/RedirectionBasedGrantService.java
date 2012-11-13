@@ -316,4 +316,29 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
     }
     
+    /**
+     * Get the {@link Client} reference
+     * @param params request parameters
+     * @return Client the client reference 
+     * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found, 
+     *         the error is returned directly to the end user without 
+     *         following the redirect URI if any
+     */
+    protected Client getClient(MultivaluedMap<String, String> params) {
+        Client client = null;
+        
+        try {
+            client = getValidClient(params);
+        } catch (OAuthServiceException ex) {
+            if (ex.getError() != null) {
+                reportInvalidRequestError(ex.getError(), null);
+            }
+        }
+        
+        if (client == null) {
+            reportInvalidRequestError("Client ID is invalid", null);
+        }
+        return client;
+        
+    }
 }
