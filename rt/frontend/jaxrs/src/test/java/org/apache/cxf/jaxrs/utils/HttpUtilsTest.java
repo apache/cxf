@@ -171,7 +171,7 @@ public class HttpUtilsTest extends Assert {
         EasyMock.expectLastCall().andReturn("http");
         req.getServerName();
         EasyMock.expectLastCall().andReturn("localhost");
-        req.getLocalPort();
+        req.getServerPort();
         EasyMock.expectLastCall().andReturn(8080);
         EasyMock.replay(req);
         URI u = HttpUtils.toAbsoluteUri(URI.create("http://0.0.0.0/bar/foo"), m);
@@ -187,7 +187,7 @@ public class HttpUtilsTest extends Assert {
         EasyMock.expectLastCall().andReturn("http");
         req.getServerName();
         EasyMock.expectLastCall().andReturn("localhost");
-        req.getLocalPort();
+        req.getServerPort();
         EasyMock.expectLastCall().andReturn(8080);
         EasyMock.replay(req);
         URI u = HttpUtils.toAbsoluteUri(URI.create("http://0.0.0.0:8080/bar/foo"), m);

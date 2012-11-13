@@ -209,11 +209,13 @@ public final class HttpUtils {
         boolean absolute = u.isAbsolute();
         if (request != null && (!absolute || u.toString().contains(ANY_IP_ADDRESS_START))) {
             String serverAndPort = request.getServerName();
+            boolean localAddressUsed = false;
             if (absolute && ANY_IP_ADDRESS.equals(serverAndPort)) {
                 serverAndPort = request.getLocalAddr();
+                localAddressUsed = true;
             }
                 
-            int port = request.getLocalPort();
+            int port = localAddressUsed ? request.getLocalPort() : request.getServerPort();
             if (port != DEFAULT_HTTP_PORT) {
                 serverAndPort += ":" + port;
             }
