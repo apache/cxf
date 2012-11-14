@@ -53,9 +53,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         inMessage.getExchange().put(ContinuationCallback.class, this);
         this.inMessage = inMessage;
         
-        ContinuationProvider provider = 
-            (ContinuationProvider)inMessage.get(ContinuationProvider.class.getName());
-        cont = provider.getContinuation();
+        initContinuation();
     }
     
     @Override
@@ -94,12 +92,12 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     
     private synchronized void doCancel(String retryAfterHeader) {
         checkSuspended();
-        cancelled = true;
         ResponseBuilder rb = Response.status(503);
         if (retryAfterHeader != null) {
             rb.header(HttpHeaders.RETRY_AFTER, retryAfterHeader);
         }
         doResume(rb.build());
+        cancelled = true;
     }
 
     @Override
@@ -185,6 +183,23 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         }
     }
     
+    @Override
+    public void onComplete() {
+        done = true;
+        if (completionCallback != null) {
+            completionCallback.onComplete();
+        }
+    }
+
+    @Override
+    public void onError(Throwable error) {
+        if (completionCallback != null) {
+            Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
+            completionCallback.onError(actualError);
+        }
+        
+    }
+    
     // these methods are called by the runtime, not part of AsyncResponse    
     public synchronized void suspend() {
         checkCancelled();
@@ -213,22 +228,15 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         
     }
 
+    private void initContinuation() {
+        ContinuationProvider provider = 
+            (ContinuationProvider)inMessage.get(ContinuationProvider.class.getName());
+        cont = provider.getContinuation();
+    }
+    
+    public void prepareContinuation() {
+        initContinuation();
+    }
     
     
-    @Override
-    public void onComplete() {
-        done = true;
-        if (completionCallback != null) {
-            completionCallback.onComplete();
-        }
-    }
-
-    @Override
-    public void onError(Throwable error) {
-        if (completionCallback != null) {
-            Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
-            completionCallback.onError(actualError);
-        }
-        
-    }
 }

@@ -48,9 +48,16 @@ public class BookContinuationStore {
     
     @GET
     @Path("/books/defaulttimeout")
-    public void getBookDescriptionWithHandler(AsyncResponse async) {
+    public void getBookDescriptionWithTimeout(AsyncResponse async) {
         async.register(new CallbackImpl());
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
+    }
+    
+    @GET
+    @Path("/books/cancel")
+    public void getBookDescriptionWithCancel(@PathParam("id") String id, AsyncResponse async) {
+        async.setTimeout(2000, TimeUnit.MILLISECONDS);
+        async.setTimeoutHandler(new CancelTimeoutHandlerImpl());
     }
     
     @GET
@@ -115,11 +122,21 @@ public class BookContinuationStore {
         
         @Override
         public void handleTimeout(AsyncResponse asyncResponse) {
-            if (timeoutExtendedCounter.addAndGet(1) < 2) {
+            if (timeoutExtendedCounter.addAndGet(1) <= 2) {
                 asyncResponse.setTimeout(1, TimeUnit.SECONDS);
             } else {
                 asyncResponse.resume(books.get(id));
             }
+        }
+        
+    }
+    
+    private class CancelTimeoutHandlerImpl implements TimeoutHandler {
+
+        @Override
+        public void handleTimeout(AsyncResponse asyncResponse) {
+            asyncResponse.cancel(10);
+            
         }
         
     }

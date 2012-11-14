@@ -22,8 +22,6 @@ package org.apache.cxf.systest.jaxrs;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 
 public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTest {
@@ -36,13 +34,6 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
                    launchServer(BookContinuationServlet3Server.class));
                    
                    
-    }
-    
-    @Test
-    @Ignore
-    public void testContinuationWithTimeHandler() throws Exception {
-        
-        doTestContinuation("books/timeouthandler");
     }
     
     protected String getPort() {

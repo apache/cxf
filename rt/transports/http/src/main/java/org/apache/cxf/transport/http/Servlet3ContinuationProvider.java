@@ -57,32 +57,30 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
 
         if (continuation == null) {
             continuation = new Servlet3Continuation();
+        } else {
+            continuation.startAsyncAgain();
         }
         return continuation;
     }
     
     public class Servlet3Continuation implements Continuation, AsyncListener {
-        final AsyncContext context;
+        AsyncContext context;
         volatile boolean isNew;
         volatile boolean isResumed;
         volatile boolean isPending;
         volatile Object obj;
         private ContinuationCallback callback;
         public Servlet3Continuation() {
-            // It looks current Servlet3 implementation request doesn't pass the isAsyncStart 
-            // status to the redispatched request, so we use the attribute to check the statues
-            isNew = req.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
-            if (isNew) {
-                req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
-                                 inMessage.getExchange().getInMessage());
-                callback = inMessage.getExchange().get(ContinuationCallback.class);
-                context = req.startAsync(req, resp);
-                req.setAttribute(AbstractHTTPDestination.CXF_ASYNC_CONTEXT, context);
-                context.addListener(this);
-            } else {
-                context = (AsyncContext)req.getAttribute(AbstractHTTPDestination.CXF_ASYNC_CONTEXT);
-            }
-            
+            req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
+                             inMessage.getExchange().getInMessage());
+            callback = inMessage.getExchange().get(ContinuationCallback.class);
+            context = req.startAsync(req, resp);
+            context.addListener(this);
+        }
+        
+        void startAsyncAgain() {
+            context = req.startAsync();
+            context.addListener(this);
         }
         
         public boolean suspend(long timeout) {

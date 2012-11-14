@@ -22,7 +22,6 @@ package org.apache.cxf.systest.jaxrs;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
@@ -32,16 +31,11 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
         AbstractResourceInfo.clearAllMaps();
         createStaticBus();
         assertTrue("server did not launch correctly",
-                   launchServer(BookContinuationServer.class));
+                   launchServer(BookContinuationServer.class, true));
                    
                    
     }
     
-    @Test
-    public void testContinuationWithTimeHandler() throws Exception {
-        
-        doTestContinuation("books/timeouthandler");
-    }
     
     protected String getPort() {
         return PORT;

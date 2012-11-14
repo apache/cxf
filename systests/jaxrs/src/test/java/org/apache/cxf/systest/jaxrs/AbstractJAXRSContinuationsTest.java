@@ -24,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -45,6 +46,23 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response r = wc.get();
         assertEquals(503, r.getStatus());
+    }
+    
+    @Test
+    public void testTimeoutAndCancel() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + getPort() + "/bookstore/books/cancel");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response r = wc.get();
+        assertEquals(503, r.getStatus());
+        String retryAfter = r.getHeaderString(HttpHeaders.RETRY_AFTER);
+        assertNotNull(retryAfter);
+        assertEquals("10", retryAfter);
+    }
+    
+    @Test
+    public void testContinuationWithTimeHandler() throws Exception {
+        
+        doTestContinuation("books/timeouthandler");
     }
     
     @Test

@@ -84,6 +84,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             AsyncResponse asyncResp = exchange.get(AsyncResponse.class);
             if (asyncResp != null) {
                 AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
+                asyncImpl.prepareContinuation();
                 
                 if (asyncImpl.isResumedByApplication()) {
                     Object asyncObj = asyncImpl.getResponseObject();
