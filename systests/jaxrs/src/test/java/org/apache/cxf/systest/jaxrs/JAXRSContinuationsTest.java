@@ -31,7 +31,7 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
         AbstractResourceInfo.clearAllMaps();
         createStaticBus();
         assertTrue("server did not launch correctly",
-                   launchServer(BookContinuationServer.class, true));
+                   launchServer(BookContinuationServer.class));
                    
                    
     }
