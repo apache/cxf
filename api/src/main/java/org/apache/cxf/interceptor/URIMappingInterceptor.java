@@ -45,6 +45,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
@@ -55,6 +56,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 
 public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
+    public static final String URIMAPPING_SKIP = URIMappingInterceptor.class.getName() + ".skip";
     
     private static final Logger LOG = LogUtils.getL7dLogger(URIMappingInterceptor.class);
     
@@ -71,6 +73,9 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "URIMappingInterceptor can only handle HTTP GET, not HTTP " + method);
             }
+            return;
+        }
+        if (MessageUtils.getContextualBoolean(message, URIMAPPING_SKIP, false)) {
             return;
         }
 
