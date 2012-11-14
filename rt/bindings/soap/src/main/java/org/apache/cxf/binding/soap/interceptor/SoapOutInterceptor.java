@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.ws.AsyncHandler;
 
 import org.w3c.dom.Element;
 
@@ -220,13 +219,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 if (wrappedBmi != bmi) {
                     part = wrappedBmi.getMessageInfo().addMessagePart(part.getName());
                 }
-                int paraLength = objs.size();
-                if (objs.get(paraLength - 1) instanceof AsyncHandler) {
-                    //when use asyn handler in bare mode the last parameter is AsyncHandler
-                    //which shouldn't count in as parameter length
-                    paraLength = paraLength - 1;
-                }
-                if (part.getIndex() >= paraLength) {
+                if (part.getIndex() >= objs.size()) {
                     // The optional out of band header is not a part of parameters of the method
                     continue;
                 }
