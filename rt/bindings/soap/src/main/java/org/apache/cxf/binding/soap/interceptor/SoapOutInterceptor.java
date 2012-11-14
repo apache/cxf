@@ -212,6 +212,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             if (headers == null) {
                 return endedHeader;
             }            
+            
 
             for (SoapHeaderInfo header : headers) {
                 MessagePartInfo part = header.getPart();

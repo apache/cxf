@@ -258,6 +258,11 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         AsyncHandler<Object> handler;
         if (params.length > 0 && params[params.length - 1] instanceof AsyncHandler) {
             handler = (AsyncHandler<Object>)params[params.length - 1];
+            Object[] newParams = new Object[params.length - 1];
+            for (int i = 0; i < newParams.length; i++) {
+                newParams[i] = params[i];
+            }
+            params = newParams;
         } else {
             handler = null;
         }
