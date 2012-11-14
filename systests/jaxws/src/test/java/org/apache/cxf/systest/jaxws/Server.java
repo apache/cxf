@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import javax.jws.WebService;
@@ -27,6 +29,7 @@ import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.annotations.UseAsyncMethod;
+import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -40,6 +43,9 @@ public class Server extends AbstractBusTestServerBase {
     static final String BARE_PORT = allocatePort(Server.class, 1);
     static final String BOGUS_REAL_PORT = allocatePort(Server.class, 2);
 
+    List<Endpoint> eps = new LinkedList<Endpoint>();
+
+    @SuppressWarnings("deprecation")
     protected void run() {
         URL url = getClass().getResource("fault-stack-trace.xml");
         if (url != null) {
@@ -50,23 +56,25 @@ public class Server extends AbstractBusTestServerBase {
 
         implementor = new AsyncGreeter();
         address = "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
         
         implementor = new GreeterImplMultiPort();
         address = "http://localhost:" + PORT + "/MultiPort/GreeterPort";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
 
         implementor = new DocLitBareGreeterMultiPort();
         address = "http://localhost:" + PORT + "/MultiPort/DocBarePort";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
         
         implementor = new GreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        Endpoint ep = Endpoint.publish(address, implementor);
+        ((EndpointImpl)ep).getService().getInInterceptors().add(new URIMappingInterceptor());
+        eps.add(ep);
 
         implementor = new RefGreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort2";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
         
         //publish port with soap12 binding
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
@@ -75,16 +83,24 @@ public class Server extends AbstractBusTestServerBase {
         EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING, 
                                                         new Greeter12Impl());
         e.publish(address);
+        eps.add(e);
         
         implementor = new DocLitBareGreeterImpl();
         address = "http://localhost:" + BARE_PORT + "/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
         
         
         implementor = new GreeterImplBogus();
         address = "http://localhost:" + BOGUS_REAL_PORT + "/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
     }
+    
+    public void tearDown() {
+        while (!eps.isEmpty()) {
+            Endpoint ep = eps.remove(0);
+            ep.stop();
+        }
+    }    
     
     @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http")

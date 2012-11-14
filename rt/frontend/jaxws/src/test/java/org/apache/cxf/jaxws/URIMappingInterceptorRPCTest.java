@@ -45,6 +45,7 @@ import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("deprecation")
 public class URIMappingInterceptorRPCTest extends AbstractCXFTest {
     
     Message message;

@@ -26,6 +26,7 @@ import java.net.URLConnection;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -41,10 +42,12 @@ public class JavaFirstHttpGetTest extends AbstractBusClientServerTestBase {
             + PORT + "/JavaFirstHttpGetTest";
     
     public static class Server extends AbstractBusTestServerBase {        
+        @SuppressWarnings("deprecation")
         protected void run() {
             MyImplementation implementor = new MyImplementation();
             JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
             svrFactory.setServiceClass(MyInterface.class);
+            svrFactory.getInInterceptors().add(new URIMappingInterceptor());
             svrFactory.setAddress(BASE_URL);
             svrFactory.setServiceBean(implementor);
             svrFactory.getInInterceptors().add(new LoggingInInterceptor());

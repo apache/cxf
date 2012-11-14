@@ -19,8 +19,13 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.interceptor.URIMappingInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.headers.HeaderTesterImpl;
 import org.apache.hello_world_xml_http.bare.GreeterImpl;
@@ -32,26 +37,38 @@ public class ServerXMLBinding extends AbstractBusTestServerBase {
     static final String WRAP_PORT = allocatePort(ServerXMLBinding.class, 1);
     static final String MIX_PORT = allocatePort(ServerXMLBinding.class, 2);
 
+    List<Endpoint> eps = new LinkedList<Endpoint>();
+    
+    @SuppressWarnings("deprecation")
     protected void run() {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + REG_PORT + "/XMLService/XMLPort";
-        Endpoint.publish(address, implementor);
+        eps.add(Endpoint.publish(address, implementor));
+        
+        ((EndpointImpl)eps.get(0)).getService().getInInterceptors().add(new URIMappingInterceptor());
 
         Object implementor1 = new org.apache.hello_world_xml_http.wrapped.GreeterImpl();
         address = "http://localhost:" + WRAP_PORT + "/XMLService/XMLPort";
-        Endpoint.publish(address, implementor1);
+        eps.add(Endpoint.publish(address, implementor1));
 
         Object faultImplementor = new GreeterFaultImpl();
         String faultAddress = "http://localhost:" + REG_PORT + "/XMLService/XMLFaultPort";
-        Endpoint.publish(faultAddress, faultImplementor);
+        eps.add(Endpoint.publish(faultAddress, faultImplementor));
 
         Object implementor2 = new HeaderTesterImpl();
         address = "http://localhost:" + REG_PORT + "/XMLContext/XMLPort";
-        Endpoint.publish(address, implementor2);
+        eps.add(Endpoint.publish(address, implementor2));
         
         Object implementor3 = new org.apache.hello_world_xml_http.mixed.GreeterImpl();
         address = "http://localhost:" + MIX_PORT + "/XMLService/XMLPort";
-        Endpoint.publish(address, implementor3);
+        eps.add(Endpoint.publish(address, implementor3));
+    }
+    
+    public void tearDown() {
+        while (!eps.isEmpty()) {
+            Endpoint ep = eps.remove(0);
+            ep.stop();
+        }
     }
 
     public static void main(String[] args) {

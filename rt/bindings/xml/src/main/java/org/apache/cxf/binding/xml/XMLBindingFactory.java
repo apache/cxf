@@ -37,7 +37,6 @@ import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -65,7 +64,6 @@ public class XMLBindingFactory extends AbstractBindingFactory {
         
         xb.getInInterceptors().add(new AttachmentInInterceptor());    
         xb.getInInterceptors().add(new StaxInInterceptor());
-        xb.getInInterceptors().add(new URIMappingInterceptor());
         xb.getInInterceptors().add(new DocLiteralInInterceptor());
         xb.getInInterceptors().add(new XMLMessageInInterceptor());
         

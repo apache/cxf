@@ -60,6 +60,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(URIMappingInterceptor.class);
     
+    @Deprecated
     public URIMappingInterceptor() {
         super(Phase.UNMARSHAL);
     }

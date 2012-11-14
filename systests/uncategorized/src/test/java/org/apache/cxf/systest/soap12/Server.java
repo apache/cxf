@@ -21,18 +21,27 @@ package org.apache.cxf.systest.soap12;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.interceptor.URIMappingInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
 
+    Endpoint ep;
 
+    @SuppressWarnings("deprecation")
     protected void run()  {    
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        ep = Endpoint.publish(address, implementor);
+        EndpointImpl epi = (EndpointImpl)ep;
+        epi.getService().getInInterceptors().add(new URIMappingInterceptor());
     }
 
+    public void tearDown() throws Exception {
+        ep.stop();
+    }
 
     public static void main(String[] args) {
         try {

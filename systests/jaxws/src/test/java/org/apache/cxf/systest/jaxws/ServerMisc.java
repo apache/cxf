@@ -23,6 +23,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
+import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxb_element_test.JaxbElementTestImpl;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
@@ -51,6 +52,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
     public static final String DOCLIT_CODEFIRST_SETTINGS_URL = 
         "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceSettings/";
     
+    @SuppressWarnings("deprecation")
     protected void run() {
         
         Factory factory = new PerRequestFactory(DocLitWrappedCodeFirstServiceImpl.class);
@@ -86,6 +88,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
         Object implementor7 = new DocLitBareCodeFirstServiceImpl();
         EndpointImpl ep = (EndpointImpl)Endpoint.publish(DOCLITBARE_CODEFIRST_URL, implementor7);
         ep.getServer().getEndpoint().getInInterceptors().add(new SAAJInInterceptor());
+        ep.getServer().getEndpoint().getInInterceptors().add(new URIMappingInterceptor());
 
         
         Object implementor6 = new InterfaceInheritTestImpl();

@@ -45,6 +45,7 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("deprecation")
 public class URIMappingInterceptorDocLitTest extends AbstractCXFTest {
     
     Message message;

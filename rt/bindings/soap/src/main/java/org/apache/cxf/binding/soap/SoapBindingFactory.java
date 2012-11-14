@@ -88,7 +88,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -434,11 +433,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         sb.getOutInterceptors().add(new SoapOutInterceptor(getBus()));
         sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
         sb.getOutFaultInterceptors().add(SoapHeaderOutFilterInterceptor.INSTANCE);
-
-        // REVISIT: The phase interceptor chain seems to freak out if this added
-        // first. Not sure what the deal is at the moment, I suspect the
-        // ordering algorithm needs to be improved
-        sb.getInInterceptors().add(new URIMappingInterceptor());
 
         if (version.getVersion() == 1.1) {
             sb.getInFaultInterceptors().add(new Soap11FaultInInterceptor());

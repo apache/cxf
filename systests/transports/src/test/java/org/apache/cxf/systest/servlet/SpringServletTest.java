@@ -74,33 +74,7 @@ public class SpringServletTest extends AbstractServletTest {
         assertValid("/s:Envelope/s:Body", doc);
         assertValid("//h:sayHiResponse", doc);
     }
-    
-    @Test
-    public void testGreetMeGetRequest() throws Exception {
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(true);
-        
-        WebRequest req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter/greetMe?"
-                                         + "requestType=hello");
-        
-        WebResponse response = client.getResponse(req);        
-        Document doc = DOMUtils.readXml(response.getInputStream());
-        addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        assertValid("/s:Envelope/s:Body", doc);
-        assertValid("//h:greetMeResponse", doc);
-        
-        req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter1/greetMe?"
-                                         + "requestType=hello");
-        
-        response = client.getResponse(req);        
-        doc = DOMUtils.readXml(response.getInputStream());
-        addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        assertValid("/s:Envelope/s:Body", doc);
-        assertValid("//h:greetMeResponse", doc);
-    }
-    
+     
         
     @Test
     public void testGetWSDL() throws Exception {

@@ -34,6 +34,7 @@ import org.apache.cxf.aegis.services.Echo;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
+import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
@@ -50,12 +51,14 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
     public static final String PORT = TestUtil.getPortNumber(AegisJaxwsGetTest.class); 
     
     
+    @SuppressWarnings("deprecation")
     @Before
     public void before() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setAddress("http://localhost:" + PORT + "/Echo");
         sf.setDataBinding(new AegisDatabinding());
         sf.setServiceBean(new Echo());
+        sf.getInInterceptors().add(new URIMappingInterceptor());
         Server server = sf.create();
         // turn off nanny in URIMappingInterceptor
         server.getEndpoint()
@@ -65,6 +68,7 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
         sf2.setAddress("http://localhost:" + PORT + "/SimpleEcho");
         sf2.setDataBinding(new AegisDatabinding());
         sf2.setServiceBean(new Echo());
+        sf2.getInInterceptors().add(new URIMappingInterceptor());
         server = sf2.create();
         // turn off nanny in URIMappingInterceptor
         server.getEndpoint()
