@@ -75,10 +75,6 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         assertEquals("testfoobar", string);
         assertEquals("Hi", textHolder.value);
         
-        if (Boolean.getBoolean("java.awt.headless")) {
-            return;
-        }
-        
         URL url1 = this.getClass().getResource("resources/attach.text");
         URL url2 = this.getClass().getResource("resources/attach.html");
         URL url3 = this.getClass().getResource("resources/attach.xml");
@@ -188,11 +184,6 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testSwaTypes() throws Exception {
-        if (Boolean.getBoolean("java.awt.headless")) {
-            System.out.println("Running headless. Skipping test as Images may not work.");
-            return;
-        }
-        
         SwAService service = new SwAService();
         
         SwAServiceInterface port = service.getSwAServiceHttpPort();
@@ -232,11 +223,6 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testSwaTypesWithDispatchAPI() throws Exception {
-        if (Boolean.getBoolean("java.awt.headless")) {
-            System.out.println("Running headless. Skipping test as Images may not work.");
-            return;
-        }
-        
         URL url1 = this.getClass().getResource("resources/attach.text");
         URL url2 = this.getClass().getResource("resources/attach.html");
         URL url3 = this.getClass().getResource("resources/attach.xml");

@@ -372,9 +372,6 @@ public class ServerLauncher {
         for (Map.Entry<Object, Object> entry : TestUtil.getAllPorts().entrySet()) {
             cmd.add("-D" + entry.getKey() + "=" + entry.getValue());
         }
-        if (Boolean.getBoolean("java.awt.headless")) {
-            cmd.add("-Djava.awt.headless=true");
-        }
         String vmargs = System.getProperty("server.launcher.vmargs");
         if (StringUtils.isEmpty(vmargs)) {
             cmd.add("-ea");

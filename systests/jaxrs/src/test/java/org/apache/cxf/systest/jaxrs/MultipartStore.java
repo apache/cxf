@@ -100,12 +100,8 @@ public class MultipartStore {
         
         xop.setAttachinfo2(bookXsd.getBytes());
      
-        if (Boolean.getBoolean("java.awt.headless")) {
-            System.out.println("Running headless. Ignoring an Image property.");
-        } else {
-            xop.setImage(ImageIO.read(getClass().getResource(
+        xop.setImage(ImageIO.read(getClass().getResource(
                 "/org/apache/cxf/systest/jaxrs/resources/java.jpg")));
-        }
         return xop;
     }
     

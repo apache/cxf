@@ -366,11 +366,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             "/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
         xop.setAttachinfo2(bookXsd.getBytes());
      
-        if (Boolean.getBoolean("java.awt.headless")) {
-            System.out.println("Running headless. Ignoring an Image property.");
-        } else {
-            xop.setImage(getImage("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        }
+        xop.setImage(getImage("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         
         XopType xop2 = client.post(xop, XopType.class);
         
