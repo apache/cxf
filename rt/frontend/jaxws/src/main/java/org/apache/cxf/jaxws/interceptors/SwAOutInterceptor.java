@@ -92,10 +92,13 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             }
         }
         try {
-            return (Boolean)m.invoke(ctx);
+            if (m != null) {
+                return (Boolean)m.invoke(ctx);
+            }
         } catch (Exception e) {
-            return false;
+            //ignore
         }
+        return false;
     }
 
     public void handleMessage(SoapMessage message) throws Fault {

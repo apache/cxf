@@ -94,7 +94,10 @@ public class ObjectType extends AegisType {
             throw new DatabindingException("Missing 'xsi:type' attribute");
         }
 
-        String typeName = typeReader.getValue();
+        String typeName = null;
+        if (typeReader != null) {
+            typeName = typeReader.getValue();
+        }
 
         if (null == typeName && !readToDocument) {
             throw new DatabindingException("Missing 'xsi:type' attribute value");

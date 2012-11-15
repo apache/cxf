@@ -277,7 +277,10 @@ public class URIResolver {
         }
         
         // decode spaces before returning otherwise File.exists returns false 
-        return path.replace("%20", " ");
+        if (path != null) {
+            return path.replace("%20", " ");
+        }
+        return null;
     }
 
     private void tryArchive(String baseStr, String uriStr) throws IOException {

@@ -96,9 +96,9 @@ public final class XMLBeansSchemaTypeUtils {
                 schemaType = schemaType.getBaseType();
             }
         }
-        if (schemaType.isBuiltinType()) {
+        if (schemaType != null && schemaType.isBuiltinType()) {
             result = BUILTIN_TYPES_MAP.get(schemaType.getFullJavaName());
-        } else {
+        } else if (schemaType != null) {
             result = schemaType.getFullJavaName().replace('$', '.');
         }        
         return result;

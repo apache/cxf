@@ -213,11 +213,11 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
     protected QName getMessageParamQName(MessageInfo msgInfo,
                                          String paramName,
                                          int index) {
-        QName paramQName;
+        QName paramQName = null;
         MessagePartInfo part = msgInfo.getMessageParts().get(index);
         if (part != null && part.isElement()) {
             paramQName = part.getElementQName();
-        } else {
+        } else if (part != null)  {
             paramQName = part.getName();
         }
         return paramQName;

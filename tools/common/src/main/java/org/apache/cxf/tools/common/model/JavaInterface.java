@@ -243,7 +243,9 @@ public class JavaInterface implements JavaAnnotatable {
             return;
         }
         // replace "$" with "." to correctly deal with member classes
-        imports.add(i.replaceAll("\\$", "\\."));
+        if (i != null) {
+            imports.add(i.replaceAll("\\$", "\\."));
+        }
     }
     
     public void addImports(Collection<String> ii) {

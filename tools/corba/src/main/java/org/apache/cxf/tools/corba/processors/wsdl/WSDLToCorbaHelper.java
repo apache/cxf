@@ -1082,9 +1082,11 @@ public class WSDLToCorbaHelper {
         }
 
         //Deal with Attributes defined in Extension
-        for (int i = 0; i < attrMembers.size(); i++) {
-            MemberType member = attrMembers.get(i);
-            corbaStruct.getMember().add(member);
+        if (attrMembers != null) {
+            for (int i = 0; i < attrMembers.size(); i++) {
+                MemberType member = attrMembers.get(i);
+                corbaStruct.getMember().add(member);
+            }
         }
 
         return corbaStruct;

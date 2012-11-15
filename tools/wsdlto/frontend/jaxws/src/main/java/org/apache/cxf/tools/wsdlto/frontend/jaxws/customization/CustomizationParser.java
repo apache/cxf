@@ -441,7 +441,9 @@ public final class CustomizationParser {
             elem = DOMUtils.getNextElement(elem);       
         }
 
-        firstChild.appendChild(cloneNode);
+        if (firstChild != null) {
+            firstChild.appendChild(cloneNode);
+        }
     }
 
     private boolean isGlobaleBindings(Element binding) {

@@ -91,7 +91,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         Bus bus = ex.get(Bus.class);
         if (null == bus) {
             LOG.log(Level.INFO, "CAN_NOT_GET_BUS_FROM_EXCHANGE");
-            BusFactory.getThreadDefaultBus();
+            bus = BusFactory.getThreadDefaultBus();
         }
         
         Message message = ex.getOutMessage();

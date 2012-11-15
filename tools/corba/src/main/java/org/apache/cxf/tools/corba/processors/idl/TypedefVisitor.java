@@ -157,9 +157,10 @@ public class TypedefVisitor extends VisitorBase {
         // corba:alias
         Alias alias = new Alias();
         alias.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
-        if (corbaType != null || schemaType != null) {
+        if (corbaType != null) {
             alias.setBasetype(corbaType.getQName());
-        } else {
+        // if (schemaType == null) might not be correct here
+        } else if (schemaType == null) {
             wsdlVisitor.getDeferredActions().
                 add(fqName, new TypedefDeferredAction(alias));
             scopedNames.add(scopedName);         

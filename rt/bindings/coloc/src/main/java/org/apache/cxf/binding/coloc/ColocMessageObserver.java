@@ -163,7 +163,9 @@ public class ColocMessageObserver extends ChainInitiationObserver {
         
         exchange.put(BindingInfo.class, bi);
         exchange.put(BindingOperationInfo.class, boi);
-        exchange.put(OperationInfo.class, boi.getOperationInfo());
+        if (boi != null) {
+            exchange.put(OperationInfo.class, boi.getOperationInfo());
+        }
     }
     
     protected List<Interceptor<? extends Message>> addColocInterceptors() {

@@ -130,7 +130,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             }
             conduits.add(c);
         } 
-        if (c.getTarget() != null && c.getTarget().getAddress() != null) {
+        if (c != null && c.getTarget() != null && c.getTarget().getAddress() != null) {
             replaceEndpointAddressPropertyIfNeeded(message, c.getTarget().getAddress().getValue(), c);
         }
         //the search for the conduit could cause extra properties to be reset/loaded. 

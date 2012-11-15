@@ -65,11 +65,13 @@ public class TemplateTypeSpecVisitor extends VisitorBase {
             visitor = new FixedVisitor(getScope(), definition, schema, wsdlVisitor, identifierNode);
         }
 
-        visitor.visit(node);
+        if (visitor != null) {
+            visitor.visit(node);
 
-        setSchemaType(visitor.getSchemaType());
-        setCorbaType(visitor.getCorbaType());
-        setFullyQualifiedName(visitor.getFullyQualifiedName());
+            setSchemaType(visitor.getSchemaType());
+            setCorbaType(visitor.getCorbaType());
+            setFullyQualifiedName(visitor.getFullyQualifiedName());
+        }
     }
 
 }

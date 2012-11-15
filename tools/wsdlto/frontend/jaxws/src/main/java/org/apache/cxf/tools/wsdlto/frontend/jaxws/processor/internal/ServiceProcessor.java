@@ -452,10 +452,11 @@ public class ServiceProcessor extends AbstractProcessor {
         List<ExtensibilityElement> inbindings = null;
         if (operation.getInput() != null) {
             inbindings = operation.getInput().getExtensors(ExtensibilityElement.class);
-            if (inbindings == null) {
-                inbindings = new ArrayList<ExtensibilityElement>();
-            }
         }
+        if (inbindings == null) {
+            inbindings = new ArrayList<ExtensibilityElement>();
+        }
+
         String use = null;
         for (ExtensibilityElement ext : inbindings) {
             if (SOAPBindingUtil.isSOAPBody(ext)) {

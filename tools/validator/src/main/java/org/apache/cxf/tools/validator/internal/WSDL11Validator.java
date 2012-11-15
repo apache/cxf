@@ -255,7 +255,11 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
     private void sort(List<InputSource> list) {
         Collections.sort(list, new Comparator<InputSource>() {
             public int compare(InputSource i1, InputSource i2) {
-                if (i1 == null && i2 == null) {
+                if (i1 == null && i2 != null) {
+                    return -1;
+                } else if (i1 != null && i2 == null) {
+                    return 1;
+                } else if (i1 == null && i2 == null) {
                     return -1;
                 }
                 return i1.getSystemId().compareTo(i2.getSystemId());

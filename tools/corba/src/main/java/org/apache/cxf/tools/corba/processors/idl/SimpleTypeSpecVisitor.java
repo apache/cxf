@@ -71,11 +71,12 @@ public class SimpleTypeSpecVisitor extends VisitorBase {
         
         }
         
-        
-        visitor.visit(node);
+        if (visitor != null) {
+            visitor.visit(node);
 
-        setSchemaType(visitor.getSchemaType());
-        setCorbaType(visitor.getCorbaType());
-        setFullyQualifiedName(visitor.getFullyQualifiedName());
+            setSchemaType(visitor.getSchemaType());
+            setCorbaType(visitor.getCorbaType());
+            setFullyQualifiedName(visitor.getFullyQualifiedName());
+        }
     }
 }

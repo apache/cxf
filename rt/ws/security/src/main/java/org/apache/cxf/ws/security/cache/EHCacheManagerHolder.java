@@ -93,9 +93,11 @@ public final class EHCacheManagerHolder {
 
         String defaultConfigFile = "cxf-ehcache.xml";
         URL configFileURL = null;
+        String busId = "";
         if (bus != null) {
             ResourceManager rm = bus.getExtension(ResourceManager.class);
             configFileURL = rm.resolveResource(defaultConfigFile, URL.class);
+            busId = bus.getId();
         }
         try {
             if (configFileURL == null) {
@@ -117,10 +119,10 @@ public final class EHCacheManagerHolder {
             }
             if (Boolean.parseBoolean(perBus)) {
             */
-            conf.setName(bus.getId());
+            conf.setName(busId);
             if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
                 String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                    + bus.getId();
+                    + busId;
                 conf.getDiskStoreConfiguration().setPath(path);
             }
             return CacheManager.create(conf);

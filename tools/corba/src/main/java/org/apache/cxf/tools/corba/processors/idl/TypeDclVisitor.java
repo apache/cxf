@@ -79,7 +79,9 @@ public class TypeDclVisitor extends VisitorBase {
 
         // TODO forward declaration <constr_forward_declaration>
         
-        visitor.visit(node);
+        if (visitor != null) {
+            visitor.visit(node);
+        }      
     }
 
 }
