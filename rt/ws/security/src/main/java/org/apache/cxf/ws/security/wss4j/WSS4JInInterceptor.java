@@ -59,6 +59,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -196,6 +197,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg)) {
             return;
         }
+        //make sure we skip the URIMapping as we cannot apply security requirements to that
+        msg.put(URIMappingInterceptor.URIMAPPING_SKIP, Boolean.TRUE);
         msg.put(SECURITY_PROCESSED, Boolean.TRUE);
         
         boolean utWithCallbacks = 
