@@ -173,9 +173,8 @@ final class Utils {
                 
                 if (setter != null && setter.isAnnotationPresent(XmlTransient.class)) {
                     return false;
-                } else {
-                    return true;
-                }
+                } 
+                return true;
             }
         }
         return false;
