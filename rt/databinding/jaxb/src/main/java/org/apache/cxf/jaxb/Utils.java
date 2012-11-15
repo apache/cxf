@@ -170,10 +170,10 @@ final class Utils {
                 String setterName = "set" + m.getName().substring(index);
                 Class<?> paramTypes = m.getReturnType();
                 Method setter = getDeclaredMethod(declaringClass, setterName, paramTypes);
-                if (setter == null) {
-                    return true;
-                }
-                if (setter != null && !setter.isAnnotationPresent(XmlTransient.class)) {
+                
+                if (setter != null && setter.isAnnotationPresent(XmlTransient.class)) {
+                    return false;
+                } else {
                     return true;
                 }
             }
