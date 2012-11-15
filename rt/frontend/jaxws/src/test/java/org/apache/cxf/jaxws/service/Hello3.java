@@ -54,7 +54,6 @@ public class Hello3 implements HelloInterface {
         return null;
     }
 
-    @Override
     @WebMethod
     public String addNumbers(int arg0, int arg1) throws AddNumbersException {
         // TODO Auto-generated method stub
