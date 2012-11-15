@@ -136,7 +136,6 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
             }
         }
         if (notValid) {
-            System.out.println(this.getErrorMessage());
             throw new ToolException(this.getErrorMessage());            
         }
 
