@@ -209,7 +209,7 @@ public class MessageImpl extends StringMapImpl implements Message {
     private void calcContextCache() {
         Map<String, Object> o = new HashMap<String, Object>() {
             public void putAll(Map<? extends String, ? extends Object> m) {
-                if (m != null) {
+                if (m != null && m.size() > 0) {
                     super.putAll(m);
                 }
             }
