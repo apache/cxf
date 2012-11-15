@@ -62,7 +62,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         Service service = bean.create();
 
         InterfaceInfo i = service.getServiceInfos().get(0).getInterface();
-        assertEquals(4, i.getOperations().size());
+        assertEquals(5, i.getOperations().size());
 
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setBus(bus);
@@ -100,7 +100,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         javax.wsdl.PortType portType = d.getPortType(portTypeName);
 
         assertNotNull(portType);
-        assertEquals(4, portType.getOperations().size());
+        assertEquals(5, portType.getOperations().size());
     }
 
     @Test
@@ -124,7 +124,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         javax.wsdl.PortType portType = d.getPortType(portTypeName);
 
         assertNotNull(portType);
-        assertEquals(4, portType.getOperations().size());
+        assertEquals(5, portType.getOperations().size());
     }
     @Test
     public void testExcludeOnInterface() throws Exception {

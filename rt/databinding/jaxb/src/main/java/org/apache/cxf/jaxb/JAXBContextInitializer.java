@@ -379,8 +379,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     static boolean isMethodAccepted(Method method, XmlAccessType accessType) {
         // We only accept non static property getters which are not marked @XmlTransient
         if (Modifier.isStatic(method.getModifiers()) 
-            || method.isAnnotationPresent(XmlTransient.class)
-            || !Modifier.isPublic(method.getModifiers())) {
+                || method.isAnnotationPresent(XmlTransient.class)
+                || !Modifier.isPublic(method.getModifiers())
+                || "getClass".equals(method.getName())) {
             return false;
         }
 
@@ -390,11 +391,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             || method.getDeclaringClass().equals(Throwable.class)) {
             return false;
         }
-
+        if (method.getName().startsWith("get")
+                || method.getName().startsWith("is")) { 
+                //continue with below check.
+        } else {
+            return false;
+        }
         int beginIndex = 3;
         if (method.getName().startsWith("is")) {
             beginIndex = 2;
         }
+        
         Method setter = null;
         try {
             setter = method.getDeclaringClass()
@@ -403,10 +410,11 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         } catch (Exception e) {
             //getter, but no setter
         }
-        if (setter == null 
-            || setter.isAnnotationPresent(XmlTransient.class)
-            || !Modifier.isPublic(setter.getModifiers())) {
+        if ((setter != null) 
+                && ((setter.isAnnotationPresent(XmlTransient.class)
+                 || !Modifier.isPublic(setter.getModifiers())))) {
             return false;
+             
         }
 
         if (accessType == XmlAccessType.NONE

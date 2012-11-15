@@ -136,7 +136,8 @@ final class Utils {
         if (method.isBridge()
                 || Modifier.isStatic(method.getModifiers())
                 || method.isAnnotationPresent(XmlTransient.class)
-                || method.getDeclaringClass().equals(Throwable.class)) {
+                || method.getDeclaringClass().equals(Throwable.class)
+                || "getClass".equals(method.getName())) {
             return false;
         }
         // Allow only public methods if PUBLIC_MEMBER access is requested
@@ -169,9 +170,11 @@ final class Utils {
                 String setterName = "set" + m.getName().substring(index);
                 Class<?> paramTypes = m.getReturnType();
                 Method setter = getDeclaredMethod(declaringClass, setterName, paramTypes);
-                if (setter != null && !setter.isAnnotationPresent(XmlTransient.class)) {
-                    return true;
-                }
+                
+                if (setter != null && setter.isAnnotationPresent(XmlTransient.class)) {
+                    return false;
+                } 
+                return true;
             }
         }
         return false;
