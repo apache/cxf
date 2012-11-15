@@ -35,10 +35,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -47,6 +49,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  */
 public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(XSLTOutInterceptor.class);
+
+    public XSLTOutInterceptor(String xsltPath) {
+        super(Phase.PRE_STREAM, StaxOutInterceptor.class, null, xsltPath);
+    }
 
     public XSLTOutInterceptor(String phase, Class<?> before, Class<?> after, String xsltPath) {
         super(phase, before, after, xsltPath);

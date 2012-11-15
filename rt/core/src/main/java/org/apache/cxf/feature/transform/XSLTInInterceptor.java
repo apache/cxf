@@ -30,8 +30,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
 
@@ -40,6 +42,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  */
 public class XSLTInInterceptor extends AbstractXSLTInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(XSLTInInterceptor.class);    
+
+    public XSLTInInterceptor(String xsltPath) {
+        super(Phase.POST_STREAM, StaxInInterceptor.class, null, xsltPath);
+    }
 
     public XSLTInInterceptor(String phase, Class<?> before, Class<?> after, String xsltPath) {
         super(phase, before, after, xsltPath);

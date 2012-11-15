@@ -22,9 +22,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.interceptor.StaxInInterceptor;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.phase.Phase;
 
 /**
  * This class defines a feature is used to transform message using XSLT script. 
@@ -41,13 +38,12 @@ public class XSLTFeature extends AbstractFeature {
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         if (inXSLTPath != null) {
-            XSLTInInterceptor in = new XSLTInInterceptor(Phase.POST_STREAM, StaxInInterceptor.class, null, inXSLTPath);
+            XSLTInInterceptor in = new XSLTInInterceptor(inXSLTPath);
             provider.getInInterceptors().add(in);            
         }
         
         if (outXSLTPath != null) {
-            XSLTOutInterceptor out = new XSLTOutInterceptor(Phase.PRE_STREAM, StaxOutInterceptor.class, null,
-                                                            outXSLTPath);
+            XSLTOutInterceptor out = new XSLTOutInterceptor(outXSLTPath);
             provider.getOutInterceptors().add(out);            
             provider.getOutFaultInterceptors().add(out);            
         }

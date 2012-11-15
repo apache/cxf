@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import junit.framework.Assert;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -45,7 +46,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,8 +70,8 @@ public class XSLTInterceptorsTest {
             throw new IllegalArgumentException("Cannot load message from path: " + MESSAGE_FILE);
         }
         message = new MessageImpl();
-        inInterceptor = new XSLTInInterceptor(Phase.POST_STREAM, null, null, TRANSFORMATION_XSL);
-        outInterceptor = new XSLTOutInterceptor(Phase.PRE_STREAM, null, null, TRANSFORMATION_XSL);
+        inInterceptor = new XSLTInInterceptor(TRANSFORMATION_XSL);
+        outInterceptor = new XSLTOutInterceptor(TRANSFORMATION_XSL);
     }
     
     @Test

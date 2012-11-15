@@ -31,9 +31,6 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.transform.XSLTInInterceptor;
 import org.apache.cxf.feature.transform.XSLTOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.StaxInInterceptor;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,8 +56,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
          
         Echo port = service.getPort(PORT_NAME, Echo.class);
         Client client = ClientProxy.getClient(port);
-        XSLTOutInterceptor outInterceptor = new XSLTOutInterceptor(Phase.PRE_STREAM, StaxOutInterceptor.class, null,
-                                                                   XSLT_REQUEST_PATH);
+        XSLTOutInterceptor outInterceptor = new XSLTOutInterceptor(XSLT_REQUEST_PATH);
         client.getOutInterceptors().add(outInterceptor);
         String response = port.echo("test");
         Assert.assertTrue("Request was not transformed", response.contains(TRANSFORMED_CONSTANT));
@@ -74,8 +70,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
          
         Echo port = service.getPort(PORT_NAME, Echo.class);
         Client client = ClientProxy.getClient(port);
-        XSLTInInterceptor inInterceptor = new XSLTInInterceptor(Phase.POST_STREAM, StaxInInterceptor.class, null,
-                                                                   XSLT_RESPONSE_PATH);
+        XSLTInInterceptor inInterceptor = new XSLTInInterceptor(XSLT_RESPONSE_PATH);
         client.getInInterceptors().add(inInterceptor);
         String response = port.echo("test");
         Assert.assertTrue(response.contains(TRANSFORMED_CONSTANT));
