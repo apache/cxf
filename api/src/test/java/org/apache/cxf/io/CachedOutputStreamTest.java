@@ -61,7 +61,7 @@ public class CachedOutputStreamTest extends Assert {
         CachedOutputStream cos = new CachedOutputStream();
         cos.setThreshold(4);
         // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
-        cos.setCipherTransformation("DES/CFB8/NoPadding");
+        cos.setCipherTransformation("RC4");
         
         final String text = "Hello Secret World!";
         cos.write(text.getBytes("UTF-8"));
@@ -91,7 +91,7 @@ public class CachedOutputStreamTest extends Assert {
         CachedOutputStream cos = new CachedOutputStream();
         cos.setThreshold(4);
         // need a 8-bit cipher so that all bytes are flushed when the stream is flushed.
-        cos.setCipherTransformation("DES/CFB8/NoPadding");
+        cos.setCipherTransformation("RC4");
         
         final String text = "Hello Secret World!";
         cos.write(text.getBytes("UTF-8"));
