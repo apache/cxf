@@ -18,21 +18,20 @@
  */
 package org.apache.cxf.jaxws.service;
 
-import java.util.List;
+import javax.xml.ws.WebFault;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+@WebFault
+public class AddNumbersException extends Exception {
+    private String info;
 
-@WebService
-public interface HelloInterface {
-    @WebMethod
-    String sayHi(String text);
-    @WebMethod
-    List<String> getGreetings();
-    @WebMethod
-    String[] getStringArray(String[] strs);
-    @WebMethod
-    List<String> getStringList(List<String> list);
-    @WebMethod
-    String addNumbers(int arg0, int arg1) throws AddNumbersException;
+    public AddNumbersException() {
+    }
+
+    public AddNumbersException(String info) { 
+        this.info = info; 
+    }
+
+    public String getInfo() { 
+        return info; 
+    }
 }

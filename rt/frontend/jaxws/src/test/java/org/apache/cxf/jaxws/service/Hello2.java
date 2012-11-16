@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.jaxws.service.HelloInterface")
@@ -46,6 +47,13 @@ public class Hello2 implements HelloInterface {
     }
 
     public List<String> getStringList(List<String> list) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    @WebMethod
+    public String addNumbers(int arg0, int arg1) throws AddNumbersException {
         // TODO Auto-generated method stub
         return null;
     }

@@ -491,7 +491,7 @@ public final class JAXBEncoderDecoder {
                         m = Utils.getMethod(cls, accessType, "is" + s);
                     }
                     Type type = m.getGenericReturnType();
-                    Method m2 = Utils.getMethod(cls, accessType, "set" + s, m.getReturnType());
+                    Object o = null;
                     if (JAXBSchemaInitializer.isArray(type)) {
                         Class<?> compType = JAXBSchemaInitializer
                             .getArrayComponentType(type);
@@ -499,7 +499,7 @@ public final class JAXBEncoderDecoder {
                                                            q,
                                                            compType,
                                                            createList(type));
-                        Object o = ret;
+                        o = ret;
                         if (!isList(type)) {
                             if (compType.isPrimitive()) {
                                 o = java.lang.reflect.Array.newInstance(compType, ret.size());
@@ -510,12 +510,23 @@ public final class JAXBEncoderDecoder {
                                 o = ret.toArray((Object[])Array.newInstance(compType, ret.size()));
                             }
                         }
-
-                        m2.invoke(obj, o);
                     } else {
-                        Object o = getElementValue(u.unmarshal(reader, Utils.getMethodReturnType(m)));
-                        Utils.setMethodValue(m, m2, obj, o);
+                        o = getElementValue(u.unmarshal(reader, Utils.getMethodReturnType(m)));
                     }
+                    Method m2 = Utils.getMethod(cls, accessType, "set" + s, m.getReturnType());
+                    if (m2 != null) {
+                        if (JAXBSchemaInitializer.isArray(type)) {
+                            m2.invoke(obj, o);
+                        } else {
+                            Utils.setMethodValue(m, m2, obj, o);
+                        }
+                    } else {
+                        Field fn = ReflectionUtil.getDeclaredField(cls, q.getLocalPart());
+                        if (fn != null) {
+                            ReflectionUtil.setAccessible(fn);
+                            fn.set(obj, o);
+                        }
+                    }                
                 }
             }
             return (Exception)obj;

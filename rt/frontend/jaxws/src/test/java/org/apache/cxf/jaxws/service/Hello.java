@@ -68,4 +68,12 @@ public class Hello {
         ret.add("Bonjour" + list.get(1));
         return ret;
     }
+    
+    @WebMethod
+    public String addNumbers(int arg0, int arg1) throws AddNumbersException {
+        if (arg0 + arg1 < 0) {
+            throw new AddNumbersException("Sum is less than 0.");
+        }
+        return "Result = " + String.valueOf(arg0 + arg1);
+    }
 }

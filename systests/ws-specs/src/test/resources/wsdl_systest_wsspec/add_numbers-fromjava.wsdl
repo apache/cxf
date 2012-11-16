@@ -28,7 +28,9 @@ under the License.
 		    targetNamespace="http://server.addr_fromjava.ws.systest.cxf.apache.org/">
 	    <xsd:element name="AddNumbersException" type="tns:AddNumbersException"/>
 	    <xsd:complexType name="AddNumbersException">
-		<xsd:sequence/>
+		<xsd:sequence>
+                     <xsd:element name="detail" type="xsd:string"/>
+                </xsd:sequence>
 	    </xsd:complexType>
 	    <xsd:element name="addNumbers3" type="tns:addNumbers3"/>
 	    <xsd:complexType name="addNumbers3">

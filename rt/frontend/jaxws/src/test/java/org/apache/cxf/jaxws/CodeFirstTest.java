@@ -42,9 +42,11 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.service.AddNumbersException;
 import org.apache.cxf.jaxws.service.ArrayService;
 import org.apache.cxf.jaxws.service.ArrayServiceImpl;
 import org.apache.cxf.jaxws.service.Entity;
@@ -138,7 +140,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         Service service = bean.create();
 
         InterfaceInfo i = service.getServiceInfos().get(0).getInterface();
-        assertEquals(4, i.getOperations().size());
+        assertEquals(5, i.getOperations().size());
 
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setBus(bus);
@@ -222,6 +224,32 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         assertEquals(2, result.size());
     }
     
+    @Test
+    public void testException() throws Exception {
+        Hello serviceImpl = new Hello();
+        EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
+        ep.publish("local://localhost:9090/hello");
+        ep.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "HelloService");
+        QName portName = new QName("http://service.jaxws.cxf.apache.org/", "HelloPort");
+
+        // need to set the same bus with service , so use the ServiceImpl
+        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello");
+
+        HelloInterface proxy = service.getPort(portName, HelloInterface.class);
+        ClientProxy.getClient(proxy).getInFaultInterceptors().add(new LoggingInInterceptor());
+        ClientProxy.getClient(proxy).getInInterceptors().add(new LoggingInInterceptor());
+        try {   
+            proxy.addNumbers(1, -2);
+            fail("should throw AddNumbersException");
+        } catch (AddNumbersException e) {
+            assertEquals(e.getInfo(), "Sum is less than 0.");
+        }
+
+    }
+
     
     @Test
     public void testRpcClient() throws Exception {
