@@ -42,6 +42,7 @@ public class RMUtilsTest extends Assert {
     
     @Before
     public void setUp() {
+
         control = EasyMock.createNiceControl();
     }
 
@@ -79,15 +80,18 @@ public class RMUtilsTest extends Assert {
 
         // this test makes sure that an automatically generated id will be
         // mapped to the static default bus name "cxf".
+        System.out.println("bus: " + BusFactory.getThreadDefaultBus(false));
         control.reset();
         EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
         EasyMock.expect(ei.getName()).andReturn(eqn);
         EasyMock.expect(ei.getService()).andReturn(si);
         EasyMock.expect(si.getName()).andReturn(sqn);
         control.replay();
+        Bus bus = BusFactory.getDefaultBus();
         assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID, 
-                     RMUtils.getEndpointIdentifier(e, BusFactory.getDefaultBus()));
-
+                     RMUtils.getEndpointIdentifier(e, bus));
+        bus.shutdown(true);
+        
         // a generated bundle artifact bus
         control.reset();
         EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
