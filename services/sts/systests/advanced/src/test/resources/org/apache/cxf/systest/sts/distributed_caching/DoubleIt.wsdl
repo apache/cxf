@@ -106,8 +106,8 @@
 						<sp:TransportToken>
 							<wsp:Policy>
 								<sp:HttpsToken>
-                                                                    <wsp:Policy/>
-                                                                </sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
@@ -182,8 +182,8 @@
 						<sp:TransportToken>
 							<wsp:Policy>
 								<sp:HttpsToken>
-                                                                    <wsp:Policy/>
-                                                                </sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
@@ -258,8 +258,8 @@
 						<sp:TransportToken>
 							<wsp:Policy>
 								<sp:HttpsToken>
-                                                                    <wsp:Policy/>
-                                                                </sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>

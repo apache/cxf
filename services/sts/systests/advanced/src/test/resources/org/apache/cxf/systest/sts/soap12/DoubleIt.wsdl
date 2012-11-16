@@ -88,8 +88,8 @@
 									</sp:Issuer>
 								</sp:IssuedToken>
 								<sp:HttpsToken>
-                                                                    <wsp:Policy/>
-                                                                </sp:HttpsToken>
+                                    <wsp:Policy/>
+                                </sp:HttpsToken>
 							</wsp:Policy>
 						</sp:TransportToken>
 						<sp:AlgorithmSuite>
