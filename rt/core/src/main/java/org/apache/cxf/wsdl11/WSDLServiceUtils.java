@@ -41,7 +41,10 @@ public final class WSDLServiceUtils {
                 sb.delete(0, sb.length());
                 sb.append(ext.getElementType().getNamespaceURI());
                 try {
-                    factory = bus.getExtension(BindingFactoryManager.class).getBindingFactory(sb.toString());
+                    BindingFactoryManager manager = bus.getExtension(BindingFactoryManager.class);
+                    if (manager != null) {
+                        factory = manager.getBindingFactory(sb.toString());
+                    }
                 } catch (BusException e) {
                     // ignore, we'll use a generic BindingInfo
                 }
