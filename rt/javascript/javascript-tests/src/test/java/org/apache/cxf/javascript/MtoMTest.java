@@ -27,6 +27,8 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.MtoMImpl;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -51,6 +53,7 @@ public class MtoMTest extends JavascriptRhinoTest {
     
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:MtoMBeans.xml"};
     }
     
