@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,8 +32,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class OAuthPermission extends Permission {
-    private List<String> httpVerbs = Collections.emptyList();
-    private List<String> uris = Collections.emptyList();
+    private List<String> httpVerbs = new LinkedList<String>();
+    private List<String> uris = new LinkedList<String>();
     
     public OAuthPermission() {
         
