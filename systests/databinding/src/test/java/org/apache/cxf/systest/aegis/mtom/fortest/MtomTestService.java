@@ -24,6 +24,7 @@ import javax.jws.WebService;
 import javax.xml.ws.soap.MTOM;
 
 import org.apache.cxf.aegis.type.java5.XmlParamType;
+import org.apache.cxf.aegis.type.java5.XmlReturnType;
 
 /**
  *
@@ -34,5 +35,6 @@ public interface MtomTestService {
     void acceptDataHandler(@WebParam(name = "inputDhBean")
                            @XmlParamType(name = "inputDhBean")
                            DataHandlerBean dhBean);
+    @XmlReturnType(name = "inputDhBean")
     DataHandlerBean produceDataHandlerBean();
 }
