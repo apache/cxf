@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.invoker.MethodDispatcher;
@@ -46,6 +47,9 @@ public class ClientProxy implements InvocationHandler, Closeable {
     public ClientProxy(Client c) {
         endpoint = c.getEndpoint();
         client = c;
+        if (c instanceof ClientImpl) {
+            ((ClientImpl)c).setProxyObject(this);
+        }
     }
     public void close() throws IOException {
         if (client != null) {
@@ -120,4 +124,5 @@ public class ClientProxy implements InvocationHandler, Closeable {
     public static Client getClient(Object o) {
         return ((ClientProxy)Proxy.getInvocationHandler(o)).getClient();
     }
+
 }
