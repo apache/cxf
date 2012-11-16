@@ -38,7 +38,6 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 		<property name="dataBinding" ref="aegisBean" />
 	</bean>
 
-
 	<jaxws:endpoint id="mtom-jaxws-service" implementor="#mtomImpl"
 		address="http://localhost:${testutil.ports.MtomTest}/jaxWsMtom">
 		<jaxws:serviceFactory>
@@ -71,7 +70,9 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
 	<simple:server id="mtom-xmime-server"
 		address="http://localhost:${testutil.ports.MtomTest}/mtomXmime"
-		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService">
+		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService"
+		xmlns:sns="http://fortest.mtom.aegis.systest.cxf.apache.org/"
+		serviceName="sns:MtomTestServiceXmime">
 		<simple:dataBinding>
 			<bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
 				<property name="mtomEnabled" value="true" />
