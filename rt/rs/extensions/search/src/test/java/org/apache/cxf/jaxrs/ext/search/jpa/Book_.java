@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
+import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 @javax.persistence.metamodel.StaticMetamodel(Book.class)
@@ -31,5 +32,7 @@ public final class Book_ {
     public static volatile SingularAttribute<Book, Library> library;
     public static volatile SingularAttribute<Book, OwnerInfo> ownerInfo;
     public static volatile SingularAttribute<Book, OwnerAddress> address;
+    public static volatile ListAttribute<Book, BookReview> reviews;
+    public static volatile ListAttribute<Book, String> authors;
 }
 //CHECKSTYLE:ON

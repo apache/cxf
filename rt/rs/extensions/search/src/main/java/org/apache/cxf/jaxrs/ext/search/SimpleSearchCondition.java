@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 
 /**
  * Simple search condition comparing primitive objects or complex object by its getters. For details see
@@ -68,7 +71,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             throw new IllegalArgumentException("unsupported condition type: " + cType.name());
         }
         this.condition = condition;
-        scts = createConditions(null, null, cType);
+        scts = createConditions(null, null, null, cType);
                 
     }
 
@@ -82,6 +85,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      */
     public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
                                  Map<String, String> realGetters,
+                                 Map<String, TypeInfo> propertyTypeInfo,
                                  T condition) {
         if (getters2operators == null) {
             throw new IllegalArgumentException("getters2operators is null");
@@ -100,12 +104,12 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 throw new IllegalArgumentException("unsupported condition type: " + ct.name());
             }
         }
-        scts = createConditions(getters2operators, realGetters, null);
+        scts = createConditions(getters2operators, realGetters, propertyTypeInfo, null);
     }
 
     public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
                                  T condition) {
-        this(getters2operators, null, condition);
+        this(getters2operators, null, null, condition);
     }
     
     public T getCondition() {
@@ -135,10 +139,11 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
 
     private List<SearchCondition<T>> createConditions(Map<String, ConditionType> getters2operators,
                                                       Map<String, String> realGetters,
+                                                      Map<String, TypeInfo> propertyTypeInfo,
                                                       ConditionType sharedType) {
         if (isBuiltIn(condition)) {
             return Collections.singletonList(
-                (SearchCondition<T>)new PrimitiveSearchCondition<T>(null, condition, sharedType, condition));
+                (SearchCondition<T>)new PrimitiveSearchCondition<T>(null, condition, null, sharedType, condition));
         } else {
             List<SearchCondition<T>> list = new ArrayList<SearchCondition<T>>();
             Map<String, Object> get2val = getGettersAndValues();
@@ -158,8 +163,11 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 }
                 String realGetter = realGetters != null && realGetters.containsKey(getter) 
                     ? realGetters.get(getter) : getter;
+                    
+                Type genType = propertyTypeInfo != null && propertyTypeInfo.containsKey(getter)
+                    ? propertyTypeInfo.get(getter).getGenericType() : rval.getClass();
                 
-                list.add(new PrimitiveSearchCondition<T>(realGetter, rval, ct, condition));
+                list.add(new PrimitiveSearchCondition<T>(realGetter, rval, genType, ct, condition));
                 
             }
             if (list.isEmpty()) {

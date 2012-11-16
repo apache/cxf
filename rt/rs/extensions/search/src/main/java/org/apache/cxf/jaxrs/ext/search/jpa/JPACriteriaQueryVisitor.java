@@ -34,7 +34,14 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     public JPACriteriaQueryVisitor(EntityManager em, 
                                    Class<T> tClass,
                                    Class<E> queryClass) {
-        this(em, tClass, queryClass, null);
+        this(em, tClass, queryClass, null, null);
+    }
+    
+    public JPACriteriaQueryVisitor(EntityManager em, 
+                                   Class<T> tClass,
+                                   Class<E> queryClass,
+                                   List<String> joinProps) {
+        this(em, tClass, queryClass, null, null);
     }
     
     public JPACriteriaQueryVisitor(EntityManager em, 
@@ -44,12 +51,20 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
         super(em, tClass, queryClass, fieldMap);
     }
     
+    public JPACriteriaQueryVisitor(EntityManager em, 
+                                   Class<T> tClass,
+                                   Class<E> queryClass,
+                                   Map<String, String> fieldMap,
+                                   List<String> joinProps) {
+        super(em, tClass, queryClass, fieldMap, joinProps);
+    }
+    
     public CriteriaQuery<E> getQuery() {
         return getCriteriaQuery();
     }
         
     public CriteriaQuery<E> selectArray(List<SingularAttribute<T, ?>> attributes) {
-        return selectArraySelections(toSelectionsArray(toSelectionsList(attributes)));
+        return selectArraySelections(toSelectionsArray(toSelectionsList(attributes, false)));
     }
     
     private CriteriaQuery<E> selectArraySelections(Selection<?>... selections) {
@@ -60,7 +75,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     }
     
     public CriteriaQuery<E> selectConstruct(List<SingularAttribute<T, ?>> attributes) {
-        return selectConstructSelections(toSelectionsArray(toSelectionsList(attributes)));
+        return selectConstructSelections(toSelectionsArray(toSelectionsList(attributes, false)));
     }
     
     private CriteriaQuery<E> selectConstructSelections(Selection<?>... selections) {
@@ -69,7 +84,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     }
     
     public CriteriaQuery<E> selectTuple(List<SingularAttribute<T, ?>> attributes) {
-        return selectTupleSelections(toSelectionsArray(toSelectionsList(attributes)));
+        return selectTupleSelections(toSelectionsArray(toSelectionsList(attributes, true)));
     }
     
     private CriteriaQuery<E> selectTupleSelections(Selection<?>... selections) {
@@ -80,7 +95,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
         return getQuery();
     }
     
-    private List<Selection<?>> toSelectionsList(List<SingularAttribute<T, ?>> attributes) {
+    private List<Selection<?>> toSelectionsList(List<SingularAttribute<T, ?>> attributes, boolean setAlias) {
         List<Selection<?>> selections = new ArrayList<Selection<?>>(attributes.size());
         for (SingularAttribute<T, ?> attr : attributes) {
             Path<?> path = getRoot().get(attr);

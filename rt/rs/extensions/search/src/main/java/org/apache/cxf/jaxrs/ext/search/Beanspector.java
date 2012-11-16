@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -91,7 +92,7 @@ public class Beanspector<T> {
         return Collections.unmodifiableSet(setters.keySet());
     }
 
-    public Class<?> getAccessorType(String getterOrSetterName) throws Exception {
+    public TypeInfo getAccessorTypeInfo(String getterOrSetterName) throws Exception {
         Method m = getters.get(getterOrSetterName);
         if (m == null) {
             m = setters.get(getterOrSetterName);
@@ -102,7 +103,7 @@ public class Beanspector<T> {
                                        setters.keySet(), getters.keySet());
             throw new IntrospectionException(msg);
         }
-        return m.getReturnType();
+        return new TypeInfo(m.getReturnType(), m.getGenericReturnType());
     }
 
     public Beanspector<T> swap(T newobject) throws Exception {
@@ -190,5 +191,21 @@ public class Beanspector<T> {
     }
 
     
-
+    public static class TypeInfo {
+        private Class<?> cls;
+        private Type genericType;
+        
+        public TypeInfo(Class<?> cls, Type genericType) {
+            this.cls = cls;
+            this.genericType = genericType;
+        }
+        
+        public Class<?> getTypeClass() {
+            return cls;
+        }
+        
+        public Type getGenericType() {
+            return genericType;
+        }
+    }
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.lang.reflect.Type;
+
 /**
  * Encapsulates a basic search statement such as a = b, i < 5, etc
  */
@@ -26,12 +28,14 @@ public class PrimitiveStatement {
 
     private String property;
     private Object value;
+    private Type propertyType;
     private ConditionType condition;
     
-    public PrimitiveStatement(String property, Object value, ConditionType condition) {
+    public PrimitiveStatement(String property, Object value, Type type, ConditionType condition) {
         this.property = property;
         this.value = value;
         this.condition = condition;
+        this.propertyType = type;
     }
     
     public String getProperty() {
@@ -41,6 +45,11 @@ public class PrimitiveStatement {
     public Object getValue() {
         return value;
     }
+    
+    public Type getValueType() {
+        return propertyType;
+    }
+    
     public ConditionType getCondition() {
         return condition;
     }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -26,11 +28,30 @@ import javax.persistence.TypedQuery;
 public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, TypedQuery<T>> {
 
     public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
-        this(em, tClass, null);
+        this(em, tClass, null, null);
     }
     
     public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
         super(em, tClass, fieldMap);
+    }
+    
+    public JPATypedQueryVisitor(EntityManager em, 
+                                Class<T> tClass, 
+                                List<String> joinProps) {
+        super(em, tClass, null, joinProps);
+    }
+    
+    public JPATypedQueryVisitor(EntityManager em, 
+                                Class<T> tClass, 
+                                String joinProp) {
+        super(em, tClass, null, Collections.singletonList(joinProp));
+    }
+    
+    public JPATypedQueryVisitor(EntityManager em, 
+                                Class<T> tClass, 
+                                Map<String, String> fieldMap,
+                                List<String> joinProps) {
+        super(em, tClass, fieldMap, joinProps);
     }
     
     public TypedQuery<T> getQuery() {
