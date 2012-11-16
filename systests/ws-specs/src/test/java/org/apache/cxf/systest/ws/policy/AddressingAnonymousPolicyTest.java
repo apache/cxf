@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
@@ -52,6 +53,7 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
 
     public static class Server extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
+        Endpoint ep;
         public Server() {
         }
         public Server(String dir) {
@@ -62,6 +64,7 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
             System.setProperty("server.temp.location", tmpDir);
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-anon-server.xml");
+            setBus(bus);
             BusFactory.setDefaultBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
             bus.getInInterceptors().add(in);
@@ -72,8 +75,12 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
             
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            Endpoint.publish(address, implementor);
+            ep = Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");            
+        }
+        public void tearDown() {
+            ep.stop();
+            ep = null;
         }
         
 
@@ -137,8 +144,9 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault ex) {
-            assertEquals(2, (int)ex.getFaultInfo().getMajor());
-            assertEquals(1, (int)ex.getFaultInfo().getMinor());
-        } 
+            assertEquals(2, ex.getFaultInfo().getMajor());
+            assertEquals(1, ex.getFaultInfo().getMinor());
+        }
+        ((Closeable)greeter).close();
     }
 }

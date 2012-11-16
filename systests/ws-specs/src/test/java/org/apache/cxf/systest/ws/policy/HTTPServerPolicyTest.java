@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
@@ -55,14 +56,14 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
     private static final Logger LOG = LogUtils.getLogger(HTTPServerPolicyTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
-   
+        Endpoint ep;
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/http-server.xml");
-            
+            setBus(bus);
             GreeterImpl implementor = new GreeterImpl();
             implementor.setThrowAlways(true);
-            Endpoint.publish("http://localhost:" + PORT + "/SoapContext/GreeterPort", implementor);
+            ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/GreeterPort", implementor);
 
             LOG.info("Published greeter endpoint."); 
             
@@ -74,6 +75,9 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
             bus.getOutFaultInterceptors().add(out);
         }
         
+        public void tearDown() {
+            ep.stop();
+        }
 
         public static void main(String[] args) {
             try { 
@@ -142,6 +146,6 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
             assertEquals(2, (int)ex.getFaultInfo().getMajor());
             assertEquals(1, (int)ex.getFaultInfo().getMinor());
         }
-
+        ((Closeable)greeter).close();
     }
 }

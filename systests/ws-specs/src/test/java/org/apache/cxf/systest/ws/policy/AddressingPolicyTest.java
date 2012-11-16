@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
@@ -36,6 +37,8 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,7 +50,6 @@ import org.junit.Test;
 public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString(); 
-    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(AddressingPolicyTest.class);
 
@@ -96,6 +98,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        TestUtil.getNewPortNumber("decoupled");
         PolicyTestHelper.updatePolicyRef("addr-external.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
 
@@ -144,5 +147,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
             assertEquals(2, (int)ex.getFaultInfo().getMajor());
             assertEquals(1, (int)ex.getFaultInfo().getMinor());
         } 
+        ((Closeable)greeter).close();
+
     }
 }

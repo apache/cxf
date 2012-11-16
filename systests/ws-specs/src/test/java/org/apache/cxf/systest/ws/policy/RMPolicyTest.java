@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
@@ -37,6 +38,7 @@ import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.testutil.recorders.InMessageRecorder;
 import org.apache.cxf.testutil.recorders.MessageRecorder;
 import org.apache.cxf.testutil.recorders.OutMessageRecorder;
@@ -54,7 +56,6 @@ import org.junit.Test;
 public class RMPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString(); 
-    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(RMPolicyTest.class);
     private static final String GREETMEONEWAY_ACTION 
@@ -112,6 +113,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        TestUtil.getNewPortNumber("decoupled");
         PolicyTestHelper.updatePolicyRef("rm-external.xml", ":9020", ":" + PORT);
         System.setProperty("temp.location", TEMPDIR);
 
@@ -192,6 +194,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
-         
+        ((Closeable)greeter).close();
+
     }
 }
