@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.BasicGreeterService;
@@ -46,7 +47,7 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/http-addr-server.xml");
-            
+            setBus(bus);
             GreeterImpl implementor = new GreeterImpl();
             implementor.setThrowAlways(true);
             Endpoint.publish("http://localhost:" + PORT + "/SoapContext/GreeterPort", implementor);
@@ -86,7 +87,8 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
         // use a plain client
         
         SpringBusFactory bf = new SpringBusFactory();
-        Bus bus = bf.createBus();
+        bus = bf.createBus();
+        BusFactory.setDefaultBus(bus);
         
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
@@ -107,6 +109,5 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
                        e.getMessage().contains("Addressing Property is not present"));
         }
         ((Closeable)greeter).close();
-
     }
 }

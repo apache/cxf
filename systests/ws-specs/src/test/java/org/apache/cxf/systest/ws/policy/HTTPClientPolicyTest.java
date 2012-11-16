@@ -68,11 +68,11 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         new QName("http://cxf.apache.org/greeter_control", "BasicGreeterService");
     
     public static class Server extends AbstractBusTestServerBase {
-   
+        Endpoint ep;
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus();
-            
+            setBus(bus);
             BusFactory.setDefaultBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
             LoggingOutInterceptor out = new LoggingOutInterceptor();           
@@ -83,10 +83,13 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
             HttpGreeterImpl implementor = new HttpGreeterImpl();
             implementor.setThrowAlways(true);
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            Endpoint.publish(address, implementor);
+            ep = Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");            
         }
-        
+        public void tearDown() {
+            ep.stop();
+            ep = null;
+        }
 
         public static void main(String[] args) {
             try { 
