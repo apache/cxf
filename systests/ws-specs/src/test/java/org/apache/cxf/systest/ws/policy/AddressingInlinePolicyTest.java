@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,6 +37,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.policy.PolicyInInterceptor;
 import org.apache.cxf.ws.policy.PolicyOutInterceptor;
 import org.junit.BeforeClass;
@@ -48,23 +50,28 @@ import org.junit.Test;
  */
 public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(AddressingInlinePolicyTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
     
+        Endpoint ep;
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy.xml");
+            BusFactory.setDefaultBus(bus);
+            setBus(bus);
             
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            Endpoint.publish(address, implementor);
+            ep = Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");            
             testInterceptors(bus);
         }
         
+        public void tearDown() {
+            ep.stop();
+        }
 
         public static void main(String[] args) {
             try { 
@@ -81,6 +88,7 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
 
     @BeforeClass
     public static void startServers() throws Exception {
+        TestUtil.getNewPortNumber("decoupled");
         assertTrue("server did not launch correctly", launchServer(Server.class, false));
     }
     
@@ -125,6 +133,8 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
             assertEquals(2, ex.getFaultInfo().getMajor());
             assertEquals(1, ex.getFaultInfo().getMinor());
         } 
+        ((Closeable)greeter).close();
+        
     }
 
     private static void testInterceptors(Bus b) {

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,6 +36,7 @@ import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.testutil.recorders.InMessageRecorder;
 import org.apache.cxf.testutil.recorders.MessageRecorder;
 import org.apache.cxf.testutil.recorders.OutMessageRecorder;
@@ -54,8 +56,7 @@ import org.junit.Test;
  */
 public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String DECOUPLED = allocatePort("decoupled");
-
+       
     private static final Logger LOG = LogUtils.getLogger(RMPolicyWsdlTest.class);
     private static final String GREETMEONEWAY_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
@@ -71,11 +72,11 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
 
 
     public static class Server extends AbstractBusTestServerBase {
-    
         protected void run()  {            
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/rmwsdl_server.xml");
             BusFactory.setDefaultBus(bus);
+            setBus(bus);
             
             ServerRegistry sr = bus.getExtension(ServerRegistry.class);
             PolicyEngine pe = bus.getExtension(PolicyEngine.class);
@@ -117,6 +118,7 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
+        TestUtil.getNewPortNumber("decoupled");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
          
@@ -197,6 +199,6 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[] {false, false, false, false}, false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
-        
+        ((Closeable)greeter).close();
     }
 }
