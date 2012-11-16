@@ -32,6 +32,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFSpringTest;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.GenericApplicationContext;
@@ -40,6 +42,7 @@ import org.springframework.context.support.GenericApplicationContext;
  * 
  */
 public class QueryHandlerTest extends AbstractCXFSpringTest {
+    public static final String PORT = TestUtil.getPortNumber("TestPort");
     private static final Charset UTF8 = Charset.forName("utf-8");
     private static final Logger LOG = LogUtils.getL7dLogger(QueryHandlerTest.class);
     private Endpoint hwEndpoint;
