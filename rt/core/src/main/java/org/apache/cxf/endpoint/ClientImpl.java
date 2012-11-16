@@ -104,6 +104,12 @@ public class ClientImpl
     protected Executor executor;
 
 
+    // This is mostly to hold onto the client proxy that is using this ClientImpl so 
+    // the IBM JDK's aggressive garbage collector doesn't gc the ClientProxy while
+    // an invocation is being made
+    private Object clientProxy;
+
+
     public ClientImpl(Bus b, Endpoint e) {
         this(b, e, (ConduitSelector)null);
     }
@@ -192,6 +198,12 @@ public class ClientImpl
             throw new IllegalStateException("Unable to create endpoint: " + epex.getMessage(), epex);
         }
         notifyLifecycleManager();
+    }
+    public void setProxyObject(Object cp) {
+        clientProxy = cp;    
+    }
+    public Object getProxyObject() {
+        return clientProxy;
     }
     
     public Bus getBus() {
