@@ -29,6 +29,8 @@ import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.SimpleDocLitWrappedImpl;
 import org.apache.cxf.javascript.fortest.TestBean1;
 import org.apache.cxf.javascript.fortest.TestBean2;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -64,6 +66,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:DocLitWrappedClientTestBeans.xml"};
     }
 

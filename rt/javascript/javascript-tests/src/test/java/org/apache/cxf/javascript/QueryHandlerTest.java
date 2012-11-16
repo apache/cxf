@@ -42,7 +42,6 @@ import org.springframework.context.support.GenericApplicationContext;
  * 
  */
 public class QueryHandlerTest extends AbstractCXFSpringTest {
-    public static final String PORT = TestUtil.getPortNumber("TestPort");
     private static final Charset UTF8 = Charset.forName("utf-8");
     private static final Logger LOG = LogUtils.getL7dLogger(QueryHandlerTest.class);
     private Endpoint hwEndpoint;
@@ -62,6 +61,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
     /** {@inheritDoc}*/
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:HelloWorldDocLitBeans.xml",
                              "classpath:DocLitBareClientTestBeans.xml",
                              "classpath:HelloWorldGreeterBeans.xml"};

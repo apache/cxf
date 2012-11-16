@@ -25,6 +25,8 @@ import java.net.URL;
 import org.apache.cxf.javascript.JavascriptTestUtilities.CountDownNotifier;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -41,6 +43,7 @@ public class GreeterClientTest extends JavascriptRhinoTest {
     
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:GreeterClientTestBeans.xml"};
     }
     
