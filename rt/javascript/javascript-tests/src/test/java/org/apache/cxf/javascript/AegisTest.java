@@ -29,6 +29,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.javascript.JavascriptTestUtilities.JSRunnable;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.AegisServiceImpl;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +57,7 @@ public class AegisTest extends JavascriptRhinoTest {
     
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:AegisBeans.xml"};
     }
     

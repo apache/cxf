@@ -28,6 +28,8 @@ import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.javascript.fortest.SimpleDocLitBareImpl;
 import org.apache.cxf.javascript.fortest.TestBean1;
 import org.apache.cxf.javascript.fortest.TestBean2;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -55,6 +57,7 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
     
     @Override
     protected String[] getConfigLocations() {
+        TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:DocLitBareClientTestBeans.xml"};
     }
     
