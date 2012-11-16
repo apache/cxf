@@ -1134,6 +1134,13 @@ public final class InjectionUtils {
         }
         if (cls.isPrimitive()) {
             return PrimitiveUtils.read(value, cls);
+        } else if (cls.isEnum()) {
+            try {
+                Method m  = cls.getMethod("valueOf", new Class[]{String.class});
+                return m.invoke(null, value.toUpperCase());
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         } else {
             try {
                 Constructor<?> c = cls.getConstructor(new Class<?>[]{String.class});

@@ -6,6 +6,7 @@
      <provider>org.hibernate.ejb.HibernatePersistence</provider>
      <class>org.apache.cxf.jaxrs.ext.search.jpa.Book</class>
      <class>org.apache.cxf.jaxrs.ext.search.jpa.Library</class>
+     <class>org.apache.cxf.jaxrs.ext.search.jpa.BookReview</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:books-jpa"/>
@@ -23,6 +24,7 @@
      <class>org.apache.cxf.jaxrs.ext.search.jpa.OwnerAddress</class>
      <class>org.apache.cxf.jaxrs.ext.search.jpa.OwnerInfo</class>
      <class>org.apache.cxf.jaxrs.ext.search.jpa.Name</class>
+     <class>org.apache.cxf.jaxrs.ext.search.jpa.BookReview</class>
      <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>
         <property name="openjpa.ConnectionURL" value="jdbc:hsqldb:mem:books-jpa"/>

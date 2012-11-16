@@ -34,6 +34,7 @@ import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.cxf.jaxrs.ext.search.AndSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.Beanspector;
+import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PropertyNotFoundException;
@@ -252,7 +253,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 name = beanPropertyName;
             }
             
-            Object castedValue = parseType(name, value);
+            TypeInfoObject castedValue = parseType(name, value);
             if (castedValue != null) {
                 return new Comparison(name, operator, castedValue);
             } else if (MessageUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
@@ -266,13 +267,15 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     }
 
     
-    private Object parseType(String setter, String value) throws SearchParseException {
+    private TypeInfoObject parseType(String setter, String value) throws SearchParseException {
         String name = getSetter(setter);
         
         try {
-            Class<?> valueType = 
-                beanspector != null ? beanspector.getAccessorType(name) : String.class;
-            return parseType(null, null, setter, valueType, value);
+            TypeInfo typeInfo = 
+                beanspector != null ? beanspector.getAccessorTypeInfo(name) 
+                    : new TypeInfo(String.class, String.class);
+            Object object = parseType(null, null, setter, typeInfo, value);
+            return new TypeInfoObject(object, typeInfo);
         } catch (Exception e) {
             return null;
         }
@@ -280,29 +283,41 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     }
 
     private Object parseType(Object ownerBean, Object lastCastedValue, String setter, 
-                             Class<?> valueType, String value) throws SearchParseException {
+                             TypeInfo typeInfo, String value) throws SearchParseException {
+        Class<?> valueType = typeInfo.getTypeClass();
+        boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(valueType);
+        Class<?> actualType = isCollection ? InjectionUtils.getActualType(typeInfo.getGenericType()) : valueType;
+        
         int index = setter.indexOf(".");
         if (index == -1) {
             Object castedValue = value;
             if (Date.class.isAssignableFrom(valueType)) {
                 castedValue = convertToDate(value);
-            } else if (ownerBean == null || valueType.isPrimitive()) {
-                try {
-                    castedValue = InjectionUtils.convertStringToPrimitive(value, valueType);
-                } catch (Exception e) {
-                    throw new SearchParseException("Cannot convert String value \"" + value
-                                                 + "\" to a value of class " + valueType.getName(), e);
-                }
             } else {
-                try {
-                    Method setterM = valueType.getMethod("set" + getMethodNameSuffix(setter),
-                                                         new Class[]{String.class});
-                    setterM.invoke(ownerBean, new Object[]{value});
-                } catch (Throwable ex) {
-                    throw new SearchParseException("Cannot convert String value \"" + value
-                                                   + "\" to a value of class " + valueType.getName(), ex);
+                if (ownerBean == null || InjectionUtils.isPrimitive(valueType) || valueType.isEnum()) {
+                    try {
+                        castedValue = InjectionUtils.convertStringToPrimitive(value, actualType);
+                        if (isCollection) {
+                            castedValue = Collections.singletonList(castedValue);
+                        }
+                    } catch (Exception e) {
+                        throw new SearchParseException("Cannot convert String value \"" + value
+                                                     + "\" to a value of class " + valueType.getName(), e);
+                    }
+                } else {
+                    Class<?> classType = isCollection ? valueType : value.getClass(); 
+                    try {
+                        Method setterM = valueType.getMethod("set" + getMethodNameSuffix(setter),
+                                                             new Class[]{classType});
+                        Object objectValue = !isCollection ? value : Collections.singletonList(value);
+                        setterM.invoke(ownerBean, new Object[]{objectValue});
+                        castedValue = objectValue; 
+                    } catch (Throwable ex) {
+                        throw new SearchParseException("Cannot convert String value \"" + value
+                                                       + "\" to a value of class " + valueType.getName(), ex);
+                    }
+                    
                 }
-                
             }
             if (lastCastedValue != null) {
                 castedValue = lastCastedValue;
@@ -312,32 +327,39 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             String[] names = setter.split("\\.");
             try {
                 String nextPart = getMethodNameSuffix(names[1]);
-                Method getterM = valueType.getMethod("get" + nextPart, new Class[]{});   
+                Method getterM = actualType.getMethod("get" + nextPart, new Class[]{});   
                 Class<?> returnType = getterM.getReturnType();
+                boolean returnCollection = InjectionUtils.isSupportedCollectionOrArray(returnType);
                 
-                boolean isPrimitive = InjectionUtils.isPrimitive(returnType);
-                boolean lastTry = names.length == 2 && (isPrimitive || returnType == Date.class);
+                boolean isPrimitive = InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
+                boolean lastTry = names.length == 2 
+                    && (isPrimitive || returnType == Date.class || returnCollection);
                 
-                Object valueObject = lastTry && ownerBean != null ? ownerBean : valueType.newInstance();
+                Object valueObject = lastTry && ownerBean != null ? ownerBean : actualType.newInstance();
                 Object nextObject;
                 
                 if (lastTry) {
-                    nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType) 
-                        : convertToDate(value); 
+                    if (!returnCollection) {
+                        nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType) 
+                            : convertToDate(value);
+                    } else {
+                        nextObject = Collections.singletonList(value);
+                    }
                 } else {
                     nextObject = returnType.newInstance();
                 }
                 
-                Method setterM = valueType.getMethod("set" + nextPart, new Class[]{getterM.getReturnType()});
+                Method setterM = actualType.getMethod("set" + nextPart, new Class[]{returnType});
                 setterM.invoke(valueObject, new Object[]{nextObject});
                 
                 lastCastedValue = lastCastedValue == null ? valueObject : lastCastedValue;
                 if (lastTry) {
-                    return lastCastedValue;
+                    return isCollection ? Collections.singletonList(lastCastedValue) : lastCastedValue;
                 } 
                 
+                TypeInfo nextTypeInfo = new TypeInfo(nextObject.getClass(), getterM.getGenericReturnType()); 
                 return parseType(nextObject, lastCastedValue, setter.substring(index + 1), 
-                                 nextObject.getClass(), value);
+                                 nextTypeInfo, value);
             } catch (Throwable e) {
                 throw new SearchParseException("Cannot convert String value \"" + value
                                                + "\" to a value of class " + valueType.getName(), e);
@@ -440,22 +462,23 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     private class Comparison implements ASTNode<T> {
         private String name;
         private String operator;
-        private Object value;
+        private TypeInfoObject tvalue;
 
-        public Comparison(String name, String operator, Object value) {
+        public Comparison(String name, String operator, TypeInfoObject value) {
             this.name = name;
             this.operator = operator;
-            this.value = value;
+            this.tvalue = value;
         }
 
         @Override
         public String toString() {
-            return name + " " + operator + " " + value + " (" + value.getClass().getSimpleName() + ")";
+            return name + " " + operator + " " + tvalue.getObject() 
+                + " (" + tvalue.getObject().getClass().getSimpleName() + ")";
         }
 
         public SearchCondition<T> build() throws SearchParseException {
             String templateName = getSetter(name);
-            T cond = createTemplate(templateName, value);
+            T cond = createTemplate(templateName);
             ConditionType ct = OPERATORS_MAP.get(operator);
             
             if (isPrimitive(cond)) {
@@ -463,7 +486,8 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             } else {
                 return new SimpleSearchCondition<T>(Collections.singletonMap(templateName, ct),
                                                     Collections.singletonMap(templateName, name),
-                                                   cond);
+                                                    Collections.singletonMap(templateName, tvalue.getTypeInfo()),
+                                                    cond);
             }
         }
 
@@ -472,19 +496,38 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         }
         
         @SuppressWarnings("unchecked")
-        private T createTemplate(String setter, Object val) throws SearchParseException {
+        private T createTemplate(String setter) throws SearchParseException {
             try {
                 if (beanspector != null) {
-                    beanspector.instantiate().setValue(setter, val);
+                    beanspector.instantiate().setValue(setter, tvalue.getObject());
                     return beanspector.getBean();
                 } else {
                     SearchBean bean = (SearchBean)conditionClass.newInstance();
-                    bean.set(setter, value.toString());
+                    bean.set(setter, tvalue.getObject().toString());
                     return (T)bean;
                 }
             } catch (Throwable e) {
                 throw new SearchParseException(e);
             }
         }
+    }
+    
+    static class TypeInfoObject {
+        private Object object;
+        private TypeInfo typeInfo;
+        
+        public TypeInfoObject(Object object, TypeInfo typeInfo) {
+            this.object = object;
+            this.typeInfo = typeInfo;
+        }
+
+        public TypeInfo getTypeInfo() {
+            return typeInfo;
+        }
+
+        public Object getObject() {
+            return object;
+        }
+                
     }
 }
