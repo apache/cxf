@@ -20,7 +20,9 @@ package org.apache.cxf.xmlbeans;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
@@ -84,12 +86,19 @@ public class WrappedStyleTest extends AbstractXmlBeansTest {
         Node wsdl = getWSDLDocument("TestService");
 
         addNamespace("xsd", SOAPConstants.XSD);
+        addNamespace("ns0", "http://cxf.apache.org/xmlbeans");
         assertValid("//xsd:schema[@targetNamespace='urn:TestService']" 
                     + "/xsd:complexType[@name='mixedRequest']"
                     + "//xsd:element[@name='string'][@type='xsd:string']", wsdl);
-        assertValid("//xsd:schema[@targetNamespace='urn:TestService']" 
+        
+        NodeList list = assertValid("//xsd:schema[@targetNamespace='urn:TestService']" 
                     + "/xsd:complexType[@name='mixedRequest']"
-                    + "//xsd:element[@ref='ns0:request']", wsdl);
+                    + "//xsd:element[@ref]", wsdl);
+        for (int x = 0; x < list.getLength(); x++) {
+            Element el = (Element)list.item(x);
+            assertTrue(el.getAttribute("ref"), el.getAttribute("ref").contains("request"));
+        }
+        
         assertValid("//xsd:schema[@targetNamespace='urn:TestService']"
                     + "/xsd:element[@name='CustomFault'][@type='xsd:string']", wsdl);
 
