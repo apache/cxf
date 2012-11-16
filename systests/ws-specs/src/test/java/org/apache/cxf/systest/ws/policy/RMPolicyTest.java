@@ -72,6 +72,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
 
     public static class Server extends AbstractBusTestServerBase {
         String tmpDir = TEMPDIR;
+        Endpoint ep;
         public Server() {
         }
         public Server(String dir) {
@@ -82,6 +83,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/rm.xml");
             BusFactory.setDefaultBus(bus);
+            setBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
             bus.getInInterceptors().add(in);
             LoggingOutInterceptor out = new LoggingOutInterceptor();
@@ -90,10 +92,13 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
             
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            Endpoint.publish(address, implementor);
+            ep = Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");
         }
-        
+        public void tearDown() {
+            ep.stop();
+            ep = null;
+        }
 
         public static void main(String[] args) {
             try { 
