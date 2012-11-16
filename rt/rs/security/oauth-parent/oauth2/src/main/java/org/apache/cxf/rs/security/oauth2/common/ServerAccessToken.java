@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ import java.util.List;
 public abstract class ServerAccessToken extends AccessToken {
     private String grantType;
     private Client client;
-    private List<OAuthPermission> scopes = Collections.emptyList();
+    private List<OAuthPermission> scopes = new LinkedList<OAuthPermission>();
     private UserSubject subject;
     
     protected ServerAccessToken(Client client, 

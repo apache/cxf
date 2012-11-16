@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -26,8 +26,8 @@ import java.util.List;
  */
 public class AccessTokenRegistration {
     private Client client; 
-    private List<String> requestedScope = Collections.emptyList();
-    private List<String> approvedScope = Collections.emptyList();
+    private List<String> requestedScope = new LinkedList<String>();
+    private List<String> approvedScope = new LinkedList<String>();
     private String grantType;
     private UserSubject subject;
     
