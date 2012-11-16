@@ -41,7 +41,6 @@ import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -110,6 +109,53 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         doTestEnvelopedSAMLToken(false);
     }
     
+    @Test
+    public void testGetBookPreviousSAMLTokenAsHeader() throws Exception {
+        String address = "https://localhost:" + PORT + "/samlheader/bookstore/books/123";
+        
+        WebClient wc = 
+            createWebClientForExistingToken(address, new SamlHeaderOutInterceptor(), null);
+        
+        try {
+            Book book = wc.get(Book.class);
+            assertEquals(123L, book.getId());
+        } catch (WebApplicationException ex) {
+            fail(ex.getMessage());
+        } catch (ClientException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
+        }
+        
+    }
+    
+    @Test
+    public void testGetBookPreviousSAMLTokenInForm() throws Exception {
+        String address = "https://localhost:" + PORT + "/samlform/bookstore/books";
+        FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
+        formProvider.setExpectedEncoded(true);
+        WebClient wc = createWebClientForExistingToken(address, new SamlFormOutInterceptor(),
+                                       formProvider);
+        
+        wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_XML);
+        try {
+            Book book = wc.post(new Form().set("name", "CXF").set("id", 125),
+                                Book.class);                
+            assertEquals(125L, book.getId());
+        } catch (WebApplicationException ex) {
+            fail(ex.getMessage());
+        } catch (ClientException ex) {
+            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+                fail(ex.getCause().getMessage());
+            } else {
+                fail(ex.getMessage());
+            }
+        }
+        
+    }
+    
     public void doTestEnvelopedSAMLToken(boolean signed) throws Exception {
         String address = "https://localhost:" + PORT + "/samlxml/bookstore/books";
         WebClient wc = createWebClient(address, new SamlEnvelopedOutInterceptor(!signed),
@@ -162,6 +208,25 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         bean.setProperties(properties);
         
         bean.getOutInterceptors().add(outInterceptor);
+        if (provider != null) {
+            bean.setProvider(provider);
+        }
+        return bean.createWebClient();
+    }
+    
+    private WebClient createWebClientForExistingToken(String address, 
+                                      Interceptor<Message> outInterceptor,
+                                      Object provider) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSSamlTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        bean.getOutInterceptors().add(outInterceptor);
+        bean.getOutInterceptors().add(new SamlRetrievalInterceptor());
         if (provider != null) {
             bean.setProvider(provider);
         }

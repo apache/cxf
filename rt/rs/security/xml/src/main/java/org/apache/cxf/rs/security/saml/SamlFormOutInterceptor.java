@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
@@ -42,8 +44,16 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
         if (form == null) {
             return;
         }
-        AssertionWrapper assertionWrapper = createAssertion(message);
+        
         try {
+            Element samlToken = 
+                (Element)message.getContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT);
+            AssertionWrapper assertionWrapper;
+            if (samlToken != null) {
+                assertionWrapper = new AssertionWrapper(samlToken);
+            } else {
+                assertionWrapper = createAssertion(message);
+            }
             
             String encodedToken = encodeToken(assertionWrapper.assertionToString());
                 

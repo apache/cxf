@@ -222,6 +222,32 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // In this test, the WSDL the client is using has no Claims Element (however the service
+    // is using a WSDL that requires Claims). A CallbackHandler is used to send the Claims
+    // Element to the STS.
+    @org.junit.Test
+    public void testSaml2ClaimsCallbackHandler() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ClaimsTest.class.getResource("cxf-client-cbhandler.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ClaimsTest.class.getResource("DoubleItNoClaims.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ClaimsPort");
+        DoubleItPortType transportClaimsPort = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportClaimsPort, PORT);
+        
+        doubleIt(transportClaimsPort, 25);
+        
+        ((java.io.Closeable)transportClaimsPort).close();
+        bus.shutdown(true);
+    }
+    
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2 , resp);

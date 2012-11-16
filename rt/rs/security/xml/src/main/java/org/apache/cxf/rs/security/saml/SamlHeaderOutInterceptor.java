@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -37,8 +39,15 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         LogUtils.getL7dLogger(SamlHeaderOutInterceptor.class);
     
     public void handleMessage(Message message) throws Fault {
-        AssertionWrapper assertionWrapper = createAssertion(message);
         try {
+            Element samlToken = 
+                (Element)message.getContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT);
+            AssertionWrapper assertionWrapper;
+            if (samlToken != null) {
+                assertionWrapper = new AssertionWrapper(samlToken);
+            } else {
+                assertionWrapper = createAssertion(message);
+            }
             
             String encodedToken = encodeToken(assertionWrapper.assertionToString());
             
