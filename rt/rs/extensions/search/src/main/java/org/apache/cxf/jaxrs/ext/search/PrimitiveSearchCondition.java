@@ -37,6 +37,13 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     
     public PrimitiveSearchCondition(String propertyName, 
                                     Object propertyValue,
+                                    ConditionType ct,
+                                    T condition) {
+        this(propertyName, propertyValue, propertyValue.getClass(), ct, condition);    
+    }
+    
+    public PrimitiveSearchCondition(String propertyName, 
+                                    Object propertyValue,
                                     Type propertyType,
                                     ConditionType ct,
                                     T condition) {
