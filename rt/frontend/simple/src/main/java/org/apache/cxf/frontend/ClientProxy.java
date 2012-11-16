@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -46,9 +45,6 @@ public class ClientProxy implements InvocationHandler, Closeable {
     public ClientProxy(Client c) {
         endpoint = c.getEndpoint();
         client = c;
-        if (c instanceof ClientImpl) {
-            ((ClientImpl)c).setProxyObject(this);
-        }
     }
     public void close() throws IOException {
         if (client != null) {
@@ -81,7 +77,14 @@ public class ClientProxy implements InvocationHandler, Closeable {
             params = new Object[0];
         }
 
-        return invokeSync(method, oi, params);
+        Object o = invokeSync(method, oi, params);
+        //call a virtual method passing the object.  This causes the IBM JDK
+        //to keep the "this" pointer references and thus "this" doesn't get 
+        //finalized in the midst of an invoke operation
+        return adjustObject(o); 
+    }
+    protected Object adjustObject(Object o) {
+        return o;
     }
 
     public Object invokeSync(Method method, BindingOperationInfo oi, Object[] params)

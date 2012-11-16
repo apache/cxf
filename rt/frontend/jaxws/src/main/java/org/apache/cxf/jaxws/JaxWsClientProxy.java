@@ -178,8 +178,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 }
             }
         }
-        return result;
-
+        return adjustObject(result);
     }
     boolean isAsync(Method m) {
         return m.getName().endsWith("Async")
