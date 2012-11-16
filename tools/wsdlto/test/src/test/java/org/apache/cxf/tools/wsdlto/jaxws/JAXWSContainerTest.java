@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wsdlto.jaxws;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.apache.cxf.tools.common.FrontEndGenerator;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
+import org.apache.cxf.tools.common.model.JavaException;
 import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.common.model.JavaModel;
@@ -188,8 +190,13 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             assertTrue(methodSame);
             
             assertEquals(2, m1.getExceptions().size());
-            assertEquals("BadRecordLitFault", m1.getExceptions().get(0).getName());
-            assertEquals("NoSuchCodeLitFault", m1.getExceptions().get(1).getName());
+            List<String> names = new ArrayList<String>();
+            for (JavaException exc : m1.getExceptions()) {
+                names.add(exc.getName());
+            }
+            
+            assertTrue("BadRecordLitFault", names.contains("BadRecordLitFault"));
+            assertTrue("NoSuchCodeLitFault", names.contains("NoSuchCodeLitFault"));
 
             String address = null;
 
