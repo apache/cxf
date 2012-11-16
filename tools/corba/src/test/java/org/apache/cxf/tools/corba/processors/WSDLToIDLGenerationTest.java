@@ -672,16 +672,18 @@ public class WSDLToIDLGenerationTest extends Assert {
             idlgen.setGenerateAllBindings(true);            
             idlgen.generateIDL(null);
 
-            InputStream origstream;
-            if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
-                // The ibm jdk outputs the idl modules in a different order
+            InputStream origstream = getClass().getResourceAsStream("/idlgen/expected_multiplebinding.idl");
+            byte orig[] = inputStreamToBytes(origstream);
+            
+            try {
+                checkIDLStrings(orig, idloutput.toByteArray());           
+            } catch (Throwable ex) {
+                // The ibm jdk SOMTIMES outputs the idl modules in a different order
                 // (still valid idl).
                 origstream = getClass().getResourceAsStream("/idlgen/expected_multiplebinding_ibmjdk.idl");
-            } else {
-                origstream = getClass().getResourceAsStream("/idlgen/expected_multiplebinding.idl");
+                orig = inputStreamToBytes(origstream);
+                checkIDLStrings(orig, idloutput.toByteArray());    
             }
-            byte orig[] = inputStreamToBytes(origstream);
-            checkIDLStrings(orig, idloutput.toByteArray());           
         } finally {
             new File("multiplebinding.idl").deleteOnExit();
         }
