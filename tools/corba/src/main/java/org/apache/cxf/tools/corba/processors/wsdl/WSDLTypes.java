@@ -363,10 +363,10 @@ public final class WSDLTypes {
         }
 
         if (!boundedDecimal) {
-            if (anonymous) {
+            if (anonymous && corbaTypeImpl instanceof Anonfixed) {
                 Anonfixed fixed = (Anonfixed)corbaTypeImpl;
                 digits = Integer.parseInt(String.valueOf(fixed.getDigits()));
-            } else {
+            } else if (corbaTypeImpl instanceof Fixed) {
                 Fixed fixed = (Fixed)corbaTypeImpl;
                 digits = Integer.parseInt(String.valueOf(fixed.getDigits()));
             }

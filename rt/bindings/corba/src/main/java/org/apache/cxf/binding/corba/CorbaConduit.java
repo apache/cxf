@@ -124,8 +124,9 @@ public class CorbaConduit implements Conduit {
             message.setContent(OutputStream.class,
                                new CorbaOutputStream(message));
             
-            CorbaMessage corbaMessage = (CorbaMessage) message;
-            corbaMessage.setCorbaTypeMap(typeMap);
+            if (message instanceof CorbaMessage) {
+                ((CorbaMessage)message).setCorbaTypeMap(typeMap);
+            }
            
         } catch (java.lang.Exception ex) {
             LOG.log(Level.SEVERE, "Could not resolve target object");
@@ -138,7 +139,9 @@ public class CorbaConduit implements Conduit {
             BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
             OperationType opType = boi.getExtensor(OperationType.class);
             try {
-                buildRequest((CorbaMessage)message, opType);            
+                if (message instanceof CorbaMessage) {
+                    buildRequest((CorbaMessage)message, opType);            
+                }
                 message.getContent(OutputStream.class).close();
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Could not build the corba request");

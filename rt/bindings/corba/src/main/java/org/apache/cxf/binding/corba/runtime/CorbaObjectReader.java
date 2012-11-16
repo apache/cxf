@@ -119,28 +119,28 @@ public class CorbaObjectReader {
         
         // Now for the complex types
         case TCKind._tk_array:
-            this.readArray(obj);
+            this.readArray((CorbaArrayHandler)obj);
             break;
         case TCKind._tk_sequence:
             this.readSequence(obj);
             break;
         case TCKind._tk_struct:
-            this.readStruct(obj);
+            this.readStruct((CorbaStructHandler)obj);
             break;
         case TCKind._tk_enum:
             this.readEnum(obj);
             break;
         case TCKind._tk_except:
-            this.readException(obj);
+            this.readException((CorbaExceptionHandler)obj);
             break;
         case TCKind._tk_fixed:
-            this.readFixed(obj);
+            this.readFixed((CorbaFixedHandler)obj);
             break;
         case TCKind._tk_union:
-            this.readUnion(obj);
+            this.readUnion((CorbaUnionHandler)obj);
             break;
         case TCKind._tk_objref:
-            this.readObjectReference(obj);
+            this.readObjectReference((CorbaObjectReferenceHandler)obj);
             break;            
         default:
         // TODO: Provide Implementation. Do we throw an exception.
@@ -311,16 +311,14 @@ public class CorbaObjectReader {
         enumObj.setValue(enumerators.get(enumIndex).getValue());
     }
 
-    public void readStruct(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaStructHandler structObj = (CorbaStructHandler)obj;
+    public void readStruct(CorbaStructHandler structObj) throws CorbaBindingException {
         List<CorbaObjectHandler> structMembers = structObj.getMembers();
         for (int i = 0; i < structMembers.size(); ++i) {
             this.read(structMembers.get(i));
         }
     }
 
-    public void readException(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaExceptionHandler exceptObj = (CorbaExceptionHandler)obj;
+    public void readException(CorbaExceptionHandler exceptObj) throws CorbaBindingException {
         List<CorbaObjectHandler> exceptElements = exceptObj.getMembers();
 
         String exceptId = stream.read_string();
@@ -331,8 +329,7 @@ public class CorbaObjectReader {
         }
     }
 
-    public void readFixed(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaFixedHandler fixedHandler = (CorbaFixedHandler)obj;
+    public void readFixed(CorbaFixedHandler fixedHandler) throws CorbaBindingException {
         long scale = fixedHandler.getScale();
         try {
             java.math.BigDecimal fixedValue = stream.read_fixed().movePointLeft((int)scale);
@@ -343,7 +340,8 @@ public class CorbaObjectReader {
             Method m = null;
             try {
                 m = stream.getClass().getMethod("read_fixed", new Class[] {TypeCode.class});
-                BigDecimal fixedValue = (BigDecimal)m.invoke(stream, new Object[] {obj.getTypeCode()});
+                BigDecimal fixedValue =
+                    (BigDecimal)m.invoke(stream, new Object[] {fixedHandler.getTypeCode()});
                 fixedHandler.setValue(fixedValue);
             } catch (Throwable e1) {
                 throw ex;
@@ -362,8 +360,7 @@ public class CorbaObjectReader {
         disc.setValue(enumerators.get(enumIndex).getValue());
     }
 
-    public void readUnion(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaUnionHandler unionHandler = (CorbaUnionHandler)obj;
+    public void readUnion(CorbaUnionHandler unionHandler) throws CorbaBindingException {
         Union unionType = (Union)unionHandler.getType();
         List<Unionbranch> branches = unionType.getUnionbranch();
         CorbaObjectHandler discriminator = unionHandler.getDiscriminator();
@@ -412,8 +409,7 @@ public class CorbaObjectReader {
     }
 
     //CHECKSTYLE:OFF  -  processing the typecodes in a switch makes this method fairly long/complex
-    public void readArray(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaArrayHandler arrayObj = (CorbaArrayHandler)obj;
+    public void readArray(CorbaArrayHandler arrayObj) throws CorbaBindingException {
         List<CorbaObjectHandler> arrayElements = arrayObj.getElements();
 
         Object val = null;
@@ -556,8 +552,7 @@ public class CorbaObjectReader {
         }
     }
 
-    public void readObjectReference(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaObjectReferenceHandler objRefObj = (CorbaObjectReferenceHandler)obj;
+    public void readObjectReference(CorbaObjectReferenceHandler objRefObj) throws CorbaBindingException {
         org.omg.CORBA.Object objRef = stream.read_Object();
         objRefObj.setReference(objRef);
     }

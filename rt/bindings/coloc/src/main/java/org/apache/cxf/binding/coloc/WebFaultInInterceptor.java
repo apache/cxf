@@ -76,7 +76,7 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private MessagePartInfo getFaultMessagePart(QName qname, OperationInfo op) {
-        if (op.isUnwrapped()) {
+        if (op.isUnwrapped() && (op instanceof UnwrappedOperationInfo)) {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
         

@@ -68,11 +68,15 @@ public class CorbaServerConduit implements Conduit {
         message.put(CorbaConstants.ORB, orb);
         message.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, targetObject);
         message.setContent(OutputStream.class, new CorbaOutputStream(message));
-        ((CorbaMessage) message).setCorbaTypeMap(typeMap);
+        if (message instanceof CorbaMessage) {
+            ((CorbaMessage) message).setCorbaTypeMap(typeMap);
+        }
     }
 
     public void close(Message message) throws IOException {        
-        buildRequestResult((CorbaMessage)message);
+        if (message instanceof CorbaMessage) {
+            buildRequestResult((CorbaMessage)message);
+        }
         message.getContent(OutputStream.class).close();
     }
 

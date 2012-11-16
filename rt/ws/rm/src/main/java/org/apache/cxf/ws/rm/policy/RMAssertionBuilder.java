@@ -63,6 +63,7 @@ public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
         @Override
         public boolean equal(PolicyComponent policyComponent) {
             if (policyComponent.getType() != Constants.TYPE_ASSERTION
+                || !(policyComponent instanceof Assertion)
                 || !getName().equals(((Assertion)policyComponent).getName())) {
                 return false;
             }

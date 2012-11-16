@@ -499,36 +499,36 @@ public class WSDLToIDLAction {
         String local = name[name.length - 1];
 
         if (corbaTypeImpl instanceof Enum) {
-            result = createEnum(corbaTypeImpl, scope, local);
+            result = createEnum((Enum)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Sequence) {
-            result = createSequence(corbaTypeImpl, scope, local);
+            result = createSequence((Sequence)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Anonsequence) {
-            result = createAnonSequence(corbaTypeImpl, scope, local);
+            result = createAnonSequence((Anonsequence)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl 
             instanceof org.apache.cxf.binding.corba.wsdl.Exception) {
-            result = createIdlException(corbaTypeImpl, scope, local);
+            result = createIdlException((org.apache.cxf.binding.corba.wsdl.Exception)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Struct) {
-            result = createStruct(corbaTypeImpl, scope, local);            
+            result = createStruct((Struct)corbaTypeImpl, scope, local);            
         } else if (corbaTypeImpl instanceof Union) {
-            result = createUnion(corbaTypeImpl, scope, local);
+            result = createUnion((Union)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Alias) {
-            result = createTypedef(corbaTypeImpl, scope, local);        
+            result = createTypedef((Alias)corbaTypeImpl, scope, local);        
         } else if (corbaTypeImpl instanceof Array) {
-            result = createArray(corbaTypeImpl, scope, local);
+            result = createArray((Array)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Anonarray) {
-            result = createAnonArray(corbaTypeImpl, scope, local);
+            result = createAnonArray((Anonarray)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Fixed) {
-            result = createFixed(corbaTypeImpl, scope, local);
+            result = createFixed((Fixed)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Anonfixed) {
-            result = createAnonFixed(corbaTypeImpl, scope, local);
+            result = createAnonFixed((Anonfixed)corbaTypeImpl, scope, local);
         } else if (corbaTypeImpl instanceof Const) {
-            result = createConst(corbaTypeImpl, scope, local);        
+            result = createConst((Const)corbaTypeImpl, scope, local);        
         } else {
             result = checkAnon(corbaTypeImpl, scope, local);
         } 
         
-        if (result == null && corbaTypeImpl != null) {
-            result = createInterface(corbaTypeImpl, scope, local);            
+        if (result == null && corbaTypeImpl instanceof org.apache.cxf.binding.corba.wsdl.Object) {
+            result = createInterface((org.apache.cxf.binding.corba.wsdl.Object)corbaTypeImpl, scope, local);            
         }
         
         return result; 
@@ -547,13 +547,11 @@ public class WSDLToIDLAction {
         return result;
     }
 
-    private IdlType createInterface(CorbaTypeImpl ctype, IdlScopeBase scope, String local) 
+    private IdlType createInterface(org.apache.cxf.binding.corba.wsdl.Object obj, IdlScopeBase scope, String local) 
         throws Exception {
     
         IdlType result = null;
         
-        org.apache.cxf.binding.corba.wsdl.Object obj = 
-            (org.apache.cxf.binding.corba.wsdl.Object)ctype;
         QName bqname = obj.getBinding();        
 
         Binding binding = def.getBinding(bqname);
@@ -582,11 +580,9 @@ public class WSDLToIDLAction {
         return result;
     }
     
-    private IdlType createIdlException(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createIdlException(org.apache.cxf.binding.corba.wsdl.Exception e, IdlScopeBase scope, 
                                        String local) throws Exception {
         IdlType result = null;
-        org.apache.cxf.binding.corba.wsdl.Exception e = 
-            (org.apache.cxf.binding.corba.wsdl.Exception)ctype;
 
         Object obj = scope.lookup(local);
 
@@ -607,9 +603,8 @@ public class WSDLToIDLAction {
         return result;        
     }
     
-    private IdlType createUnion(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createUnion(Union u, IdlScopeBase scope, 
                                 String local) throws Exception {
-        Union u = (Union)ctype;
         boolean undefinedCircular = false;
         IdlType disc = findType(u.getDiscriminator());
         IdlUnion union = IdlUnion.create(scope, local, disc);
@@ -652,9 +647,8 @@ public class WSDLToIDLAction {
         return union;
     }
     
-    private IdlType createStruct(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createStruct(Struct s, IdlScopeBase scope, 
                                  String local) throws Exception {
-        Struct s = (Struct)ctype;
         boolean undefinedCircular = false;
         IdlStruct struct = IdlStruct.create(scope, local);
         scope.holdForScope(struct);
@@ -689,20 +683,18 @@ public class WSDLToIDLAction {
         return struct;        
     }
     
-    private IdlType createTypedef(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createTypedef(Alias a, IdlScopeBase scope, 
                                   String local) throws Exception {
         IdlType idlType = null;
-        Alias a = (Alias)ctype;
         IdlType base = findType(a.getBasetype());                               
         idlType = IdlTypedef.create(scope, local, base);
         scope.addToScope(idlType);
         return idlType;
     }
     
-    private IdlType createConst(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createConst(Const c, IdlScopeBase scope, 
                                 String local) throws Exception {
         IdlType idlType = null;
-        Const c = (Const)ctype;
         IdlType base = findType(c.getIdltype());
         String value = c.getValue(); 
         idlType = IdlConst.create(scope, local, base, value);
@@ -710,10 +702,9 @@ public class WSDLToIDLAction {
         return idlType;
     }
     
-    private IdlType createSequence(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createSequence(Sequence s, IdlScopeBase scope, 
                                    String local) throws Exception {
         IdlType idlType = null;
-        Sequence s = (Sequence)ctype;
         IdlType base = findType(s.getElemtype());        
         int bound = (int)s.getBound();
         idlType = IdlSequence.create(scope, local, base, bound);
@@ -721,10 +712,9 @@ public class WSDLToIDLAction {
         return idlType;
     }
     
-    private IdlType createAnonSequence(CorbaTypeImpl ctype, IdlScopeBase scope, 
+    private IdlType createAnonSequence(Anonsequence s, IdlScopeBase scope, 
                                        String local)  throws Exception {
         IdlType idlType = null;
-        Anonsequence s = (Anonsequence)ctype;
         IdlType base = findType(s.getElemtype());        
         int bound = (int)s.getBound();
         idlType = IdlAnonSequence.create(scope, base, bound);
@@ -732,10 +722,9 @@ public class WSDLToIDLAction {
         return idlType;
     }
     
-    private IdlType createArray(CorbaTypeImpl ctype, IdlScopeBase scope, String local) 
+    private IdlType createArray(Array s, IdlScopeBase scope, String local) 
         throws Exception {
         IdlType idlType = null;
-        Array s = (Array)ctype;
         IdlType base = findType(s.getElemtype());        
         int bound = (int)s.getBound();
         idlType = IdlArray.create(scope, local, base, bound);
@@ -743,10 +732,9 @@ public class WSDLToIDLAction {
         return idlType;
     }
     
-    private IdlType createAnonArray(CorbaTypeImpl ctype, IdlScopeBase scope, String local) 
+    private IdlType createAnonArray(Anonarray s, IdlScopeBase scope, String local) 
         throws Exception {
         IdlType idlType = null;
-        Anonarray s = (Anonarray)ctype;
         IdlType base = findType(s.getElemtype());        
         int bound = (int)s.getBound();
         idlType = IdlAnonArray.create(scope, base, bound);
@@ -754,9 +742,8 @@ public class WSDLToIDLAction {
         return idlType;
     }
     
-    private IdlType createFixed(CorbaTypeImpl ctype, IdlScopeBase scope, String local) {
+    private IdlType createFixed(Fixed f, IdlScopeBase scope, String local) {
         IdlType idlType = null;
-        Fixed f = (Fixed)ctype;     
         Long digits = f.getDigits();
         Long scale = f.getScale();        
         idlType = IdlFixed.create(scope, local, digits.intValue(),   
@@ -765,9 +752,8 @@ public class WSDLToIDLAction {
         return idlType;
     }
     
-    private IdlType createAnonFixed(CorbaTypeImpl ctype, IdlScopeBase scope, String local) {
+    private IdlType createAnonFixed(Anonfixed f, IdlScopeBase scope, String local) {
         IdlType idlType = null;
-        Anonfixed f = (Anonfixed)ctype;     
         Long digits = f.getDigits();
         Long scale = f.getScale();        
         idlType = IdlAnonFixed.create(scope, digits.intValue(), scale.intValue());
@@ -775,8 +761,7 @@ public class WSDLToIDLAction {
         return idlType;
     }
 
-    private IdlType createEnum(CorbaTypeImpl ctype, IdlScopeBase scope, String local) {
-        Enum e = (Enum)ctype;
+    private IdlType createEnum(Enum e, IdlScopeBase scope, String local) {
         IdlEnum enum1 = IdlEnum.create(scope, local);
         Iterator<Enumerator> it = e.getEnumerator().iterator();
 

@@ -99,33 +99,33 @@ public class CorbaObjectWriter {
             this.writeWString((String)((CorbaPrimitiveHandler)obj).getValue());
             break;
         case TCKind._tk_any:
-            this.writeAny(obj);
+            this.writeAny((CorbaAnyHandler)obj);
             break;
 
         // Now for the complex types
         case TCKind._tk_array:
-            this.writeArray(obj);
+            this.writeArray((CorbaArrayHandler)obj);
             break;
         case TCKind._tk_sequence:
             this.writeSequence(obj);
             break;
         case TCKind._tk_struct:
-            this.writeStruct(obj);
+            this.writeStruct((CorbaStructHandler)obj);
             break;
         case TCKind._tk_enum:
-            this.writeEnum(obj);
+            this.writeEnum((CorbaEnumHandler)obj);
             break;
         case TCKind._tk_except:
-            this.writeException(obj);
+            this.writeException((CorbaExceptionHandler)obj);
             break;
         case TCKind._tk_fixed:
-            this.writeFixed(obj);
+            this.writeFixed((CorbaFixedHandler)obj);
             break;
         case TCKind._tk_union:
             this.writeUnion(obj);
             break;
         case TCKind._tk_objref:
-            this.writeObjectReference(obj);
+            this.writeObjectReference((CorbaObjectReferenceHandler)obj);
             break;            
         default:
         // TODO: Provide Implementation. Do we throw an exception.
@@ -245,8 +245,7 @@ public class CorbaObjectWriter {
         }
     }
 
-    public void writeAny(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaAnyHandler anyHandler = (CorbaAnyHandler)obj;
+    public void writeAny(CorbaAnyHandler anyHandler) throws CorbaBindingException {
         CorbaObjectHandler containedType = anyHandler.getAnyContainedType();
         Any a = anyHandler.getValue();
 
@@ -262,8 +261,7 @@ public class CorbaObjectWriter {
     }
 
     // -- complex types --
-    public void writeEnum(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaEnumHandler enumHandler = (CorbaEnumHandler)obj;
+    public void writeEnum(CorbaEnumHandler enumHandler) throws CorbaBindingException {
         Enum enumType = (Enum)enumHandler.getType();
         String enumLabel = enumHandler.getValue();
         List<Enumerator> enumerators = enumType.getEnumerator();
@@ -278,8 +276,7 @@ public class CorbaObjectWriter {
         throw new CorbaBindingException("CorbaObjectWriter: unable to find enumeration label");
     }
 
-    public void writeStruct(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaStructHandler structHandler = (CorbaStructHandler)obj;
+    public void writeStruct(CorbaStructHandler structHandler) throws CorbaBindingException {
         List<CorbaObjectHandler> structElements = structHandler.getMembers();
 
         for (int i = 0; i < structElements.size(); ++i) {
@@ -287,8 +284,7 @@ public class CorbaObjectWriter {
         }
     }
 
-    public void writeException(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaExceptionHandler exHandler = (CorbaExceptionHandler)obj;
+    public void writeException(CorbaExceptionHandler exHandler) throws CorbaBindingException {
         Exception exType = (Exception)exHandler.getType();
         List<CorbaObjectHandler> exMembers = exHandler.getMembers();
         stream.write_string(exType.getRepositoryID());
@@ -297,8 +293,7 @@ public class CorbaObjectWriter {
         }
     }
 
-    public void writeFixed(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaFixedHandler fixedHandler = (CorbaFixedHandler)obj;
+    public void writeFixed(CorbaFixedHandler fixedHandler) throws CorbaBindingException {
         short scale = (short)fixedHandler.getScale();
         short fixed = (short)fixedHandler.getDigits();
         //the write_fixed method is a "late addition" and not all orbs implement it.
@@ -326,8 +321,7 @@ public class CorbaObjectWriter {
         }
     }
 
-    public void writeArray(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaArrayHandler arrayHandler = (CorbaArrayHandler)obj;
+    public void writeArray(CorbaArrayHandler arrayHandler) throws CorbaBindingException {
         List<CorbaObjectHandler> arrayElements = arrayHandler.getElements();
 
         for (int i = 0; i < arrayElements.size(); ++i) {
@@ -351,8 +345,7 @@ public class CorbaObjectWriter {
         }
     }
     
-    public void writeObjectReference(CorbaObjectHandler obj) throws CorbaBindingException {
-        CorbaObjectReferenceHandler objHandler = (CorbaObjectReferenceHandler)obj;
+    public void writeObjectReference(CorbaObjectReferenceHandler objHandler) throws CorbaBindingException {
         stream.write_Object(objHandler.getReference());
     }   
 }

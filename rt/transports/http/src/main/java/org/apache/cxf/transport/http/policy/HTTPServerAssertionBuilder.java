@@ -62,6 +62,7 @@ public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerP
                 return true;
             }
             if (policyComponent.getType() != Constants.TYPE_ASSERTION
+                || !(policyComponent instanceof Assertion)
                 || !getName().equals(((Assertion)policyComponent).getName())) {
                 return false;
             }
@@ -77,3 +78,4 @@ public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerP
         } 
     }
 }
+

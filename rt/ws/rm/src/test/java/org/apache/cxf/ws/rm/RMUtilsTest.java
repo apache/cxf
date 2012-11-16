@@ -80,7 +80,7 @@ public class RMUtilsTest extends Assert {
 
         // this test makes sure that an automatically generated id will be
         // mapped to the static default bus name "cxf".
-        System.out.println("bus: " + BusFactory.getThreadDefaultBus(false));
+        // System.out.println("bus: " + BusFactory.getThreadDefaultBus(false));
         control.reset();
         EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
         EasyMock.expect(ei.getName()).andReturn(eqn);
