@@ -94,9 +94,9 @@ public class CXFBusImplTest extends Assert {
     public void testBusID() {
         CXFBusImpl bus = new CXFBusImpl();
         String id = bus.getId();
-        assertEquals("The bus id should be cxf", id, Bus.DEFAULT_BUS_ID + bus.hashCode());
+        assertEquals("The bus id should be cxf", id, Bus.DEFAULT_BUS_ID + Math.abs(bus.hashCode()));
         bus.setId("test");
-        assertEquals("The bus id should be changed", bus.getId(), "test");
+        assertEquals("The bus id should be changed", "test", bus.getId());
     }
     
     @Test
