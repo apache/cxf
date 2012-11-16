@@ -97,7 +97,7 @@ public class JAXBDataBindingTest extends Assert {
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         destinationFactoryManager = control.createMock(DestinationFactoryManager.class);
         
-        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
+        EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class))
             .andStubReturn(destinationFactoryManager);
 
