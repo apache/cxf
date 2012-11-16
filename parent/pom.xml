@@ -1440,7 +1440,6 @@
                 <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
                 <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
                 <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
-                <jdk.version>1.6</jdk.version>
             </properties>
         </profile>
         <profile>
