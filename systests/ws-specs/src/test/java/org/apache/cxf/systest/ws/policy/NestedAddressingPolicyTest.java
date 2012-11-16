@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.util.logging.Logger;
 
 import javax.xml.ws.Endpoint;
@@ -105,6 +106,7 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
             assertTrue("Addressing Header Required message is expected",
                        e.getMessage().contains("Addressing Property is not present"));
         }
+        ((Closeable)greeter).close();
 
     }
 }

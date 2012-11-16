@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.policy;
 
+import java.io.Closeable;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -164,6 +165,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
             assertEquals(2, ex.getFaultInfo().getMajor());
             assertEquals(1, ex.getFaultInfo().getMinor());
         } 
+        ((Closeable)greeter).close();
 
     }
     
@@ -195,5 +197,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         assertEquals("unexpected DecoupledEndpoint", 
                      "http://localhost:9909/decoupled_endpoint",
                      c.getClient().getDecoupledEndpoint());
+        ((Closeable)greeter).close();
+
     }
 }
