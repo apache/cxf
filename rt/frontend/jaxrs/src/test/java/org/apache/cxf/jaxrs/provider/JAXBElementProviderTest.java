@@ -1227,7 +1227,6 @@ public class JAXBElementProviderTest extends Assert {
                              new MetadataMap<String, Object>(), new ByteArrayOutputStream());
             fail("Validation exception expected");
         } catch (Exception ex) {
-            ex.printStackTrace();
             Throwable cause = ex.getCause();
             assertTrue(cause.getMessage().contains("Cannot find the declaration of element"));
         }
