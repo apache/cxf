@@ -97,24 +97,24 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
-        CountDownLatch doneSignal = new CountDownLatch(1);
+        CountDownLatch doneSignal = new CountDownLatch(5);
         
         executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/1", 
                                         "1", 
                                         "CXF in Action1", startSignal, doneSignal));
-//        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/2", 
-//                                        "2", 
-//                                        "CXF in Action2", startSignal, doneSignal));
-//        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/3", 
-//                                        "3", 
-//                                        "CXF in Action3", startSignal, doneSignal));
-//        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/4", 
-//                                        "4", 
-//                                        "CXF in Action4", startSignal, doneSignal));
-//        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/5", 
-//                                        "5", 
-//                                        "CXF in Action5", startSignal, doneSignal));
-//        
+        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/2", 
+                                        "2", 
+                                        "CXF in Action2", startSignal, doneSignal));
+        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/3", 
+                                        "3", 
+                                        "CXF in Action3", startSignal, doneSignal));
+        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/4", 
+                                        "4", 
+                                        "CXF in Action4", startSignal, doneSignal));
+        executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/5", 
+                                        "5", 
+                                        "CXF in Action5", startSignal, doneSignal));
+        
         startSignal.countDown();
         doneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
