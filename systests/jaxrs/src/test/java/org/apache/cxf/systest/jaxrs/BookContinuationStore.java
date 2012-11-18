@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.TimeoutHandler;
@@ -54,6 +55,13 @@ public class BookContinuationStore {
     }
     
     @GET
+    @Path("/books/resume")
+    @Produces("text/plain")
+    public void getBookDescriptionImmediateResume(AsyncResponse async) {
+        async.resume("immediateResume");
+    }
+    
+    @GET
     @Path("/books/cancel")
     public void getBookDescriptionWithCancel(@PathParam("id") String id, AsyncResponse async) {
         async.setTimeout(2000, TimeUnit.MILLISECONDS);
@@ -63,8 +71,15 @@ public class BookContinuationStore {
     @GET
     @Path("/books/timeouthandler/{id}")
     public void getBookDescriptionWithHandler(@PathParam("id") String id, AsyncResponse async) {
-        async.setTimeout(2000, TimeUnit.MILLISECONDS);
-        async.setTimeoutHandler(new TimeoutHandlerImpl(id));
+        async.setTimeout(1000, TimeUnit.MILLISECONDS);
+        async.setTimeoutHandler(new TimeoutHandlerImpl(id, false));
+    }
+    
+    @GET
+    @Path("/books/timeouthandlerresume/{id}")
+    public void getBookDescriptionWithHandlerResumeOnly(@PathParam("id") String id, AsyncResponse async) {
+        async.setTimeout(1000, TimeUnit.MILLISECONDS);
+        async.setTimeoutHandler(new TimeoutHandlerImpl(id, true));
     }
     
     @GET
@@ -112,17 +127,18 @@ public class BookContinuationStore {
     }
      
     private class TimeoutHandlerImpl implements TimeoutHandler {
-
+        private boolean resumeOnly;
         private String id;
         private AtomicInteger timeoutExtendedCounter = new AtomicInteger();
         
-        public TimeoutHandlerImpl(String id) {
+        public TimeoutHandlerImpl(String id, boolean resumeOnly) {
             this.id = id;
+            this.resumeOnly = resumeOnly;
         }
         
         @Override
         public void handleTimeout(AsyncResponse asyncResponse) {
-            if (timeoutExtendedCounter.addAndGet(1) <= 2) {
+            if (!resumeOnly && timeoutExtendedCounter.addAndGet(1) <= 2) {
                 asyncResponse.setTimeout(1, TimeUnit.SECONDS);
             } else {
                 asyncResponse.resume(books.get(id));

@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.ResumeCallback;
@@ -41,6 +42,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     
     private Continuation cont;
     private Message inMessage;
+    private boolean initialSuspend;
     private boolean cancelled;
     private volatile boolean done;
     private boolean resumedByApplication;
@@ -72,7 +74,11 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         inMessage.getExchange().put(AsyncResponse.class, this);
         cont.setObject(response);
         resumedByApplication = true;
-        cont.resume();
+        if (!initialSuspend) {
+            cont.resume();
+        } else {
+            initialSuspend = false;
+        }
     }
     
     @Override
@@ -121,6 +127,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         checkSuspended();
         inMessage.getExchange().put(AsyncResponse.class, this);
         long timeout = TimeUnit.MILLISECONDS.convert(time, unit);
+        initialSuspend = false;
         cont.suspend(timeout);
     }
 
@@ -178,7 +185,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     private void checkSuspended() {
-        if (!cont.isPending()) {
+        if (!initialSuspend && !isSuspended()) {
             throw new IllegalStateException();
         }
     }
@@ -200,9 +207,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         
     }
     
-    // these methods are called by the runtime, not part of AsyncResponse    
-    public synchronized void suspend() {
-        checkCancelled();
+    public synchronized void suspendContinuation() {
+        initialSuspend = false;
         cont.suspend(AsyncResponse.NO_TIMEOUT);
     }
     
@@ -218,20 +224,21 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         return resumedByApplication;
     }
     
-    public synchronized boolean handleTimeout() {
-        if (!resumedByApplication && timeoutHandler != null) {
-            suspend();
-            timeoutHandler.handleTimeout(this);
-            return true;
+    public synchronized void handleTimeout() {
+        if (!resumedByApplication) {
+            if (timeoutHandler != null) {
+                timeoutHandler.handleTimeout(this);
+            } else {
+                cont.setObject(new ServiceUnavailableException());
+            }
         }
-        return false;
-        
     }
 
     private void initContinuation() {
         ContinuationProvider provider = 
             (ContinuationProvider)inMessage.get(ContinuationProvider.class.getName());
         cont = provider.getContinuation();
+        initialSuspend = true;
     }
     
     public void prepareContinuation() {
