@@ -29,7 +29,7 @@ import javax.xml.ws.WebServiceProvider;
 
 @WebServiceProvider(portName = "SoapPort1", serviceName = "SOAPService1",
                       targetNamespace = "http://apache.org/hello_world_soap_http",
-                      wsdlLocation = "wsdl/hello_world.wsdl")
+                      wsdlLocation = "/hello_world.wsdl")
 @ServiceMode(value = Service.Mode.MESSAGE)
 public class GreeterSoapMessageProvider implements Provider<SOAPMessage> {
 
@@ -42,7 +42,7 @@ public class GreeterSoapMessageProvider implements Provider<SOAPMessage> {
         try {
             System.out.println("Incoming Client Request as a SOAPMessage");
             MessageFactory factory = MessageFactory.newInstance();
-            InputStream is = getClass().getResourceAsStream("GreetMeDocLiteralResp1.xml");
+            InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp1.xml");
             response =  factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {

@@ -64,7 +64,7 @@ public final class Client {
         QName portName1 = new QName("http://apache.org/hello_world_soap_http", "SoapPort1");
 
         SOAPService1 service1 = new SOAPService1(wsdlURL, serviceName1);
-        InputStream is1 =  Client.class.getResourceAsStream("GreetMeDocLiteralReq1.xml");
+        InputStream is1 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq1.xml");
         if (is1 == null) {
             System.err.println("Failed to create input stream from file "
                                + "GreetMeDocLiteralReq1.xml, please check");
@@ -83,7 +83,7 @@ public final class Client {
         QName portName2 = new QName("http://apache.org/hello_world_soap_http", "SoapPort2");
 
         SOAPService2 service2 = new SOAPService2(wsdlURL, serviceName2);
-        InputStream is2 =  Client.class.getResourceAsStream("GreetMeDocLiteralReq2.xml");
+        InputStream is2 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq2.xml");
         if (is2 == null) {
             System.err.println("Failed to create input stream from file "
                                + "GreetMeDocLiteralReq2.xml, please check");
@@ -104,7 +104,7 @@ public final class Client {
         QName portName3 = new QName("http://apache.org/hello_world_soap_http", "SoapPort3");
 
         SOAPService3 service3 = new SOAPService3(wsdlURL, serviceName3);
-        InputStream is3 =  Client.class.getResourceAsStream("GreetMeDocLiteralReq3.xml");
+        InputStream is3 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq3.xml");
         if (is3 == null) {
             System.err.println("Failed to create input stream from file "
                                + "GreetMeDocLiteralReq3.xml, please check");
