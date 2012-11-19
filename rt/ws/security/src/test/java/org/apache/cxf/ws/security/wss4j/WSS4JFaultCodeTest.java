@@ -166,7 +166,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             //
             // Sleep for over a second to make the timestamp invalid
             //
-            Thread.sleep(1001);
+            Thread.sleep(1250);
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an invalid Timestamp");
         } catch (SoapFault fault) {
