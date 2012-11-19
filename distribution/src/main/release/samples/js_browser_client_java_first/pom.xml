@@ -42,24 +42,6 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/staticContent/Beverages.html" todir="${basedir}/target/classes/staticContent" />
-                                <copy file="${basedir}/cxf.xml" todir="${basedir}/target/classes/" />
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -111,7 +93,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.0.6.RELEASE</version>
         </dependency>
     </dependencies>
 </project>
