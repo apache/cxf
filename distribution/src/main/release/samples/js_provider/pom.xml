@@ -32,6 +32,7 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <cxf.release.base>${basedir}/../..</cxf.release.base>
+        <wsdl.file>${basedir}/src/main/resources/hello_world.wsdl</wsdl.file>
     </properties>
     <build>
         <defaultGoal>install</defaultGoal>
@@ -56,24 +57,6 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-transform</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/main/java/demo/hwDispatch/client/GreetMeDocLiteralReq1.xml" todir="${basedir}/target/classes/demo/hwDispatch/client" />
-                                <copy file="${basedir}/src/main/java/demo/hwDispatch/client/GreetMeDocLiteralReq3.xml" todir="${basedir}/target/classes/demo/hwDispatch/client" />
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
@@ -84,7 +67,7 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
+                                    <wsdl>${wsdl.file}</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -144,7 +127,7 @@
                                 <configuration>
                                     <mainClass>demo.hwDispatch.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${wsdl.file}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
