@@ -176,17 +176,11 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     }
     
     public static final void setBlocking(ApplicationContext ctx, EndpointImpl impl) {
-        Class<?> cls = null;
-        try {
-            cls = Class.forName(CommonAnnotationBeanPostProcessor.class.getName());
-        } catch (ClassNotFoundException e) {
-            //ignore
-        }
         AutowireCapableBeanFactory fact = ctx.getAutowireCapableBeanFactory();
         if (fact instanceof DefaultListableBeanFactory) {
             DefaultListableBeanFactory dlbf = (DefaultListableBeanFactory)fact;
             for (BeanPostProcessor bpp : dlbf.getBeanPostProcessors()) {
-                if (cls != null && cls.isInstance(bpp)) {
+                if (CommonAnnotationBeanPostProcessor.class.isInstance(bpp)) {
                     impl.getServerFactory().setBlockPostConstruct(true);
                     impl.getServerFactory().setBlockInjection(false);
                     return;
