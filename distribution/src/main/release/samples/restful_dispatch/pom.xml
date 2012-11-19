@@ -42,25 +42,6 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/main/java/demo/restful/client/CustomerJohnReq.xml" todir="${basedir}/target/classes/demo/restful/client" />
-                                <copy file="${basedir}/src/main/java/demo/restful/server/CustomerJohnResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
-                                <copy file="${basedir}/src/main/java/demo/restful/server/CustomerAllResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>

@@ -83,7 +83,7 @@ public final class Client {
         Map<String, Object> requestContext = dispatcher.getRequestContext();
 
         Client client = new Client();
-        InputStream is = client.getClass().getResourceAsStream("CustomerJohnReq.xml");
+        InputStream is = client.getClass().getResourceAsStream("/CustomerJohnReq.xml");
         Document doc = XMLUtils.parse(is);
         DOMSource reqMsg = new DOMSource(doc);
 
