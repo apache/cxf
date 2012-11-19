@@ -71,7 +71,7 @@ public final class Client {
         URL wsdlURL;
         File wsdlFile = new File(args[0]);
         if (wsdlFile.exists()) {
-            wsdlURL = wsdlFile.toURL();
+            wsdlURL = wsdlFile.toURI().toURL();
         } else {
             wsdlURL = new URL(args[0]);
         }
@@ -79,7 +79,7 @@ public final class Client {
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         ServerPortType port = ss.getSOAPPort();
         
-        InputStream is = demo.callback.client.Client.class.getResourceAsStream("callback_infoset.xml");
+        InputStream is = demo.callback.client.Client.class.getResourceAsStream("/callback_infoset.xml");
         Document doc = XMLUtils.parse(is);
         Element referenceParameters = XMLUtils.fetchElementByNameAttribute(doc.getDocumentElement(),
                                                                            "wsa:ReferenceParameters",
