@@ -18,7 +18,7 @@
  */
 
 var WebServiceProvider = {
-    "wsdlLocation": "file:./wsdl/hello_world.wsdl",
+    "wsdlLocation": "file:./src/main/resources/hello_world.wsdl",
     "serviceName": "SOAPService3",
     "portName": "SoapPort3",
     "targetNamespace": "http://apache.org/hello_world_soap_http",

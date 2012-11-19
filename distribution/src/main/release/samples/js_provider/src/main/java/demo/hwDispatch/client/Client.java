@@ -48,7 +48,7 @@ public final class Client {
         URL wsdlURL;
         File wsdlFile = new File(args[0]);
         if (wsdlFile.exists()) {
-            wsdlURL = wsdlFile.toURL();
+            wsdlURL = wsdlFile.toURI().toURL();
         } else {
             wsdlURL = new URL(args[0]);
         }
@@ -61,7 +61,7 @@ public final class Client {
         QName portName1 = new QName(ns, "SoapPort1");
 
         SOAPService1 service1 = new SOAPService1(wsdlURL, serviceName1);
-        InputStream is1 =  Client.class.getResourceAsStream("GreetMeDocLiteralReq1.xml");
+        InputStream is1 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq1.xml");
         SOAPMessage soapReq1 = factory.createMessage(null, is1);
 
         Dispatch<SOAPMessage> dispSOAPMsg = service1.createDispatch(portName1,
@@ -75,7 +75,7 @@ public final class Client {
         QName portName3 = new QName(ns, "SoapPort3");
 
         SOAPService3 service3 = new SOAPService3(wsdlURL, serviceName3);
-        InputStream is3 =  Client.class.getResourceAsStream("GreetMeDocLiteralReq3.xml");
+        InputStream is3 =  Client.class.getResourceAsStream("/GreetMeDocLiteralReq2.xml");
         SOAPMessage soapReq3 = MessageFactory.newInstance().createMessage(null, is3);
         DOMSource domReqPayload = new DOMSource(soapReq3.getSOAPBody().extractContentAsDocument());
 
