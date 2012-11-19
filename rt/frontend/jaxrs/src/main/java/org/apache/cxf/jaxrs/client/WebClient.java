@@ -371,6 +371,17 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Does HTTP PUT invocation and returns typed response object
+     * @param body request body, can be null
+     * @param responseClass expected type of response object
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
+    public <T> T put(Object body, Class<T> responseClass) {
+        return invoke("PUT", body, responseClass);
+    }
+    
+    /**
      * Does HTTP invocation and returns a collection of typed objects 
      * @param httpMethod HTTP method 
      * @param body request body, can be null
