@@ -46,9 +46,9 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 
 
 public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
