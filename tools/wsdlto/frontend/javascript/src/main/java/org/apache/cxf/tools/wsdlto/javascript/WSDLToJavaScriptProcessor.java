@@ -68,7 +68,8 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
                 prefixManager.collect(prefixEntry.getValue(), prefixEntry.getKey());
             }
         }
-        
+
+        BufferedWriter writer = null;
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
@@ -77,7 +78,7 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             }
             
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
-            BufferedWriter writer = new BufferedWriter(outputStreamWriter);
+            writer = new BufferedWriter(outputStreamWriter);
             
             XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
             SchemaJavascriptBuilder jsBuilder = 
@@ -93,11 +94,18 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();
             writer.append(serviceJavascript);
-            writer.close();
         } catch (FileNotFoundException e) {
             throw new ToolException(e);
         } catch (IOException e) {
             throw new ToolException(e);
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                throw new ToolException(e);
+            }
         }
     }
     

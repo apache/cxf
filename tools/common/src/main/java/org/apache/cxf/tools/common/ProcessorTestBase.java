@@ -92,28 +92,34 @@ public class ProcessorTestBase extends Assert {
                 }
                 if (filename.indexOf("surefirebooter") != -1) {
                     //surefire 2.4 uses a MANIFEST classpath that javac doesn't like
-                    JarFile jar = new JarFile(filename);
-                    Attributes attr = jar.getManifest().getMainAttributes();
-                    if (attr != null) {
-                        String cp = attr.getValue("Class-Path");
-                        while (cp != null) {
-                            String fileName = cp;
-                            int idx = fileName.indexOf(' ');
-                            if (idx != -1) {
-                                fileName = fileName.substring(0, idx);
-                                cp =  cp.substring(idx + 1).trim();
-                            } else {
-                                cp = null;
-                            }
-                            URI uri = new URI(fileName);
-                            File f2 = new File(uri);
-                            if (f2.exists()) {
-                                classPath.append(f2.getAbsolutePath());
-                                classPath.append(System.getProperty("path.separator"));
+                    JarFile jar = null;
+                    try {
+                        jar = new JarFile(filename);
+                        Attributes attr = jar.getManifest().getMainAttributes();
+                        if (attr != null) {
+                            String cp = attr.getValue("Class-Path");
+                            while (cp != null) {
+                                String fileName = cp;
+                                int idx = fileName.indexOf(' ');
+                                if (idx != -1) {
+                                    fileName = fileName.substring(0, idx);
+                                    cp =  cp.substring(idx + 1).trim();
+                                } else {
+                                    cp = null;
+                                }
+                                URI uri = new URI(fileName);
+                                File f2 = new File(uri);
+                                if (f2.exists()) {
+                                    classPath.append(f2.getAbsolutePath());
+                                    classPath.append(System.getProperty("path.separator"));
+                                }
                             }
                         }
+                    } finally {
+                        if (jar != null) {
+                            jar.close();
+                        }
                     }
-                    jar.close();
                 }
             }
         }

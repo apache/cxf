@@ -101,11 +101,18 @@ public final class SSLUtils {
         KeyStore ks = KeyStore.getInstance(keyStoreType);
         
         if (keyStoreType.equalsIgnoreCase(PKCS12_TYPE)) {
-            FileInputStream fis = new FileInputStream(keyStoreLocation);
-            DataInputStream dis = new DataInputStream(fis);
-            byte[] bytes = new byte[dis.available()];
-            dis.readFully(bytes);
-            dis.close();
+            DataInputStream dis = null;
+            byte[] bytes = null;
+            try {
+                FileInputStream fis = new FileInputStream(keyStoreLocation);
+                dis = new DataInputStream(fis);
+                bytes = new byte[dis.available()];
+                dis.readFully(bytes);
+            } finally {
+                if (dis != null) {
+                    dis.close();
+                }
+            }
             ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
             
             if (keyStorePassword != null) {
@@ -212,33 +219,45 @@ public final class SSLUtils {
         if (fileName == null) {
             return null;
         }
-        FileInputStream in = new FileInputStream(fileName);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[512];
-        int i = in.read(buf);
-        while (i  > 0) {
-            out.write(buf, 0, i);
-            i = in.read(buf);
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(fileName);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[512];
+            int i = in.read(buf);
+            while (i  > 0) {
+                out.write(buf, 0, i);
+                i = in.read(buf);
+            }
+            return out.toByteArray();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
         }
-        in.close();
-        return out.toByteArray();
     }
 
     protected static byte[] loadCACert(String fileName) throws IOException {
         if (fileName == null) {
             return null;
         }
-        FileInputStream in = new FileInputStream(fileName);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[512];
-        int i = in.read(buf);
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(fileName);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[512];
+            int i = in.read(buf);
         
-        while (i > 0) {
-            out.write(buf, 0, i);
-            i = in.read(buf);
+            while (i > 0) {
+                out.write(buf, 0, i);
+                i = in.read(buf);
+            }
+            return out.toByteArray();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
         }
-        in.close();
-        return out.toByteArray();
     }
 
     public static String getKeystore(String keyStoreLocation, Logger log) {

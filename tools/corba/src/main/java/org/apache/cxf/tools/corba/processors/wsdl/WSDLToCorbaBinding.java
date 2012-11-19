@@ -342,14 +342,18 @@ public class WSDLToCorbaBinding {
 
             String addr = null;
             if (getAddressFile() != null) {
+                BufferedReader bufferedReader = null;
                 try {
                     File addrFile = new File(getAddressFile());
                     FileReader fileReader = new FileReader(addrFile);
-                    BufferedReader bufferedReader = new BufferedReader(fileReader);
+                    bufferedReader = new BufferedReader(fileReader);
                     addr = bufferedReader.readLine();
-                    bufferedReader.close();
                 } catch (Exception ex) {
                     throw new ToolException(ex.getMessage(), ex);
+                } finally {
+                    if (bufferedReader != null) {
+                        bufferedReader.close();
+                    }
                 }
             } else {
                 addr = getAddress();

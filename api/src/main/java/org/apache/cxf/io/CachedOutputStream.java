@@ -324,25 +324,34 @@ public class CachedOutputStream extends OutputStream {
             }
         } else {
             // read the file
-            InputStream fin = createInputStream(tempFile);
-            Reader reader = new InputStreamReader(fin, charsetName);
-            char bytes[] = new char[1024];
-            long x = reader.read(bytes);
-            while (x != -1) {
-                if ((count + x) > limit) {
-                    x = limit - count;
-                }
-                out.append(bytes, 0, (int)x);
-                count += x;
+            InputStream fin = null;
+            Reader reader = null;
+            try {
+                fin = createInputStream(tempFile);
+                reader = new InputStreamReader(fin, charsetName);
+                char bytes[] = new char[1024];
+                long x = reader.read(bytes);
+                while (x != -1) {
+                    if ((count + x) > limit) {
+                        x = limit - count;
+                    }
+                    out.append(bytes, 0, (int)x);
+                    count += x;
 
-                if (count >= limit) {
-                    x = -1;
-                } else {
-                    x = reader.read(bytes);
+                    if (count >= limit) {
+                        x = -1;
+                    } else {
+                        x = reader.read(bytes);
+                    }
+                }
+            } finally {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (fin != null) {
+                    fin.close();
                 }
             }
-            reader.close();
-            fin.close();
         }
     }
     
@@ -364,16 +373,25 @@ public class CachedOutputStream extends OutputStream {
             }
         } else {
             // read the file
-            InputStream fin = createInputStream(tempFile);
-            Reader reader = new InputStreamReader(fin, charsetName);
-            char bytes[] = new char[1024];
-            int x = reader.read(bytes);
-            while (x != -1) {
-                out.append(bytes, 0, x);
-                x = reader.read(bytes);
+            InputStream fin = null;
+            Reader reader = null;
+            try {
+                fin = createInputStream(tempFile);
+                reader = new InputStreamReader(fin, charsetName);
+                char bytes[] = new char[1024];
+                int x = reader.read(bytes);
+                while (x != -1) {
+                    out.append(bytes, 0, x);
+                    x = reader.read(bytes);
+                }
+            } finally {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (fin != null) {
+                    fin.close();
+                }
             }
-            reader.close();
-            fin.close();
         }
     }
 

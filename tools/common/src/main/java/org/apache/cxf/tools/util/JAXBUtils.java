@@ -127,13 +127,21 @@ public final class JAXBUtils {
         schemaBindings.appendChild(pkgElement);
         rootElement.appendChild(annoElement);
         File tmpFile = null;
+        FileOutputStream fout = null;
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
-            FileOutputStream fout = new FileOutputStream(tmpFile);
+            fout = new FileOutputStream(tmpFile);
             DOMUtils.writeXml(rootElement, fout);
-            fout.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (fout != null) {
+                try {
+                    fout.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return tmpFile;
     }

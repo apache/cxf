@@ -281,6 +281,7 @@ public class ServerLauncher {
         }
 
         public void run() {
+            PrintStream ps = null;
             try {
                 String outputDir = System.getProperty("server.output.dir", "target/surefire-reports/");
                 FileOutputStream fos;
@@ -298,7 +299,7 @@ public class ServerLauncher {
                     file.mkdirs();
                     fos = new FileOutputStream(outputDir + className + ".out");
                 }
-                PrintStream ps = new PrintStream(fos);
+                ps = new PrintStream(fos);
                 boolean running = true;
                 StringBuilder serverOutput = new StringBuilder();
                 for (int ch = in.read(); ch != -1; ch = in.read()) {
@@ -327,10 +328,13 @@ public class ServerLauncher {
                         }
                     }
                 }
-                ps.close();
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
                     ex.printStackTrace();
+                }
+            } finally {
+                if (ps != null) {
+                    ps.close();
                 }
             }
         }

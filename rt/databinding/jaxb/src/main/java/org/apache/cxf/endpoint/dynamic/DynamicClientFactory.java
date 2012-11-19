@@ -602,36 +602,42 @@ public class DynamicClientFactory {
     static void addClasspathFromManifest(StringBuilder classPath, File file) 
         throws URISyntaxException, IOException {
         
-        JarFile jar = new JarFile(file);
-        Attributes attr = null;
-        if (jar.getManifest() != null) {
-            attr = jar.getManifest().getMainAttributes();
-        }
-        if (attr != null) {
-            String cp = attr.getValue("Class-Path");
-            while (cp != null) {
-                String fileName = cp;
-                int idx = fileName.indexOf(' ');
-                if (idx != -1) {
-                    fileName = fileName.substring(0, idx);
-                    cp =  cp.substring(idx + 1).trim();
-                } else {
-                    cp = null;
-                }
-                URI uri = new URI(fileName);
-                File f2;
-                if (uri.isAbsolute()) {
-                    f2 = new File(uri);
-                } else {
-                    f2 = new File(file, fileName);
-                }
-                if (f2.exists()) {
-                    classPath.append(f2.getAbsolutePath());
-                    classPath.append(File.pathSeparator);
+        JarFile jar = null;
+        try {
+            jar = new JarFile(file);
+            Attributes attr = null;
+            if (jar.getManifest() != null) {
+                attr = jar.getManifest().getMainAttributes();
+            }
+            if (attr != null) {
+                String cp = attr.getValue("Class-Path");
+                while (cp != null) {
+                    String fileName = cp;
+                    int idx = fileName.indexOf(' ');
+                    if (idx != -1) {
+                        fileName = fileName.substring(0, idx);
+                        cp =  cp.substring(idx + 1).trim();
+                    } else {
+                        cp = null;
+                    }
+                    URI uri = new URI(fileName);
+                    File f2;
+                    if (uri.isAbsolute()) {
+                        f2 = new File(uri);
+                    } else {
+                        f2 = new File(file, fileName);
+                    }
+                    if (f2.exists()) {
+                        classPath.append(f2.getAbsolutePath());
+                        classPath.append(File.pathSeparator);
+                    }
                 }
             }
+        } finally {
+            if (jar != null) {
+                jar.close();
+            }
         }
-        jar.close();
     }
 
     static void setupClasspath(StringBuilder classPath, ClassLoader classLoader)

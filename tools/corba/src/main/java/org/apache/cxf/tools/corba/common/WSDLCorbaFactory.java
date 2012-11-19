@@ -139,10 +139,15 @@ public abstract class WSDLCorbaFactory {
             try {
                 Properties properties = new Properties();
                 File propFile = new File(propFileName);
-                FileInputStream fis = new FileInputStream(propFile);
-
-                properties.load(fis);
-                fis.close();
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(propFile);
+                    properties.load(fis);
+                } finally {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                }
 
                 factoryImplName = properties.getProperty(PROPERTY_NAME);
 

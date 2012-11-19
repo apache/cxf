@@ -93,9 +93,15 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                     } else {
                         wsdlFile = new File(outputdir, wsdlDef.getQName().getLocalPart() + ".wsdl");
                     }
-                    OutputStream wsdlOs = new BufferedOutputStream(new FileOutputStream(wsdlFile));
-                    wsdlWriter.writeWSDL(wsdlDef, wsdlOs);
-                    wsdlOs.close();
+                    OutputStream wsdlOs = null;
+                    try {
+                        wsdlOs = new BufferedOutputStream(new FileOutputStream(wsdlFile));
+                        wsdlWriter.writeWSDL(wsdlDef, wsdlOs);
+                    } finally {
+                        if (wsdlOs != null) {
+                            wsdlOs.close();
+                        }
+                    }
                 }
             }
 

@@ -116,11 +116,16 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
             }
         }
 
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
 
-        fileOutputStream.write(stringWriter.getBuffer().toString().getBytes());
-
-        fileOutputStream.close();
+            fileOutputStream.write(stringWriter.getBuffer().toString().getBytes());
+        } finally {
+            if (fileOutputStream != null) {
+                fileOutputStream.close();
+            }
+        }
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Exchange data saved in " + file.getAbsolutePath());

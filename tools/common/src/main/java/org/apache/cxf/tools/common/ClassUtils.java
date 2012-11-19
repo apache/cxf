@@ -22,6 +22,7 @@ package org.apache.cxf.tools.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -91,7 +92,13 @@ public class ClassUtils {
 
                                 File targetFile = new File(targetDir + File.separator + dirName
                                                            + File.separator + str);
-                                copyXmlFile(otherFile, targetFile);
+                                try {
+                                    copyXmlFile(otherFile, targetFile);
+
+                                } catch (IOException e) {
+                                    Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
+                                    throw new ToolException(msg, e);
+                                }
                             }
                         }
                     }
@@ -115,15 +122,17 @@ public class ClassUtils {
         }        
     }
     
-    private void copyXmlFile(File from, File to) throws ToolException {
+    private void copyXmlFile(File from, File to) throws ToolException, IOException {
 
+        FileInputStream input = null;
+        FileOutputStream output = null;
         try {
             String dir = to.getCanonicalPath()
                 .substring(0, to.getCanonicalPath().lastIndexOf(File.separator));
             File dirFile = new File(dir);
             dirFile.mkdirs();
-            FileInputStream input = new FileInputStream(from);
-            FileOutputStream output = new FileOutputStream(to);
+            input = new FileInputStream(from);
+            output = new FileOutputStream(to);
             byte[] b = new byte[1024 * 3];
             int len = 0;
             while (len != -1) {
@@ -133,11 +142,16 @@ public class ClassUtils {
                 }
             }
             output.flush();
-            output.close();
-            input.close();
         } catch (Exception e) {
             Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
             throw new ToolException(msg, e);
+        } finally {
+            if (output != null) {
+                output.close();
+            }
+            if (input != null) {
+                input.close();
+            }
         }
     }    
 }

@@ -1247,9 +1247,15 @@ public class SourceGenerator {
         
         try {
             file.createNewFile();
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(content.getBytes());
-            fos.close();
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(file);
+                fos.write(content.getBytes());
+            } finally {
+                if (fos != null) {
+                    fos.close();
+                }
+            }
         } catch (FileNotFoundException ex) {
             LOG.warning(file.getAbsolutePath() + " is not found");
         } catch (IOException ex) {

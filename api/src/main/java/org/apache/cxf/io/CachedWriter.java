@@ -261,16 +261,22 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader fin = new InputStreamReader(new FileInputStream(tempFile), "UTF-8");
-            CharArrayWriter out = new CharArrayWriter((int)tempFile.length());
-            char bytes[] = new char[1024];
-            int x = fin.read(bytes);
-            while (x != -1) {
-                out.write(bytes, 0, x);
-                x = fin.read(bytes);
+            Reader fin = null;
+            try {
+                fin = new InputStreamReader(new FileInputStream(tempFile), "UTF-8");
+                CharArrayWriter out = new CharArrayWriter((int)tempFile.length());
+                char bytes[] = new char[1024];
+                int x = fin.read(bytes);
+                while (x != -1) {
+                    out.write(bytes, 0, x);
+                    x = fin.read(bytes);
+                }
+                return out.toCharArray();
+            } finally {
+                if (fin != null) {
+                    fin.close();
+                }
             }
-            fin.close();
-            return out.toCharArray();
         }
     }
 
@@ -284,14 +290,20 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader fin = new InputStreamReader(new FileInputStream(tempFile), "UTF-8");
-            char bytes[] = new char[1024];
-            int x = fin.read(bytes);
-            while (x != -1) {
-                out.write(bytes, 0, x);
-                x = fin.read(bytes);
+            Reader fin = null;
+            try {
+                fin = new InputStreamReader(new FileInputStream(tempFile), "UTF-8");
+                char bytes[] = new char[1024];
+                int x = fin.read(bytes);
+                while (x != -1) {
+                    out.write(bytes, 0, x);
+                    x = fin.read(bytes);
+                }
+            } finally {
+                if (fin != null) {
+                    fin.close();
+                }
             }
-            fin.close();
         }
     }
     
@@ -313,23 +325,29 @@ public class CachedWriter extends Writer {
             }
         } else {
             // read the file
-            Reader fin = new InputStreamReader(new FileInputStream(tempFile), "UTF-8");
-            char bytes[] = new char[1024];
-            long x = fin.read(bytes);
-            while (x != -1) {
-                if ((count + x) > limit) {
-                    x = limit - count;
-                }
-                out.append(bytes, 0, (int)x);
-                count += x;
+            Reader fin = null;
+            try {
+                fin = new InputStreamReader(new FileInputStream(tempFile), "UTF-8");
+                char bytes[] = new char[1024];
+                long x = fin.read(bytes);
+                while (x != -1) {
+                    if ((count + x) > limit) {
+                        x = limit - count;
+                    }
+                    out.append(bytes, 0, (int)x);
+                    count += x;
 
-                if (count >= limit) {
-                    x = -1;
-                } else {
-                    x = fin.read(bytes);
+                    if (count >= limit) {
+                        x = -1;
+                    } else {
+                        x = fin.read(bytes);
+                    }
+                }
+            } finally {
+                if (fin != null) {
+                    fin.close();
                 }
             }
-            fin.close();
         }
     }
     
@@ -345,14 +363,20 @@ public class CachedWriter extends Writer {
         } else {
             // read the file
             FileInputStream fin = new FileInputStream(tempFile);
-            Reader r = new InputStreamReader(fin, "UTF-8");
-            char chars[] = new char[1024];
-            int x = r.read(chars);
-            while (x != -1) {
-                out.append(chars, 0, x);
-                x = r.read(chars);
+            Reader r = null;
+            try {
+                r = new InputStreamReader(fin, "UTF-8");
+                char chars[] = new char[1024];
+                int x = r.read(chars);
+                while (x != -1) {
+                    out.append(chars, 0, x);
+                    x = r.read(chars);
+                }
+            } finally {
+                if (r != null) {
+                    r.close();
+                }
             }
-            r.close();
         }
     }
 

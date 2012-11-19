@@ -82,6 +82,7 @@ public class JavaToJSProcessor implements Processor {
         NamespacePrefixAccumulator prefixManager = new NamespacePrefixAccumulator(serviceInfo
             .getXmlSchemaCollection());
         Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
+        BufferedWriter writer = null;
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
@@ -89,7 +90,7 @@ public class JavaToJSProcessor implements Processor {
             }
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
-            BufferedWriter writer = new BufferedWriter(outputStreamWriter);
+            writer = new BufferedWriter(outputStreamWriter);
 
             for (SchemaInfo schema : schemata) {
                 SchemaJavascriptBuilder jsBuilder = new SchemaJavascriptBuilder(serviceInfo
@@ -103,11 +104,18 @@ public class JavaToJSProcessor implements Processor {
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();
             writer.append(serviceJavascript);
-            writer.close();
         } catch (FileNotFoundException e) {
             throw new ToolException(e);
         } catch (IOException e) {
             throw new ToolException(e);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    throw new ToolException(e);
+                }
+            }
         }
 
         System.setProperty(JAVA_CLASS_PATH, oldClassPath);
