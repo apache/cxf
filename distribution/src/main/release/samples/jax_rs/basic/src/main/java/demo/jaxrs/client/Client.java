@@ -64,7 +64,7 @@ public final class Client {
         System.out.println("\n");
         System.out.println("Sent HTTP PUT request to update customer info");
         Client client = new Client();
-        String inputFile = client.getClass().getResource("update_customer.xml").getFile();
+        String inputFile = client.getClass().getResource("/update_customer.xml").getFile();
         URIResolver resolver = new URIResolver(inputFile);
         File input = new File(resolver.getURI());
         PutMethod put = new PutMethod("http://localhost:9000/customerservice/customers");
@@ -86,7 +86,7 @@ public final class Client {
         // Sent HTTP POST request to add customer
         System.out.println("\n");
         System.out.println("Sent HTTP POST request to add customer");
-        inputFile = client.getClass().getResource("add_customer.xml").getFile();
+        inputFile = client.getClass().getResource("/add_customer.xml").getFile();
         resolver = new URIResolver(inputFile);
         input = new File(resolver.getURI());
         PostMethod post = new PostMethod("http://localhost:9000/customerservice/customers");
