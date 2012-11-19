@@ -31,6 +31,7 @@
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
+        <wsdl.file>${basedir}/src/main/resources/addNumbers.wsdl</wsdl.file>
     </properties>
 
     <build>
@@ -53,7 +54,7 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/addNumbers.wsdl</wsdl>
+                                    <wsdl>${wsdl.file}</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -62,23 +63,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                           <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/src/main/java/demo/handlers/common/demo_handlers.xml" todir="${basedir}/target/classes/demo/handlers/common" />
-                            </tasks>
-                        </configuration>
-                    </execution>
-	        </executions>
             </plugin>
         </plugins>
     </build>   
@@ -100,7 +84,7 @@
                                 <configuration>
                                     <mainClass>demo.handlers.server.Server</mainClass>
                                     <arguments>
-				        <argument>${basedir}/wsdl/addNumbers.wsdl</argument>
+                                        <argument>${wsdl.file}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -126,7 +110,7 @@
                                 <configuration>
                                     <mainClass>demo.handlers.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/addNumbers.wsdl</argument>
+                                        <argument>${wsdl.file}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
