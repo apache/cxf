@@ -31,7 +31,7 @@ import org.apache.handlers.types.FaultDetail;
             portName = "AddNumbersPort",
             endpointInterface = "org.apache.handlers.AddNumbers",
             serviceName = "AddNumbersService")
-@HandlerChain(file = "../common/demo_handlers.xml")
+@HandlerChain(file = "/demo_handlers.xml")
 public class AddNumbersImpl implements AddNumbers {
 
 
