@@ -46,6 +46,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -177,8 +178,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     public static final void setBlocking(ApplicationContext ctx, EndpointImpl impl) {
         Class<?> cls = null;
         try {
-            cls = Class
-                .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
+            cls = Class.forName(CommonAnnotationBeanPostProcessor.class.getName());
         } catch (ClassNotFoundException e) {
             //ignore
         }
