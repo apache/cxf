@@ -74,16 +74,16 @@ public class RestSourcePayloadProvider implements Provider<DOMSource> {
     }
 
     private DOMSource getAllCustomers() {
-        return createDOMSource("CustomerAllResp.xml");
+        return createDOMSource("/CustomerAllResp.xml");
     }
 
     private DOMSource getCustomer(String customerID) {
-        return createDOMSource("CustomerJohnResp.xml");
+        return createDOMSource("/CustomerJohnResp.xml");
     }
 
     private DOMSource updateCustomer(DOMSource request) {
         // TBD: returned update customer info
-        return createDOMSource("CustomerJohnResp.xml");
+        return createDOMSource("/CustomerJohnResp.xml");
     }
 
     private DOMSource createDOMSource(String fileName) {
