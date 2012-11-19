@@ -32,6 +32,7 @@
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
+        <wsdl.file>${basedir}/src/main/resources/hello_world.wsdl</wsdl.file>
     </properties>
     <build>
         <plugins>
@@ -53,31 +54,13 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
+                                    <wsdl>${wsdl.file}</wsdl>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copyxmlfiles</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${basedir}/staticContent/HelloWorld.html" todir="${basedir}/target/classes/staticContent" />
-                                <copy file="${basedir}/cxf.xml" todir="${basedir}/target/classes/" />
-                            </tasks>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -124,7 +107,7 @@
                                 <configuration>
                                     <mainClass>demo.hw.client.Client</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${wsdl.file}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
