@@ -453,6 +453,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         if (mexLoc != null) {
             try {
                 JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
+                proxyFac.setBindingId(soapVersion);
                 proxyFac.setAddress(mexLoc);
                 MetadataExchange exc = proxyFac.create(MetadataExchange.class);
                 Metadata metadata = exc.get2004();
