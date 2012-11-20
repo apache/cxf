@@ -77,6 +77,7 @@ import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.Nullable;
 import org.apache.cxf.jaxrs.ext.Oneway;
+import org.apache.cxf.jaxrs.ext.search.QueryContext;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
@@ -588,6 +589,15 @@ public class BookStore {
             throw new BookNotFoundFault("Single book is expected");
         }
         return found.get(0);
+    }
+    
+    @GET
+    @Path("/books/querycontext/{expression}")
+    @Produces("text/plain")
+    public String getBookQueryContext(@PathParam("expression") String expression, 
+                                      @Context QueryContext searchContext) 
+        throws BookNotFoundFault {
+        return searchContext.getConvertedExpression(expression);
     }
     
     @GET

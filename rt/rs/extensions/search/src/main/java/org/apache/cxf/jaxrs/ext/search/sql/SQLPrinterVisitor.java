@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.ext.search.sql;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,11 @@ public class SQLPrinterVisitor<T> extends AbstractSearchConditionVisitor<T, Stri
     private String table;
     private String tableAlias;
     private List<String> columns;
+    
+    // Can be useful when some other code will build Select and From clauses.
+    public SQLPrinterVisitor() {
+        this(null, null, Collections.<String>emptyList());
+    }
     
     public SQLPrinterVisitor(String table, String... columns) {
         this(null, table, Arrays.asList(columns));

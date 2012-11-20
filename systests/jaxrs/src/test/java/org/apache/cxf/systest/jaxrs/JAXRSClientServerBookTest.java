@@ -1043,6 +1043,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetSearchBookSQL() throws Exception {
+        String address = "http://localhost:" + PORT 
+            + "/bookstore/books/querycontext/id=ge=123";
+                          
+        WebClient client = WebClient.create(address);
+        client.accept("text/plain");
+        String sql = client.get(String.class);
+        assertEquals("SELECT * FROM books WHERE id >= '123'", sql);
+    }
+    
+    
+    @Test
     public void testGetBook123CGLIB() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/123/cglib",
                                "resources/expected_get_book123.txt",
