@@ -141,7 +141,7 @@
     </feature>
     <feature name="cxf-http-jetty" version="${project.version}" resolver='(obr)'>
         <feature version="[2,3)">cxf-http</feature>
-        <feature version="[7,8)">jetty</feature>
+        <feature version="[7,9)">jetty</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${project.version}</bundle>
     </feature>
     <feature name="cxf-bindings-soap" version="${project.version}" resolver='(obr)'>
