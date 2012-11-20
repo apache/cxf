@@ -153,7 +153,9 @@ public class AttachmentSerializer {
             encoding = "UTF-8";
         }
         StringWriter writer = new StringWriter();
-        writer.write("\n");
+        String lineSeparator = java.security.AccessController.doPrivileged(
+            new sun.security.action.GetPropertyAction("line.separator"));
+        writer.write(lineSeparator);
         writer.write("--");
         writer.write(bodyBoundary);
         
