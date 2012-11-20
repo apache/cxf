@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
@@ -153,8 +154,8 @@ public class AttachmentSerializer {
             encoding = "UTF-8";
         }
         StringWriter writer = new StringWriter();
-        String lineSeparator = java.security.AccessController.doPrivileged(
-            new sun.security.action.GetPropertyAction("line.separator"));
+        String lineSeparator = 
+            SystemPropertyAction.getProperty("line.separator", "\r\n");
         writer.write(lineSeparator);
         writer.write("--");
         writer.write(bodyBoundary);
