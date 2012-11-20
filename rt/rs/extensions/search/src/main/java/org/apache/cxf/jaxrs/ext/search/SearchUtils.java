@@ -30,6 +30,7 @@ public final class SearchUtils {
     public static final String TIMEZONE_SUPPORT_PROPERTY = "search.timezone.support";
     public static final String LAX_PROPERTY_MATCH = "search.lax.property.match";
     public static final String BEAN_PROPERTY_MAP = "search.bean.property.map";
+    public static final String SEARCH_VISITOR_PROPERTY = "search.visitor";
     
     private SearchUtils() {
         

@@ -29,7 +29,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.search.QueryContextProvider;
+import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
+import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -64,6 +67,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new GenericHandlerWriter());
         providers.add(new FaultyRequestHandler());
         providers.add(new SearchContextProvider());
+        providers.add(new QueryContextProvider());
         sf.setProviders(providers);
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
@@ -76,7 +80,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.setAddress("http://localhost:" + PORT + "/");
 
         sf.getProperties(true).put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", true);
-        
+        sf.getProperties().put("search.visitor", new SQLPrinterVisitor<SearchBean>("books"));
         server = sf.create();
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
