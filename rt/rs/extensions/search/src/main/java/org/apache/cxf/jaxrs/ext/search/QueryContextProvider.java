@@ -39,18 +39,15 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
             this.message = message;
         }
 
-        @Override
         public String getConvertedExpression(String originalExpression) {
             return getConvertedExpression(originalExpression, SearchBean.class);
         }
 
-        @Override
         public <T> String getConvertedExpression(String originalExpression, Class<T> beanClass) {
             return getConvertedExpression(originalExpression, beanClass, String.class);
             
         }
         
-        @Override
         public <T, E> E getConvertedExpression(String originalExpression,
                                                Class<T> beanClass,
                                                Class<E> queryClass) {
