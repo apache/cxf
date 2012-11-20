@@ -5,6 +5,7 @@
 .checkstyle
 .classpath
 .pmd
+.pmdruleset
 .project
 .ruleset
 .settings/
