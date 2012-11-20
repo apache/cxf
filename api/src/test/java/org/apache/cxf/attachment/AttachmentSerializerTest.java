@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -90,8 +91,11 @@ public class AttachmentSerializerTest extends Assert {
         
         out.flush();
         
+        DataSource source = new ByteArrayDataSource(new ByteArrayInputStream(out.toByteArray()), ct);
+        MimeMultipart mpart = new MimeMultipart(source);
         Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage inMsg = new MimeMessage(session, new ByteArrayInputStream(out.toByteArray()));
+        MimeMessage inMsg = new MimeMessage(session);
+        inMsg.setContent(mpart);
         inMsg.addHeaderLine("Content-Type: " + ct);
         
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
@@ -158,9 +162,12 @@ public class AttachmentSerializerTest extends Assert {
         serializer.writeAttachments();
         
         out.flush();
-        
+        DataSource source = new ByteArrayDataSource(new ByteArrayInputStream(out.toByteArray()), ct);
+        MimeMultipart mpart = new MimeMultipart(source);
         Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage inMsg = new MimeMessage(session, new ByteArrayInputStream(out.toByteArray()));
+        MimeMessage inMsg = new MimeMessage(session);
+        inMsg.setContent(mpart);
+        
         inMsg.addHeaderLine("Content-Type: " + ct);
         
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();

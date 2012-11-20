@@ -28,10 +28,12 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -116,8 +118,11 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     
     public static MimeMultipart readAttachmentParts(String contentType, InputStream bais) throws 
         MessagingException, IOException {
+        DataSource source = new ByteArrayDataSource(bais, contentType);
+        MimeMultipart mpart = new MimeMultipart(source);
         Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage mm = new MimeMessage(session, bais);
+        MimeMessage mm = new MimeMessage(session);
+        mm.setContent(mpart);
         mm.addHeaderLine("Content-Type:" + contentType);
         return (MimeMultipart) mm.getContent();
     }
