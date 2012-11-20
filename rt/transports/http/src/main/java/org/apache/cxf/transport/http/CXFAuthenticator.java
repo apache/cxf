@@ -19,12 +19,16 @@
 
 package org.apache.cxf.transport.http;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.net.URLClassLoader;
 
+import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -34,29 +38,43 @@ import org.apache.cxf.transport.Conduit;
  * 
  */
 public class CXFAuthenticator extends Authenticator {
-    static Authenticator wrapped;
     static boolean setup;
+    private static final CXFAuthenticator INSTANCE = new CXFAuthenticator();
     
     
     public CXFAuthenticator() {
-        try {
-            for (Field f : Authenticator.class.getDeclaredFields()) {
-                if (f.getType().equals(Authenticator.class)) {
-                    f.setAccessible(true);
-                    wrapped = (Authenticator)f.get(null);
-                }
-            }
-        } catch (Throwable ex) {
-            //ignore
-        }
     }
 
     public static synchronized void addAuthenticator() { 
         if (!setup) {
+            Authenticator wrapped = null;
+            for (final Field f : Authenticator.class.getDeclaredFields()) {
+                if (f.getType().equals(Authenticator.class)) {
+                    ReflectionUtil.setAccessible(f);
+                    try {
+                        wrapped = (Authenticator)f.get(null);
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                }
+            }
+            
             try {
-                Authenticator.setDefault(new CXFAuthenticator());
+                InputStream ins = ReferencingAuthenticator.class.getResourceAsStream("ReferencingAuthenticator.class");
+                final byte b[] = IOUtils.readBytesFromStream(ins);
+                ClassLoader loader = new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
+                Method m = ClassLoader.class.getDeclaredMethod("defineClass", String.class, 
+                                                               byte[].class, Integer.TYPE, Integer.TYPE);
+                ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
+                                                       b, 0, b.length);
+                Class<?> cls = loader.loadClass(ReferencingAuthenticator.class.getName());
+                Authenticator auth = (Authenticator)cls.getConstructor(Authenticator.class, Authenticator.class)
+                    .newInstance(INSTANCE, wrapped);
+                
+                Authenticator.setDefault(auth);
             } catch (Throwable t) {
                 //ignore
+                t.printStackTrace();
             }
             setup = true;
         }
@@ -64,24 +82,6 @@ public class CXFAuthenticator extends Authenticator {
     
     protected PasswordAuthentication getPasswordAuthentication() { 
         PasswordAuthentication auth = null;
-        if (wrapped != null) {
-            try {
-                for (Field f : Authenticator.class.getDeclaredFields()) {
-                    if (!Modifier.isStatic(f.getModifiers())) {
-                        f.setAccessible(true);
-                        f.set(wrapped, f.get(this));
-                    }
-                }
-                Method m = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
-                m.setAccessible(true);
-                auth = (PasswordAuthentication)m.invoke(wrapped);
-            } catch (Throwable t) {
-                //ignore
-            }
-        }
-        if (auth != null) {
-            return auth;
-        }
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {
             Exchange exchange = m.getExchange();
