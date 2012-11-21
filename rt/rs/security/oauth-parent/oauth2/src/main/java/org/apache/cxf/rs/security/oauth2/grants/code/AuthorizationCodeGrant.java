@@ -82,10 +82,10 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
      */
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putSingle("grant_type", OAuthConstants.AUTHORIZATION_CODE_GRANT);
-        map.putSingle("code", code);
+        map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
+        map.putSingle(OAuthConstants.AUTHORIZATION_CODE_VALUE, code);
         if (redirectUri != null) {
-            map.putSingle("redirect_uri", redirectUri);
+            map.putSingle(OAuthConstants.REDIRECT_URI, redirectUri);
         }
         return map;
     }
