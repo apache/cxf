@@ -37,7 +37,6 @@ public class ResourceOwnerGrant implements AccessTokenGrant {
         return OAuthConstants.RESOURCE_OWNER_GRANT;
     }
 
-    @Override
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.RESOURCE_OWNER_GRANT);

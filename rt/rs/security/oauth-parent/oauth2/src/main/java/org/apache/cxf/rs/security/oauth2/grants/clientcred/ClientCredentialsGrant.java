@@ -38,7 +38,6 @@ public class ClientCredentialsGrant implements AccessTokenGrant {
         return OAuthConstants.CLIENT_CREDENTIALS_GRANT;
     }
 
-    @Override
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.CLIENT_CREDENTIALS_GRANT);

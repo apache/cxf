@@ -35,7 +35,6 @@ public class RefreshTokenGrant implements AccessTokenGrant {
         return OAuthConstants.REFRESH_TOKEN_GRANT;
     }
 
-    @Override
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.REFRESH_TOKEN_GRANT);
