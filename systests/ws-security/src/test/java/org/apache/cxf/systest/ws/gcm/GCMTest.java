@@ -64,6 +64,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
     public void testAESGCM128() throws Exception {
         //
         // This test fails with the IBM JDK 7
+        // IBM JDK 7 appears to require a GCMParameter class to be used, which
+        // only exists in JDK 7. The Sun JDK appears to be more lenient and 
+        // allows us to use the existing IVParameterSpec class.
         //
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))
             && System.getProperty("java.version") != null
@@ -98,6 +101,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         
         //
         // This test fails with the IBM JDK 7
+        // IBM JDK 7 appears to require a GCMParameter class to be used, which
+        // only exists in JDK 7. The Sun JDK appears to be more lenient and 
+        // allows us to use the existing IVParameterSpec class.
         //
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))
             && System.getProperty("java.version") != null
@@ -132,6 +138,9 @@ public class GCMTest extends AbstractBusClientServerTestBase {
         
         //
         // This test fails with the IBM JDK 7
+        // IBM JDK 7 appears to require a GCMParameter class to be used, which
+        // only exists in JDK 7. The Sun JDK appears to be more lenient and 
+        // allows us to use the existing IVParameterSpec class.
         //
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))
             && System.getProperty("java.version") != null
