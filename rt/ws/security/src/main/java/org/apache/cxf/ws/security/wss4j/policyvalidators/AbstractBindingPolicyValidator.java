@@ -169,12 +169,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
-        // Check the AlgorithmSuite
-        AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
-        if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
-            return false;
-        }
-        
         // Check the IncludeTimestamp
         if (!validateTimestamp(binding.isIncludeTimestamp(), false, results, signedResults, message)) {
             String error = "Received Timestamp does not match the requirements";

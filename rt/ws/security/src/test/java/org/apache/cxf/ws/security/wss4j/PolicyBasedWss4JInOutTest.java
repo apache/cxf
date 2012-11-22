@@ -199,12 +199,17 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.ENCRYPTED_ELEMENTS,
                 null,
                 CoverageType.ENCRYPTED);
-        this.runInInterceptorAndValidate(
+        try {
+            this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_elements_policy3.xml",
                 Arrays.asList(SP12Constants.ENCRYPTED_ELEMENTS),
-                Arrays.asList(SP12Constants.SYMMETRIC_BINDING, SP12Constants.PROTECTION_TOKEN),
+                null,
                 Arrays.asList(CoverageType.ENCRYPTED));
+            fail("Failure expected on an algorithm mismatch");
+        } catch (org.apache.cxf.binding.soap.SoapFault fault) {
+            // expected
+        }
         
         this.runAndValidate(
                 "wsse-request-clean.xml",
