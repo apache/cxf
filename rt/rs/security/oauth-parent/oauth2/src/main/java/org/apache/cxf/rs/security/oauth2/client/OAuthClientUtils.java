@@ -234,24 +234,31 @@ public final class OAuthClientUtils {
      * @param accessToken the access token  
      * @return the header value
      */
+    @Deprecated
     public static String createAuthorizationHeader(Consumer consumer,
                                                    ClientAccessToken accessToken)
         throws OAuthServiceException {
-        StringBuilder sb = new StringBuilder();
-        appendTokenData(sb, accessToken, null);  
-        return sb.toString();
+        return createAuthorizationHeader(accessToken);
+    }
+    
+    /**
+     * Creates OAuth Authorization header with Bearer scheme
+     * @param accessToken the access token  
+     * @return the header value
+     */
+    public static String createAuthorizationHeader(ClientAccessToken accessToken)
+        throws OAuthServiceException {
+        return createAuthorizationHeader(accessToken, null);
     }
     
     /**
      * Creates OAuth Authorization header with the scheme that
      * may require an access to the current HTTP request properties
-     * @param consumer represents the registered client
      * @param accessToken the access token  
      * @param httpProps http request properties, can be null for Bearer tokens
      * @return the header value
      */
-    public static String createAuthorizationHeader(Consumer consumer,
-                                                   ClientAccessToken accessToken,
+    public static String createAuthorizationHeader(ClientAccessToken accessToken,
                                                    HttpRequestProperties httpProps)
         throws OAuthServiceException {
         StringBuilder sb = new StringBuilder();
