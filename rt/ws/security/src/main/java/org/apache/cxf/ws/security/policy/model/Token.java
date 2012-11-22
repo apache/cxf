@@ -38,6 +38,11 @@ public abstract class Token extends AbstractSecurityAssertion {
     private boolean explicitDerivedKeys;
     
     private String issuerName;
+    
+    /**
+     * A Reference to a parent SupportingToken assertion
+     */
+    private SupportingToken supportingToken;
 
     public Token(SPConstants version) {
         super(version);
@@ -102,5 +107,13 @@ public abstract class Token extends AbstractSecurityAssertion {
     
     public void setIssuerName(String issuerName) {
         this.issuerName = issuerName;
+    }
+    
+    public SupportingToken getSupportingToken() {
+        return supportingToken;
+    }
+
+    public void setSupportingToken(SupportingToken supportingToken) {
+        this.supportingToken = supportingToken;
     }
 }

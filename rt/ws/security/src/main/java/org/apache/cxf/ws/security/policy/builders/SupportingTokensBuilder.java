@@ -115,6 +115,7 @@ public class SupportingTokensBuilder implements AssertionBuilder<Element> {
 
             } else if (primitive instanceof Token) {
                 supportingToken.addToken((Token)primitive);
+                ((Token)primitive).setSupportingToken(supportingToken);
             }
         }
     }
