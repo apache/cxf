@@ -347,6 +347,15 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
     public void setAlgorithmSuite(String algoSuite) throws WSSPolicyException {
         setAlgoSuiteString(algoSuite);
         this.algoSuiteString = algoSuite;
+        
+        if (algoSuiteString != null && algoSuiteString.endsWith("Rsa15")) {
+            int index = algoSuiteString.indexOf("Rsa15");
+            LOG.warning(
+                "An Rsa15 AlgorithmSuite - " + algoSuiteString + " - has been configured, "
+                + "which is not recommended. Please consider using "
+                + algoSuiteString.substring(0, index) + " instead."
+            );
+        }
 
         // TODO: Optimize this :-)
         if (SPConstants.ALGO_SUITE_BASIC256.equals(algoSuite)) {
