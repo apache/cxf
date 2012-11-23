@@ -209,7 +209,17 @@ Examples:
                 </annotation>
                 <switch>supportMultipleXmlReps</switch>
             </option>
-            
+ 
+            <option id="async" maxOccurs="unbounded">
+                <annotation>
+                    Specifies a comma separated list of method names or identifiers 
+                    which need to support suspended asynchronous invocations                     
+                </annotation>
+                <associatedArgument placement="immediate">
+                    <annotation>methodNames</annotation>
+                </associatedArgument>
+                <switch>async</switch>
+            </option>           
 <!-- 
 
 TODO: consider implementing most of the following options
@@ -267,11 +277,6 @@ TODO: consider implementing most of the following options
                 <associatedArgument placement="afterSpace">
                     <annotation>schema-namespace [= java-package-name]</annotation>
                 </associatedArgument>
-            </option>
- 
-            <option id="notypes" maxOccurs="1">
-                <annotation>Turns off generating types</annotation>
-                <switch>noTypes</switch>
             </option>
             <option id="defaultns" maxOccurs="1">
                 <annotation>

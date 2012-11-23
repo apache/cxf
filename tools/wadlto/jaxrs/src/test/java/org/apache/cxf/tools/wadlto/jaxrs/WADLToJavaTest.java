@@ -40,6 +40,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
                 output.getCanonicalPath(),
                 "-p",
                 "custom.service",
+                "-async getName,delete",
                 "-compile",
                 getLocation("/wadl/bookstore.xml"),
             };

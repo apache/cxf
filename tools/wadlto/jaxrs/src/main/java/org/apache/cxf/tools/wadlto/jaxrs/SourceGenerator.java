@@ -56,6 +56,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -186,6 +188,7 @@ public class SourceGenerator {
     private List<InputSource> bindingFiles = Collections.emptyList();
     private List<InputSource> schemaPackageFiles = Collections.emptyList();
     private List<String> compilerArgs = new ArrayList<String>();
+    private Set<String> suspendedAsyncMethods = Collections.emptySet();
     private Map<String, String> schemaPackageMap = Collections.emptyMap();
     private Map<String, String> javaTypeMap = Collections.emptyMap();
     private Map<String, String> schemaTypeMap = Collections.emptyMap();
@@ -224,6 +227,10 @@ public class SourceGenerator {
     
     public void setSkipSchemaGeneration(boolean skip) {
         this.skipSchemaGeneration = skip;
+    }
+    
+    public void setSuspendedAsyncMethods(Set<String> asyncMethods) {
+        this.suspendedAsyncMethods = asyncMethods;
     }
     
     private String getClassPackageName(String wadlPackageName) {
@@ -643,18 +650,20 @@ public class SourceGenerator {
         List<Element> allRequestReps = getWadlElements(firstRequestEl, "representation");
         List<Element> xmlRequestReps = getXmlReps(allRequestReps);
         
+        final String methodNameLowerCase = methodEl.getAttribute("name").toLowerCase();
+        String id = methodEl.getAttribute("id");
+        if (id.length() == 0) {
+            id = methodNameLowerCase;
+        }
+        final boolean suspendedAsync = suspendedAsyncMethods.contains(methodNameLowerCase)
+            || methodNameLowerCase != id && suspendedAsyncMethods.contains(id.toLowerCase());
+        
         boolean jaxpSourceRequired = xmlRequestReps.size() > 1 && !supportMultipleXmlReps;
         int numOfMethods = jaxpSourceRequired ? 1 : xmlRequestReps.size(); 
         for (int i = 0; i < numOfMethods; i++) {
             
             Element inXmlRep = xmlRequestReps.get(i);
                         
-            String methodNameLowerCase = methodEl.getAttribute("name").toLowerCase();
-            String id = methodEl.getAttribute("id");
-            if (id.length() == 0) {
-                id = methodNameLowerCase;
-            }
-            
             String suffixName = "";
             if (!jaxpSourceRequired && inXmlRep != null && xmlRequestReps.size() > 1) {
                 String value = inXmlRep.getAttribute("element");
@@ -687,7 +696,7 @@ public class SourceGenerator {
             }
             boolean responseTypeAvailable = true;
             if (methodNameLowerCase.length() > 0) {
-                responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info);
+                responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, suspendedAsync);
                 String genMethodName = id + suffixName;
                 if (methodNameLowerCase.equals(genMethodName)) {
                     genMethodName += firstCharToUpperCase(
@@ -723,7 +732,7 @@ public class SourceGenerator {
             
             Element repElement = getActualRepElement(allRequestReps, inXmlRep); 
             writeRequestTypes(firstRequestEl, classPackage, repElement, inParamElements, 
-                    jaxpSourceRequired, sbCode, imports, info);
+                    jaxpSourceRequired, sbCode, imports, info, suspendedAsync);
             sbCode.append(")");
             if (info.isInterfaceGenerated()) {
                 sbCode.append(";");
@@ -820,9 +829,10 @@ public class SourceGenerator {
     private boolean writeResponseType(List<Element> responseEls,
                                       StringBuilder sbCode,
                                       Set<String> imports,  
-                                      ContextInfo info) {
+                                      ContextInfo info,
+                                      boolean suspendedAsync) {
         
-        Element okResponse = getOKResponse(responseEls);
+        Element okResponse = !suspendedAsync ? getOKResponse(responseEls) : null;
         
         List<Element> repElements = null;
         if (okResponse != null) {
@@ -832,7 +842,7 @@ public class SourceGenerator {
         }
         
         if (repElements.size() == 0) {
-            if (useVoidForEmptyResponses) {
+            if (useVoidForEmptyResponses || suspendedAsync) {
                 sbCode.append("void ");
             } else {
                 addImport(imports, Response.class.getName());
@@ -882,7 +892,8 @@ public class SourceGenerator {
                                    boolean jaxpRequired,
                                    StringBuilder sbCode, 
                                    Set<String> imports, 
-                                   ContextInfo info) {
+                                   ContextInfo info,
+                                   boolean suspendedAsync) {
     //CHECKSTYLE:ON    
         boolean form = false;
         boolean formParamsAvailable = false;
@@ -967,6 +978,15 @@ public class SourceGenerator {
                 sbCode.append(", ");
             }
             sbCode.append(elementParamType).append(" ").append(elementParamName);
+        }
+        if (suspendedAsync) {
+            if (inParamEls.size() > 0 || elementParamType != null) {
+                sbCode.append(", ");
+            }
+            addImport(imports, Suspended.class.getName());
+            addImport(imports, AsyncResponse.class.getName());
+            sbCode.append("@").append(Suspended.class.getSimpleName()).append(" ")
+                .append(AsyncResponse.class.getSimpleName()).append(" ").append("async");
         }
     }
     

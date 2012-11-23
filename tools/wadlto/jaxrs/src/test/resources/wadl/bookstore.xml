@@ -95,6 +95,8 @@ required="true">
      <response status="204"></response>
     </method>
     
+    <method name="DELETE"/>
+    
     <resource path="/book2">
      <method name="GET" id="getBook2">
       <response>

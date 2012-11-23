@@ -52,6 +52,13 @@ public final class WadlToolConstants {
     public static final String CFG_GENERATE_ENUMS = "generateEnums";
     public static final String CFG_INHERIT_PARAMS = "inheritResourceParams";
     
+    // JAX-RS 2.0 @Suspended AsyncResponse
+    public static final String CFG_SUSPENDED_ASYNC = "async";
+    
+    // CXF @UseAsyncMethod - equivalent of the proposed @ManagedAsync which
+    // which did not make it into JAX-RS 2.0
+    //public static final String CFG_MANAGED_ASYNC = "managedAsync";
+    
     public static final String CFG_WADLURL = "wadl";
     
     

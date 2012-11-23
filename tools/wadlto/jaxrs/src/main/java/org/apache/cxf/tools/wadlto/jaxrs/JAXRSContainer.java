@@ -149,6 +149,8 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setSchemaTypeMap(getSchemaTypeMap());
         sg.setMediaTypeMap(getMediaTypeMap());
 
+        sg.setSuspendedAsyncMethods(getSuspendedAsyncMethods());
+        
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
         sg.setInheritResourceParams(context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS));
         sg.setSkipSchemaGeneration(context.optionSet(WadlToolConstants.CFG_NO_TYPES));
@@ -203,6 +205,23 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         String absoluteWadlURL = URIParserUtil.getAbsoluteURI(wadlURL);
         context.put(WadlToolConstants.CFG_WADLURL, absoluteWadlURL);
         return absoluteWadlURL;
+    }
+    
+    public Set<String> getSuspendedAsyncMethods() {
+        Object value = context.get(WadlToolConstants.CFG_SUSPENDED_ASYNC);
+        if (value != null) {
+            Set<String> methods = new HashSet<String>();
+            String[] values = value.toString().split(",");
+            for (String s : values) {
+                String actual = s.trim();
+                if (!actual.isEmpty()) {
+                    methods.add(actual.toLowerCase());
+                }
+            }
+            return methods;
+        } else {
+            return Collections.emptySet();
+        }
     }
     
     //TODO: this belongs to JAXB Databinding, should we just reuse 
