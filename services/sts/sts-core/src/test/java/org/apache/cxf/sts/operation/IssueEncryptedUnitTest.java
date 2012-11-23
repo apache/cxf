@@ -195,7 +195,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         encryptionProperties.setEncryptionName("myservicekey");
-        encryptionProperties.setEncryptionAlgorithm(WSConstants.TRIPLE_DES);
+        encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
         
@@ -274,7 +274,7 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         JAXBElement<String> encryptionAlgorithmType = 
             new JAXBElement<String>(
-                QNameConstants.ENCRYPTION_ALGORITHM, String.class, WSConstants.TRIPLE_DES
+                QNameConstants.ENCRYPTION_ALGORITHM, String.class, WSConstants.AES_128
             );
         request.getAny().add(encryptionAlgorithmType);
         
