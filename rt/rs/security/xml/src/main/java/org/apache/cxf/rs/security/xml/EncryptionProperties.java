@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.rs.security.xml;
 
+import org.apache.xml.security.encryption.XMLCipher;
+
 public class EncryptionProperties {
-    private String encryptionKeyTransportAlgo;
+    private String encryptionKeyTransportAlgo = XMLCipher.RSA_OAEP;
     private String encryptionSymmetricKeyAlgo;
     private String encryptionDigestAlgo;
     private String encryptionKeyIdType;
