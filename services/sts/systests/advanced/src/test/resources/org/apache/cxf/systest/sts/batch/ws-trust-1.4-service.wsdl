@@ -282,7 +282,7 @@
                   </sp:TransportToken>
                   <sp:AlgorithmSuite>
                      <wsp:Policy>
-                        <sp:TripleDesRsa15 />
+                        <sp:TripleDes />
                      </wsp:Policy>
                   </sp:AlgorithmSuite>
                   <sp:Layout>
