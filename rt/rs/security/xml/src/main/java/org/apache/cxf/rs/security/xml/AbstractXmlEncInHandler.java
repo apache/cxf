@@ -135,12 +135,15 @@ public abstract class AbstractXmlEncInHandler extends AbstractXmlSecInHandler {
         if (encProps != null) {
             if (encProps.getEncryptionKeyTransportAlgo() != null
                 && !encProps.getEncryptionKeyTransportAlgo().equals(keyEncAlgo)) {
-                throwFault("Symmetric Key Algorithm is not supported", null);
+                throwFault("Key Transport Algorithm is not supported", null);
             }
             if (encProps.getEncryptionDigestAlgo() != null
                 && (digestAlgo == null || !encProps.getEncryptionDigestAlgo().equals(digestAlgo))) {
                 throwFault("Digest Algorithm is not supported", null);
             }
+        } else if (!XMLCipher.RSA_OAEP.equals(keyEncAlgo)) {
+            // RSA OAEP is the required default Key Transport Algorithm
+            throwFault("Key Transport Algorithm is not supported", null);
         }
         
         

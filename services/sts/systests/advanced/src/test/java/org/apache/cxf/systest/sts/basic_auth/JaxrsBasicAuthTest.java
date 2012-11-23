@@ -84,7 +84,6 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
             if (authFailureExpected) {
                 throw new RuntimeException("Exception expected");
             }
-            System.out.println("The number " + numToDouble + " doubled is " + resp);
             org.junit.Assert.assertEquals(2 * numToDouble, resp);
         } catch (WebApplicationException ex) {
             if (!authFailureExpected) {
