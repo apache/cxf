@@ -173,7 +173,6 @@ public class SamlTokenInterceptor extends AbstractSoapInterceptor {
 
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
-        SAMLTokenProcessor p = new SAMLTokenProcessor();
         WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         RequestData data = new RequestData() {
             public CallbackHandler getCallbackHandler() {
@@ -208,6 +207,8 @@ public class SamlTokenInterceptor extends AbstractSoapInterceptor {
             }
         };
         data.setWssConfig(WSSConfig.getNewInstance());
+        
+        SAMLTokenProcessor p = new SAMLTokenProcessor();
         List<WSSecurityEngineResult> results = 
             p.handleToken(tokenElement, data, wsDocInfo);
         return results;
@@ -234,6 +235,7 @@ public class SamlTokenInterceptor extends AbstractSoapInterceptor {
 
 
     private void addSamlToken(SoapMessage message) {
+        WSSConfig.init();
         SamlToken tok = assertSamlTokens(message);
 
         Header h = findSecurityHeader(message, true);
