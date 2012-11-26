@@ -469,10 +469,16 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             ctx.setAttribute(ClientContext.SCHEME_REGISTRY, reg);
             connectionFuture = new BasicFuture<Boolean>(callback);
             DefaultHttpAsyncClient c = getHttpAsyncClient();
+            CredentialsProvider credProvider = c.getCredentialsProvider();
             Credentials creds = (Credentials)outMessage.getContextualProperty(Credentials.class.getName());
-            if (creds != null) {
-                c.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+            if (creds != null && credProvider != null) {
+                credProvider.setCredentials(AuthScope.ANY, creds);
             }
+            if (credProvider != null && credProvider.getCredentials(AuthScope.ANY) != null) {
+                ctx.setAttribute(ClientContext.USER_TOKEN,
+                                 credProvider.getCredentials(AuthScope.ANY).getUserPrincipal());
+            }
+            
             c.execute(new CXFHttpAsyncRequestProducer(entity, outbuf),
                       new CXFHttpAsyncResponseConsumer(this, inbuf, responseCallback),
                       ctx,
