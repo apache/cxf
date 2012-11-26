@@ -830,11 +830,17 @@ public final class ContextUtils {
         LOG.fine("Determining action");
         Exception fault = message.getContent(Exception.class);
 
+        if (fault instanceof Fault 
+            && Names.WSA_NAMESPACE_NAME.equals(((Fault)fault).getFaultCode().getNamespaceURI())) {
+            // wsa relevant faults should use the wsa-fault action value
+            action = Names.WSA_DEFAULT_FAULT_ACTION;
+        } else {
+            action = getActionFromServiceModel(message, fault);    
+        }
         // REVISIT: add support for @{Fault}Action annotation (generated
         // from the wsaw:Action WSDL element). For the moment we just
         // pick up the wsaw:Action attribute by walking the WSDL model
         // directly 
-        action = getActionFromServiceModel(message, fault);
         LOG.fine("action: " + action);
         return action != null ? getAttributedURI(action) : null;
     }
@@ -883,6 +889,9 @@ public final class ContextUtils {
                 // http://www.w3.org/2005/02/addressing/wsdl schema
                 for (BindingFaultInfo bfi : bindingOpInfo.getFaults()) {
                     FaultInfo fi = bfi.getFaultInfo();
+                    if (fi.size() == 0) {
+                        continue;
+                    }
                     Class<?> fiTypeClass = fi.getMessagePart(0).getTypeClass();
                     if (t != null 
                             && fiTypeClass != null
