@@ -72,8 +72,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         XMLStreamWriter xmlWriter = origXmlWriter;
         CachingXmlEventWriter cache = null;
         
-        // configure endpoint and operation level schema validation based on
-        // annotations
+        // configure endpoint and operation level schema validation
         setOperationSchemaValidation(operation.getOperationInfo(), message);
         
         Object en = message.getContextualProperty(OUT_BUFFERING);
@@ -138,7 +137,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
     
     /**
      * Where an operation level validation type has been set, copy it to the message, so it can be interrogated
-     * by all downstream interceptors and update the DataReader with the schema.
+     * by all downstream interceptors
      * 
      * @param bop
      * @param message
@@ -196,12 +195,6 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
 
     /**
      * Based on the Schema Validation configuration, will initialise the DataWriter with or without the schema set.
-     * 
-     * Can also be called to override schema validation at operation level, thus the writer.setSchema(null)
-     * to remove schema validation
-     * 
-     * Note this is different to the reader side, as we know the binding operation info up front, so won't
-     * need to overwrite the service level schema validation.
      */
     private void setDataWriterValidation(Service service, Message message, DataWriter<?> writer) {
         if (shouldValidate(message)) {

@@ -246,7 +246,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             message.put(Message.WSDL_OPERATION, operation.getName());
         }
 
-        // configure endpoint and operation level schema validation based on annotations
+        // configure endpoint and operation level schema validation
         setOperationSchemaValidation(operation.getOperationInfo(), message);
         
         QName serviceQName = si.getName();
