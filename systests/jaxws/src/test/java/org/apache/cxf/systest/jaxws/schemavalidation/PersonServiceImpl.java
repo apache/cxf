@@ -17,28 +17,27 @@
  * under the License.
  */
 
-package org.apache.cxf.annotations;
+package org.apache.cxf.systest.jaxws.schemavalidation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.jws.WebService;
 
-/**
- * Enables schema validation
- */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface SchemaValidation {
-    public enum SchemaValidationType {
-        IN, OUT, BOTH, NONE
+@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonService", 
+    serviceName = "PersonService", 
+    targetNamespace = "http://org.apache.cxf/service/PersonService")
+public class PersonServiceImpl implements PersonService {
+    @Override
+    public void saveNoValidation(Person data) {
     }
-    
-    @Deprecated
-    boolean enabled() default true;
-    
-    SchemaValidationType type() default SchemaValidationType.BOTH;
-}
 
+    @Override
+    public void saveInheritEndpoint(Person data) {
+    }
+
+    @Override
+    public void saveValidateIn(Person data) {
+    }
+
+    @Override
+    public void saveValidateOut(Person data) {
+    }
+}

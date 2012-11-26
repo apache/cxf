@@ -157,6 +157,11 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (col != null) {
                 addDocumentation(inf, WSDLDocumentation.Placement.PORT_TYPE_OPERATION, col.value());
             }
+            
+            SchemaValidation methodValidation = m.getAnnotation(SchemaValidation.class);
+            if (methodValidation != null) {
+                addSchemaValidationSupport(inf, methodValidation);
+            }
             break;
         }
         default:
@@ -318,6 +323,15 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
     }
 
+    private void addSchemaValidationSupport(OperationInfo inf, SchemaValidation annotation) {
+        // Notice no support for deprecated enabled property here!
+        // TODO - should we check for the use of this property and at least log the fact we are
+        // ignoring it
+        if (annotation != null) {
+            inf.setProperty(Message.SCHEMA_VALIDATION_ENABLED, annotation.type());
+        }
+    }
+    
     private void addDocumentation(OperationInfo inf, Placement defPlace, WSDLDocumentation ... values) {
         List<WSDLDocumentation> later = new ArrayList<WSDLDocumentation>();
         for (WSDLDocumentation doc : values) {

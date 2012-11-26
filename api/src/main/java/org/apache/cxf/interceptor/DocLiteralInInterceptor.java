@@ -37,6 +37,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
@@ -81,24 +82,16 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             return;
         }
 
-        //bop might be a unwrapped, wrap it back so that we can get correct info 
-        if (bop != null && bop.isUnwrapped()) {
-            bop = bop.getWrappedOperation();
-        }
-
-        if (bop == null) {
-            QName startQName = xmlReader == null 
-                ? new QName("http://cxf.apache.org/jaxws/provider", "invoke")
-                : xmlReader.getName();
-            bop = getBindingOperationInfo(exchange, startQName, client);
-        }
+        Service service = ServiceModelUtil.getService(message.getExchange());
+        bop = getBindingOperationInfo(xmlReader, exchange, bop, client);
 
         try {
             if (bop != null && bop.isUnwrappedCapable()) {
                 ServiceInfo si = bop.getBinding().getService();
                 // Wrapped case
                 MessageInfo msgInfo = setMessage(message, bop, client, si);
-    
+                setDataReaderValidation(service, message, dr);
+                
                 // Determine if we should keep the parameters wrapper
                 if (shouldWrapParameters(msgInfo, message)) {
                     QName startQName = xmlReader.getName();
@@ -168,7 +161,9 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     }
                     return;
                 }
-    
+
+                setDataReaderValidation(service, message, dr);
+                
                 int paramNum = 0;
     
                 do {
@@ -223,6 +218,22 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             }
             throw f;
         }
+    }
+
+    private BindingOperationInfo getBindingOperationInfo(DepthXMLStreamReader xmlReader, Exchange exchange,
+                                                         BindingOperationInfo bop, boolean client) {
+        //bop might be a unwrapped, wrap it back so that we can get correct info 
+        if (bop != null && bop.isUnwrapped()) {
+            bop = bop.getWrappedOperation();
+        }
+
+        if (bop == null) {
+            QName startQName = xmlReader == null 
+                ? new QName("http://cxf.apache.org/jaxws/provider", "invoke")
+                : xmlReader.getName();
+            bop = getBindingOperationInfo(exchange, startQName, client);
+        }
+        return bop;
     }
     
     private void validatePart(MessagePartInfo p, QName elName, Message m) {

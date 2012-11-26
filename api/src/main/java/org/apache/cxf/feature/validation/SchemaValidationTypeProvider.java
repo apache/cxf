@@ -16,29 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.feature.validation;
 
-package org.apache.cxf.annotations;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
+import org.apache.cxf.service.model.OperationInfo;
 
 /**
- * Enables schema validation
+ * Returning null from the getSchemaValidationType will be ignored.  This generally
+ * will mean, it falls back to the service endpoint default, whether configured 
+ * by @SchemaValidation or a endpoint property.
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface SchemaValidation {
-    public enum SchemaValidationType {
-        IN, OUT, BOTH, NONE
-    }
-    
-    @Deprecated
-    boolean enabled() default true;
-    
-    SchemaValidationType type() default SchemaValidationType.BOTH;
+public interface SchemaValidationTypeProvider {
+    SchemaValidationType getSchemaValidationType(OperationInfo info);
 }
-
