@@ -182,14 +182,8 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             }
             final SOAPPart part = soapMessage.getSOAPPart();
             Document node = (Document) message.getContent(Node.class);
-            if (node != part) {
-                if (node == null) {
-                    // replicate 2.1 behavior.
-                    part.setContent(new DOMSource(null));
-                } else {
-                    //part.setContent(new DOMSource(node));
-                    StaxUtils.copy(node, new SAAJStreamWriter(part));
-                }
+            if (node != part && node != null) {
+                StaxUtils.copy(node, new SAAJStreamWriter(part));
             }
             message.setContent(Node.class, soapMessage.getSOAPPart());
 

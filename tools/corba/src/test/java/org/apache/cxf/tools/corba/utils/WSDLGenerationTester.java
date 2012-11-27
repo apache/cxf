@@ -131,7 +131,7 @@ public class WSDLGenerationTester {
     private void compareCharacters(QName elName, XMLStreamReader orig, XMLStreamReader actual)
         throws Exception {
         Assert.assertEquals("Element Characters not matched " + elName,
-                            orig.getText(), actual.getText());
+                            orig.getText().trim(), actual.getText().trim());
     }
 
     public File writeDefinition(File targetDir, File defnFile) throws Exception {

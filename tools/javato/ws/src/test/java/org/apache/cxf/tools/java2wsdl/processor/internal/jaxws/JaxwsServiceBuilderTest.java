@@ -329,8 +329,8 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
 
         s = IOUtils.toString(new FileInputStream(logical));
 
-        assertTrue(s.indexOf("<import namespace=\"http://foo.com/HelloWorld\" "
-                             + "schemaLocation=\"HelloService_schema1.xsd\"/>") != -1);
+        assertTrue(s.indexOf("<import namespace=\"http://foo.com/HelloWorld\"") != -1);
+        assertTrue(s.indexOf("schemaLocation=\"HelloService_schema1.xsd\"/>") != -1);
         assertTrue(s.indexOf("targetNamespace=\"http://foo.com/HelloWorld\"") != -1);
 
         s = IOUtils.toString(new FileInputStream(schema));

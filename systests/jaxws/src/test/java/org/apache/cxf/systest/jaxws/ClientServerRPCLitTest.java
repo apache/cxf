@@ -55,6 +55,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -141,7 +142,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         Source resp = disp.invoke(source);
         assertNotNull(resp);
         
-        Node nd = XMLUtils.fromSource(resp);
+        Node nd = StaxUtils.read(resp);
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
         }

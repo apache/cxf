@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.ext.xml;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -28,64 +27,58 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * Utility class for manipulating XML response using XPath and XSLT
  *
  */
 public class XMLSource {
-    private static final Logger LOG = LogUtils.getL7dLogger(XMLSource.class);
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(XMLSource.class);
     
     private static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace"; 
     
-    private InputStream stream; 
-    private boolean buffering;
-    private boolean markFailed;
+    private InputStream stream;
+    private Document doc; 
     
     public XMLSource(InputStream is) {
         stream = is;
     }
     
     /**
-     * Allows for multiple queries against the same stream
-     * @param enable if set to true then multiple queries will be supported. 
+     * Allows for multiple queries against the same stream by buffering to DOM
      */
-    public void setBuffering(boolean enable) {
-        buffering = enable;
-        if (!stream.markSupported()) {
-            try {
-                stream = IOUtils.loadIntoBAIS(stream);
-            } catch (IOException ex) {
-                LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
-            }
+    public void setBuffering() {
+        try {
+            doc = StaxUtils.read(new StreamSource(stream));
+            stream = null;
+        } catch (XMLStreamException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
     
@@ -114,15 +107,19 @@ public class XMLSource {
      */
     @SuppressWarnings("unchecked")
     public <T> T getNode(String expression, Map<String, String> namespaces, Class<T> cls) {
-        Node node = (Node)evaluate(expression, namespaces, XPathConstants.NODE);
-        if (node == null) {
+        Object obj = evaluate(expression, namespaces, XPathConstants.NODE);
+        if (obj == null) {
             return null;
         }
-        if (cls.isPrimitive() || cls == String.class) {
-            return (T)readPrimitiveValue(node, cls);    
-        } else {
-            return readNode(node, cls);
+        if (obj instanceof Node) {
+            Node node = (Node)obj;
+            if (cls.isPrimitive() || cls == String.class) {
+                return (T)readPrimitiveValue(node, cls);    
+            } else {
+                return readNode(node, cls);
+            }
         }
+        return cls.cast(evaluate(expression, namespaces, XPathConstants.STRING));
     }
     
     /**
@@ -290,7 +287,11 @@ public class XMLSource {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
         try {
-            return xpath.evaluate(expression, getSource(), type);
+            if (stream == null) {
+                return xpath.compile(expression).evaluate(doc, type);
+            } else {
+                return xpath.compile(expression).evaluate(new InputSource(stream), type);
+            }
         } catch (XPathExpressionException ex) {
             throw new IllegalArgumentException("Illegal XPath expression '" + expression + "'", ex);
         }
@@ -374,23 +375,5 @@ public class XMLSource {
             throw new RuntimeException(ex);
         }
     }
-    
-    private InputSource getSource() {
-        if (!markFailed && buffering) {
-            try {
-                stream.reset();
-                stream.mark(stream.available());
-            } catch (IOException ex) {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
-                markFailed = true;
-                try {
-                    stream = IOUtils.loadIntoBAIS(stream);
-                } catch (IOException ex2) {
-                    throw new RuntimeException(ex2);
-                }
-            }
-        }
-        
-        return new InputSource(stream);
-    }
+
 }

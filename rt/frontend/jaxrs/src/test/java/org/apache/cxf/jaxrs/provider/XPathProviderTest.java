@@ -62,6 +62,7 @@ public class XPathProviderTest extends Assert {
         XPathProvider<Book> provider = new XPathProvider<Book>();
         provider.setExpression("/Book");
         provider.setClassName(Book.class.getName());
+        provider.setForceDOM(true);
         Book book = (Book)provider.readFrom(Book.class, null, null, null, null,
                           new ByteArrayInputStream(value.getBytes()));
         assertNotNull(book);
