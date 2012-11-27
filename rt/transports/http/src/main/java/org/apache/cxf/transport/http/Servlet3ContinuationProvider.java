@@ -79,7 +79,13 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         
         void startAsyncAgain() {
-            context = req.startAsync();
+            
+            AsyncContext old = context;
+            try {
+                context = req.startAsync();
+            } catch (IllegalStateException ex) { 
+                context = old;
+            }
             context.addListener(this);
         }
         
