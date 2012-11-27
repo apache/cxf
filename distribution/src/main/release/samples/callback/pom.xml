@@ -54,28 +54,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${wsdl.file}</wsdl>
-                                    <extraargs>
-                                        <extraarg>-sn</extraarg>
-                                        <extraarg>CallbackService</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generate-SOAPService</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${wsdl.file}</wsdl>
-                                    <extraargs>
-                                        <extraarg>-sn</extraarg>
-                                        <extraarg>SOAPService</extraarg>
-                                    </extraargs>
+                                    <frontEnd>jaxws21</frontEnd>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>

@@ -44,15 +44,6 @@ public final class Client {
     private static final QName SERVICE_NAME 
         = new QName("http://apache.org/callback", "SOAPService");
 
-    private static final QName SERVICE_NAME_CALLBACK 
-        = new QName("http://apache.org/callback", "CallbackService");
-    
-    private static final QName PORT_NAME_CALLBACK 
-        = new QName("http://apache.org/callback", "CallbackPort");
-    
-    private static final QName PORT_TYPE_CALLBACK
-        = new QName("http://apache.org/callback", "CallbackPortType");
-
     private Client() {
     } 
 
