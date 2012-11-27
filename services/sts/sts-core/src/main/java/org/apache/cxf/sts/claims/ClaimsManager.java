@@ -88,7 +88,12 @@ public class ClaimsManager {
             if (claimHandlers != null && claimHandlers.size() > 0 && claims != null && claims.size() > 0) {
                 ClaimCollection returnCollection = new ClaimCollection();
                 for (ClaimsHandler handler : claimHandlers) {
-                    ClaimCollection claimCollection = handler.retrieveClaimValues(claims, parameters);
+                    RequestClaimCollection supportedClaims = 
+                            filterHandlerClaims(claims, handler.getSupportedClaimTypes());
+                    if (supportedClaims.isEmpty()) {
+                        continue;
+                    }
+                    ClaimCollection claimCollection = handler.retrieveClaimValues(supportedClaims, parameters);
                     if (claimCollection != null && claimCollection.size() != 0) {
                         returnCollection.addAll(claimCollection);
                     }
@@ -128,6 +133,17 @@ public class ClaimsManager {
         return null;
     }
 
+    private RequestClaimCollection filterHandlerClaims(RequestClaimCollection claims,
+                                                         List<URI> handlerClaimTypes) {
+        RequestClaimCollection supportedClaims = new RequestClaimCollection(); 
+        for (RequestClaim claim : claims) {
+            if (handlerClaimTypes.contains(claim.getClaimType())) {
+                supportedClaims.add(claim);
+            }
+        }
+        return supportedClaims;
+    }
+    
     private boolean validateClaimValues(RequestClaimCollection requestedClaims, ClaimCollection claims) {
         for (RequestClaim claim : requestedClaims) {
             URI claimType = claim.getClaimType();
