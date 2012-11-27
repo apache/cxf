@@ -25,7 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Configuration tags used to configure the WS-SecurityPolicy layer.
+ * Configuration tags used to configure the WS-SecurityPolicy layer. Some of them are also 
+ * used by the non WS-SecurityPolicy approach in the WSS4J(Out|In)Interceptors.
  */
 public final class SecurityConstants {
     
@@ -173,6 +174,14 @@ public final class SecurityConstants {
      * Set it to true to cache for both cases. Set this to "false" to not cache Timestamp Created Strings.
      */
     public static final String ENABLE_TIMESTAMP_CACHE = "ws-security.enable.timestamp.cache";
+    
+    /**
+     * Whether to validate the SubjectConfirmation requirements of a received SAML Token
+     * (sender-vouches or holder-of-key). The default is false (for backwards
+     * compatibility reasons).
+     */
+    public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
+        "ws-security.validate.saml.subject.conf";
     
     //
     // Non-boolean WS-Security Configuration parameters

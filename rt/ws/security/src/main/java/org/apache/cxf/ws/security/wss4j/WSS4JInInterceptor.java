@@ -288,7 +288,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
                 storeSignature(msg, reqData, wsResult);
                 storeTimestamp(msg, reqData, wsResult);
-                checkActions(msg, reqData, wsResult, actions);
+                checkActions(msg, reqData, wsResult, actions, doc.getSOAPBody());
                 doResults(
                     msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult, utWithCallbacks
                 );
@@ -311,7 +311,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     // checkActions(msg, reqData, wsResult, actions);
                     doResults(msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult);
                 } else {
-                    checkActions(msg, reqData, wsResult, actions);
+                    checkActions(msg, reqData, wsResult, actions, doc.getSOAPBody());
                     doResults(msg, actor, doc.getSOAPHeader(), doc.getSOAPBody(), wsResult);
                 }
             }
@@ -340,7 +340,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         SoapMessage msg, 
         RequestData reqData, 
         List<WSSecurityEngineResult> wsResult, 
-        List<Integer> actions
+        List<Integer> actions,
+        Element body
     ) throws WSSecurityException {
         if (ignoreActions) {
             // Not applicable for the WS-SecurityPolicy case
@@ -362,6 +363,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 + "SignatureCoverageChecker";
             LOG.warning(warning);
         }
+        
+        // Now check SAML SenderVouches + Holder Of Key requirements
+        boolean validateSAMLSubjectConf = 
+            MessageUtils.getContextualBoolean(
+                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, false
+            );
+        if (validateSAMLSubjectConf) {
+            SAMLUtils.validateSAMLResults(wsResult, msg, body);
+        }
+        
     }
     
     private void storeSignature(

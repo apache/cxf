@@ -19,22 +19,16 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.security.Principal;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
+import org.apache.cxf.ws.security.wss4j.SAMLUtils;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 
 /**
  * Some abstract functionality for validating SAML Assertions
@@ -82,93 +76,7 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
-        List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
-        for (String confirmationMethod : confirmationMethods) {
-            if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
-                if (tlsCerts == null && (signedResults == null || signedResults.isEmpty())) {
-                    return false;
-                }
-                SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-                if (!compareCredentials(subjectKeyInfo, signedResults, tlsCerts)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Compare the credentials of the assertion to the credentials used in 2-way TLS or those
-     * used to verify signatures.
-     * Return true on a match
-     * @param subjectKeyInfo the SAMLKeyInfo object
-     * @param signedResults a list of all of the signed results
-     * @return true if the credentials of the assertion were used to verify a signature
-     */
-    private boolean compareCredentials(
-        SAMLKeyInfo subjectKeyInfo,
-        List<WSSecurityEngineResult> signedResults,
-        Certificate[] tlsCerts
-    ) {
-        X509Certificate[] subjectCerts = subjectKeyInfo.getCerts();
-        PublicKey subjectPublicKey = subjectKeyInfo.getPublicKey();
-        byte[] subjectSecretKey = subjectKeyInfo.getSecret();
-        
-        //
-        // Try to match the TLS certs first
-        //
-        if (tlsCerts != null && tlsCerts.length > 0 && subjectCerts != null 
-            && subjectCerts.length > 0 && tlsCerts[0].equals(subjectCerts[0])) {
-            return true;
-        } else if (tlsCerts != null && tlsCerts.length > 0 && subjectPublicKey != null
-            && tlsCerts[0].getPublicKey().equals(subjectPublicKey)) {
-            return true;
-        }
-        
-        //
-        // Now try the message-level signatures
-        //
-        for (WSSecurityEngineResult signedResult : signedResults) {
-            X509Certificate[] certs =
-                (X509Certificate[])signedResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-            PublicKey publicKey =
-                (PublicKey)signedResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-            byte[] secretKey =
-                (byte[])signedResult.get(WSSecurityEngineResult.TAG_SECRET);
-            if (certs != null && certs.length > 0 && subjectCerts != null
-                && subjectCerts.length > 0 && certs[0].equals(subjectCerts[0])) {
-                return true;
-            }
-            if (publicKey != null && publicKey.equals(subjectPublicKey)) {
-                return true;
-            }
-            if (checkSecretKey(secretKey, subjectSecretKey, signedResult)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean checkSecretKey(
-        byte[] secretKey,
-        byte[] subjectSecretKey,
-        WSSecurityEngineResult signedResult
-    ) {
-        if (secretKey != null && subjectSecretKey != null) {
-            if (Arrays.equals(secretKey, subjectSecretKey)) {
-                return true;
-            } else {
-                Principal principal =
-                    (Principal)signedResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                if (principal instanceof WSDerivedKeyTokenPrincipal) {
-                    secretKey = ((WSDerivedKeyTokenPrincipal)principal).getSecret();
-                    if (Arrays.equals(secretKey, subjectSecretKey)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return SAMLUtils.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts);
     }
 
 }
