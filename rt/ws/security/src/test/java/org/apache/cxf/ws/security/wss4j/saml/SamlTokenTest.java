@@ -100,7 +100,10 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
@@ -138,7 +141,10 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
@@ -404,7 +410,10 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
@@ -451,7 +460,10 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml2:Assertion");
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
@@ -497,7 +509,10 @@ public class SamlTokenTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/saml1:Assertion");
 
-        Message message = makeInvocation(outProperties, xpaths, inProperties);
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
         final List<WSHandlerResult> handlerResults = 
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         
@@ -518,6 +533,15 @@ public class SamlTokenTest extends AbstractSecurityTest {
         Map<String, Object> outProperties,
         List<String> xpaths,
         Map<String, Object> inProperties
+    ) throws Exception {
+        return makeInvocation(outProperties, xpaths, inProperties, new HashMap<String, String>());
+    }
+    
+    private SoapMessage makeInvocation(
+        Map<String, Object> outProperties,
+        List<String> xpaths,
+        Map<String, Object> inProperties,
+        Map<String, String> inMessageProperties
     ) throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
@@ -565,6 +589,9 @@ public class SamlTokenTest extends AbstractSecurityTest {
 
         SoapMessage inmsg = new SoapMessage(new MessageImpl());
         inmsg.put(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, "role");
+        for (String inMessageProperty : inMessageProperties.keySet()) {
+            inmsg.put(inMessageProperty, inMessageProperties.get(inMessageProperty));
+        }
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 

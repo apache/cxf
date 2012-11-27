@@ -284,7 +284,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
                 storeSignature(msg, reqData, wsResult);
                 storeTimestamp(msg, reqData, wsResult);
-                checkActions(msg, reqData, wsResult, actions);
+                checkActions(msg, reqData, wsResult, actions, SAAJUtils.getBody(doc));
                 doResults(
                     msg, actor, 
                     SAAJUtils.getHeader(doc),
@@ -313,7 +313,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                               SAAJUtils.getBody(doc),
                               wsResult);
                 } else {
-                    checkActions(msg, reqData, wsResult, actions);
+                    checkActions(msg, reqData, wsResult, actions, SAAJUtils.getBody(doc));
                     doResults(msg, actor,
                               SAAJUtils.getHeader(doc),
                               SAAJUtils.getBody(doc),
@@ -345,7 +345,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         SoapMessage msg, 
         RequestData reqData, 
         List<WSSecurityEngineResult> wsResult, 
-        List<Integer> actions
+        List<Integer> actions,
+        Element body
     ) throws WSSecurityException {
         if (ignoreActions) {
             // Not applicable for the WS-SecurityPolicy case
@@ -367,6 +368,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 + "SignatureCoverageChecker";
             LOG.warning(warning);
         }
+        
+        // Now check SAML SenderVouches + Holder Of Key requirements
+        boolean validateSAMLSubjectConf = 
+            MessageUtils.getContextualBoolean(
+                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, false
+            );
+        if (validateSAMLSubjectConf) {
+            SAMLUtils.validateSAMLResults(wsResult, msg, body);
+        }
+        
     }
     
     private void storeSignature(
