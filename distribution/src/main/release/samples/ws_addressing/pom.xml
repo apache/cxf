@@ -63,8 +63,8 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/wsdl/hello_world_addr.wsdl</wsdl>
-									<frontEnd>jaxws21</frontEnd>
-									<faultSerialVersionUID>1</faultSerialVersionUID>
+                                    <frontEnd>jaxws21</frontEnd>
+                                    <faultSerialVersionUID>1</faultSerialVersionUID>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
