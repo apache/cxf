@@ -137,17 +137,25 @@ public final class XPathAssert {
                                          Node node, 
                                          Map<String, String> namespaces)
         throws Exception {
-        Node result = (Node)createXPath(namespaces).evaluate(xpath, node, XPathConstants.NODE);
-        if (result == null) {
-            throw new AssertionFailedError("No nodes were found for expression: " 
-                                           + xpath 
-                                           + " in document " 
-                                           + writeNodeToString(node));
+        Object o = createXPath(namespaces).compile(xpath)
+            .evaluate(node, XPathConstants.NODE);
+        if (o instanceof Node) {
+            Node result = (Node)o;
+            String value2 = DOMUtils.getContent(result);
+            Assert.assertEquals(value, value2);
+            return;
+        } else {
+            o = createXPath(namespaces).compile(xpath)
+                .evaluate(node, XPathConstants.STRING);
+            if (o instanceof String) {
+                Assert.assertEquals(value, (String)o);
+                return;
+            }
         }
-
-        String value2 = DOMUtils.getContent(result);
-
-        Assert.assertEquals(value, value2);
+        throw new AssertionFailedError("No nodes were found for expression: " 
+            + xpath 
+            + " in document " 
+            + writeNodeToString(node));
     }
 
     public static void assertNoFault(Node node) throws Exception {
@@ -178,7 +186,6 @@ public final class XPathAssert {
         if (namespaces != null) {
             xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
         }
-
         return xpath;
     }
 

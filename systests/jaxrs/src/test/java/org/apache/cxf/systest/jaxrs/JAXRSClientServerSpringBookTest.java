@@ -204,6 +204,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/xhtml+xml").path(666).matrix("name2", 2).query("name", "Action - ");
         XMLSource source = wc.get(XMLSource.class);
+        source.setBuffering();
         Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         Book2 b = source.getNode("xhtml:html/xhtml:body/xhtml:ul/xhtml:Book", namespaces, Book2.class);

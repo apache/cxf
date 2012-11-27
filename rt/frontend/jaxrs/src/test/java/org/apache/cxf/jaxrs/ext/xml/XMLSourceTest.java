@@ -46,17 +46,19 @@ public class XMLSourceTest extends Assert {
     public void testNodeStringValue() {
         InputStream is = getClass().getResourceAsStream("/book1.xsd");
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Map<String, String> nsMap = 
             Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
         String value = xp.getNode("/xs:schema", nsMap, String.class);
         assertFalse(value.contains("<?xml"));
-        assertTrue(value.startsWith("<xs:schema"));
+        assertTrue(value, value.startsWith("<xs:schema"));
     }
     
     @Test
     public void testAttributeValue() {
         InputStream is = new ByteArrayInputStream("<foo><bar attr=\"baz\">barValue</bar></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         assertEquals("baz", xp.getValue("/foo/bar/@attr"));
     }
     
@@ -64,6 +66,7 @@ public class XMLSourceTest extends Assert {
     public void testAttributeValueAsNode() {
         InputStream is = new ByteArrayInputStream("<foo><bar attr=\"baz\">barValue</bar></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Node node = xp.getNode("/foo/bar/@attr", Node.class);
         assertNotNull(node);
         assertEquals("baz", node.getTextContent());
@@ -73,6 +76,7 @@ public class XMLSourceTest extends Assert {
     public void testNodeTextValue() {
         InputStream is = new ByteArrayInputStream("<foo><bar attr=\"baz\">barValue</bar></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         assertEquals("barValue", xp.getValue("/foo/bar"));
     }
     
@@ -81,6 +85,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(
             "<foo><bar attr=\"baz\">bar1</bar><bar attr=\"baz2\">bar2</bar></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         List<String> values = Arrays.asList(xp.getValues("/foo/bar/@attr"));
         assertEquals(2, values.size());
         assertTrue(values.contains("baz"));
@@ -92,6 +97,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(
             "<foo><bar attr=\"baz\">bar1</bar><bar attr=\"baz2\">bar2</bar></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         List<String> values = Arrays.asList(xp.getValues("/foo/bar/text()"));
         assertEquals(2, values.size());
         assertTrue(values.contains("bar1"));
@@ -103,6 +109,7 @@ public class XMLSourceTest extends Assert {
         InputStream is = new ByteArrayInputStream(
             "<foo><bar attr=\"1\"/><bar attr=\"2\"/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Integer[] values = xp.getNodes("/foo/bar/@attr", Integer.class);
         assertEquals(2, values.length);
         assertTrue(values[0] == 1 && values[1] == 2 || values[0] == 2 && values[1] == 1);
@@ -112,6 +119,7 @@ public class XMLSourceTest extends Assert {
     public void testGetNodeNoNamespace() {
         InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Bar bar = xp.getNode("/foo/bar", Bar.class);
         assertNotNull(bar);
     }
@@ -120,6 +128,7 @@ public class XMLSourceTest extends Assert {
     public void testGetNodeAsElement() {
         InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Element element = xp.getNode("/foo/bar", Element.class);
         assertNotNull(element);
     }
@@ -128,6 +137,7 @@ public class XMLSourceTest extends Assert {
     public void testGetNodeAsSource() {
         InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Source element = xp.getNode("/foo/bar", Source.class);
         assertNotNull(element);
     }
@@ -136,6 +146,7 @@ public class XMLSourceTest extends Assert {
     public void testGetNodeNull() {
         InputStream is = new ByteArrayInputStream("<foo><bar/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         assertNull(xp.getNode("/foo/bar1", Element.class));
     }
     
@@ -143,6 +154,7 @@ public class XMLSourceTest extends Assert {
     public void testGetNodeAsJaxbElement() {
         InputStream is = new ByteArrayInputStream("<foo><bar name=\"foo\"/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Bar3 bar = xp.getNode("/foo/bar", Bar3.class);
         assertNotNull(bar);
         assertEquals("foo", bar.getName());
@@ -153,6 +165,7 @@ public class XMLSourceTest extends Assert {
         String data = "<x:foo xmlns:x=\"http://baz\"><x:bar/></x:foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
@@ -164,7 +177,7 @@ public class XMLSourceTest extends Assert {
         String data = "<x:foo xmlns:x=\"http://baz\"><x:bar/></x:foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
-        xp.setBuffering(true);
+        xp.setBuffering();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
@@ -178,6 +191,7 @@ public class XMLSourceTest extends Assert {
         String data = "<z:foo xmlns:z=\"http://baz\"><z:bar/></z:foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
@@ -189,6 +203,7 @@ public class XMLSourceTest extends Assert {
         String data = "<x:foo xmlns:x=\"http://foo\" xmlns:z=\"http://baz\"><z:bar/></x:foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("x", "http://foo");
         map.put("y", "http://baz");
@@ -201,6 +216,7 @@ public class XMLSourceTest extends Assert {
         String data = "<foo xmlns=\"http://baz\"><bar/></foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("x", "http://baz");
         Bar2 bar = xp.getNode("/x:foo/x:bar", map, Bar2.class);
@@ -211,6 +227,7 @@ public class XMLSourceTest extends Assert {
     public void testGetNodesNoNamespace() {
         InputStream is = new ByteArrayInputStream("<foo><bar/><bar/></foo>".getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Bar[] bars = xp.getNodes("/foo/bar", Bar.class);
         assertNotNull(bars);
         assertEquals(2, bars.length);
@@ -222,6 +239,7 @@ public class XMLSourceTest extends Assert {
         String data = "<x:foo xmlns:x=\"http://baz\"><x:bar/><x:bar/></x:foo>"; 
         InputStream is = new ByteArrayInputStream(data.getBytes());
         XMLSource xp = new XMLSource(is);
+        xp.setBuffering();
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("x", "http://baz");
         Bar2[] bars = xp.getNodes("/x:foo/x:bar", map, Bar2.class);

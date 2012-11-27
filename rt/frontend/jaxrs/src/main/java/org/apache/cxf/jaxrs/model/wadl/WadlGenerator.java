@@ -1312,7 +1312,7 @@ public class WadlGenerator implements RequestHandler {
         }
         ByteArrayInputStream bis = IOUtils.loadIntoBAIS(is);
         XMLSource source = new XMLSource(bis);
-        source.setBuffering(true);
+        source.setBuffering();
         String targetNs = source.getValue("/*/@targetNamespace");
 
         Map<String, String> nsMap =
@@ -1396,7 +1396,7 @@ public class WadlGenerator implements RequestHandler {
             // we'll need to do the proper schema caching eventually
             for (String s : schemas) {
                 XMLSource source = new XMLSource(new ByteArrayInputStream(s.getBytes()));
-                source.setBuffering(true);
+                source.setBuffering();
                 Map<String, String> locs = getLocationsMap(source, "import", links, ui);
                 locs.putAll(getLocationsMap(source, "include", links, ui));
                 String actualSchema = !locs.isEmpty() ? transformSchema(s, locs) : s;

@@ -521,7 +521,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         InputStream is = (InputStream)r.getEntity();
         assertNotNull(is);
         XMLSource source = new XMLSource(is);
-        source.setBuffering(true);
+        source.setBuffering();
         assertEquals(124L, Long.parseLong(source.getValue("Book/id")));
         assertEquals("CXF rocks", source.getValue("Book/name"));
     }
