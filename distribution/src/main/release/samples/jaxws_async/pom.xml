@@ -152,7 +152,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>3.0.7.RELEASE</version>
         </dependency>
         <dependency>
             <!-- With this dependency, if you deploy the war into a standard Jetty 7.x -->
