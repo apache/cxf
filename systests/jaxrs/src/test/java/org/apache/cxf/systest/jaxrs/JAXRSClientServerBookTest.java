@@ -90,6 +90,28 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testUseParamBeanWebClient() {
+        String address = "http://localhost:" + PORT + "/bookstore/beanparam";
+        doTestUseParamBeanWebClient(address);
+    }
+    
+    @Test
+    public void testUseParamBeanWebClient2() {
+        String address = "http://localhost:" + PORT + "/bookstore/beanparam2";
+        doTestUseParamBeanWebClient(address);
+    }
+    
+    private void doTestUseParamBeanWebClient(String address) {
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        wc.query("id", "120");
+        wc.query("id1", "3");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+    }
+    
+    
+    @Test
     public void testGetIntroChapterFromSelectedBook() {
         String address = "http://localhost:" + PORT + "/bookstore/books(id=le=123)/chapter";
         doTestGetChapterFromSelectedBook(address);

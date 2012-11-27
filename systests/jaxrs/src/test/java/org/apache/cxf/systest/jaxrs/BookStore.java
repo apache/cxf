@@ -38,6 +38,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -108,6 +109,9 @@ public class BookStore {
     @Context 
     private UriInfo ui;
     
+    @BeanParam
+    private BookBean theBookBean;
+    
     public BookStore() {
         init();
     }
@@ -122,6 +126,23 @@ public class BookStore {
         //System.out.println("PreDestroy called");
     }
 
+    @GET
+    @Path("/beanparam")
+    @Produces("application/xml")
+    public Book getBeanParamBook(@BeanParam BookBean bean) {
+        
+        long id = bean.getId() + bean.getId1(); 
+        
+        return books.get(id);
+    }
+    
+    @GET
+    @Path("/beanparam2")
+    @Produces("application/xml")
+    public Book getBeanParamBook2() {
+        return getBeanParamBook(theBookBean);
+    }
+    
     @GET
     @Path("emptybook")
     @Produces({"application/xml", "application/json" })
@@ -1267,6 +1288,32 @@ public class BookStore {
         return (Book)ProxyHelper.getProxy(this.getClass().getClassLoader(), 
                                     new Class[]{Book.class}, 
                                     handler);
+    }
+    
+    public static class BookBean {
+        private long id;
+        private long id1;
+
+        public long getId() {
+            return id;
+        }
+
+        @QueryParam("id")
+        public void setId(long id) {
+            this.id = id;
+        }
+        
+        @Context
+        public void setUriInfo(UriInfo ui) {
+            String id1Value = ui.getQueryParameters().getFirst("id1");
+            if (id1Value != null) {
+                this.id1 = Long.valueOf(id1Value);
+            }
+        }
+
+        public long getId1() {
+            return id1;
+        }
     }
 }
 

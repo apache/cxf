@@ -90,6 +90,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -117,6 +118,8 @@ import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorContextImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
+import org.apache.cxf.jaxrs.model.BeanParamInfo;
+import org.apache.cxf.jaxrs.model.BeanResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfoComparator;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -228,42 +231,60 @@ public final class JAXRSUtils {
         return supportedMimeTypes;
     }
     
-    @SuppressWarnings("unchecked")
     public static void injectParameters(OperationResourceInfo ori,
                                         Object requestObject,
                                         Message message) {
-        ClassResourceInfo cri = ori.getClassResourceInfo();
+        injectParameters(ori, ori.getClassResourceInfo(), requestObject, message);    
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void injectParameters(OperationResourceInfo ori,
+                                        BeanResourceInfo bri,
+                                        Object requestObject,
+                                        Message message) {
                 
-        if (cri.isSingleton() 
-            && (!cri.getParameterMethods().isEmpty() || !cri.getParameterFields().isEmpty())) {
+        if (bri.isSingleton() 
+            && (!bri.getParameterMethods().isEmpty() || !bri.getParameterFields().isEmpty())) {
             LOG.fine("Injecting request parameters into singleton resource is not thread-safe");
         }
         // Param methods
         MultivaluedMap<String, String> values = 
             (MultivaluedMap<String, String>)message.get(URITemplate.TEMPLATE_PARAMETERS);
-        for (Method m : cri.getParameterMethods()) {
+        for (Method m : bri.getParameterMethods()) {
             Parameter p = ResourceUtils.getParameter(0, m.getAnnotations(), 
                                                      m.getParameterTypes()[0]);
-            Object o = createHttpParameterValue(p, 
+            Object o;
+            
+            if (p.getType() == ParameterType.BEAN && bri instanceof ClassResourceInfo) {
+                o = createBeanParamValue(message, m.getParameterTypes()[0], ori);    
+            } else {
+                o = createHttpParameterValue(p, 
                                                 m.getParameterTypes()[0],
                                                 m.getGenericParameterTypes()[0],
                                                 m.getParameterAnnotations()[0],
                                                 message,
                                                 values,
                                                 ori);
+            }
             InjectionUtils.injectThroughMethod(requestObject, m, o);
         }
         // Param fields
-        for (Field f : cri.getParameterFields()) {
+        for (Field f : bri.getParameterFields()) {
             Parameter p = ResourceUtils.getParameter(0, f.getAnnotations(), 
                                                      f.getType());
-            Object o = createHttpParameterValue(p, 
+            Object o = null;
+            
+            if (p.getType() == ParameterType.BEAN && bri instanceof ClassResourceInfo) {
+                o = createBeanParamValue(message, f.getType(), ori);    
+            } else {
+                o = createHttpParameterValue(p, 
                                                 f.getType(),
                                                 f.getGenericType(),
                                                 f.getAnnotations(),
                                                 message,
                                                 values,
                                                 ori);
+            }
             InjectionUtils.injectFieldValue(f, requestObject, o);
         }
         
@@ -668,6 +689,8 @@ public final class JAXRSUtils {
                                        message);
         } else if (parameter.getType() == ParameterType.CONTEXT) {
             return createContextValue(message, parameterType, parameterClass);
+        } else if (parameter.getType() == ParameterType.BEAN) {
+            return createBeanParamValue(message, parameterClass, ori);
         } else {
             
             return createHttpParameterValue(parameter,
@@ -868,6 +891,28 @@ public final class JAXRSUtils {
         
         return InjectionUtils.handleParameter(c.getValue(), false, pClass, paramAnns, 
                                               ParameterType.COOKIE, m);
+    }
+    
+    public static Object createBeanParamValue(Message m, Class<?> clazz, OperationResourceInfo ori) {
+        BeanParamInfo bmi = ProviderFactory.getInstance(m).getBeanParamInfo(clazz);
+        if (bmi == null) {
+            // we could've started introspecting now but the fact no bean info 
+            // is available indicates that the one created at start up has been 
+            // lost and hence it is 500
+            LOG.warning("Bean parameter info is not available");
+            throw new InternalServerErrorException();
+        }
+        Object instance;
+        try {
+            instance = ClassLoaderUtils.loadClass(clazz.getName(), JAXRSUtils.class).newInstance();
+        } catch (Throwable t) {
+            throw new InternalServerErrorException(t);
+        }
+        JAXRSUtils.injectParameters(ori, bmi, instance, m);
+        
+        InjectionUtils.injectContexts(instance, bmi, m);
+        
+        return instance;
     }
     
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {

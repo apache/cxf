@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -77,6 +78,7 @@ import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
+import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -157,6 +159,10 @@ public final class ProviderFactory {
     private ProviderInfo<Application> application;
     private List<DynamicFeature> dynamicFeatures = new LinkedList<DynamicFeature>();
     
+    // This may be better be kept at OperationResourceInfo ? Though we may have many methods
+    // across different resources that use the same BeanParam. 
+    private Map<Class<?>, BeanParamInfo> beanParams = new HashMap<Class<?>, BeanParamInfo>();
+    
     // List of injected providers
     private Collection<ProviderInfo<?>> injectedProviders = 
         new LinkedList<ProviderInfo<?>>();
@@ -234,6 +240,14 @@ public final class ProviderFactory {
     
     public static ProviderFactory getSharedInstance() {
         return SHARED_FACTORY;
+    }
+    
+    public void addBeanParamInfo(BeanParamInfo bpi) {
+        beanParams.put(bpi.getResourceClass(), bpi);
+    }
+    
+    public BeanParamInfo getBeanParamInfo(Class<?> beanClass) {
+        return beanParams.get(beanClass);
     }
     
     public <T> ContextResolver<T> createContextResolver(Type contextType, 

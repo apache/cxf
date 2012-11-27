@@ -19,10 +19,6 @@
 
 package org.apache.cxf.jaxrs.model;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,7 +39,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-public class ClassResourceInfo extends AbstractResourceInfo {
+public class ClassResourceInfo extends BeanResourceInfo {
     
     private URITemplate uriTemplate;
     private MethodDispatcher methodDispatcher;
@@ -51,8 +47,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     private ConcurrentHashMap<SubresourceKey, ClassResourceInfo> subResources 
         = new ConcurrentHashMap<SubresourceKey, ClassResourceInfo>();
    
-    private List<Field> paramFields;
-    private List<Method> paramMethods;
     private boolean enableStatic;
     private boolean createdFromModel; 
     private String consumesTypes;
@@ -68,8 +62,10 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             this.uriTemplate = cri.uriTemplate;    
             this.methodDispatcher = new MethodDispatcher(cri.methodDispatcher, this);
             this.subResources = cri.subResources;
+            //CHECKSTYLE:OFF
             this.paramFields = cri.paramFields;
             this.paramMethods = cri.paramMethods;
+            //CHECKSTYLE:ON
             this.enableStatic = true;
             this.nameBindings = cri.nameBindings;
             this.parent = cri.parent;
@@ -84,8 +80,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         super(theResourceClass, theServiceClass, theRoot, bus);
         this.enableStatic = enableStatic;
         if (root && resourceClass != null) {
-            setParamField(serviceClass);
-            setParamMethods(serviceClass);
             nameBindings = AnnotationUtils.getNameBindings(serviceClass.getAnnotations());
         }
     }
@@ -186,42 +180,7 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         return methods;
     }
     
-    private void setParamField(Class<?> cls) {
-        if (Object.class == cls || cls == null) {
-            return;
-        }
-        for (Field f : cls.getDeclaredFields()) {
-            for (Annotation a : f.getAnnotations()) {
-                if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
-                    if (paramFields == null) {
-                        paramFields = new ArrayList<Field>();
-                    }
-                    paramFields.add(f);
-                }
-            }
-        }
-        setParamField(cls.getSuperclass());
-    }
     
-    private void setParamMethods(Class<?> cls) {
-        
-        for (Method m : cls.getMethods()) {
-        
-            if (!m.getName().startsWith("set") || m.getParameterTypes().length != 1) {
-                continue;
-            }
-            for (Annotation a : m.getAnnotations()) {
-                if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
-                    checkParamMethod(m, AnnotationUtils.getAnnotationValue(a));
-                    break;
-                }
-            }
-        }
-        Class<?>[] interfaces = cls.getInterfaces();
-        for (Class<?> i : interfaces) {
-            setParamMethods(i);
-        }
-    }
 
     public URITemplate getURITemplate() {
         return uriTemplate;
@@ -282,31 +241,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     public Path getPath() {
         return AnnotationUtils.getClassAnnotation(getServiceClass(), Path.class);
-    }
-    
-    private void addParamMethod(Method m) {
-        if (paramMethods == null) {
-            paramMethods = new ArrayList<Method>();
-        }
-        paramMethods.add(m);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<Method> getParameterMethods() {
-        return paramMethods == null ? Collections.EMPTY_LIST 
-                                    : Collections.unmodifiableList(paramMethods);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<Field> getParameterFields() {
-        return paramFields == null ? Collections.EMPTY_LIST 
-                                    : Collections.unmodifiableList(paramFields);
-    }
-    
-    private void checkParamMethod(Method m, String value) {
-        if (m.getName().equalsIgnoreCase("set" + value)) {
-            addParamMethod(m);
-        }
     }
     
     @Override

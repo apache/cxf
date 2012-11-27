@@ -26,6 +26,7 @@ public enum ParameterType {
     HEADER,
     COOKIE,
     FORM,
+    BEAN,
     
     REQUEST_BODY,
     CONTEXT,

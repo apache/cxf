@@ -33,6 +33,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.BindingPriority;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
@@ -113,6 +114,7 @@ public final class AnnotationUtils {
         classes.add(HeaderParam.class);
         classes.add(CookieParam.class);
         classes.add(FormParam.class);
+        classes.add(BeanParam.class);
         return classes;
     }
 

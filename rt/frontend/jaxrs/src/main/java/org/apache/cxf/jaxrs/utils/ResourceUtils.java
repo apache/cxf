@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
@@ -305,6 +306,7 @@ public final class ResourceUtils {
         return params;
     }
     
+    //CHECKSTYLE:OFF
     public static Parameter getParameter(int index, Annotation[] anns, Class<?> type) {
         
         Context ctx = AnnotationUtils.getAnnotation(anns, Context.class);
@@ -313,24 +315,22 @@ public final class ResourceUtils {
         }
         
         boolean isEncoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
-        String dValue = AnnotationUtils.getDefaultParameterValue(anns);
         
-        Parameter p = null;
+        BeanParam bp = AnnotationUtils.getAnnotation(anns, BeanParam.class);
+        if (bp != null) {
+            return new Parameter(ParameterType.BEAN, index, null, isEncoded, null);
+        }
+        
+        String dValue = AnnotationUtils.getDefaultParameterValue(anns);
         
         PathParam a = AnnotationUtils.getAnnotation(anns, PathParam.class); 
         if (a != null) {
-            p = new Parameter(ParameterType.PATH, index, a.value(), isEncoded, dValue);
+            return new Parameter(ParameterType.PATH, index, a.value(), isEncoded, dValue);
         } 
-        if (p == null) {
-            QueryParam q = AnnotationUtils.getAnnotation(anns, QueryParam.class);
-            if (q != null) {
-                p = new Parameter(ParameterType.QUERY, index, q.value(), isEncoded, dValue);
-            }
+        QueryParam q = AnnotationUtils.getAnnotation(anns, QueryParam.class);
+        if (q != null) {
+            return new Parameter(ParameterType.QUERY, index, q.value(), isEncoded, dValue);
         }
-        if (p != null) {
-            return p;
-        }
-        
         MatrixParam m = AnnotationUtils.getAnnotation(anns, MatrixParam.class);
         if (m != null) {
             return new Parameter(ParameterType.MATRIX, index, m.value(), isEncoded, dValue);
@@ -346,17 +346,15 @@ public final class ResourceUtils {
             return new Parameter(ParameterType.HEADER, index, h.value(), isEncoded, dValue);
         }  
         
-        p = null;
         CookieParam c = AnnotationUtils.getAnnotation(anns, CookieParam.class);
         if (c != null) {
-            p = new Parameter(ParameterType.COOKIE, index, c.value(), isEncoded, dValue);
-        } else {
-            p = new Parameter(ParameterType.REQUEST_BODY, index, null); 
+            return new Parameter(ParameterType.COOKIE, index, c.value(), isEncoded, dValue);
         }
         
-        return p;
+        return new Parameter(ParameterType.REQUEST_BODY, index, null); 
+        
     }
-    
+    //CHECKSTYLE:ON
     
     private static OperationResourceInfo createOperationInfo(Method m, Method annotatedMethod, 
                                                       ClassResourceInfo cri, Path path, String httpMethod) {
