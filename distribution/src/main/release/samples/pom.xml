@@ -142,18 +142,6 @@
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>1.2</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.4</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.ant</groupId>
-                            <artifactId>ant-trax</artifactId>
-                            <version>1.8.0</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
