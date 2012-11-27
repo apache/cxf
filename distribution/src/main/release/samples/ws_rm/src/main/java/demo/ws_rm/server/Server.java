@@ -40,7 +40,7 @@ public class Server {
     public static void main(String args[]) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = Server.class.getResource("ws_rm.xml");
+        URL busFile = Server.class.getResource("/server.xml");
         Bus bus = bf.createBus(busFile.toString());
         
         BusFactory.setDefaultBus(bus);
