@@ -42,7 +42,7 @@ public final class Client {
         try {
             
             SpringBusFactory bf = new SpringBusFactory();
-            URL busFile = Client.class.getResource("ws_rm.xml");
+            URL busFile = Client.class.getResource("/client.xml");
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
