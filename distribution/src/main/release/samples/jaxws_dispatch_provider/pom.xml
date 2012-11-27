@@ -54,46 +54,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${wsdl.file}</wsdl>
-                                    <extraargs>
-                                        <extraarg>-sn</extraarg>
-                                        <extraarg>SOAPService1</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generate-SOAPService2</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${wsdl.file}</wsdl>
-                                    <extraargs>
-                                        <extraarg>-sn</extraarg>
-                                        <extraarg>SOAPService2</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generate-SOAPService3</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${wsdl.file}</wsdl>
-                                    <extraargs>
-                                        <extraarg>-sn</extraarg>
-                                        <extraarg>SOAPService3</extraarg>
-                                    </extraargs>
+                                    <frontEnd>jaxws21</frontEnd>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
