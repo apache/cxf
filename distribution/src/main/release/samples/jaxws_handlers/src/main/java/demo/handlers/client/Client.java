@@ -53,7 +53,7 @@ public final class Client {
 
         File wsdl = new File(args[0]);
 
-        AddNumbersService service = new AddNumbersService(wsdl.toURL(), serviceName);
+        AddNumbersService service = new AddNumbersService(wsdl.toURI().toURL(), serviceName);
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
 
         //Add client side handlers programmatically
