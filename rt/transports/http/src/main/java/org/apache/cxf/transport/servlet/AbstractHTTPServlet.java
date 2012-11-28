@@ -123,11 +123,15 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             Map<String, String> map = new HashMap<String, String>();
             String[] pairs = sequence.split(" ");
             for (String pair : pairs) {
-                String[] value = pair.split("=");
+                String thePair = pair.trim();
+                if (thePair.length() == 0) {
+                    continue;
+                }
+                String[] value = thePair.split("=");
                 if (value.length == 2) {
                     map.put(value[0].trim(), value[1].trim());
                 } else {
-                    map.put(pair.trim(), "");
+                    map.put(thePair, "");
                 }
             }
             return map;
