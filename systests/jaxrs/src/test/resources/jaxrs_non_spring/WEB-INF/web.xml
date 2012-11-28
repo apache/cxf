@@ -43,7 +43,12 @@
 		<init-param>
 		      <param-name>jaxrs.providers</param-name>
 		      <param-value>
-		           org.apache.cxf.jaxrs.provider.json.JSONProvider(dropRootElement=false attributesToElements=true),
+		           org.apache.cxf.jaxrs.provider.json.JSONProvider(
+		             dropRootElement=false 
+		             attributesToElements=true
+		             arrayKeys=a
+		             arrayKeys=b
+		           ),
 		           org.apache.cxf.jaxrs.provider.JAXBElementProvider
 		      </param-value>    
 		</init-param>

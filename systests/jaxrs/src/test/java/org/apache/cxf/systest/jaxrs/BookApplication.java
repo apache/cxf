@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -68,7 +69,11 @@ public class BookApplication extends Application {
         defaultName = name;
     }
     
-    public void setDefaultId(long id) {
-        defaultId = id;
+    public void setDefaultId(List<String> ids) {
+        StringBuilder sb = new StringBuilder();
+        for (String id : ids) {
+            sb.append(id);
+        }
+        defaultId = Long.valueOf(sb.toString());
     }
 }
