@@ -1370,6 +1370,10 @@ public class SourceGenerator {
     private JCodeModel createCodeModel(List<SchemaInfo> schemaElements, Set<String> type) {
         
         SchemaCompiler compiler = createCompiler(type);
+        Object elForRun = ReflectionInvokationHandler
+            .createProxyWrapper(new InnerErrorListener(),
+                            JAXBUtils.getParamClass(compiler, "setErrorListener"));
+        compiler.setErrorListener(elForRun);
         compiler.setEntityResolver(OASISCatalogManager.getCatalogManager(bus)
                                        .getEntityResolver());
         if (compilerArgs.size() > 0) {
@@ -1381,11 +1385,6 @@ public class SourceGenerator {
             compiler.getOptions().addBindFile(is);
         }
         
-        Object elForRun = ReflectionInvokationHandler
-            .createProxyWrapper(new InnerErrorListener(),
-                            JAXBUtils.getParamClass(compiler, "setErrorListener"));
-        
-        compiler.setErrorListener(elForRun);
         S2JJAXBModel intermediateModel = compiler.bind();
         JCodeModel codeModel = intermediateModel.generateCode(null, elForRun);
         JAXBUtils.logGeneratedClassNames(LOG, codeModel);
