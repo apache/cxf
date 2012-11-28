@@ -26,7 +26,7 @@ public class SpringServer {
     protected SpringServer() throws Exception {
         System.out.println("Starting Server");
         // creating the context sets the server into motion.
-        new ClassPathXmlApplicationContext(new String[] {"/demo/hw/server/server-beans.xml"});
+        new ClassPathXmlApplicationContext(new String[] {"/server-beans.xml"});
     }
 
     public static void main(String args[]) throws Exception {
