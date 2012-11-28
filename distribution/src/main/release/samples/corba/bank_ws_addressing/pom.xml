@@ -47,6 +47,33 @@
                         <target>1.6</target>
                     </configuration>
                 </plugin>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>
+                                            idlj-maven-plugin
+                                        </artifactId>
+                                        <versionRange>[1.2.1,)</versionRange>
+                                        <goals>
+                                            <goal>generate</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute></execute>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -59,9 +86,11 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <sourceRoot>${basedir}/target/generated-sources/cxf</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>src/main/resources/wsdl/BankWS-corba.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
                                     <packagenames>
                                         <package>http://cxf.apache.org/schemas/cxf/idl/Bank=cxf.common</package>
                                     </packagenames>
@@ -77,12 +106,13 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>idlj-maven-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.2.1</version>
                 <executions>
                     <execution>
                         <id>generate-sources-from-idl</id>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <outputDirectory>${basedir}/target/generated-sources/cxf</outputDirectory>
                             <sources>
                                 <source>
                                     <packagePrefixes>
@@ -223,12 +253,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.0.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
