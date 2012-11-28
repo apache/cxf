@@ -62,6 +62,7 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>src/main/resources/wsdl/bank.wsdl</wsdl>
+                                    <frontEnd>jaxws21</frontEnd>
                                     <packagenames>
                                         <package>bank.common</package>
                                     </packagenames>
@@ -147,12 +148,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.0.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -28,6 +28,8 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class SampleServlet extends CXFNonSpringJaxrsServlet {
 
+    private static final long serialVersionUID = -1531317723099896635L;
+
     protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
         throws ServletException {
         // technically, you should look up the application name from ServletConfig's init parameters
