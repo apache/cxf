@@ -69,7 +69,7 @@ public final class Client {
             }
 
             SpringBusFactory bf = new SpringBusFactory();
-            URL busFile = Client.class.getResource("client.xml");
+            URL busFile = Client.class.getResource("/client.xml");
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 

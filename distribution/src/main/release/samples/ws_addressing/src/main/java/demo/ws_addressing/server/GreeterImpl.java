@@ -31,7 +31,7 @@ import org.apache.hello_world_soap_http.types.FaultDetail;
             portName = "SoapPort",
             serviceName = "SOAPService", 
             targetNamespace = "http://apache.org/hello_world_soap_http", 
-            wsdlLocation = "file:./wsdl/hello_world_addr.wsdl")
+            wsdlLocation = "file:./src/main/resources/hello_world_addr.wsdl")
                   
 public class GreeterImpl implements Greeter {
 
