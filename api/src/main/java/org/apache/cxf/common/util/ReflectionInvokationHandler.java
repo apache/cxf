@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.lang.reflect.Proxy;
@@ -50,7 +51,9 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         try {
             Method m = target.getClass().getMethod(method.getName(), getParameterTypes(method, args));
             ReflectionUtil.setAccessible(m);
-            return wrapReturn(wr, m.invoke(target, args));                
+            return wrapReturn(wr, m.invoke(target, args));
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
         } catch (NoSuchMethodException e) {
             for (Method m2 : target.getClass().getMethods()) {
                 if (m2.getName().equals(method.getName())
