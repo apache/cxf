@@ -28,27 +28,37 @@ import java.util.List;
  */
 public class OAuthContext {
 
-    private UserSubject subject;
-    private List<OAuthPermission> permissions;
+    private UserSubject resourceOwnerSubject;
+    private UserSubject clientSubject;
+    private List<OAuthPermission> tokenPermissions;
     private String tokenGrantType;
     private String clientId;
     private String tokenKey;
     
-    public OAuthContext(UserSubject subject, 
+    public OAuthContext(UserSubject resourceOwnerSubject,
+                        UserSubject clientSubject,
                         List<OAuthPermission> perms,
                         String tokenGrantType) {
-        this.subject = subject;
-        this.permissions = perms;
+        this.resourceOwnerSubject = resourceOwnerSubject;
+        this.clientSubject = clientSubject;
+        this.tokenPermissions = perms;
         this.tokenGrantType = tokenGrantType;
     }
    
     /**
-     * Gets the {@link UserSubject} representing the end user authorizing the client 
-     * at the authorization grant creation time 
+     * Gets the {@link UserSubject} representing the resource owner
      * @return the subject
      */
     public UserSubject getSubject() {
-        return subject;
+        return resourceOwnerSubject;
+    }
+    
+    /**
+     * Gets the {@link UserSubject} representing the client
+     * @return the subject
+     */
+    public UserSubject getClientSubject() {
+        return clientSubject;
     }
     
     /**
@@ -56,7 +66,7 @@ public class OAuthContext {
      * @return the permissions
      */
     public List<OAuthPermission> getPermissions() {
-        return Collections.unmodifiableList(permissions);
+        return Collections.unmodifiableList(tokenPermissions);
     }
 
     /**

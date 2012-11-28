@@ -33,7 +33,7 @@ public final class OAuthContextUtils {
     
     /**
      * @param mc the {@link MessageContext}
-     * @return the name of the UserSubject of the logged in user
+     * @return the name of the UserSubject of the logged in user or resource owner
      * @throws WebApplicationException with Status 401 if not authenticated
      */
     public static String resolveUserName(final MessageContext mc) {
@@ -43,7 +43,7 @@ public final class OAuthContextUtils {
 
     /**
      * @param mc the {@link MessageContext}
-     * @return the list of roles of the logged in user
+     * @return the list of roles of the logged in user or resource owner
      * @throws WebApplicationException with Status 401 if not authenticated
      */
     public static List<String> resolveUserRoles(final MessageContext mc) {
@@ -96,7 +96,7 @@ public final class OAuthContextUtils {
 
     /**
      * @param mc the {@link MessageContext}
-     * @return the client the user is using to access
+     * @return the client registration id
      * @throws WebApplicationException with Status 401 if not authenticated
      */
     public static String resolveClient(MessageContext mc) {
@@ -106,9 +106,8 @@ public final class OAuthContextUtils {
 
     /**
      * @param mc the {@link MessageContext}
-     * @param client the desired client
-     * @throws WebApplicationException with Status 401 if not authenticated
-     * @throws WebApplicationException with Status 403 if user doesn't have needed role
+     * @param client the desired client registration id
+     * @throws WebApplicationException with Status 403 if the current client id is not valid
      */
     public static void assertClient(MessageContext mc, String client) {
         String cl = resolveClient(mc);

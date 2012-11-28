@@ -26,9 +26,15 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class RefreshTokenGrant implements AccessTokenGrant {
     private String refreshToken;
+    private String scope;
     
     public RefreshTokenGrant(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+    
+    public RefreshTokenGrant(String refreshToken, String scope) {
+        this.refreshToken = refreshToken;
+        this.scope = scope;
     }
     
     public String getType() {
@@ -39,6 +45,9 @@ public class RefreshTokenGrant implements AccessTokenGrant {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.REFRESH_TOKEN_GRANT);
         map.putSingle(OAuthConstants.REFRESH_TOKEN, refreshToken);
+        if (scope != null) {
+            map.putSingle(OAuthConstants.SCOPE, scope);
+        }
         return map;
     }
 
