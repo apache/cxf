@@ -347,6 +347,10 @@
         <wsdl:port name="DoubleItInlinePolicyPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItSamlInlinePolicy" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSaml2PEPPort" 
+                   binding="tns:DoubleItSaml2SymmetricBinding">
+            <soap:address location="http://localhost:9001/DoubleItSaml2PEP" />
+        </wsdl:port>
     </wsdl:service>
 
     <wsp:Policy wsu:Id="DoubleItSaml1TransportPolicy">

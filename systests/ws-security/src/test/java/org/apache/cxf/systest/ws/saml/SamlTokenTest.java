@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
+import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
@@ -555,6 +556,55 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = "The received token does not match the token inclusion requirement";
             assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)saml2Port).close();
+        bus.shutdown(true);
+    }
+    
+    // In this test-case, the WSP is configured with a XACML PEP interceptor, which in this
+    // case just mocks the call to the PDP + enforces the decision
+    @org.junit.Test
+    public void testSaml2PEP() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml2PEPPort");
+        DoubleItPortType saml2Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT);
+       
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected as Assertion doesn't contain Role information");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+        
+        SamlRoleCallbackHandler roleCallbackHandler = 
+            new SamlRoleCallbackHandler();
+        roleCallbackHandler.setRoleName("manager");
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", roleCallbackHandler
+        );
+        
+        int result = saml2Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        // Expected failure on incorrect role
+        roleCallbackHandler.setRoleName("boss");
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected as Assertion doesn't contain correct role");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
         }
         
         ((java.io.Closeable)saml2Port).close();

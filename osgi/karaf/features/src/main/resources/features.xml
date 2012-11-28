@@ -111,6 +111,10 @@
         <bundle start-level='40' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/${cxf.ehcache.bundle.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-security/${project.version}</bundle>
     </feature>
+    <feature name="cxf-rt-security" version="${project.version}" resolver='(obr)'>
+        <feature version="${cxf.wss4j.version}">wss4j</feature>
+        <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-security/${project.version}</bundle>
+    </feature>
     <feature name="cxf-http" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
         <feature version="[2,4)">http-whiteboard</feature>

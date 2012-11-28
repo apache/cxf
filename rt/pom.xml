@@ -65,6 +65,7 @@
         <module>management</module>
         <module>management-web</module>
         <module>javascript</module>
+        <module>security</module>
     </modules>
 
 </project>

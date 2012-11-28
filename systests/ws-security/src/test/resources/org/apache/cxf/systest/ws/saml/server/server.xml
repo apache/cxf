@@ -378,4 +378,30 @@
      
     </jaxws:endpoint> 
     
+    <bean class="org.apache.cxf.systest.ws.saml.server.XACMLAuthorizingInterceptor" 
+         id="XACMLInterceptor">
+    </bean>
+   
+    <jaxws:endpoint 
+       id="Saml2TokenOverSymmetricPEP"
+       address="http://localhost:${testutil.ports.Server}/DoubleItSaml2PEP" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItSaml2PEPPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+           <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+           <entry key="ws-security.saml2.validator" 
+                  value="org.apache.cxf.systest.ws.saml.server.CustomSaml2Validator"/>
+       </jaxws:properties> 
+       <jaxws:inInterceptors>
+           <ref bean="XACMLInterceptor"/>
+       </jaxws:inInterceptors>
+    </jaxws:endpoint> 
+    
 </beans>
