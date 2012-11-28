@@ -46,15 +46,8 @@ public class CustomerServiceImpl implements CustomerService {
         if (c == null || c.getId() != customer.getId()) {
             throw new WebApplicationException();
         }
-        Response r;
-        if (c != null) {
-            customers.put(customer.getId(), customer);
-            r = Response.ok(customer).build();
-        } else {
-            r = Response.notModified().build();
-        }
-
-        return r;
+        customers.put(customer.getId(), customer);
+        return Response.ok(customer).build();
     }
 
     public Response addCustomer(Customer customer) {
