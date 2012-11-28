@@ -41,10 +41,8 @@ public class ClientCredentialsGrantHandler extends AbstractGrantHandler {
         throws OAuthServiceException {
         checkIfGrantSupported(client);
         
-        // the OAuth filter will use Client.getUserSubject() 
-        // to initialize the request security context
         return doCreateAccessToken(client, 
-                                   null, 
+                                   client.getSubject(), 
                                    OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));
     }
 
