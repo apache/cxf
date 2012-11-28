@@ -22,7 +22,7 @@ package demo.jaxrs.service;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
-import org.springframework.security.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 
 public class SecurityExceptionMapper implements ExceptionMapper<AccessDeniedException> {
 
