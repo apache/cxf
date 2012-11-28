@@ -86,6 +86,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         
         // Also set the OAuthContext
         OAuthContext oauthContext = new OAuthContext(accessTokenV.getTokenSubject(),
+                                                     accessTokenV.getClientSubject(),
                                                      matchingPermissions,
                                                      accessTokenV.getTokenGrantType());
         
@@ -134,11 +135,11 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
     
     protected SecurityContext createSecurityContext(HttpServletRequest request, 
                                                     AccessTokenValidation accessTokenV) {
-        UserSubject endUserSubject = accessTokenV.getTokenSubject();
+        UserSubject resourceOwnerSubject = accessTokenV.getTokenSubject();
         UserSubject clientSubject = accessTokenV.getClientSubject();
 
         final UserSubject theSubject = 
-            OAuthRequestFilter.this.useUserSubject ? endUserSubject : clientSubject;
+            OAuthRequestFilter.this.useUserSubject ? resourceOwnerSubject : clientSubject;
                     
         return new SecurityContext() {
 
