@@ -117,7 +117,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     private void readBusProperties() {
-        Bus b = BusFactory.getDefaultBus(false);
+        Bus b = BusFactory.getThreadDefaultBus(false);
         if (b != null) {
             String v = getBusProperty(b, "bus.io.CachedOutputStream.Threshold", null);
             if (v != null && threshold == defaultThreshold) {

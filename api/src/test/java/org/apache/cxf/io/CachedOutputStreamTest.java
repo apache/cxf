@@ -121,7 +121,7 @@ public class CachedOutputStreamTest extends Assert {
 
     @Test
     public void testUseBusProps() throws Exception {
-        Bus oldbus = BusFactory.getDefaultBus(false); 
+        Bus oldbus = BusFactory.getThreadDefaultBus(false); 
         try {
             CachedOutputStream cos = new CachedOutputStream();
             cos.write("Hello World!".getBytes());
@@ -136,7 +136,7 @@ public class CachedOutputStreamTest extends Assert {
             EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.MaxSize")).andReturn(null);
             EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.CipherTransformation")).andReturn(null);
         
-            BusFactory.setDefaultBus(b);
+            BusFactory.setThreadDefaultBus(b);
             
             control.replay();
 
@@ -148,7 +148,7 @@ public class CachedOutputStreamTest extends Assert {
             
             control.verify();
         } finally {
-            BusFactory.setDefaultBus(oldbus);
+            BusFactory.setThreadDefaultBus(oldbus);
         }
     }
     
