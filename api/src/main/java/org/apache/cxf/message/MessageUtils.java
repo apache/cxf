@@ -21,6 +21,8 @@ package org.apache.cxf.message;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.util.PropertyUtils;
+
 
 /**
  * Holder for utility methods relating to messages.
@@ -117,22 +119,14 @@ public final class MessageUtils {
      * @return true if value is either the String "true" or Boolean.TRUE
      */
     public static boolean isTrue(Object value) {
-        if (value == null) {
-            return false;
-        }
-
-        if (Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString())) {
-            return true;
-        }
-        
-        return false;
+        // TODO - consider deprecation as this really belongs in PropertyUtils
+        return PropertyUtils.isTrue(value);
     }
-    
     
     public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
         Object o = m.getContextualProperty(key);
         if (o != null) {
-            return isTrue(o);
+            return PropertyUtils.isTrue(o);
         }
         return defaultValue;
     }

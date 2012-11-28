@@ -66,6 +66,7 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.databinding.AbstractDataBinding;
@@ -231,7 +232,9 @@ public class JAXBDataBinding extends AbstractDataBinding
             extraClass = (Class[])o;
         }
 
-        if (props != null && "false".equalsIgnoreCase((String) props.get(JAXB_SCAN_PACKAGES))) {
+        // the default for scan packages is true, so the jaxb scan packages
+        // property must be explicitly set to false to disable it
+        if (PropertyUtils.isFalse(props, JAXB_SCAN_PACKAGES)) {
             scanPackages = false;
         }
     }
@@ -822,6 +825,4 @@ public class JAXBDataBinding extends AbstractDataBinding
     public List<Interceptor<? extends Message>> getOutInterceptors() {
         return out;
     }
-
-
 }
