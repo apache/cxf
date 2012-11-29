@@ -170,6 +170,7 @@ public class ClaimsManager {
     private RequestClaimCollection filterHandlerClaims(RequestClaimCollection claims,
                                                          List<URI> handlerClaimTypes) {
         RequestClaimCollection supportedClaims = new RequestClaimCollection(); 
+        supportedClaims.setDialect(claims.getDialect());
         for (RequestClaim claim : claims) {
             if (handlerClaimTypes.contains(claim.getClaimType())) {
                 supportedClaims.add(claim);
@@ -298,6 +299,8 @@ public class ClaimsManager {
         
         // Merge claims
         RequestClaimCollection mergedClaims = new RequestClaimCollection();
+        mergedClaims.setDialect(primaryClaims.getDialect());
+        
         for (RequestClaim claim : primaryClaims) {
             RequestClaim matchingClaim = null;
             // Search for a matching claim via the ClaimType URI
