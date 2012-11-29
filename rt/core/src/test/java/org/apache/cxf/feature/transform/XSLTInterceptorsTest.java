@@ -106,11 +106,13 @@ public class XSLTInterceptorsTest {
     @Test
     public void outStreamTest() throws SAXException, IOException, ParserConfigurationException {
         CachedOutputStream cos = new CachedOutputStream();
+        cos.holdTempFile();
         message.setContent(OutputStream.class, cos);
         outInterceptor.handleMessage(message);
         OutputStream os = message.getContent(OutputStream.class);
         IOUtils.copy(messageIS, os);
         os.close();
+        cos.releaseTempFileHold();
         Document doc = DOMUtils.readXml(cos.getInputStream());
         Assert.assertTrue("Message was not transformed", checkTransformedXML(doc));
     }
@@ -118,12 +120,14 @@ public class XSLTInterceptorsTest {
     @Test
     public void outXMLStreamTest() throws XMLStreamException, SAXException, IOException, ParserConfigurationException {
         CachedWriter cWriter = new CachedWriter();
+        cWriter.holdTempFile();
         XMLStreamWriter xWriter = StaxUtils.createXMLStreamWriter(cWriter);
         message.setContent(XMLStreamWriter.class, xWriter);
         outInterceptor.handleMessage(message);
         XMLStreamWriter tXWriter = message.getContent(XMLStreamWriter.class);
         StaxUtils.copy(new StreamSource(messageIS), tXWriter);
         tXWriter.close();
+        cWriter.releaseTempFileHold();
         Document doc = DOMUtils.readXml(cWriter.getReader());
         Assert.assertTrue("Message was not transformed", checkTransformedXML(doc));
     }
