@@ -167,14 +167,12 @@ public class ServletController {
                             orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                         }
                     }
+                    updateDestination(request, d);
+                    
                     QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
-
-                    if (!StringUtils.isEmpty(request.getQueryString()) && queryHandlerRegistry != null) {
-                        
-                        // update the EndPoint Address with request url
-                        if ("GET".equals(request.getMethod())) {
-                            updateDestination(request, d);
-                        }
+                    if ("GET".equals(request.getMethod()) 
+                        && !StringUtils.isEmpty(request.getQueryString()) 
+                        && queryHandlerRegistry != null) {
                         
                         String ctxUri = request.getPathInfo();
                         String baseUri = request.getRequestURL().toString()
@@ -187,8 +185,6 @@ public class ServletController {
                             respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
                             return;
                         }
-                    } else {
-                        updateDestination(request, d);
                     }
                     invokeDestination(request, res, d);
                 } finally {
