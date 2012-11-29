@@ -91,7 +91,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         providerParameters.setClaimsManager(claimsManager);
         
         RequestClaimCollection claims = createClaims();
-        providerParameters.setRequestedClaims(claims);
+        providerParameters.setRequestedPrimaryClaims(claims);
         
         List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
         customProviderList.add(new CustomAttributeProvider());
@@ -111,6 +111,101 @@ public class SAMLClaimsTest extends org.junit.Assert {
         assertTrue(tokenString.contains(ClaimTypes.EMAILADDRESS.toString()));
         assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
         assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
+    }
+    
+    /**
+     * Test the creation of a SAML2 Assertion with various Attributes set by a ClaimsHandler.
+     * We have both a primary claim (sent in wst:RequestSecurityToken) and a secondary claim
+     * (send in wst:RequestSecurityToken/wst:SecondaryParameters).
+     */
+    @org.junit.Test
+    public void testSaml2MultipleClaims() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+        
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        providerParameters.setClaimsManager(claimsManager);
+        
+        RequestClaimCollection primaryClaims = createClaims();
+        providerParameters.setRequestedPrimaryClaims(primaryClaims);
+        
+        RequestClaimCollection secondaryClaims = new RequestClaimCollection();
+        RequestClaim claim = new RequestClaim();
+        claim.setClaimType(ClaimTypes.STREETADDRESS);
+        secondaryClaims.add(claim);
+        providerParameters.setRequestedSecondaryClaims(secondaryClaims);
+        
+        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        customProviderList.add(new CustomAttributeProvider());
+        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.contains(ClaimTypes.EMAILADDRESS.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.STREETADDRESS.toString()));
+    }
+    
+    /**
+     * Test the creation of a SAML2 Assertion with various Attributes set by a ClaimsHandler.
+     * We have both a primary claim (sent in wst:RequestSecurityToken) and a secondary claim
+     * (send in wst:RequestSecurityToken/wst:SecondaryParameters), and both have the 
+     * same dialect in this test.
+     */
+    @org.junit.Test
+    public void testSaml2MultipleClaimsSameDialect() throws Exception {
+        TokenProvider samlTokenProvider = new SAMLTokenProvider();
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
+        
+        ClaimsManager claimsManager = new ClaimsManager();
+        ClaimsHandler claimsHandler = new CustomClaimsHandler();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
+        providerParameters.setClaimsManager(claimsManager);
+        
+        RequestClaimCollection primaryClaims = createClaims();
+        primaryClaims.setDialect(ClaimTypes.URI_BASE);
+        providerParameters.setRequestedPrimaryClaims(primaryClaims);
+        
+        RequestClaimCollection secondaryClaims = new RequestClaimCollection();
+        RequestClaim claim = new RequestClaim();
+        claim.setClaimType(ClaimTypes.STREETADDRESS);
+        secondaryClaims.add(claim);
+        secondaryClaims.setDialect(ClaimTypes.URI_BASE);
+        providerParameters.setRequestedSecondaryClaims(secondaryClaims);
+        
+        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        customProviderList.add(new CustomAttributeProvider());
+        ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
+        
+        assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+        
+        Element token = providerResponse.getToken();
+        String tokenString = DOM2Writer.nodeToString(token);
+        assertTrue(tokenString.contains(providerResponse.getTokenId()));
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+        assertTrue(tokenString.contains(ClaimTypes.EMAILADDRESS.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.FIRSTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
+        assertTrue(tokenString.contains(ClaimTypes.STREETADDRESS.toString()));
     }
     
     /**
@@ -134,7 +229,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         RequestClaim claim = new RequestClaim();
         claim.setClaimType(CLAIM_STATIC_COMPANY);
         claims.add(claim);
-        providerParameters.setRequestedClaims(claims);
+        providerParameters.setRequestedPrimaryClaims(claims);
         
         List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
@@ -191,7 +286,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         RequestClaim claim = new RequestClaim();
         claim.setClaimType(CLAIM_APPLICATION);
         claims.add(claim);
-        providerParameters.setRequestedClaims(claims);
+        providerParameters.setRequestedPrimaryClaims(claims);
         
         List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
@@ -250,7 +345,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         RequestClaim claim = new RequestClaim();
         claim.setClaimType(CLAIM_APPLICATION);
         claims.add(claim);
-        providerParameters.setRequestedClaims(claims);
+        providerParameters.setRequestedPrimaryClaims(claims);
         
         List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
         customProviderList.add(new ClaimsAttributeStatementProvider());

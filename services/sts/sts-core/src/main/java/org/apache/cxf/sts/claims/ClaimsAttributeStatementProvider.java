@@ -59,7 +59,8 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
             params.setWebServiceContext(providerParameters.getWebServiceContext());
             retrievedClaims = 
                 claimsManager.retrieveClaimValues(
-                    providerParameters.getRequestedClaims(),
+                    providerParameters.getRequestedPrimaryClaims(),
+                    providerParameters.getRequestedSecondaryClaims(),
                     params
                 );
         }

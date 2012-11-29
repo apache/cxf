@@ -298,8 +298,8 @@ public class RequestParser {
         } else if (QNameConstants.CLAIMS.equals(jaxbElement.getName())) {
             ClaimsType claimsType = (ClaimsType)jaxbElement.getValue();
             RequestClaimCollection requestedClaims = parseClaims(claimsType, claimsParsers);
-            tokenRequirements.setClaims(requestedClaims);
-            LOG.fine("Found Claims token");
+            tokenRequirements.setPrimaryClaims(requestedClaims);
+            LOG.fine("Found Primary Claims token");
         } else if (QNameConstants.RENEWING.equals(jaxbElement.getName())) {
             RenewingType renewingType = (RenewingType)jaxbElement.getValue();
             Renewing renewing = new Renewing();
@@ -552,11 +552,10 @@ public class RequestParser {
                 String keyType = child.getTextContent().trim();
                 LOG.fine("Found KeyType: " + keyType);
                 keyRequirements.setKeyType(keyType);
-            } else if (tokenRequirements.getClaims() == null 
-                && "Claims".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
-                LOG.fine("Found Claims element");
+            } else if ("Claims".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
+                LOG.fine("Found Secondary Claims element");
                 RequestClaimCollection requestedClaims = parseClaims(child, claimsParsers);
-                tokenRequirements.setClaims(requestedClaims);
+                tokenRequirements.setSecondaryClaims(requestedClaims);
             } else {
                 LOG.fine("Found unknown element: " + localName + " " + namespace);
             }

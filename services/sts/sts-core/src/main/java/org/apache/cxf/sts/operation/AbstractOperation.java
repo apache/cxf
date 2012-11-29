@@ -452,8 +452,10 @@ public abstract class AbstractOperation {
         }
         
         // Set the requested Claims
-        RequestClaimCollection claims = tokenRequirements.getClaims();
-        providerParameters.setRequestedClaims(claims);
+        RequestClaimCollection claims = tokenRequirements.getPrimaryClaims();
+        providerParameters.setRequestedPrimaryClaims(claims);
+        claims = tokenRequirements.getSecondaryClaims();
+        providerParameters.setRequestedSecondaryClaims(claims);
         
         EncryptionProperties encryptionProperties = stsProperties.getEncryptionProperties();
         if (address != null) {

@@ -36,7 +36,8 @@ public class TokenRequirements {
     private ReceivedToken cancelTarget;
     private ReceivedToken renewTarget;
     private Lifetime lifetime;
-    private RequestClaimCollection claims;
+    private RequestClaimCollection primaryClaims;
+    private RequestClaimCollection secondaryClaims;
     private Renewing renewing;
     
     public Renewing getRenewing() {
@@ -119,12 +120,28 @@ public class TokenRequirements {
         this.lifetime = lifetime;
     }
     
+    @Deprecated
     public RequestClaimCollection getClaims() {
-        return claims;
+        if (primaryClaims != null) {
+            return primaryClaims;
+        }
+        return secondaryClaims;
     }
     
-    public void setClaims(RequestClaimCollection claims) {
-        this.claims = claims;
+    public RequestClaimCollection getPrimaryClaims() {
+        return primaryClaims;
+    }
+
+    public void setPrimaryClaims(RequestClaimCollection primaryClaims) {
+        this.primaryClaims = primaryClaims;
+    }
+
+    public RequestClaimCollection getSecondaryClaims() {
+        return secondaryClaims;
+    }
+
+    public void setSecondaryClaims(RequestClaimCollection secondaryClaims) {
+        this.secondaryClaims = secondaryClaims;
     }
 
 }

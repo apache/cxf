@@ -45,6 +45,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
         knownURIs.add(ClaimTypes.FIRSTNAME);
         knownURIs.add(ClaimTypes.LASTNAME);
         knownURIs.add(ClaimTypes.EMAILADDRESS);
+        knownURIs.add(ClaimTypes.STREETADDRESS);
         knownURIs.add(ROLE_CLAIM);
     }
 
@@ -72,6 +73,8 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     claim.addValue("doe");
                 } else if (ClaimTypes.EMAILADDRESS.equals(requestClaim.getClaimType())) {
                     claim.addValue("alice@cxf.apache.org");
+                } else if (ClaimTypes.STREETADDRESS.equals(requestClaim.getClaimType())) {
+                    claim.addValue("1234 1st Street");
                 } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
                     String requestedRole = requestClaim.getClaimValue();
                     if (isUserInRole(parameters.getPrincipal(), requestedRole)) {

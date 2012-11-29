@@ -96,7 +96,9 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         TokenProviderParameters providerParameters = createTokenProviderParameters(requestParser, context);
 
         // Check if the requested claims can be handled by the configured claim handlers
-        RequestClaimCollection requestedClaims = providerParameters.getRequestedClaims();
+        RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
+        checkClaimsSupport(requestedClaims);
+        requestedClaims = providerParameters.getRequestedSecondaryClaims();
         checkClaimsSupport(requestedClaims);
         providerParameters.setClaimsManager(claimsManager);
         

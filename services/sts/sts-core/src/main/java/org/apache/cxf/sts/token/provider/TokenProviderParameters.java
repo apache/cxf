@@ -43,7 +43,8 @@ public class TokenProviderParameters {
     private EncryptionProperties encryptionProperties;
     private Principal principal;
     private WebServiceContext webServiceContext;
-    private RequestClaimCollection requestedClaims;
+    private RequestClaimCollection requestedPrimaryClaims;
+    private RequestClaimCollection requestedSecondaryClaims;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private String appliesToAddress;
@@ -92,12 +93,12 @@ public class TokenProviderParameters {
         this.keyRequirements = keyRequirements;
     }
 
+    @Deprecated
     public RequestClaimCollection getRequestedClaims() {
-        return requestedClaims;
-    }
-
-    public void setRequestedClaims(RequestClaimCollection requestedClaims) {
-        this.requestedClaims = requestedClaims;
+        if (requestedPrimaryClaims != null) {
+            return requestedPrimaryClaims;
+        }
+        return requestedSecondaryClaims;
     }
 
     public STSPropertiesMBean getStsProperties() {
@@ -146,6 +147,22 @@ public class TokenProviderParameters {
     
     public String getRealm() {
         return realm;
+    }
+
+    public RequestClaimCollection getRequestedPrimaryClaims() {
+        return requestedPrimaryClaims;
+    }
+
+    public void setRequestedPrimaryClaims(RequestClaimCollection requestedPrimaryClaims) {
+        this.requestedPrimaryClaims = requestedPrimaryClaims;
+    }
+
+    public RequestClaimCollection getRequestedSecondaryClaims() {
+        return requestedSecondaryClaims;
+    }
+
+    public void setRequestedSecondaryClaims(RequestClaimCollection requestedSecondaryClaims) {
+        this.requestedSecondaryClaims = requestedSecondaryClaims;
     }
     
 }

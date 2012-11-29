@@ -73,7 +73,8 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             params.setWebServiceContext(providerParameters.getWebServiceContext());
             retrievedClaims = 
                 claimsManager.retrieveClaimValues(
-                    providerParameters.getRequestedClaims(),
+                    providerParameters.getRequestedPrimaryClaims(),
+                    providerParameters.getRequestedSecondaryClaims(),
                     params
                 );
         }

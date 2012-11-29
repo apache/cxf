@@ -866,7 +866,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         requestClaim.setClaimType(ClaimTypes.LASTNAME);
         requestClaim.setOptional(false);
         requestedClaims.add(requestClaim);
-        providerParameters.setRequestedClaims(requestedClaims);
+        providerParameters.setRequestedSecondaryClaims(requestedClaims);
         
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
