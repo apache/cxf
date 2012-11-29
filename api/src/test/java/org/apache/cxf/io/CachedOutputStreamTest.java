@@ -24,6 +24,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -114,6 +119,39 @@ public class CachedOutputStreamTest extends Assert {
         assertFalse("file is not deleted", tmpfile.exists());
     }
 
+    @Test
+    public void testUseBusProps() throws Exception {
+        Bus oldbus = BusFactory.getThreadDefaultBus(false); 
+        try {
+            CachedOutputStream cos = new CachedOutputStream();
+            cos.write("Hello World!".getBytes());
+            cos.flush();
+            assertNull("expects no tmp file", cos.getTempFile());
+            cos.close();
+            
+            IMocksControl control = EasyMock.createControl();
+            
+            Bus b = control.createMock(Bus.class);
+            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.Threshold")).andReturn("4");
+            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.MaxSize")).andReturn(null);
+            EasyMock.expect(b.getProperty("bus.io.CachedOutputStream.CipherTransformation")).andReturn(null);
+        
+            BusFactory.setThreadDefaultBus(b);
+            
+            control.replay();
+
+            cos = new CachedOutputStream();
+            cos.write("Hello World!".getBytes());
+            cos.flush();
+            assertNotNull("expects a tmp file", cos.getTempFile());
+            cos.close();
+            
+            control.verify();
+        } finally {
+            BusFactory.setThreadDefaultBus(oldbus);
+        }
+    }
+    
     private static String readFromStream(InputStream is) throws IOException {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         try {

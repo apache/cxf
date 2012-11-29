@@ -44,6 +44,8 @@ import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -99,6 +101,7 @@ public class CachedOutputStream extends OutputStream {
     public CachedOutputStream(PipedInputStream stream) throws IOException {
         currentStream = new PipedOutputStream(stream);
         inmem = true;
+        readBusProperties();
     }
 
     public CachedOutputStream() {
@@ -109,6 +112,30 @@ public class CachedOutputStream extends OutputStream {
         this.threshold = threshold; 
         currentStream = new LoadingByteArrayOutputStream(2048);
         inmem = true;
+        readBusProperties();
+    }
+
+    private void readBusProperties() {
+        Bus b = BusFactory.getThreadDefaultBus(false);
+        if (b != null) {
+            String v = getBusProperty(b, "bus.io.CachedOutputStream.Threshold", null);
+            if (v != null && threshold == defaultThreshold) {
+                threshold = Integer.parseInt(v);
+            }
+            v = getBusProperty(b, "bus.io.CachedOutputStream.MaxSize", null);
+            if (v != null) {
+                maxSize = Integer.parseInt(v);
+            }
+            v = getBusProperty(b, "bus.io.CachedOutputStream.CipherTransformation", null);
+            if (v != null) {
+                cipherTransformation = v;
+            }
+        }
+    }
+
+    private static String getBusProperty(Bus b, String key, String dflt) {
+        String v = (String)b.getProperty(key);
+        return v != null ? v : dflt;
     }
 
     public void holdTempFile() {
