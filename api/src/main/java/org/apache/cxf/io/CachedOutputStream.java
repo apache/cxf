@@ -35,6 +35,7 @@ import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.security.GeneralSecurityException;
 import java.security.Key;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,7 +94,6 @@ public class CachedOutputStream extends OutputStream {
     private String cipherTransformation = defaultCipherTransformation;
     private Cipher enccipher;
     private Cipher deccipher;
-    
 
     private List<CachedOutputStreamCallback> callbacks;
     
@@ -500,7 +500,6 @@ public class CachedOutputStream extends OutputStream {
             
             currentStream = createOutputStream(tempFile);
             bout.writeTo(currentStream);
-            currentStream = new BufferedOutputStream(currentStream);
             inmem = false;
             streamList.add(currentStream);
         } catch (Exception ex) {
@@ -640,7 +639,9 @@ public class CachedOutputStream extends OutputStream {
                 a = cipherTransformation;
             }
             try {
-                Key key = KeyGenerator.getInstance(a).generateKey();
+                KeyGenerator keygen = KeyGenerator.getInstance(a);
+                keygen.init(new SecureRandom());
+                Key key = keygen.generateKey();
                 enccipher = Cipher.getInstance(cipherTransformation);
                 deccipher = Cipher.getInstance(cipherTransformation);
                 enccipher.init(Cipher.ENCRYPT_MODE, key);
@@ -655,7 +656,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     private OutputStream createOutputStream(File file) throws IOException {
-        OutputStream out = new FileOutputStream(file);
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
         if (cipherTransformation != null) {
             try {
                 initCiphers();
