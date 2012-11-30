@@ -198,6 +198,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String base = "http://localhost:" + PORT;
         String endpointAddress = base + "/bookstore/name-in-query"; 
         WebClient wc = WebClient.create(endpointAddress);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
         String name = "Many        spaces";
         wc.query("name", name);
         String content = wc.get(String.class);

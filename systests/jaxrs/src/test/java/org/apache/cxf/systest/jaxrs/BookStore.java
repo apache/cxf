@@ -245,7 +245,7 @@ public class BookStore {
     @GET
     @Path("name-in-query")
     @Produces("application/xml")
-    @XMLInstruction("<!DOCTYPE Something SYSTEM 'my.dtd'><?xmlstylesheet href='common.css'?>")
+    @XMLInstruction("<!DOCTYPE Something SYSTEM 'my.dtd'><?xmlstylesheet href='common.css' ?>")
     @XSISchemaLocation("book.xsd")
     public Book getBookFromQuery(@QueryParam("name") String name) {
         return new Book(name, 321L);

@@ -417,7 +417,11 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             String value = pi.value();
             int ind = value.indexOf("href='");
             if (ind > 0) {
-                String relRef = value.substring(ind + 6, value.length() - 3);
+                String relRef = value.substring(ind + 6);
+                relRef = relRef.substring(0, relRef.length() - 3).trim();
+                if (relRef.endsWith("'")) {
+                    relRef = relRef.substring(0, relRef.length() - 1);
+                }
                 String absRef = buildAbsoluteXMLResourceURI(relRef);
                 value = value.substring(0, ind + 6) + absRef + "'?>";
             }
