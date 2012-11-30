@@ -241,8 +241,13 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         this.sessionAuthenticityTokenProvider = sessionAuthenticityTokenProvider;
     }
     
-    private UserSubject createUserSubject(SecurityContext securityContext) {
-        return OAuthUtils.createSubject(securityContext);
+    protected UserSubject createUserSubject(SecurityContext securityContext) {
+        UserSubject subject = getMessageContext().getContent(UserSubject.class);
+        if (subject != null) {
+            return subject;
+        } else {
+            return OAuthUtils.createSubject(securityContext);
+        }
     }
     
     protected abstract Response createErrorResponse(MultivaluedMap<String, String> params,
