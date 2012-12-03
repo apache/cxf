@@ -42,6 +42,15 @@ public abstract class AbstractOAuthService {
     private MessageContext mc;
     private OAuthDataProvider dataProvider;
     private boolean blockUnsecureRequests;
+    private boolean writeOptionalParameters = true;
+    
+    public void setWriteOptionalParameters(boolean write) {
+        writeOptionalParameters = write;
+    }
+    
+    public boolean isWriteOptionalParameters() { 
+        return writeOptionalParameters;
+    }
     
     @Context 
     public void setMessageContext(MessageContext context) {

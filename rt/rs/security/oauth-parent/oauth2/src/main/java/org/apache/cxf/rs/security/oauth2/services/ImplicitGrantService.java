@@ -79,9 +79,11 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         sb.append(OAuthConstants.ACCESS_TOKEN).append("=").append(token.getTokenKey());
         sb.append("&")
             .append(OAuthConstants.ACCESS_TOKEN_TYPE).append("=").append(token.getTokenType());
-        //TODO: token parameters should also be included probably
-        //      though it's not obvious the embedded client can deal with
-        //      MAC tokens or other sophisticated tokens 
+        if (isWriteOptionalParameters()) {
+            sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
+                .append("=").append(token.getExpiresIn());
+            //TODO: also report the approved scope and other parameters if any  
+        }
         return Response.seeOther(URI.create(sb.toString())).build();
     }
     
