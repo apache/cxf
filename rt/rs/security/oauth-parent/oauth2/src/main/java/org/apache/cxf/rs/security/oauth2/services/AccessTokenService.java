@@ -52,12 +52,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 @Path("/token")
 public class AccessTokenService extends AbstractOAuthService {
     private List<AccessTokenGrantHandler> grantHandlers = Collections.emptyList();
-    private boolean writeOptionalParameters = true;
     private boolean writeCustomErrors;
-    
-    public void setWriteOptionalParameters(boolean write) {
-        writeOptionalParameters = write;
-    }
     
     public void setWriteCustomErrors(boolean write) {
         writeCustomErrors = write;
@@ -109,7 +104,7 @@ public class AccessTokenService extends AbstractOAuthService {
         ClientAccessToken clientToken = new ClientAccessToken(serverToken.getTokenType(),
                                                               serverToken.getTokenKey());
         clientToken.setRefreshToken(serverToken.getRefreshToken());
-        if (writeOptionalParameters) {
+        if (isWriteOptionalParameters()) {
             clientToken.setExpiresIn(serverToken.getExpiresIn());
             List<OAuthPermission> perms = serverToken.getScopes();
             if (!perms.isEmpty()) {
