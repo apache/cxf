@@ -144,12 +144,12 @@ public class XACMLRequestBuilderTest extends org.junit.Assert {
         RequestType request = 
             builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
-        assertNotNull(request.getEnvironment());
+        assertFalse(request.getEnvironment().getAttributes().isEmpty());
         
         ((DefaultXACMLRequestBuilder)builder).setSendDateTime(false);
         request = builder.createRequest(principal, Collections.singletonList("manager"), msg);
         assertNotNull(request);
-        assertNull(request.getEnvironment());
+        assertTrue(request.getEnvironment().getAttributes().isEmpty());
     }
     
 }

@@ -137,7 +137,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         ActionType actionType = RequestComponentBuilder.createActionType(attributes);
         
         // Environment
-        EnvironmentType environmentType = null;
+        attributes.clear();
         if (sendDateTime) {
             DateTime dateTime = new DateTime();
             AttributeValueType environmentAttributeValue = 
@@ -149,10 +149,10 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
                         null,
                         Collections.singletonList(environmentAttributeValue)
                 );
-            attributes.clear();
             attributes.add(environmentAttribute);
-            environmentType = RequestComponentBuilder.createEnvironmentType(attributes);
         }
+        EnvironmentType environmentType = 
+            RequestComponentBuilder.createEnvironmentType(attributes);
         
         // Request
         RequestType request = 
