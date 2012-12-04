@@ -74,8 +74,6 @@ For XmlBeans databinding support:
 
 For WS-Security support:
 - bcprov-jdk15.jar
-- xalan.jar
-- serializer.jar
 - wss4j.jar
 - xmlsec.jar
 - ehcache-core.jar
