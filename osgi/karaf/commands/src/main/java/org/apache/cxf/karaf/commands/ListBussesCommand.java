@@ -31,9 +31,10 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  */
 @Command(scope = "cxf", name = "list-busses", description = "Lists all CXF Busses.")
 public class ListBussesCommand extends OsgiCommandSupport {
-    protected static final String HEADER_FORMAT = "%-40s %-20s";
-    protected static final String OUTPUT_FORMAT = "[%-38s] [%-18s]";
-
+    protected static final int DEFAULT_BUSID_LENGTH = 38;
+    protected String headerFormat = "%-40s %-20s";
+    protected String outputFormat = "[%-38s] [%-18s]";
+   
     private CXFController cxfController;
 
     public void setController(CXFController controller) {
@@ -42,15 +43,29 @@ public class ListBussesCommand extends OsgiCommandSupport {
 
     protected Object doExecute() throws Exception {
         List<Bus> busses = cxfController.getBusses();
-        System.out.println(String.format(HEADER_FORMAT, "Name", "State"));
+        renderFormat(busses);
+        System.out.println(String.format(headerFormat, "Name", "State"));
 
         for (Bus bus : busses) {
             String state = "";
             if (bus instanceof CXFBusImpl) {
                 state = ((CXFBusImpl)bus).getState().toString();
             }
-            System.out.println(String.format(OUTPUT_FORMAT, bus.getId(), state));
+            System.out.println(String.format(outputFormat, bus.getId(), state));
         }
         return null;
+    }
+
+    private void renderFormat(List<Bus> busses) {
+        int longestBusId = DEFAULT_BUSID_LENGTH;
+        for (Bus bus : busses) {
+            if (bus.getId().length() > longestBusId) {
+                longestBusId = bus.getId().length();
+            }
+        }
+        if (longestBusId > DEFAULT_BUSID_LENGTH) {
+            headerFormat = "%-" + (longestBusId + 2) + "s %-20s";
+            outputFormat = "[%-" + longestBusId + "s] [%-18s]";
+        }
     }
 }
