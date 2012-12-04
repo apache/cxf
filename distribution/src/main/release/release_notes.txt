@@ -1,4 +1,4 @@
-Apache CXF 2.5.6 Release Notes
+Apache CXF 2.5.7 Release Notes
 
 1. Overview
 
@@ -20,8 +20,7 @@ http://cxf.apache.org/docs/25-migration-guide.html
 for further information and requirements for upgrading to 2.5.x.
 
 
-
-2.5.6 fixes over 35 JIRA issues reported by users and the community.
+2.5.7 fixes over 50 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -63,41 +62,70 @@ for caveats when upgrading from CXF 2.4.x to 2.5.x.
 
 7. Specific issues, features, and improvements fixed in this version
 
+
 ** Bug
-    * [CXF-4475] - LoggingInInterceptor throws when pretty printing MTOM messages
-    * [CXF-4476] - Content-Disposition header may be incorrectly set in MTOM under windows 
-    * [CXF-4477] - [WADL2JAVA] Generate incorrect primitive parameter type 
-    * [CXF-4481] - unable to generate WADL to java 
+    * [CXF-3613] - Various problems with "java.lang.Class"
+    * [CXF-4391] - org.apache.cxf.configuration.spring.ConfigurerImpl.initWildcardDefinitionMap does not fail silently when bean names containing certain characters do not parse as a regex
     * [CXF-4482] - AttachmentSerializer puts an extra new line
-    * [CXF-4483] - apache-cxf feature has a merge conflict
-    * [CXF-4484] - Claims to SAML attribute encoding wrong
-    * [CXF-4493] - If javax.jws.Oneway annotation is specified for a SOAP interface method a NPE occurs
-    * [CXF-4494] - JMSDestination need set binary mode if server send MTOM message back
-    * [CXF-4499] - wrong charset encoding in FormEncodingProvider 
-    * [CXF-4503] - TransformOutInterceptor may lose namespace declarations in some elements
-    * [CXF-4505] - Invalid WS-RM messages may not be correctly rejected by WS-RM destination
-    * [CXF-4507] - bug in SchemaJavascriptBuilder while deserializing an Array
-    * [CXF-4511] - WS-RM Sequence header should have mustUnderstand attribute
-    * [CXF-4514] - JAXRS client ignores enum properties when populating request URI from beans
-    * [CXF-4517] - ClassCastException in WS-RM when RMP 200702  assertions are used
-    * [CXF-4518] - CXF bundle jax-ws-catalog.xml doesn't include mapping of "http://www.w3.org/2006/03/addressing" 
-    * [CXF-4520] - XMLStreamException about namespace has not been bound to a prefix with other stax implemenation
-    * [CXF-4523] - Unclosed XMLStreamReader/Writer causes leaking
-    * [CXF-4526] - PolicyAnnotationListener throws NPE in jar
-    * [CXF-4533] - Encoding error in CachedOutputStream when double-byte char is on 1024 byte boundary
-    * [CXF-4534] - SortedMap is returned as HashMap
-    * [CXF-4535] - SOAP fault XML is invalid when a details element exists
-    * [CXF-4537] - XmlAdapter Not Being Used
-    * [CXF-4539] - WS-Security inbound performance regression
-    * [CXF-4540] - Colon character in the password is not hanled properly in AbstractHTTPDestination class
-    * [CXF-4541] - idl2wsdl not finding properly scoped structure elements
-    * [CXF-4542] - @XmlJavaTypeAdapter ignored on exception classes 
-    * [CXF-4545] - ut_sign + sign_enc samples broken in last releases
+    * [CXF-4550] - Wsdl2Java fails if tmp folder contains spaces
+    * [CXF-4554] -  "http://schemas.xmlsoap.org/soap/http/" should not be in the SoapTransportFactory active namespaces list
+    * [CXF-4556] - JAX-RS SAML TLS HolderOfKey check does not work
+    * [CXF-4557] - More unclosed XMLStreamReader/Writer - CXF-4523
+    * [CXF-4562] - Soap Fault fields precedence is incorrect
+    * [CXF-4563] - Empty XML or JSON responses are not processed correctly on the client side
+    * [CXF-4565] - The message flow is not correct when handler throw ProtocolException outbound
+    * [CXF-4566] - StaxTransformFeature outTransformElements does not work when converting namespaces
+    * [CXF-4569] - cxf-services-wsn-core doesn't support to be installed with other verion of CXF
+    * [CXF-4570] - Attachment Header Content-ID conversion
+    * [CXF-4573] - WADL to Java generator loses the namespace info for types from imported schemas
+    * [CXF-4579] -  Exchange's out message is not set for recovered outbound WS-RM messages
+    * [CXF-4580] - InjectionUtils can not handle boolean properties with getters starting from 'is'
+    * [CXF-4584] - org.w3c.dom.DOMException when sending soap11 request and returning soap12 response
+    * [CXF-4587] - Signature Confirmation does not work with TransportBinding and EndorsingSupportingToken
+    * [CXF-4591] - Fix @XmlTransient handling for exception types
+    * [CXF-4592] - Some tests fail when CachedOutputStream's file caching is enforced
+    * [CXF-4594] - Incompatible fault type is generated in the wsdl if no setter method in Exception
+    * [CXF-4595] - RequireClientCertificate is not validated
+    * [CXF-4601] - An invalid WS-RM message to a robust WS-RM endpoint may lead to NPE
+    * [CXF-4603] - Digital Signature using CXF 2.6.1 on Websphere 7
+    * [CXF-4606] - cxf-codegen-plugin doesn't works if Maven repository's path contain spaces
+    * [CXF-4608] - DOMSource is returned rather than StAXSource
+    * [CXF-4612] - SAML assertion element is not imported into SecurityHeader document
+    * [CXF-4618] - DataSourceProvider is not closing inputstream acquired from DataSource
+    * [CXF-4620] - Exception at compilation when a 'space' character is present in maven local repository path
+    * [CXF-4623] - Marshalling Error during asynchronous service invocation when adding a soap header using a SOAPHandler
+    * [CXF-4629] - Security issue with GET methods: WSS4JInInterceptor always allows HTTP Get requests from browser
+    * [CXF-4630] - local part cannot be "null" when creating a QName
+    * [CXF-4631] - HttpUtils.toAbsoluteUri should use request.getServerPort() instead of request.getLocalPort()
+    * [CXF-4640] - @PostConstruct methods invoked twice in Spring projects when using OSGi even with fix for CXF-3959
+    * [CXF-4643] - Initial non-GET request returns 404 if it has query parameters
+    * [CXF-4647] - A wrong soap action when using ws-addressing may lead to an empty response or the fault with the wrong action
+    * [CXF-4652] - Additional namespace is added when web service provider implements Provider<DOMSource>
+    * [CXF-4659] - Policy configuration in spring cause SAXParseException if no internet connection available
+    * [CXF-4665] - cxf-utils.js missing from release zip file
 
 ** Improvement
-    * [CXF-4479] - Improve "No namespace on "{0}" element" error message.
-    * [CXF-4485] - Provide optional support for inheriting WADL resource parameters
-    * [CXF-4490] - cxf-codegen-plugin does not detect changes in WSDL loaded from classpath
-    * [CXF-4506] - support to set the username and password on the wsn service configuration
-    * [CXF-4515] - maven java2ws plugin address configuration
-    * [CXF-4521] - Optimization for other stax implementations
+    * [CXF-4555] - enable http:conduit to configure the chunk size
+    * [CXF-4561] - Allow disabling WSI-BSP compliance in UsernameTokenInterceptor
+    * [CXF-4590] - STSUtils: DRY refactoring and support Soap12 via property
+    * [CXF-4593] - STSClient: support different SOAP bindings for MEX call
+    * [CXF-4602] - getL7dLogger improvements
+    * [CXF-4607] - RequestDispatcherProvider should be able to use enum classes better
+    * [CXF-4619] - cxf:list-endpoints - Duplicate headers if multiple endpoints installed
+    * [CXF-4622] - cxf:list-endpoints - Add option to list the full url of the service
+    * [CXF-4646] - Use AlgorithmSuite functionality in WSS4J 1.6.8
+    * [CXF-4654] - cxf:list-buses - Table layout should be aligned if bus name is long
+    * [CXF-4655] - Enforce SAML SubjectConfirmation requirements for the non WS-SecurityPolicy case
+
+
+
+
+
+
+
+
+
+
+
+
+
