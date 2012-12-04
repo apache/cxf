@@ -28,6 +28,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -124,6 +125,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     
     private boolean skipJaxbChecks;
     private boolean singleJaxbContext;
+    private boolean useSingleContextForPackages;
+    
     private Class<?>[] extraClass;
     
     private boolean validateOutput;
@@ -156,6 +159,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         singleJaxbContext = useSingleContext;
     }
     
+    public void setUseSingleContextForPackages(boolean use) {
+        useSingleContextForPackages = use;
+    }
+    
     public void setExtraClass(Class<?>[] userExtraClass) {
         extraClass = userExtraClass;
     }
@@ -163,14 +170,24 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     @Override
     public void init(List<ClassResourceInfo> cris) {
         if (singleJaxbContext) {
-            Set<Class<?>> allTypes = 
-                new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true)
+            JAXBContext context = null;
+            Set<Class<?>> allTypes = null;
+            if (cris != null) {    
+                allTypes = new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true)
                     .getAllTypes().keySet());
-            JAXBContext context = 
-                ResourceUtils.createJaxbContext(allTypes, extraClass, cProperties);
+                context = ResourceUtils.createJaxbContext(allTypes, extraClass, cProperties);
+            } else if (extraClass != null) {
+                allTypes = new HashSet<Class<?>>(Arrays.asList(extraClass));
+                context = ResourceUtils.createJaxbContext(allTypes, null, cProperties);
+            }
+            
             if (context != null) {
                 for (Class<?> cls : allTypes) {
-                    classContexts.put(cls, context);
+                    if (useSingleContextForPackages) {
+                        packageContexts.put(PackageUtils.getPackageName(cls), context);
+                    } else {
+                        classContexts.put(cls, context);
+                    }
                 }
             }
         }
@@ -471,8 +488,21 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
             JAXBContext context = packageContexts.get(packageName);
             if (context == null) {
                 try {
-                    if (type.getClassLoader() != null && objectFactoryOrIndexAvailable(type)) { 
-                        context = JAXBContext.newInstance(packageName, type.getClassLoader(), cProperties);
+                    if (type.getClassLoader() != null && objectFactoryOrIndexAvailable(type)) {
+                        
+                        String contextName = packageName;
+                        if (extraClass != null) {
+                            StringBuilder sb = new StringBuilder(contextName);
+                            for (Class<?> extra : extraClass) {
+                                String extraPackage = PackageUtils.getPackageName(extra);
+                                if (!extraPackage.equals(packageName)) {
+                                    sb.append(":").append(extraPackage);
+                                }
+                            }
+                            contextName = sb.toString();
+                        }
+                        
+                        context = JAXBContext.newInstance(contextName, type.getClassLoader(), cProperties);
                         packageContexts.put(packageName, context);
                     }
                 } catch (JAXBException ex) {
