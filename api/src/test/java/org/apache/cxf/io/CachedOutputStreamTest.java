@@ -123,7 +123,7 @@ public class CachedOutputStreamTest extends Assert {
     public void testUseBusProps() throws Exception {
         Bus oldbus = BusFactory.getThreadDefaultBus(false); 
         try {
-            CachedOutputStream cos = new CachedOutputStream();
+            CachedOutputStream cos = new CachedOutputStream(64);
             cos.write("Hello World!".getBytes());
             cos.flush();
             assertNull("expects no tmp file", cos.getTempFile());
