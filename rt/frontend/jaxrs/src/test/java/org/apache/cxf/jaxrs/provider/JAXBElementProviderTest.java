@@ -528,6 +528,54 @@ public class JAXBElementProviderTest extends Assert {
         assertEquals(124L, book.getSuperId());
     }
     
+    @Test
+    public void testObjectFactoryExtraClass() throws Exception {
+        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book> provider 
+            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book>();
+        provider.setExtraClass(new Class[]{org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3.class});
+
+        doTestObjectFactoryExtraClass(provider);
+    }
+    
+    @Test
+    public void testObjectFactoryExtraClass2() throws Exception {
+        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book> provider 
+            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book>();
+        provider.setExtraClass(new Class[] {
+            org.apache.cxf.jaxrs.fortest.jaxb.Book.class,                               
+            org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3.class});
+        provider.setSingleJaxbContext(true);
+        provider.setUseSingleContextForPackages(true);
+        provider.init(null);
+        
+        doTestObjectFactoryExtraClass(provider);
+    }
+    
+    private void doTestObjectFactoryExtraClass(JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book> provider)
+        throws Exception {
+
+        org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3 b = 
+            new org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3("CXF in Action", 123L, 124L);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
+                         org.apache.cxf.jaxrs.fortest.jaxb.Book.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book> provider2 
+            = new JAXBElementProvider<org.apache.cxf.jaxrs.fortest.jaxb.Book>();
+        provider2.setExtraClass(new Class[]{org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3.class});
+        
+        ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
+        org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3 book = 
+            (org.apache.cxf.jaxrs.fortest.jaxb.index.SuperBook3)provider2.readFrom(
+                       org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
+                       org.apache.cxf.jaxrs.fortest.jaxb.Book.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(124L, book.getSuperId());
+    }
+    
+    
     private void readSuperBook(String data, boolean xsiTypeExpected) throws Exception {
         if (xsiTypeExpected) {
             assertTrue(data.contains("xsi:type"));
