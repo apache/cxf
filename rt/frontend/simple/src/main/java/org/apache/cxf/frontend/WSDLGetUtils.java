@@ -215,7 +215,7 @@ public class WSDLGetUtils {
                         updatePublishedEndpointUrl(epurl, def, endpointInfo.getName());
                         base = epurl;
                     }
-        
+
                     WSDLWriter wsdlWriter = bus.getExtension(WSDLManager.class)
                         .getWSDLFactory().newWSDLWriter();
                     def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
@@ -436,6 +436,19 @@ public class WSDLGetUtils {
             }
         }
     }    
+    
+    public void updateWSDLPublishedEndpointAddress(Definition def, EndpointInfo endpointInfo)
+    {
+        synchronized (def) {
+            //writing a def is not threadsafe.  Sync on it to make sure
+            //we don't get any ConcurrentModificationExceptions
+            if (endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL) != null) {
+                String epurl = 
+                    String.valueOf(endpointInfo.getProperty(PUBLISHED_ENDPOINT_URL));
+                updatePublishedEndpointUrl(epurl, def, endpointInfo.getName());
+            }
+        }
+    }
 
     protected void updatePublishedEndpointUrl(String publishingUrl, Definition def, QName name) {
         Collection<Service> services = CastUtils.cast(def.getAllServices().values());
