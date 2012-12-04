@@ -26,7 +26,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,21 +53,14 @@ final class Utils {
     }
 
     static Collection<Field> getFields(Class<?> cls, XmlAccessType accessType) {
-        if (cls.isAnnotationPresent(XmlTransient.class)) {
-            // When placed on a class, it indicates that the class shouldn't be mapped
-            // to XML by itself. Properties on such class will be mapped to XML along
-            // with its derived classes, as if the class is inlined.
-            return Collections.emptySet();
-        } else {
-            return getFieldsInternal(cls, accessType);
-        }
+        return getFieldsInternal(cls, accessType);
     }
 
     private static Collection<Field> getFieldsInternal(Class<?> cls, XmlAccessType accessType) {
         Set<Field> fields = new HashSet<Field>();
         Class<?> superClass = cls.getSuperclass();
-        if (superClass != null && superClass.isAnnotationPresent(XmlTransient.class)) {
-            // only if superClass is @XmlTransient annotated it will be processed recursively
+        if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
+            // process super class until java.lang.Object or java.lang.Throwable is not reached
             fields.addAll(getFieldsInternal(superClass, accessType));
         }
         // process current class
@@ -81,22 +73,15 @@ final class Utils {
     }
 
     private static Collection<Method> getMethods(Class<?> cls, XmlAccessType accessType, boolean acceptSetters) {
-        if (cls.isAnnotationPresent(XmlTransient.class)) {
-            // When placed on a class, it indicates that the class shouldn't be mapped
-            // to XML by itself. Properties on such class will be mapped to XML along
-            // with its derived classes, as if the class is inlined.
-            return Collections.emptySet();
-        } else {
-            return getMethodsInternal(cls, accessType, acceptSetters);
-        }
+        return getMethodsInternal(cls, accessType, acceptSetters);
     }
     
     private static Collection<Method> getMethodsInternal(Class<?> cls, XmlAccessType accessType,
             boolean acceptSetters) {
         Set<Method> methods = new HashSet<Method>();
         Class<?> superClass = cls.getSuperclass();
-        if (superClass != null && superClass.isAnnotationPresent(XmlTransient.class)) {
-            // only if superClass is @XmlTransient annotated it will be processed recursively
+        if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
+            // process super class until java.lang.Object or java.lang.Throwable is not reached
             methods.addAll(getMethodsInternal(superClass, accessType, acceptSetters));
         }
         // process current class
