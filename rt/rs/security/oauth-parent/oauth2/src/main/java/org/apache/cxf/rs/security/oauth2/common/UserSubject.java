@@ -32,7 +32,7 @@ public class UserSubject {
     
     private String login;
     private List<String> roles = new LinkedList<String>();
-    private List<Property> properties = new LinkedList<Property>();;
+    private List<Property> properties = new LinkedList<Property>();
     
     public UserSubject() {
         
