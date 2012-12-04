@@ -344,7 +344,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                     Definition def = endpointInfo.getService()
                         .getProperty(WSDLServiceBuilder.WSDL_DEFINITION, Definition.class);
                     if (def == null) {
-                        bus.getExtension(WSDLManager.class).getDefinition(wsdlLocation);
+                        def = bus.getExtension(WSDLManager.class).getDefinition(wsdlLocation);
                     }
                     new WSDLGetUtils().updateWSDLPublishedEndpointAddress(def, endpointInfo);
                 }
