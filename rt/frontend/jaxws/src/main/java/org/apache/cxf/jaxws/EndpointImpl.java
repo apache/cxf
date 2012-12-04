@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.ws.Binding;
@@ -60,6 +61,8 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.frontend.WSDLGetUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
@@ -69,6 +72,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 public class EndpointImpl extends javax.xml.ws.Endpoint 
     implements InterceptorProvider, Configurable {
@@ -333,8 +338,15 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                     endpointInfo.setAddress(addr);
                 }
                 if (publishedEndpointUrl != null) {
-                    // TODO is there a good place to put this key-string as a constant?
-                    endpointInfo.setProperty("publishedEndpointUrl", publishedEndpointUrl);
+                    endpointInfo.setProperty(WSDLGetUtils.PUBLISHED_ENDPOINT_URL, publishedEndpointUrl);
+                    //early update the publishedEndpointUrl so that endpoints in the same app sharing the same wsdl
+                    //do not require all of them to be queried for wsdl before the wsdl is finally fully updated
+                    Definition def = endpointInfo.getService()
+                        .getProperty(WSDLServiceBuilder.WSDL_DEFINITION, Definition.class);
+                    if (def == null) {
+                        bus.getExtension(WSDLManager.class).getDefinition(wsdlLocation);
+                    }
+                    new WSDLGetUtils().updateWSDLPublishedEndpointAddress(def, endpointInfo);
                 }
 
                 if (null != properties) {
