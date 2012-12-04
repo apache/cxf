@@ -42,14 +42,6 @@
 		<!-- I'm using the dependency plugin to build a dependency list that would get placed in FileInstall's
 		     load folder; I couldn't get maven-assembly-plugin's dependencySet to work as I had desired -->
 		<plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
