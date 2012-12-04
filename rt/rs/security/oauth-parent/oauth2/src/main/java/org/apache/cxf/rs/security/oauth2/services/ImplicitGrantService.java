@@ -28,9 +28,11 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
 /**
@@ -82,8 +84,16 @@ public class ImplicitGrantService extends RedirectionBasedGrantService {
         if (isWriteOptionalParameters()) {
             sb.append("&").append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
                 .append("=").append(token.getExpiresIn());
-            //TODO: also report the approved scope and other parameters if any  
+            // Reporting scope is required if the approved scope is different and
+            // optional - otherwise; lets always report it for now if it is non-empty 
+            List<OAuthPermission> perms = token.getScopes();
+            if (!perms.isEmpty()) {
+                sb.append("&").append(OAuthConstants.SCOPE)
+                    .append("=").append(OAuthUtils.convertPermissionsToScope(perms));
+            }
+            //TODO: also report other token parameters if any if needed  
         }
+        
         return Response.seeOther(URI.create(sb.toString())).build();
     }
     
