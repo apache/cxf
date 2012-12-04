@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public class Client {
     
     private boolean isConfidential;
     private List<String> allowedGrantTypes = Collections.emptyList();
-    
+    private List<Property> properties = new LinkedList<Property>();
     private UserSubject subject;
         
     public Client(String clientId, String clientSecret, boolean isConfidential) {
@@ -213,5 +214,21 @@ public class Client {
      */
     public UserSubject getSubject() {
         return subject;
+    }
+    
+    /**
+     * Get the list of additional client properties
+     * @return the list of properties
+     */
+    public List<Property> getProperties() {
+        return properties;
+    }
+
+    /**
+     * Set the list of additional client properties
+     * @param properties the properties
+     */
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
     }
 }
