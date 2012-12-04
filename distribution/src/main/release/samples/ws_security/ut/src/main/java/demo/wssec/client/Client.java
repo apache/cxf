@@ -38,8 +38,6 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 public final class Client {
 
-    private static final String USER_NAME = System.getProperty("user.name");
-
     private Client() {
     }
 

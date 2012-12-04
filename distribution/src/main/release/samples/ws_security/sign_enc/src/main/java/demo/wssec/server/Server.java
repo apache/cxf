@@ -44,7 +44,7 @@ public class Server {
 
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
-        Endpoint e = Endpoint.publish(address, implementor);
+        Endpoint.publish(address, implementor);
     }
 
     public static void main(String args[]) throws Exception {
