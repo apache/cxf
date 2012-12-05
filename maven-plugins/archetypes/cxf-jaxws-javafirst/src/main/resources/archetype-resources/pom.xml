@@ -21,8 +21,8 @@
     <artifactId>$artifactId</artifactId>
     <version>$version</version>
     <packaging>war</packaging>
-    <name>Simple CXF project using spring configuration</name>
-    <description>Simple CXF project using spring configuration</description>
+    <name>Simple CXF Java-First SOAP project using Spring configuration</name>
+    <description>Simple CXF Java-First SOAP project using Spring configuration</description>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -37,7 +37,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>3.0.6.RELEASE</version>
+            <version>${cxf.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${cxf.junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
