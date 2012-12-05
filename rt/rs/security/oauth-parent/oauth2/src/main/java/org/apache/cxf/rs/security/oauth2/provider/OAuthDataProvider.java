@@ -61,21 +61,29 @@ public interface OAuthDataProvider {
     /**
      * Get preauthorized access token 
      * @param client Client
+     * @param requestedScopes the scopes requested by the client
      * @param subject End User subject 
      * @return AccessToken access token
      * @throws OAuthServiceException
      */
-    ServerAccessToken getPreauthorizedToken(Client client, UserSubject subject, String grantType) 
+    ServerAccessToken getPreauthorizedToken(Client client,
+                                            List<String> requestedScopes,
+                                            UserSubject subject, 
+                                            String grantType) 
         throws OAuthServiceException;
     
     /**
      * Refresh access token 
-     * @param clientId the client id
+     * @param client the client
      * @param refreshToken refresh token key 
+     * @param requestedScopes the scopes requested by the client  
      * @return AccessToken
      * @throws OAuthServiceException
      */
-    ServerAccessToken refreshAccessToken(String clientId, String refreshToken) throws OAuthServiceException;
+    ServerAccessToken refreshAccessToken(Client client, 
+                                         String refreshToken, 
+                                         List<String> requestedScopes) 
+        throws OAuthServiceException;
 
     /**
      * Removes the token

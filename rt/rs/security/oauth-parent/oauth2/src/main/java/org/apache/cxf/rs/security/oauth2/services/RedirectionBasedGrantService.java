@@ -133,7 +133,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         
         // Request a new grant only if no pre-authorized token is available
         ServerAccessToken preauthorizedToken = getDataProvider().getPreauthorizedToken(
-            client, userSubject, supportedGrantType);
+            client, requestedScope, userSubject, supportedGrantType);
         if (preauthorizedToken != null) {
             return createGrant(params,
                                client, 
