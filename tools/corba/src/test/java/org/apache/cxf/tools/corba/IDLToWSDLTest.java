@@ -422,4 +422,17 @@ public class IDLToWSDLTest extends ToolTestBase {
         }
         fail("Did not find foo element");
     }
+    public void testCXF3329() throws Exception {
+        File input = new File(getClass().getResource("/idl/CXF3329.idl").toURI());
+        String[] args = new String[] {
+            "-o", output.toString(),
+            input.toString()
+        };
+        IDLToWSDL.run(args);
+        File fs = new File(output, "CXF3329.wsdl");
+        assertTrue(fs.getName() + " was not created.", fs.exists());
+        Document doc = StaxUtils.read(new FileInputStream(fs));
+        String s = StaxUtils.toString(doc.getDocumentElement());
+        assertTrue(s.contains("name=\"myStruct\""));
+    }
 }
