@@ -58,6 +58,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Attr;
@@ -466,13 +467,10 @@ public final class StaxUtils {
             if (ss.getXMLStreamReader() == null) {
                 return;
             }
-        } else if ("javax.xml.transform.stax.StAXSource".equals(source.getClass().getName())) {
-            try {
-                if (source.getClass().getMethod("getXMLStreamReader").invoke(source) == null) {
-                    return;
-                }
-            } catch (Exception ex) {
-                //ignore
+        } else if (source instanceof StAXSource) {
+            StAXSource ss = (StAXSource)source;
+            if (ss.getXMLStreamReader() == null) {
+                return;
             }
         } else if (source instanceof SAXSource) {
             SAXSource ss = (SAXSource)source;
@@ -1314,13 +1312,8 @@ public final class StaxUtils {
                 if (null != el) {
                     return new W3CDOMStreamReader(el, source.getSystemId());
                 }
-            } else if ("javax.xml.transform.stax.StAXSource".equals(source.getClass().getName())) {
-                try {
-                    return (XMLStreamReader)source.getClass()
-                        .getMethod("getXMLStreamReader").invoke(source);
-                } catch (Exception ex) {
-                    //ignore
-                }
+            } else if (source instanceof StAXSource) {
+                return ((StAXSource)source).getXMLStreamReader();
             } else if (source instanceof StaxSource) {
                 return ((StaxSource)source).getXMLStreamReader();
             } else if (source instanceof SAXSource) {
