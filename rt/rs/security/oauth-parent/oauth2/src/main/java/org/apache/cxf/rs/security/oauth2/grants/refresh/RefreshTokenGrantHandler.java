@@ -49,19 +49,19 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
             throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
         }
         String refreshToken = params.getFirst(OAuthConstants.REFRESH_TOKEN);
+        List<String> requestedScopes = OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE));
         
-        ServerAccessToken token = dataProvider.refreshAccessToken(client.getClientId(), 
-                                                                  refreshToken);
+        ServerAccessToken token = dataProvider.refreshAccessToken(client, 
+                                                                  refreshToken,
+                                                                  requestedScopes);
         if (token == null) {
             return null;
         }
-        String scope = params.getFirst(OAuthConstants.SCOPE);
-        if (scope != null) {
-            List<String> tokenScopes = OAuthUtils.convertPermissionsToScopeList(token.getScopes());
-            if (!tokenScopes.containsAll(OAuthUtils.parseScope(scope))) {            
-                throw new OAuthServiceException(OAuthConstants.INVALID_SCOPE);
-            }
+        List<String> tokenScopes = OAuthUtils.convertPermissionsToScopeList(token.getScopes());
+        if (!tokenScopes.containsAll(requestedScopes)) {            
+            throw new OAuthServiceException(OAuthConstants.INVALID_SCOPE);
         }
+        
         
         return token;
     }

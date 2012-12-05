@@ -68,7 +68,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
                                                     List<String> requestedScope) {
         // Check if a pre-authorized  token available
         ServerAccessToken token = dataProvider.getPreauthorizedToken(
-                                     client, subject, supportedGrant);
+                                     client, requestedScope, subject, supportedGrant);
         if (token != null) {
             return token;
         }
