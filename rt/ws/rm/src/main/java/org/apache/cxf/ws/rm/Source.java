@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -48,7 +49,7 @@ public class Source extends AbstractEndpoint {
 
     Source(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new HashMap<String, SourceSequence>();
+        map = new ConcurrentHashMap<String, SourceSequence>();
         current = new HashMap<String, SourceSequence>();
              
         sequenceCreationLock = new ReentrantLock();
