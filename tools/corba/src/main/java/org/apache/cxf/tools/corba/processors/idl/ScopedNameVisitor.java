@@ -56,16 +56,27 @@ public class ScopedNameVisitor extends VisitorBase {
     public void setExceptionMode(boolean value) {
         exceptionMode = value;
     }
-    
     public static boolean accept(Scope scope,
                                  Definition defn,
                                  XmlSchema schemaRef,
                                  AST node,                                 
                                  WSDLASTVisitor wsdlVisitor) {
+        return accept(scope, defn, schemaRef, node, wsdlVisitor, false);
+    }    
+    
+    // when accepting a "name" (for example, name of a field in a struct), we may need
+    // to relax the strict checking for forward decls and schema types to not count for 
+    // exact parent scope names
+    public static boolean accept(Scope scope,
+                                 Definition defn,
+                                 XmlSchema schemaRef,
+                                 AST node,                                 
+                                 WSDLASTVisitor wsdlVisitor,
+                                 boolean asName) {
         boolean result = false;
         if (PrimitiveTypesVisitor.accept(node)) {
             result = true; 
-        } else if (isforwardDeclared(scope, node, wsdlVisitor)) {
+        } else if (isforwardDeclared(scope, node, wsdlVisitor, asName)) {
             result = true;          
         } else if (ObjectReferenceVisitor.accept(scope,
                                                  schemaRef,
@@ -73,7 +84,7 @@ public class ScopedNameVisitor extends VisitorBase {
                                                  node,
                                                  wsdlVisitor)) {
             result = true;
-        } else if (findSchemaType(scope, defn, schemaRef, node, wsdlVisitor, null)) {
+        } else if (findSchemaType(scope, defn, schemaRef, node, wsdlVisitor, null, asName)) {
             result = true;
         }
         return result;
@@ -155,6 +166,9 @@ public class ScopedNameVisitor extends VisitorBase {
     }
          
     protected static boolean isforwardDeclared(Scope scope, AST node, WSDLASTVisitor wsdlVisitor) {
+        return isforwardDeclared(scope, node, wsdlVisitor, false);
+    }
+    protected static boolean isforwardDeclared(Scope scope, AST node, WSDLASTVisitor wsdlVisitor, boolean b) {
         boolean isForward = false;
         Scope currentScope = scope;
 
@@ -172,6 +186,9 @@ public class ScopedNameVisitor extends VisitorBase {
                 }
                 if (scopedNames.getScope(scopedName) != null) {
                     isForward = true;
+                }
+                if (b && currentScope.equals(new Scope(currentScope.getParent(), node))) {
+                    break;
                 }
                 currentScope = currentScope.getParent();
             }
@@ -256,13 +273,21 @@ public class ScopedNameVisitor extends VisitorBase {
         return result;
     }
     
-    
     protected static boolean findSchemaType(Scope scope,
                                             Definition defn,
                                             XmlSchema schemaRef,
                                             AST node,
                                             WSDLASTVisitor wsdlVisitor,
                                             VisitorTypeHolder holder) {
+        return findSchemaType(scope, defn, schemaRef, node, wsdlVisitor, holder, false);
+    }    
+    protected static boolean findSchemaType(Scope scope,
+                                            Definition defn,
+                                            XmlSchema schemaRef,
+                                            AST node,
+                                            WSDLASTVisitor wsdlVisitor,
+                                            VisitorTypeHolder holder,
+                                            boolean checkExact) {
                                                 
         boolean result = false;
         Scope currentScope = scope;        
@@ -290,6 +315,10 @@ public class ScopedNameVisitor extends VisitorBase {
                                                             node, wsdlVisitor, holder);
                     
                 }
+                if (checkExact && currentScope.equals(new Scope(currentScope.getParent(), node))) {
+                    return false;
+                }
+
                 currentScope = currentScope.getParent();
             }
         }

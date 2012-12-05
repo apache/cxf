@@ -138,7 +138,7 @@ public class StructVisitor extends VisitorBase {
             // (hence the ScopedNameVisitor.accept() call).
             while (memberNode != null
                    && memberNode.getType() == IDLTokenTypes.IDENT
-                   && !ScopedNameVisitor.accept(structScope, definition, schema, memberNode, wsdlVisitor)) {
+                   && !ScopedNameVisitor.accept(structScope, definition, schema, memberNode, wsdlVisitor, true)) {
 
                 XmlSchemaType memberSchemaType = schemaType;
                 CorbaTypeImpl memberCorbaType = corbaType;
