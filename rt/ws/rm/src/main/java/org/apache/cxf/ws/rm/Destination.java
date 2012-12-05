@@ -21,8 +21,8 @@ package org.apache.cxf.ws.rm;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +48,7 @@ public class Destination extends AbstractEndpoint {
 
     Destination(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new HashMap<String, DestinationSequence>();
+        map = new ConcurrentHashMap<String, DestinationSequence>();
     }
 
     public DestinationSequence getSequence(Identifier id) {
@@ -65,9 +65,7 @@ public class Destination extends AbstractEndpoint {
 
     public void addSequence(DestinationSequence seq, boolean persist) {
         seq.setDestination(this);
-        synchronized (map) {
-            map.put(seq.getIdentifier().getValue(), seq);
-        }
+        map.put(seq.getIdentifier().getValue(), seq);
         if (persist) {
             RMStore store = getReliableEndpoint().getManager().getStore();
             if (null != store) {
@@ -79,9 +77,7 @@ public class Destination extends AbstractEndpoint {
 
     public void removeSequence(DestinationSequence seq) {
         DestinationSequence o;
-        synchronized (map) {
-            o = map.remove(seq.getIdentifier().getValue());
-        }
+        o = map.remove(seq.getIdentifier().getValue());
         RMStore store = getReliableEndpoint().getManager().getStore();
         if (null != store) {
             store.removeDestinationSequence(seq.getIdentifier());

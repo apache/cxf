@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -43,7 +44,7 @@ public class Source extends AbstractEndpoint {
 
     Source(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new HashMap<String, SourceSequence>();
+        map = new ConcurrentHashMap<String, SourceSequence>();
         current = new HashMap<String, SourceSequence>();
              
         sequenceCreationLock = new ReentrantLock();
@@ -64,9 +65,7 @@ public class Source extends AbstractEndpoint {
     
     public void addSequence(SourceSequence seq, boolean persist) {
         seq.setSource(this);
-        synchronized (map) {
-            map.put(seq.getIdentifier().getValue(), seq);
-        }
+        map.put(seq.getIdentifier().getValue(), seq);
         if (persist) {
             RMStore store = getReliableEndpoint().getManager().getStore();
             if (null != store) {
@@ -78,9 +77,7 @@ public class Source extends AbstractEndpoint {
     
     public void removeSequence(SourceSequence seq) {
         SourceSequence o;
-        synchronized (map) {
-            o = map.remove(seq.getIdentifier().getValue());
-        }
+        o = map.remove(seq.getIdentifier().getValue());
         RMStore store = getReliableEndpoint().getManager().getStore();
         if (null != store) {
             store.removeSourceSequence(seq.getIdentifier());
