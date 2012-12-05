@@ -170,6 +170,10 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         }
 
         for (MessagePartInfo p : messageInfo.getMessageParts()) {
+            if (p.getTypeClass() == null) {
+                //WSDL part wasn't mapped to a parameter
+                continue;
+            }
             ensureSize(partNames, p.getIndex());
             ensureSize(elTypeNames, p.getIndex());
             ensureSize(partClasses, p.getIndex());

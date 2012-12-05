@@ -787,6 +787,13 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
             if (part == null && isHeader && o.isUnwrapped()) {
                 part = ((UnwrappedOperationInfo)o).getWrappedOperation().getInput().getMessagePart(name);
+                if (part == null) {
+                    QName name2 = this.getInParameterName(o, method, i);
+                    part = o.getInput().getMessagePart(name2);
+                    if (part != null) {
+                        name = name2;
+                    }
+                }
                 if (part != null) {
                     //header part in wsdl, need to get this mapped in to the unwrapped form
                     MessagePartInfo inf = o.getInput().addMessagePart(part.getName());
@@ -820,11 +827,15 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         } else if (isIn && isOut) {
             QName name = getInPartName(o, method, i);
             part = o.getInput().getMessagePart(name);
+            if (part == null && isHeader && o.isUnwrapped()) {
+                QName name2 = this.getInParameterName(o, method, i);
+                part = o.getInput().getMessagePart(name2);
+                if (part != null) {
+                    name = name2;
+                }
+            }
             if (part == null && this.isFromWsdl()) {
                 part = o.getInput().getMessagePartByIndex(i);
-            }
-            if (part == null && isHeader && o.isUnwrapped()) {
-                part = o.getUnwrappedOperation().getInput().getMessagePart(name);
             }
             if (part == null) {
                 return false;
