@@ -122,7 +122,9 @@ public final class MBServerConnectorFactory {
 
     public void createConnector() throws IOException {
         
-        server = MBeanServerHolder.INSTANCE;
+        if (server == null) {
+            server = MBeanServerHolder.INSTANCE;
+        }
         
         // Create the JMX service URL.
         JMXServiceURL url = new JMXServiceURL(serviceUrl);       
