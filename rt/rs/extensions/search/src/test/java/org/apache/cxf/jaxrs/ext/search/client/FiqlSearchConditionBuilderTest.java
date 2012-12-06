@@ -255,11 +255,23 @@ public class FiqlSearchConditionBuilderTest extends Assert {
     public void testOrSimple() {
         String ret = b.is("foo").greaterThan(20).or().is("foo").lessThan(10).query();
         assertEquals("foo=gt=20,foo=lt=10", ret);
-    }    
+    }
+    
+    @Test
+    public void testOrSimpleShortcut() {
+        String ret = b.is("foo").greaterThan(20).or("foo").lessThan(10).query();
+        assertEquals("foo=gt=20,foo=lt=10", ret);
+    }
     
     @Test
     public void testAndSimple() {
         String ret = b.is("foo").greaterThan(20).and().is("bar").equalTo("plonk").query();
+        assertEquals("foo=gt=20;bar==plonk", ret);
+    }
+    
+    @Test
+    public void testAndSimpleShortcut() {
+        String ret = b.is("foo").greaterThan(20).and("bar").equalTo("plonk").query();
         assertEquals("foo=gt=20;bar==plonk", ret);
     }
     
