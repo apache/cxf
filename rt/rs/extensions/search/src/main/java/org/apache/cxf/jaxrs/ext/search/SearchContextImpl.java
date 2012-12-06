@@ -47,15 +47,24 @@ public class SearchContextImpl implements SearchContext {
         return getCondition(null, cls);
     }
     
+    public <T> SearchCondition<T> getCondition(Class<T> cls, Map<String, String> beanProperties) {
+        return getCondition(null, cls, beanProperties);
+    }
+    
     public <T> SearchCondition<T> getCondition(String expression, Class<T> cls) {
-        
+        return getCondition(expression, cls, null);
+    }
+    
+    public <T> SearchCondition<T> getCondition(String expression, 
+                                               Class<T> cls, 
+                                               Map<String, String> beanProperties) {    
         if (InjectionUtils.isPrimitive(cls)) {
             String errorMessage = "Primitive condition types are not supported"; 
             LOG.warning(errorMessage);
             throw new IllegalArgumentException(errorMessage);
         }
         
-        SearchConditionParser<T> parser = getParser(cls);
+        SearchConditionParser<T> parser = getParser(cls, beanProperties);
         
         String theExpression = expression == null 
             ? getSearchExpression() : expression;
@@ -88,7 +97,7 @@ public class SearchContextImpl implements SearchContext {
         }
     }
     
-    private <T> SearchConditionParser<T> getParser(Class<T> cls) {
+    private <T> SearchConditionParser<T> getParser(Class<T> cls, Map<String, String> beanProperties) {
         // we can use this method as a parser factory, ex
         // we can get parsers capable of parsing XQuery and other languages
         // depending on the properties set by a user
@@ -100,8 +109,13 @@ public class SearchContextImpl implements SearchContext {
         props.put(SearchUtils.LAX_PROPERTY_MATCH, 
                   (String)message.getContextualProperty(SearchUtils.LAX_PROPERTY_MATCH));
         
-        Map<String, String> beanProps = 
-            CastUtils.cast((Map<?, ?>)message.getContextualProperty(SearchUtils.BEAN_PROPERTY_MAP));
+        Map<String, String> beanProps = null;
+            
+        if (beanProperties == null) {    
+            beanProps = CastUtils.cast((Map<?, ?>)message.getContextualProperty(SearchUtils.BEAN_PROPERTY_MAP));
+        } else {
+            beanProps = beanProperties;
+        }
         
         return new FiqlParser<T>(cls, props, beanProps); 
     }

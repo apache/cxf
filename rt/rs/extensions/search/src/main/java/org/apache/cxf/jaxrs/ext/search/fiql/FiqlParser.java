@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -298,7 +299,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                     try {
                         castedValue = InjectionUtils.convertStringToPrimitive(value, actualType);
                         if (isCollection) {
-                            castedValue = Collections.singletonList(castedValue);
+                            castedValue = getCollectionSingleton(valueType, castedValue);
                         }
                     } catch (Exception e) {
                         throw new SearchParseException("Cannot convert String value \"" + value
@@ -309,7 +310,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                     try {
                         Method setterM = valueType.getMethod("set" + getMethodNameSuffix(setter),
                                                              new Class[]{classType});
-                        Object objectValue = !isCollection ? value : Collections.singletonList(value);
+                        Object objectValue = !isCollection ? value : getCollectionSingleton(valueType, value);
                         setterM.invoke(ownerBean, new Object[]{objectValue});
                         castedValue = objectValue; 
                     } catch (Throwable ex) {
@@ -364,6 +365,14 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 throw new SearchParseException("Cannot convert String value \"" + value
                                                + "\" to a value of class " + valueType.getName(), e);
             }
+        }
+    }
+    
+    private Object getCollectionSingleton(Class<?> collectionCls, Object value) {
+        if (Set.class.isAssignableFrom(collectionCls)) {
+            return Collections.singleton(value);
+        } else {
+            return Collections.singletonList(value);
         }
     }
     
