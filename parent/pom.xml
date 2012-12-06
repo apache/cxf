@@ -162,7 +162,7 @@
         <cxf.aries.version>0.3.1</cxf.aries.version>
         <cxf.aries.version.range>[0.3,2)</cxf.aries.version.range>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
-        <cxf.karaf.version>2.2.6</cxf.karaf.version>
+        <cxf.karaf.version>2.2.9</cxf.karaf.version>
 
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
