@@ -249,10 +249,18 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             result += FiqlParser.AND;
             return this;
         }
+        
+        public Property and(String name) {
+            return and().is(name);
+        }
 
         public PartialCondition or() {
             result += FiqlParser.OR;
             return this;
+        }
+        
+        public Property or(String name) {
+            return or().is(name);
         }
 
         public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
