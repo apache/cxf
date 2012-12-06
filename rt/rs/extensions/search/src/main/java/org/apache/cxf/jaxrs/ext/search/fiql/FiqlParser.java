@@ -344,7 +344,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                         nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType) 
                             : convertToDate(value);
                     } else {
-                        nextObject = Collections.singletonList(value);
+                        nextObject = getCollectionSingleton(valueType, value);
                     }
                 } else {
                     nextObject = returnType.newInstance();
@@ -355,7 +355,7 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 
                 lastCastedValue = lastCastedValue == null ? valueObject : lastCastedValue;
                 if (lastTry) {
-                    return isCollection ? Collections.singletonList(lastCastedValue) : lastCastedValue;
+                    return isCollection ? getCollectionSingleton(valueType, lastCastedValue) : lastCastedValue;
                 } 
                 
                 TypeInfo nextTypeInfo = new TypeInfo(nextObject.getClass(), getterM.getGenericReturnType()); 
