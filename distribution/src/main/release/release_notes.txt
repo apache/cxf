@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.1 fixes over 104 JIRA issues reported by users and the community.
+2.7.1 fixes over 110 JIRA issues reported by users and the community.
 
 
 
@@ -74,7 +74,9 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 
 
 ** Bug
+    * [CXF-3329] - idl2wsdl: attributes of structs with the same name as a type do not show up in XSD
     * [CXF-3613] - Various problems with "java.lang.Class"
+    * [CXF-4301] - Problem with Implicit Soap Headers and @ResponseWrapper in methods with multiple response attributes: NullPointerException in ReflectionServiceFactoryBean or Response-Marshalling Error
     * [CXF-4391] - org.apache.cxf.configuration.spring.ConfigurerImpl.initWildcardDefinitionMap does not fail silently when bean names containing certain characters do not parse as a regex
     * [CXF-4482] - AttachmentSerializer puts an extra new line
     * [CXF-4529] - PermGen Leak for CXFAuthenticator (WS Client Configuration)
@@ -102,6 +104,7 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-4579] -  Exchange's out message is not set for recovered outbound WS-RM messages
     * [CXF-4580] - InjectionUtils can not handle boolean properties with getters starting from 'is'
     * [CXF-4581] - cxf-codegen-plugin tries to generate code during m2e "configuration" build
+    * [CXF-4583] - When the logical handler return false processing the outbound message, the SoapMessage's body is always empty.
     * [CXF-4584] - org.w3c.dom.DOMException when sending soap11 request and returning soap12 response
     * [CXF-4587] - Signature Confirmation does not work with TransportBinding and EndorsingSupportingToken
     * [CXF-4588] - cxf-codegen-plugin: Error resolving component
@@ -141,6 +144,12 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-4662] - Jaxb data binding jaxb.scanPackages does not support Boolean object
     * [CXF-4665] - cxf-utils.js missing from release zip file
     * [CXF-4666] - [OAuth2] securityContext problem on createSubject
+    * [CXF-4678] - ConcurrentModificationException from WS-RM's RMOutInterceptor's acknowledgement update code
+    * [CXF-4679] - STS onBehalfOf validation should throw exception for invalid tokens in issue operation
+    * [CXF-4681] - CXF karaf feature cannot pass the karaf feature validate
+    * [CXF-4683] - workqueue configuration in BP does not derive the id attribute from the name attribute
+
+
 
 ** Improvement
     * [CXF-4461] - ClaimsHandler is called only if a requested claim is supported
@@ -176,7 +185,10 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-4669] - [OAuth2] Return expires_in with token in ImplicitGrantService
     * [CXF-4670] - [OAuth2] Add tokenLife property to org.apache.cxf.rs.security.oauth2.common.Client
     * [CXF-4672] - Extra class property is not used when JAXB package contexts are created
+    * [CXF-4673] - [OAuth2] Add requestedScope as a parameter to getPreauthorizedToken
     * [CXF-4674] - Early consume publishedEndpointUrl property
+    * [CXF-4675] - Move createUserSubject from RedirectionBasedGrantService to the OAuthDataProvider
+    * [CXF-4677] - Introduce "autoRewriteSoapAddressForAllServices" property to overwrite all service endpoints in returning WSDL 
 
 ** New Feature
     * [CXF-4610] - Provide support for enabling / disabling Schema Validation at the Operation level
@@ -185,6 +197,8 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
     * [CXF-4632] - upgrade to aries 1.0.0
     * [CXF-4648] - Update wadl-to-java code generator to add AsyncResponse parameters to selected methods
     * [CXF-4667] - Provide FIQL to LDAP query visitor
+    * [CXF-4682] - Upgrade Karaf version to 2.2.9
+
 
 
 
