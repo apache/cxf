@@ -101,6 +101,7 @@
         <cxf.httpcomponents.client.version>4.2.1</cxf.httpcomponents.client.version>
         <cxf.httpcomponents.core.version>4.2.2</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.2.1,4.3.0)</cxf.httpcomponents.core.version.range>
+        <cxf.mina.version>2.0.5</cxf.mina.version>
         <cxf.geronimo.annotation.version>1.1.1</cxf.geronimo.annotation.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
@@ -184,6 +185,7 @@
         <cxf.bcel.bundle.version>5.2_4</cxf.bcel.bundle.version>
         <cxf.xalan.bundle.version>2.7.1_5</cxf.xalan.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
+        <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
 
 
@@ -594,7 +596,7 @@
             <dependency>
                 <groupId>org.apache.mina</groupId>
                 <artifactId>mina-core</artifactId>
-                <version>2.0.5</version>
+                <version>${cxf.mina.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>

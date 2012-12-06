@@ -51,6 +51,8 @@
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-main/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-i18n/${cxf.abdera.version}</bundle>
+        <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${cxf.jdom.bundle.version}</bundle>
+        <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${cxf.dom4j.bundle.version}</bundle>
         <bundle start-level='35' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.abdera-parser/${cxf.abdera-parser.bundle.version}</bundle> 
         <!--bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-html/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-json/${cxf.abdera.version}</bundle>-->
@@ -90,6 +92,7 @@
     <feature name="cxf-ws-addr" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-ws-policy</feature>
         <feature version="${project.version}">cxf-bindings-soap</feature>
+        <feature version="${project.version}">cxf-databinding-jaxb</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-ws-addr/${project.version}</bundle>
     </feature>
     <feature name="cxf-ws-rm" version="${project.version}" resolver='(obr)'>
@@ -244,6 +247,7 @@
     </feature>
     <feature name="cxf-transports-udp" version="${project.version}" resolver='(obr)'>
         <feature version="${project.version}">cxf-core</feature>
+        <bundle dependency="true">mvn:org.apache.mina/mina-core/${cxf.mina.version}</bundle>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-udp/${project.version}</bundle>
     </feature>
     <feature name="cxf-javascript" version="${project.version}" resolver='(obr)'>
