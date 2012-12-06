@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.util.Map;
+
 /**
  * Represents the current search expression.
  */
@@ -34,6 +36,18 @@ public interface SearchContext {
      */
     <T> SearchCondition<T> getCondition(Class<T> cls);
     
+    /**
+     * Returns the typed search condition representing 
+     * the search expression which is extracted from 
+     * the request URI
+     * 
+     * @param cls the type of the bean(s) the new search condition will 
+     *        attempt to match
+     * @param beanProperties mapping between search and bean properties       
+     * @return the search condition
+     */
+    <T> SearchCondition<T> getCondition(Class<T> cls, Map<String, String> beanProperties);
+    
     
     /**
      * Returns the typed search condition representing 
@@ -45,6 +59,18 @@ public interface SearchContext {
      * @return the search condition
      */
     <T> SearchCondition<T> getCondition(String expression, Class<T> cls);
+    
+    /**
+     * Returns the typed search condition representing 
+     * the provided search expression
+     * 
+     * @param expression the search expression
+     * @param cls the type of the bean(s) the new search condition will 
+     *        attempt to match
+     * @param beanProperties mapping between search and bean properties       
+     * @return the search condition
+     */
+    <T> SearchCondition<T> getCondition(String expression, Class<T> cls, Map<String, String> beanProperties);
     
     
     /**
