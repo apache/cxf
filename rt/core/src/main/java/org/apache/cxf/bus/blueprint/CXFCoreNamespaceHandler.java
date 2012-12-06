@@ -68,7 +68,7 @@ public class CXFCoreNamespaceHandler implements NamespaceHandler {
                         id = "cxf.workqueue."; 
                         id += element.hasAttribute("name") ? element.getAttribute("name") : "def";
                     }
-                    return super.getId(element, context);
+                    return id;
                 }
 
                 protected void processNameAttribute(Element element, ParserContext ctx,
