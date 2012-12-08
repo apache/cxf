@@ -57,8 +57,9 @@
                     in console output; WSDL browser address will be
                     concatenation of the two: http://xxx/yyy?wsdl
                     -->
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>tomcat-maven-plugin</artifactId>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat6-maven-plugin</artifactId>
+                    <version>2.0</version>
                     <executions>
                         <execution>
                             <id>start-tomcat</id>
