@@ -73,6 +73,10 @@ public class Server {
         outProps.put("signatureParts", "{Element}{" + WSU_NS + "}Timestamp;"
                          + "{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body");
 
+        outProps.put("encryptionKeyTransportAlgorithm", 
+                         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+        outProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+
         bus.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
         Map<String, Object> inProps = new HashMap<String, Object>();
@@ -86,6 +90,9 @@ public class Server {
 
         inProps.put("signaturePropFile", "etc/Server_SignVerf.properties");
         inProps.put("signatureKeyIdentifier", "DirectReference");
+        inProps.put("encryptionKeyTransportAlgorithm", 
+                    "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
+        inProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
         bus.getInInterceptors().add(new WSS4JInInterceptor(inProps));
 
