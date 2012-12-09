@@ -27,19 +27,22 @@ import javax.xml.datatype.Duration;
  */
 public interface Property {
     /** Is textual property equal to given literal or matching given pattern? */
-    CompleteCondition equalTo(String literalOrPattern);
+    CompleteCondition equalTo(String value, String ...moreValues);
 
     /** Is numeric property equal to given double number? */
-    CompleteCondition equalTo(double number);
+    CompleteCondition equalTo(Double number, Double... moreValues);
 
     /** Is numeric property equal to given long number? */
-    CompleteCondition equalTo(long number);
+    CompleteCondition equalTo(Long number, Long... moreValues);
+    
+    /** Is numeric property equal to given long number? */
+    CompleteCondition equalTo(Integer number, Integer... moreValues);
     
     /** Is date property same as given date? */
-    CompleteCondition equalTo(Date date);
+    CompleteCondition equalTo(Date date, Date... moreValues);
 
     /** Is date property same as date distant from now by given period of time? */
-    CompleteCondition equalTo(Duration distanceFromNow);
+    CompleteCondition equalTo(Duration distanceFromNow, Duration... moreValues);
 
     /** Is textual property different than given literal or not matching given pattern? */
     CompleteCondition notEqualTo(String literalOrPattern);

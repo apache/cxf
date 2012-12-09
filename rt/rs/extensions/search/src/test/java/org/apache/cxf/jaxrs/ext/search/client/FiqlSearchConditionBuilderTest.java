@@ -297,12 +297,46 @@ public class FiqlSearchConditionBuilderTest extends Assert {
 
     @Test
     public void testComplex2() {
-        String ret = b.is("foo").equalTo(123.4).or().is("foo").equalTo("null").and().or(
+        String ret = b.is("foo").equalTo(123L).or().is("foo").equalTo("null").and().or(
             b.is("bar").equalTo("asadf*"), 
             b.is("baz").lessThan(20).and().or(
-                b.is("sub1").equalTo(0),
-                b.is("sub2").equalTo(0))).query();
+                b.is("sub1").equalTo(0L),
+                b.is("sub2").equalTo(0L))).query();
         
-        assertEquals("foo==123.4,foo==null;(bar==asadf*,baz=lt=20;(sub1==0,sub2==0))", ret);
+        assertEquals("foo==123,foo==null;(bar==asadf*,baz=lt=20;(sub1==0,sub2==0))", ret);
+    }
+    
+    @Test
+    public void testOrAndImplicitWrap() {
+        String ret = b.is("foo").equalTo(1, 2).and("bar").equalTo("baz").query();
+        
+        assertEquals("(foo==1,foo==2);bar==baz", ret);
+    }
+    
+    @Test
+    public void testMultipleOrShortcut() {
+        // alternative to
+        // b.is("foo").equalTo(123.4).or().is("foo").equalTo("137.8")
+        String ret = b.is("foo").equalTo(123.4, 137.8).query();
+        
+        assertEquals("foo==123.4,foo==137.8", ret);
+    }
+    
+    @Test
+    public void testMultipleOrShortcutWithAnd() {
+        // alternative to
+        // b.is("foo").equalTo(123.4).or().is("foo").equalTo("137.8")
+        String ret = b.is("foo").equalTo(123.4, 137.8).and("bar").equalTo("baz").query();
+        
+        assertEquals("(foo==123.4,foo==137.8);bar==baz", ret);
+    }
+    
+    @Test
+    public void testMultipleOrShortcutWithAnd2() {
+        // alternative to
+        // b.is("foo").equalTo(123.4).or().is("foo").equalTo("137.8")
+        String ret = b.is("foo").equalTo(123.4, 137.8).or("n").equalTo("n1").and("bar").equalTo("baz").query();
+        
+        assertEquals("(foo==123.4,foo==137.8,n==n1);bar==baz", ret);
     }
 }
