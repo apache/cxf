@@ -79,7 +79,6 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
         XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is);
         if (transformReader != null) {
             message.setContent(XMLStreamReader.class, transformReader);
-            message.removeContent(InputStream.class);
         }
          
     }
