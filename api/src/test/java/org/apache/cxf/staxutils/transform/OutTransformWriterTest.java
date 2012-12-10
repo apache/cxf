@@ -300,6 +300,20 @@ public class OutTransformWriterTest extends Assert {
     }
     
     @Test
+    public void testRemoveOneDefaultNamespace() throws Exception {
+        Map<String, String> inMap = new HashMap<String, String>();
+        inMap.put("{http://cxf.apache.org/hello_world_soap_http/types2}requestType", "requestType"); 
+        XMLStreamReader reader = 
+            TransformTestUtils.createOutTransformedStreamReader("../resources/greetMe2ReqIn1.xml", 
+                                                                inMap, null, null, null, false, null);
+        
+        XMLStreamReader reader2 = 
+            StaxUtils.createXMLStreamReader(
+                InTransformReader.class.getResourceAsStream("../resources/greetMe2Req.xml"));
+        TransformTestUtils.verifyReaders(reader2, reader, true, true);
+    }
+
+    @Test
     public void testReadWithReplaceAppend() throws Exception {
         Map<String, String> transformElements = new HashMap<String, String>();
         transformElements.put("requestValue",
