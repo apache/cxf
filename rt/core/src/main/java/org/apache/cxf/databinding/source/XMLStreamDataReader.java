@@ -181,31 +181,24 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 public boolean hasNext() throws XMLStreamException {
                     boolean b = super.hasNext();
                     if (!b && !closed) {
-                        closed = true;
-                        try {
-                            super.close();
-                        } catch (XMLStreamException e) {
-                            //ignore
-                        }
-                        try {
-                            ins.close();
-                        } catch (IOException e) {
-                            //ignore
-                        }
+                        close();
                     }
                     return b;
                 }
 
                 public void close() throws XMLStreamException {
+                    closed = true;
                     try {
                         super.close();
                     }  catch (XMLStreamException e) {
                         //ignore
                     }
-                    try {
-                        ins.close();
-                    }  catch (IOException e) {
-                        //ignore
+                    if (ins != null) {
+                        try {
+                            ins.close();
+                        }  catch (IOException e) {
+                            //ignore
+                        }
                     }
                 }
             };
