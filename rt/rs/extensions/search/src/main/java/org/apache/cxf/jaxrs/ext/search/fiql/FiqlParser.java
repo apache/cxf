@@ -69,9 +69,11 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     public static final String EQ = "==";
     public static final String NEQ = "!=";
     
-    private static final Pattern COMPARATORS_PATTERN; 
+    public static final Map<ConditionType, String> CONDITION_MAP;
+    
     private static final Map<String, ConditionType> OPERATORS_MAP;
-
+    private static final Pattern COMPARATORS_PATTERN; 
+    
     static {
         // operatorsMap
         OPERATORS_MAP = new HashMap<String, ConditionType>();
@@ -81,6 +83,15 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         OPERATORS_MAP.put(LE, ConditionType.LESS_OR_EQUALS);
         OPERATORS_MAP.put(EQ, ConditionType.EQUALS);
         OPERATORS_MAP.put(NEQ, ConditionType.NOT_EQUALS);
+        
+        CONDITION_MAP = new HashMap<ConditionType, String>();
+        CONDITION_MAP.put(ConditionType.GREATER_THAN, GT);
+        CONDITION_MAP.put(ConditionType.GREATER_OR_EQUALS, GE);
+        CONDITION_MAP.put(ConditionType.LESS_THAN, LT);
+        CONDITION_MAP.put(ConditionType.LESS_OR_EQUALS, LE);
+        CONDITION_MAP.put(ConditionType.EQUALS, EQ);
+        CONDITION_MAP.put(ConditionType.NOT_EQUALS, NEQ);
+        
         
         // pattern
         String comparators = GT + "|" + GE + "|" + LT + "|" + LE + "|" + EQ + "|" + NEQ;

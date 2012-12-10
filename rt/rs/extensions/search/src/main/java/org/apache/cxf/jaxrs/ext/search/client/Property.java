@@ -22,10 +22,13 @@ import java.util.Date;
 
 import javax.xml.datatype.Duration;
 
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+
 /**
  * Part of fluent interface of {@link SearchConditionBuilder}.
  */
 public interface Property {
+    
     /** Is textual property equal to given literal or matching given pattern? */
     CompleteCondition equalTo(String value, String ...moreValues);
 
@@ -43,15 +46,18 @@ public interface Property {
 
     /** Is date property same as date distant from now by given period of time? */
     CompleteCondition equalTo(Duration distanceFromNow, Duration... moreValues);
-
+        
     /** Is textual property different than given literal or not matching given pattern? */
     CompleteCondition notEqualTo(String literalOrPattern);
 
     /** Is numeric property different than given double number? */
-    CompleteCondition notEqualTo(double number);
+    CompleteCondition notEqualTo(Double number);
     
     /** Is numeric property different than given long number? */
-    CompleteCondition notEqualTo(long number);
+    CompleteCondition notEqualTo(Long number);
+    
+    /** Is numeric property different than given int number? */
+    CompleteCondition notEqualTo(Integer number);
 
     /** Is date property different than given date? */
     CompleteCondition notEqualTo(Date date);
@@ -60,29 +66,41 @@ public interface Property {
     CompleteCondition notEqualTo(Duration distanceFromNow);
 
     /** Is numeric property greater than given number? */
-    CompleteCondition greaterThan(double number);
+    CompleteCondition greaterThan(Double number);
     
     /** Is numeric property greater than given number? */
-    CompleteCondition greaterThan(long number);
+    CompleteCondition greaterThan(Long number);
+    
+    /** Is numeric property greater than given number? */
+    CompleteCondition greaterThan(Integer number);
 
     /** Is numeric property less than given number? */
-    CompleteCondition lessThan(double number);
+    CompleteCondition lessThan(Double number);
     
     /** Is numeric property less than given number? */
-    CompleteCondition lessThan(long number);
+    CompleteCondition lessThan(Long number);
 
-    /** Is numeric property greater or equal to given number? */
-    CompleteCondition greaterOrEqualTo(double number);
+    /** Is numeric property less than given number? */
+    CompleteCondition lessThan(Integer number);
     
     /** Is numeric property greater or equal to given number? */
-    CompleteCondition greaterOrEqualTo(long number);
+    CompleteCondition greaterOrEqualTo(Double number);
+    
+    /** Is numeric property greater or equal to given number? */
+    CompleteCondition greaterOrEqualTo(Long number);
+    
+    /** Is numeric property greater or equal to given number? */
+    CompleteCondition greaterOrEqualTo(Integer number);
 
     /** Is numeric property less or equal to given number? */
-    CompleteCondition lessOrEqualTo(double number);
+    CompleteCondition lessOrEqualTo(Double number);
     
     /** Is numeric property less or equal to given number? */
-    CompleteCondition lessOrEqualTo(long number);
+    CompleteCondition lessOrEqualTo(Long number);
 
+    /** Is numeric property less or equal to given number? */
+    CompleteCondition lessOrEqualTo(Integer number);
+    
     /** Is date property after (greater than) given date? */
     CompleteCondition after(Date date);
 
@@ -120,4 +138,23 @@ public interface Property {
 
     /** Is textual property lexically not after (less or equal to) given literal? */
     CompleteCondition lexicalNotAfter(String literal);
+    
+    /** Generic */
+    CompleteCondition comparesTo(ConditionType op, String value);
+    
+    /** Generic */
+    CompleteCondition comparesTo(ConditionType op, Double value);
+    
+    /** Generic */
+    CompleteCondition comparesTo(ConditionType op, Long value);
+    
+    /** Generic */
+    CompleteCondition comparesTo(ConditionType op, Integer value);
+    
+    /** Generic */
+    CompleteCondition comparesTo(ConditionType op, Date value);
+    
+    /** Generic */
+    CompleteCondition comparesTo(ConditionType op, Duration value);
+
 }

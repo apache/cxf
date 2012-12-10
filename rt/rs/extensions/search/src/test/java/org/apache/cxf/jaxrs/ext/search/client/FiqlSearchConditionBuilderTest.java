@@ -29,6 +29,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 import org.junit.AfterClass;
@@ -68,6 +69,12 @@ public class FiqlSearchConditionBuilderTest extends Assert {
     public void testEqualToNumber() {
         String ret = b.is("foo").equalTo(123.5).query();
         assertEquals("foo==123.5", ret);
+    }
+    
+    @Test
+    public void testEqualToNumberCondition() {
+        String ret = b.is("foo").comparesTo(ConditionType.LESS_THAN, 123.5).query();
+        assertEquals("foo=lt=123.5", ret);
     }
 
     private Date parseDate(String format, String value) throws ParseException {

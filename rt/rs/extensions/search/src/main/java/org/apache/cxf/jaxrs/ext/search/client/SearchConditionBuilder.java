@@ -32,6 +32,7 @@ import java.util.Map;
 public abstract class SearchConditionBuilder implements PartialCondition {
 
     public static final String DEFAULT_LANGUAGE = "FIQL";
+    public static final String FIQL = DEFAULT_LANGUAGE;
     /**
      * Creates instance of builder.
      * 

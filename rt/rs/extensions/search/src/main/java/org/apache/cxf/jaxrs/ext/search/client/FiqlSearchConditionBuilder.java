@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 
@@ -129,6 +130,36 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             return condition(FiqlParser.LT, toString(date));
         }
 
+        public CompleteCondition comparesTo(ConditionType type, String value) {
+            
+            return condition(toFiqlPrimitiveCondition(type), value);
+        }
+        
+        public CompleteCondition comparesTo(ConditionType type, Double value) {
+            
+            return condition(toFiqlPrimitiveCondition(type), value);
+        }
+        
+        public CompleteCondition comparesTo(ConditionType type, Integer value) {
+            
+            return condition(toFiqlPrimitiveCondition(type), value);
+        }
+        
+        public CompleteCondition comparesTo(ConditionType type, Long value) {
+            
+            return condition(toFiqlPrimitiveCondition(type), value);
+        }
+        
+        public CompleteCondition comparesTo(ConditionType type, Date value) {
+            
+            return condition(toFiqlPrimitiveCondition(type), value);
+        }
+        
+        public CompleteCondition comparesTo(ConditionType type, Duration value) {
+            
+            return condition(toFiqlPrimitiveCondition(type), value);
+        }
+        
         public CompleteCondition equalTo(String value, String...moreValues) {
             return condition(FiqlParser.EQ, value, (Object[])moreValues);
         }
@@ -154,35 +185,51 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         }
 
         
-        public CompleteCondition greaterOrEqualTo(double number) {
+        public CompleteCondition greaterOrEqualTo(Double number) {
             return condition(FiqlParser.GE, number);
         }
         
-        public CompleteCondition greaterOrEqualTo(long number) {
+        public CompleteCondition greaterOrEqualTo(Long number) {
+            return condition(FiqlParser.GE, number);
+        }
+        
+        public CompleteCondition greaterOrEqualTo(Integer number) {
             return condition(FiqlParser.GE, number);
         }
 
-        public CompleteCondition greaterThan(double number) {
+        public CompleteCondition greaterThan(Double number) {
             return condition(FiqlParser.GT, number);
         }
         
-        public CompleteCondition greaterThan(long number) {
+        public CompleteCondition greaterThan(Long number) {
+            return condition(FiqlParser.GT, number);
+        }
+        
+        public CompleteCondition greaterThan(Integer number) {
             return condition(FiqlParser.GT, number);
         }
 
-        public CompleteCondition lessOrEqualTo(double number) {
+        public CompleteCondition lessOrEqualTo(Double number) {
             return condition(FiqlParser.LE, number);
         }
         
-        public CompleteCondition lessOrEqualTo(long number) {
+        public CompleteCondition lessOrEqualTo(Long number) {
+            return condition(FiqlParser.LE, number);
+        }
+        
+        public CompleteCondition lessOrEqualTo(Integer number) {
             return condition(FiqlParser.LE, number);
         }
 
-        public CompleteCondition lessThan(double number) {
+        public CompleteCondition lessThan(Double number) {
             return condition(FiqlParser.LT, number);
         }
         
-        public CompleteCondition lessThan(long number) {
+        public CompleteCondition lessThan(Long number) {
+            return condition(FiqlParser.LT, number);
+        }
+        
+        public CompleteCondition lessThan(Integer number) {
             return condition(FiqlParser.LT, number);
         }
 
@@ -214,11 +261,15 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             return condition(FiqlParser.NEQ, literalOrPattern);
         }
 
-        public CompleteCondition notEqualTo(double number) {
+        public CompleteCondition notEqualTo(Double number) {
             return condition(FiqlParser.NEQ, number);
         }
         
-        public CompleteCondition notEqualTo(long number) {
+        public CompleteCondition notEqualTo(Long number) {
+            return condition(FiqlParser.NEQ, number);
+        }
+        
+        public CompleteCondition notEqualTo(Integer number) {
             return condition(FiqlParser.NEQ, number);
         }
 
@@ -344,6 +395,14 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             } else {
                 return value.toString();
             }
+        }
+        
+        private String toFiqlPrimitiveCondition(ConditionType type) {
+            String fiqlType = FiqlParser.CONDITION_MAP.get(type);
+            if (fiqlType == null) {
+                throw new IllegalArgumentException("Only primitive condition types are supported");
+            }
+            return fiqlType;
         }
     }
 
