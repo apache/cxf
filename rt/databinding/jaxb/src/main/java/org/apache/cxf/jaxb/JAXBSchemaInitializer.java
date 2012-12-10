@@ -562,7 +562,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (propertyOrder != null && propertyOrder.length == seq.getItems().size()) {
             sortItems(seq, propertyOrder);
         } else if (propertyOrder != null && propertyOrder.length != seq.getItems().size()) {
-            LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" + Arrays.toString(propertyOrder));
+            LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" 
+                + Arrays.toString(propertyOrder));
         }
        
         schemas.addCrossImports();
