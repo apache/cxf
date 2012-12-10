@@ -31,5 +31,6 @@ public enum ConditionType {
     LESS_OR_EQUALS,
     GREATER_OR_EQUALS,
     OR,
-    AND
+    AND,
+    CUSTOM
 }
