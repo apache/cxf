@@ -176,9 +176,6 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         value = cv.getValue();    
         
         Path<?> path = getPath(root, name, cv);
-        if (tClass != queryClass) {
-            path.alias(name);
-        }
         
         Predicate pred = null;
         switch (ct) {
