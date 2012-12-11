@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
+package org.apache.cxf.jaxrs.ext.search.visitor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 

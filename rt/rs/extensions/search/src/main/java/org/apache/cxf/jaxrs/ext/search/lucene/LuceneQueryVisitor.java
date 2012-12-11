@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.index.Term;

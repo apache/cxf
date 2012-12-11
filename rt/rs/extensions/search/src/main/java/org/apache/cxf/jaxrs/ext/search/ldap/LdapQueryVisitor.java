@@ -21,17 +21,15 @@ package org.apache.cxf.jaxrs.ext.search.ldap;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.cxf.jaxrs.ext.search.AbstractSearchConditionVisitor;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.visitor.AbstractUntypedSearchConditionVisitor;
 /**
  * Initial Implementation of http://tools.ietf.org/html/rfc4515
  */
-public class LdapQueryVisitor<T> extends AbstractSearchConditionVisitor<T, String> {
+public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T, String> {
 
-    private StringBuilder sb = new StringBuilder();
-    
     public LdapQueryVisitor() {
         this(Collections.<String, String>emptyMap());
     }
@@ -41,6 +39,11 @@ public class LdapQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Strin
     }
     
     public void visit(SearchCondition<T> sc) {
+    
+        StringBuilder sb = getStringBuilder();
+        if (sb == null) {
+            sb = new StringBuilder();
+        }
         
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
@@ -67,15 +70,15 @@ public class LdapQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Strin
             }
             
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
+                saveStringBuilder(sb);
                 condition.accept(this);
+                sb = getStringBuilder();
             }
             sb.append(")");
         }
+        saveStringBuilder(sb);
     }
     
-    public String getQuery() {
-        return sb.toString();
-    }
     
     public static String conditionTypeToLdapOperator(ConditionType ct) {
         String op;
