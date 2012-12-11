@@ -25,6 +25,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
+import org.apache.cxf.jaxrs.ext.search.visitor.SBThreadLocalVisitorState;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -96,6 +97,20 @@ public class SQLPrinterVisitorTest extends Assert {
     public void testSQL4() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
+        filter.accept(visitor);
+        String sql = visitor.getQuery();
+        assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
+                   + " AND ((name = 'test1') OR (level <> '19'))").equals(sql)
+                   || ("SELECT * FROM table WHERE ((name = 'test1') OR (level <> '19'))"
+                   + " AND ((name = 'test') OR (level = '18'))").equals(sql));
+    }
+    
+    @Test
+    public void testSQL4WithTLStateAndSingleThread() throws SearchParseException {
+        SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
+        SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<Condition>("table");
+        visitor.setVisitorState(new SBThreadLocalVisitorState());
+        
         filter.accept(visitor);
         String sql = visitor.getQuery();
         assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
