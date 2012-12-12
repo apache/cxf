@@ -40,6 +40,62 @@ import org.junit.Test;
 public class UriBuilderImplTest extends Assert {
 
     @Test
+    public void testResolveTemplate() {
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}")).resolveTemplate("a", "1").build();
+        assertEquals("/1", uri.toString());        
+    }
+    
+    @Test
+    public void testResolveTemplate2() {
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}")).resolveTemplate("a", "1").build("2");
+        assertEquals("/1/2", uri.toString());        
+    }
+    
+    @Test
+    public void testResolveTemplate3() {
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}")).resolveTemplate("b", "1").build("2");
+        assertEquals("/2/1", uri.toString());        
+    }
+    
+    @Test
+    public void testResolveTemplate4() {
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}").queryParam("c", "{c}"))
+            .resolveTemplate("a", "1").build("2", "3");
+        assertEquals("/1/2?c=3", uri.toString());        
+    }
+    
+    @Test
+    public void testResolveTemplate5() {
+        Map<String, Object> templs = new HashMap<String, Object>();
+        templs.put("a", "1");
+        templs.put("b", "2");
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}").queryParam("c", "{c}"))
+            .resolveTemplates(templs).build("3");
+        assertEquals("/1/2?c=3", uri.toString());        
+    }
+    
+    
+    @Test
+    public void testResolveTemplateFromEncoded() {
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}")).resolveTemplate("a", "%20 ").buildFromEncoded();
+        assertEquals("/%20%20", uri.toString());        
+    }
+    
+    @Test
+    public void testResolveTemplateFromMap() {
+        URI uri;
+        uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}")).resolveTemplate("a", "1")
+            .buildFromMap(Collections.singletonMap("b", "2"));
+        assertEquals("/1/2", uri.toString());        
+    }
+    
+    @Test
     public void testQueryParamWithTemplateValues() {
         URI uri;
         uri = UriBuilder.fromPath("/index.jsp").queryParam("a", "{a}").queryParam("b", "{b}")
@@ -954,6 +1010,16 @@ public class UriBuilderImplTest extends Assert {
 
         String template = UriBuilder.fromPath(path1).segment(path2).toTemplate();
         assertEquals(template, expected);        
+    }
+    
+    @Test
+    public void testToTemplateAndResolved() {
+        Map<String, Object> templs = new HashMap<String, Object>();
+        templs.put("a", "1");
+        templs.put("b", "2");
+        String template = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}").queryParam("c", "{c}"))
+            .resolveTemplates(templs).toTemplate();
+        assertEquals("/1/2?c={c}", template);        
     }
     
     @Test

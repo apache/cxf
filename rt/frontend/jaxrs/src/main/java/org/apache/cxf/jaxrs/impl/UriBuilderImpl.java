@@ -23,9 +23,11 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,10 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
     private MultivaluedMap<String, String> matrix = new MetadataMap<String, String>();
     
+    private Map<String, Object> resolvedTemplates;
+    private Map<String, Object> resolvedTemplatesPathEnc;
+    private Map<String, Object> resolvedEncodedTemplates;
+    
     /**
      * Creates builder with empty URI.
      */
@@ -75,37 +81,64 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         return doBuild(false, true, values);
     }
 
+    private static Map<String, Object> getResolvedTemplates(Map<String, Object> rtemplates) {
+        return rtemplates == null
+            ? Collections.<String, Object>emptyMap() : new LinkedHashMap<String, Object>(rtemplates);
+    }
+    
     private URI doBuild(boolean fromEncoded, boolean encodePathSlash, Object... values) {
+        UriParts parts = doBuildUriParts(fromEncoded, encodePathSlash, values);
+        try {
+            return buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
+        } catch (URISyntaxException ex) {
+            throw new UriBuilderException("URI can not be built", ex);
+        }
+    }
+    
+    private UriParts doBuildUriParts(boolean fromEncoded, boolean encodePathSlash, Object... values) {
+        
+        Map<String, Object> alreadyResolvedTs = getResolvedTemplates(resolvedTemplates);
+        Map<String, Object> alreadyResolvedTsPathEnc = getResolvedTemplates(resolvedTemplatesPathEnc);
+        Map<String, Object> alreadyResolvedEncTs = getResolvedTemplates(resolvedEncodedTemplates);
+        final int resolvedTsSize = alreadyResolvedTs.size() 
+            + alreadyResolvedEncTs.size()
+            + alreadyResolvedTsPathEnc.size();
         
         String thePath = buildPath(fromEncoded);
         URITemplate pathTempl = new URITemplate(thePath);
-        thePath = substituteVarargs(pathTempl, values, 0, encodePathSlash);
+        thePath = substituteVarargs(pathTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
+                                    alreadyResolvedEncTs, values, 0, false, fromEncoded, encodePathSlash);
+        int pathTemplateVarsSize = pathTempl.getVariables().size();
         
         String theQuery = buildQuery(fromEncoded);
         int queryTemplateVarsSize = 0;
         if (theQuery != null) {
             URITemplate queryTempl = new URITemplate(theQuery);
-            int lengthDiff = values.length - pathTempl.getVariables().size(); 
+            int lengthDiff = values.length + resolvedTsSize 
+                - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size() 
+                - pathTemplateVarsSize; 
             if (lengthDiff > 0) {
-                queryTemplateVarsSize = queryTempl.getVariables().size(); 
-                theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff, false);
+                queryTemplateVarsSize = queryTempl.getVariables().size();
+                theQuery = substituteVarargs(queryTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
+                                             alreadyResolvedEncTs, values, values.length - lengthDiff, 
+                                             true, fromEncoded, false);
             }
         }
         
         String theFragment = fragment;
         if (theFragment != null) {
             URITemplate fragmentTempl = new URITemplate(theFragment);
-            int lengthDiff = values.length - pathTempl.getVariables().size() - queryTemplateVarsSize; 
+            int lengthDiff = values.length  + resolvedTsSize 
+                - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size()
+                - pathTemplateVarsSize - queryTemplateVarsSize; 
             if (lengthDiff > 0) {
-                theFragment = substituteVarargs(fragmentTempl, values, values.length - lengthDiff, false);
+                theFragment = substituteVarargs(fragmentTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
+                                                alreadyResolvedEncTs, values, values.length - lengthDiff, 
+                                                true, fromEncoded, false);
             }
         }
         
-        try {
-            return buildURI(fromEncoded, thePath, theQuery, theFragment);
-        } catch (URISyntaxException ex) {
-            throw new UriBuilderException("URI can not be built", ex);
-        }
+        return new UriParts(thePath, theQuery, theFragment);
     }
     
     private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment) 
@@ -211,61 +244,124 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                                boolean encodePathSlash) 
         throws IllegalArgumentException, UriBuilderException {
         try {
+            Map<String, Object> alreadyResolvedTs = getResolvedTemplates(resolvedTemplates);
+            Map<String, Object> alreadyResolvedTsPathEnc = getResolvedTemplates(resolvedTemplatesPathEnc);
+            Map<String, Object> alreadyResolvedEncTs = getResolvedTemplates(resolvedEncodedTemplates);
+                        
             String thePath = buildPath(fromEncoded);
-            thePath = substituteMapped(thePath, map, encodePathSlash);
+            thePath = substituteMapped(thePath, map, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
+                                       alreadyResolvedEncTs, false, fromEncoded, encodePathSlash);
             
             String theQuery = buildQuery(fromEncoded);
             if (theQuery != null) {
-                theQuery = substituteMapped(theQuery, map, false);
+                theQuery = substituteMapped(theQuery, map, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
+                                            alreadyResolvedEncTs, true, fromEncoded, false);
             }
             
             String theFragment = fragment == null 
-                ? null : substituteMapped(fragment, map, encodePathSlash);
+                ? null : substituteMapped(fragment, map, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
+                                          alreadyResolvedEncTs, true, fromEncoded, encodePathSlash);
             
             return buildURI(fromEncoded, thePath, theQuery, theFragment);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
     }
-    
+    //CHECKSTYLE:OFF
     private String substituteVarargs(URITemplate templ, 
+                                     Map<String, Object> alreadyResolvedTs,
+                                     Map<String, Object> alreadyResolvedTsPathEnc,
+                                     Map<String, Object> alreadyResolvedTsEnc,
                                      Object[] values, 
                                      int ind,
+                                     boolean isQuery,
+                                     boolean fromEncoded,
                                      boolean encodePathSlash) {
+   //CHECKSTYLE:ON     
         Map<String, String> varValueMap = new HashMap<String, String>();
         
         // vars in set are properly ordered due to linking in hash set
         Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
-        if (values.length < uniqueVars.size()) {
+        if (values.length + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
+            + alreadyResolvedTsPathEnc.size() < uniqueVars.size()) {
             throw new IllegalArgumentException("Unresolved variables; only " + values.length
                                                + " value(s) given for " + uniqueVars.size()
                                                + " unique variable(s)");
         }
         int idx = ind;
+        Set<String> pathEncodeVars = alreadyResolvedTsPathEnc.isEmpty() && !encodePathSlash 
+            ? Collections.<String>emptySet() : new HashSet<String>();
         for (String var : uniqueVars) {
-            Object oval = values[idx++];
+            
+            boolean isPathEncVar = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
+            
+            boolean isVarEncoded = isPathEncVar || alreadyResolvedTs.containsKey(var) ? false : true;
+            Map<String, Object> resolved = isVarEncoded ? alreadyResolvedTsEnc 
+                : isPathEncVar ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
+            Object oval = resolved.isEmpty() ? null : resolved.remove(var);
+            if (oval == null) {
+                oval = values[idx++];
+            } else if (fromEncoded) {
+                oval = HttpUtils.encodePartiallyEncoded(oval.toString(), isQuery);
+            }
             if (oval == null) {
                 throw new IllegalArgumentException("No object for " + var);
             }
             String value = oval.toString();
             varValueMap.put(var, value);
+            
+            if (!isQuery && (isPathEncVar || encodePathSlash)) {
+                pathEncodeVars.add(var);
+            }
         }
-        return templ.substitute(varValueMap, encodePathSlash);
+        return templ.substitute(varValueMap, pathEncodeVars);
     }
     
+    //CHECKSTYLE:OFF
     private String substituteMapped(String path, 
                                     Map<String, ? extends Object> varValueMap,
+                                    Map<String, Object> alreadyResolvedTs,
+                                    Map<String, Object> alreadyResolvedTsPathEnc,
+                                    Map<String, Object> alreadyResolvedTsEnc,
+                                    boolean isQuery,
+                                    boolean fromEncoded,
                                     boolean encodePathSlash) {
-    
+    //CHECKSTYLE:ON
         URITemplate templ = new URITemplate(path);
         
         Set<String> uniqueVars = new HashSet<String>(templ.getVariables());
-        if (varValueMap.size() < uniqueVars.size()) {
+        if (varValueMap.size() + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
+            + alreadyResolvedTsPathEnc.size() < uniqueVars.size()) {
             throw new IllegalArgumentException("Unresolved variables; only " + varValueMap.size()
                                                + " value(s) given for " + uniqueVars.size()
                                                + " unique variable(s)");
         }
-        return templ.substitute(varValueMap, encodePathSlash);
+        
+        Set<String> pathEncodeVars = alreadyResolvedTsPathEnc.isEmpty() && !encodePathSlash 
+            ? Collections.<String>emptySet() : new HashSet<String>();
+        
+        Map<String, Object> theMap = new LinkedHashMap<String, Object>(); 
+        for (String var : uniqueVars) {
+            boolean isPathEncVar = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
+            
+            boolean isVarEncoded = isPathEncVar || alreadyResolvedTs.containsKey(var) ? false : true;
+            Map<String, Object> resolved = isVarEncoded ? alreadyResolvedTsEnc 
+                : isPathEncVar ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
+            Object oval = resolved.isEmpty() ? null : resolved.remove(var);
+            if (oval == null) {
+                oval = varValueMap.get(var);
+            } else if (fromEncoded) {
+                oval = HttpUtils.encodePartiallyEncoded(oval.toString(), isQuery);
+            }
+            if (oval == null) {
+                throw new IllegalArgumentException("No object for " + var);
+            }
+            theMap.put(var, oval);
+            if (!isQuery && (isPathEncVar || encodePathSlash)) {
+                pathEncodeVars.add(var);
+            }
+        }
+        return templ.substitute(theMap, pathEncodeVars);
     }
 
     @Override
@@ -760,9 +856,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public String toTemplate() {
-        final String thePath = buildPath(true);
-        final String theQuery = buildQuery(true);
-        return buildUriString(thePath, theQuery, fragment);
+        UriParts parts = doBuildUriParts(false, false);
+        return buildUriString(parts.path, parts.query, parts.fragment);
     }
     
     public UriBuilder resolveTemplate(String name, Object value) throws IllegalArgumentException {
@@ -771,11 +866,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     
     public UriBuilder resolveTemplate(String name, Object value, boolean encodePathSlash) 
         throws IllegalArgumentException {
-        throw new UnsupportedOperationException();
-    }
-    
-    public UriBuilder resolveTemplateFromEncoded(String name, Object value) throws IllegalArgumentException {
-        throw new UnsupportedOperationException();
+        return resolveTemplates(Collections.singletonMap(name, value), encodePathSlash);
     }
     
     public UriBuilder resolveTemplates(Map<String, Object> values) throws IllegalArgumentException {
@@ -784,12 +875,51 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     
     public UriBuilder resolveTemplates(Map<String, Object> values, boolean encodePathSlash) 
         throws IllegalArgumentException {
-        throw new UnsupportedOperationException();
+        if (encodePathSlash) {
+            resolvedTemplatesPathEnc = fillInResolveTemplates(resolvedTemplatesPathEnc, values);
+        } else {
+            resolvedTemplates = fillInResolveTemplates(resolvedTemplates, values);
+        }
+        return this;
+    }
+    
+    public UriBuilder resolveTemplateFromEncoded(String name, Object value) throws IllegalArgumentException {
+        return resolveTemplatesFromEncoded(Collections.singletonMap(name, value));
     }
     
     public UriBuilder resolveTemplatesFromEncoded(Map<String, Object> values) 
         throws IllegalArgumentException {
-        throw new UnsupportedOperationException();
+        resolvedEncodedTemplates = fillInResolveTemplates(resolvedEncodedTemplates, values);
+        return this;
     }
     
+    private static Map<String, Object> fillInResolveTemplates(Map<String, Object> map, Map<String, Object> values) 
+        throws IllegalArgumentException {
+        if (values == null) {
+            throw new IllegalArgumentException();
+        }
+        if (map == null) {
+            map = new LinkedHashMap<String, Object>();
+        }
+
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) {
+                throw new IllegalArgumentException();
+            }
+            map.put(entry.getKey(), entry.getValue());
+        }
+        return map;
+    }
+    
+    private class UriParts {
+        String path;
+        String query;
+        String fragment;
+        
+        public UriParts(String path, String query, String fragment) {
+            this.path = path;
+            this.query = query;
+            this.fragment = fragment;
+        }
+    }
 }

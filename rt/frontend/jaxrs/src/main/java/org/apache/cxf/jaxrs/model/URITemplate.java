@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -249,7 +250,7 @@ public final class URITemplate {
     }
 
     public String substitute(Map<String, ? extends Object> valuesMap) throws IllegalArgumentException {
-        return this.substitute(valuesMap, false);
+        return this.substitute(valuesMap, Collections.<String>emptySet());
     }
     
     /**
@@ -265,7 +266,7 @@ public final class URITemplate {
      * @return template with bound variables.
      */
     public String substitute(Map<String, ? extends Object> valuesMap,
-                             boolean encodePathSlash) throws IllegalArgumentException {
+                             Set<String> encodePathSlashVars) throws IllegalArgumentException {
         if (valuesMap == null) {
             throw new IllegalArgumentException("valuesMap is null");
         }
@@ -281,7 +282,7 @@ public final class URITemplate {
                                                            + var.getName() + " with pattern "
                                                            + var.getPattern());
                     }
-                    if (encodePathSlash) {
+                    if (encodePathSlashVars.contains(var.getName())) {
                         sval = sval.replaceAll("/", "%2F");
                     }
                     sb.append(sval);
