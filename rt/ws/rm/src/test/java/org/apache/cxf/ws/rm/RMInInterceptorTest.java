@@ -329,7 +329,6 @@ public class RMInInterceptorTest extends Assert {
             interceptor.handle(message);
             fail("must reject the invalid rm message");
         } catch (Exception e) {
-            System.out.println(e);
             assertTrue(e instanceof RMException);
             // verify a partial error text match to exclude an unexpected exception
             // (see WSRM_REQUIRED_EXC in Messages.properties)
@@ -346,6 +345,8 @@ public class RMInInterceptorTest extends Assert {
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        exchange.setOneWay(false);
+        EasyMock.expectLastCall();
         control.replay();
         
         try {

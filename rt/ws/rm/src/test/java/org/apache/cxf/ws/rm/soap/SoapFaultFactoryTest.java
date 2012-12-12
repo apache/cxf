@@ -62,7 +62,7 @@ public class SoapFaultFactoryTest extends Assert {
         sf = control.createMock(SequenceFault.class);
         EasyMock.expect(sf.getReason()).andReturn("reason");
         EasyMock.expect(sf.isSender()).andReturn(isSender);
-        EasyMock.expect(sf.getFaultCode()).andReturn(code);
+        EasyMock.expect(sf.getFaultCode()).andReturn(code).anyTimes();
         if (null != detail) {
             EasyMock.expect(sf.getDetail()).andReturn(detail);
             SequenceFaultType sft = new SequenceFaultType();
@@ -81,7 +81,7 @@ public class SoapFaultFactoryTest extends Assert {
         SoapFault fault = (SoapFault)factory.createFault(sf, createInboundMessage());
         assertEquals("reason", fault.getReason());
         assertEquals(Soap11.getInstance().getReceiver(), fault.getFaultCode());
-        assertEquals(RM10Constants.SEQUENCE_TERMINATED_FAULT_QNAME, fault.getSubCode());
+        assertNull(fault.getSubCode());
         assertNull(fault.getDetail());
         assertSame(sf, fault.getCause());
         control.verify();        

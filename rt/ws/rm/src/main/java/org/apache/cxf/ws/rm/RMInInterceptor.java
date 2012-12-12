@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
@@ -57,6 +58,16 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 destination.releaseDeliveringStatus(message);
             } catch (RMException e) {
                 LOG.log(Level.WARNING, "Failed to revert the delivering status");
+            }
+        } else if (!ContextUtils.isRequestor(message)) {
+            // force the fault to be returned.
+            Exchange exchange = message.getExchange();
+            exchange.setOneWay(false);
+
+            final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, true);
+            if (maps != null && !ContextUtils.isGenericAddress(maps.getFaultTo())) {
+                //TODO look at how we can refactor all these decoupled faultTo stuff
+                exchange.setDestination(ContextUtils.createDecoupledDestination(exchange, maps.getFaultTo()));
             }
         }
     }
