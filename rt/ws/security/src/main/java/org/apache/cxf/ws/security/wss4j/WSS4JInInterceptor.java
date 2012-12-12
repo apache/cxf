@@ -192,7 +192,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg)) {
             return;
         }
-        msg.put(SECURITY_PROCESSED, Boolean.TRUE);
         
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
@@ -327,6 +326,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             if (doDebug) {
                 LOG.fine("WSS4JInInterceptor: exit handleMessage()");
             }
+            msg.put(SECURITY_PROCESSED, Boolean.TRUE);
 
         } catch (WSSecurityException e) {
             LOG.log(Level.WARNING, "", e);
