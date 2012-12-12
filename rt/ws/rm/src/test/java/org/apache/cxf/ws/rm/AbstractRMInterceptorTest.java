@@ -82,7 +82,7 @@ public class AbstractRMInterceptorTest extends Assert {
         SequenceFault sf = control.createMock(SequenceFault.class);
         interceptor.setSequenceFault(sf);
         Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex);
+        EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
         Endpoint e = control.createMock(Endpoint.class);
         EasyMock.expect(ex.get(Endpoint.class)).andReturn(e);
         EasyMock.expect(e.getBinding()).andReturn(null);
@@ -102,7 +102,7 @@ public class AbstractRMInterceptorTest extends Assert {
         SequenceFault sf = control.createMock(SequenceFault.class);
         interceptor.setSequenceFault(sf);
         Exchange ex = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(ex);
+        EasyMock.expect(message.getExchange()).andReturn(ex).anyTimes();
         Endpoint e = control.createMock(Endpoint.class);
         EasyMock.expect(ex.get(Endpoint.class)).andReturn(e);
         Binding b = control.createMock(Binding.class);
