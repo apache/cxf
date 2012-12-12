@@ -182,15 +182,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
     public final boolean isGET(SoapMessage message) {
         String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);
-        return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
+        boolean isGet = 
+            "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
+        if (isGet) {
+            //make sure we skip the URIMapping as we cannot apply security requirements to that
+            message.put(URIMappingInterceptor.URIMAPPING_SKIP, Boolean.TRUE);
+        }
+        return isGet;
     }
     
     public void handleMessage(SoapMessage msg) throws Fault {
         if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg)) {
             return;
         }
-        //make sure we skip the URIMapping as we cannot apply security requirements to that
-        msg.put(URIMappingInterceptor.URIMAPPING_SKIP, Boolean.TRUE);
         msg.put(SECURITY_PROCESSED, Boolean.TRUE);
         
         boolean utWithCallbacks = 
