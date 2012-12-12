@@ -80,7 +80,7 @@ class DelegatingNamespaceContext implements NamespaceContext {
             }
         }
         String ns = nc.getNamespaceURI(prefix);
-        if (ns != null) {
+        if (ns != null && ns.length() > 0) {
             addPrefix(prefix, ns);
         }
         return ns;
