@@ -79,8 +79,12 @@ public interface Message extends StringMap {
     /**
      * Boolean property specifying if oneWay response must be processed.
      */
-    String PROCESS_ONEWAY_REPONSE = "org.apache.cxf.transport.processOneWayResponse";
+    String PROCESS_ONEWAY_RESPONSE = "org.apache.cxf.transport.processOneWayResponse";
     
+    /**
+     * @deprecated use PROCESS_ONEWAY_RESPONSE
+     */
+    String PROCESS_ONEWAY_REPONSE = PROCESS_ONEWAY_RESPONSE;
     
     String ROBUST_ONEWAY = "org.apache.cxf.oneway.robust";
     
