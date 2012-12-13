@@ -1,0 +1,24 @@
+
+----=_Part_4_701508.1145579811786
+
+Content-Type: application/xml
+Content-Transfer-Encoding: binary
+Content-ID: rootPart
+ 
+<hello>World</hello>
+------=_Part_4_701508.1145579811786
+Content-Type: application/x-www-form-urlencoded
+Content-Transfer-Encoding: binary
+Content-ID: <mapdata>
+
+id-name=Dreams&entity-name=True&native-id=NAT5
+------=_Part_4_701508.1145579811786
+
+Content-Type: application/xml
+Content-Transfer-Encoding: binary
+Content-ID: <test-cid>
+
+<hello>World2</hello>
+
+------=_Part_4_701508.1145579811786
+

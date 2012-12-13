@@ -652,6 +652,36 @@ public class MultipartStore {
         throw new WebApplicationException();
     }
     
+    @POST
+    @Path("/books/mixedmultivaluedmap")
+    @Consumes("multipart/mixed")
+    @Produces("text/xml")
+    public Response addBookFromFormConsumesMixed(
+        @Multipart(value = "mapdata", type = MediaType.APPLICATION_FORM_URLENCODED) 
+        MultivaluedMap<String, String> data,
+        @Multipart(value = "test-cid", type = MediaType.APPLICATION_XML) 
+        String testXml) throws Exception {
+        if (!"Dreams".equals(data.get("id-name").get(0))) {
+            throw new Exception("Map entry 0 does not match");
+        }
+        if (!"True".equals(data.get("entity-name").get(0))) {
+            throw new Exception("Map entry 1 does not match");
+        }
+        if (!"NAT5\n".equals(data.get("native-id").get(0))) {
+            throw new Exception("Map entry 2 does not match");
+        }
+        if (data.size() != 3) {
+            throw new Exception("Map size does not match");
+        }
+        if ("<hello>World2</hello>".equals(testXml)) {
+            throw new Exception("testXml does not match");
+        }
+        
+        Book b = new Book();
+        b.setId(124);
+        b.setName("CXF in Action - 2");
+        return Response.ok(b).build();
+    }
     private Response readBookFromInputStream(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();

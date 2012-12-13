@@ -142,7 +142,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             && AnnotationUtils.getAnnotation(anns, Multipart.class) == null) {
             return getAttachmentCollection(t, infos, anns);
         }
-        if (Map.class.isAssignableFrom(c)) {
+        if (c.isAssignableFrom(Map.class)) {
             Map<String, Object> map = new LinkedHashMap<String, Object>(infos.size());
             Class<?> actual = getActualType(t, 1);
             for (Attachment a : infos) {
