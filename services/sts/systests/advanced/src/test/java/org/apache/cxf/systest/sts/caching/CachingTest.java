@@ -103,34 +103,34 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = CachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml1Port, PORT);
+        updateAddressPort(port, PORT);
         
         // Make a successful invocation
-        doubleIt(transportSaml1Port, 25);
+        doubleIt(port, 25);
         
         // Change the STSClient so that it can no longer find the STS
-        BindingProvider p = (BindingProvider)transportSaml1Port;
+        BindingProvider p = (BindingProvider)port;
         clearSTSClient(p);
         
         // This should succeed as the token is cached
-        doubleIt(transportSaml1Port, 30);
+        doubleIt(port, 30);
         
         // This should fail as the cached token is manually removed
-        Client client = ClientProxy.getClient(transportSaml1Port);
+        Client client = ClientProxy.getClient(port);
         Endpoint ep = client.getEndpoint();
         ep.remove(SecurityConstants.TOKEN_ID);
         ep.remove(SecurityConstants.TOKEN);
 
         try {
-            doubleIt(transportSaml1Port, 35);
+            doubleIt(port, 35);
             fail("Expected failure on clearing the cache");
         } catch (SOAPFaultException ex) {
             // Expected
         }
         
-        ((java.io.Closeable)transportSaml1Port).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
@@ -146,32 +146,32 @@ public class CachingTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = CachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port2");
+        DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml1Port, PORT);
+        updateAddressPort(port, PORT);
         
         // Disable storing tokens per-proxy
-        ((BindingProvider)transportSaml1Port).getRequestContext().put(
+        ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
         
         // Make a successful invocation
-        doubleIt(transportSaml1Port, 25);
+        doubleIt(port, 25);
         
         // Change the STSClient so that it can no longer find the STS
-        BindingProvider p = (BindingProvider)transportSaml1Port;
+        BindingProvider p = (BindingProvider)port;
         clearSTSClient(p);
         
         // This should fail as it can't get the token
         try {
-            doubleIt(transportSaml1Port, 35);
+            doubleIt(port, 35);
             fail("Expected failure");
         } catch (SOAPFaultException ex) {
             // Expected
         }
         
-        ((java.io.Closeable)transportSaml1Port).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
@@ -188,15 +188,15 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = CachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1AlternativePort");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType port = 
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportSaml1Port, PORT);
+        updateAddressPort(port, PORT);
         
         // Make an initial successful invocation
-        doubleIt(transportSaml1Port, 25);
+        doubleIt(port, 25);
         
         // Store the SAML Assertion that was obtained from the STS
-        Client client = ClientProxy.getClient(transportSaml1Port);
+        Client client = ClientProxy.getClient(port);
         Endpoint ep = client.getEndpoint();
         String id = (String)ep.get(SecurityConstants.TOKEN_ID);
         TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
@@ -213,16 +213,16 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         // Try another invocation - this will fail as the STSClient on the server side is disabled
         // after the first invocation
         try {
-            doubleIt(transportSaml1Port, 30);
+            doubleIt(port, 30);
             fail("Failure expected as the STSClient on the server side is null");
         } catch (Throwable ex) {
             // expected
         }
         // Try again using the original SAML token - this should work as it should be cached by the service
         tok.setToken(storedToken);
-        doubleIt(transportSaml1Port, 35);
+        doubleIt(port, 35);
         
-        ((java.io.Closeable)transportSaml1Port).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
     
