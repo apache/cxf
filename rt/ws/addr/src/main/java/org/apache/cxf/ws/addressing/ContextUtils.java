@@ -115,7 +115,7 @@ public final class ContextUtils {
     /**
      * Indicates a partial response has already been sent
      */
-    private static final String PARTIAL_REPONSE_SENT_PROPERTY =
+    private static final String PARTIAL_RESPONSE_SENT_PROPERTY =
         "org.apache.cxf.ws.addressing.partial.response.sent";
  
    /**
@@ -682,7 +682,7 @@ public final class ContextUtils {
      * @param message the current message
      */
     public static void storePartialResponseSent(Message message) {
-        message.put(PARTIAL_REPONSE_SENT_PROPERTY, Boolean.TRUE);
+        message.put(PARTIAL_RESPONSE_SENT_PROPERTY, Boolean.TRUE);
     }
 
     /**
@@ -693,7 +693,7 @@ public final class ContextUtils {
      * has been sent
      */
     public static boolean retrievePartialResponseSent(Message message) {
-        Boolean ret = (Boolean)message.get(PARTIAL_REPONSE_SENT_PROPERTY);
+        Boolean ret = (Boolean)message.get(PARTIAL_RESPONSE_SENT_PROPERTY);
         return ret != null && ret.booleanValue();
     }
 

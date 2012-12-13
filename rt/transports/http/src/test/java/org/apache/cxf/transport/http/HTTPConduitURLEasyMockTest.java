@@ -217,7 +217,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         HTTPConduit conduit = setUpConduit(true, false);
         Message message = new MessageImpl();
         conduit.prepare(message);
-        message.put(Message.PROCESS_ONEWAY_REPONSE, Boolean.TRUE);
+        message.put(Message.PROCESS_ONEWAY_RESPONSE, Boolean.TRUE);
         verifySentMessage(conduit, 
                           message, 
                           ResponseStyle.NONE,
