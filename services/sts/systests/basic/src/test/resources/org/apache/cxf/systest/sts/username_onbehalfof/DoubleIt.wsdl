@@ -44,6 +44,70 @@
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
+	<wsdl:binding name="DoubleItAsymmetricSAML2BearerBinding2" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingAsymmetricSAML2BearerPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricSAML2BearerBinding3" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingAsymmetricSAML2BearerPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricSAML2BearerBinding4" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingAsymmetricSAML2BearerPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricSAML2BearerBinding5" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingAsymmetricSAML2BearerPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
 
 	<wsdl:service name="DoubleItService">
 		<wsdl:port name="DoubleItOBOAsymmetricSAML2BearerPort" 
@@ -51,6 +115,26 @@
 			<soap:address
 				location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearerobo" />
 		</wsdl:port>
+		<wsdl:port name="DoubleItOBOAsymmetricSAML2BearerPort2" 
+                   binding="tns:DoubleItAsymmetricSAML2BearerBinding2">
+            <soap:address
+                location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearerobo2" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItOBOAsymmetricSAML2BearerPort3" 
+                   binding="tns:DoubleItAsymmetricSAML2BearerBinding3">
+            <soap:address
+                location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearerobo3" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItOBOAsymmetricSAML2BearerPort4" 
+                   binding="tns:DoubleItAsymmetricSAML2BearerBinding5">
+            <soap:address
+                location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearerobo4" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItOBOAsymmetricSAML2BearerPort5" 
+                   binding="tns:DoubleItAsymmetricSAML2BearerBinding5">
+            <soap:address
+                location="http://localhost:8082/doubleit/services/doubleitasymmetricsaml2bearerobo5" />
+        </wsdl:port>
 	</wsdl:service>
 	
 	<wsp:Policy wsu:Id="DoubleItBindingAsymmetricSAML2BearerPolicy">
