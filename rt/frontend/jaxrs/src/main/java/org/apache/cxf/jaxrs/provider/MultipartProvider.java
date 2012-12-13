@@ -65,6 +65,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -106,12 +107,20 @@ public class MultipartProvider extends AbstractConfigurableProvider
         return isSupported(type, genericType, annotations, mt);
     }
     
-    private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
+    private boolean isSupported(Class<?> type, Type genericType, Annotation[] anns, 
                                 MediaType mt) {
         if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)
             || Attachment.class.isAssignableFrom(type) || MultipartBody.class.isAssignableFrom(type)
             || mediaTypeSupported(mt)
             || isSupportedFormDataType(type, mt)) {
+            
+            if (type == InputStream.class 
+                && AnnotationUtils.getAnnotation(anns, Multipart.class) == null
+                && MessageUtils.isTrue(mc.getContextualProperty(JAXRSUtils.DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES))) {
+                return false;
+            }
+            
+            
             return true;
         }
         return false;

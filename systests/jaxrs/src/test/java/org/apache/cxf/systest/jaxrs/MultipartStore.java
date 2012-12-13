@@ -299,8 +299,21 @@ public class MultipartStore {
     @POST
     @Path("/books/istream")
     @Produces("text/xml")
-    public Response addBookFromInputStream(InputStream is) throws Exception {
+    public Response addBookFromInputStream(@Multipart("rootPart") InputStream is) throws Exception {
         return readBookFromInputStream(is);
+    }
+    
+    @POST
+    @Path("/books/istream2")
+    @Produces("text/xml")
+    public Book addBookFromInputStreamReadItself(InputStream is) throws Exception {
+        
+        String body = IOUtils.readStringFromStream(is);
+        if (!body.trim().startsWith("--")) {
+            throw new RuntimeException();
+        }
+        
+        return new Book("432", 432L);
     }
     
     @POST

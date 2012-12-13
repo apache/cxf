@@ -19,12 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 
@@ -35,9 +37,11 @@ public class MultipartServer extends AbstractBusTestServerBase {
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
-        sf.setProperties(Collections.<String, Object>singletonMap(
-                AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
-                String.valueOf(1024 * 10)));
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, String.valueOf(1024 * 10));
+        props.put(JAXRSUtils.DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES, "true");
+        sf.setProperties(props);
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(MultipartStore.class,
                                new SingletonResourceProvider(new MultipartStore()));

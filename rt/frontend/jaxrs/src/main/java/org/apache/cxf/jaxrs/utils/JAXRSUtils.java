@@ -109,6 +109,7 @@ public final class JAXRSUtils {
     public static final String ROOT_INSTANCE = "service.root.instance";
     public static final String ROOT_PROVIDER = "service.root.provider";
     public static final String DOC_LOCATION = "wadl.location";
+    public static final String DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES = "defaultProviders.for.simpleTypes";
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
