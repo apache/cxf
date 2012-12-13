@@ -321,9 +321,15 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
     private void restoreProxySetting(String originalProxyHost, String originalProxyPort,
                                      String originalNonProxyHosts) {
-        System.setProperty(HTTP_PROXY_HOST, originalProxyHost);
-        System.setProperty(HTTP_PROXY_PORT, originalProxyPort);
-        System.setProperty(HTTP_NON_PROXY_HOSTS, originalNonProxyHosts);        
+        if (originalProxyHost != null) {
+            System.setProperty(HTTP_PROXY_HOST, originalProxyHost);
+        }
+        if (originalProxyPort != null) {
+            System.setProperty(HTTP_PROXY_PORT, originalProxyPort);
+        }
+        if (originalNonProxyHosts != null) {
+            System.setProperty(HTTP_NON_PROXY_HOSTS, originalNonProxyHosts);
+        }
     }
 
     protected abstract Bus generate(GenericWsdlOption o, 
