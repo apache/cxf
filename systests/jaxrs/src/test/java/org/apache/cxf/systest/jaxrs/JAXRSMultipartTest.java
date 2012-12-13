@@ -244,6 +244,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testAddBookMixedMultiValueMapParameter() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/mixedmultivaluedmap";
+        doAddBook("multipart/mixed", address, "attachmentFormMixed", 200);               
+    }
+    
+    @Test
     public void testAddBookAsJAXBJSON() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjson";
         doAddBook(address, "attachmentData2", 200);               
