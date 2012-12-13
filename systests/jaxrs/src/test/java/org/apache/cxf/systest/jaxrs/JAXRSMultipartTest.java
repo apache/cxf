@@ -94,6 +94,17 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookAsRootAttachmentInputStreamReadItself() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/istream2";
+        WebClient wc = WebClient.create(address);
+        wc.type("multipart/mixed;type=text/xml");
+        wc.accept("text/xml");
+        
+        Book book = wc.post(new Book("CXF in Action - 2", 12345L), Book.class);
+        assertEquals(432L, book.getId());
+    }
+    
+    @Test
     public void testBookAsMessageContextDataHandler() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/mchandlers";
         doAddBook(address, "attachmentData", 200);               
