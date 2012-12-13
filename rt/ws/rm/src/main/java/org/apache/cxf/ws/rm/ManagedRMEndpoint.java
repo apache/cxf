@@ -496,9 +496,11 @@ public class ManagedRMEndpoint implements ManagedComponent {
         if (null == ss) {
             throw new JMException("no source sequence");
         }
-        //TODO use cancel instead of suspend
         RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
-        rq.suspend(ss);
+        if (rq.countUnacknowledged(ss) > 0) {
+            throw new JMException("sequence not empty");
+        }
+        rq.stop(ss);
         ss.getSource().removeSequence(ss);
     }
 
@@ -511,12 +513,24 @@ public class ManagedRMEndpoint implements ManagedComponent {
         if (null == ds) {
             throw new JMException("no source sequence");
         }
-        //TODO use cancel instead of suspend
 //         RedeliveryQueue rq = endpoint.getManager().getRedeliveryQueue();
 //         rq.suspend(ds);
         ds.getDestination().removeSequence(ds);
     }
     
+    @ManagedOperation(description = "Purge UnAcknowledged Messages")
+    @ManagedOperationParameters({
+        @ManagedOperationParameter(name = "sequenceId", description = "The sequence identifier") 
+    })
+    public void purgeUnAcknowledgedMessages(String sid) {
+        SourceSequence ss = getSourceSeq(sid);
+        if (null == ss) {
+            throw new IllegalArgumentException("no sequence");
+        }
+        RetransmissionQueue rq = endpoint.getManager().getRetransmissionQueue();
+        rq.purgeAll(ss);
+    }
+
     private static String getAddressValue(EndpointReferenceType epr) {
         if (null != epr && null != epr.getAddress()) {
             return epr.getAddress().getValue();

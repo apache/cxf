@@ -131,6 +131,21 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @param seq the sequence object.
      */
     public void purgeAcknowledged(SourceSequence seq) {
+        purgeCandidates(seq, false);
+    }
+
+    /**
+     * Purge all candidates for the given sequence. This method is used to 
+     * terminate the sequence by force and release the resource associated
+     * with the sequence.
+     *  
+     * @param seq the sequence object.
+     */
+    public void purgeAll(SourceSequence seq) {
+        purgeCandidates(seq, true);
+    }
+    
+    private void purgeCandidates(SourceSequence seq, boolean any) {
         Collection<Long> purged = new ArrayList<Long>();
         synchronized (this) {
             LOG.fine("Start purging resend candidates.");
@@ -139,7 +154,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 for (int i = sequenceCandidates.size() - 1; i >= 0; i--) {
                     ResendCandidate candidate = sequenceCandidates.get(i);
                     long m = candidate.getNumber();
-                    if (seq.isAcknowledged(m)) {
+                    if (any || seq.isAcknowledged(m)) {
                         sequenceCandidates.remove(i);
                         candidate.resolved();
                         unacknowledgedCount--;
@@ -260,7 +275,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }           
         }
     }
-
+    
     /**
      * @return the exponential backoff
      */
