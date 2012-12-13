@@ -1596,7 +1596,7 @@ public class HTTPConduit
                 return true;
             }
             // 2. Context property
-            return MessageUtils.getContextualBoolean(message, Message.PROCESS_ONEWAY_REPONSE, false);
+            return MessageUtils.getContextualBoolean(message, Message.PROCESS_ONEWAY_RESPONSE, false);
         }
 
         protected void handleResponseInternal() throws IOException {
