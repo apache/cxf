@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.SystemUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.URIParserUtil;
@@ -61,6 +62,23 @@ import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 public abstract class AbstractCodegenMoho extends AbstractMojo {
+    
+    /**
+     * JVM/System property name holding the hostname of the http proxy.
+     */
+    private static final String HTTP_PROXY_HOST = "http.proxyHost";
+
+    /**
+     * JVM/System property name holding the port of the http proxy.
+     */
+    private static final String HTTP_PROXY_PORT = "http.proxyPort";
+
+    /**
+     * JVM/System property name holding the list of hosts/patterns that
+     * should not use the proxy configuration.
+     */
+    private static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+    
 
     /**
      * @parameter expression="${project.build.outputDirectory}"
@@ -227,6 +245,10 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
        
         markerDirectory.mkdirs();
 
+        String originalProxyHost = SystemPropertyAction.getProperty(HTTP_PROXY_HOST);
+        String originalProxyPort = SystemPropertyAction.getProperty(HTTP_PROXY_PORT);
+        String originalNonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
+        
         configureProxyServerSettings();
 
         List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
@@ -263,6 +285,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 bus.shutdown(true);
             }
             classLoaderSwitcher.restoreClassLoader();
+            restoreProxySetting(originalProxyHost, originalProxyPort, originalNonProxyHosts);
         }
 
         // add the generated source into compile source
@@ -274,6 +297,13 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
 
         System.gc();
+    }
+
+    private void restoreProxySetting(String originalProxyHost, String originalProxyPort,
+                                     String originalNonProxyHosts) {
+        System.setProperty(HTTP_PROXY_HOST, originalProxyHost);
+        System.setProperty(HTTP_PROXY_PORT, originalProxyPort);
+        System.setProperty(HTTP_NON_PROXY_HOSTS, originalNonProxyHosts);        
     }
 
     protected abstract Bus generate(GenericWsdlOption o, 
@@ -318,9 +348,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (proxy.getHost() == null) {
                 throw new MojoExecutionException("Proxy in settings.xml has no host");
             } else {
-                System.setProperty("proxySet", "true");
-                System.setProperty("proxyHost", proxy.getHost());
-                System.setProperty("proxyPort", String.valueOf(proxy.getPort()));
+                System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
+                System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
+                System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
             }
 
         }
