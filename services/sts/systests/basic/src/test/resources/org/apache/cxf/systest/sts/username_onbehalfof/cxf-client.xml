@@ -37,7 +37,151 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
     
     <bean id="delegationCallbackHandler" class="org.apache.cxf.ws.security.trust.delegation.WSSUsernameCallbackHandler" />
    
-   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+           <entry key="ws-security.signature.username" value="myclientkey"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+           <entry key="ws-security.encryption.username" value="myservicekey"/>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/X509?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port"/>
+                   <property name="onBehalfOf" ref="delegationCallbackHandler" />
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.signature.username" value="myclientkey"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.username" value="mystskey"/>
+                           <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+   </jaxws:client>
+   
+     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort2" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+           <entry key="ws-security.signature.username" value="myclientkey"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+           <entry key="ws-security.encryption.username" value="myservicekey"/>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/X509?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port"/>
+                   <property name="onBehalfOf" ref="delegationCallbackHandler" />
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.signature.username" value="myclientkey"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.username" value="mystskey"/>
+                           <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+   </jaxws:client>
+   
+     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort3" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+           <entry key="ws-security.signature.username" value="myclientkey"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+           <entry key="ws-security.encryption.username" value="myservicekey"/>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/X509?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port"/>
+                   <property name="onBehalfOf" ref="delegationCallbackHandler" />
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.signature.username" value="myclientkey"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.username" value="mystskey"/>
+                           <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+   </jaxws:client>
+   
+     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort4" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
+           <entry key="ws-security.signature.username" value="myclientkey"/>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+           <entry key="ws-security.encryption.username" value="myservicekey"/>
+           <entry key="ws-security.sts.client">
+               <bean class="org.apache.cxf.ws.security.trust.STSClient">
+                   <constructor-arg ref="cxf"/>
+                   <property name="wsdlLocation" 
+                             value="http://localhost:8080/SecurityTokenService/X509?wsdl"/>
+                   <property name="serviceName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService"/>
+                   <property name="endpointName" 
+                             value="{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port"/>
+                   <property name="onBehalfOf" ref="delegationCallbackHandler" />
+                   <property name="properties">
+                       <map>
+                           <entry key="ws-security.signature.username" value="myclientkey"/>
+                           <entry key="ws-security.callback-handler" 
+                                  value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+                           <entry key="ws-security.signature.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.properties" value="clientKeystore.properties"/> 
+                           <entry key="ws-security.encryption.username" value="mystskey"/>
+                           <entry key="ws-security.sts.token.username" value="myclientkey"/>
+                           <entry key="ws-security.sts.token.properties" value="clientKeystore.properties"/> 
+                       </map>
+                   </property>
+               </bean>            
+           </entry> 
+       </jaxws:properties>
+   </jaxws:client>
+   
+   <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItOBOAsymmetricSAML2BearerPort5" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.signature.properties" value="clientKeystore.properties"/>
