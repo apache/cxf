@@ -20,7 +20,9 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -173,6 +175,72 @@ public class ManagedRMManagerTest extends Assert {
         assertTrue(2L == numbers[0] && 4L == numbers[1]);
     }
     
+    @Test
+    public void testRemoveSequence() throws Exception {
+        manager = new RMManager(); 
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        EndpointReferenceType ref = RMUtils.createReference(TEST_URI);
+        Source source = new Source(rme);
+        Destination destination = new Destination(rme);
+        
+        RetransmissionQueue rq = new TestRetransmissionQueue();
+        manager.setRetransmissionQueue(rq);
+        manager.initialise();
+        
+        SourceSequence ss1 = createTestSourceSequence(source, "seq1", ref, 
+                                                     ProtocolVariation.RM10WSA200408, new long[]{1L, 1L, 3L, 3L});
+        SourceSequence ss3 = createTestSourceSequence(source, "seq3", ref, 
+                                                     ProtocolVariation.RM10WSA200408, new long[]{1L, 5L});
+
+        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
+        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
+        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
+
+        control.replay();
+        setCurrentMessageNumber(ss1, 5L);
+        setCurrentMessageNumber(ss3, 5L);
+        source.addSequence(ss1);
+        source.addSequence(ss3);
+        source.setCurrent(ss3);
+
+        ManagedRMEndpoint managedEndpoint = new ManagedRMEndpoint(rme);
+        
+        // for those sequences without any unacknowledged messages
+        CompositeData cd = managedEndpoint.getSourceSequence("seq3");
+        assertNotNull(cd);
+        
+        managedEndpoint.removeSourceSequence("seq3");
+        try {
+            cd = managedEndpoint.getSourceSequence("seq3");
+            fail("sequnce not removed");
+        } catch (Exception e) {
+            // ok
+        }
+        
+        // for those sequences with some unacknowledged messages        
+        cd = managedEndpoint.getSourceSequence("seq1");
+        assertNotNull(cd);
+        
+        try {
+            managedEndpoint.removeSourceSequence("seq1");
+            fail("sequnce may not be removed");
+        } catch (Exception e) {
+            // ok
+        }
+        cd = managedEndpoint.getSourceSequence("seq1");
+        assertNotNull(cd);
+        
+        managedEndpoint.purgeUnAcknowledgedMessages("seq1");
+        managedEndpoint.removeSourceSequence("seq1");
+
+        try {
+            cd = managedEndpoint.getSourceSequence("seq1");
+            fail("sequnce not removed");
+        } catch (Exception e) {
+            // ok
+        }
+    }
+
     @Test
     public void testGetSourceSequenceAcknowledgedRange() throws Exception {
         ManagedRMEndpoint managedEndpoint = createTestManagedRMEndpoint();
@@ -400,15 +468,19 @@ public class ManagedRMManagerTest extends Assert {
     private class TestRetransmissionQueue implements RetransmissionQueue {
         private Set<String> suspended = new HashSet<String>();
         private RetryStatus status = new TestRetransmissionStatus();
+        private Map<String, List<Long>> numlists = new HashMap<String, List<Long>>();
+        
+        public TestRetransmissionQueue() {
+            numlists.put("seq1", new ArrayList<Long>());
+            numlists.put("seq2", new ArrayList<Long>());
+            Collections.addAll(numlists.get("seq1"), 2L, 4L);
+            Collections.addAll(numlists.get("seq2"), 3L);
+        }
         
         public int countUnacknowledged(SourceSequence seq) {
-            final String key = seq.getIdentifier().getValue(); 
-            if ("seq1".equals(key)) {
-                return 2;
-            } else if ("seq2".equals(key)) {
-                return 1;
-            }
-            return 0;
+            final String key = seq.getIdentifier().getValue();
+            List<Long> list = numlists.get(key);
+            return list != null ? list.size() : 0;
         }
 
         public boolean isEmpty() {
@@ -423,25 +495,24 @@ public class ManagedRMManagerTest extends Assert {
             // TODO Auto-generated method stub
         }
 
-        public List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq) {
-            List<Long> list = new ArrayList<Long>();
+        public void purgeAll(SourceSequence seq) {
             final String key = seq.getIdentifier().getValue(); 
-            if ("seq1".equals(key)) {
-                list.add(2L);
-                list.add(4L);
-            } else if ("seq2".equals(key)) {
-                list.add(3L);
+            List<Long> list = numlists.get(key);
+            if (list != null) {
+                list.clear();
             }
-            return list;
+        }
+
+        public List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq) {
+            final String key = seq.getIdentifier().getValue(); 
+            List<Long> list = numlists.get(key);
+            return list != null ? list : new ArrayList<Long>();
         }
 
         public RetryStatus getRetransmissionStatus(SourceSequence seq, long num) {
             final String key = seq.getIdentifier().getValue();
-            if (("seq1".equals(key) && (2L == num || 4L == num)) 
-                || ("seq2".equals(key) && (2L == num))) {
-                return status;
-            }
-            return null;
+            List<Long> list = numlists.get(key);
+            return list.contains(num) ? status : null;
         }
 
         public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
@@ -474,7 +545,7 @@ public class ManagedRMManagerTest extends Assert {
         }
 
         public int countUnacknowledged() {
-            return 3;
+            return numlists.get("seq1").size() + numlists.get("seq2").size();
         }
     }
     

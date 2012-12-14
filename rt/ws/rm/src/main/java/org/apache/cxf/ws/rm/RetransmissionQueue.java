@@ -60,6 +60,13 @@ public interface RetransmissionQueue {
     void purgeAcknowledged(SourceSequence seq);
     
     /**
+     * Purge all candiates for the given sequence.
+     * 
+     * @param seq the sequence object
+     */
+    void purgeAll(SourceSequence seq);
+    
+    /**
      * 
      * @param seq
      * @return
