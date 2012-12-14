@@ -120,6 +120,12 @@ public class BookStore {
         //System.out.println("PreDestroy called");
     }
 
+    @POST
+    @Path("/mapperonbus")
+    public void mapperOnBus() {
+        throw new BusMapperException();
+    }
+
     @GET
     @Path("emptybook")
     @Produces({"application/xml", "application/json" })

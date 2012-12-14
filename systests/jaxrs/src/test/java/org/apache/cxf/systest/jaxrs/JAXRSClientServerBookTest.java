@@ -89,6 +89,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testUseMapperOnBus() {
+        String address = "http://localhost:" + PORT + "/bookstore/mapperonbus";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.post(null);
+        assertEquals(500, r.getStatus());
+        assertEquals("the-mapper", r.getMetadata().getFirst("BusMapper").toString());
+    }
+
     public void testGetIntroChapterFromSelectedBook() {
         String address = "http://localhost:" + PORT + "/bookstore/books(id=le=123)/chapter";
         doTestGetChapterFromSelectedBook(address);

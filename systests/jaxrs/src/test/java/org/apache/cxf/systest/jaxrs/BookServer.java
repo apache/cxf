@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.Interceptor;
@@ -46,6 +49,7 @@ public class BookServer extends AbstractBusTestServerBase {
     
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
+        bus.setProperty(ExceptionMapper.class.getName(), new BusMapperExceptionMapper());
         setBus(bus);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
@@ -102,5 +106,13 @@ public class BookServer extends AbstractBusTestServerBase {
         } finally {
             System.out.println("done!");
         }
+    }
+    
+    private static class BusMapperExceptionMapper implements ExceptionMapper<BusMapperException> {
+
+        public Response toResponse(BusMapperException exception) {
+            return Response.serverError().header("BusMapper", "the-mapper").build();
+        }
+        
     }
 }
