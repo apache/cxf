@@ -94,7 +94,11 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
 
     public final <T> T getExtension(Class<T> extensionType) {
         Object obj = extensions.get(extensionType);
-        if (obj == null && !missingExtensions.contains(extensionType)) {
+        if (obj == null) {
+            if (missingExtensions.contains(extensionType)) {
+                //already know we cannot find it
+                return null;
+            }
             ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
             if (loc == null) {
                 loc = createConfiguredBeanLocator();
@@ -113,6 +117,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         if (null != obj) {
             return extensionType.cast(obj);
         } else {
+            //record that it couldn't be found to avoid expensive searches again in the future
             missingExtensions.add(extensionType);
         }
         return null;
