@@ -62,7 +62,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.WSDLGetUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
