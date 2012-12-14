@@ -136,6 +136,12 @@ public class BookStore {
         return books.get(id);
     }
     
+    @POST
+    @Path("/mapperonbus")
+    public void mapperOnBus() {
+        throw new BusMapperException();
+    }
+    
     @GET
     @Path("/beanparam2")
     @Produces("application/xml")
