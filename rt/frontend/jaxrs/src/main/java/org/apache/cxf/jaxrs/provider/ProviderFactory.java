@@ -670,12 +670,16 @@ public final class ProviderFactory {
     
     private void setBusProviders() {
         List<Object> extensions = new LinkedList<Object>(); 
-        addBusExtension(extensions,
-                        MessageBodyReader.class,
-                        MessageBodyWriter.class,
-                        ExceptionMapper.class);
-        if (!extensions.isEmpty()) {
-            setProviders(extensions.toArray());
+        final String alreadySetProp = "bus.providers.set";
+        if (bus.getProperty(alreadySetProp) == null) {
+            addBusExtension(extensions,
+                            MessageBodyReader.class,
+                            MessageBodyWriter.class,
+                            ExceptionMapper.class);
+            if (!extensions.isEmpty()) {
+                setProviders(extensions.toArray());
+                bus.setProperty(alreadySetProp, "");
+            }
         }
     }
     
