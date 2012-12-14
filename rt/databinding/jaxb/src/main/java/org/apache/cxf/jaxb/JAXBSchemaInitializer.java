@@ -26,8 +26,13 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -58,6 +63,7 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
 import org.apache.ws.commons.schema.XmlSchemaType;
@@ -464,6 +470,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         }
         XmlType xmlTypeAnno = cls.getAnnotation(XmlType.class);
+        String[] propertyOrder = null;
         boolean respectXmlTypeNS = false;
         XmlSchema faultBeanSchema = null;
         if (xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.namespace()) 
@@ -474,9 +481,14 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             nsMap.add(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
             
             SchemaInfo faultBeanSchemaInfo = createSchemaIfNeeded(xmlTypeAnno.namespace(), nsMap);
-            faultBeanSchema = faultBeanSchemaInfo.getSchema();            
+            faultBeanSchema = faultBeanSchemaInfo.getSchema(); 
         }
         
+        if (xmlTypeAnno != null &&  xmlTypeAnno.propOrder().length > 0) {
+            propertyOrder = xmlTypeAnno.propOrder();
+            //TODO: handle @XmlAccessOrder
+        }
+                        
         XmlSchema schema = null;
         if (schemaInfo == null) {
             NamespaceMap nsMap = new NamespaceMap();
@@ -516,7 +528,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         ct.setParticle(seq);
         String namespace = part.getElementQName().getNamespaceURI();
         XmlAccessType accessType = Utils.getXmlAccessType(cls);
-
+//
         for (Field f : Utils.getFields(cls, accessType)) {
             //map field
             Type type = Utils.getFieldType(f);
@@ -546,6 +558,14 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             seq.getItems().add(exEle);
 
         }
+        
+        if (propertyOrder != null && propertyOrder.length == seq.getItems().size()) {
+            sortItems(seq, propertyOrder);
+        } else if (propertyOrder != null && propertyOrder.length != seq.getItems().size()) {
+            LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" 
+                + Arrays.toString(propertyOrder));
+        }
+       
         schemas.addCrossImports();
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
@@ -616,5 +636,19 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
     private boolean isExistSchemaElement(XmlSchema schema, QName qn) {
         return schema.getElementByName(qn) != null;
+    }
+    
+    private void sortItems(final XmlSchemaSequence seq, final String[] propertyOrder) {
+        final List<String> propList = Arrays.asList(propertyOrder);
+        Collections.sort(seq.getItems(), new Comparator<XmlSchemaSequenceMember>() {
+            public int compare(XmlSchemaSequenceMember o1, XmlSchemaSequenceMember o2) {
+                XmlSchemaElement element1 = (XmlSchemaElement)o1;
+                XmlSchemaElement element2 = (XmlSchemaElement)o2;
+                int index1 = propList.indexOf(element1.getName());
+                int index2 = propList.indexOf(element2.getName());
+                return index1 - index2;
+            }
+        
+        });
     }
 }
