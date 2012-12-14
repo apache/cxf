@@ -699,4 +699,33 @@ public class JavaToProcessorTest extends ProcessorTestBase {
                    != -1);
         assertTrue(wsdlContent.indexOf("wsdl:part name=\"add1\" element=\"tns:add1\"") != -1);
     }
+    
+    
+    
+    @Test
+    public void testPropOrderInException() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_prop_order.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.EchoImpl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File wsdlFile = new File(output, "exception_prop_order.wsdl");
+        assertTrue(wsdlFile.exists());
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        int summaryIndex = wsdlContent.indexOf("<xs:element name=\"summary\"");
+        int fromIndex = wsdlContent.indexOf("<xs:element name=\"from\"");
+        int idIndex = wsdlContent.indexOf("<xs:element name=\"id\"");
+        
+        assertTrue(summaryIndex > -1);
+        assertTrue(fromIndex > -1);
+        assertTrue(idIndex > -1);
+        assertTrue(fromIndex > summaryIndex && idIndex > fromIndex);
+        
+    }
+    
+    
 }
