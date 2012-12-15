@@ -1,0 +1,128 @@
+##    licensed to the Apache Software Foundation (ASF) under one
+##    or more contributor license agreements. See the NOTICE file
+##    distributed with this work for additional information
+##    regarding copyright ownership. The ASF licenses this file
+##    to you under the Apache License, Version 2.0 (the
+##    "License"); you may not use this file except in compliance
+##    with the License. You may obtain a copy of the License at
+##
+##    http://www.apache.org/licenses/LICENSE-2.0
+##
+##    Unless required by applicable law or agreed to in writing,
+##    software distributed under the License is distributed on an
+##    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+##    KIND, either express or implied. See the License for the
+##    specific language governing permissions and limitations
+##    under the License.
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>$groupId</groupId>
+    <artifactId>$artifactId</artifactId>
+    <version>$version</version>
+    <packaging>war</packaging>
+    <name>Simple CXF WSDL-first SOAP project using Spring configuration</name>
+    <description>Simple CXF WSDL-first SOAP project using Spring configuration</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${cxf.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${cxf.junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <sourceRoot>
+                                target/generated-sources
+                            </sourceRoot>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>
+                                       src/main/webapp/WEB-INF/wsdl/HelloWorld.wsdl
+                                    </wsdl>
+                                    <wsdlLocation>classpath:HelloWorld.wsdl</wsdlLocation>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <!-- mvn clean install tomcat7:run to deploy
+                    Look for "Running war on http://xxx" and
+                    "Setting the server's publish address to be /yyy"
+                    in console output; WSDL browser address will be
+                    concatenation of the two: http://xxx/yyy?wsdl
+                    -->
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <version>2.0</version>
+                    <executions>
+                        <execution>
+                            <id>start-tomcat</id>
+                            <goals>
+                                <goal>run-war</goal>
+                            </goals>
+                            <phase>pre-integration-test</phase>
+                            <configuration>
+                                <port>${test.server.port}</port>
+                                <path>/webservice</path>
+                                <fork>true</fork>
+                                <useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <configuration>
+                        <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+                        <wtpmanifest>true</wtpmanifest>
+                        <wtpapplicationxml>true</wtpapplicationxml>
+                        <wtpversion>2.0</wtpversion>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
