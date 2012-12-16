@@ -75,6 +75,7 @@ public class SAMLTokenProvider implements TokenProvider {
     private ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
     private boolean signToken = true;
     private Map<String, SAMLRealm> realmMap = new HashMap<String, SAMLRealm>();
+    private SamlCustomHandler samlCustomHandler;
     
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
@@ -312,6 +313,10 @@ public class SAMLTokenProvider implements TokenProvider {
         return realmMap;
     }
 
+    public void setSamlCustomHandler(SamlCustomHandler samlCustomHandler) {
+        this.samlCustomHandler = samlCustomHandler;
+    }
+
     private AssertionWrapper createSamlToken(
         TokenProviderParameters tokenParameters, byte[] secret, Document doc
     ) throws Exception {
@@ -326,6 +331,10 @@ public class SAMLTokenProvider implements TokenProvider {
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(handler);
         AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        
+        if (samlCustomHandler != null) {
+            samlCustomHandler.handle(assertion, tokenParameters);
+        }
         
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
