@@ -72,6 +72,7 @@ public final class ProviderFactory {
     
     private static final String JAXB_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.JAXBElementProvider";
     private static final String JSON_PROVIDER_NAME = "org.apache.cxf.jaxrs.provider.json.JSONProvider";
+    private static final String BUS_PROVIDERS_ALL = "org.apache.cxf.jaxrs.bus.providers";
     
     static {
         SHARED_FACTORY.setProviders(new BinaryDataProvider<Object>(),
@@ -496,12 +497,19 @@ public final class ProviderFactory {
         }
     }
     
+    
     private void addBusExtension(List<Object> extensions, Class<?>... extClasses) {
         for (Class<?> extClass : extClasses) {
             Object ext = bus.getProperty(extClass.getName());
-            if (ext != null && extClass.isInstance(ext)) {
+            if (extClass.isInstance(ext)) {
                 extensions.add(ext);
             }
+        }
+        Object allProp = bus.getProperty(BUS_PROVIDERS_ALL);
+        if (allProp instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<Object> all = (List<Object>)allProp;
+            extensions.addAll(all);
         }
     }
     
