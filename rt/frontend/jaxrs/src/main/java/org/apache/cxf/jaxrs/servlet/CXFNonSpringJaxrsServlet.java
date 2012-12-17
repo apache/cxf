@@ -89,6 +89,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
     
+    private ClassLoader classLoader;
     
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -456,17 +457,26 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         bean.create();
     }
     
-    private Class<?> loadClass(String cName) throws ServletException {
+    protected Class<?> loadClass(String cName) throws ServletException {
         return loadClass(cName, "Resource");
     }
     
-    private Class<?> loadClass(String cName, String classType) throws ServletException {
+    protected Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
-            return ClassLoaderUtils.loadClass(cName, CXFNonSpringJaxrsServlet.class);
+            
+            Class<?> cls = null;
+            if (classLoader == null) {
+                cls = ClassLoaderUtils.loadClass(cName, CXFNonSpringJaxrsServlet.class);
+            } else {
+                cls = classLoader.loadClass(cName); 
+            }
+            return cls;
         } catch (ClassNotFoundException ex) {
             throw new ServletException("No " + classType + " class " + cName.trim() + " can be found", ex); 
         }
     }
     
-    
+    public void setClassLoader(ClassLoader loader) {
+        this.classLoader = loader;
+    }
 }
