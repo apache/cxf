@@ -78,9 +78,13 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bean.addConstructorArgValue(bus);
         } else if (!"cxf".equals(bus)) {
             bean.getRawBeanDefinition().setBeanClass(SpringBus.class);
-            bean.getRawBeanDefinition().getPropertyValues().removePropertyValue("bus");
             bean.setDestroyMethodName("shutdown");
-            element.setUserData("ID", bus, null);
+            try {
+                element.setUserData("ID", bus, null);
+                bean.getRawBeanDefinition().getPropertyValues().removePropertyValue("bus");
+            } catch (Throwable t) {
+                //likely not DOM level 3, ignore
+            }
         } else {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);
             bean.getRawBeanDefinition().setAttribute(WIRE_BUS_CREATE, 
@@ -121,7 +125,12 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     @Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, 
                                ParserContext ctx) {
-        String bus = (String)element.getUserData("ID");
+        String bus = null;
+        try {
+            bus = (String)element.getUserData("ID");
+        } catch (Throwable t) {
+            //ignore
+        }
         if (bus == null) {
             bus = element.getAttribute("bus");        
             if (StringUtils.isEmpty(bus)) {
@@ -132,7 +141,11 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             } else {
                 bus = bus + ".config";
             }
-            element.setUserData("ID", bus, null);
+            try {
+                element.setUserData("ID", bus, null);
+            } catch (Throwable t) {
+                //maybe no DOM level 3, ignore, but, may have issues with the counter 
+            }
         }
         return bus;
     }
