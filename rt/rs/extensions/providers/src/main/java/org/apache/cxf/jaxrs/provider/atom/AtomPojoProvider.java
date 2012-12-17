@@ -283,7 +283,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         return null;
     }
     
-    private <T> T getAtomElementHandler(Map<String, T> handlers, Class<?> pojoClass) {
+    protected <T> T getAtomElementHandler(Map<String, T> handlers, Class<?> pojoClass) {
         T handler = getAtomElementHandlerSuperClass(handlers, pojoClass);
         if (handler == null) {
             Class<?>[] interfaces = pojoClass.getInterfaces();
@@ -298,7 +298,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
     
     private <T> T getAtomElementHandlerSuperClass(Map<String, T> handlers, Class<?> pojoClass) {
-        if (pojoClass == Object.class) {
+        if (pojoClass == null || pojoClass == Object.class) {
             return null;
         }
         T handler = handlers.get(pojoClass.getName());
