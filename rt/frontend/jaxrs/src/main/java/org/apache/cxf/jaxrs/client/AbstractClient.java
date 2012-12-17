@@ -503,10 +503,14 @@ public abstract class AbstractClient implements Client, Retryable {
     
     protected void waitForResponseCode(Exchange exchange) {
         synchronized (exchange) {
-            try {
-                exchange.wait(cfg.getSynchronousTimeout());
-            } catch (InterruptedException ex) {
-                // ignore
+            if (getResponseCode(exchange) == null) { 
+                try {
+                    exchange.wait(cfg.getSynchronousTimeout());
+                } catch (InterruptedException ex) {
+                    // ignore
+                }
+            } else {
+                return;
             }
         }
         
