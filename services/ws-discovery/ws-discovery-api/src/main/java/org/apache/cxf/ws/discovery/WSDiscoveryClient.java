@@ -197,7 +197,7 @@ public class WSDiscoveryClient implements Closeable {
             dispatch = null;
         }
     }
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
         close();
     }
