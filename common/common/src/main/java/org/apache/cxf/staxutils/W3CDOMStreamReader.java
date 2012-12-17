@@ -417,7 +417,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
             if (o instanceof Location) { 
                 return (Location)o;
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             //ignore, probably not DOM level 3
         }
         return super.getLocation();
