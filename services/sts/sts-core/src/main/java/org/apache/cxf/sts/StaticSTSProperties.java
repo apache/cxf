@@ -51,10 +51,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     private CallbackHandler callbackHandler;
     private String callbackHandlerClass;
     private Crypto signatureCrypto;
-    private String signaturePropertiesFile;
+    private Object signatureCryptoProperties;
     private String signatureUsername;
     private Crypto encryptionCrypto;
-    private String encryptionPropertiesFile;
+    private Object encryptionCryptoProperties;
     private String encryptionUsername;
     private String issuer;
     private SignatureProperties signatureProperties = new SignatureProperties();
@@ -68,10 +68,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      * Load the CallbackHandler, Crypto objects, if necessary.
      */
     public void configureProperties() throws STSException {
-        if (signatureCrypto == null && signaturePropertiesFile != null) {
-            Properties sigProperties = getProps(signaturePropertiesFile);
+        if (signatureCrypto == null && signatureCryptoProperties != null) {
+            Properties sigProperties = getProps(signatureCryptoProperties);
             if (sigProperties == null) {
-                LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
+                LOG.fine("Cannot load signature properties using: " + signatureCryptoProperties);
                 throw new STSException("Configuration error: cannot load signature properties");
             }
             try {
@@ -82,10 +82,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             }
         }
         
-        if (encryptionCrypto == null && encryptionPropertiesFile != null) {
-            Properties encrProperties = getProps(encryptionPropertiesFile);
+        if (encryptionCrypto == null && encryptionCryptoProperties != null) {
+            Properties encrProperties = getProps(encryptionCryptoProperties);
             if (encrProperties == null) {
-                LOG.fine("Cannot load encryption properties using: " + encryptionPropertiesFile);
+                LOG.fine("Cannot load encryption properties using: " + encryptionCryptoProperties);
                 throw new STSException("Configuration error: cannot load encryption properties");
             }
             try {
@@ -144,9 +144,19 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      * Set the String corresponding to the signature Properties class
      * @param signaturePropertiesFile the String corresponding to the signature properties file
      */
+    @Deprecated
     public void setSignaturePropertiesFile(String signaturePropertiesFile) {
-        this.signaturePropertiesFile = signaturePropertiesFile;
-        LOG.fine("Setting signature properties: " + signaturePropertiesFile);
+        setSignatureCryptoProperties(signaturePropertiesFile);
+    }
+    
+    /**
+     * Set the Object corresponding to the signature Properties class. It can be a String
+     * corresponding to a filename, a Properties object, or a URL.
+     * @param signatureCryptoProperties the object corresponding to the signature properties
+     */
+    public void setSignatureCryptoProperties(Object signatureCryptoProperties) {
+        this.signatureCryptoProperties = signatureCryptoProperties;
+        LOG.fine("Setting signature crypto properties: " + signatureCryptoProperties);
     }
     
     /**
@@ -186,9 +196,19 @@ public class StaticSTSProperties implements STSPropertiesMBean {
      * Set the String corresponding to the encryption Properties class
      * @param signaturePropertiesFile the String corresponding to the encryption properties file
      */
+    @Deprecated
     public void setEncryptionPropertiesFile(String encryptionPropertiesFile) {
-        this.encryptionPropertiesFile = encryptionPropertiesFile;
-        LOG.fine("Setting encryptionProperties: " + encryptionPropertiesFile);
+        setEncryptionCryptoProperties(encryptionPropertiesFile);
+    }
+    
+    /**
+     * Set the Object corresponding to the encryption Properties class. It can be a String
+     * corresponding to a filename, a Properties object, or a URL.
+     * @param encryptionCryptoProperties the object corresponding to the encryption properties
+     */
+    public void setEncryptionCryptoProperties(Object encryptionCryptoProperties) {
+        this.encryptionCryptoProperties = encryptionCryptoProperties;
+        LOG.fine("Setting encryptionProperties: " + encryptionCryptoProperties);
     }
     
     /**
