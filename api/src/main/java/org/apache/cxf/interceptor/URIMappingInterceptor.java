@@ -193,7 +193,8 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         
         Class<?>[] types = method.getParameterTypes();        
         
-        for (String key : queries.keySet()) {
+        for (Map.Entry<String, String> ent : queries.entrySet()) {
+            String key = ent.getKey();
             MessagePartInfo inf = null;
             for (MessagePartInfo p : operation.getOperationInfo().getInput().getMessageParts()) {
                 if (p.getConcreteName().getLocalPart().equals(key)) {
@@ -226,10 +227,11 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             // TODO check the parameter name here
             Object param = null;
                         
-            if (type.isPrimitive() && queries.get(key) != null) {
-                param = PrimitiveUtils.read(queries.get(key), type);
+            String val = ent.getValue();
+            if (type.isPrimitive() && val != null) {
+                param = PrimitiveUtils.read(val, type);
             } else {
-                param = readType(queries.get(key), type);
+                param = readType(val, type);
             }
             parameters.set(idx, param);
             
