@@ -32,8 +32,10 @@
         <version>2.6.5-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
+    
 
     <properties>
+        <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
         <cxf.osgi.export>
             !org.apache.cxf.internal,
             org.apache.cxf.*,
@@ -166,6 +168,35 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>create-noncanonicalrev</id>
+                            <goals>
+                                <goal>create-timestamp</goal>
+                            </goals>
+                        <configuration>
+                            <timestampFormat>'NON-CANONICAL_'yyyy-MM-dd_HH-mm_'${user.name}'</timestampFormat>
+                            <timestampPropertyName>nonCanonicalRevision</timestampPropertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-buildnumber</id>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                            <configuration>
+                                <doCheck>false</doCheck>
+                                <doUpdate>false</doUpdate>
+                                <urlScm>${buildnumber.connection.url}</urlScm>
+                                <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
+                            </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>
@@ -344,6 +375,18 @@
                     <artifactId>${cxf.stax.impl.artifactId}</artifactId>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <!-- default profile enables javadoc stuff -->
+            <id>git.build.number</id>
+            <activation>
+                <file>
+                    <exists>../.git</exists>
+                </file>
+            </activation>
+            <properties>
+                <buildnumber.connection.url>scm:git:http://</buildnumber.connection.url>
+            </properties>
         </profile>
     </profiles>
 

@@ -27,6 +27,7 @@ public final class Version {
     private static String version;
     private static String name;
     private static String fullVersion;
+    private static String buildNumber;
     
     private static final String VERSION_BASE = "/org/apache/cxf/version/";
 
@@ -57,7 +58,13 @@ public final class Version {
 
             version = p.getProperty("product.version", "<unknown>");
             name = p.getProperty("product.name", "Apache CXF");
-            fullVersion = name + " " + version;
+            buildNumber = p.getProperty("build.number", "<unknown>");
+            if (version.contains("SNAPSHOT") 
+                || version.contains("<unknown>")) {
+                fullVersion = name + " " + version + " (" + buildNumber + ")";
+            } else {
+                fullVersion = name + " " + version;
+            }
         }
     }
 
