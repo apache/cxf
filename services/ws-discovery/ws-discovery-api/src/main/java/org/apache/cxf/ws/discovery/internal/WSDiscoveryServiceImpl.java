@@ -36,7 +36,11 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Provider;
@@ -51,6 +55,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.transform.InTransformReader;
 import org.apache.cxf.ws.discovery.WSDiscoveryClient;
 import org.apache.cxf.ws.discovery.WSDiscoveryService;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
@@ -372,6 +377,26 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                 //Since WS-Discovery messages are small (UDP datagram size), parsing to DOM
                 //is not a HUGE deal
                 Document doc = StaxUtils.read(request);
+                boolean mapToOld = false;
+                if ("http://schemas.xmlsoap.org/ws/2005/04/discovery"
+                    .equals(doc.getDocumentElement().getNamespaceURI())) {
+                    //old version of ws-discovery, we'll transform this to newer version
+                    
+                    XMLStreamReader domReader = StaxUtils.createXMLStreamReader(doc);
+                    Map<String, String> inMap = new HashMap<String, String>();
+                    inMap.put("{http://schemas.xmlsoap.org/ws/2005/04/discovery}*",
+                              "{http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01}*");
+                    InTransformReader reader = new InTransformReader(domReader, inMap , null, false);
+                    doc = StaxUtils.read(reader);
+                    mapToOld = true;
+                }
+                
+                
+                if (!"http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
+                    .equals(doc.getDocumentElement().getNamespaceURI())) {
+                    //not a proper ws-discovery message, ignore it
+                    return null;
+                }
                 
                 Object obj = context.createUnmarshaller().unmarshal(doc.getDocumentElement());
                 if (obj instanceof JAXBElement) {
@@ -381,6 +406,20 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                     ProbeMatchesType pmt = handleProbe((ProbeType)obj);
                     if (pmt == null) {
                         return null;
+                    }
+                    if (mapToOld) {
+                        doc.removeChild(doc.getDocumentElement());
+                        DOMResult result = new DOMResult(doc);
+                        XMLStreamWriter r = StaxUtils.createXMLStreamWriter(result);
+                        context.createMarshaller().marshal(factory.createProbeMatches(pmt), r);
+                        
+                        XMLStreamReader domReader = StaxUtils.createXMLStreamReader(doc);
+                        Map<String, String> inMap = new HashMap<String, String>();
+                        inMap.put("{http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01}*",
+                                  "{http://schemas.xmlsoap.org/ws/2005/04/discovery}*");
+                        InTransformReader reader = new InTransformReader(domReader, inMap , null, false);
+                        doc = StaxUtils.read(reader);
+                        return new DOMSource(doc);
                     }
                     return new JAXBSource(context, factory.createProbeMatches(pmt));
                 } else if (obj instanceof HelloType) {
