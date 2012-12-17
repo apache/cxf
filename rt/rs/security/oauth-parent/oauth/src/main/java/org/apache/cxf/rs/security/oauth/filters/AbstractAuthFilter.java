@@ -224,8 +224,8 @@ public class AbstractAuthFilter {
             }
         }
         if (!foundValidScope) {
-            String message = "Invalid request URI";
-            LOG.fine(message);
+            String message = "Invalid request URI: " + request.getRequestURL().toString();
+            LOG.warning(message);
         }
         return foundValidScope;
     }
