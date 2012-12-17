@@ -1188,7 +1188,7 @@ public final class StaxUtils {
                         }
                     };
                     node.setUserData("location", loc2, LocationUserDataHandler.INSTANCE);
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     //possibly not DOM level 3, won't be able to record this then
                     return false;
                 }
