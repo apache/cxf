@@ -732,9 +732,12 @@ public class DoMerges {
         }
         
         int onlyVersion = -1;
+        int fromVersion = -1;
         if (args.length > 0) {
             if ("-auto".equals(args[0])) { 
                 auto = true;
+            } else if ("-from".equals(args[0])) {
+                fromVersion = Integer.valueOf(args[1]);
             } else {
                 onlyVersion = Integer.valueOf(args[0]);
             }
@@ -757,6 +760,15 @@ public class DoMerges {
             }
             verList.clear();
             verList.add(onlyVersion);
+        }
+        if (fromVersion != -1) {
+            Iterator<Integer> it = verList.iterator();
+            while (it.hasNext()) {
+                Integer i = it.next();
+                if (i < fromVersion) {
+                    it.remove();
+                }
+            }
         }
         if (verList.isEmpty()) {
             System.out.println("Nothing needs to be merged");
