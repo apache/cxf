@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -62,7 +63,22 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     public CriteriaQuery<E> getQuery() {
         return getCriteriaQuery();
     }
-        
+    
+    public Long count() {
+        if (super.getQueryClass() != Long.class) {
+            throw new IllegalStateException("Query class needs to be of type Long");
+        }
+        @SuppressWarnings("unchecked")
+        CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>)getCriteriaQuery();
+        countQuery.select(getCriteriaBuilder().count(getRoot()));
+        return super.getEntityManager().createQuery(countQuery).getSingleResult();
+    }
+     
+    public TypedQuery<E> getArrayTypedQuery(List<SingularAttribute<T, ?>> attributes) {
+        CriteriaQuery<E> cQuery = selectArraySelections(toSelectionsArray(toSelectionsList(attributes, false)));
+        return getTypedQuery(cQuery);
+    }
+    
     public CriteriaQuery<E> selectArray(List<SingularAttribute<T, ?>> attributes) {
         return selectArraySelections(toSelectionsArray(toSelectionsList(attributes, false)));
     }
@@ -78,6 +94,11 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
         return selectConstructSelections(toSelectionsArray(toSelectionsList(attributes, false)));
     }
     
+    public TypedQuery<E> getConstructTypedQuery(List<SingularAttribute<T, ?>> attributes) {
+        CriteriaQuery<E> cQuery = selectConstructSelections(toSelectionsArray(toSelectionsList(attributes, false)));
+        return getTypedQuery(cQuery);
+    }
+    
     private CriteriaQuery<E> selectConstructSelections(Selection<?>... selections) {
         getQuery().select(getCriteriaBuilder().construct(getQueryClass(), selections));
         return getQuery();
@@ -85,6 +106,11 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
     
     public CriteriaQuery<E> selectTuple(List<SingularAttribute<T, ?>> attributes) {
         return selectTupleSelections(toSelectionsArray(toSelectionsList(attributes, true)));
+    }
+    
+    public TypedQuery<E> getTupleTypedQuery(List<SingularAttribute<T, ?>> attributes) {
+        CriteriaQuery<E> cQuery = selectTupleSelections(toSelectionsArray(toSelectionsList(attributes, true)));
+        return getTypedQuery(cQuery);
     }
     
     private CriteriaQuery<E> selectTupleSelections(Selection<?>... selections) {
@@ -109,4 +135,7 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
         return selections.toArray(new Selection[]{});
     }
     
+    private TypedQuery<E> getTypedQuery(CriteriaQuery<E> theCriteriaQuery) {
+        return super.getEntityManager().createQuery(theCriteriaQuery);
+    }
 }
