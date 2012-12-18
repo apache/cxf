@@ -229,6 +229,11 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     @Test
+    public void testEqualsCriteriaQueryCount() throws Exception {
+        assertEquals(1L, criteriaQueryBooksCount("id==10"));
+    }
+    
+    @Test
     public void testEqualsCriteriaQueryConstruct() throws Exception {
         List<BookInfo> books = criteriaQueryBooksConstruct("id==10");
         assertEquals(1, books.size());
@@ -439,6 +444,15 @@ public class JPATypedQueryVisitorTest extends Assert {
         return em.createQuery(cquery).getResultList();
     }
     
+    private long criteriaQueryBooksCount(String expression) throws Exception {
+        SearchCondition<Book> filter = 
+            new FiqlParser<Book>(Book.class).parse(expression);
+        JPACriteriaQueryVisitor<Book, Long> jpa = 
+            new JPACriteriaQueryVisitor<Book, Long>(em, Book.class, Long.class);
+        filter.accept(jpa);
+        return jpa.count();
+    }
+    
     private List<BookInfo> criteriaQueryBooksConstruct(String expression) throws Exception {
         SearchCondition<Book> filter = 
             new FiqlParser<Book>(Book.class).parse(expression);
@@ -469,10 +483,7 @@ public class JPATypedQueryVisitorTest extends Assert {
         selections.add(Book_.id);
         selections.add(Book_.title);
         
-        jpa.selectArray(selections);
-        
-        CriteriaQuery<Object[]> cquery = jpa.getQuery();
-        return em.createQuery(cquery).getResultList();
+        return jpa.getArrayTypedQuery(selections).getResultList();
     }
     
     public static class BookInfo {
