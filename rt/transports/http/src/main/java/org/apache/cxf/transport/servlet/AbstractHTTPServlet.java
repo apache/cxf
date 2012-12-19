@@ -102,7 +102,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
             List<Pattern> list = new LinkedList<Pattern>();
-            String[] pathValues = values.split(" ");
+            String[] pathValues = StringUtils.split(values, " ");
             for (String value : pathValues) {
                 String theValue = value.trim();
                 if (theValue.length() > 0) {
@@ -119,9 +119,13 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, String> map = new HashMap<String, String>();
-            String[] pairs = sequence.split(" ");
+            String[] pairs = StringUtils.split(sequence, " ");
             for (String pair : pairs) {
-                String[] value = pair.split("=");
+                String thePair = pair.trim();
+                if (thePair.length() == 0) {
+                    continue;
+                }
+                String[] value = StringUtils.split(thePair, "=");
                 if (value.length == 2) {
                     map.put(value[0].trim(), value[1].trim());
                 } else {
