@@ -53,9 +53,48 @@ public class Soap11ClientServerTest extends AbstractBusClientServerTestBase {
             StackTraceElement[] elements = ex.getCause().getStackTrace();
             assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl11", 
                          elements[0].getClassName());
+        }
+        
+        // testing Fault(new NullPointerException())
+        try {
+            greeter.greetMe("Anya");
+            fail("Should throw Exception!");
+        } catch (SOAPFaultException ex) {
+            assertEquals(NullPointerException.class.getName(), ex.getMessage());
+        } 
+
+        // testing Fault(new IllegalArgumentException("Get a wrong name for greetMe"))
+        try {
+            greeter.greetMe("Banya");
+            fail("Should throw Exception!");
+        } catch (SOAPFaultException ex) {
+            assertEquals("Get a wrong name for greetMe", ex.getMessage());
+        } 
+
+        // testing Fault("unexpected null", LOG, new NullPointerException())        
+        try {
+            greeter.greetMe("Canya");
+            fail("Should throw Exception!");
+        } catch (SOAPFaultException ex) {
+            assertEquals("unexpected null", ex.getMessage());
+        } 
+
+        // testing Fault("greetMeFault", LOG, new IllegalArgumentException("Get a wrong name greetMe"))
+        try {
+            greeter.greetMe("Danya");
+            fail("Should throw Exception!");
+        } catch (SOAPFaultException ex) {
+            assertEquals("greetMeFault Caused by: Get a wrong name greetMe", ex.getMessage());
+        } 
+
+        // testing Fault("invalid", LOG)        
+        try {
+            greeter.greetMe("Eanna");
+            fail("Should throw Exception!");
+        } catch (SOAPFaultException ex) {
+            assertEquals("invalid", ex.getMessage());
         } 
     }
-    
 
     @Test
     public void testPingMeFault() throws Exception {
