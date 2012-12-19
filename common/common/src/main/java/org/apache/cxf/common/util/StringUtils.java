@@ -110,9 +110,9 @@ public final class StringUtils {
         return str1;
     }
     
-    public static List<String> getParts(String str, String sperator) {
+    public static List<String> getParts(String str, String seperator) {
         List<String> ret = new ArrayList<String>();
-        List<String> parts = Arrays.asList(str.split("/"));
+        List<String> parts = Arrays.asList(str.split(seperator));
         for (String part : parts) {
             if (!isEmpty(part)) {
                 ret.add(part);
@@ -121,8 +121,8 @@ public final class StringUtils {
         return ret;
     }
     
-    public static String getFirstNotEmpty(String str, String sperator) {
-        List<String> parts = Arrays.asList(str.split("/"));
+    public static String getFirstNotEmpty(String str, String seperator) {
+        List<String> parts = Arrays.asList(str.split(seperator));
         for (String part : parts) {
             if (!isEmpty(part)) {
                 return part;
