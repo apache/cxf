@@ -200,13 +200,13 @@ final class Utils {
 
     static Class<?> getFieldType(Field f) {
         XmlJavaTypeAdapter adapter = getFieldXJTA(f);
-        Class<?> adapterType = getTypeFromXmlAdapter(adapter);
+        Class<?> adapterType = (Class<?>)getTypeFromXmlAdapter(adapter);
         return adapterType != null ? adapterType : f.getType();
     }
 
     static Class<?> getMethodReturnType(Method m) {
         XmlJavaTypeAdapter adapter = getMethodXJTA(m);
-        Class<?> adapterType = getTypeFromXmlAdapter(adapter);
+        Class<?> adapterType = (Class<?>)getTypeFromXmlAdapter(adapter);
         return adapterType != null ? adapterType : m.getReturnType(); 
     }
 
@@ -282,7 +282,7 @@ final class Utils {
         return adapter;
     }
 
-    static Class<?> getTypeFromXmlAdapter(XmlJavaTypeAdapter xjta) {
+    static Type getTypeFromXmlAdapter(XmlJavaTypeAdapter xjta) {
         if (xjta != null) {
             Class<?> c2 = xjta.value();
             Type sp = c2.getGenericSuperclass();
@@ -291,7 +291,7 @@ final class Utils {
                 c2 = c2.getSuperclass();
             }
             if (sp instanceof ParameterizedType) {
-                return (Class<?>)((ParameterizedType)sp).getActualTypeArguments()[0];
+                return ((ParameterizedType)sp).getActualTypeArguments()[0];
             }
         }
         return null;
