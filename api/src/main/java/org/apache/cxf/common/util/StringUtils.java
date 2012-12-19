@@ -134,9 +134,9 @@ public final class StringUtils {
         return str1;
     }
     
-    public static List<String> getParts(String str, String seperator) {
+    public static List<String> getParts(String str, String separator) {
         List<String> ret = new ArrayList<String>();
-        List<String> parts = Arrays.asList(split(str, seperator));
+        List<String> parts = Arrays.asList(split(str, separator));
         for (String part : parts) {
             if (!isEmpty(part)) {
                 ret.add(part);
@@ -145,8 +145,8 @@ public final class StringUtils {
         return ret;
     }
     
-    public static String getFirstNotEmpty(String str, String seperator) {
-        List<String> parts = Arrays.asList(split(str, seperator));
+    public static String getFirstNotEmpty(String str, String separator) {
+        List<String> parts = Arrays.asList(split(str, separator));
         for (String part : parts) {
             if (!isEmpty(part)) {
                 return part;
