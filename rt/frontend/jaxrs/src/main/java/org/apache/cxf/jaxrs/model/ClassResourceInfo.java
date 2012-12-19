@@ -53,7 +53,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     private String producesTypes;
     private List<String> nameBindings = Collections.emptyList();
     private ClassResourceInfo parent;
-    
+    private Set<String> injectedSubInstances = new HashSet<String>();
     public ClassResourceInfo(ClassResourceInfo cri) {
         super(cri.getBus());       
         if (cri.isCreatedFromModel() && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
@@ -77,9 +77,9 @@ public class ClassResourceInfo extends BeanResourceInfo {
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
                              boolean theRoot, boolean enableStatic, Bus bus) {
-        super(theResourceClass, theServiceClass, theRoot, bus);
+        super(theResourceClass, theServiceClass, theRoot, theRoot || enableStatic, bus);
         this.enableStatic = enableStatic;
-        if (root && resourceClass != null) {
+        if (resourceClass != null) {
             nameBindings = AnnotationUtils.getNameBindings(serviceClass.getAnnotations());
         }
     }
@@ -122,25 +122,49 @@ public class ClassResourceInfo extends BeanResourceInfo {
         return subResources.get(key);
     }
     
+    @Override
+    public boolean contextsAvailable() {
+        // avoid re-injecting the contexts if the root acts as subresource
+        return super.contextsAvailable() && (isRoot() || parent != null);
+    }
+    
     public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass) {
-        
         instanceClass = enableStatic ? typedClass : instanceClass;
+        return getSubResource(typedClass, instanceClass, null, enableStatic);
+    }
+    
+    public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass, Object instance) {
+        instanceClass = enableStatic ? typedClass : instanceClass;
+        return getSubResource(typedClass, instanceClass, instance, enableStatic);
+    }
+    
+    public ClassResourceInfo getSubResource(Class<?> typedClass, 
+                                            Class<?> instanceClass,
+                                            Object instance,
+                                            boolean resolveContexts) {
         
         SubresourceKey key = new SubresourceKey(typedClass, instanceClass);
         ClassResourceInfo cri = subResources.get(key);
-        if (cri == null && !enableStatic) {
-            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, enableStatic,
+        if (cri == null) {
+            cri = ResourceUtils.createClassResourceInfo(typedClass, instanceClass, false, resolveContexts,
                                                         getBus());
             if (cri != null) {
-                ClassResourceInfo tmpCri = subResources.putIfAbsent(key, cri);
-                if (tmpCri != null) {
-                    cri = tmpCri;
-                    if (cri != this) {
-                        cri.setParent(this);
-                    }
+                cri.setParent(this);
+                subResources.putIfAbsent(key, cri);
+            }
+        }
+        // this branch will run only if ResourceContext is used 
+        // or static resolution is enabled for subresources initialized
+        // from within singleton root resources (not default)
+        if (resolveContexts && cri != null && cri.isSingleton() && instance != null && cri.contextsAvailable()) {
+            synchronized (this) {
+                if (!injectedSubInstances.contains(instance.toString())) {
+                    InjectionUtils.injectContextProxies(cri, instance);
+                    injectedSubInstances.add(instance.toString());
                 }
             }
         }
+        
         return cri;
     }
     
@@ -158,10 +182,10 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public List<String> getNameBindings() {
-        if (root || parent == null) {
+        if (parent == null) {
             return nameBindings;
         } else {
-            return parent.nameBindings;
+            return parent.getNameBindings();
         }
     }
     
@@ -216,7 +240,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public List<MediaType> getProduceMime() {
-        if (root || parent == null) {
+        if (parent == null) {
             if (producesTypes != null) {
                 return JAXRSUtils.parseMediaTypes(producesTypes);
             }
@@ -228,7 +252,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
     }
     
     public List<MediaType> getConsumeMime() {
-        if (root || parent == null) {
+        if (parent == null) {
             if (consumesTypes != null) {
                 return JAXRSUtils.parseMediaTypes(consumesTypes);
             }
@@ -245,7 +269,11 @@ public class ClassResourceInfo extends BeanResourceInfo {
     
     @Override
     public boolean isSingleton() {
-        return resourceProvider != null && resourceProvider.isSingleton();
+        if (parent == null) {
+            return resourceProvider != null && resourceProvider.isSingleton();
+        } else {
+            return parent.isSingleton();
+        }
     }
 
     void setParent(ClassResourceInfo parent) {

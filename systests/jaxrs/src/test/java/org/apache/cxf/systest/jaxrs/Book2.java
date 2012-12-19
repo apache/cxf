@@ -19,10 +19,17 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -34,6 +41,10 @@ public class Book2 {
     private String name;
     @XmlElement(name = "id", namespace = "http://www.example.org/books")
     private long id;
+    
+    @Context
+    @XmlTransient
+    private UriInfo uriInfo; 
     
     public Book2() {
     }
@@ -58,5 +69,14 @@ public class Book2 {
         return id;
     }
     
+    @GET
+    @Path("rc")
+    @Produces("application/xml")
+    public Book2 initFromContext() {
+        MultivaluedMap<String, String> params = uriInfo.getQueryParameters();
+        id = Long.valueOf(params.getFirst("bookid"));
+        name = params.getFirst("bookname");
+        return this;
+    }
 
 }

@@ -32,18 +32,27 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 public abstract class BeanResourceInfo extends AbstractResourceInfo {
     protected List<Field> paramFields;
     protected List<Method> paramMethods;
-    
+    private boolean paramsAvailable;
     
     protected BeanResourceInfo(Bus bus) {
         super(bus);
     }
 
     protected BeanResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot, Bus bus) {
-        super(resourceClass, serviceClass, isRoot, bus);
-        if (isRoot && resourceClass != null) {
+        this(resourceClass, serviceClass, isRoot, true, bus);
+    }
+    
+    protected BeanResourceInfo(Class<?> resourceClass, Class<?> serviceClass, 
+                               boolean isRoot, boolean checkContexts, Bus bus) {
+        super(resourceClass, serviceClass, isRoot, checkContexts, bus);
+        if (checkContexts && resourceClass != null) {
             setParamField(serviceClass);
             setParamMethods(serviceClass);
         }
+    }
+    
+    public boolean paramsAvailable() {
+        return paramsAvailable;
     }
     
     private void setParamField(Class<?> cls) {
@@ -56,6 +65,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
                     if (paramFields == null) {
                         paramFields = new ArrayList<Field>();
                     }
+                    paramsAvailable = true;
                     paramFields.add(f);
                 }
             }
@@ -87,6 +97,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
         if (paramMethods == null) {
             paramMethods = new ArrayList<Method>();
         }
+        paramsAvailable = true;
         paramMethods.add(m);
     }
     

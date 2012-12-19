@@ -56,12 +56,18 @@ public abstract class AbstractResourceInfo {
         this.bus = bus;
     }
 
-    protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot, Bus bus) {
+    protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, 
+                                   boolean isRoot, Bus bus) {
+        this(resourceClass, serviceClass, isRoot, true, bus);
+    }
+    
+    protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, 
+                                   boolean isRoot, boolean checkContexts, Bus bus) {
         this.bus = bus;
         this.serviceClass = serviceClass;
         this.resourceClass = resourceClass;
         root = isRoot;
-        if (root && resourceClass != null) {
+        if (checkContexts && resourceClass != null) {
             findContexts(serviceClass);   
         }
     }

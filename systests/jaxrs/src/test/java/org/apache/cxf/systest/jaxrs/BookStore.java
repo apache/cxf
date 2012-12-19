@@ -54,6 +54,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -84,6 +85,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.ext.xml.XMLInstruction;
 import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
+import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
 
@@ -108,9 +110,13 @@ public class BookStore {
     private SecurityContext securityContext;
     @Context 
     private UriInfo ui;
+    @Context 
+    private ResourceContext resourceContext;
     
     @BeanParam
     private BookBean theBookBean;
+    
+    private Book2 book2Sub = new Book2();
     
     public BookStore() {
         init();
@@ -884,6 +890,17 @@ public class BookStore {
             details.setId(Long.parseLong(id));
             throw new BookNotFoundFault(details);
         }
+    }
+    
+    @Path("/booksubresource/context")
+    public Book2 getBookSubResourceRC() {
+        return resourceContext.getResource(Book2.class);
+    }
+    
+    @Path("/booksubresource/instance/context")
+    public Book2 getBookSubResourceInstanceRC(@Context ResourceContext rc) {
+        // This cast is temporarily
+        return ((ResourceContextImpl)rc).initResource(book2Sub);
     }
     
     @Path("/booksubresourceobject/{bookId}/")

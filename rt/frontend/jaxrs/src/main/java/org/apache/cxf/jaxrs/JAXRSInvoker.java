@@ -153,15 +153,19 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             
             pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), inMessage);
-                    
-            if (cri.isRoot()) {
+            
+            final boolean contextsAvailable = cri.contextsAvailable();
+            final boolean paramsAvailable = cri.paramsAvailable();
+            if (contextsAvailable || paramsAvailable) {
                 Object realResourceObject = ClassHelper.getRealObject(resourceObject);
-                JAXRSUtils.injectParameters(ori, realResourceObject, inMessage);
-    
-                InjectionUtils.injectContexts(realResourceObject,
-                                              ori.getClassResourceInfo(),
-                                              inMessage);
-                
+                if (paramsAvailable) {
+                    JAXRSUtils.injectParameters(ori, realResourceObject, inMessage);
+                }
+                if (contextsAvailable) {
+                    InjectionUtils.injectContexts(realResourceObject, cri, inMessage);
+                }
+            }
+            if (cri.isRoot()) {
                 ProviderInfo<?> appProvider = 
                     (ProviderInfo<?>)exchange.getEndpoint().get(Application.class.getName());
                 if (appProvider != null) {
@@ -169,7 +173,6 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                   appProvider,
                                                   inMessage);
                 }
-                
             }
         }
         
@@ -228,7 +231,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 result = checkResultObject(result, subResourcePath);
 
                 subCri = cri.getSubResource(methodToInvoke.getReturnType(),
-                    ClassHelper.getRealClass(result));
+                    ClassHelper.getRealClass(result), result);
                 if (subCri == null) {
                     org.apache.cxf.common.i18n.Message errorM =
                         new org.apache.cxf.common.i18n.Message("NO_SUBRESOURCE_FOUND",

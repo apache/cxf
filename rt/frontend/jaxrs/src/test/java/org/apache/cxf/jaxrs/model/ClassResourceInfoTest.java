@@ -117,12 +117,8 @@ public class ClassResourceInfoTest extends Assert {
     
     @Test
     public void testGetHttpContexts() {
-        ClassResourceInfo c = new ClassResourceInfo(TestClass.class, false);
+        ClassResourceInfo c = new ClassResourceInfo(TestClass.class, true);
         List<Field> fields = c.getContextFields();
-        assertEquals("Only root classes should check these fields", 0, fields.size());
-        
-        c = new ClassResourceInfo(TestClass.class, true);
-        fields = c.getContextFields();
         Set<Class<?>> clses = new HashSet<Class<?>>(); 
         for (Field f : fields) {
             clses.add(f.getType());

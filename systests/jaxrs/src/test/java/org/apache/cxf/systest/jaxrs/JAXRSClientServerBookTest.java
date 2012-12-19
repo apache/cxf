@@ -112,7 +112,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     private void doTestUseParamBeanWebClient(String address) {
         WebClient wc = WebClient.create(address);
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
         wc.query("id", "120");
         wc.query("id1", "3");
         Book book = wc.get(Book.class);
@@ -1421,6 +1420,29 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/booksubresource/123/chapters/1",
                                "resources/expected_get_chapter1.txt",
                                "application/xml", "application/xml;charset=ISO-8859-1", 200);
+    }
+    
+    @Test
+    public void testGetBookWithResourceContext() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/booksubresource/context/rc";
+        doTestGetBookWithResourceContext(address);
+    }
+    
+    @Test
+    public void testGetBookWithResourceContextInstance() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/booksubresource/instance/context/rc";
+        doTestGetBookWithResourceContext(address);
+    }
+    
+    private void doTestGetBookWithResourceContext(String address) throws Exception {
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        wc.accept("application/xml");
+        wc.query("bookid", "12345");
+        wc.query("bookname", "bookcontext");
+        Book2 book = wc.get(Book2.class);
+        assertEquals(12345L, book.getId());
+        assertEquals("bookcontext", book.getName());
     }
     
     @Test

@@ -47,6 +47,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
@@ -88,6 +89,7 @@ public final class AnnotationUtils {
         classes.add(Providers.class);
         classes.add(Request.class);
         classes.add(ResourceInfo.class);
+        classes.add(ResourceContext.class);
         classes.add(Application.class);
         // Servlet API
         try {
