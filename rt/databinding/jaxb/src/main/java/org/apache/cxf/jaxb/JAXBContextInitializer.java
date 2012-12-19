@@ -407,13 +407,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         // must not have parameters and return type must not be void
         if (method.getReturnType() == Void.class 
             || method.getParameterTypes().length != 0
-            || method.getDeclaringClass().equals(Throwable.class)) {
-            return false;
-        }
-        if (method.getName().startsWith("get")
-                || method.getName().startsWith("is")) { 
-                //continue with below check.
-        } else {
+            || method.getDeclaringClass().equals(Throwable.class)
+            || !(method.getName().startsWith("get")
+                    || method.getName().startsWith("is"))) {
             return false;
         }
         int beginIndex = 3;
@@ -429,19 +425,23 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         } catch (Exception e) {
             //getter, but no setter
         }
-        if ((setter != null) 
-                && ((setter.isAnnotationPresent(XmlTransient.class)
-                 || !Modifier.isPublic(setter.getModifiers())))) {
+        if (setter != null) {
+            if (setter.isAnnotationPresent(XmlTransient.class)
+                || !Modifier.isPublic(setter.getModifiers())) {
+                return false;
+            }
+        } else if (!Collection.class.isAssignableFrom(method.getReturnType())
+            && !Throwable.class.isAssignableFrom(method.getDeclaringClass())) {
+            //no setter, it's not a collection (thus getter().add(...)), and
+            //not an Exception, 
             return false;
-             
         }
 
         if (accessType == XmlAccessType.NONE
             || accessType == XmlAccessType.FIELD) {
             return checkJaxbAnnotation(method.getAnnotations());
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**
