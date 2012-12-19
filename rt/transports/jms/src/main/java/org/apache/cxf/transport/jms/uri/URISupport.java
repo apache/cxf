@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cxf.common.util.StringUtils;
+
 /**
  * URI utilities.
  *
@@ -113,7 +115,7 @@ public final class URISupport {
         try {
             Map<String, String> rc = new HashMap<String, String>();
             if (uri != null) {
-                String[] parameters = uri.split("&");
+                String[] parameters = StringUtils.split(uri, "&");
                 for (String parameter : parameters) {
                     int p = parameter.indexOf("=");
                     if (p >= 0) {

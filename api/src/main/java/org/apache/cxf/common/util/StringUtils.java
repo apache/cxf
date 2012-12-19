@@ -24,13 +24,37 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtils {
-
+    public static final Map<String, Pattern> PATTERN_MAP = new HashMap<String, Pattern>();
+    static {
+        String patterns[] = {"/", " ", ":", "," , ";", "="}; 
+        for (String p : patterns) {
+            PATTERN_MAP.put(p, Pattern.compile(p));
+        }
+    }
+        
     private StringUtils() {
+    }
+    
+    public static String[] split(String s, String regex) {
+        Pattern p = PATTERN_MAP.get(regex);
+        if (p != null) {
+            return p.split(s);
+        }
+        return s.split(regex);
+    }
+    public static String[] split(String s, String regex, int limit) {
+        Pattern p = PATTERN_MAP.get(regex);
+        if (p != null) {
+            return p.split(s, limit);
+        }
+        return s.split(regex, limit);
     }
 
     public static String extract(String string, String startToken, String endToken) {
@@ -112,7 +136,7 @@ public final class StringUtils {
     
     public static List<String> getParts(String str, String seperator) {
         List<String> ret = new ArrayList<String>();
-        List<String> parts = Arrays.asList(str.split(seperator));
+        List<String> parts = Arrays.asList(split(str, seperator));
         for (String part : parts) {
             if (!isEmpty(part)) {
                 ret.add(part);
@@ -122,7 +146,7 @@ public final class StringUtils {
     }
     
     public static String getFirstNotEmpty(String str, String seperator) {
-        List<String> parts = Arrays.asList(str.split(seperator));
+        List<String> parts = Arrays.asList(split(str, seperator));
         for (String part : parts) {
             if (!isEmpty(part)) {
                 return part;
