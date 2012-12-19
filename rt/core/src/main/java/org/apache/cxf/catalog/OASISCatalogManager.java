@@ -22,13 +22,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +56,7 @@ public class OASISCatalogManager {
 
     private EntityResolver resolver;
     private Object catalog;
-    private Set<URI> loadedCatalogs = Collections.synchronizedSet(new HashSet<URI>());
+    private Set<String> loadedCatalogs = new CopyOnWriteArraySet<String>();
     private Bus bus;
 
     public OASISCatalogManager() {
@@ -144,15 +142,15 @@ public class OASISCatalogManager {
         Enumeration<URL> catalogs = classLoader.getResources(name);
         while (catalogs.hasMoreElements()) {
             URL catalogURL = catalogs.nextElement();
-            if (!loadedCatalogs.contains(URI.create(replaceWhitespace(catalogURL.toString())))) {
+            if (!loadedCatalogs.contains(catalogURL.toString())) {
                 ((Catalog)catalog).parseCatalog(catalogURL);
-                loadedCatalogs.add(URI.create(replaceWhitespace(catalogURL.toString())));
+                loadedCatalogs.add(catalogURL.toString());
             }
         }
     }
 
     public final void loadCatalog(URL catalogURL) throws IOException {
-        if (!loadedCatalogs.contains(URI.create(replaceWhitespace(catalogURL.toString()))) && catalog != null) {
+        if (!loadedCatalogs.contains(catalogURL.toString()) && catalog != null) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {
                     File file = new File(catalogURL.toURI());
@@ -166,17 +164,10 @@ public class OASISCatalogManager {
 
             ((Catalog)catalog).parseCatalog(catalogURL);
 
-            loadedCatalogs.add(URI.create(replaceWhitespace(catalogURL.toString())));
+            loadedCatalogs.add(catalogURL.toString());
         }
     }
     
-    private String replaceWhitespace(String str) {
-        if (str.contains(" ")) {
-            str = str.replace(" ", "%20");
-        }
-        return str;
-    }
-
     private static OASISCatalogManager getContextCatalog() {
         try {
             OASISCatalogManager oasisCatalog = new OASISCatalogManager();
