@@ -155,9 +155,10 @@ public abstract class AbstractHTTPDestination
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
-        String authType = credentials.split(" ")[0];
+        String creds[] = StringUtils.split(credentials, " ");
+        String authType = creds[0];
         if ("Basic".equals(authType)) {
-            String authEncoded = credentials.split(" ")[1];
+            String authEncoded = creds[1];
             try {
                 String authDecoded = new String(Base64Utility.decode(authEncoded));
                 int idx = authDecoded.indexOf(':');

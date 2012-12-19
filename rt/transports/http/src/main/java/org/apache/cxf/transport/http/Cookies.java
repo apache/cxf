@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -68,11 +69,11 @@ public class Cookies {
         }
     
         for (String header : headers) {
-            String[] cookies = header.split(",");
+            String[] cookies = StringUtils.split(header, ",");
             for (String cookie : cookies) {
-                String[] parts = cookie.split(";");
+                String[] parts = StringUtils.split(cookie, ";");
     
-                String[] kv = parts[0].split("=", 2);
+                String[] kv = StringUtils.split(parts[0], "=", 2);
                 if (kv.length != 2) {
                     continue;
                 }
@@ -81,7 +82,7 @@ public class Cookies {
                 Cookie newCookie = new Cookie(name, value);
     
                 for (int i = 1; i < parts.length; i++) {
-                    kv = parts[i].split("=", 2);
+                    kv = StringUtils.split(parts[i], "=", 2);
                     name = kv[0].trim();
                     value = (kv.length > 1) ? kv[1].trim() : null;
                     if (name.equalsIgnoreCase(Cookie.DISCARD_ATTRIBUTE)) {

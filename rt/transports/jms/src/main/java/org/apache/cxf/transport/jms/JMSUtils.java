@@ -47,6 +47,7 @@ import javax.jms.Topic;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.MessageUtils;
@@ -339,7 +340,7 @@ public final class JMSUtils {
         String contentType = ct.toLowerCase();
         String enc = null;
 
-        String[] tokens = contentType.split(";");
+        String[] tokens = StringUtils.split(contentType, ";");
         for (String token : tokens) {
             int index = token.indexOf("charset=");
             if (index >= 0) {
