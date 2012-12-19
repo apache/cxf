@@ -28,11 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.common.logging.LogUtils;
 
 public class TextExtensionFragmentParser {
     private static final Logger LOG = LogUtils.getL7dLogger(TextExtensionFragmentParser.class);
+    private static Pattern colonPattern = Pattern.compile(":");
     
     public List<Extension> getExtensions(final URL url) {
         InputStream is = null;
@@ -82,7 +84,7 @@ public class TextExtensionFragmentParser {
             return null;
         }
         final Extension ext = new Extension();
-        String[] parts = line.split(":");
+        String[] parts = colonPattern.split(line, 0);
         ext.setClassname(parts[0]);
         if (ext.getClassname() == null) {
             return null;
