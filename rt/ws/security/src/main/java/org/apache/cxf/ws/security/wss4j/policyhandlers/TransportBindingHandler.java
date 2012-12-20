@@ -591,7 +591,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 result.addAll(
                     this.getElements(
                         "Element", signedElements.getXPathExpressions(), 
-                        signedElements.getDeclaredNamespaces(), found
+                        signedElements.getDeclaredNamespaces(), found, true
                     )
                 );
             } catch (XPathExpressionException e) {
