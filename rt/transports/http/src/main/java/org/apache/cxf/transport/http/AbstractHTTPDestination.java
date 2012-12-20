@@ -696,7 +696,7 @@ public abstract class AbstractHTTPDestination
                 written = true;
             }
             if (wrappedStream != null) {
-                return IOUtils.copy(in, wrappedStream, IOUtils.DEFAULT_BUFFER_SIZE);
+                return IOUtils.copy(in, wrappedStream);
             }
             return IOUtils.copy(in, this, IOUtils.DEFAULT_BUFFER_SIZE);
         }

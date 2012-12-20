@@ -43,6 +43,7 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CopyingOutputStream;
@@ -394,6 +395,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     
     static class JettyOutputStream extends FilterOutputStream implements CopyingOutputStream {
         final Output out;
+        boolean written;
         public JettyOutputStream(Output o) {
             super(o);
             out = o;
@@ -401,9 +403,20 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
 
         @Override
         public int copyFrom(InputStream in) throws IOException {
+            if (written) {
+                return IOUtils.copy(in, out);
+            }
             CountingInputStream c = new CountingInputStream(in);
             out.sendContent(c);
             return c.getCount();
+        }
+        public void write(int b) throws IOException {
+            written = true;
+            out.write(b);
+        }
+        public void write(byte b[], int off, int len) throws IOException {
+            written = true;
+            out.write(b, off, len);
         }
     }
     static class CountingInputStream extends FilterInputStream {
