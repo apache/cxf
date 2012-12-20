@@ -532,11 +532,11 @@
                 </sp:SymmetricBinding>
                 <sp:EncryptedElements
                   xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:XPath xmlns:example1="http://cxf.apache.org/policytest/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
+                    <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
                 </sp:EncryptedElements>
                 <sp:SignedElements
                   xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
-                    <sp:XPath xmlns:example1="http://cxf.apache.org/policytest/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
+                    <sp:XPath xmlns:example1="http://www.example.org/schema/DoubleIt">//example1:DoubleIt/numberToDouble</sp:XPath>
                 </sp:SignedElements>
                 <sp:RequiredElements
                   xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
