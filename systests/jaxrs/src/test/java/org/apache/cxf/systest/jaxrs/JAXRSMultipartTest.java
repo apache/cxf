@@ -105,6 +105,27 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookAsStringContent() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/content/string";
+        doTestGetBookAsPlainContent(address);
+    }
+    
+    @Test
+    public void testGetBookAsByteContent() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/content/bytes";
+        doTestGetBookAsPlainContent(address);
+    }
+    
+    private void doTestGetBookAsPlainContent(String address) throws Exception {
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        wc.accept("multipart/mixed");
+        MultipartBody book = wc.get(MultipartBody.class);
+        Book b = book.getRootAttachment().getObject(Book.class);
+        assertEquals(888L, b.getId());
+    }
+    
+    @Test
     public void testBookAsMessageContextDataHandler() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/mchandlers";
         doAddBook(address, "attachmentData", 200);               
@@ -421,7 +442,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     private void doTestNullPart(String address) throws Exception {
         WebClient client = WebClient.create(address);
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
         client.type("multipart/form-data").accept("text/plain");
         List<Attachment> atts = new LinkedList<Attachment>();
         atts.add(new Attachment("somepart", "text/plain", "hello there"));
