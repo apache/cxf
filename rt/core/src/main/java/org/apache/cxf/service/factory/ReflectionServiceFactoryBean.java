@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -900,6 +901,17 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     private void setFaultClassInfo(OperationInfo o, Method selected) {
         Class<?>[] types = selected.getExceptionTypes();
+        Map<FaultInfo, List<MessagePartInfo>> mpiMap = null;
+        if (types.length > 0) {
+            //early iterate over FaultInfo before cycling on exception types
+            //as fi.getMessageParts() is very time-consuming due to elements
+            //copy in ArrayList constructor
+            mpiMap = new HashMap<FaultInfo, List<MessagePartInfo>>();
+            for (FaultInfo fi : o.getFaults()) {
+                mpiMap.put(fi, fi.getMessageParts());
+            }
+        }
+        
         for (int i = 0; i < types.length; i++) {
             Class<?> exClass = types[i];
             Class<?> beanClass = getBeanClass(exClass);
@@ -909,8 +921,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
             QName name = getFaultName(o.getInterface(), o, exClass, beanClass);
 
-            for (FaultInfo fi : o.getFaults()) {
-                List<MessagePartInfo> mpis = fi.getMessageParts();
+            for (Entry<FaultInfo, List<MessagePartInfo>> entry : mpiMap.entrySet()) {
+                FaultInfo fi = entry.getKey();
+                List<MessagePartInfo> mpis = entry.getValue();
                 if (mpis.size() != 1) {
                     Message message = new Message("NO_FAULT_PART", LOG, fi.getFaultName()); 
                     LOG.log(Level.WARNING, message.toString());
