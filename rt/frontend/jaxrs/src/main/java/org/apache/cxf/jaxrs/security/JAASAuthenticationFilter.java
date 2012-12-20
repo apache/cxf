@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.security.AuthenticationException;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
@@ -126,7 +127,7 @@ public class JAASAuthenticationFilter implements RequestHandler {
             List<String> authHeader = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
             if (authHeader.size() > 0) {
                 // should HttpHeadersImpl do it ?
-                String[] authValues = authHeader.get(0).split(" ");
+                String[] authValues = StringUtils.split(authHeader.get(0), " ");
                 if (authValues.length > 0) {
                     sb.append(authValues[0]);
                 }

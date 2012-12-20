@@ -86,7 +86,7 @@ public final class FormUtils {
                                              boolean decode,
                                              HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
-            List<String> parts = Arrays.asList(postBody.split("&"));
+            List<String> parts = Arrays.asList(StringUtils.split(postBody, "&"));
             checkNumberOfParts(m, parts.size());
             for (String part : parts) {
                 String[] keyValue = new String[2];

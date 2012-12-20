@@ -29,6 +29,7 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.UserResource;
@@ -47,7 +48,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
                                 Element e, String name, 
                                 String val, ParserContext context) {
         if ("beanNames".equals(name)) {
-            String[] values = val.split(" ");
+            String[] values = StringUtils.split(val, " ");
             MutableCollectionMetadata tempFactories = context.createMetadata(MutableCollectionMetadata.class);
             for (String v : values) {
                 String theValue = v.trim();
