@@ -1221,7 +1221,7 @@ public abstract class AbstractBindingBuilder {
         
         // Handle sign/enc elements
         try {
-            result.addAll(this.getElements("Element", xpaths, namespaces, found));
+            result.addAll(this.getElements("Element", xpaths, namespaces, found, sign));
         } catch (XPathExpressionException e) {
             LOG.log(Level.FINE, e.getMessage(), e);
             // REVISIT
@@ -1229,7 +1229,7 @@ public abstract class AbstractBindingBuilder {
         
         // Handle content encrypted elements
         try {
-            result.addAll(this.getElements("Content", contentXpaths, cnamespaces, found));
+            result.addAll(this.getElements("Content", contentXpaths, cnamespaces, found, sign));
         } catch (XPathExpressionException e) {
             LOG.log(Level.FINE, e.getMessage(), e);
             // REVISIT
@@ -1332,6 +1332,8 @@ public abstract class AbstractBindingBuilder {
      *            signing/encryption. Populated with additional matches found by
      *            this method and used to prevent including the same element
      *            twice under the same operation.
+     * @param forceId 
+     *         force adding a wsu:Id onto the elements.  Recommended for signatures.
      * @return a configured list of {@code WSEncryptionPart}s suitable for
      *         processing by WSS4J
      * @throws XPathExpressionException
@@ -1342,7 +1344,8 @@ public abstract class AbstractBindingBuilder {
      */
     protected List<WSEncryptionPart> getElements(String encryptionModifier,
             List<String> xpaths, Map<String, String> namespaces,
-            List<Element> found) throws XPathExpressionException, SOAPException {
+            List<Element> found,
+            boolean forceId) throws XPathExpressionException, SOAPException {
         
         List<WSEncryptionPart> result = new ArrayList<WSEncryptionPart>();
         
@@ -1360,8 +1363,21 @@ public abstract class AbstractBindingBuilder {
                     Element el = (Element)list.item(x);
                     
                     if (!found.contains(el)) {
-                        final String id = this.addWsuIdToElement(el);
-                        
+                        String id = null;
+                        if (forceId) {
+                            id = this.addWsuIdToElement(el);
+                        } else {
+                            //not forcing an ID on this.  Use one if there is one 
+                            //there already, but don't force one
+                            Attr idAttr = el.getAttributeNode("Id");
+                            if (idAttr == null) {
+                                //then try the wsu:Id value
+                                idAttr = el.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
+                            }
+                            if (idAttr != null) {
+                                id = idAttr.getValue();
+                            }
+                        }
                         WSEncryptionPart part = 
                             new WSEncryptionPart(id, encryptionModifier);
                         part.setElement(el);
