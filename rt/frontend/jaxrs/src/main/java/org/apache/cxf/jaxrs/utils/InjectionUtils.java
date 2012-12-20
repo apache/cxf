@@ -73,6 +73,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
@@ -785,7 +786,7 @@ public final class InjectionUtils {
         }
         List<String> newValues = new ArrayList<String>();
         for (String v : values) {
-            String[] segments = v.split("/");
+            String[] segments = StringUtils.split(v, "/");
             for (String s : segments) {
                 if (s.length() != 0) {
                     newValues.add(s);

@@ -54,7 +54,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         builder.uri(value.substring(1, closeIndex).trim());
         if (closeIndex < value.length() - 1) {
             
-            String[] tokens = value.substring(closeIndex + 1).split(";");
+            String[] tokens = StringUtils.split(value.substring(closeIndex + 1), ";");
             for (String token : tokens) {
                 String theToken = token.trim();
                 if (theToken.isEmpty()) {
@@ -68,7 +68,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
                     paramValue = i == theToken.length() - 1 ? "" : theToken.substring(i + 1).trim();
                 }
                 if (REL.equals(paramName)) {
-                    String[] rels = removeQuotesIfNeeded(paramValue).split(",");
+                    String[] rels = StringUtils.split(removeQuotesIfNeeded(paramValue), ",");
                     for (String rel : rels) {
                         builder.rel(rel.trim());
                     }

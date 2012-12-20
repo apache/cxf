@@ -147,13 +147,13 @@ public class HttpHeadersImpl implements HttpHeaders {
         List<Locale> newLs = new ArrayList<Locale>(); 
         Map<Locale, Float> prefs = new HashMap<Locale, Float>();
         for (String l : ls) {
-            String[] pair = l.split(";");
+            String[] pair = StringUtils.split(l, ";");
             
             Locale locale = HttpUtils.getLocale(pair[0].trim());
             
             newLs.add(locale);
             if (pair.length > 1) {
-                String[] pair2 = pair[1].split("=");
+                String[] pair2 = StringUtils.split(pair[1], "=");
                 if (pair2.length > 1) {
                     prefs.put(locale, JAXRSUtils.getMediaTypeQualityFactor(pair2[1].trim()));
                 } else {
@@ -209,7 +209,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     private List<String> getHeaderValues(String headerName, String originalValue, String sep) {
         if (!originalValue.contains(QUOTE)
             || HEADERS_WITH_POSSIBLE_QUOTES.contains(headerName)) {
-            String[] ls = originalValue.split(sep);
+            String[] ls = StringUtils.split(originalValue, sep);
             if (ls.length == 1) {
                 return Collections.singletonList(ls[0].trim());
             } else {

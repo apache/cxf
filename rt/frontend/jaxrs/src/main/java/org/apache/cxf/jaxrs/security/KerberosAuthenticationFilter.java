@@ -75,7 +75,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             LOG.fine("No Authorization header is available");
             throw new NotAuthorizedException(getFaultResponse());
         }
-        String[] authPair = authHeaders.get(0).split(" ");
+        String[] authPair = StringUtils.split(authHeaders.get(0), " ");
         if (authPair.length != 2 || !NEGOTIATE_SCHEME.equalsIgnoreCase(authPair[0])) {
             LOG.fine("Negotiate Authorization scheme is expected");
             throw new NotAuthorizedException(getFaultResponse());

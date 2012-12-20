@@ -204,7 +204,7 @@ public final class HttpUtils {
             return null;
         }
         
-        String[] values = value.split("-");
+        String[] values = StringUtils.split(value, "-");
         if (values.length == 0 || values.length > 2) {
             throw new IllegalArgumentException("Illegal locale value : " + value);
         }

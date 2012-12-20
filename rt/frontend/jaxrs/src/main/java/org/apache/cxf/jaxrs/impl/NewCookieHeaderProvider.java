@@ -22,6 +22,8 @@ package org.apache.cxf.jaxrs.impl;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
+import org.apache.cxf.common.util.StringUtils;
+
 public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
 
     private static final String VERSION = "Version";
@@ -46,7 +48,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         int maxAge = -1;
         boolean isSecure = false;
         
-        String[] tokens = c.split(";");
+        String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
             String theToken = token.trim();
             if (theToken.startsWith(VERSION)) {

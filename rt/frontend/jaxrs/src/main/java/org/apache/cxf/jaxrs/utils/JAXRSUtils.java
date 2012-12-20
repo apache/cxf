@@ -174,7 +174,7 @@ public final class JAXRSUtils {
     
     public static List<PathSegment> getPathSegments(String thePath, boolean decode, 
                                                     boolean ignoreLastSlash) {
-        String[] segments = thePath.split("/");
+        String[] segments = StringUtils.split(thePath, "/");
         List<PathSegment> theList = new ArrayList<PathSegment>();
         for (String path : segments) {
             if (!StringUtils.isEmpty(path)) {
@@ -1093,7 +1093,7 @@ public final class JAXRSUtils {
                                            boolean decode,
                                            boolean decodePlus) {
         if (!StringUtils.isEmpty(query)) {            
-            List<String> parts = Arrays.asList(query.split(sep));
+            List<String> parts = Arrays.asList(StringUtils.split(query, sep));
             for (String part : parts) {
                 int index = part.indexOf('=');
                 String name = null;

@@ -180,7 +180,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (schemas == null) {
             return;
         }
-        String[] locations = schemas.split(" ");
+        String[] locations = StringUtils.split(schemas, " ");
         List<String> list = new ArrayList<String>();
         for (String loc : locations) {
             String theLoc = loc.trim();
@@ -208,7 +208,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (value == null) {
             return;
         }
-        String[] values = value.split(splitChar);
+        String[] values = StringUtils.split(value, splitChar);
         List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
         for (String interceptorVal : values) {
             Map<String, List<String>> props = new HashMap<String, List<String>>();
@@ -273,7 +273,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             }
             throw new ServletException("At least one resource class should be specified");
         }
-        String[] classNames = serviceBeans.split(splitChar);
+        String[] classNames = StringUtils.split(serviceBeans, splitChar);
         Map<Class<?>, Map<String, List<String>>> map = 
             new HashMap<Class<?>, Map<String, List<String>>>();
         for (String cName : classNames) {
@@ -295,7 +295,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (providersList == null) {
             return Collections.EMPTY_LIST;
         }
-        String[] classNames = providersList.split(splitChar);
+        String[] classNames = StringUtils.split(providersList, splitChar);
         List<Object> providers = new ArrayList<Object>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<String, List<String>>();
@@ -322,13 +322,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (sequence != null) {
             sequence = sequence.trim();
             Map<String, List<String>> map = new HashMap<String, List<String>>();
-            String[] pairs = sequence.split(" ");
+            String[] pairs = StringUtils.split(sequence, " ");
             for (String pair : pairs) {
                 String thePair = pair.trim();
                 if (thePair.length() == 0) {
                     continue;
                 }
-                String[] values = thePair.split("=");
+                String[] values = StringUtils.split(thePair, "=");
                 String key;
                 String value;
                 if (values.length == 2) {

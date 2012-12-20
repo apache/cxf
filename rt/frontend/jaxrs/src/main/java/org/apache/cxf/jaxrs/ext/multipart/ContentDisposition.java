@@ -24,12 +24,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.StringUtils;
+
 public class ContentDisposition {
 
     private List<String> values;
     
     public ContentDisposition(String value) {
-        values = Arrays.asList(value.split(";"));
+        values = Arrays.asList(StringUtils.split(value, ";"));
     }
     
     public String getType() {
@@ -40,7 +42,7 @@ public class ContentDisposition {
         for (int i = 1; i < values.size(); i++) {
             String v = values.get(i).trim();
             if (v.startsWith(name)) {
-                String[] parts = v.split("=");
+                String[] parts = StringUtils.split(v, "=");
                 return parts.length == 2 ? parts[1].trim().replace("\"", "").replace("'", "") : ""; 
             }
         }
@@ -50,7 +52,7 @@ public class ContentDisposition {
     public Map<String, String> getParameters() {
         Map<String, String> map = new LinkedHashMap<String, String>();
         for (int i = 1; i < values.size(); i++) {
-            String[] parts = values.get(i).split("=");
+            String[] parts = StringUtils.split(values.get(i), "=");
             map.put(parts[0].trim(), parts.length == 2 
                     ? parts[1].trim().replace("\"", "").replace("'", "") : ""); 
         }
