@@ -105,11 +105,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 writer.writeStartElement(defaultPrefix, "Reason", ns);
                 writer.writeStartElement(defaultPrefix, "Text", ns);
                 writer.writeAttribute("xml", "http://www.w3.org/XML/1998/namespace", "lang", getLangCode());
-                if (fault.getMessage() != null) {
-                    writer.writeCharacters(fault.getMessage());
-                } else {
-                    writer.writeCharacters("Fault occurred while processing.");
-                }
+                writer.writeCharacters(getFaultMessage(message, fault));
                 writer.writeEndElement();
                 writer.writeEndElement();
 
