@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.security.SecurityContext;
 
 
@@ -94,7 +95,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     }
     
     public void setGlobalRoles(String roles) {
-        globalRoles = Arrays.asList(roles.split(" "));
+        globalRoles = Arrays.asList(StringUtils.split(roles, " "));
     }
     
     public void setCheckConfiguredRolesOnly(boolean checkConfiguredRolesOnly) {
@@ -104,7 +105,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
-            map.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
+            map.put(entry.getKey(), Arrays.asList(StringUtils.split(entry.getValue(), " ")));
         }
         return map;
     }
