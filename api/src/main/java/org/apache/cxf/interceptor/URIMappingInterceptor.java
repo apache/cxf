@@ -319,10 +319,10 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         Map<String, String> queries = new LinkedHashMap<String, String>();
         String query = (String)message.get(Message.QUERY_STRING);
         if (!StringUtils.isEmpty(query)) {            
-            List<String> parts = Arrays.asList(query.split("&"));
+            List<String> parts = Arrays.asList(StringUtils.split(query, "&"));
             for (String part : parts) {
                 if (part.contains("=")) {
-                    String[] keyValue = part.split("=");
+                    String[] keyValue = StringUtils.split(part, "=");
                     if (keyValue.length >= 2) {
                         queries.put(keyValue[0], uriDecode(keyValue[1]));
                     }

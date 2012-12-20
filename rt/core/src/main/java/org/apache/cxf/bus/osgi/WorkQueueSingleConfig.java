@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.cm.ConfigurationException;
@@ -46,7 +47,7 @@ public class WorkQueueSingleConfig implements ManagedService {
         }
         Dictionary<String, String> p = CastUtils.cast(properties);
         String names = (String)properties.get(PROPERTY_PREFIX + ".names");
-        String[] nameAr = names.split(",");
+        String[] nameAr = StringUtils.split(names, ",");
         for (String name : nameAr) {
             updateQueue(name.trim(), p);
         }
