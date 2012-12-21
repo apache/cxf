@@ -366,7 +366,7 @@ public final class AttachmentUtil {
 
     public static Attachment createMtomAttachment(boolean isXop, String mimeType, String elementNS, 
                                                  byte[] data, int offset, int length, int threshold) {
-        if (!isXop || length < threshold) {
+        if (!isXop || length <= threshold) {
             return null;
         }        
         if (mimeType == null) {
