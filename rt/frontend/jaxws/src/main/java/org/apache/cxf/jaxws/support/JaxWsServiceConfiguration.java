@@ -165,13 +165,15 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             || method.isSynthetic()) {
             return Boolean.FALSE;
         }
+        
         WebMethod wm = method.getAnnotation(WebMethod.class);
-        if (wm != null) {
-            if (wm.exclude()) {
-                return Boolean.FALSE;
-            } else {
-                return Boolean.TRUE;
-            }
+        Class<?>  cls = method.getDeclaringClass();
+        if ((wm != null) && wm.exclude()) {
+            return Boolean.FALSE;
+        }
+        if ((wm != null && !wm.exclude()) || (cls.isInterface() 
+                && cls.isAssignableFrom(implInfo.getSEIClass()))) {
+            return Boolean.TRUE;
         }
         if (method.getDeclaringClass().isInterface()) {
             return hasWebServiceAnnotation(method);
