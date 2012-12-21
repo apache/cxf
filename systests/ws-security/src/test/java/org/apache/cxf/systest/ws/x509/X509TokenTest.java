@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.ws.x509;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -29,6 +31,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
 import org.apache.cxf.systest.ws.x509.server.Intermediary;
@@ -608,6 +612,12 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         DoubleItPortType2 x509Port = 
                 service.getPort(portQName, DoubleItPortType2.class);
         updateAddressPort(x509Port, PORT);
+        
+        List<Header> headers = new ArrayList<Header>();
+        Header dummyHeader = new Header(new QName("uri:org.apache.cxf", "dummy"), "dummy-header",
+                                        new JAXBDataBinding(String.class));
+        headers.add(dummyHeader);
+        ((BindingProvider)x509Port).getRequestContext().put(Header.HEADER_LIST, headers);
         
         int response = x509Port.doubleIt(25);
         assertEquals(50, response);
