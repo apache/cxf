@@ -63,6 +63,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.ws.security.cache.ReplayCache;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -189,6 +190,14 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                     return (Validator)validator;
                 }
             };
+            
+            // Configure replay caching
+            ReplayCache nonceCache = 
+                WSS4JUtils.getReplayCache(
+                    message, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
+                );
+            data.setNonceReplayCache(nonceCache);
+            
             WSSConfig config = WSSConfig.getNewInstance();
             config.setWsiBSPCompliant(bspCompliant);
             data.setWssConfig(config);

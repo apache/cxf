@@ -283,4 +283,43 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // In this test, the service is using the UsernameTokenInterceptor, but the
+    // client is using the WSS4JOutInterceptor
+    @org.junit.Test
+    public void testPasswordHashedNoBindingReplay() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        
+        QName portQName = new QName(NAMESPACE, "DoubleItDigestNoBindingPort");
+        DoubleItPortType utPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, PORT);
+        
+        Client cxfClient = ClientProxy.getClient(utPort);
+        SecurityHeaderCacheInterceptor cacheInterceptor =
+            new SecurityHeaderCacheInterceptor();
+        cxfClient.getOutInterceptors().add(cacheInterceptor);
+        
+        // Make two invocations with the same UsernameToken
+        utPort.doubleIt(25);
+        try {
+            utPort.doubleIt(25);
+            fail("Failure expected on a replayed UsernameToken");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "A replay attack has been detected";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+    
 }

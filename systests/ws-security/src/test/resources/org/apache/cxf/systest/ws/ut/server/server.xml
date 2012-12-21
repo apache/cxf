@@ -260,4 +260,45 @@
      
     </jaxws:endpoint> 
     
+     <jaxws:endpoint 
+       id="HashedNoBinding"
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTDigestNoBinding" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItDigestNoBindingPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+       </jaxws:properties> 
+       <jaxws:features>
+         <p:policies>
+            <wsp:Policy xmlns:wsp="http://www.w3.org/ns/ws-policy">
+                <wsp:ExactlyOne>
+                    <wsp:All>
+                        <wsp:Policy>
+                          <sp:SupportingTokens
+                            xmlns:wsp="http://www.w3.org/ns/ws-policy"
+                            xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                            <wsp:Policy>
+                              <sp:UsernameToken
+                                sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                <wsp:Policy>
+                                  <sp:HashPassword/>
+                                </wsp:Policy>
+                              </sp:UsernameToken>
+                            </wsp:Policy>
+                          </sp:SupportingTokens>
+                        </wsp:Policy>
+                    </wsp:All>
+                </wsp:ExactlyOne>
+            </wsp:Policy>
+          </p:policies>
+        </jaxws:features>
+     
+    </jaxws:endpoint> 
+    
 </beans>
