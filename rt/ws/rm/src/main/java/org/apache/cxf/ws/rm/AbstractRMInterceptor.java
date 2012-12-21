@@ -95,7 +95,8 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
                 LOG.fine("Manager: " + m);
                 BindingFaultFactory bff = m.getBindingFaultFactory(b);
                 Fault f = bff.createFault(sf, msg);
-                LogUtils.log(LOG, Level.SEVERE, "SEQ_FAULT_MSG", bff.toString(f));
+                // log with warning instead sever, as this may happen for some delayed messages
+                LogUtils.log(LOG, Level.WARNING, "SEQ_FAULT_MSG", bff.toString(f));
                 throw f;
             }
             throw new Fault(sf);
