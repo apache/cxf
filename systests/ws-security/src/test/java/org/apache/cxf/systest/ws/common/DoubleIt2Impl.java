@@ -23,11 +23,10 @@ import javax.jws.WebService;
 import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType2;
-import org.example.schema.doubleit.DoubleItResponse;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
             serviceName = "DoubleItService", 
-            endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
+            endpointInterface = "org.example.contract.doubleit.DoubleItPortType2")
 @Features(features = "org.apache.cxf.feature.LoggingFeature")              
 public class DoubleIt2Impl implements DoubleItPortType2 {
     
@@ -35,12 +34,8 @@ public class DoubleIt2Impl implements DoubleItPortType2 {
         return numberToDouble * 2;
     }
     
-    public org.example.schema.doubleit.DoubleItResponse doubleIt2(
-        org.example.schema.doubleit.DoubleIt parameters
-    ) throws DoubleItFault {
-        DoubleItResponse response = new DoubleItResponse();
-        response.setDoubledNumber(parameters.getNumberToDouble() * 2);
-        return response;
+    public int doubleIt2(int numberToDouble) {
+        return numberToDouble * 2;
     }
 
 }

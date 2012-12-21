@@ -36,8 +36,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItPortType2;
-import org.example.schema.doubleit.DoubleIt;
-import org.example.schema.doubleit.DoubleItResponse;
 import org.junit.BeforeClass;
 
 /**
@@ -537,7 +535,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testKeyIdentifier2() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -557,10 +554,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         int response = x509Port.doubleIt(25);
         assertEquals(50, response);
         
-        DoubleIt parameters = new DoubleIt();
-        parameters.setNumberToDouble(15);
-        DoubleItResponse response2 = x509Port.doubleIt2(parameters);
-        assertEquals(30, response2.getDoubledNumber());
+        int response2 = x509Port.doubleIt2(15);
+        assertEquals(30, response2);
         
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);

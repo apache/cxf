@@ -58,9 +58,6 @@
                 <soap:body use="literal" />
                 <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy2"/>
             </wsdl:output>
-            <wsdl:fault name="DoubleItFault">
-                <soap:body use="literal" name="DoubleItFault" />
-            </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     
