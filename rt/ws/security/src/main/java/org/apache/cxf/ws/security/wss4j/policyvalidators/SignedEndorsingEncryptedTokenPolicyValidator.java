@@ -121,7 +121,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                         "The received token does not match the signed endorsing encrypted "
                         + "supporting token requirement"
                     );
-                    return false;
+                    continue;
                 }
             }
         }

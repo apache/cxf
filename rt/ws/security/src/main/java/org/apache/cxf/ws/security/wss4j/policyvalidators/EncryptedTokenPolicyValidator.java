@@ -115,7 +115,7 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
                     ai.setNotAsserted(
                         "The received token does not match the encrypted supporting token requirement"
                     );
-                    return false;
+                    continue;
                 }
             }
         }

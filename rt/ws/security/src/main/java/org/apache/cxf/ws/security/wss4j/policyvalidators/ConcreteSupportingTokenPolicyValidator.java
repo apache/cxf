@@ -115,7 +115,7 @@ public class ConcreteSupportingTokenPolicyValidator extends AbstractSupportingTo
                     ai.setNotAsserted(
                         "The received token does not match the supporting token requirement"
                     );
-                    return false;
+                    continue;
                 }
             }
 

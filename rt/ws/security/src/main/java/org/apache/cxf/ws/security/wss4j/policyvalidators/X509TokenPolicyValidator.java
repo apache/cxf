@@ -71,12 +71,12 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
-                return false;
+                continue;
             }
 
             if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType(), bstResults)) {
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
-                return false;
+                continue;
             }
         }
         return true;
