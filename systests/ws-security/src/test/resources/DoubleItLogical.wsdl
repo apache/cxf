@@ -79,6 +79,18 @@
             <wsdl:output message="tns:DoubleItResponse" />
         </wsdl:operation>
     </wsdl:portType>
+    <wsdl:portType name="DoubleItPortType2">
+        <wsdl:operation name="DoubleIt">
+            <wsdl:input message="tns:DoubleItRequest" />
+            <wsdl:output message="tns:DoubleItResponse" />
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault" />
+        </wsdl:operation>
+        <wsdl:operation name="DoubleIt2">
+            <wsdl:input message="tns:DoubleItRequest" />
+            <wsdl:output message="tns:DoubleItResponse" />
+            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault" />
+        </wsdl:operation>
+    </wsdl:portType>
 	
 	
 </wsdl:definitions>

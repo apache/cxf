@@ -85,6 +85,24 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
+       id="KeyIdentifier2"
+       address="http://localhost:${testutil.ports.Server}/DoubleItX509KeyIdentifier2" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItKeyIdentifierPort2"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleIt2Impl"
+       wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItOperations.wsdl">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+          <entry key="ws-security.signature.properties" 
+                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+       </jaxws:properties> 
+     
+    </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
        id="IssuerSerial"
        address="http://localhost:${testutil.ports.Server}/DoubleItX509IssuerSerial" 
        serviceName="s:DoubleItService"
