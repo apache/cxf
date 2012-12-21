@@ -56,7 +56,7 @@
             </wsdl:input>
             <wsdl:output>
                 <soap:body use="literal" />
-                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy2"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
@@ -113,9 +113,10 @@
    <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Input_Policy2">
       <wsp:ExactlyOne>
          <wsp:All>
-            <sp:SignedParts>
+             <sp:EncryptedParts>
                <sp:Body/>
-            </sp:SignedParts>
+               <sp:Header Namespace="uri:org.apache.cxf" />
+            </sp:EncryptedParts>
          </wsp:All>
       </wsp:ExactlyOne>
    </wsp:Policy>
@@ -125,15 +126,6 @@
             <sp:EncryptedParts>
                <sp:Body/>
             </sp:EncryptedParts>
-         </wsp:All>
-      </wsp:ExactlyOne>
-   </wsp:Policy>
-   <wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Output_Policy2">
-      <wsp:ExactlyOne>
-         <wsp:All>
-            <sp:SignedParts>
-               <sp:Body/>
-            </sp:SignedParts>
          </wsp:All>
       </wsp:ExactlyOne>
    </wsp:Policy>
