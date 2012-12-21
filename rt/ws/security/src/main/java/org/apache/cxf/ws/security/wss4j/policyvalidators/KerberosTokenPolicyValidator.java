@@ -58,7 +58,7 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
                 
                 if (!checkToken(kerberosTokenPolicy, kerberosToken)) {
                     ai.setNotAsserted("An incorrect Kerberos Token Type is detected");
-                    return false;
+                    continue;
                 }
             }
         }

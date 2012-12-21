@@ -69,17 +69,17 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
 
             // Check the protection order
             if (!checkProtectionOrder(binding, ai, results)) {
-                return false;
+                continue;
             }
             
             // Check various properties of the binding
             if (!checkProperties(binding, ai, aim, results, signedResults, message)) {
-                return false;
+                continue;
             }
             
             // Check various tokens of the binding
             if (!checkTokens(binding, ai, aim, hasDerivedKeys, signedResults, encryptedResults)) {
-                return false;
+                continue;
             }
         }
         

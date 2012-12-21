@@ -75,13 +75,13 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
-                return false;
+                continue;
             }
 
             Element template = issuedToken.getRstTemplate();
             if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
-                return false;
+                continue;
             }
 
             TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
@@ -91,7 +91,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
             if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
                 ai.setNotAsserted("Assertion fails holder-of-key requirements");
-                return false;
+                continue;
             }
         }
         return true;

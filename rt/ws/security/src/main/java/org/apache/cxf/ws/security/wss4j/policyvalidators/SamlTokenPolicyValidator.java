@@ -78,7 +78,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
-                return false;
+                continue;
             }
             
             // All of the received SAML Assertions must conform to the policy
@@ -88,7 +88,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                 
                 if (!checkVersion(samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
-                    return false;
+                    continue;
                 }
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
                 Certificate[] tlsCerts = null;
@@ -97,11 +97,11 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                 }
                 if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
                     ai.setNotAsserted("Assertion fails holder-of-key requirements");
-                    return false;
+                    continue;
                 }
                 if (!SAMLUtils.checkSenderVouches(assertionWrapper, tlsCerts, body, signed)) {
                     ai.setNotAsserted("Assertion fails sender-vouches requirements");
-                    return false;
+                    continue;
                 }
                 /*
                     if (!checkIssuerName(samlToken, assertionWrapper)) {
