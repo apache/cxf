@@ -424,7 +424,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         ai.setNotAsserted("No " + type 
                                 + " element found matching one of the XPaths " 
                                 + Arrays.toString(xpaths.toArray()));
-                        return false;
                     }
                 }
             }
@@ -459,7 +458,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         }
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted(msg.getVersion().getBody() + " not " + type);
-                        return false;
+                        continue;
                     }
                 }
                 
@@ -470,7 +469,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                 CoverageScope.ELEMENT);
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted(h.getQName() + " not + " + type);
-                        return false;
                     }
                 }
             }
@@ -864,7 +862,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     if (header == null 
                         || DOMUtils.getFirstChildWithName((Element)header, h.getQName()) == null) {
                         ai.setNotAsserted("No header element of name " + h.getQName() + " found.");
-                        return false;
                     }
                 }
             }
@@ -888,11 +885,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                                                  XPathConstants.NODESET);
                         if (list.getLength() == 0) {
                             ai.setNotAsserted("No header element matching XPath " + expression + " found.");
-                            return false;
                         }
                     } catch (XPathExpressionException e) {
                         ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
-                        return false;
                     }
                 }
             }

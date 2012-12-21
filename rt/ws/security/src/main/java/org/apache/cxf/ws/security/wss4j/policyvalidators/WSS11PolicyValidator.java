@@ -67,7 +67,7 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
                 ai.setNotAsserted(
                     "Signature Confirmation policy validation failed"
                 );
-                return false;
+                continue;
             }
         }
         return true;

@@ -67,7 +67,7 @@ public class SecurityContextTokenPolicyValidator
                 ai.setNotAsserted(
                     "The received token does not match the token inclusion requirement"
                 );
-                return false;
+                continue;
             }
         }
         return true;

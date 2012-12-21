@@ -118,7 +118,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                     ai.setNotAsserted(
                         "The received token does not match the signed endorsing supporting token requirement"
                     );
-                    return false;
+                    continue;
                 }
             }
         }

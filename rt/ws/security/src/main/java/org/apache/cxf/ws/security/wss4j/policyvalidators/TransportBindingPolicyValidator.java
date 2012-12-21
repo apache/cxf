@@ -62,7 +62,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
             if (!initiator && tlsInfo == null) {
                 ai.setNotAsserted("TLS is not enabled");
-                return false;
+                continue;
             }
             
             // HttpsToken is validated by the HttpsTokenInterceptorProvider
@@ -75,7 +75,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 String error = "Received Timestamp does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
                 ai.setNotAsserted(error);
-                return false;
+                continue;
             }
             assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
             
@@ -87,7 +87,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.LAYOUT, error);
                 ai.setNotAsserted(error);
-                return false;
+                continue;
             }
             assertPolicy(aim, SP12Constants.LAYOUT);
         }
