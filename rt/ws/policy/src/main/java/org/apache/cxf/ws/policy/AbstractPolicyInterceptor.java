@@ -41,11 +41,7 @@ public abstract class AbstractPolicyInterceptor extends AbstractPhaseInterceptor
     }
     
     public void handleMessage(Message message) throws Fault {
-        try {
-            handle(message);
-        } catch (PolicyException ex) {
-            throw new Fault(ex);
-        }
+        handle(message);
     }
 
     protected void getTransportAssertions(Message message) {
