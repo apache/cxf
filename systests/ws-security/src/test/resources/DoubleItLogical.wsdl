@@ -35,6 +35,13 @@
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
+            <xsd:element name="DoubleIt2">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="numberToDouble" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
 			<xsd:element name="DoubleItResponse">
 				<xsd:complexType>
 					<xsd:sequence>
@@ -56,11 +63,17 @@
 	<wsdl:message name="DoubleItRequest">
 		<wsdl:part element="di:DoubleIt" name="parameters" />
 	</wsdl:message>
+    <wsdl:message name="DoubleIt2Request">
+        <wsdl:part element="di:DoubleIt2" name="parameters" />
+    </wsdl:message>
 	<wsdl:message name="DoubleItRequestHeader">
         <wsdl:part element="di:DoubleIt" name="parameters" />
         <wsdl:part element="di:DoubleItHeader" name="header" />
     </wsdl:message>
-	<wsdl:message name="DoubleItResponse">
+    <wsdl:message name="DoubleItResponse">
+        <wsdl:part element="di:DoubleItResponse" name="parameters" />
+    </wsdl:message>
+	<wsdl:message name="DoubleIt2Response">
 		<wsdl:part element="di:DoubleItResponse" name="parameters" />
 	</wsdl:message>
 	<wsdl:message name="DoubleItFault">
@@ -86,9 +99,8 @@
             <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault" />
         </wsdl:operation>
         <wsdl:operation name="DoubleIt2">
-            <wsdl:input message="tns:DoubleItRequest" />
-            <wsdl:output message="tns:DoubleItResponse" />
-            <wsdl:fault message="tns:DoubleItFault" name="DoubleItFault" />
+            <wsdl:input message="tns:DoubleIt2Request" />
+            <wsdl:output message="tns:DoubleIt2Response" />
         </wsdl:operation>
     </wsdl:portType>
 	
