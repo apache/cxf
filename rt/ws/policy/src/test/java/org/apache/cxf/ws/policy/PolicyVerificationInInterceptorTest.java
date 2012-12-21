@@ -148,7 +148,7 @@ public class PolicyVerificationInInterceptorTest extends Assert {
         if (setupBindingOperationInfo && null == boi) {
             boi = control.createMock(BindingOperationInfo.class);
         }
-        EasyMock.expect(exchange.get(BindingOperationInfo.class)).andReturn(boi);
+        EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(boi);
         if (!setupBindingOperationInfo) {
             return;
         }
