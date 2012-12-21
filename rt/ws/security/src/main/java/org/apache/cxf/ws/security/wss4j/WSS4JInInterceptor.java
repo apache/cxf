@@ -65,10 +65,8 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.cache.ReplayCacheFactory;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.CustomTokenPrincipal;
@@ -743,36 +741,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     protected ReplayCache getReplayCache(
         SoapMessage message, String booleanKey, String instanceKey
     ) {
-        Object o = message.getContextualProperty(booleanKey);
-        if (o == null || !MessageUtils.isTrue(o)) {
-            return null;
-        }
-        
-        Endpoint ep = message.getExchange().get(Endpoint.class);
-        if (ep != null && ep.getEndpointInfo() != null) {
-            EndpointInfo info = ep.getEndpointInfo();
-            synchronized (info) {
-                ReplayCache replayCache = 
-                        (ReplayCache)message.getContextualProperty(instanceKey);
-                if (replayCache == null) {
-                    replayCache = (ReplayCache)info.getProperty(instanceKey);
-                }
-                if (replayCache == null) {
-                    ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-                    String cacheKey = instanceKey;
-                    if (info.getName() != null) {
-                        cacheKey += "-" + info.getName().toString().hashCode();
-                    }
-                    replayCache = replayCacheFactory.newReplayCache(cacheKey, message);
-                    info.setProperty(instanceKey, replayCache);
-                }
-                return replayCache;
-            }
-        }
-        return null;
+        return WSS4JUtils.getReplayCache(message, booleanKey, instanceKey);
     }
-
-
 
     /**
      * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
