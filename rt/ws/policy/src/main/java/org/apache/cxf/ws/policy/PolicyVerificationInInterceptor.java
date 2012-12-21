@@ -63,7 +63,7 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
         }
 
         Exchange exchange = message.getExchange();
-        BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo boi = exchange.getBindingOperationInfo();
         if (null == boi) {
             LOG.fine("No binding operation info.");
             return;
