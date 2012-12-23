@@ -36,6 +36,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11FaultOutInterceptorInternal;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12FaultOutInterceptorInternal;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -146,23 +147,27 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
     public void testFaultToSoapFault() throws Exception {
         Exception ex = new Exception();
         Fault fault = new Fault(ex, Fault.FAULT_CODE_CLIENT);
-        
-        SoapFault sf = SoapFault.createFault(fault, Soap11.getInstance());
-        assertEquals(Soap11.getInstance().getSender(), sf.getFaultCode());
-        
-        sf = SoapFault.createFault(fault, Soap12.getInstance());
-        assertEquals(Soap12.getInstance().getSender(), sf.getFaultCode());
+        verifyFaultToSoapFault(fault, ex.toString(), true, Soap11.getInstance());
+        verifyFaultToSoapFault(fault, ex.toString(), true, Soap12.getInstance());
         
         fault = new Fault(ex, Fault.FAULT_CODE_SERVER);
-        sf = SoapFault.createFault(fault, Soap11.getInstance());
-        assertEquals(Soap11.getInstance().getReceiver(), sf.getFaultCode());
+        verifyFaultToSoapFault(fault, ex.toString(), false, Soap11.getInstance());
+        verifyFaultToSoapFault(fault, ex.toString(), false, Soap12.getInstance());
         
-        sf = SoapFault.createFault(fault, Soap12.getInstance());
-        assertEquals(Soap12.getInstance().getReceiver(), sf.getFaultCode());
-        
+        fault.setMessage("fault-one");
+        verifyFaultToSoapFault(fault, "fault-one", false, Soap11.getInstance());
+
+        ex = new Exception("fault-two");
+        fault = new Fault(ex, Fault.FAULT_CODE_CLIENT);
+        verifyFaultToSoapFault(fault, "fault-two", true, Soap11.getInstance());
     }
     
-    
+    private void verifyFaultToSoapFault(Fault fault, String msg, boolean sender, SoapVersion v) {
+        SoapFault sf = SoapFault.createFault(fault, v);
+        assertEquals(sender ? v.getSender() : v.getReceiver(), sf.getFaultCode());
+        assertEquals(msg, sf.getMessage());
+    }
+
     @Test
     public void testCXF1864() throws Exception {
 
