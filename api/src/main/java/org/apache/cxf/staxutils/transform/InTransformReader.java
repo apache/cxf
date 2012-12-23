@@ -21,10 +21,10 @@ package org.apache.cxf.staxutils.transform;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,8 +49,8 @@ public class InTransformReader extends DepthXMLStreamReader {
     private Map<QName, ElementProperty> inAppendMap = new HashMap<QName, ElementProperty>(5);
     private Set<QName> inDropSet = new HashSet<QName>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
-    private Stack<ParsingEvent> pushedBackEvents = new Stack<ParsingEvent>();
-    private Stack<List<ParsingEvent>> pushedAheadEvents = new Stack<List<ParsingEvent>>();
+    private List<ParsingEvent> pushedBackEvents = new LinkedList<ParsingEvent>();
+    private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
     private String replaceText;
     private ParsingEvent currentEvent;
     private List<Integer> attributesIndexes = new ArrayList<Integer>(); 
@@ -95,9 +95,9 @@ public class InTransformReader extends DepthXMLStreamReader {
     public int next() throws XMLStreamException {
         final boolean doDebug = LOG.isLoggable(Level.FINE);
 
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             // consume events from the pushed back stack
-            currentEvent = pushedBackEvents.pop();
+            currentEvent = pushedBackEvents.remove(0);
             if (doDebug) {
                 LOG.fine("pushed event available: " + currentEvent);
             }
@@ -146,7 +146,7 @@ public class InTransformReader extends DepthXMLStreamReader {
                     LOG.fine("replacing content with " + replaceText);    
                 }
                 currentEvent = TransformUtils.createStartElementEvent(expected);
-                pushedAheadEvents.push(null);
+                pushedAheadEvents.add(0, null);
             } else if (dropped) {
                 if (doDebug) {
                     LOG.fine("shallow-dropping start " + expected);
@@ -172,13 +172,13 @@ public class InTransformReader extends DepthXMLStreamReader {
             namespaceContext.up();
             final boolean dropped = inDropSet.contains(theName);
             if (!dropped) {
-                List<ParsingEvent> pe = pushedAheadEvents.pop();
+                List<ParsingEvent> pe = pushedAheadEvents.remove(0);
                 if (null != pe) {
                     if (doDebug) {
                         LOG.fine("pushed event found");    
                     }
-                    pushedBackEvents.addAll(pe);
-                    currentEvent = pushedBackEvents.pop();
+                    pushedBackEvents.addAll(0, pe);
+                    currentEvent = pushedBackEvents.remove(0);
                     event = currentEvent.getEvent();
                 } else {
                     if (doDebug) {
@@ -207,45 +207,45 @@ public class InTransformReader extends DepthXMLStreamReader {
             // ap-post-*
             if (null == appendProp.getText()) {
                 // ap-post-wrap
-                pushedBackEvents.push(TransformUtils.createStartElementEvent(appendProp.getName()));
+                pushedBackEvents.add(0, TransformUtils.createStartElementEvent(appendProp.getName()));
                 currentEvent = TransformUtils.createStartElementEvent(expected);
 
                 List<ParsingEvent> pe = new ArrayList<ParsingEvent>(2);
-                pe.add(TransformUtils.createEndElementEvent(expected));
                 pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
-                pushedAheadEvents.push(pe);
+                pe.add(TransformUtils.createEndElementEvent(expected));
+                pushedAheadEvents.add(0, pe);
             } else {
                 // ap-post-incl
                 currentEvent = TransformUtils.createStartElementEvent(expected);
 
-                List<ParsingEvent> pe = new ArrayList<ParsingEvent>();
-                pe.add(TransformUtils.createEndElementEvent(expected));
-                pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
-                pe.add(TransformUtils.createCharactersEvent(appendProp.getText()));
+                List<ParsingEvent> pe = new ArrayList<ParsingEvent>(4);
                 pe.add(TransformUtils.createStartElementEvent(appendProp.getName()));
-                pushedAheadEvents.push(pe);
+                pe.add(TransformUtils.createCharactersEvent(appendProp.getText()));
+                pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
+                pe.add(TransformUtils.createEndElementEvent(expected));
+                pushedAheadEvents.add(0, pe);
             }
         } else { 
             // ap-pre-*
             if (null == appendProp.getText()) {
                 // ap-pre-wrap
-                pushedBackEvents.push(TransformUtils.createStartElementEvent(expected));
+                pushedBackEvents.add(0, TransformUtils.createStartElementEvent(expected));
                 currentEvent = TransformUtils.createStartElementEvent(appendProp.getName());
 
-                List<ParsingEvent> pe = new ArrayList<ParsingEvent>();
-                pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
+                List<ParsingEvent> pe = new ArrayList<ParsingEvent>(2);
                 pe.add(TransformUtils.createEndElementEvent(expected));
-                pushedAheadEvents.push(pe);
+                pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
+                pushedAheadEvents.add(0, pe);
             } else {
                 // ap-pre-incl
-                pushedBackEvents.push(TransformUtils.createStartElementEvent(expected));
-                pushedBackEvents.push(TransformUtils.createEndElementEvent(appendProp.getName()));
-                pushedBackEvents.push(TransformUtils.createCharactersEvent(appendProp.getText()));
+                pushedBackEvents.add(0, TransformUtils.createStartElementEvent(expected));
+                pushedBackEvents.add(0, TransformUtils.createEndElementEvent(appendProp.getName()));
+                pushedBackEvents.add(0, TransformUtils.createCharactersEvent(appendProp.getText()));
                 currentEvent = TransformUtils.createStartElementEvent(appendProp.getName());
                 if (doDebug) {
                     LOG.fine("ap-pre-incl " + appendProp.getName() + "=" + appendProp.getText());
                 }
-                pushedAheadEvents.push(null);
+                pushedAheadEvents.add(0, null);
             }
         }
     }
@@ -255,9 +255,9 @@ public class InTransformReader extends DepthXMLStreamReader {
         if (!name.equals(expected)) {
             List<ParsingEvent> pe = new ArrayList<ParsingEvent>(1);
             pe.add(TransformUtils.createEndElementEvent(expected));
-            pushedAheadEvents.push(pe);
+            pushedAheadEvents.add(0, pe);
         } else {
-            pushedAheadEvents.push(null);
+            pushedAheadEvents.add(0, null);
         }
     }
     
@@ -293,7 +293,7 @@ public class InTransformReader extends DepthXMLStreamReader {
         QName name = readCurrentElement();
         String prefix = name.getPrefix();
         if (prefix.length() == 0 && getNamespaceURI().length() > 0) {
-            prefix = getNamespaceContext().getPrefix(getNamespaceURI());
+            prefix = namespaceContext.getPrefix(getNamespaceURI());
             if (prefix == null) {
                 prefix = "";
             }
@@ -352,7 +352,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public int getAttributeCount() {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             return 0;
         }
         checkAttributeIndexRange(-1);
@@ -360,7 +360,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getAttributeLocalName(int arg0) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             throwIndexException(arg0, 0);
         }
         checkAttributeIndexRange(arg0);
@@ -369,7 +369,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public QName getAttributeName(int arg0) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             throwIndexException(arg0, 0);
         }
         checkAttributeIndexRange(arg0);
@@ -380,7 +380,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getAttributeNamespace(int arg0) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             throwIndexException(arg0, 0);
         }
         checkAttributeIndexRange(arg0);
@@ -389,7 +389,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getAttributePrefix(int arg0) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             throwIndexException(arg0, 0);
         }
         checkAttributeIndexRange(arg0);
@@ -408,7 +408,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getAttributeType(int arg0) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             throwIndexException(arg0, 0);
         }
         checkAttributeIndexRange(arg0);
@@ -416,7 +416,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getAttributeValue(int arg0) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             throwIndexException(arg0, 0);
         }
         checkAttributeIndexRange(arg0);
@@ -424,7 +424,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
     public String getAttributeValue(String namespace, String localName) {
-        if (!pushedBackEvents.empty()) {
+        if (!pushedBackEvents.isEmpty()) {
             return null;
         }
         checkAttributeIndexRange(-1);
