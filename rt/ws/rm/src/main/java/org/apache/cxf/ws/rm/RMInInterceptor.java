@@ -59,7 +59,8 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
             } catch (RMException e) {
                 LOG.log(Level.WARNING, "Failed to revert the delivering status");
             }
-        } else if (!ContextUtils.isRequestor(message)) {
+        } 
+        if (!ContextUtils.isRequestor(message)) {
             // force the fault to be returned.
             Exchange exchange = message.getExchange();
             exchange.setOneWay(false);
