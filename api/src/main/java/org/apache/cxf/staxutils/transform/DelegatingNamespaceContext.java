@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.staxutils.transform;
 
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -31,8 +30,8 @@ import javax.xml.namespace.NamespaceContext;
 class DelegatingNamespaceContext implements NamespaceContext {
     private NamespaceContext nc;
     private Map<String, String> nsMap;
-    private Deque<Map<String, String>> namespaces;
-    private Deque<Map<String, String>> prefixes;
+    private List<Map<String, String>> namespaces;
+    private List<Map<String, String>> prefixes;
 
     public DelegatingNamespaceContext(NamespaceContext nc, Map<String, String> nsMap) {
         this.nc = nc;
@@ -42,18 +41,18 @@ class DelegatingNamespaceContext implements NamespaceContext {
     }
     
     public void down() {
-        namespaces.addFirst(new HashMap<String, String>(8));
-        prefixes.addFirst(new HashMap<String, String>(8));
+        ((LinkedList<Map<String, String>>)namespaces).addFirst(new HashMap<String, String>(8));
+        ((LinkedList<Map<String, String>>)prefixes).addFirst(new HashMap<String, String>(8));
     }
 
     public void up() {
-        namespaces.removeFirst();
-        prefixes.removeFirst();
+        ((LinkedList<Map<String, String>>)namespaces).removeFirst();
+        ((LinkedList<Map<String, String>>)prefixes).removeFirst();
     }
     
     public void addPrefix(String prefix, String ns) {
-        namespaces.getFirst().put(prefix, ns);
-        prefixes.getFirst().put(ns, prefix);
+        ((LinkedList<Map<String, String>>)namespaces).getFirst().put(prefix, ns);
+        ((LinkedList<Map<String, String>>)prefixes).getFirst().put(ns, prefix);
     }
     
     public String findUniquePrefix(String ns) {
@@ -77,7 +76,7 @@ class DelegatingNamespaceContext implements NamespaceContext {
     
     public String getNamespaceURI(String prefix) {
         if (!namespaces.isEmpty()) {
-            Map<String, String> cache = namespaces.getFirst();
+            Map<String, String> cache = ((LinkedList<Map<String, String>>)namespaces).getFirst();
             for (Map<String, String> nss : namespaces) {
                 String ns = nss.get(prefix);
                 if (ns != null) {
@@ -111,7 +110,7 @@ class DelegatingNamespaceContext implements NamespaceContext {
         }
         
         if (!prefixes.isEmpty()) {
-            Map<String, String> cache = prefixes.getFirst();
+            Map<String, String> cache = ((LinkedList<Map<String, String>>)prefixes).getFirst();
             for (Map<String, String> pfs : prefixes) {
                 String prefix = pfs.get(ns);
                 if (prefix != null && ns.equals(getNamespaceURI(prefix))) {
