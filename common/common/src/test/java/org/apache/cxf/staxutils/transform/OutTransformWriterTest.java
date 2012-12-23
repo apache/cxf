@@ -115,9 +115,9 @@ public class OutTransformWriterTest extends Assert {
         String xmlPI = "<?xml version='1.0' encoding='UTF-8'?>";
         String start = "<testBean xmlns=\"http://testbeans.com/v2\"";
         String expected1 = xmlPI + start
-            + " xmlns:ps1=\"http://testbeans.com/v3\"><ps1:bean/></testBean>";
+            + " xmlns:ps2=\"http://testbeans.com/v3\"><ps2:bean/></testBean>";
         String expected2 = xmlPI + start
-            + "><ps1:bean xmlns:ps1=\"http://testbeans.com/v3\"/></testBean>";
+            + "><ps2:bean xmlns:ps2=\"http://testbeans.com/v3\"/></testBean>";
         String out = os.toString();
         assertTrue("Output \"" + out + "\" does not match expected values",
                 expected1.equals(out) || expected2.equals(out));
@@ -531,6 +531,15 @@ public class OutTransformWriterTest extends Assert {
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
         assertEquals("<ps1:test xmlns:ps1=\"http://bar\"><ps1:a>1</ps1:a></ps1:test>", value);        
+    }
+
+    @Test
+    public void testNamespacedAttributeDropElement() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("{http://www.w3.org/2005/08/addressing}ReplyTo", "");
+        TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeWSAReqIn.xml", 
+                                                        "../resources/greetMeWSAReq.xml",
+                                  transformElements, null, null, null, null);
     }
 
 }

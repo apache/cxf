@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -47,8 +46,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private List<Set<String>> writtenUris = new LinkedList<Set<String>>();
     
     private Set<QName> dropElements;
-    private Stack<List<ParsingEvent>> pushedAheadEvents = new Stack<List<ParsingEvent>>();
-    private Stack<QName> elementsStack = new Stack<QName>();
+    private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
+    private List<QName> elementsStack = new LinkedList<QName>();
     private String replaceNamespace;
     private String replaceText;
     private int currentDepth;
@@ -104,7 +103,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         uri = value != null ? value : uri;
         
         if (writtenUris.get(0).contains(uri) 
-            && (prefix.length() == 0 || prefix.equals(getPrefix(uri)))) {
+            && (prefix.length() == 0 || prefix.equals(namespaceContext.getPrefix(uri)))) {
             return;
         }
         
@@ -136,7 +135,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         
         uri = value != null ? value : uri;
         
-        if (writtenUris.get(0).contains(uri) && "".equals(getPrefix(uri))) {
+        if (writtenUris.get(0).contains(uri) && "".equals(namespaceContext.getPrefix(uri))) {
             return;
         }
         super.writeDefaultNamespace(uri);
@@ -189,7 +188,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                 // if the element is promoted to a qualified element, use the prefix bound 
                 // to that namespace. If the namespace is unbound, generate a new prefix and
                 // write its declaration later.
-                prefix = getPrefix(expected.getNamespaceURI());
+                prefix = namespaceContext.getPrefix(expected.getNamespaceURI());
                 if (prefix == null) {
                     prefix = namespaceContext.findUniquePrefix(expected.getNamespaceURI());
                 }
@@ -208,7 +207,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                 boolean nsadded = false;
                 if (theprefix == null) {
                     nsadded = true;
-                    theprefix = getPrefix(appendQName.getNamespaceURI());
+                    theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI());
                     if (theprefix == null 
                         && (appendQName.getNamespaceURI().equals(expected.getNamespaceURI()) 
                             && expected.getPrefix().length() > 0)) {
@@ -230,8 +229,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                     pe = new ArrayList<ParsingEvent>();
                     pe.add(TransformUtils.createEndElementEvent(expected));
                     pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
-                    pushedAheadEvents.push(null);
-                    elementsStack.push(appendQName);
+                    pushedAheadEvents.add(0, null);
+                    elementsStack.add(0, appendQName);
                 } else {
                     // ap-pre-incl
                     super.writeCharacters(appendProp.getText());
@@ -243,11 +242,11 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             replaceText = appendProp.getText();
         } else if (dropped) {
             // unwrap the current element (shallow drop)
-            elementsStack.push(theName);
+            elementsStack.add(0, theName);
             return;
         } else if (TransformUtils.isEmptyQName(expected)) {
             // skip the current element (deep drop));
-            dropDepth = currentDepth - 1;
+            dropDepth = currentDepth;
             return;
         }
         write(expected, false);
@@ -255,38 +254,38 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             // the element is promoted to a qualified element, thus write its declaration
             writeNamespace(expected.getPrefix(), expected.getNamespaceURI());
         }
-        pushedAheadEvents.push(pe);
-        elementsStack.push(expected);
+        pushedAheadEvents.add(0, pe);
+        elementsStack.add(0, expected);
         replaceNamespace = expected.getNamespaceURI().equals(theName.getNamespaceURI()) 
             ? null : theName.getNamespaceURI();
 
         if (appendProp != null && !replaceContent && appendProp.isChild()) {
             // ap-post-*
             QName appendQName = appendProp.getName();
-            String theprefix = getPrefix(appendQName.getNamespaceURI());
+            String theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI());
                 
             if (appendProp.getText() == null) {
                 // ap-post-wrap
                 write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(), 
                                 theprefix == null ? "" : theprefix), false);
-                if (getNamespaceContext().getPrefix(appendQName.getNamespaceURI()) == null) {
+                if (namespaceContext.getPrefix(appendQName.getNamespaceURI()) == null) {
                     this.writeNamespace(theprefix, uri);
                 }
                 currentDepth++;
                 pe = new ArrayList<ParsingEvent>();
                 pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
                 pe.add(TransformUtils.createEndElementEvent(expected));
-                pushedAheadEvents.push(pe);
-                elementsStack.push(appendQName);
+                pushedAheadEvents.add(0, pe);
+                elementsStack.add(0, appendQName);
             } else {
                 // ap-post-incl
-                pushedAheadEvents.pop();
+                pushedAheadEvents.remove(0);
                 pe = new ArrayList<ParsingEvent>();
                 pe.add(TransformUtils.createStartElementEvent(appendProp.getName()));
                 pe.add(TransformUtils.createCharactersEvent(appendProp.getText()));
                 pe.add(TransformUtils.createEndElementEvent(appendProp.getName()));
                 pe.add(TransformUtils.createEndElementEvent(expected));
-                pushedAheadEvents.push(pe);
+                pushedAheadEvents.add(0, pe);
             }
         }
     }
@@ -294,9 +293,12 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     
     @Override
     public void writeStartElement(String uri, String local) throws XMLStreamException {
+        /*
         pushedAheadEvents.push(null);
         elementsStack.push(new QName(uri, local));
         super.writeStartElement(uri, local);
+        */
+        writeStartElement("", local, uri);
     }
 
     @Override
@@ -306,20 +308,22 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeEndElement() throws XMLStreamException {
+        final boolean indrop = matchesDropped(false);
         namespaceContext.up();
         --currentDepth;
-        if (matchesDropped(false)) {
+        if (indrop) {
+            if (dropDepth > currentDepth) {
+                dropDepth = 0;
+            }
             return;
-        } else if (dropDepth > 0) {
-            dropDepth = 0;
         }
         if (!writtenUris.isEmpty()) {
             writtenUris.remove(0);
         }
-        QName theName = elementsStack.pop();
+        QName theName = elementsStack.remove(0);
         final boolean dropped = dropElements.contains(theName);
         if (!dropped) {
-            List<ParsingEvent> pes = pushedAheadEvents.pop();
+            List<ParsingEvent> pes = pushedAheadEvents.remove(0);
             if (null != pes) {
                 for (ParsingEvent pe : pes) {
                     switch (pe.getEvent()) {
@@ -360,7 +364,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             if ((replacePrefix || isDefaultNamespaceRedefined()) 
                 && qname.getPrefix().length() == 0) {
                 // if the default namespace is configured to be replaced, a non-empty prefix must be assigned 
-                prefix = getPrefix(qname.getNamespaceURI());
+                prefix = namespaceContext.getPrefix(qname.getNamespaceURI());
                 if (prefix == null) {
                     prefix = namespaceContext.findUniquePrefix(qname.getNamespaceURI());
                     writeNs = true;
@@ -391,7 +395,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     private boolean matchesDropped(boolean shallow) {
         if ((dropDepth > 0 && dropDepth <= currentDepth) 
-            || (shallow && (elementsStack.size() > 0 && dropElements.contains(elementsStack.peek())))) {
+            || (shallow && (elementsStack.size() > 0 && dropElements.contains(elementsStack.get(0))))) {
             return true;
         }
         return false;
