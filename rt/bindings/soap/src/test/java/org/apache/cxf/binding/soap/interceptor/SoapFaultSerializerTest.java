@@ -147,12 +147,12 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
     public void testFaultToSoapFault() throws Exception {
         Exception ex = new Exception();
         Fault fault = new Fault(ex, Fault.FAULT_CODE_CLIENT);
-        verifyFaultToSoapFault(fault, ex.toString(), true, Soap11.getInstance());
-        verifyFaultToSoapFault(fault, ex.toString(), true, Soap12.getInstance());
+        verifyFaultToSoapFault(fault, null, true, Soap11.getInstance());
+        verifyFaultToSoapFault(fault, null, true, Soap12.getInstance());
         
         fault = new Fault(ex, Fault.FAULT_CODE_SERVER);
-        verifyFaultToSoapFault(fault, ex.toString(), false, Soap11.getInstance());
-        verifyFaultToSoapFault(fault, ex.toString(), false, Soap12.getInstance());
+        verifyFaultToSoapFault(fault, null, false, Soap11.getInstance());
+        verifyFaultToSoapFault(fault, null, false, Soap12.getInstance());
         
         fault.setMessage("fault-one");
         verifyFaultToSoapFault(fault, "fault-one", false, Soap11.getInstance());

@@ -43,7 +43,19 @@ public class GreeterImpl11 {
     private static final Logger LOG = LogUtils.getLogger(GreeterImpl11.class);
 
     public String greetMe(String me) {
-        return "Hello " + me;
+        if (me.startsWith("A")) {
+            throw new Fault(new NullPointerException());
+        } else if (me.startsWith("B")) {
+            throw new Fault(new IllegalArgumentException("Get a wrong name for greetMe"));
+        } else if (me.startsWith("C")) {
+            throw new Fault("unexpected null", LOG, new NullPointerException());
+        } else if (me.startsWith("D")) {
+            throw new Fault("greetMeFault", LOG, new IllegalArgumentException("Get a wrong name greetMe"));
+        } else if (me.startsWith("E")) {
+            throw new Fault("invalid", LOG);
+        } else {
+            return "Hello " + me;
+        }
     }
 
     public String sayHi() {

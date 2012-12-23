@@ -84,7 +84,7 @@ public class Fault extends UncheckedException {
         if (super.getMessage() != null) {
             message = super.getMessage();
         } else {
-            message = getMessage(t);
+            message = t == null ? null : t.getMessage();
         }
         code = FAULT_CODE_SERVER;
     }
@@ -106,7 +106,7 @@ public class Fault extends UncheckedException {
         if (super.getMessage() != null) {
             message = super.getMessage();
         } else {
-            message = getMessage(t);
+            message = t == null ? null : t.getMessage();
         }
         code = fc;
     }    
@@ -183,14 +183,5 @@ public class Fault extends UncheckedException {
      */
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
-    }
-
-    /**
-     * Extracts the effective message value from the specified exception object
-     * @param t
-     * @return
-     */
-    private static String getMessage(Throwable t) {
-        return t == null ? null : t.getMessage() != null ? t.getMessage() : t.toString();
     }
 }
