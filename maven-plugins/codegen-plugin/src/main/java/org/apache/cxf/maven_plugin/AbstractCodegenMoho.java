@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.jar.Manifest;
 import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -79,6 +82,16 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * should not use the proxy configuration.
      */
     private static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+    
+    /**
+     * JVM/System property name holding the username of the http proxy.
+     */
+    private static final String HTTP_PROXY_USER = "http.proxyUser";
+    
+    /**
+     * JVM/System property name holding the password of the http proxy.
+     */
+    private static final String HTTP_PROXY_PASSWORD = "http.proxyPassword";
     
 
     /**
@@ -269,7 +282,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String originalProxyHost = SystemPropertyAction.getProperty(HTTP_PROXY_HOST);
         String originalProxyPort = SystemPropertyAction.getProperty(HTTP_PROXY_PORT);
         String originalNonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
-        
+        String originalProxyUser = SystemPropertyAction.getProperty(HTTP_PROXY_USER);
+        String originalProxyPassword = SystemPropertyAction.getProperty(HTTP_PROXY_PASSWORD);
+                
         configureProxyServerSettings();
 
         List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
@@ -306,7 +321,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 bus.shutdown(true);
             }
             classLoaderSwitcher.restoreClassLoader();
-            restoreProxySetting(originalProxyHost, originalProxyPort, originalNonProxyHosts);
+            restoreProxySetting(originalProxyHost, originalProxyPort, originalNonProxyHosts,
+                                originalProxyUser, originalProxyPassword);
         }
 
         // refresh the generated sources
@@ -320,15 +336,38 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private void restoreProxySetting(String originalProxyHost, String originalProxyPort,
-                                     String originalNonProxyHosts) {
+                                     String originalNonProxyHosts,
+                                     String originalProxyUser,
+                                     String originalProxyPassword) {
         if (originalProxyHost != null) {
             System.setProperty(HTTP_PROXY_HOST, originalProxyHost);
+        } else {
+            System.getProperties().remove(HTTP_PROXY_HOST);
         }
         if (originalProxyPort != null) {
             System.setProperty(HTTP_PROXY_PORT, originalProxyPort);
+        } else {
+            System.getProperties().remove(HTTP_PROXY_PORT);
         }
         if (originalNonProxyHosts != null) {
             System.setProperty(HTTP_NON_PROXY_HOSTS, originalNonProxyHosts);
+        } else {
+            System.getProperties().remove(HTTP_NON_PROXY_HOSTS);
+        }
+        if (originalProxyUser != null) {
+            System.setProperty(HTTP_PROXY_USER, originalProxyUser);
+        } else {
+            System.getProperties().remove(HTTP_PROXY_USER);
+        }
+        if (originalProxyPassword != null) {
+            System.setProperty(HTTP_PROXY_PASSWORD, originalProxyPassword);
+        } else {
+            System.getProperties().remove(HTTP_PROXY_PASSWORD);
+        }
+        Proxy proxy = mavenSession.getSettings().getActiveProxy();
+        if (proxy != null && !StringUtils.isEmpty(proxy.getUsername()) 
+            && !StringUtils.isEmpty(proxy.getPassword())) {
+            Authenticator.setDefault(null);
         }
     }
 
@@ -374,9 +413,28 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (proxy.getHost() == null) {
                 throw new MojoExecutionException("Proxy in settings.xml has no host");
             } else {
-                System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
-                System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
-                System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
+                if (proxy.getHost() != null) {
+                    System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
+                }
+                if (String.valueOf(proxy.getPort()) != null) {
+                    System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
+                }
+                if (proxy.getNonProxyHosts() != null) {
+                    System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
+                }
+                if (!StringUtils.isEmpty(proxy.getUsername()) 
+                    && !StringUtils.isEmpty(proxy.getPassword())) {
+                    final String authUser = proxy.getUsername();
+                    final String authPassword = proxy.getPassword();
+                    Authenticator.setDefault(new Authenticator() {
+                        public PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(authUser, authPassword.toCharArray());
+                        }
+                    });
+
+                    System.setProperty(HTTP_PROXY_USER, authUser);
+                    System.setProperty(HTTP_PROXY_PORT, authPassword);
+                }
             }
 
         }
