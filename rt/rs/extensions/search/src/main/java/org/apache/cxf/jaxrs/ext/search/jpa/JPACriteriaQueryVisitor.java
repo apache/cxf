@@ -25,7 +25,9 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CompoundSelection;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.SingularAttribute;
@@ -73,7 +75,24 @@ public class JPACriteriaQueryVisitor<T, E> extends AbstractJPATypedQueryVisitor<
         countQuery.select(getCriteriaBuilder().count(getRoot()));
         return super.getEntityManager().createQuery(countQuery).getSingleResult();
     }
-     
+    
+    public TypedQuery<E> getOrderedTypedQuery(List<SingularAttribute<T, ?>> attributes, boolean asc) {
+        CriteriaQuery<E> cQuery = orderBy(attributes, asc);
+        return getTypedQuery(cQuery);
+    }
+    
+    public CriteriaQuery<E> orderBy(List<SingularAttribute<T, ?>> attributes, boolean asc) {
+        CriteriaBuilder cb = getCriteriaBuilder();
+        
+        List<Order> orders = new ArrayList<Order>();
+        for (SingularAttribute<T, ?> attribute : attributes) {
+            Path<?> selection = getRoot().get(attribute);
+            Order order = asc ? cb.asc(selection) : cb.desc(selection);
+            orders.add(order);
+        }
+        return getCriteriaQuery().orderBy(orders);
+    }
+    
     public TypedQuery<E> getArrayTypedQuery(List<SingularAttribute<T, ?>> attributes) {
         CriteriaQuery<E> cQuery = selectArraySelections(toSelectionsArray(toSelectionsList(attributes, false)));
         return getTypedQuery(cQuery);

@@ -289,6 +289,7 @@ public class JPATypedQueryVisitorTest extends Assert {
         assertEquals(1L, criteriaQueryBooksCount("id==10"));
     }
     
+    
     @Test
     public void testEqualsCriteriaQueryConstruct() throws Exception {
         List<BookInfo> books = criteriaQueryBooksConstruct("id==10");
@@ -296,6 +297,24 @@ public class JPATypedQueryVisitorTest extends Assert {
         BookInfo info = books.get(0);
         assertEquals(10, info.getId());
         assertEquals("num10", info.getTitle());
+    }
+    
+    @Test
+    public void testOrderByAsc() throws Exception {
+        List<Book> books = criteriaQueryBooksOrderBy("reviews=gt=0", true);
+        assertEquals(3, books.size());
+        assertEquals(9, books.get(0).getId());
+        assertEquals(10, books.get(1).getId());
+        assertEquals(11, books.get(2).getId());
+    }
+    
+    @Test
+    public void testOrderByDesc() throws Exception {
+        List<Book> books = criteriaQueryBooksOrderBy("reviews=gt=0", false);
+        assertEquals(3, books.size());
+        assertEquals(11, books.get(0).getId());
+        assertEquals(10, books.get(1).getId());
+        assertEquals(9, books.get(2).getId());
     }
     
     @Test
@@ -507,6 +526,20 @@ public class JPATypedQueryVisitorTest extends Assert {
             new JPACriteriaQueryVisitor<Book, Long>(em, Book.class, Long.class);
         filter.accept(jpa);
         return jpa.count();
+    }
+    
+    private List<Book> criteriaQueryBooksOrderBy(String expression, boolean asc) throws Exception {
+        SearchCondition<Book> filter = 
+            new FiqlParser<Book>(Book.class).parse(expression);
+        JPACriteriaQueryVisitor<Book, Book> jpa = 
+            new JPACriteriaQueryVisitor<Book, Book>(em, Book.class, Book.class);
+        filter.accept(jpa);
+        
+        List<SingularAttribute<Book, ?>> selections = 
+            new ArrayList<SingularAttribute<Book, ?>>();
+        selections.add(Book_.id);
+        
+        return jpa.getOrderedTypedQuery(selections, asc).getResultList();
     }
     
     private List<BookInfo> criteriaQueryBooksConstruct(String expression) throws Exception {
