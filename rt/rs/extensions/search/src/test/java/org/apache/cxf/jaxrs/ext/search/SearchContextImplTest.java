@@ -30,6 +30,53 @@ import org.junit.Test;
 public class SearchContextImplTest extends Assert {
 
     @Test
+    public void testPlainQuery1() {
+        Message m = new MessageImpl();
+        m.put("search.use.plain.queries", true);
+        m.put(Message.QUERY_STRING, "a=b");
+        String exp = new SearchContextImpl(m).getSearchExpression();
+        assertEquals("a==b", exp);
+    }
+    
+    @Test
+    public void testPlainQuery2() {
+        Message m = new MessageImpl();
+        m.put("search.use.plain.queries", true);
+        m.put(Message.QUERY_STRING, "a=b&a=b1");
+        String exp = new SearchContextImpl(m).getSearchExpression();
+        assertEquals("(a==b,a==b1)", exp);
+    }
+    
+    @Test
+    public void testPlainQuery3() {
+        Message m = new MessageImpl();
+        m.put("search.use.plain.queries", true);
+        m.put(Message.QUERY_STRING, "a=b&c=d");
+        String exp = new SearchContextImpl(m).getSearchExpression();
+        assertEquals("(a==b;c==d)", exp);
+    }
+    
+    @Test
+    public void testPlainQuery4() {
+        Message m = new MessageImpl();
+        m.put("search.use.plain.queries", true);
+        m.put(Message.QUERY_STRING, "a=b&a=b2&c=d&f=g");
+        String exp = new SearchContextImpl(m).getSearchExpression();
+        assertEquals("((a==b,a==b2);c==d;f==g)", exp);
+    }
+    
+    @Test
+    public void testPlainQuery5() {
+        Message m = new MessageImpl();
+        m.put("search.use.plain.queries", true);
+        m.put(Message.QUERY_STRING, "aFrom=1&aTill=3");
+        String exp = new SearchContextImpl(m).getSearchExpression();
+        assertEquals("(a=ge=1;a=le=3)", exp);
+    }
+    
+    
+    
+    @Test
     public void testFiqlSearchCondition() {
         doTestFiqlSearchCondition(
             SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");

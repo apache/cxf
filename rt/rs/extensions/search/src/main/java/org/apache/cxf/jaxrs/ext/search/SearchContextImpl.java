@@ -19,7 +19,9 @@
 
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -27,15 +29,19 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.ext.search.client.CompleteCondition;
+import org.apache.cxf.jaxrs.ext.search.client.SearchConditionBuilder;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class SearchContextImpl implements SearchContext {
 
     public static final String SEARCH_QUERY = "_search";
     public static final String SHORT_SEARCH_QUERY = "_s";
+    private static final String USE_PLAIN_QUERY_PARAMETERS = "search.use.plain.queries";
     private static final Logger LOG = LogUtils.getL7dLogger(SearchContextImpl.class);
     private Message message;
     
@@ -96,19 +102,55 @@ public class SearchContextImpl implements SearchContext {
     public String getSearchExpression() {
         
         String queryStr = (String)message.get(Message.QUERY_STRING);
-        if (queryStr != null 
-            && (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY))) {
+        if (queryStr != null) { 
             MultivaluedMap<String, String> params = 
                 JAXRSUtils.getStructuredParams(queryStr, "&", true, false);
-            if (params.containsKey(SHORT_SEARCH_QUERY)) {
-                return params.getFirst(SHORT_SEARCH_QUERY);
-            } else {
-                return params.getFirst(SEARCH_QUERY);
+            if (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY)) {
+                if (params.containsKey(SHORT_SEARCH_QUERY)) {
+                    return params.getFirst(SHORT_SEARCH_QUERY);
+                } else {
+                    return params.getFirst(SEARCH_QUERY);
+                }
+            } else if (MessageUtils.isTrue(message.getContextualProperty(USE_PLAIN_QUERY_PARAMETERS))) {
+                return convertPlainQueriesToFiqlExp(params);     
             }
-        } else {
-            return null;
         }
+        return null;
+        
     }
+    
+    private String convertPlainQueriesToFiqlExp(MultivaluedMap<String, String> params) {
+        SearchConditionBuilder builder = SearchConditionBuilder.instance();
+        List<CompleteCondition> list = new ArrayList<CompleteCondition>(params.size());
+        
+        for (Map.Entry<String, List<String>> entry : params.entrySet()) {
+            list.add(getOrCondition(builder, entry));
+        }
+        return builder.and(list).query();
+    }
+    
+    private CompleteCondition getOrCondition(SearchConditionBuilder builder,
+                                             Map.Entry<String, List<String>> entry) {
+        String key = entry.getKey();
+        ConditionType ct = null;
+        if (key.endsWith("From")) { 
+            ct = ConditionType.GREATER_OR_EQUALS;
+            key = key.substring(0, key.length() - 4);
+        } else if (key.endsWith("Till")) {
+            ct = ConditionType.LESS_OR_EQUALS;
+            key = key.substring(0, key.length() - 4);
+        } else {
+            ct = ConditionType.EQUALS;
+        }
+        
+        List<CompleteCondition> list = new ArrayList<CompleteCondition>(entry.getValue().size());
+        for (String value : entry.getValue()) {
+            list.add(builder.is(key).comparesTo(ct, value));
+        }
+        return builder.or(list);
+    }
+    
+    
     
     private <T> SearchConditionParser<T> getParser(Class<T> cls, 
                                                    Map<String, String> beanProperties,
