@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.ext.search.client;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.datatype.Duration;
@@ -76,6 +78,14 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
     public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, 
                                  CompleteCondition... cn) {
         return new Builder(properties).and(c1, c2, cn);
+    }
+    
+    public CompleteCondition and(List<CompleteCondition> conditions) {
+        return new Builder(properties).and(conditions);
+    }
+    
+    public CompleteCondition or(List<CompleteCondition> conditions) {
+        return new Builder(properties).or(conditions);
     }
 
     public CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
@@ -372,6 +382,33 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             result += ")";
             return this;
         }
+        
+        public CompleteCondition and(List<CompleteCondition> conditions) {
+            return conditionsList(FiqlParser.AND, conditions);
+        }
+        
+        public CompleteCondition or(List<CompleteCondition> conditions) {
+            return conditionsList(FiqlParser.OR, conditions);
+        }
+        
+        private CompleteCondition conditionsList(String op, List<CompleteCondition> conditions) {
+            if (conditions.size() == 1) {
+                result += ((Builder)conditions.get(0)).buildPartial(this);
+            } else {
+                result += "(";
+                
+                for (Iterator<CompleteCondition> it = conditions.iterator(); it.hasNext();) {
+                    result += ((Builder)it.next()).buildPartial(this);
+                    if (it.hasNext()) {
+                        result += op;
+                    }
+                }
+                result += ")";
+            }
+            
+            return this;
+        }
+        
 
         public Property is(String property) {
             Builder b = new Builder(this);

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search.client;
 
+import java.util.List;
+
 /**
  * Part of fluent interface of {@link SearchConditionBuilder}.
  */
@@ -30,4 +32,10 @@ public interface PartialCondition {
 
     /** Disjunct multiple expressions */
     CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn);
+    
+    /** Conjunct multiple expressions */
+    CompleteCondition and(List<CompleteCondition> conditions);
+    
+    /** Disjunct multiple expressions */
+    CompleteCondition or(List<CompleteCondition> conditions);
 }
