@@ -25,7 +25,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckStatement;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 
@@ -50,23 +53,26 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     }    
     
     protected ClassValue getPrimitiveFieldClass(String name, Class<?> valueCls, Object value) {
-        return getPrimitiveFieldClass(name, valueCls, valueCls, value);
+        return getPrimitiveFieldClass(null, name, valueCls, valueCls, value);
     }
     
-    protected ClassValue getPrimitiveFieldClass(String name, Class<?> valueCls, Type type, Object value) {
-        return doGetPrimitiveFieldClass(name, valueCls, type, value, new HashSet<String>());
+    protected ClassValue getPrimitiveFieldClass(PrimitiveStatement ps, String name, Class<?> valueCls, 
+                                                Type type, Object value) {
+        return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, new HashSet<String>());
     }
     
     @SuppressWarnings("rawtypes")
-    private ClassValue doGetPrimitiveFieldClass(String name, Class<?> valueCls, Type type, Object value, 
+    private ClassValue doGetPrimitiveFieldClass(PrimitiveStatement ps,
+                                                String name, Class<?> valueCls, Type type, Object value, 
                                                 Set<String> set) {
         boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(valueCls);
-        
+        Class<?> actualCls = isCollection ? InjectionUtils.getActualType(type) : valueCls;
+        CollectionCheckInfo collInfo = null;
         int index = name.indexOf(".");
         if (index != -1) {
             String[] names = name.split("\\.");
             name = name.substring(index + 1);
-            if (value != null && !InjectionUtils.isPrimitive(valueCls)) {
+            if (value != null && !InjectionUtils.isPrimitive(actualCls)) {
                 try {
                     String nextPart = names[1];
                     if (nextPart.length() == 1) {
@@ -74,8 +80,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
                     } else {
                         nextPart = Character.toUpperCase(nextPart.charAt(0)) + nextPart.substring(1);
                     }
-                    Class<?> actualCls = isCollection 
-                        ? InjectionUtils.getActualType(type) : valueCls;
+                    
                     Method m = actualCls.getMethod("get" + nextPart, new Class[]{});
                     if (isCollection) {
                         value = ((Collection)value).iterator().next();
@@ -87,12 +92,16 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
                 } catch (Throwable ex) {
                     throw new RuntimeException();
                 }
-                return doGetPrimitiveFieldClass(name, valueCls, type, value, set);
+                return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, set);
             }
         } else if (isCollection) {
             set.add(name);
-            value = ((Collection)value).iterator().next();
-            valueCls = value.getClass();
+            Collection coll = (Collection)value;
+            value = coll.isEmpty() ? null : coll.iterator().next();
+            valueCls = actualCls;
+            if (ps instanceof CollectionCheckStatement) { 
+                collInfo = ((CollectionCheckStatement)ps).getCollectionCheckInfo();
+            }
         }
         
         Class<?> cls = null;
@@ -102,7 +111,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
         if (cls == null) {  
             cls = valueCls;
         }
-        return new ClassValue(cls, value, set);
+        return new ClassValue(cls, value, collInfo, set);
     }
 
     public void setPrimitiveFieldTypeMap(Map<String, Class<?>> primitiveFieldTypeMap) {
@@ -116,10 +125,16 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     protected class ClassValue {
         private Class<?> cls;
         private Object value;
+        private CollectionCheckInfo collInfo;
+        
         private Set<String> collectionProps;
-        public ClassValue(Class<?> cls, Object value, Set<String> collectionProps) {
+        public ClassValue(Class<?> cls, 
+                          Object value,
+                          CollectionCheckInfo collInfo,
+                          Set<String> collectionProps) {
             this.cls = cls;
             this.value = value;
+            this.collInfo = collInfo;
             this.collectionProps = collectionProps;       
         }
         public Class<?> getCls() {
@@ -133,6 +148,10 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
         }
         public void setValue(Object value) {
             this.value = value;
+        }
+        
+        public CollectionCheckInfo getCollectionCheckInfo() {
+            return collInfo;
         }
         
         public boolean isCollection(String name) {

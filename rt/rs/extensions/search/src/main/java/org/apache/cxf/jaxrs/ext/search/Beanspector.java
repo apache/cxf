@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
+
 /**
  * Bean introspection utility.
  */
@@ -194,6 +196,7 @@ public class Beanspector<T> {
     public static class TypeInfo {
         private Class<?> cls;
         private Type genericType;
+        private CollectionCheckInfo checkInfo;
         
         public TypeInfo(Class<?> cls, Type genericType) {
             this.cls = cls;
@@ -206,6 +209,14 @@ public class Beanspector<T> {
         
         public Type getGenericType() {
             return genericType;
+        }
+
+        public CollectionCheckInfo getCollectionCheckInfo() {
+            return checkInfo;
+        }
+
+        public void setCollectionCheckInfo(CollectionCheckInfo info) {
+            this.checkInfo = info;
         }
     }
 }

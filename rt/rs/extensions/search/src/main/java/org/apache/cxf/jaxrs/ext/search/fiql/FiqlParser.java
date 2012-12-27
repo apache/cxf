@@ -45,6 +45,8 @@ import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.ext.search.SimpleSearchCondition;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheck;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.MessageUtils;
 
@@ -70,6 +72,10 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     public static final String NEQ = "!=";
     
     public static final Map<ConditionType, String> CONDITION_MAP;
+        
+    public static final String EXTENSION_COUNT = "count";
+    
+    private static final String EXTENSION_COUNT_OPEN = EXTENSION_COUNT + "(";
     
     private static final Map<String, ConditionType> OPERATORS_MAP;
     private static final Pattern COMPARATORS_PATTERN; 
@@ -253,19 +259,20 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     private Comparison parseComparison(String expr) throws SearchParseException {
         Matcher m = COMPARATORS_PATTERN.matcher(expr);
         if (m.find()) {
-            String name = expr.substring(0, m.start(1));
+            String propertyName = expr.substring(0, m.start(1));
             String operator = m.group(1);
             String value = expr.substring(m.end(1));
             if ("".equals(value)) {
                 throw new SearchParseException("Not a comparison expression: " + expr);
             }
             
+            String name = unwrapSetter(propertyName);
             String beanPropertyName = beanPropertiesMap == null ? null : beanPropertiesMap.get(name);
             if (beanPropertyName != null) {
                 name = beanPropertyName;
             }
             
-            TypeInfoObject castedValue = parseType(name, value);
+            TypeInfoObject castedValue = parseType(propertyName, name, value);
             if (castedValue != null) {
                 return new Comparison(name, operator, castedValue);
             } else if (MessageUtils.isTrue(contextProperties.get(SearchUtils.LAX_PROPERTY_MATCH))) {
@@ -279,14 +286,14 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
     }
 
     
-    private TypeInfoObject parseType(String setter, String value) throws SearchParseException {
+    private TypeInfoObject parseType(String originalName, String setter, String value) throws SearchParseException {
         String name = getSetter(setter);
         
         try {
             TypeInfo typeInfo = 
                 beanspector != null ? beanspector.getAccessorTypeInfo(name) 
                     : new TypeInfo(String.class, String.class);
-            Object object = parseType(null, null, setter, typeInfo, value);
+            Object object = parseType(originalName, null, null, setter, typeInfo, value);
             return new TypeInfoObject(object, typeInfo);
         } catch (Exception e) {
             return null;
@@ -294,8 +301,12 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         
     }
 
-    private Object parseType(Object ownerBean, Object lastCastedValue, String setter, 
-                             TypeInfo typeInfo, String value) throws SearchParseException {
+    private Object parseType(String originalPropName, 
+                             Object ownerBean, 
+                             Object lastCastedValue, 
+                             String setter, 
+                             TypeInfo typeInfo, 
+                             String value) throws SearchParseException {
         Class<?> valueType = typeInfo.getTypeClass();
         boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(valueType);
         Class<?> actualType = isCollection ? InjectionUtils.getActualType(typeInfo.getGenericType()) : valueType;
@@ -306,11 +317,19 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
             if (Date.class.isAssignableFrom(valueType)) {
                 castedValue = convertToDate(value);
             } else {
-                if (ownerBean == null || InjectionUtils.isPrimitive(valueType) || valueType.isEnum()) {
+                boolean isPrimitive = InjectionUtils.isPrimitive(valueType);
+                boolean isPrimitiveOrEnum = isPrimitive || valueType.isEnum();
+                if (ownerBean == null || isPrimitiveOrEnum) {
                     try {
-                        castedValue = InjectionUtils.convertStringToPrimitive(value, actualType);
-                        if (isCollection) {
+                        CollectionCheck collCheck = getCollectionCheck(originalPropName, isCollection, actualType);
+                        if (collCheck == null) {
+                            castedValue = InjectionUtils.convertStringToPrimitive(value, actualType);
+                        } 
+                        if (collCheck == null && isCollection) {
                             castedValue = getCollectionSingleton(valueType, castedValue);
+                        } else if (isCollection) {
+                            typeInfo.setCollectionCheckInfo(new CollectionCheckInfo(collCheck, castedValue));
+                            castedValue = getEmptyCollection(valueType);
                         }
                     } catch (Exception e) {
                         throw new SearchParseException("Cannot convert String value \"" + value
@@ -342,6 +361,8 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 Method getterM = actualType.getMethod("get" + nextPart, new Class[]{});   
                 Class<?> returnType = getterM.getReturnType();
                 boolean returnCollection = InjectionUtils.isSupportedCollectionOrArray(returnType);
+                Class<?> actualReturnType = !returnCollection ? returnType 
+                    : InjectionUtils.getActualType(getterM.getGenericReturnType());
                 
                 boolean isPrimitive = InjectionUtils.isPrimitive(returnType) || returnType.isEnum();
                 boolean lastTry = names.length == 2 
@@ -355,7 +376,13 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                         nextObject = isPrimitive ? InjectionUtils.convertStringToPrimitive(value, returnType) 
                             : convertToDate(value);
                     } else {
-                        nextObject = getCollectionSingleton(valueType, value);
+                        CollectionCheck collCheck = getCollectionCheck(originalPropName, true, actualReturnType);
+                        if (collCheck == null) {
+                            nextObject = getCollectionSingleton(valueType, value);
+                        } else {
+                            typeInfo.setCollectionCheckInfo(new CollectionCheckInfo(collCheck, value));
+                            nextObject = getEmptyCollection(valueType);
+                        }
                     }
                 } else {
                     nextObject = returnType.newInstance();
@@ -370,8 +397,12 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
                 } 
                 
                 TypeInfo nextTypeInfo = new TypeInfo(nextObject.getClass(), getterM.getGenericReturnType()); 
-                return parseType(nextObject, lastCastedValue, setter.substring(index + 1), 
-                                 nextTypeInfo, value);
+                return parseType(originalPropName,
+                                 nextObject, 
+                                 lastCastedValue, 
+                                 setter.substring(index + 1), 
+                                 nextTypeInfo, 
+                                 value);
             } catch (Throwable e) {
                 throw new SearchParseException("Cannot convert String value \"" + value
                                                + "\" to a value of class " + valueType.getName(), e);
@@ -379,11 +410,32 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         }
     }
     
+    private CollectionCheck getCollectionCheck(String propName, boolean isCollection, Class<?> actualCls) {
+        if (isCollection) {
+            if (InjectionUtils.isPrimitive(actualCls)) {
+                if (propName.startsWith(EXTENSION_COUNT_OPEN)) {
+                    return CollectionCheck.SIZE;
+                }
+            } else {
+                return CollectionCheck.SIZE;
+            }
+        }
+        return null;
+    }
+    
     private Object getCollectionSingleton(Class<?> collectionCls, Object value) {
         if (Set.class.isAssignableFrom(collectionCls)) {
             return Collections.singleton(value);
         } else {
             return Collections.singletonList(value);
+        }
+    }
+    
+    private Object getEmptyCollection(Class<?> collectionCls) {
+        if (Set.class.isAssignableFrom(collectionCls)) {
+            return Collections.emptySet();
+        } else {
+            return Collections.emptyList();
         }
     }
     
@@ -417,6 +469,14 @@ public class FiqlParser<T> implements SearchConditionParser<T> {
         int index = setter.indexOf(".");
         if (index != -1) {
             return setter.substring(0, index).toLowerCase();
+        } else {
+            return setter;
+        }
+    }
+    
+    private String unwrapSetter(String setter) {
+        if (setter.startsWith(EXTENSION_COUNT_OPEN) && setter.endsWith(")")) {
+            return setter.substring(EXTENSION_COUNT_OPEN.length(), setter.length() - 1);        
         } else {
             return setter;
         }
