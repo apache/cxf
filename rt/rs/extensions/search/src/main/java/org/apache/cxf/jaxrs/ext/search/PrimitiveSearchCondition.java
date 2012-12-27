@@ -76,6 +76,18 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         return cType;
     }
 
+    protected String getPropertyName() {
+        return propertyName;
+    }
+    
+    protected Object getPropertyValue() {
+        return propertyValue;
+    }
+    
+    protected Type getPropertyType() {
+        return propertyType;
+    }
+    
     public List<SearchCondition<T>> getSearchConditions() {
         return null;
     }

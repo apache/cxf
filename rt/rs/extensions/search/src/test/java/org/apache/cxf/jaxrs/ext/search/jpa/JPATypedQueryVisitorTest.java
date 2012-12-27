@@ -199,6 +199,62 @@ public class JPATypedQueryVisitorTest extends Assert {
     }
     
     @Test
+    public void testQueryElementCollection() throws Exception {
+        List<Book> books = 
+            queryBooks("authors==John");
+        assertEquals(2, books.size());
+    }
+    
+    @Test
+    public void testNumberOfReviews() throws Exception {
+        List<Book> books = 
+            queryBooks("reviews=gt=0");
+        assertEquals(3, books.size());
+    }
+    
+    @Test
+    public void testNumberOfReviews2() throws Exception {
+        List<Book> books = 
+            queryBooks("reviews=gt=3");
+        assertEquals(0, books.size());
+    }
+    
+    @Test
+    public void testNumberOfReviewAuthors() throws Exception {
+        List<Book> books = 
+            queryBooks("count(reviews.authors)=gt=0");
+        assertEquals(3, books.size());
+    }
+    
+    @Test
+    public void testNumberOfReviewAuthors2() throws Exception {
+        List<Book> books = 
+            queryBooks("count(reviews.authors)=gt=3");
+        assertEquals(0, books.size());
+    }
+    
+    @Test
+    public void testNumberOfAuthors() throws Exception {
+        List<Book> books = 
+            queryBooks("count(authors)=gt=0");
+        assertEquals(3, books.size());
+    }
+    
+    @Test
+    public void testNumberOfAuthors2() throws Exception {
+        List<Book> books = 
+            queryBooks("count(authors)=gt=3");
+        assertEquals(0, books.size());
+    }
+    
+    @Test
+    public void testQueryCollectionSize2() throws Exception {
+        List<Book> books = 
+            queryBooks("reviews.authors=gt=0");
+        assertEquals(3, books.size());
+    }
+    
+    @Test
     public void testAndQueryCollection() throws Exception {
         List<Book> books = 
             queryBooks("id==10;authors==John;reviews.review==good;reviews.authors==Ted");

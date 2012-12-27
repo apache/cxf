@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search.jpa;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -39,6 +40,7 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 import org.apache.cxf.jaxrs.ext.search.visitor.AbstractSearchConditionVisitor;
 
 public abstract class AbstractJPATypedQueryVisitor<T, T1, E> 
@@ -116,14 +118,8 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
             root = cq.from(tClass);
             predStack.push(new ArrayList<Predicate>());
         }
-        PrimitiveStatement statement = sc.getStatement();
-        if (statement != null) {
-            if (statement.getProperty() != null) {
-                predStack.peek().add(buildPredicate(sc.getConditionType(), 
-                                                    statement.getProperty(), 
-                                                    statement.getValue(),
-                                                    statement.getValueType()));
-            }
+        if (sc.getStatement() != null) {
+            predStack.peek().add(buildPredicate(sc.getStatement()));
         } else {
             predStack.push(new ArrayList<Predicate>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
@@ -166,21 +162,34 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         return cq;
     }
     
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Predicate buildPredicate(ConditionType ct, String name, Object value, Type valueType) {
-
+    private Predicate buildPredicate(PrimitiveStatement ps) {
+        String name = ps.getProperty();
         name = super.getRealPropertyName(name);
-        ClassValue cv = getPrimitiveFieldClass(name, value.getClass(), valueType, value); 
+        ClassValue cv = getPrimitiveFieldClass(ps,
+                                               name, 
+                                               ps.getValue().getClass(), 
+                                               ps.getValueType(), 
+                                               ps.getValue()); 
+        CollectionCheckInfo collInfo = cv.getCollectionCheckInfo();
+        Path<?> path = getPath(root, name, cv, collInfo);
         
-        Class<? extends Comparable> clazz = (Class<? extends Comparable>)cv.getCls();
-        value = cv.getValue();    
+        Predicate pred = collInfo == null 
+            ? doBuildPredicate(ps.getCondition(), path, cv.getCls(), cv.getValue()) 
+            : doBuildCollectionPredicate(ps.getCondition(), path, collInfo);
         
-        Path<?> path = getPath(root, name, cv);
+        return pred;
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private Predicate doBuildPredicate(ConditionType ct, Path<?> path, Class<?> valueClazz, Object value) {
+        
+        Class<? extends Comparable> clazz = (Class<? extends Comparable>)valueClazz;
+        Expression<? extends Comparable> exp = path.as(clazz);
         
         Predicate pred = null;
         switch (ct) {
         case GREATER_THAN:
-            pred = builder.greaterThan(path.as(clazz), clazz.cast(value));
+            pred = builder.greaterThan(exp, clazz.cast(value));
             break;
         case EQUALS:
             if (clazz.equals(String.class)) {
@@ -188,47 +197,77 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
                 if (theValue.contains("*")) {
                     theValue = ((String)value).replaceAll("\\*", "");
                 }
-                pred = builder.like(path.as(String.class), "%" + theValue + "%");
+                pred = builder.like((Expression<String>)exp, "%" + theValue + "%");
             } else {
-                pred = builder.equal(path.as(clazz), clazz.cast(value));
+                pred = builder.equal(exp, clazz.cast(value));
             }
             break;
         case NOT_EQUALS:
-            pred = builder.notEqual(path.as(clazz), 
-                                    clazz.cast(value));
+            pred = builder.notEqual(exp, clazz.cast(value));
             break;
         case LESS_THAN:
-            pred = builder.lessThan(path.as(clazz), 
-                                    clazz.cast(value));
+            pred = builder.lessThan(exp, clazz.cast(value));
             break;
         case LESS_OR_EQUALS:
-            pred = builder.lessThanOrEqualTo(path.as(clazz), 
-                                             clazz.cast(value));
+            pred = builder.lessThanOrEqualTo(exp, clazz.cast(value));
             break;
         case GREATER_OR_EQUALS:
-            pred = builder.greaterThanOrEqualTo(path.as(clazz), 
-                                                clazz.cast(value));
+            pred = builder.greaterThanOrEqualTo(exp, clazz.cast(value));
             break;
         default: 
             break;
         }
         return pred;
     }
-
-    private Path<?> getPath(Path<?> element, String name, ClassValue cv) {
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private Predicate doBuildCollectionPredicate(ConditionType ct, Path<?> path, CollectionCheckInfo collInfo) {
+        Predicate pred = null;
+        
+        Expression<Integer> exp = builder.size((Expression<? extends Collection>)path);
+        Integer value = Integer.valueOf(collInfo.getCollectionCheckValue().toString());
+        
+        switch (ct) {
+        case GREATER_THAN:
+            pred = builder.greaterThan(exp, value);
+            break;
+        case EQUALS:
+            pred = builder.equal(exp, value);
+            break;
+        case NOT_EQUALS:
+            pred = builder.notEqual(exp, value);
+            break;
+        case LESS_THAN:
+            pred = builder.lessThan(exp, value);
+            break;
+        case LESS_OR_EQUALS:
+            pred = builder.lessThanOrEqualTo(exp, value);
+            break;
+        case GREATER_OR_EQUALS:
+            pred = builder.greaterThanOrEqualTo(exp, value);
+            break;
+        default: 
+            break;
+        }
+        return pred;
+    }
+    
+    private Path<?> getPath(Path<?> element, String name, ClassValue cv, CollectionCheckInfo collSize) {
         if (name.contains(".")) {
             String pre = name.substring(0, name.indexOf('.'));
             String post = name.substring(name.indexOf('.') + 1);
-            return getPath(getNextPath(element, pre, cv), 
+            return getPath(getNextPath(element, pre, cv, null), 
                            post, 
-                           cv);
+                           cv,
+                           collSize);
         } else {
-            return getNextPath(element, name, cv);
+            return getNextPath(element, name, cv, collSize);
         }
     }
 
-    private Path<?> getNextPath(Path<?> element, String name, ClassValue cv) {
-        if ((cv.isCollection(name) || isJoinProperty(name)) && (element == root || element instanceof Join)) {
+    private Path<?> getNextPath(Path<?> element, String name, ClassValue cv, CollectionCheckInfo collSize) {
+        if (collSize == null
+            && (cv.isCollection(name) || isJoinProperty(name)) && (element == root || element instanceof Join)) {
             return element == root ? root.join(name) : ((Join<?, ?>)element).join(name);
         } else {
             return element.get(name);

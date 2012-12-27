@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.jaxrs.ext.search.Beanspector.TypeInfo;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckCondition;
+import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 
 /**
  * Simple search condition comparing primitive objects or complex object by its getters. For details see
@@ -163,11 +165,16 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
                 }
                 String realGetter = realGetters != null && realGetters.containsKey(getter) 
                     ? realGetters.get(getter) : getter;
-                    
-                Type genType = propertyTypeInfo != null && propertyTypeInfo.containsKey(getter)
-                    ? propertyTypeInfo.get(getter).getGenericType() : rval.getClass();
                 
-                list.add(new PrimitiveSearchCondition<T>(realGetter, rval, genType, ct, condition));
+                TypeInfo tInfo = propertyTypeInfo != null ? propertyTypeInfo.get(getter) : null;
+                Type genType = tInfo != null ? tInfo.getGenericType() : rval.getClass();
+                CollectionCheckInfo checkInfo = tInfo != null ? tInfo.getCollectionCheckInfo() : null;
+                
+                PrimitiveSearchCondition<T> pc = checkInfo == null 
+                    ? new PrimitiveSearchCondition<T>(realGetter, rval, genType, ct, condition)
+                    : new CollectionCheckCondition<T>(realGetter, rval, genType, ct, condition, checkInfo);    
+                
+                list.add(pc);
                 
             }
             if (list.isEmpty()) {
