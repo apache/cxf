@@ -151,7 +151,7 @@ public final class JAXRSUtils {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
-    
+    private static final String  SUPPORT_WAE_SPEC_OPTIMIZATION = "support.wae.spec.optimization";
     private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
     static {
         EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
@@ -1397,6 +1397,16 @@ public final class JAXRSUtils {
     }
     
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
+        
+        if (ex.getClass() == WebApplicationException.class) {
+            WebApplicationException webEx = (WebApplicationException)ex;
+            if (webEx.getResponse().hasEntity() 
+                && webEx.getCause() == null
+                && MessageUtils.isTrue(inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION))) {
+                return webEx.getResponse();
+            }
+        }
+        
         ExceptionMapper<T>  mapper =
             ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
