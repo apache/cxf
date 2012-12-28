@@ -42,6 +42,7 @@ public class SearchContextImpl implements SearchContext {
     public static final String SEARCH_QUERY = "_search";
     public static final String SHORT_SEARCH_QUERY = "_s";
     private static final String USE_PLAIN_QUERY_PARAMETERS = "search.use.plain.queries";
+    private static final String USE_ALL_QUERY_COMPONENT = "search.use.all.query.component";
     private static final Logger LOG = LogUtils.getL7dLogger(SearchContextImpl.class);
     private Message message;
     
@@ -103,6 +104,9 @@ public class SearchContextImpl implements SearchContext {
         
         String queryStr = (String)message.get(Message.QUERY_STRING);
         if (queryStr != null) { 
+            if (MessageUtils.isTrue(message.getContextualProperty(USE_ALL_QUERY_COMPONENT))) {
+                return queryStr;
+            }
             MultivaluedMap<String, String> params = 
                 JAXRSUtils.getStructuredParams(queryStr, "&", true, false);
             if (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY)) {
