@@ -68,6 +68,8 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private static final String REQUEST_SCOPE = "request";
     private static final String SESSION_SCOPE = "session";
     
+    private static final String MESSAGE_RESOURCE_PATH_PROPERTY = "redirect.resource.path";
+    
     private static final String DEFAULT_RESOURCE_EXTENSION = ".jsp";
     private static final String DEFAULT_LOCATION_PREFIX = "/WEB-INF/";
     
@@ -135,6 +137,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                     return true;
                 }
             }
+        }
+        if (mc != null && mc.get(MESSAGE_RESOURCE_PATH_PROPERTY) != null) {
+            return true;
         }
         return false;
     }
@@ -226,8 +231,10 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 return resourcePaths.get(requestPath);
             }
         }
-        // won't happen given that isWriteable() returned true
-        return null;
+        
+        Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
+        return resourcePathProp != null ? resourcePathProp.toString() : null;
+        
     }
     
     private String getRequestPath() {
