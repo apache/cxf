@@ -18,15 +18,28 @@
  */
 package org.apache.cxf.jaxws;
 
-
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Provider;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.continuations.SuspendedInvocationException;
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -44,6 +57,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class JAXWSMethodInvokerTest extends Assert {
+    private static final QName TEST_HEADER_NAME = new QName("testHeader");
     Factory factory = EasyMock.createMock(Factory.class);
     Object target = EasyMock.createMock(Hello.class);
         
@@ -84,6 +98,51 @@ public class JAXWSMethodInvokerTest extends Assert {
         }
     }
     
+    @Test
+    public void testFaultAvoidHeadersCopy() throws Throwable {
+        ExceptionService serviceObject = new ExceptionService();
+        Method serviceMethod = ExceptionService.class.getMethod("invoke", new Class[]{});
+        
+        Exchange ex = new ExchangeImpl();
+        prepareInMessage(ex, false);
+        
+
+        JAXWSMethodInvoker jaxwsMethodInvoker = prepareJAXWSMethodInvoker(ex, serviceObject, serviceMethod);
+        try {
+            jaxwsMethodInvoker.invoke(ex, new MessageContentsList(new Object[]{}));
+            fail("Expected fault");
+        } catch (Fault fault) {
+            Message outMsg = ex.getOutMessage();
+            Assert.assertNull(outMsg);
+        }
+    }
+
+    @Test
+    public void testFaultHeadersCopy() throws Throwable {
+        ExceptionService serviceObject = new ExceptionService();
+        Method serviceMethod = ExceptionService.class.getMethod("invoke", new Class[]{});
+        
+        Exchange ex = new ExchangeImpl();
+        prepareInMessage(ex, true);
+        Message msg = new MessageImpl();
+        SoapMessage outMessage = new SoapMessage(msg);
+        ex.setOutMessage(outMessage);
+
+        JAXWSMethodInvoker jaxwsMethodInvoker = prepareJAXWSMethodInvoker(ex, serviceObject, serviceMethod);
+
+        try {
+            jaxwsMethodInvoker.invoke(ex, new MessageContentsList(new Object[]{}));
+            fail("Expected fault");
+        } catch (Fault fault) {
+            Message outMsg = ex.getOutMessage();
+            Assert.assertNotNull(outMsg);
+            @SuppressWarnings("unchecked")
+            List<Header> headers = (List<Header>)outMsg.get(Header.HEADER_LIST);
+            Assert.assertEquals(1, headers.size());
+            Assert.assertEquals(TEST_HEADER_NAME, headers.get(0).getName());
+        }
+    }
+
     @Test
     public void testProviderInterpretNullAsOneway() throws Throwable {
         NullableProviderService serviceObject = new NullableProviderService();
@@ -205,4 +264,30 @@ public class JAXWSMethodInvokerTest extends Assert {
             return nullable ? null : request;
         }
     }
+
+    public static class ExceptionService {
+        private Throwable ex = new RuntimeException("Test Exception");
+        
+        public void invoke() {
+            throw new Fault(ex);
+        }
+        
+    }
+
+    private Message prepareInMessage(Exchange ex, boolean copyHeadersByFault)
+        throws ParserConfigurationException, SAXException, IOException {
+        Message inMessage = new MessageImpl();
+        inMessage.setExchange(ex);
+        inMessage.put(JAXWSMethodInvoker.COPY_SOAP_HEADERS_BY_FAULT, Boolean.valueOf(copyHeadersByFault));
+        List<Header> headers = new ArrayList<Header>();
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document headerDoc = builder.parse(new ByteArrayInputStream("<test:testValue xmlns:test=\"test\"/>"
+            .getBytes()));
+        Header testHeader = new Header(TEST_HEADER_NAME, headerDoc.getDocumentElement());
+        headers.add(testHeader);
+        inMessage.put(Header.HEADER_LIST, headers);
+        ex.setInMessage(inMessage);
+        return inMessage;
+    }
+
 }
