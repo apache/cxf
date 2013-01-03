@@ -22,11 +22,11 @@ package org.apache.cxf.jaxws;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import junit.framework.Assert;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.junit.Assert;
 
 public class MessageReplayObserver implements MessageObserver {
     String responseMessage;

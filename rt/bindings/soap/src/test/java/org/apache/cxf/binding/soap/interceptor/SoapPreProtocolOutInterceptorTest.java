@@ -25,8 +25,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.helpers.CastUtils;
@@ -42,6 +40,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

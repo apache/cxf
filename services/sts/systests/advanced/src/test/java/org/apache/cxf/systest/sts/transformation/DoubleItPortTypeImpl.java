@@ -25,8 +25,6 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.ws.security.WSConstants;
@@ -36,6 +34,8 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.example.contract.doubleit.DoubleItPortType;
+
+import org.junit.Assert;
 
 @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
             serviceName = "DoubleItService", 

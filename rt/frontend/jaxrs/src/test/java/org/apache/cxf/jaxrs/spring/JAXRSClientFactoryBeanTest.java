@@ -20,10 +20,10 @@ package org.apache.cxf.jaxrs.spring;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

@@ -33,10 +33,11 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 
 import org.apache.cxf.helpers.DOMUtils;
+
+import org.junit.Assert;
 
 /**
  * XPath test assertions.

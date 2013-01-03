@@ -25,8 +25,6 @@ import java.util.Collection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.Test;
 
 
@@ -64,7 +62,7 @@ public abstract class AbstractHelloWorldTest extends AbstractSDOTest {
                             + "/databinding/sdo/hello_world_soap_http/types']", 
                             doc);
                 return;
-            } catch (AssertionFailedError ex) {
+            } catch (AssertionError ex) {
                 //ignore
             }
         }

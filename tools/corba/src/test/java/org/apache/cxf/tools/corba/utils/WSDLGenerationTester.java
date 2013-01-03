@@ -34,14 +34,14 @@ import javax.wsdl.xml.WSDLWriter;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.binding.corba.wsdl.BindingType;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
+
+import org.junit.Assert;
 
 public class WSDLGenerationTester {
 
