@@ -1,11 +1,10 @@
 MTOM Demo for SWA & XOP
 =======================
 
-This demo illustrates the use of a SOAP message 
-with an attachment and XML-binary Optimized Packaging.
+This demo illustrates the use of a SOAP message with an attachment and
+XML-binary Optimized Packaging.
 
-Please review the README in the samples directory before
-continuing.
+Please review the README in the samples directory before continuing.
 
 
 Building and running the demo using Maven
