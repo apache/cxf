@@ -38,6 +38,8 @@ import org.apache.cxf.service.invoker.SingletonFactory;
 
 public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
 
+    public static final String COPY_SOAP_HEADERS_BY_FAULT = "org.apache.cxf.fault.copySoapHeaders";
+
     public JAXWSMethodInvoker(final Object bean) {
         super(new SingletonFactory(bean));
     }
@@ -74,7 +76,9 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             updateWebServiceContext(exchange, ctx);
         } catch (Fault f) {
             //get chance to copy over customer's header
-            updateHeader(exchange, ctx);
+            if (MessageUtils.getContextualBoolean(exchange.getInMessage(), COPY_SOAP_HEADERS_BY_FAULT, true)) {
+                updateHeader(exchange, ctx);
+            }
             throw f;
         } finally {
             //clear the WebServiceContextImpl's ThreadLocal variable
