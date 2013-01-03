@@ -185,14 +185,6 @@ public abstract class AbstractOperation {
         SecurityTokenReferenceType securityTokenReferenceType = 
             QNameConstants.WSSE_FACTORY.createSecurityTokenReferenceType();
         
-        // Create the identifier according to whether it is an attached reference or not
-        String identifier = tokenReference.getIdentifier();
-        if (attached && identifier.charAt(0) != '#') {
-            identifier = "#" + identifier;
-        } else if (!attached && identifier.charAt(0) == '#') {
-            identifier = identifier.substring(1);
-        }
-        
         // TokenType
         String tokenType = tokenReference.getWsse11TokenType();
         if (tokenType != null) {
@@ -200,6 +192,11 @@ public abstract class AbstractOperation {
         }
         
         if (tokenReference.isUseKeyIdentifier()) {
+            String identifier = tokenReference.getIdentifier();
+            if (identifier.charAt(0) == '#') {
+                identifier = identifier.substring(1);
+            }
+            
             KeyIdentifierType keyIdentifierType = 
                 QNameConstants.WSSE_FACTORY.createKeyIdentifierType();
             keyIdentifierType.setValue(identifier);
@@ -211,6 +208,13 @@ public abstract class AbstractOperation {
                 QNameConstants.WSSE_FACTORY.createKeyIdentifier(keyIdentifierType);
             securityTokenReferenceType.getAny().add(keyIdentifier);
         } else if (tokenReference.isUseDirectReference()) {
+            String identifier = tokenReference.getIdentifier();
+            if (attached && identifier.charAt(0) != '#') {
+                identifier = "#" + identifier;
+            } else if (!attached && identifier.charAt(0) == '#') {
+                identifier = identifier.substring(1);
+            }
+            
             ReferenceType referenceType = QNameConstants.WSSE_FACTORY.createReferenceType();
             referenceType.setURI(identifier);
             
