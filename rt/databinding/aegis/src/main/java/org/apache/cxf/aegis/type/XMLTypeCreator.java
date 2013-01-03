@@ -135,7 +135,13 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         }
     }
     
-    private XPathUtils xpathUtils = new XPathUtils();
+    private volatile XPathUtils xpathUtils;
+    private synchronized XPathUtils getXPathUtils() {
+        if (xpathUtils == null) {
+            xpathUtils = new XPathUtils();
+        }
+        return xpathUtils;
+    }
 
     private Document readAegisFile(InputStream is, final String path) throws IOException {
         DocumentBuilder documentBuilder;
@@ -195,23 +201,24 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         if (clazz == null) {
             return null;
         }
-        Document doc = documents.get(clazz.getName());
-        if (doc != null) {
-            return doc;
+        if (documents.containsKey(clazz.getName())) {
+            return documents.get(clazz.getName());
         }
         String path = '/' + clazz.getName().replace('.', '/') + ".aegis.xml";
         InputStream is = clazz.getResourceAsStream(path);
         if (is == null) {
+            documents.put(clazz.getName(), null);
             LOG.finest("Mapping file : " + path + " not found.");
             return null;
         }
         LOG.finest("Found mapping file : " + path);
         try {
-            doc = readAegisFile(is, path);
+            Document doc = readAegisFile(is, path);
             documents.put(clazz.getName(), doc);
             return doc;
         } catch (IOException e) {
             LOG.log(Level.SEVERE, "Error loading file " + path, e);
+            documents.put(clazz.getName(), null);
             return null;
         }
     }
@@ -714,11 +721,11 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     private Element getMatch(Node doc, String xpath) {
-        return (Element)xpathUtils.getValue(xpath, doc, XPathConstants.NODE);
+        return (Element)getXPathUtils().getValue(xpath, doc, XPathConstants.NODE);
     }
 
     private List<Element> getMatches(Node doc, String xpath) {
-        NodeList nl = (NodeList)xpathUtils.getValue(xpath, doc, XPathConstants.NODESET);
+        NodeList nl = (NodeList)getXPathUtils().getValue(xpath, doc, XPathConstants.NODESET);
         List<Element> r = new ArrayList<Element>();
         for (int x = 0; x < nl.getLength(); x++) {
             r.add((Element)nl.item(x));
