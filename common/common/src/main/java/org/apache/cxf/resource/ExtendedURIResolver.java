@@ -72,7 +72,9 @@ public class ExtendedURIResolver {
         while (!resourceOpened.isEmpty()) {
             try {
                 InputStream in = resourceOpened.pop();
-                in.close();
+                if (in != null) {
+                    in.close();
+                }
             } catch (IOException ioe) {
                 // move on...
             }
