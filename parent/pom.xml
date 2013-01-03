@@ -123,15 +123,10 @@
         <cxf.jetty.osgi.version>[7.2,8.2)</cxf.jetty.osgi.version>
         <cxf.jetty.version>7.5.4.v20111024</cxf.jetty.version>
         <cxf.jibx.version>1.2.4.5</cxf.jibx.version>
-<<<<<<< HEAD
         <cxf.joda.time.version>1.6.2</cxf.joda.time.version>
         <cxf.joda.time.version2>2.1</cxf.joda.time.version2>
-        <cxf.junit.version>4.10</cxf.junit.version>
-	    <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
-=======
         <cxf.junit.version>4.11</cxf.junit.version>
         <cxf.maven.core.version>2.2.1</cxf.maven.core.version>
->>>>>>> 83c7a1b... Upgrade to latest junit
         <cxf.msv.version>2011.1</cxf.msv.version>
         <cxf.neethi.version>3.0.2</cxf.neethi.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
