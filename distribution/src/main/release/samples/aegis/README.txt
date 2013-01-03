@@ -1,8 +1,8 @@
 Aegis Demo
 ====================
 
-This demo illustrates how to develop a service use the "code first", pojo based.
-This demo uses the Aegis data binding.
+This demo illustrates how to develop a service using a "code first", pojo based
+approach with the Aegis data binding.
 
 Building and running the demo using Maven
 ---------------------------------------
