@@ -25,8 +25,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -37,6 +35,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;

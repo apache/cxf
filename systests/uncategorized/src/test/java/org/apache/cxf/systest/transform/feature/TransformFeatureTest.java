@@ -25,13 +25,13 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.transform.XSLTInInterceptor;
 import org.apache.cxf.feature.transform.XSLTOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

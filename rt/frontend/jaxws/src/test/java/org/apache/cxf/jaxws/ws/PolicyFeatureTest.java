@@ -20,8 +20,6 @@ package org.apache.cxf.jaxws.ws;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;
@@ -37,6 +35,7 @@ import org.apache.cxf.ws.policy.WSPolicyFeature;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.neethi.Policy;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -22,7 +22,6 @@ package org.apache.cxf.systest.coloc;
 import java.util.ResourceBundle;
 import javax.xml.ws.Holder;
 
-import static junit.framework.Assert.assertEquals;
 
 import org.apache.commons.logging.Log;
 import org.apache.cxf.common.i18n.Message;
@@ -37,6 +36,8 @@ import org.apache.headers.coloc.types.OutHeaderResponseT;
 import org.apache.headers.coloc.types.OutHeaderT;
 import org.apache.headers.doc_lit.HeaderTester;
 import org.apache.headers.doc_lit.PingMeFault;
+
+import static org.junit.Assert.assertEquals;
 
 public class BaseHeaderTesterDocLitImpl implements HeaderTester {
     private Log logger;

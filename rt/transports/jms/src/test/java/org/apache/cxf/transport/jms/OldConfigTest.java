@@ -19,8 +19,8 @@
 
 package org.apache.cxf.transport.jms;
 
-import junit.framework.Assert;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

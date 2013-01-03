@@ -20,7 +20,6 @@ package org.apache.cxf.ws.policy.spring;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.policy.PolicyEngine;
@@ -28,6 +27,7 @@ import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.selector.MaximalAlternativeSelector;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class PolicyBeansTest extends Assert {

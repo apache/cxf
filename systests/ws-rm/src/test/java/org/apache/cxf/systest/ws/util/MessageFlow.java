@@ -29,11 +29,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.RMConstants;
+
+import org.junit.Assert;
 
 public class MessageFlow extends Assert {
     

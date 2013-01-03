@@ -20,7 +20,6 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.net.URL;
 
-import junit.framework.Assert;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -31,6 +30,7 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

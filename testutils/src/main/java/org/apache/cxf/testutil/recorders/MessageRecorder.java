@@ -21,7 +21,7 @@ package org.apache.cxf.testutil.recorders;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class MessageRecorder extends Assert {
    

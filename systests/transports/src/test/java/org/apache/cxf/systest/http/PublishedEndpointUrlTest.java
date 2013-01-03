@@ -31,8 +31,6 @@ import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
@@ -40,6 +38,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.Greeter;
+import org.junit.Assert;
 import org.junit.Test;
 
 

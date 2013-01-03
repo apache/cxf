@@ -22,11 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.bus.managers.WorkQueueManagerImpl;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
+import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 

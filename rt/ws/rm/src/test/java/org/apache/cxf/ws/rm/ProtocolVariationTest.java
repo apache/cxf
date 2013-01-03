@@ -19,11 +19,10 @@
 
 package org.apache.cxf.ws.rm;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

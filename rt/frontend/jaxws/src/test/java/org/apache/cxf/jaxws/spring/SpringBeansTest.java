@@ -25,8 +25,6 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexType;
@@ -57,6 +55,7 @@ import org.apache.cxf.jaxws.spring.NamespaceHandler.SpringServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.beans.factory.BeanCreationException;

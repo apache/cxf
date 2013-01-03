@@ -23,7 +23,6 @@ import java.util.ResourceBundle;
 
 import javax.xml.ws.Holder;
 
-import static junit.framework.Assert.assertEquals;
 
 import org.apache.commons.logging.Log;
 import org.apache.cxf.common.i18n.Message;
@@ -40,6 +39,8 @@ import org.apache.headers.coloc.types.PingMeResponseT;
 import org.apache.headers.coloc.types.PingMeT;
 import org.apache.headers.rpc_lit.HeaderTester;
 import org.apache.headers.rpc_lit.PingMeFault;
+
+import static org.junit.Assert.assertEquals;
 
 public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
     private Log logger;

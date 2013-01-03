@@ -23,9 +23,8 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-import junit.framework.Assert;
-
 import com.sample.procure.PurchaseOrderDocument;
+import org.junit.Assert;
 
 
 @WebService(targetNamespace = "urn:TestService", 
