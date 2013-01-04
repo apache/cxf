@@ -32,7 +32,9 @@
         <version>2.5.8-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
-
+    <properties>
+        <buildnumber.connection.url>${project.scm.developerConnection}</buildnumber.connection.url>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -122,7 +124,39 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>create-noncanonicalrev</id>
+                            <goals>
+                                <goal>create-timestamp</goal>
+                            </goals>
+                        <configuration>
+                            <timestampFormat>'NON-CANONICAL_'yyyy-MM-dd_HH-mm_'${user.name}'</timestampFormat>
+                            <timestampPropertyName>nonCanonicalRevision</timestampPropertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-buildnumber</id>
+                            <goals>
+                                <goal>create</goal>
+                            </goals>
+                            <configuration>
+                                <doCheck>false</doCheck>
+                                <doUpdate>false</doUpdate>
+                                <urlScm>${buildnumber.connection.url}</urlScm>
+                                <revisionOnScmFailure>${nonCanonicalRevision}</revisionOnScmFailure>
+                            </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
             <id>jdk15</id>
@@ -175,6 +209,18 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <!-- default profile enables javadoc stuff -->
+            <id>git.build.number</id>
+            <activation>
+                <file>
+                    <exists>../../../.git</exists>
+                </file>
+            </activation>
+            <properties>
+                <buildnumber.connection.url>scm:git:http://</buildnumber.connection.url>
+            </properties>
         </profile>
     </profiles>
 
