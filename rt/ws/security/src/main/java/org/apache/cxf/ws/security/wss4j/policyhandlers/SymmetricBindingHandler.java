@@ -733,7 +733,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             return doSignatureDK(sigs, policyTokenWrapper, policyToken, tok, included);
         } else {
             WSSecSignature sig = new WSSecSignature(wssConfig);
-            sig.setWsConfig(wssConfig);
             // If a EncryptedKeyToken is used, set the correct value type to
             // be used in the wsse:Reference in ds:KeyInfo
             int type = included ? WSConstants.CUSTOM_SYMM_SIGNING 
