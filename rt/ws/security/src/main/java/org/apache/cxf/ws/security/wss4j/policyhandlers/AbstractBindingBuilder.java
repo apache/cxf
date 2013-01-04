@@ -162,12 +162,13 @@ public abstract class AbstractBindingBuilder {
     
     protected List<byte[]> signatures = new ArrayList<byte[]>();
 
-    Element lastSupportingTokenElement;
-    Element lastEncryptedKeyElement;
-    Element lastDerivedKeyElement;
-    Element bottomUpElement;
-    Element topDownElement;
-    Element bstElement;
+    protected Element bottomUpElement;
+    protected Element topDownElement;
+    protected Element bstElement;
+    
+    private Element lastSupportingTokenElement;
+    private Element lastEncryptedKeyElement;
+    private Element lastDerivedKeyElement;
     
     public AbstractBindingBuilder(
                            WSSConfig config,
@@ -397,7 +398,6 @@ public abstract class AbstractBindingBuilder {
                 ttl = 300;
             }
             timestampEl = new WSSecTimestamp(wssConfig);
-            timestampEl.setWsConfig(wssConfig);
             timestampEl.setTimeToLive(ttl);
             timestampEl.prepare(saaj.getSOAPPart());
             for (AssertionInfo ai : ais) {
