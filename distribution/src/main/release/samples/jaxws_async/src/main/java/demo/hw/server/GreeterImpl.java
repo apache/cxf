@@ -41,7 +41,7 @@ public class GreeterImpl implements GreeterAsync {
     private static final Logger LOG = 
         Logger.getLogger(GreeterImpl.class.getPackage().getName());
  
-     /* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMeSometime(java.lang.String)
      */
     @UseAsyncMethod
@@ -51,7 +51,7 @@ public class GreeterImpl implements GreeterAsync {
         return "How are you " + me;
     }
     
-    public Future<?>  greetMeSometimeAsync(final String me, 
+    public Future<?> greetMeSometimeAsync(final String me, 
                                            final AsyncHandler<GreetMeSometimeResponse> asyncHandler) {
         LOG.info("Executing operation greetMeSometimeAsync asynchronously");
         System.out.println("Executing operation greetMeSometimeAsync asynchronously\n");

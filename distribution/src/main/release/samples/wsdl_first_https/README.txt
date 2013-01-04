@@ -1,10 +1,8 @@
 Hello World Demo using HTTPS communications
 =============================================
-This demo provides a "hello world" example of making
-SOAP calls with HTTPS.
+This demo provides a "hello world" example of making SOAP calls with HTTPS.
 
-Please review the README in the samples directory before
-continuing.
+Please review the README in the samples directory before continuing.
 
 Building and running the demo using Maven
 -----------------------------------------
@@ -75,7 +73,6 @@ Here, configuration is done via Java API (in ClientSpring.java) and not
 Spring XML files.  The client does NOT provide the appropriate credentials 
 programmatically and so the invocation on the server fails.
 
-  
 Scenario 4: (-Psecure.client.non.spring)
 
 Same Java class as in Scenario #3 is used, however the class is coded 
