@@ -1,4 +1,4 @@
-Apache CXF 2.6.4 Release Notes
+Apache CXF 2.6.5 Release Notes
 
 1. Overview
 
@@ -34,7 +34,7 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.4 fixes over 90 JIRA issues reported by users and the community.
+2.6.5 fixes over 25 JIRA issues reported by users and the community.
 
 
 
@@ -79,100 +79,34 @@ for caveats when upgrading from CXF 2.5.x to 2.6.x.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-3329] - idl2wsdl: attributes of structs with the same name as a type do not show up in XSD
-    * [CXF-3613] - Various problems with "java.lang.Class"
-    * [CXF-4301] - Problem with Implicit Soap Headers and @ResponseWrapper in methods with multiple response attributes: NullPointerException in ReflectionServiceFactoryBean or Response-Marshalling Error
-    * [CXF-4391] - org.apache.cxf.configuration.spring.ConfigurerImpl.initWildcardDefinitionMap does not fail silently when bean names containing certain characters do not parse as a regex
-    * [CXF-4482] - AttachmentSerializer puts an extra new line
-    * [CXF-4546] - @XMLInstruction
-    * [CXF-4550] - Wsdl2Java fails if tmp folder contains spaces
-    * [CXF-4551] - MTOM + SchemaValidation results in empty input stream from data handler
-    * [CXF-4554] -  "http://schemas.xmlsoap.org/soap/http/" should not be in the SoapTransportFactory active namespaces list
-    * [CXF-4556] - JAX-RS SAML TLS HolderOfKey check does not work
-    * [CXF-4557] - More unclosed XMLStreamReader/Writer - CXF-4523
-    * [CXF-4562] - Soap Fault fields precedence is incorrect
-    * [CXF-4563] - Empty XML or JSON responses are not processed correctly on the client side
-    * [CXF-4564] - NPE in MavenToolErrorListener during wsdl2java code generation
-    * [CXF-4565] - The message flow is not correct when handler throw ProtocolException outbound
-    * [CXF-4566] - StaxTransformFeature outTransformElements does not work when converting namespaces
-    * [CXF-4567] - Couple error messages did not get moved to managers properties file
-    * [CXF-4569] - cxf-services-wsn-core doesn't support to be installed with other verion of CXF
-    * [CXF-4570] - Attachment Header Content-ID conversion
-    * [CXF-4572] - GZIPOutInterceptor not negotiating first without compressing
-    * [CXF-4579] -  Exchange's out message is not set for recovered outbound WS-RM messages
-    * [CXF-4580] - InjectionUtils can not handle boolean properties with getters starting from 'is'
-    * [CXF-4581] - cxf-codegen-plugin tries to generate code during m2e "configuration" build
-    * [CXF-4583] - When the logical handler return false processing the outbound message, the SoapMessage's body is always empty.
-    * [CXF-4584] - org.w3c.dom.DOMException when sending soap11 request and returning soap12 response
-    * [CXF-4587] - Signature Confirmation does not work with TransportBinding and EndorsingSupportingToken
-    * [CXF-4588] - cxf-codegen-plugin: Error resolving component
-    * [CXF-4591] - Fix @XmlTransient handling for exception types
-    * [CXF-4592] - Some tests fail when CachedOutputStream's file caching is enforced
-    * [CXF-4594] - Incompatible fault type is generated in the wsdl if no setter method in Exception
-    * [CXF-4595] - RequireClientCertificate is not validated
-    * [CXF-4598] - Error resolving inline schema references 
-    * [CXF-4601] - An invalid WS-RM message to a robust WS-RM endpoint may lead to NPE
-    * [CXF-4603] - Digital Signature using CXF 2.6.1 on Websphere 7
-    * [CXF-4606] - cxf-codegen-plugin doesn't works if Maven repository's path contain spaces
-    * [CXF-4608] - DOMSource is returned rather than StAXSource
-    * [CXF-4612] - SAML assertion element is not imported into SecurityHeader document
-    * [CXF-4613] - Token URI is missing ampersands
-    * [CXF-4614] - Error using role, tokenService and ValidationService when initialize client AccessTokenValidation.
-    * [CXF-4616] - When creating DataContentHandler, defaultCommandMap should be considered.
-    * [CXF-4618] - DataSourceProvider is not closing inputstream acquired from DataSource
-    * [CXF-4620] - Exception at compilation when a 'space' character is present in maven local repository path
-    * [CXF-4623] - Marshalling Error during asynchronous service invocation when adding a soap header using a SOAPHandler
-    * [CXF-4629] - Security issue with GET methods: WSS4JInInterceptor always allows HTTP Get requests from browser
-    * [CXF-4630] - local part cannot be "null" when creating a QName
-    * [CXF-4631] - HttpUtils.toAbsoluteUri should use request.getServerPort() instead of request.getLocalPort()
-    * [CXF-4633] - Redirection based OAuth services need to return an error directly to the end user
-    * [CXF-4637] - Exception when validating access token on a resource server (OAuth2)
-    * [CXF-4640] - @PostConstruct methods invoked twice in Spring projects when using OSGi even with fix for CXF-3959
-    * [CXF-4643] - Initial non-GET request returns 404 if it has query parameters
-    * [CXF-4644] - shouldn't have dependency='true' for saaj-impl bundle 
-    * [CXF-4647] - A wrong soap action when using ws-addressing may lead to an empty response or the fault with the wrong action
-    * [CXF-4652] - Additional namespace is added when web service provider implements Provider<DOMSource>
-    * [CXF-4659] - Policy configuration in spring cause SAXParseException if no internet connection available
-    * [CXF-4665] - cxf-utils.js missing from release zip file
-    * [CXF-4666] - [OAuth2] securityContext problem on createSubject
-    * [CXF-4678] - ConcurrentModificationException from WS-RM's RMOutInterceptor's acknowledgement update code
-    * [CXF-4679] - STS onBehalfOf validation should throw exception for invalid tokens in issue operation
-    * [CXF-4681] - CXF karaf feature cannot pass the karaf feature validate
-    * [CXF-4683] - workqueue configuration in BP does not derive the id attribute from the name attribute
+    * [CXF-4680] - Fault properties not ordered correctly in WSDL according to JAX-WS spec
+    * [CXF-4684] - SOAPFault message improvement in CXF when there is unchecked NPE
+    * [CXF-4687] - cxf-codegen-plugin breaks mvn deploy when proxy exists
+    * [CXF-4689] - stax outTransform feature may fail to remove the default namespace from an element
+    * [CXF-4690] - stax's inTransform feature does not work with a generic provider's Source based service
+    * [CXF-4694] - WS-RM is not returning a correct soap fault message to the client
+    * [CXF-4695] - autoRewriteSoapAddressForAllServices does not work for relative enpoint addresses
+    * [CXF-4697] - IllegalArgumentException thrown if I have a MultivaluedMap parameter in multipart/mixed Content Type
+    * [CXF-4699] - Schema validation on Weblogic 10.3 fails with AssertionError
+    * [CXF-4704] - Class loading problem using CXFNonSpringJaxrsServlet in OSGi environment
+    * [CXF-4707] - OasisCatalogManager throws exception with backslash URL reference to jax-ws-catalog.xml
+    * [CXF-4708] - Unnable to publish service when XmlAdapter has generic parameter
+    * [CXF-4713] - Method inherited from super interface can not be part of operations in wsdl 
+    * [CXF-4715] - WS-security encrypted elements with XPath . CXF generates wsu:Id attribute, XSD validation on Metro fails
+    * [CXF-4716] - WS-security policies enforcement with CXF server, bad policy selected
+    * [CXF-4718] - UsernameTokenInterceptor is not caching nonces
+    * [CXF-4720] - Binary size is equal with MTOM threshold should not be sent as attachment
+    * [CXF-4723] - stax outTransform may generate duplicate namespace declarations for global attributes
+    * [CXF-4725] - duplicated message key found
+    * [CXF-4727] - NPE in org.apache.cxf.resource.ExtendedURIResolver
+    * [CXF-4728] - STS KeyIdentifier AttachedReference shouldn't use a URI fragment
 
 ** Improvement
-    * [CXF-4548] - Enable use of customized session provider in OAuth2 GrantService
-    * [CXF-4549] - Add retrieval of AccessToken to OAuth2 MessageContext
-    * [CXF-4555] - enable http:conduit to configure the chunk size
-    * [CXF-4558] - Relax the requirement for a child <wsp:Policy> element for a WS-SecurityPolicy HttpsToken policy
-    * [CXF-4561] - Allow disabling WSI-BSP compliance in UsernameTokenInterceptor
-    * [CXF-4568] - Adding OAuthContextUtils
-    * [CXF-4576] - Provide logs on policy attachment parsing errors
-    * [CXF-4578] - SearchConditionVisitor should be parameterized on the query type
-    * [CXF-4585] - Updated the cxf imports version range of sts-core bundle
-    * [CXF-4590] - STSUtils: DRY refactoring and support Soap12 via property
-    * [CXF-4593] - STSClient: support different SOAP bindings for MEX call
-    * [CXF-4596] - Adding an option to encrypt tmp files generated by CachedOutputStream
-    * [CXF-4602] - getL7dLogger improvements
-    * [CXF-4607] - RequestDispatcherProvider should be able to use enum classes better
-    * [CXF-4619] - cxf:list-endpoints - Duplicate headers if multiple endpoints installed
-    * [CXF-4622] - cxf:list-endpoints - Add option to list the full url of the service
-    * [CXF-4641] - Make it simpler to convert FIQL expressions to custom expressions in the application code
-    * [CXF-4646] - Use AlgorithmSuite functionality in WSS4J 1.6.8
-    * [CXF-4654] - cxf:list-buses - Table layout should be aligned if bus name is long
-    * [CXF-4655] - Enforce SAML SubjectConfirmation requirements for the non WS-SecurityPolicy case
-    * [CXF-4656] - [OAuth 2] Add attributes property to UserSubject object
-    * [CXF-4660] - Support list parameters at CXFNonSpringJaxrsServlet
-    * [CXF-4661] - Make CachedOutputStream configurable using the Bus properties
-    * [CXF-4669] - [OAuth2] Return expires_in with token in ImplicitGrantService
-    * [CXF-4670] - [OAuth2] Add tokenLife property to org.apache.cxf.rs.security.oauth2.common.Client
-    * [CXF-4672] - Extra class property is not used when JAXB package contexts are created
-    * [CXF-4673] - [OAuth2] Add requestedScope as a parameter to getPreauthorizedToken
-    * [CXF-4674] - Early consume publishedEndpointUrl property
-    * [CXF-4675] - Move createUserSubject from RedirectionBasedGrantService to the OAuthDataProvider
-    * [CXF-4677] - Introduce "autoRewriteSoapAddressForAllServices" property to overwrite all service endpoints in returning WSDL 
-
-** Task
-    * [CXF-4667] - Provide FIQL to LDAP query visitor
-    * [CXF-4682] - Upgrade Karaf version to 2.2.9
+    * [CXF-4289] - Coping Request SOAP Headers to Fault response
+    * [CXF-4693] - Search visitors are not thread safe
+    * [CXF-4700] - Add an operation for manually removing WS-RM messages and sequences over JMX
+    * [CXF-4702] - Make it possible to get global JAX-RS providers registered on the bus
+    * [CXF-4703] - CXF loading performance
+    * [CXF-4717] - should add dependency='true' for javamail bundle in cxf features.xml
+    * [CXF-4724] - cxf-codegen-plugin should be able to use proxy.user/proxy.password from maven settings.xml
 
