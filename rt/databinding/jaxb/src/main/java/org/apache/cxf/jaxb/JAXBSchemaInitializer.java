@@ -36,7 +36,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -465,6 +467,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 break;
             }
         }
+        XmlAccessorOrder xmlAccessorOrder = cls.getAnnotation(XmlAccessorOrder.class);
         XmlType xmlTypeAnno = cls.getAnnotation(XmlType.class);
         String[] propertyOrder = null;
         boolean respectXmlTypeNS = false;
@@ -552,7 +555,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             exEle.setSchemaTypeName(getTypeName(beanInfo));
             exEle.setMinOccurs(0);
             seq.getItems().add(exEle);
-
         }
         
         if (propertyOrder != null && propertyOrder.length == seq.getItems().size()) {
@@ -560,6 +562,11 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         } else if (propertyOrder != null && propertyOrder.length != seq.getItems().size()) {
             LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" 
                 + Arrays.toString(propertyOrder));
+        }
+        
+        if (xmlAccessorOrder != null && xmlAccessorOrder.value().equals(XmlAccessOrder.ALPHABETICAL)
+            && propertyOrder == null) {
+            sort(seq);
         }
        
         schemas.addCrossImports();
@@ -647,4 +654,16 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         
         });
     }
+    //sort to Alphabetical order
+    private void sort(final XmlSchemaSequence seq) {
+        Collections.sort(seq.getItems(), new Comparator<XmlSchemaSequenceMember>() {
+            public int compare(XmlSchemaSequenceMember o1, XmlSchemaSequenceMember o2) {
+                XmlSchemaElement element1 = (XmlSchemaElement)o1;
+                XmlSchemaElement element2 = (XmlSchemaElement)o2;
+                return element1.getName().compareTo(element2.getName());
+            }
+        
+        });
+    }
+    
 }

@@ -723,8 +723,33 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(summaryIndex > -1);
         assertTrue(fromIndex > -1);
         assertTrue(idIndex > -1);
-        assertTrue(fromIndex > summaryIndex && idIndex > fromIndex);
+        assertTrue(fromIndex > summaryIndex && idIndex > fromIndex);        
+    }
+    
+    @Test
+    public void testXmlAccessorOrderInException() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_order.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.OrderEchoImpl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File wsdlFile = new File(output, "exception_order.wsdl");
+        assertTrue(wsdlFile.exists());
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+
+        int fromIndex = wsdlContent.indexOf("<xs:element name=\"from\"");
+        int idIndex = wsdlContent.indexOf("<xs:element name=\"id\"");
+        int summaryIndex = wsdlContent.indexOf("<xs:element name=\"summary\"");
         
+        
+        assertTrue(fromIndex > -1);
+        assertTrue(idIndex > -1);
+        assertTrue(summaryIndex > -1);
+        assertTrue(summaryIndex > idIndex && idIndex > fromIndex);        
     }
     
     
