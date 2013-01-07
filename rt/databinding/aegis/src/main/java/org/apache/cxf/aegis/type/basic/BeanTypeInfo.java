@@ -275,12 +275,10 @@ public class BeanTypeInfo {
                 // do nothing
             } else if (beanClass == Object.class || beanClass == Throwable.class) {
                 // do nothing
-            } else if (beanClass == Throwable.class) {
-                // do nothing
-            } else if (Throwable.class.isAssignableFrom(beanClass)) {
-                beanInfo = Introspector.getBeanInfo(beanClass, Throwable.class);
             } else if (RuntimeException.class.isAssignableFrom(beanClass)) {
                 beanInfo = Introspector.getBeanInfo(beanClass, RuntimeException.class);
+            } else if (Exception.class.isAssignableFrom(beanClass)) {
+                beanInfo = Introspector.getBeanInfo(beanClass, Exception.class);
             } else if (Throwable.class.isAssignableFrom(beanClass)) {
                 beanInfo = Introspector.getBeanInfo(beanClass, Throwable.class);
             } else {
