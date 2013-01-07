@@ -391,8 +391,12 @@ public class WSDLGetUtils {
                 if (locUri.isAbsolute()) {
                     URL baseUrl = new URL(base);
                     StringBuilder sb = new StringBuilder(baseUrl.getProtocol());
-                    sb.append("://").append(baseUrl.getHost()).append(":").append(baseUrl.getPort())
-                        .append(locUri.getPath());
+                    sb.append("://").append(baseUrl.getHost());
+                    int port = baseUrl.getPort();
+                    if (port > 0) {
+                        sb.append(":").append(port);
+                    }
+                    sb.append(locUri.getPath());
                     soapAddress.setAttribute("location", sb.toString());
                 } else if (httpBasePathProp != null) {
                     soapAddress.setAttribute("location", httpBasePathProp + location);
