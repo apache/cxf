@@ -26,12 +26,12 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://cxf.apache.org/jaxws http://cxf.apache.org/schema/jaxws.xsd">
 
     <bean id="client" class="demo.spring.service.HelloWorld" 
-      factory-bean="clientFactory" factory-method="create"/>
+          factory-bean="clientFactory" factory-method="create"/>
     
-	<bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
-	  <property name="serviceClass" value="demo.spring.service.HelloWorld"/>
-	  <property name="address" value="http://localhost:9002/services/HelloWorld"/>
-	</bean>
+    <bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+        <property name="serviceClass" value="demo.spring.service.HelloWorld"/>
+        <property name="address" value="http://localhost:9002/services/HelloWorld"/>
+    </bean>
 	  
 </beans>
 <!-- END SNIPPET: beans -->
