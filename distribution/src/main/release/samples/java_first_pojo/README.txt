@@ -1,9 +1,9 @@
 Java First POJO DEMO
 ====================
 
-This demo illustrates how to develop a service use the "code first", pojo based.
-This demo uses the JAXB Data binding by default, but you can use Aegis Data binding by 
-uncomment below four lines:
+This demo illustrates how to develop a service using the "code first", pojo
+based approach. This demo uses the JAXB Data binding by default, but you can
+use Aegis Data binding by uncommenting the four lines below:
 
 (Client.java)
 //import org.apache.cxf.aegis.databinding.AegisDatabinding;
