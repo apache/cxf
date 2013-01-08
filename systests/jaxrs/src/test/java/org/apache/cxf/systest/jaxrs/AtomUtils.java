@@ -36,14 +36,18 @@ public final class AtomUtils {
     }
     
     public static Entry createBookEntry(Book b) throws Exception {
-        return createBookEntry(b, null);
+        return createBookEntry(Abdera.getNewFactory(), b, null);
     }
-    
+    public static Entry createBookEntry(Factory factory, Book b) throws Exception {
+        return createBookEntry(factory, b, null);
+    }
     public static Entry createBookEntry(Book b, String baseUri) throws Exception {
-        Factory factory = Abdera.getNewFactory();
+        return createBookEntry(Abdera.getNewFactory(), b, baseUri);
+    }    
+    public static Entry createBookEntry(Factory factory, Book b, String baseUri) throws Exception {
         JAXBContext jc = JAXBContext.newInstance(Book.class);
         
-        Entry e = factory.getAbdera().newEntry();
+        Entry e = factory.newEntry();
         if (baseUri != null) {
             e.setBaseUri(baseUri);
         }
@@ -53,10 +57,8 @@ public final class AtomUtils {
         
         StringWriter writer = new StringWriter();
         jc.createMarshaller().marshal(b, writer);
-        
-        e.setContentElement(factory.newContent());
-        e.getContentElement().setContentType(Content.Type.XML);
-        e.getContentElement().setValue(writer.toString());
+
+        e.setContent(writer.toString(), Content.Type.XML);
         
         return e;
     }
