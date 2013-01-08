@@ -505,6 +505,7 @@ public abstract class AbstractBeanDefinitionParser
         if (null == id || "".equals(id)) {
             String names = elem.getAttribute(BeanConstants.NAME_ATTR);
             if (null != names) {
+                @SuppressWarnings("deprecation")
                 StringTokenizer st = 
                     new StringTokenizer(names, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS);
                 if (st.countTokens() > 0) {
