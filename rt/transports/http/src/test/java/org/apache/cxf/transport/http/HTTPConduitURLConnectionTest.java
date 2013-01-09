@@ -123,8 +123,10 @@ public class HTTPConduitURLConnectionTest extends Assert {
     @Test
     public void testTLSServerParameters() throws Exception {
         Object connection = doTestTLSServerParameters();
-        assertTrue("TLS Client Parameters should generate an HttpsURLConnection",
-                HttpsURLConnection.class.isInstance(connection));
+        assertNotNull("Connection should not be null", connection);
+        assertTrue("TLS Client Parameters should generate an HttpsURLConnection instead of " 
+            + connection.getClass().getName(),
+            HttpsURLConnection.class.isInstance(connection));
     }
 
     /**
@@ -140,7 +142,9 @@ public class HTTPConduitURLConnectionTest extends Assert {
         try {
             System.setProperty(javaProtocolHandlerPkgsKey, "com.sun.net.ssl.internal.www.protocol");
             Object connection = doTestTLSServerParameters();
-            assertTrue("TLS Client Parameters should generate an HttpsURLConnection",
+            assertNotNull("Connection should not be null", connection);
+            assertTrue("TLS Client Parameters should generate an HttpsURLConnection instead of " 
+                           + connection.getClass().getName(),
                     connection.getClass().getName().contains("HttpsURLConnection"));
         } finally {
             if (javaProtocolHandlerPkgsValue == null) {
