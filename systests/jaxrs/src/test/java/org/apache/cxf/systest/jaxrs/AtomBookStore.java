@@ -100,7 +100,7 @@ public class AtomBookStore {
         try {
             for (Book b : books.values()) {
                 
-                Entry e = AtomUtils.createBookEntry(b);
+                Entry e = AtomUtils.createBookEntry(factory, b);
                 
                 f.addEntry(e);
             }

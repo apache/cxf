@@ -205,10 +205,9 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         StringWriter writer = new StringWriter();
         jc.createMarshaller().marshal(b, writer);
         
-        e.setContentElement(factory.newContent());
-        e.getContentElement().setContentType(Content.Type.XML);
-        e.getContentElement().setValue(writer.toString());
-        
+        Content ct = factory.newContent(Content.Type.XML);
+        ct.setValue(writer.toString());
+        e.setContentElement(ct);
         return e;
     }   
     

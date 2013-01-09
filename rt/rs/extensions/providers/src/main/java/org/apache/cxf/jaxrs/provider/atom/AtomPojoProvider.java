@@ -459,9 +459,9 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     }
     
     protected void setEntryContent(Factory factory, Entry e, String content) {
-        e.setContentElement(factory.newContent());
-        e.getContentElement().setContentType(Content.Type.XML);
-        e.getContentElement().setValue(content);
+        Content ct = factory.newContent(Content.Type.XML);
+        ct.setValue(content);
+        e.setContentElement(ct);
     }
     
     protected void setEntryProperties(Factory factory, Entry entry, 
