@@ -34,6 +34,9 @@
     </parent>
 
     <properties>
+        <cxf.osgi.import>
+            org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}"
+        </cxf.osgi.import>
         <cxf.spi-dir>spi-2.1</cxf.spi-dir>
     </properties>
 
