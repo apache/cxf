@@ -127,32 +127,9 @@ public class HTTPConduitURLConnectionTest extends Assert {
         assertTrue("TLS Client Parameters should generate an HttpsURLConnection instead of " 
             + connection.getClass().getName(),
             HttpsURLConnection.class.isInstance(connection));
-    }
+        HttpURLConnection con = (HttpURLConnection)connection;
+        con.disconnect();
 
-    /**
-     * This verifys that the underlying connection is an HttpsURLConnection.
-     */
-    @Test
-    public void testTLSServerParametersWithDeprecatedSunSSLProtocol() throws Exception {
-        if (!System.getProperty("java.vm.vendor").toLowerCase().contains("sun")) {
-            return;
-        }
-        String javaProtocolHandlerPkgsKey = "java.protocol.handler.pkgs";
-        String javaProtocolHandlerPkgsValue = System.getProperty(javaProtocolHandlerPkgsKey);
-        try {
-            System.setProperty(javaProtocolHandlerPkgsKey, "com.sun.net.ssl.internal.www.protocol");
-            Object connection = doTestTLSServerParameters();
-            assertNotNull("Connection should not be null", connection);
-            assertTrue("TLS Client Parameters should generate an HttpsURLConnection instead of " 
-                           + connection.getClass().getName(),
-                    connection.getClass().getName().contains("HttpsURLConnection"));
-        } finally {
-            if (javaProtocolHandlerPkgsValue == null) {
-                System.clearProperty(javaProtocolHandlerPkgsKey);
-            } else {
-                System.setProperty(javaProtocolHandlerPkgsKey, javaProtocolHandlerPkgsValue);
-            }
-        }
     }
     
     private Object doTestTLSServerParameters() throws Exception {
