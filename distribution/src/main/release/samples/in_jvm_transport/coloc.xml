@@ -37,7 +37,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
     <!-- Avoid upfront Conduit creation, as client-side transport resources
          are not required in the coloc case -->
-     <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort"
+    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort"
                    createdFromAPI="true">
          <jaxws:features>
              <coloc:enableColoc/>
