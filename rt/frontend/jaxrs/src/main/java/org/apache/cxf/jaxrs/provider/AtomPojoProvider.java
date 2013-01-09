@@ -344,11 +344,11 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         StringWriter writer = new StringWriter();
         jc.createMarshaller().marshal(o, writer);
         
-        e.setContentElement(factory.newContent());
-        e.getContentElement().setContentType(Content.Type.XML);
-        e.getContentElement().setValue(writer.toString());
-        
+        Content ct = factory.newContent(Content.Type.XML);
+        ct.setValue(content);
+        e.setContentElement(ct);
     }
+    
     
     @SuppressWarnings("unchecked")
     protected void setEntryProperties(Factory factory, Entry entry, Object o, Class<?> cls) {
