@@ -94,6 +94,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         new ConcurrentHashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
+    private List<String> primitiveArrayKeys;
     private boolean unwrapped;
     private String wrapperName;
     private Map<String, String> wrapperMap;
@@ -269,7 +270,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             reader = JSONUtils.createBadgerFishReader(is);
         } else {
-            reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap, getDepthProperties());
+            reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap, 
+                                                  primitiveArrayKeys, getDepthProperties());
         }
         reader = createTransformReaderIfNeeded(reader, is);
         
@@ -546,6 +548,10 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     
     public void setReadXsiType(boolean readXsiType) {
         this.readXsiType = readXsiType;
+    }
+
+    public void setPrimitiveArrayKeys(List<String> primitiveArrayKeys) {
+        this.primitiveArrayKeys = primitiveArrayKeys;
     }
 
 }
