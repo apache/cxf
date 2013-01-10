@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseContext;
@@ -139,7 +138,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             public void completed(Book response) {
                 holder.value = response;
             }
-            public void failed(ClientException error) {
+            public void failed(Throwable error) {
             }
         };
         
@@ -160,7 +159,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             public void completed(Book response) {
                 holder.value = response;
             }
-            public void failed(ClientException error) {
+            public void failed(Throwable error) {
             }
         };
         
@@ -182,7 +181,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
             public void completed(Response response) {
                 holder.value = response;
             }
-            public void failed(ClientException error) {
+            public void failed(Throwable error) {
             }
         };
         

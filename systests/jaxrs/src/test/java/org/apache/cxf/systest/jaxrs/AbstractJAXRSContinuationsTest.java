@@ -97,7 +97,7 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
-        CountDownLatch doneSignal = new CountDownLatch(5);
+        CountDownLatch doneSignal = new CountDownLatch(1);
         
         executor.execute(new BookWorker("http://localhost:" + port + "/bookstore/" + pathSegment + "/1", 
                                         "1", 

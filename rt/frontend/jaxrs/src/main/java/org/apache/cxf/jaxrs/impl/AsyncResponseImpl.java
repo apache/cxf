@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.CompletionCallback;
-import javax.ws.rs.container.ResumeCallback;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -59,18 +58,23 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
     
     @Override
-    public void resume(Object response) throws IllegalStateException {
-        doResume(response);
+    public boolean resume(Object response) {
+        return doResume(response);
     }
 
     @Override
-    public void resume(Throwable response) throws IllegalStateException {
-        doResume(response);
+    public boolean resume(Throwable response) {
+        return doResume(response);
     }
     
-    private synchronized void doResume(Object response) throws IllegalStateException {
-        checkCancelled();
-        checkSuspended();
+    private boolean isCancelledOrNotSuspended() {
+        return isCancelled() || !isSuspended();
+    }
+    
+    private synchronized boolean doResume(Object response) {
+        if (isCancelledOrNotSuspended()) {
+            return false;
+        }
         inMessage.getExchange().put(AsyncResponse.class, this);
         cont.setObject(response);
         resumedByApplication = true;
@@ -79,36 +83,40 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         } else {
             initialSuspend = false;
         }
+        return true;
     }
     
     @Override
-    public void cancel() {
-        doCancel(null);
+    public boolean cancel() {
+        return doCancel(null);
     }
 
     @Override
-    public void cancel(int retryAfter) {
-        doCancel(Integer.toString(retryAfter));
+    public boolean cancel(int retryAfter) {
+        return doCancel(Integer.toString(retryAfter));
     }
 
     @Override
-    public void cancel(Date retryAfter) {
-        doCancel(HttpUtils.getHttpDateFormat().format(retryAfter));
+    public boolean cancel(Date retryAfter) {
+        return doCancel(HttpUtils.getHttpDateFormat().format(retryAfter));
     }
     
-    private synchronized void doCancel(String retryAfterHeader) {
-        checkSuspended();
+    private synchronized boolean doCancel(String retryAfterHeader) {
+        if (!isSuspended()) {
+            return false;
+        }
         ResponseBuilder rb = Response.status(503);
         if (retryAfterHeader != null) {
             rb.header(HttpHeaders.RETRY_AFTER, retryAfterHeader);
         }
         doResume(rb.build());
         cancelled = true;
+        return cancelled;
     }
 
     @Override
     public synchronized boolean isSuspended() {
-        return cont.isPending();
+        return initialSuspend || cont.isPending();
     }
 
     @Override
@@ -123,8 +131,9 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
 
     @Override
     public synchronized void setTimeout(long time, TimeUnit unit) throws IllegalStateException {
-        checkCancelled();
-        checkSuspended();
+        if (isCancelledOrNotSuspended()) {
+            throw new IllegalStateException();
+        }
         inMessage.getExchange().put(AsyncResponse.class, this);
         long timeout = TimeUnit.MILLISECONDS.convert(time, unit);
         initialSuspend = false;
@@ -154,7 +163,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     //TODO: API bug, boolean[] needs to be returned...
     @Override
     public boolean register(Object callback) throws NullPointerException {
-        return register(callback, CompletionCallback.class, ResumeCallback.class)[0];
+        return register(callback, CompletionCallback.class)[0];
     }
 
     //TODO: API bug, has to be Class<?>...
@@ -178,23 +187,11 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         return result;
     }
     
-    private void checkCancelled() {
-        if (cancelled) {
-            throw new IllegalStateException();
-        }
-    }
-    
-    private void checkSuspended() {
-        if (!initialSuspend && !isSuspended()) {
-            throw new IllegalStateException();
-        }
-    }
-    
     @Override
     public void onComplete() {
         done = true;
         if (completionCallback != null) {
-            completionCallback.onComplete();
+            completionCallback.onComplete(null);
         }
     }
 
@@ -202,14 +199,19 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     public void onError(Throwable error) {
         if (completionCallback != null) {
             Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
-            completionCallback.onError(actualError);
+            completionCallback.onComplete(actualError);
         }
         
     }
     
-    public synchronized void suspendContinuation() {
-        initialSuspend = false;
-        cont.suspend(AsyncResponse.NO_TIMEOUT);
+    public synchronized boolean suspendContinuationIfNeeded() {
+        if (!cont.isPending() && !resumedByApplication) {
+            initialSuspend = false;
+            cont.suspend(AsyncResponse.NO_TIMEOUT);
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public synchronized Object getResponseObject() {

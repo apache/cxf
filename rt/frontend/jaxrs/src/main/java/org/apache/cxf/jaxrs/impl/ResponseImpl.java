@@ -124,7 +124,7 @@ public final class ResponseImpl extends Response {
     }
 
     public boolean hasEntity() {
-        return getEntity() != null;
+        return entity != null;
     }
     
     public MultivaluedMap<String, Object> getMetadata() {

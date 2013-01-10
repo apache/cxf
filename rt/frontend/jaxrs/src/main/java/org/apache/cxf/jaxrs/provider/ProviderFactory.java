@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.BindingPriority;
 import javax.ws.rs.Produces;
+import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -47,8 +48,9 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Configurable;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -1173,7 +1175,7 @@ public final class ProviderFactory {
         Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
         for (OperationResourceInfo ori : oris) {
             for (DynamicFeature feature : dynamicFeatures) {
-                Configurable methodConfigurable = new MethodConfigurable(ori);
+                FeatureContext methodConfigurable = new MethodConfigurable(ori);
                 feature.configure(new ResourceInfoImpl(ori), methodConfigurable);
             }
         }
@@ -1379,7 +1381,7 @@ public final class ProviderFactory {
         }
     }
     
-    private class MethodConfigurable implements Configurable {
+    private class MethodConfigurable implements FeatureContext, Configuration {
         
         private OperationResourceInfo ori;
         private String nameBinding;
@@ -1393,49 +1395,77 @@ public final class ProviderFactory {
                 + ori.getMethodToInvoke().getName();
         }
         
+
         @Override
-        public Configurable register(Object provider) {
+        public Configuration getConfiguration() {
+            return this;
+        }
+        
+        @Override
+        public FeatureContext register(Object provider) {
             return register(provider, AnnotationUtils.getBindingPriority(provider.getClass()));
         }
 
         @Override
-        public Configurable register(Object provider, int bindingPriority) {
+        public FeatureContext register(Object provider, int bindingPriority) {
             return doRegister(provider, bindingPriority, FILTER_INTERCEPTOR_CLASSES);
         }
         
         @Override
-        public <T> Configurable register(Object provider, Class<? super T>... contracts) {
+        public FeatureContext register(Object provider, Class<?>... contracts) {
             return register(provider, BindingPriority.USER, contracts);
         }
         
-        @Override
-        public <T> Configurable register(Object provider, int bindingPriority, Class<? super T>... contracts) {
-            return doRegister(provider, bindingPriority, contracts);
+        //@Override
+        public FeatureContext register(Object provider, int priority, Class<?>... contracts) {
+            return register(provider, priority, contracts);
         }
         
         @Override
-        public Configurable register(Class<?> providerClass) {
+        public FeatureContext register(Object provider, Map<Class<?>, Integer> contracts) {
+            for (Map.Entry<Class<?>, Integer> entry : contracts.entrySet()) {
+                doRegister(provider, entry.getValue(), entry.getKey());
+            }
+            return this;
+        }
+        
+        @Override
+        public FeatureContext register(Class<?> providerClass) {
             return register(providerClass, AnnotationUtils.getBindingPriority(providerClass));
         }
 
         @Override
-        public Configurable register(Class<?> providerClass, int bindingPriority) {
+        public FeatureContext register(Class<?> providerClass, int bindingPriority) {
             return doRegister(createProvider(providerClass), bindingPriority, 
                               FILTER_INTERCEPTOR_CLASSES);
         }
 
         @Override
-        public <T> Configurable register(Class<T> providerClass, Class<? super T>... contracts) {
+        public FeatureContext register(Class<?> providerClass, Class<?>... contracts) {
             return register(providerClass, BindingPriority.USER, contracts);
         }
 
         @Override
-        public <T> Configurable register(Class<T> providerClass, int bindingPriority,
-                                         Class<? super T>... contracts) {
+        public FeatureContext register(Class<?> providerClass, Map<Class<?>, Integer> contracts) {
+            Object provider = createProvider(providerClass);
+            for (Map.Entry<Class<?>, Integer> entry : contracts.entrySet()) {
+                doRegister(provider, entry.getValue(), entry.getKey());
+            }
+            return this;
+        }
+        
+        public FeatureContext replaceWith(Configuration config) {
+            // nothing to do in this case
+            return this;
+        }
+        
+        //@Override
+        public FeatureContext register(Class<?> providerClass, int bindingPriority,
+                                         Class<?>... contracts) {
             return doRegister(createProvider(providerClass), bindingPriority, contracts);
         }
         
-        private Configurable doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
+        private FeatureContext doRegister(Object provider, int bindingPriority, Class<?>... contracts) {
         
             if (provider instanceof Feature) {
                 ((Feature)provider).configure(this);
@@ -1551,19 +1581,19 @@ public final class ProviderFactory {
         }
         
         @Override
-        public Collection<Feature> getFeatures() {
+        public Set<Class<?>> getClasses() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        @Override
+        public Map<Class<?>, Integer> getContracts(Class<?> componentClass) {
             // TODO Auto-generated method stub
             return null;
         }
 
         @Override
-        public Set<Class<?>> getProviderClasses() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Set<Object> getProviderInstances() {
+        public Set<Object> getInstances() {
             // TODO Auto-generated method stub
             return null;
         }
@@ -1575,19 +1605,44 @@ public final class ProviderFactory {
         }
 
         @Override
+        public boolean isEnabled(Feature feature) {
+            return false;
+        }
+        
+        @Override
+        public boolean isEnabled(Class<? extends Feature> featureClass) {
+            return false;
+        }
+        
+        @Override
+        public RuntimeType getRuntimeType() {
+            return null;
+        }
+        
+        @Override
         public Object getProperty(String name) {
             // TODO Auto-generated method stub
             return null;
         }
-
+        
         @Override
-        public Configurable setProperties(Map<String, ?> properties) {
+        public Collection<String> getPropertyNames() {
             // TODO Auto-generated method stub
             return null;
         }
 
         @Override
-        public Configurable setProperty(String name, Object value) {
+        public boolean isRegistered(Class<?> componentClass) {
+            return false;
+        }
+        
+        @Override
+        public boolean isRegistered(Object component) {
+            return false;
+        }
+        
+        @Override
+        public FeatureContext setProperty(String name, Object value) {
             // TODO Auto-generated method stub
             return null;
         }

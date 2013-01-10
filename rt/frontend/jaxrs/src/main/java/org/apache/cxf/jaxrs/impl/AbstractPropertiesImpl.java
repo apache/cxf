@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -37,28 +37,9 @@ public abstract class AbstractPropertiesImpl {
         this.props = CastUtils.cast((Map<?, ?>)message.get(PROPERTY_KEY));
     }
     
-    
     public Object getProperty(String name) {
         return props == null ? null : props.get(name);
     }
-
-    public Enumeration<String> getPropertyNames() {
-        final Iterator<String> it = props.keySet().iterator();
-        return new Enumeration<String>() {
-
-            @Override
-            public boolean hasMoreElements() {
-                return it.hasNext();
-            }
-
-            @Override
-            public String nextElement() {
-                return it.next();
-            }
-            
-        };
-    }
-
 
     public void removeProperty(String name) {
         if (props != null) {
@@ -76,4 +57,8 @@ public abstract class AbstractPropertiesImpl {
         
     }
 
+    public Collection<String> getPropertyNames() {
+        return props == null ? Collections.<String>emptyList() 
+            : Collections.unmodifiableSet(props.keySet());
+    }
 }

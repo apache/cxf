@@ -160,14 +160,9 @@ public class BookContinuationStore {
     private class CallbackImpl implements CompletionCallback {
 
         @Override
-        public void onComplete() {
+        public void onComplete(Throwable throwable) {
             System.out.println("CompletionCallback: onComplete");
             
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            System.out.println("CompletionCallback: onError");
         }
         
     }

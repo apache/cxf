@@ -75,6 +75,4 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
     public void setType(Class<?> ctype) {
         cls = ctype;
     }
-
-    
 }

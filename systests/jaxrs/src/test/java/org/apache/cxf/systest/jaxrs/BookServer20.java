@@ -38,8 +38,8 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -237,7 +237,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
     public static class CustomDynamicFeature implements DynamicFeature {
 
         @Override
-        public void configure(ResourceInfo resourceInfo, Configurable configurable) {
+        public void configure(ResourceInfo resourceInfo, FeatureContext configurable) {
             
             configurable.register(new PreMatchDynamicContainerRequestFilter());
             configurable.register(new PostMatchDynamicContainerResponseFilter());

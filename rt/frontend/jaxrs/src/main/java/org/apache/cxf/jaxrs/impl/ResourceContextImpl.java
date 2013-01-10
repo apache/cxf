@@ -18,11 +18,8 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
-import java.net.URI;
-
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -56,21 +53,4 @@ public class ResourceContextImpl implements ResourceContext {
         cri.getSubResource(subClass, cls, resource, true);
         return resource;
     }
-
-    @Override
-    public Object matchResource(URI arg0) throws NullPointerException, IllegalArgumentException {
-        return null;
-    }
-
-    @Override
-    public <T> T matchResource(URI arg0, Class<T> arg1) throws NullPointerException,
-        IllegalArgumentException, ClassCastException {
-        return null;
-    }
-
-    @Override
-    public UriInfo matchUriInfo(URI arg0) throws NullPointerException, IllegalArgumentException {
-        return null;
-    }
-
 }

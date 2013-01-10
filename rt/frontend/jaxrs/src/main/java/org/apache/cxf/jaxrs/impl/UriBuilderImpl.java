@@ -432,7 +432,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     }
 
     @Override
-    public UriBuilder path(Class<?> resource) throws IllegalArgumentException {
+    public UriBuilder path(@SuppressWarnings("rawtypes") Class resource) throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }
@@ -447,7 +447,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     }
 
     @Override
-    public UriBuilder path(Class<?> resource, String method) 
+    public UriBuilder path(@SuppressWarnings("rawtypes") Class resource, String method) 
         throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
@@ -861,19 +861,23 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         return buildUriString(parts.path, parts.query, parts.fragment);
     }
     
+    @Override
     public UriBuilder resolveTemplate(String name, Object value) throws IllegalArgumentException {
         return resolveTemplate(name, value, true);
     }
     
+    @Override
     public UriBuilder resolveTemplate(String name, Object value, boolean encodePathSlash) 
         throws IllegalArgumentException {
         return resolveTemplates(Collections.singletonMap(name, value), encodePathSlash);
     }
     
+    @Override
     public UriBuilder resolveTemplates(Map<String, Object> values) throws IllegalArgumentException {
         return resolveTemplates(values, true);
     }
     
+    @Override
     public UriBuilder resolveTemplates(Map<String, Object> values, boolean encodePathSlash) 
         throws IllegalArgumentException {
         if (encodePathSlash) {
@@ -884,10 +888,12 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         return this;
     }
     
+    @Override
     public UriBuilder resolveTemplateFromEncoded(String name, Object value) throws IllegalArgumentException {
         return resolveTemplatesFromEncoded(Collections.singletonMap(name, value));
     }
     
+    @Override
     public UriBuilder resolveTemplatesFromEncoded(Map<String, Object> values) 
         throws IllegalArgumentException {
         resolvedEncodedTemplates = fillInResolveTemplates(resolvedEncodedTemplates, values);
