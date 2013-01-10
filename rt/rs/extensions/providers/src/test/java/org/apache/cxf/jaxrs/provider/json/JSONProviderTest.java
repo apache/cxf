@@ -93,6 +93,26 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testReadListOfProperties() throws Exception {
+        
+        String input = 
+            "{\"theBook\":"
+            + "{" 
+            + "\"Names\":[{\"Name\":\"1\"}, {\"Name\":\"2\"}]"
+            + " }                   "
+            + "}                    ";
+    
+        JSONProvider<TheBook> provider = new JSONProvider<TheBook>();
+        provider.setPrimitiveArrayKeys(Collections.singletonList("Names"));
+        TheBook theBook = provider.readFrom(TheBook.class, null, null, 
+                                   null, null, new ByteArrayInputStream(input.getBytes()));
+        List<String> names = theBook.getName();
+        assertNotNull(names);
+        assertEquals("1", names.get(0));
+        assertEquals("2", names.get(1));
+    }
+    
+    @Test
     public void testReadEmbeddedArray() throws Exception {
         String input = 
                 "{\"store\":"
@@ -1291,6 +1311,18 @@ public class JSONProviderTest extends Assert {
         @XmlElementWrapper(name = "books")
         public List<Book> getBooks() {
             return books;
+        }
+    }
+    
+    @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+    @XmlRootElement(name = "theBook")
+    public static class TheBook {
+        private List<String> name = new LinkedList<String>();
+       
+        @XmlElement(name = "Name")
+        @XmlElementWrapper(name = "Names")
+        public List<String> getName() {
+            return name;
         }
     }
     
