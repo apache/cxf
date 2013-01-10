@@ -73,7 +73,6 @@ import org.apache.cxf.jaxrs.resources.jaxb.Book2;
 import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
@@ -975,8 +974,6 @@ public class JSONProviderTest extends Assert {
     
     
     @Test
-    @Ignore
-    // name:A is lost
     public void testDropElementsIgnored() throws Exception {
         JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
         List<String> list = new ArrayList<String>();
