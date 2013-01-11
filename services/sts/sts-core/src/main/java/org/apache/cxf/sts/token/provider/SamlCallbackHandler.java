@@ -19,6 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -112,11 +113,13 @@ public class SamlCallbackHandler implements CallbackHandler {
                 // Set the token Type.
                 TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
                 String tokenType = tokenRequirements.getTokenType();
+                boolean saml1 = false;
                 if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                     || WSConstants.SAML2_NS.equals(tokenType)) {
                     callback.setSamlVersion(SAMLVersion.VERSION_20);
                 } else {
                     callback.setSamlVersion(SAMLVersion.VERSION_11);
+                    saml1 = true;
                     setSubjectOnBeans();
                 }
                 
@@ -129,14 +132,26 @@ public class SamlCallbackHandler implements CallbackHandler {
                 }
 
                 // Set the statements
+                boolean statementAdded = false;
                 if (attributeBeans != null && !attributeBeans.isEmpty()) {
                     callback.setAttributeStatementData(attributeBeans);
+                    statementAdded = true;
                 }
                 if (authBeans != null && !authBeans.isEmpty()) {
                     callback.setAuthenticationStatementData(authBeans);
+                    statementAdded = true;
                 }
                 if (authDecisionBeans != null && !authDecisionBeans.isEmpty()) {
                     callback.setAuthDecisionStatementData(authDecisionBeans);
+                    statementAdded = true;
+                }
+                
+                // If SAML 1.1 we *must* add a Statement
+                if (saml1 && !statementAdded) {
+                    AttributeStatementBean defaultStatement = 
+                        new DefaultAttributeStatementProvider().getStatement(tokenParameters);
+                    defaultStatement.setSubject(subjectBean);
+                    callback.setAttributeStatementData(Collections.singletonList(defaultStatement));
                 }
                 
                 // Set the conditions
