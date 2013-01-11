@@ -150,6 +150,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         if (part != null && !part.isElement() && part.getTypeClass() != null) {
             honorJaxbAnnotation = true;
         }
+        checkPart(part, obj);
         
         if (obj != null
             || !(part.getXmlSchema() instanceof XmlSchemaElement)) {
@@ -183,6 +184,43 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
         } else if (needToRender(part)) {
             JAXBEncoderDecoder.marshallNullElement(createMarshaller(null, part),
                                                    output, part);
+        }
+    }
+
+    private void checkPart(MessagePartInfo part, Object object) {
+        if (part == null || part.getTypeClass() == null || object == null) {
+            return;
+        }
+        Class<?> typeClass = part.getTypeClass();
+        if (typeClass == null) {
+            return;
+        }
+        if (typeClass.isPrimitive()) {
+            if (typeClass == Long.TYPE) {
+                typeClass = Long.class;
+            } else if (typeClass == Integer.TYPE) {
+                typeClass = Integer.class;
+            } else if (typeClass == Short.TYPE) {
+                typeClass = Short.class;
+            } else if (typeClass == Byte.TYPE) {
+                typeClass = Byte.class;
+            } else if (typeClass == Character.TYPE) {
+                typeClass = Character.class;
+            } else if (typeClass == Double.TYPE) {
+                typeClass = Double.class;
+            } else if (typeClass == Float.TYPE) {
+                typeClass = Float.class;
+            } else if (typeClass == Boolean.TYPE) {
+                typeClass = Boolean.class;
+            }
+        } else if (typeClass.isArray() && object instanceof Collection) {
+            //JAXB allows a pseudo [] <--> List equivalence
+            return;
+        }
+        if (!typeClass.isInstance(object)) {
+            throw new IllegalArgumentException("Part " + part.getName() + " should be of type " 
+                + typeClass.getName() + ", not " 
+                + object.getClass().getName());
         }
     }
 
