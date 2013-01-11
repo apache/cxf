@@ -345,7 +345,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         jc.createMarshaller().marshal(o, writer);
         
         Content ct = factory.newContent(Content.Type.XML);
-        ct.setValue(content);
+        ct.setValue(writer.toString());
         e.setContentElement(ct);
     }
     
