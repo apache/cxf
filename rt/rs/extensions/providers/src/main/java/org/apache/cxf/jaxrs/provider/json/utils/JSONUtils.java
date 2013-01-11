@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -136,25 +137,29 @@ public final class JSONUtils {
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
         ConcurrentHashMap<String, String> namespaceMap) throws Exception {
-        return createStreamReader(is, readXsiType, namespaceMap, null);
+        return createStreamReader(is, readXsiType, namespaceMap, null, null);
     }
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
-        ConcurrentHashMap<String, String> namespaceMap, 
+        ConcurrentHashMap<String, String> namespaceMap,
+        List<String> primitiveArrayKeys,
         DocumentDepthProperties depthProps) throws Exception {
         if (readXsiType) {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
+        Configuration conf = new Configuration(namespaceMap);
+        conf.setPrimitiveArrayKeys(primitiveArrayKeys == null 
+            ? Collections.<String>emptySet() : new HashSet<String>(primitiveArrayKeys));
         XMLInputFactory factory = depthProps != null 
-            ? new JettisonMappedReaderFactory(namespaceMap, depthProps) 
-            : new MappedXMLInputFactory(namespaceMap);
+            ? new JettisonMappedReaderFactory(conf, depthProps) 
+            : new MappedXMLInputFactory(conf);
         return new JettisonReader(namespaceMap, factory.createXMLStreamReader(is));
     }
     
     private static class JettisonMappedReaderFactory extends MappedXMLInputFactory {
         private DocumentDepthProperties depthProps;
-        public JettisonMappedReaderFactory(Map<?, ?> nstojns, DocumentDepthProperties depthProps) {
-            super(nstojns);
+        public JettisonMappedReaderFactory(Configuration conf, DocumentDepthProperties depthProps) {
+            super(conf);
             this.depthProps = depthProps;
         }
         protected JSONTokener createNewJSONTokener(String doc) {

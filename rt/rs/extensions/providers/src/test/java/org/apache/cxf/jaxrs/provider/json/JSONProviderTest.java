@@ -73,7 +73,6 @@ import org.apache.cxf.jaxrs.resources.jaxb.Book2;
 import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
@@ -90,6 +89,26 @@ public class JSONProviderTest extends Assert {
         } catch (WebApplicationException ex) {
             assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), ex.getResponse().getStatus());
         }
+    }
+    
+    @Test
+    public void testReadListOfProperties() throws Exception {
+        
+        String input = 
+            "{\"theBook\":"
+            + "{" 
+            + "\"Names\":[{\"Name\":\"1\"}, {\"Name\":\"2\"}]"
+            + " }                   "
+            + "}                    ";
+    
+        JSONProvider<TheBook> provider = new JSONProvider<TheBook>();
+        provider.setPrimitiveArrayKeys(Collections.singletonList("Names"));
+        TheBook theBook = provider.readFrom(TheBook.class, null, null, 
+                                   null, null, new ByteArrayInputStream(input.getBytes()));
+        List<String> names = theBook.getName();
+        assertNotNull(names);
+        assertEquals("1", names.get(0));
+        assertEquals("2", names.get(1));
     }
     
     @Test
@@ -955,8 +974,6 @@ public class JSONProviderTest extends Assert {
     
     
     @Test
-    @Ignore
-    // name:A is lost
     public void testDropElementsIgnored() throws Exception {
         JSONProvider<ManyTags> provider = new JSONProvider<ManyTags>();
         List<String> list = new ArrayList<String>();
@@ -1291,6 +1308,18 @@ public class JSONProviderTest extends Assert {
         @XmlElementWrapper(name = "books")
         public List<Book> getBooks() {
             return books;
+        }
+    }
+    
+    @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+    @XmlRootElement(name = "theBook")
+    public static class TheBook {
+        private List<String> name = new LinkedList<String>();
+       
+        @XmlElement(name = "Name")
+        @XmlElementWrapper(name = "Names")
+        public List<String> getName() {
+            return name;
         }
     }
     
