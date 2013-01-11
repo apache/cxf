@@ -21,6 +21,7 @@ package org.apache.cxf.sts.token.validator;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -38,6 +39,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
+import org.apache.cxf.sts.claims.ClaimsAttributeStatementProvider;
 import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.Lifetime;
@@ -45,6 +47,7 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
+import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.DefaultConditionsProvider;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
@@ -137,6 +140,41 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
+    }
+    
+    /**
+     * Test a SAML 1.1 Assertion that is configured with the ClaimsAttributeStatementProvider,
+     * but does not contain any claims. In older versions of the STS, this generated an invalid
+     * SAML Assertion.
+     */
+    @org.junit.Test
+    public void testSAML1AssertionWithClaims() throws Exception {
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        validatorParameters.setTokenStore(null);
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        
+        // Create a ValidateTarget consisting of a SAML Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken = 
+            createSAMLAssertionWithClaimsProvider(
+                WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler
+            );
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+        
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+        
+        TokenValidatorResponse validatorResponse = 
+            samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
     }
     
     /**
@@ -354,6 +392,23 @@ public class SAMLTokenValidatorTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         
+        return providerResponse.getToken();
+    }
+    
+    private Element createSAMLAssertionWithClaimsProvider(
+        String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler
+    ) throws WSSecurityException {
+        SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
+        AttributeStatementProvider statementProvider = new ClaimsAttributeStatementProvider();
+        samlTokenProvider.setAttributeStatementProviders(Collections.singletonList(statementProvider));
+        TokenProviderParameters providerParameters = 
+            createProviderParameters(
+                tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
+            );
+        TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
+        assertTrue(providerResponse != null);
+        assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
+
         return providerResponse.getToken();
     }
     
