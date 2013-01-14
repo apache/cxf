@@ -46,7 +46,9 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.wsdl.Definition;
 import javax.wsdl.Operation;
+import javax.wsdl.WSDLException;
 import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlList;
@@ -105,6 +107,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.UnwrappedOperationInfo;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -525,7 +528,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected boolean isFromWsdl() {
-        return !populateFromClass && getWsdlURL() != null;
+        return !populateFromClass && getWsdlURL() != null && !isEmptywsdl(getWsdlURL());
     }
 
     protected void initializeServiceModel() {
@@ -2581,5 +2584,17 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     public void setSchemaLocations(List<String> schemaLocations) {
         this.schemaLocations = schemaLocations;
+    }
+    private boolean isEmptywsdl(String wsdlUrl) {
+        Definition definition;
+        try {
+            definition = getBus().getExtension(WSDLManager.class).getDefinition(wsdlUrl);
+        } catch (WSDLException e) {
+            return true;
+        }
+        if (definition.getPortTypes().isEmpty() && definition.getImports().isEmpty()) {
+            return true;
+        } 
+        return false;
     }
 }
