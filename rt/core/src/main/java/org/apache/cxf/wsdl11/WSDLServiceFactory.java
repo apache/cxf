@@ -22,15 +22,21 @@ package org.apache.cxf.wsdl11;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.wsdl.Binding;
 import javax.wsdl.Definition;
+import javax.wsdl.PortType;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensionRegistry;
+import javax.wsdl.factory.WSDLFactory;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
@@ -136,7 +142,34 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
         } else {
             javax.wsdl.Service wsdlService = definition.getService(serviceName);
             if (wsdlService == null) {
-                throw new ServiceConstructionException(new Message("NO_SUCH_SERVICE_EXC", LOG, serviceName));
+                if ((!PartialWSDLProcessor.isServiceExisted(definition, serviceName))
+                    && (!PartialWSDLProcessor.isBindingExisted(definition, serviceName))
+                    && (PartialWSDLProcessor.isPortTypeExisted(definition, serviceName))) {
+                    try {
+                        Map<QName, PortType> portTypes = CastUtils.cast(definition.getPortTypes());
+                        String existPortName = null;
+                        PortType portType = null;
+                        for (QName existPortQName : portTypes.keySet()) {
+                            existPortName = existPortQName.getLocalPart();
+                            if (serviceName.getLocalPart().contains(existPortName)) {
+                                portType = portTypes.get(existPortQName);
+                                break;
+                            }
+                        }
+                        WSDLFactory factory = WSDLFactory.newInstance();
+                        ExtensionRegistry extReg = factory.newPopulatedExtensionRegistry();
+                        Binding binding = PartialWSDLProcessor.doAppendBinding(definition, 
+                                                                               existPortName, portType, extReg);
+                        definition.addBinding(binding);
+                        wsdlService = PartialWSDLProcessor.doAppendService(definition, 
+                                                                           existPortName, extReg, binding);
+                        definition.addService(wsdlService);
+                    } catch (Exception e) {
+                        throw new ServiceConstructionException(new Message("NO_SUCH_SERVICE_EXC", LOG, serviceName));
+                    }
+                } else {
+                    throw new ServiceConstructionException(new Message("NO_SUCH_SERVICE_EXC", LOG, serviceName));
+                }
             }
             try {
                 services = new WSDLServiceBuilder(getBus()).buildServices(definition, 
