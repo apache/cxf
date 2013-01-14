@@ -409,6 +409,10 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     @Override
     public void writeAttribute(String prefix, String uri, String local, String value) 
         throws XMLStreamException {
+        if (matchesDropped(false)) {
+            return;
+        }
+        
         QName expected = attributesMap.get(new QName(uri, local, prefix));
         if (expected != null) {
             if (TransformUtils.isEmptyQName(expected)) {
@@ -426,6 +430,9 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     @Override
     public void writeAttribute(String local, String value) throws XMLStreamException {
+        if (matchesDropped(false)) {
+            return;
+        }
         String uri = XMLConstants.NULL_NS_URI;
         QName expected = attributesMap.get(new QName("", local));
         if (expected != null) {

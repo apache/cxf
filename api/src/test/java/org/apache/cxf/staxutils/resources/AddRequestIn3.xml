@@ -21,6 +21,6 @@
   <params>
     <param><i1>1</i1></param>
     <param><i2>2</i2></param>
-    <param><i3>3</i3></param>
+    <param><i3 a3="v3">3</i3></param>
   </params>
 </payload>
