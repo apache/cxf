@@ -74,9 +74,10 @@
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-core/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-main/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-i18n/${cxf.abdera.version}</bundle>
+        <bundle start-level='35'>mvn:org.apache.james/apache-mime4j-core/${cxf.james.mim4j.version}</bundle> 
+        <bundle start-level='35'>mvn:org.apache.abdera/abdera-parser/${cxf.abdera.version}</bundle>
         <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/${cxf.jdom.bundle.version}</bundle>
         <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${cxf.dom4j.bundle.version}</bundle>
-        <bundle start-level='35' dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.abdera-parser/${cxf.abdera-parser.bundle.version}</bundle> 
         <!--bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-html/${cxf.abdera.version}</bundle>
         <bundle start-level='35'>mvn:org.apache.abdera/abdera-extensions-json/${cxf.abdera.version}</bundle>-->
     </feature>
