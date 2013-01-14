@@ -34,7 +34,14 @@
                     <maxLength value="30" />
                 </restriction>
             </simpleType>
-
+            <xsd:simpleType name="TestEnum">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="ONE" />
+                    <xsd:enumeration value="TWO" />
+                    <xsd:enumeration value="THREE" />
+                </xsd:restriction>
+            </xsd:simpleType> 
+            
             <element name="sayHi">
                 <complexType/>
             </element>
@@ -57,6 +64,20 @@
                 <complexType>
                     <sequence>
                         <element name="responses" minOccurs="0" maxOccurs="unbounded" type="string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="sayHiEnum">
+                <complexType>
+                    <sequence>
+                        <element name="request" type="tns:TestEnum"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="sayHiEnumResponse">
+                <complexType>
+                    <sequence>
+                        <element name="response" type="tns:TestEnum"/>
                     </sequence>
                 </complexType>
             </element>
@@ -111,6 +132,12 @@
     <wsdl:message name="sayHiArrayResponse">
         <wsdl:part element="x1:sayHiArrayResponse" name="out"/>
     </wsdl:message>
+    <wsdl:message name="sayHiEnumRequest">
+        <wsdl:part element="x1:sayHiEnum" name="in"/>
+    </wsdl:message>
+    <wsdl:message name="sayHiEnumResponse">
+        <wsdl:part element="x1:sayHiEnumResponse" name="out"/>
+    </wsdl:message>
     <wsdl:message name="greetMeRequest">
         <wsdl:part element="x1:greetMe" name="in"/>
     </wsdl:message>
@@ -142,6 +169,10 @@
         <wsdl:operation name="sayHiArray">
             <wsdl:input message="tns:sayHiArrayRequest" name="sayHiArrayRequest"/>
             <wsdl:output message="tns:sayHiArrayResponse" name="sayHiArrayResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sayHiEnum">
+            <wsdl:input message="tns:sayHiEnumRequest" name="sayHiEnumRequest"/>
+            <wsdl:output message="tns:sayHiEnumResponse" name="sayHiEnumResponse"/>
         </wsdl:operation>
         
 
@@ -182,6 +213,15 @@
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output name="sayHiArrayResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sayHiEnum">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="sayHiEnumRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="sayHiEnumResponse">
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
