@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.TestEnum;
 import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.GreetMeFault;
 import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.Greeter;
 import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.PingMeFault;
@@ -82,5 +83,9 @@ public class GreeterImpl implements Greeter {
         ret[0] = "Hello";
         System.arraycopy(requests, 0, ret, 1, requests.length);
         return ret;
+    }
+
+    public TestEnum.Enum sayHiEnum(TestEnum.Enum request) {
+        return request;
     }
 }

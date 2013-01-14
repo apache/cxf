@@ -90,7 +90,14 @@ public final class XMLBeansSchemaTypeUtils {
     public static String getNaturalJavaClassName(SchemaType st) {
         SchemaType schemaType = st;
         String result = null;
-        if (st.isSimpleType() && !st.isBuiltinType()) {
+        if (st.getBaseEnumType() != null) {
+            if (hasBase(st)) {
+                schemaType = st.getBaseEnumType();
+                return schemaType.getFullJavaName().replace('$', '.') + ".Enum";
+            } else {
+                return st.getFullJavaName().replace('$', '.') + ".Enum";
+            }
+        } else if (st.isSimpleType() && !st.isBuiltinType()) {
             schemaType = st.getBaseType();
             while (schemaType != null && !schemaType.isBuiltinType()) {
                 schemaType = schemaType.getBaseType();
@@ -104,5 +111,18 @@ public final class XMLBeansSchemaTypeUtils {
         return result;
         
     }
-
+    private static boolean hasBase(SchemaType sType) {
+        boolean hasBase;
+        SchemaType baseEnumType = sType.getBaseEnumType();
+        if (baseEnumType.isAnonymousType() && baseEnumType.isSkippedAnonymousType()) {
+            if (sType.getContentBasedOnType() != null) {
+                hasBase = sType.getContentBasedOnType().getBaseType() != baseEnumType;
+            } else {
+                hasBase = sType.getBaseType() != baseEnumType;
+            }
+        } else {
+            hasBase = baseEnumType != sType;
+        }
+        return hasBase;
+    }
 }
