@@ -52,7 +52,7 @@ class DelegatingNamespaceContext implements NamespaceContext {
     
     public void addPrefix(String prefix, String ns) {
         ((LinkedList<Map<String, String>>)namespaces).getFirst().put(prefix, ns);
-         ((LinkedList<Map<String, String>>)prefixes).getFirst().put(ns, prefix);
+        ((LinkedList<Map<String, String>>)prefixes).getFirst().put(ns, prefix);
     }
     
     public String findUniquePrefix(String ns) {
