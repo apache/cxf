@@ -466,24 +466,4 @@ public final class SOAPBindingUtil {
         }
     }
 
-    public static javax.jws.soap.SOAPBinding.Style getSoapStyle(String soapStyle) {
-        if ("".equals(soapStyle)) {
-            return null;
-        } else if ("RPC".equalsIgnoreCase(soapStyle)) {
-            return javax.jws.soap.SOAPBinding.Style.RPC;
-        } else {
-            return javax.jws.soap.SOAPBinding.Style.DOCUMENT;
-        }
-    }
-
-    public static javax.jws.soap.SOAPBinding.Use getSoapUse(String soapUse) {
-        if ("".equals(soapUse)) {
-            return null;
-        } else if ("ENCODED".equalsIgnoreCase(soapUse)) {
-            return javax.jws.soap.SOAPBinding.Use.ENCODED;
-        } else {
-            return javax.jws.soap.SOAPBinding.Use.LITERAL;
-        }
-    }
-
 }
