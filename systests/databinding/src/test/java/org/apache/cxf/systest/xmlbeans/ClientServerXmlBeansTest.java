@@ -51,6 +51,7 @@ import org.apache.cxf.xmlbeans.docLitBare.types.TradePriceData;
 import org.apache.cxf.xmlbeans.doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.helloWorldSoapHttpXmlbeans.xmlbeans.types.TestEnum;
 import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.GreetMeFault;
 import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.Greeter;
 import org.apache.hello_world_soap_http_xmlbeans.xmlbeans.PingMeFault;
@@ -132,6 +133,11 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         String resp; 
         ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        TestEnum.Enum response = port.sayHiEnum(TestEnum.ONE);
+        assertEquals(TestEnum.ONE, response);
+
+        
         resp = port.sayHi();
         assertEquals("We should get the right response", "Bonjour", resp);        
         
@@ -167,7 +173,6 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
             assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
             assertEquals("Wrong faultDetail minor", detail.getMinor(), 1);             
         }
-        
     }
     
     @Test
