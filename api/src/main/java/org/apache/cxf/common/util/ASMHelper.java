@@ -192,12 +192,15 @@ public class ASMHelper {
         } else if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)type;
             StringBuilder a = new StringBuilder(getClassCode(pt.getRawType()));
-            a.setLength(a.length() - 1);
-            a.append('<');
-            for (java.lang.reflect.Type t : pt.getActualTypeArguments()) {
-                a.append(getClassCode(t));  
+            if (!pt.getRawType().equals(Enum.class)) {
+                a.setLength(a.length() - 1);
+                a.append('<');
+
+                for (java.lang.reflect.Type t : pt.getActualTypeArguments()) {
+                    a.append(getClassCode(t));
+                }
+                a.append(">;");
             }
-            a.append(">;");
             return a.toString();
         } else if (type instanceof WildcardType) {
             WildcardType wt = (WildcardType)type;
