@@ -267,7 +267,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testInvalidWRMOnReceive() throws Exception {
+    public void testInvalidWSRMMustUnderstandOnReceive() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
         
         // WS-RM 1.0 using the WS-A 1.0 namespace
@@ -288,15 +288,45 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         } catch (Exception e) {
             assertTrue(e.getCause() instanceof SoapFault);
             // verify a partial error text match to exclude an unexpected exception
-            // (see WSRM_REQUIRED_EXC in Messages.properties)
-            //because the ws-rm namespace isn't correct, can't detect it's a ws-rm message
-            //so can't understand ws-rm header
+            // because there is a mustUnderstand header that is not understood,
+            // the corresponding error is returned.
             final String text = "MustUnderstand headers: " 
                                 + "[{http://cxf.apache.org/invalid}Sequence] are not understood.";
             assertTrue(e.getCause().getMessage() != null 
                 && e.getCause().getMessage().indexOf(text) >= 0);
         }
     }
+
+    @Test
+    public void testInvalidWSRMOnReceive() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+        
+        // WS-RM 1.0 using the WS-A 1.0 namespace
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
+
+        // remove the outgoing message's WS-RM header
+        TransformOutInterceptor trans = new TransformOutInterceptor();
+        Map<String, String> outElements = new HashMap<String, String>();
+        outElements.put("{" + RM10Constants.NAMESPACE_URI + "}Sequence", "");
+        trans.setOutTransformElements(outElements);
+        
+        client.getOutInterceptors().add(trans);
+        try {
+            greeter.greetMe("one");
+            fail("invalid wsrm header");
+        } catch (Exception e) {
+            assertTrue(e.getCause() instanceof SoapFault);
+            // verify a partial error text match to exclude an unexpected exception
+            // (see WSRM_REQUIRED_EXC in Messages.properties)
+            final String text = "WS-ReliableMessaging is required";
+            assertTrue(e.getCause().getMessage() != null 
+                && e.getCause().getMessage().indexOf(text) >= 0);
+        }
+    }
+
+    
     
     @Test
     public void testDefaultDecoupled() throws Exception {
