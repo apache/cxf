@@ -5,8 +5,8 @@
     <artifactId>$artifactId</artifactId>
     <version>$version</version>
     <packaging>war</packaging>
-    <name>Simple CXF JAX-RS webapp service using spring configuration</name>
-    <description>Simple CXF JAX-RS webapp service using spring configuration</description>
+    <name>Simple CXF JAX-RS webapp service using Spring configuration</name>
+    <description>Simple CXF JAX-RS webapp service using Spring configuration</description>
     <properties>
         <jackson.version>1.8.6</jackson.version>
     </properties>
@@ -47,9 +47,9 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>tomcat-maven-plugin</artifactId>
-                    <version>1.1</version>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat6-maven-plugin</artifactId>
+                    <version>2.0</version>
                     <executions>
                         <execution>
                             <id>default-cli</id>
@@ -105,8 +105,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>tomcat-maven-plugin</artifactId>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat6-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>start-tomcat</id>
