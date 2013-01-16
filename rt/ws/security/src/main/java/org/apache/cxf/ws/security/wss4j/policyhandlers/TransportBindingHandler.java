@@ -50,6 +50,7 @@ import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
+import org.apache.cxf.ws.security.policy.model.SpnegoContextToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
@@ -281,7 +282,8 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         if (token instanceof IssuedToken
             || token instanceof SecureConversationToken
             || token instanceof SecurityContextToken
-            || token instanceof KerberosToken) {
+            || token instanceof KerberosToken
+            || token instanceof SpnegoContextToken) {
             addSig(doIssuedTokenSignature(token, wrapper));
         } else if (token instanceof X509Token
             || token instanceof KeyValueToken) {
