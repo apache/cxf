@@ -146,63 +146,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     
                     SecurityToken tok = retrieveCachedToken(message);
                     if (tok == null) {
-                        STSClient client = STSUtils.getClient(message, "sts", itok);
-                        AddressingProperties maps =
-                            (AddressingProperties)message
-                                .get("javax.xml.ws.addressing.context.outbound");
-                        if (maps == null) {
-                            maps = (AddressingProperties)message
-                                .get("javax.xml.ws.addressing.context");
-                        }
-                        synchronized (client) {
-                            try {
-                                // Transpose ActAs/OnBehalfOf info from original request to the STS client.
-                                Object token = 
-                                    message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS);
-                                if (token != null) {
-                                    client.setActAs(token);
-                                }
-                                token = 
-                                    message.getContextualProperty(SecurityConstants.STS_TOKEN_ON_BEHALF_OF);
-                                if (token != null) {
-                                    client.setOnBehalfOf(token);
-                                }
-                                Map<String, Object> ctx = client.getRequestContext();
-                                mapSecurityProps(message, ctx);
-                            
-                                Object o = message.getContextualProperty(SecurityConstants.STS_APPLIES_TO);
-                                String appliesTo = o == null ? null : o.toString();
-                                appliesTo = appliesTo == null 
-                                    ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
-                                        : appliesTo;
-                                boolean enableAppliesTo = client.isEnableAppliesTo();
-                                
-                                client.setMessage(message);
-                                Element onBehalfOfToken = client.getOnBehalfOfToken();
-                                Element actAsToken = client.getActAsToken();
-                                
-                                SecurityToken secToken = 
-                                    handleDelegation(
-                                        message, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
-                                    );
-                                if (secToken == null) {
-                                    secToken = getTokenFromSTS(message, client, aim, maps, itok, appliesTo);
-                                }
-                                tok = secToken;
-                                storeDelegationTokens(
-                                    message, tok, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
-                                );
-                            } catch (RuntimeException e) {
-                                throw e;
-                            } catch (Exception e) {
-                                throw new Fault(e);
-                            } finally {
-                                client.setTrust((Trust10)null);
-                                client.setTrust((Trust13)null);
-                                client.setTemplate(null);
-                                client.setAddressingNamespace(null);
-                            }
-                        }
+                        tok = issueToken(message, aim, itok);
                     } else {
                         tok = renewToken(message, aim, itok, tok);
                     }
@@ -413,11 +357,18 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             IssuedToken itok,
             SecurityToken tok
         ) {
+            // If the token has not expired then we don't need to renew it
             if (!tok.isExpired()) {
                 return tok;
             }
             
+            // If the user has explicitly disabled Renewing then we can't renew a token,
+            // so just get a new one
             STSClient client = STSUtils.getClient(message, "sts", itok);
+            if (!client.isAllowRenewing()) {
+                return issueToken(message, aim, itok);
+            }
+            
             AddressingProperties maps =
                 (AddressingProperties)message
                     .get("javax.xml.ws.addressing.context.outbound");
@@ -441,6 +392,70 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     
                     client.setTemplate(itok.getRstTemplate());
                     return client.renewSecurityToken(tok);
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new Fault(e);
+                } finally {
+                    client.setTrust((Trust10)null);
+                    client.setTrust((Trust13)null);
+                    client.setTemplate(null);
+                    client.setAddressingNamespace(null);
+                }
+            }
+        }
+        
+        private SecurityToken issueToken(
+             Message message, 
+             AssertionInfoMap aim,
+             IssuedToken itok
+        ) {
+            STSClient client = STSUtils.getClient(message, "sts", itok);
+            AddressingProperties maps =
+                (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context.outbound");
+            if (maps == null) {
+                maps = (AddressingProperties)message
+                    .get("javax.xml.ws.addressing.context");
+            }
+            synchronized (client) {
+                try {
+                    // Transpose ActAs/OnBehalfOf info from original request to the STS client.
+                    Object token = 
+                        message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS);
+                    if (token != null) {
+                        client.setActAs(token);
+                    }
+                    token = 
+                        message.getContextualProperty(SecurityConstants.STS_TOKEN_ON_BEHALF_OF);
+                    if (token != null) {
+                        client.setOnBehalfOf(token);
+                    }
+                    Map<String, Object> ctx = client.getRequestContext();
+                    mapSecurityProps(message, ctx);
+                
+                    Object o = message.getContextualProperty(SecurityConstants.STS_APPLIES_TO);
+                    String appliesTo = o == null ? null : o.toString();
+                    appliesTo = appliesTo == null 
+                        ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
+                            : appliesTo;
+                    boolean enableAppliesTo = client.isEnableAppliesTo();
+                    
+                    client.setMessage(message);
+                    Element onBehalfOfToken = client.getOnBehalfOfToken();
+                    Element actAsToken = client.getActAsToken();
+                    
+                    SecurityToken secToken = 
+                        handleDelegation(
+                            message, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
+                        );
+                    if (secToken == null) {
+                        secToken = getTokenFromSTS(message, client, aim, maps, itok, appliesTo);
+                    }
+                    storeDelegationTokens(
+                        message, secToken, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
+                    );
+                    return secToken;
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
