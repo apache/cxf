@@ -41,10 +41,10 @@ http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/
 							class="org.eclipse.jetty.server.handler.ResourceHandler">
 							<property name="baseResource">
 								<bean
-									class="org.eclipse.jetty.util.resource.FileResource">
-									<constructor-arg
-										value="file:staticContent" />
-								</bean>
+                                    class="org.eclipse.jetty.util.resource.FileResource">
+                                    <constructor-arg
+                                        value="file:src/main/resources/staticContent" />
+                                </bean>
 							</property>
 						</bean>
 					</property>

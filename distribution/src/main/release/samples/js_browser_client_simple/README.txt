@@ -37,74 +37,22 @@ Using either UNIX or Windows:
   mvn -Pclient
 
 
-Building the demo using wsdl2java and javac
--------------------------------------------
-
-From the base directory of this sample (i.e., where this README file is
-located) first create the target directory build/classes and then 
-generate code from the WSDL file.
-
-For UNIX:
-  mkdir -p build/classes
-
-  wsdl2java -d build/classes -compile ./wsdl/hello_world.wsdl
-
-For Windows:
-  mkdir build\classes
-    Must use back slashes.
-
-  wsdl2java -d build\classes -compile .\wsdl\hello_world.wsdl
-    May use either forward or back slashes.
-
-Now compile the server applications with the commands:
-
-For UNIX: 
-  
-  export CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar:./build/classes
-  javac -d build/classes src/demo/hw/server/*.java
-
-For Windows:
-  set classpath=%classpath%;%CXF_HOME%\lib\cxf-manifest.jar;.\build\classes
-  javac -d build\classes src\demo\hw\server\*.java
-
-
-Running the demo using java
----------------------------
-
-From the base directory of this sample (i.e., where this README file is
-located) run the commands, entered on a single command line:
-
-For UNIX (must use forward slashes):
-    java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
-         demo.hw.server.Server &
-
-The server process starts in the background.  After running the client,
-use the kill command to terminate the server process. Or wait five
-minutes, and the server will exit.
-
-For Windows (may use either forward or back slashes):
-  start 
-    java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
-         demo.hw.server.Server
-
-On Windows, a new command windows opens for the server process.  After running the
-client, terminate the server process by issuing Ctrl-C in its command window.
-
-To remove the code generated from the WSDL file and the .class
-files, just delete the build directory and its contents.
-
-
 Running the client in a browser
 -------------------------------
-Once the server is running, browse to:
+Once the server is running, confirm you can see the WSDL at:
 
-  http://HOSTNAME:9000/HelloWorld.html
+  http://localhost:9000/SoapContext/SoapPort?wsdl
 
-(Substitute your hostname for HOSTNAME.)
+Then browse to:
+
+  http://localhost:9000/HelloWorld.html
+
+(Change localhost above if you're using a different hostname.)
 
 On the web page you see, click on the 'invoke' button to invoke the
 very simple sayHi service, which takes no input and returns a single
 string.
+
 
 Schema Validation Exception
 ----------------------------
