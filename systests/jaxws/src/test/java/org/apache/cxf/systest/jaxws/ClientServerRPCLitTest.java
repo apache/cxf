@@ -43,6 +43,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.xpath.XPathConstants;
 
@@ -52,8 +53,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -109,6 +114,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+            ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
             updateAddressPort(greeter, PORT);
             for (int idx = 0; idx < 1; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
@@ -119,6 +125,25 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
                 String reply = greeter.sayHi();
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
+                try {
+                    greeter.greetMe("return null");
+                    fail("should catch WebServiceException");
+                } catch (WebServiceException e) {
+                    //do nothing
+                } catch (Exception e) {
+                    fail("should catch WebServiceException");
+                    throw e;
+                }
+                
+                try {
+                    greeter.greetMe(null);
+                    fail("should catch WebServiceException");
+                } catch (WebServiceException e) {
+                    //do nothing
+                } catch (Exception e) {
+                    fail("should catch WebServiceException");
+                    throw e;
+                }
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();

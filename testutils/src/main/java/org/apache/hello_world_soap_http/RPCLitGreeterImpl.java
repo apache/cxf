@@ -37,7 +37,11 @@ public class RPCLitGreeterImpl implements GreeterRPCLit {
     public String greetMe(String me) {
         //System.out.println("Executing operation greetMe");
         //System.out.println("Message received: " + me + "\n");
-        return "Hello " + me;
+        if ("return null".equals(me)) {
+            return null;
+        } else {
+            return "Hello " + me;
+        }
     }
 
     public String sayHi() {
