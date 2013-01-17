@@ -57,8 +57,6 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
