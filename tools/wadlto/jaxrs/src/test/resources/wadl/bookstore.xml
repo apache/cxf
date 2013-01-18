@@ -95,11 +95,16 @@ required="true">
      <response status="204"></response>
     </method>
     
-    <resource path="/book2">
+    <resource path="/book2/{bookid:.*}">
      <method name="GET" id="getBook2">
       <response>
        <representation mediaType="application/xml" element="prefix1:theBook2"/>
        <representation mediaType="application/json"/>
+      </response>
+     </method>
+     <method name="GET">
+      <response>
+        <representation mediaType="application/pdf"/>
       </response>
      </method>
     </resource>
