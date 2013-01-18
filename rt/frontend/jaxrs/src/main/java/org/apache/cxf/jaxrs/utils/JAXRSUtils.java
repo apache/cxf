@@ -1218,6 +1218,12 @@ public final class JAXRSUtils {
             first.aroundWriteTo(context);
         } else {
             MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(0)).getMBW();
+            if (type == byte[].class) {
+                long size = writer.getSize(entity, type, genericType, annotations, mediaType);
+                if (size != -1) {
+                    httpHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
+                }
+            }
             writer.writeTo(entity, type, genericType, annotations, mediaType,
                            httpHeaders, entityStream);
         }

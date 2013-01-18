@@ -35,6 +35,7 @@ import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -81,6 +82,21 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class, true));
         createStaticBus();
+    }
+    
+    @Test
+    public void testGetBookNameAsByteArray() {
+        String address = "http://localhost:" + PORT + "/bookstore/booknames/123";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        
+        Response r = wc.accept("application/bar").get();
+        String name = r.readEntity(String.class);
+        assertEquals("CXF in Action", name);
+        String lengthStr = r.getHeaderString(HttpHeaders.CONTENT_LENGTH);
+        assertNotNull(lengthStr);
+        long length = Long.valueOf(lengthStr);
+        assertEquals(name.length(), length);
     }
     
     @Test

@@ -52,7 +52,8 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     private static final String HTTP_RANGE_PROPERTY = "http.range.support";
     
     private static final int BUFFER_SIZE = 4096;
-
+    private boolean reportByteArraySize;
+    
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return byte[].class.isAssignableFrom(type)
                || InputStream.class.isAssignableFrom(type)
@@ -77,7 +78,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         // TODO: if it's a range request, then we should probably always return -1 and set 
         // Content-Length and Content-Range in handleRangeRequest
-        if (byte[].class.isAssignableFrom(t.getClass())) {
+        if (reportByteArraySize && byte[].class.isAssignableFrom(t.getClass())) {
             return ((byte[])t).length;
         }
         return -1;
@@ -158,4 +159,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         }
     }
 
+    public void setReportByteArraySize(boolean report) {
+        this.reportByteArraySize = report;
+    }
 }
