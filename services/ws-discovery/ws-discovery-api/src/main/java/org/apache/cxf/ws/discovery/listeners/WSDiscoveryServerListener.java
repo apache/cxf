@@ -85,8 +85,10 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
         InterfaceInfo ii = ei.getInterface();
         if (ii != null) {
             return ii.getName();
-        } else {
+        } else if (ei.getService() != null) {
             return ei.getService().getName();
+        } else {
+            return ei.getName();
         }
     }
     

@@ -127,7 +127,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
      * transport is http, binding is JAX-RS binding, endpoint address is from
      * server mainline.
      */    
-    protected EndpointInfo createEndpointInfo() throws BusException {
+    protected EndpointInfo createEndpointInfo(Service service) throws BusException {
         String transportId = getTransportId();
         if (transportId == null && getAddress() != null) {
             DestinationFactory df = getDestinationFactory();
@@ -159,7 +159,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (!StringUtils.isEmpty(publishedEndpointUrl)) {
             ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
         }
-        
+        ei.setName(service.getName());
         serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINTINFO_CREATED, ei);
 
         return ei;
@@ -220,7 +220,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             service = serviceFactory.create();
         }
 
-        EndpointInfo ei = createEndpointInfo();
+        EndpointInfo ei = createEndpointInfo(service);
         Endpoint ep = new EndpointImpl(getBus(), service, ei);
         
         if (properties != null) {
