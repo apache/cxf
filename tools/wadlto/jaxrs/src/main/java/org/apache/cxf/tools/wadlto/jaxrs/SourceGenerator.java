@@ -60,6 +60,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -699,8 +700,17 @@ public class SourceGenerator {
                 responseTypeAvailable = writeResponseType(responseEls, sbCode, imports, info, suspendedAsync);
                 String genMethodName = id + suffixName;
                 if (methodNameLowerCase.equals(genMethodName)) {
-                    genMethodName += firstCharToUpperCase(
-                        currentPath.replaceAll("/", "").replaceAll("\\{", "").replaceAll("\\}", ""));
+                    List<PathSegment> segments = JAXRSUtils.getPathSegments(currentPath, true, true);
+                    StringBuilder sb = new StringBuilder();
+                    for (PathSegment ps : segments) {
+                        String pathSeg = ps.getPath().replaceAll("\\{", "").replaceAll("\\}", "");
+                        int index = pathSeg.indexOf(":");
+                        if (index > 0) {
+                            pathSeg = pathSeg.substring(0, index);
+                        }
+                        sb.append(pathSeg);
+                    }
+                    genMethodName += firstCharToUpperCase(sb.toString());
                 }
                 sbCode.append(genMethodName);
             } else {
