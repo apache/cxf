@@ -133,6 +133,14 @@ public class BookStore {
     }
 
     @GET
+    @Path("/booknames/123")
+    @Produces("application/bar")
+    public byte[] getBookName123() {
+        Long l = Long.parseLong("123");
+        return books.get(l).getName().getBytes();
+    }
+    
+    @GET
     @Path("/beanparam")
     @Produces("application/xml")
     public Book getBeanParamBook(@BeanParam BookBean bean) {

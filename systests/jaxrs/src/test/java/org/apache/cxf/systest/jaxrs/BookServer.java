@@ -61,6 +61,7 @@ public class BookServer extends AbstractBusTestServerBase {
         BinaryDataProvider<Object> p = new BinaryDataProvider<Object>();
         p.setProduceMediaTypes(Collections.singletonList("application/bar"));
         p.setEnableBuffering(true);
+        p.setReportByteArraySize(true);
         providers.add(p);
         JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();
         Map<String, String> jaxbElementClassMap = new HashMap<String, String>(); 
