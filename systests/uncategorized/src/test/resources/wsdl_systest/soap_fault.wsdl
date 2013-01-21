@@ -48,7 +48,7 @@ under the License.
     <binding name="SoapFault_SOAPBinding" type="tns:SoapFaultPortType">
       <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
       <operation name="SoapFault">
-        <input message="tns:Soapfault">
+        <input>
           <soap:body use="literal"/>
         </input>
       </operation>
