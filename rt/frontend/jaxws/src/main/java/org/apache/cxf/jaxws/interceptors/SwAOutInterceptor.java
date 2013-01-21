@@ -25,6 +25,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -81,11 +83,20 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         addBefore(WrapperClassOutInterceptor.class.getName());
     }
     
-    private boolean callSWARefMethod(JAXBContext ctx) {
+    private boolean callSWARefMethod(final JAXBContext ctx) {
         Method m = SWA_REF_METHOD.get(ctx.getClass().getName());
         if (m == null && !SWA_REF_METHOD.containsKey(ctx.getClass().getName())) {
             try {
-                m = ctx.getClass().getMethod("hasSwaRef", new Class[0]);
+                m = AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+
+                    public Method run() throws Exception {
+                        Method hasSwaRefMethod = ctx.getClass().getMethod("hasSwaRef", new Class[0]);
+                        if (!hasSwaRefMethod.isAccessible()) {
+                            hasSwaRefMethod.setAccessible(true);
+                        }
+                        return hasSwaRefMethod;
+                    }
+                });
                 SWA_REF_METHOD.put(ctx.getClass().getName(), m);
             } catch (Exception e) {
                 //ignore
@@ -219,7 +230,8 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             atts.add(att);
         }
     }
-    private boolean hasSwaRef(JAXBDataBinding db) {
+
+    protected boolean hasSwaRef(JAXBDataBinding db) {
         JAXBContext context = db.getContext();
         return callSWARefMethod(context);
     }
