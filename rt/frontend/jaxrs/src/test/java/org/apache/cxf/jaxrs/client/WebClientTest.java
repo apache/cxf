@@ -62,6 +62,12 @@ public class WebClientTest extends Assert {
         assertEquals("http://foo/bar+%20%2B;a=value+%20?b=bv%2B+%2B", u.toString());
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullPath() {
+        WebClient.create("http://foo").path(null);
+        fail("Exception expected");
+    }
+    
     @Test
     public void testExistingAsteriscs() {
         URI u = WebClient.create("http://foo/*").getCurrentURI();

@@ -674,6 +674,9 @@ public abstract class AbstractClient implements Client, Retryable {
     
     
     protected String convertParamValue(Object pValue) {
+        if (pValue == null) {
+            return null;
+        }
         Class<?> pClass = pValue.getClass();
         if (pClass == String.class || pClass.isPrimitive()) {
             return pValue.toString();
