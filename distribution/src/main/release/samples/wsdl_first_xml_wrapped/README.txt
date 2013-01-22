@@ -1,12 +1,10 @@
 Hello World Demo using WRAPPED Style in XML Binding (pure XML over HTTP)
 ========================================================================
 
-This demo illustrates the use of Apache CXF's xml binding. This 
-specific demo shows you how xml binding works with the 
-doc-lit wrapped style.
+This demo illustrates the use of Apache CXF's XML binding. This specific demo
+shows you how the XML binding works with the doc-lit wrapped style.
 
-Please review the README in the samples directory before
-continuing.
+Please review the README in the samples directory before continuing.
 
 Building and running the demo using Maven
 ---------------------------------------
