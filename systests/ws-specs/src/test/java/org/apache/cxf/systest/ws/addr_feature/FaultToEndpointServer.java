@@ -19,6 +19,8 @@
 package org.apache.cxf.systest.ws.addr_feature;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.concurrent.Future;
 
 import javax.jws.WebService;
@@ -50,6 +52,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class FaultToEndpointServer extends AbstractBusTestServerBase {  
     static final String FAULT_PORT = allocatePort(FaultToEndpointServer.class);
+    static final String FAULT_PORT2 = allocatePort(FaultToEndpointServer.class, 2);
     static final String PORT = allocatePort(FaultToEndpointServer.class, 1);
    
     EndpointImpl ep;
@@ -113,14 +116,25 @@ public class FaultToEndpointServer extends AbstractBusTestServerBase {
         public void handle(String target, Request baseRequest, HttpServletRequest request,
                            HttpServletResponse response) throws IOException, ServletException {
             response.setContentType("text/html;charset=utf-8");
+            
+            //System.out.println("In handler: " + request.getContentLength());
+            
+            byte bytes[] = new byte[1024];
+            InputStream in = request.getInputStream();
+            while (in.read(bytes) > -1) {
+                //nothing
+            }
+
             faultRequestPath = request.getPathInfo();
             if ("/faultTo".equals(faultRequestPath)) {
-                response.setStatus(HttpServletResponse.SC_OK);
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
+            PrintWriter writer = response.getWriter();
+            writer.println("Received");
+            writer.close();
             baseRequest.setHandled(true);
-            response.getWriter().println("Received");
         }
 
         public static String getFaultRequestPath() {

@@ -27,8 +27,10 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
 
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.FaultToEndpointServer.HelloHandler;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -88,11 +90,15 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
     public void testTwoWayFaultTo() throws Exception {
         ByteArrayOutputStream input = setupInLogging();
         AddNumbersPortType port = getTwoWayPort();
-
+        
+        //setup a real decoupled endpoint that will process the fault correctly
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(port).getConduit();
+        c.getClient().setDecoupledEndpoint("http://localhost:" + FaultToEndpointServer.FAULT_PORT2 + "/sendFaultHere");
+        
         EndpointReferenceType faultTo = new EndpointReferenceType();
         AddressingProperties addrProperties = new AddressingPropertiesImpl();
         AttributedURIType epr = new AttributedURIType();
-        epr.setValue("http://localhost:" + FaultToEndpointServer.FAULT_PORT + "/faultTo");
+        epr.setValue("http://localhost:" + FaultToEndpointServer.FAULT_PORT2 + "/sendFaultHere");
         faultTo.setAddress(epr);
         addrProperties.setFaultTo(faultTo);
         
@@ -108,14 +114,16 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
         } catch (Exception e) {
             //do nothing
         }
-               
-        assertTrue("The response from faultTo endpoint is expected and actual response is " 
-                   + new String(input.toByteArray()) , 
-                   new String(input.toByteArray()).indexOf("The server sent HTTP status code :200") > -1);
+
+        String in = new String(input.toByteArray());
+        assertTrue("The response from faultTo endpoint is expected and actual response is " + in,
+                   in.indexOf("Address: http://localhost:" + FaultToEndpointServer.FAULT_PORT2 
+                                     + "/sendFaultHere") > -1);
         assertTrue("WS addressing header is expected", 
-                   new String(input.toByteArray()).indexOf("http://www.w3.org/2005/08/addressing") > -1);       
+                   in.indexOf("http://www.w3.org/2005/08/addressing") > -1);       
         assertTrue("Fault deatil is expected", 
-                   new String(input.toByteArray()).indexOf("Negative numbers cant be added") > -1);
+                   in.indexOf("Negative numbers cant be added") > -1);
+        
         ((Closeable)port).close();        
     }
      
