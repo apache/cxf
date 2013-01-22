@@ -243,8 +243,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
         } else if (cls instanceof ParameterizedType) {
             addType(((ParameterizedType)cls).getRawType());
-            for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
-                addType(t2);
+            if (!((ParameterizedType)cls).getRawType().equals(Enum.class)) {
+                for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
+                    addType(t2);
+                }
             }
         } else if (cls instanceof GenericArrayType) {
             Class<?> ct;
