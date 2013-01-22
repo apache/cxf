@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.ws.addr_feature;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.net.URL;
 import java.util.Map;
 
@@ -115,6 +116,7 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
                    new String(input.toByteArray()).indexOf("http://www.w3.org/2005/08/addressing") > -1);       
         assertTrue("Fault deatil is expected", 
                    new String(input.toByteArray()).indexOf("Negative numbers cant be added") > -1);
+        ((Closeable)port).close();        
     }
      
     private AddNumbersPortType getTwoWayPort() throws Exception {
