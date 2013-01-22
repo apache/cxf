@@ -286,6 +286,13 @@ public class WebClientTest extends Assert {
         assertNotNull(WebClient.getConfig(proxy2) != null);
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testProxyNull() {
+        // interface
+        BookInterface proxy = JAXRSClientFactory.create("http://foo", BookInterface.class);
+        proxy.getBook(null);
+    }
+    
     private static class ParamConverterProviderImpl implements ParamConverterProvider {
         
         @SuppressWarnings("unchecked")
