@@ -86,6 +86,7 @@ public class BookServer extends AbstractBusTestServerBase {
 
         sf.getProperties(true).put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", true);
         sf.getProperties().put("search.visitor", new SQLPrinterVisitor<SearchBean>("books"));
+        sf.getProperties().put("org.apache.cxf.http.header.split", true);
         server = sf.create();
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
