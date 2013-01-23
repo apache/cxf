@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.common;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,6 +35,7 @@ public class OAuthAuthorizationData implements Serializable {
     private static final long serialVersionUID = -7755998413495017637L;
     
     private String clientId;
+    private String endUserName;
     private String redirectUri;
     private String state;
     private String proposedScope;
@@ -45,7 +47,10 @@ public class OAuthAuthorizationData implements Serializable {
     private String applicationWebUri;
     private String applicationDescription;
     private String applicationLogoUri;
+    private List<Property> extraApplicationProperties = new LinkedList<Property>();
+    
     private List<? extends Permission> permissions;
+    
     
     public OAuthAuthorizationData() {
     }
@@ -230,6 +235,22 @@ public class OAuthAuthorizationData implements Serializable {
      */
     public String getReplyTo() {
         return replyTo;
+    }
+
+    public List<Property> getExtraApplicationProperties() {
+        return extraApplicationProperties;
+    }
+
+    public void setExtraApplicationProperties(List<Property> extraApplicationProperties) {
+        this.extraApplicationProperties = extraApplicationProperties;
+    }
+
+    public String getEndUserName() {
+        return endUserName;
+    }
+
+    public void setEndUserName(String endUserName) {
+        this.endUserName = endUserName;
     }
 
 }
