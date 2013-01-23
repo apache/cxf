@@ -469,7 +469,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         for (String value : values) {
             String[] items = splitPattern.split(value);
             for (String item : items) {
-                results.add(item);
+                results.add(item.trim());
             }
         }
         return results;

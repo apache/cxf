@@ -67,7 +67,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.setAddress("http://localhost:" + PORT + "/");
 
         sf.getProperties(true).put("org.apache.cxf.jaxrs.mediaTypeCheck.strict", true);
-        
+        sf.getProperties().put("org.apache.cxf.http.header.split", true);
         sf.create();
     }
 
