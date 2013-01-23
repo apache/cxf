@@ -60,6 +60,8 @@ public class HttpHeadersImplTest extends Assert {
         MetadataMap<String, String> headers = 
             createHeader("COMPLEX_HEADER",  "b=c; param=c, a=b;param=b");
         EasyMock.expectLastCall().andReturn(headers);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> values = h.getRequestHeader("COMPLEX_HEADER");
@@ -73,6 +75,8 @@ public class HttpHeadersImplTest extends Assert {
     public void testGetHeaderWithQuotes1() throws Exception {
         
         Message m = control.createMock(Message.class);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = createHeader("COMPLEX_HEADER", 
             "a1=\"a\", a2=\"a\";param, b, b;param, c1=\"c, d, e\", "
@@ -100,6 +104,8 @@ public class HttpHeadersImplTest extends Assert {
     public void testGetHeaderWithQuotes2() throws Exception {
         
         Message m = control.createMock(Message.class);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = 
             createHeader("X-WSSE", "UsernameToken Username=\"Foo\", Nonce=\"bar\"");
@@ -118,6 +124,8 @@ public class HttpHeadersImplTest extends Assert {
     public void testGetHeaderWithQuotes3() throws Exception {
         
         Message m = control.createMock(Message.class);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = 
             createHeader("COMPLEX_HEADER", "\"value with space\"");
@@ -138,6 +146,8 @@ public class HttpHeadersImplTest extends Assert {
         Message m = control.createMock(Message.class);
         m.get(Message.PROTOCOL_HEADERS);
         EasyMock.expectLastCall().andReturn(createHeaders());
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
         MultivaluedMap<String, String> hs = h.getRequestHeaders();
@@ -236,6 +246,8 @@ public class HttpHeadersImplTest extends Assert {
     public void testGetHeader() throws Exception {
         
         Message m = control.createMock(Message.class);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         m.get(Message.PROTOCOL_HEADERS);
         EasyMock.expectLastCall().andReturn(createHeaders());
         control.replay();
@@ -386,6 +398,8 @@ public class HttpHeadersImplTest extends Assert {
     public void testUnmodifiableRequestHeaders() throws Exception {
         
         Message m = control.createMock(Message.class);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
         m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = 
             createHeader(HttpHeaders.ACCEPT_LANGUAGE, 

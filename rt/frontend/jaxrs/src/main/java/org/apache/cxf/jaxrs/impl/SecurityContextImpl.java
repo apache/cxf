@@ -21,15 +21,17 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
-public class SecurityContextImpl implements SecurityContext {
 
+public class SecurityContextImpl implements SecurityContext {
     private Message m;
     
     public SecurityContextImpl(Message m) {
@@ -40,9 +42,22 @@ public class SecurityContextImpl implements SecurityContext {
         if (m.get(AuthorizationPolicy.class) != null) {
             return SecurityContext.BASIC_AUTH;
         }
-        List<String> authorizationValues = new HttpHeadersImpl(m).getRequestHeader("Authorization");
-        
-        return authorizationValues.size() > 0 ? authorizationValues.get(0) : "Unknown scheme";
+        @SuppressWarnings("unchecked")
+        Map<String, List<String>> headers = 
+            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS);
+        if (headers != null) {
+            List<String> values = headers.get(HttpHeaders.AUTHORIZATION);
+            if (values != null && values.size() == 1) {
+                String value = values.get(0);
+                if (value != null) {
+                    int index = value.trim().indexOf(" ");
+                    if (index != -1) {
+                        return value.substring(0, index);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public Principal getUserPrincipal() {
