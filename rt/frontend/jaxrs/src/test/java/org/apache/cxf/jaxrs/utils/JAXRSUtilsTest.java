@@ -1466,6 +1466,7 @@ public class JAXRSUtilsTest extends Assert {
         headers.add("Foo", "bar, baz");
         
         Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.header.split", "true");
         m.put(Message.PROTOCOL_HEADERS, headers);
         
         List<Object> params = 

@@ -70,6 +70,12 @@
 		      </param-value>    
 		</init-param>
 		<init-param>
+			  <param-name>jaxrs.properties</param-name>
+			  <param-value>
+			    org.apache.cxf.http.header.split=true
+			  </param-value>
+			 </init-param>
+		<init-param>
 		      <param-name>jaxrs.application.address.ignore</param-name>
 		      <param-value>true</param-value>    
 		</init-param>

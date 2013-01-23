@@ -43,9 +43,12 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class HttpHeadersImpl implements HttpHeaders {
 
+    private static final String HEADER_SPLIT_PROPERTY =
+        "org.apache.cxf.http.header.split";
     private static final String COOKIE_SEPARATOR_PROPERTY =
         "org.apache.cxf.http.cookie.separator";
     private static final String COOKIE_SEPARATOR_CRLF = "crlf";
@@ -122,6 +125,11 @@ public class HttpHeadersImpl implements HttpHeaders {
         }
     }
     
+    private boolean splitIndividualValue() {
+        Object property = message.getContextualProperty(HEADER_SPLIT_PROPERTY);
+        return MessageUtils.isTrue(property);
+    }
+    
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
         return values.size() == 0 ? null : createLocale(values.get(0).trim());
@@ -185,7 +193,11 @@ public class HttpHeadersImpl implements HttpHeaders {
             if (value == null) {
                 continue;
             }
-            ls.addAll(getHeaderValues(name, value, sep));
+            if (splitIndividualValue()) {
+                ls.addAll(getHeaderValues(name, value, sep));
+            } else {
+                ls.add(value);
+            }
         }
         return ls;
     }
