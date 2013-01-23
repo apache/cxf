@@ -56,6 +56,9 @@
     <bean id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService"
         class="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyServiceImpl" />
     
+    <bean id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2"
+        class="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyServiceImpl" />
+        
     <jaxws:endpoint 
        id="JavaFirstPolicyService"
        address="http://localhost:${testutil.ports.JavaFirstPolicyServer.2}/JavaFirstPolicyService" 
@@ -70,6 +73,21 @@
     <jaxws:endpoint 
        id="JavaFirstAttachmentPolicyService"
        address="http://localhost:${testutil.ports.JavaFirstPolicyServer.2}/JavaFirstAttachmentPolicyService" 
+       implementor="#org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2">
+        
+       <jaxws:properties>
+          <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+       </jaxws:properties>
+       
+       <jaxws:features>
+			<p:policies />
+	   </jaxws:features>
+    </jaxws:endpoint> 
+    
+     <jaxws:endpoint 
+       id="JavaFirstAttachmentPolicyService2"
+       address="http://localhost:${testutil.ports.JavaFirstPolicyServer.2}/JavaFirstAttachmentPolicyService2" 
        implementor="#org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService">
         
        <jaxws:properties>

@@ -121,6 +121,10 @@ public class WSPolicyFeature extends AbstractFeature {
         pe.setServerEndpointPolicy(ei, ep.updatePolicy(p));
 
         // Add policy to the service model (and consequently to the WSDL)
+        // FIXME - ideally this should probably be moved up to where the policies are applied to the
+        // endpoint, rather than this late.  As a consequence of its location, you have to declare a
+        // ws policy feature on every endpoint in order to get any policy attachments into the
+        // wsdl.  Alternatively add to the WSDLServiceBuilder somehow.
         ServiceModelPolicyUpdater pu = new ServiceModelPolicyUpdater(ei);
         for (PolicyProvider pp : ((PolicyEngineImpl) pe).getPolicyProviders()) {
             if (pp instanceof ExternalAttachmentProvider) {

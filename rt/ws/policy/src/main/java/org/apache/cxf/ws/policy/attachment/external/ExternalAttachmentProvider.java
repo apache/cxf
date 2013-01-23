@@ -167,6 +167,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                 if (Node.ELEMENT_NODE != nd.getNodeType()) {
                     continue;
                 }
+                
                 QName qn = new QName(nd.getNamespaceURI(), nd.getLocalName());
                 if (Constants.isAppliesToElem(qn)) {
                     Collection<DomainExpression> des = readDomainExpressions((Element)nd);
@@ -181,6 +182,10 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                         p = p.merge(attachment.getPolicy());
                     }
                     attachment.setPolicy(p);
+                    
+                    // cache the element so it can be used when generating the wsdl
+                    attachment.setElement((Element) nd);
+
                 } else if (Constants.isPolicyRef(qn)) {
                     PolicyReference ref = builder.getPolicyReference(nd);
                     if (null != ref) {   
