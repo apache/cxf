@@ -148,8 +148,10 @@ public final class JSONUtils {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration conf = new Configuration(namespaceMap);
-        conf.setPrimitiveArrayKeys(primitiveArrayKeys == null 
-            ? Collections.<String>emptySet() : new HashSet<String>(primitiveArrayKeys));
+        if (primitiveArrayKeys != null) { 
+            conf.setPrimitiveArrayKeys(
+                new HashSet<String>(primitiveArrayKeys));
+        }
         XMLInputFactory factory = depthProps != null 
             ? new JettisonMappedReaderFactory(conf, depthProps) 
             : new MappedXMLInputFactory(conf);
