@@ -73,7 +73,7 @@ public class MacAuthorizationScheme {
         addParameter(sb, OAuthConstants.MAC_TOKEN_ID, macKey, false);
         addParameter(sb, OAuthConstants.MAC_TOKEN_NONCE, nonce, false);
         addParameter(sb, OAuthConstants.MAC_TOKEN_SIGNATURE, signature, false);
-        addParameter(sb, OAuthConstants.MAC_TOKEN_TIMESTAMP, timestamp, false);
+        addParameter(sb, OAuthConstants.MAC_TOKEN_TIMESTAMP, timestamp, true);
         
         
         return sb.toString();
