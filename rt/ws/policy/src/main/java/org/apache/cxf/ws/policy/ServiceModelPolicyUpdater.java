@@ -47,10 +47,7 @@ import java.util.Collection;
 
 import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,7 +57,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.Extensible;
-import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.policy.attachment.external.PolicyAttachment;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
@@ -99,7 +95,7 @@ public class ServiceModelPolicyUpdater {
 
             // Add wsp:Policy to top-level wsdl:definitions
             if (policyUsed) {
-                addPolicy(pa.getPolicy());
+                addPolicy(pa);
             }
         }
     }
@@ -118,35 +114,20 @@ public class ServiceModelPolicyUpdater {
         ext.addExtensor(uee);
     }
 
-    private void addPolicy(Policy p) {
-        try {
-            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
-            p.serialize(writer);
-            Element policyEl = writer.getDocument().getDocumentElement();
-            
-            // FIXME - overwrite the Id to include the namespace prefix, for some reason neethi does not do this!
-            Attr idAttr = policyEl.getAttributeNode(Constants.ATTR_ID);
-            if (null != idAttr) {
-                idAttr.setPrefix(Constants.ATTR_WSU);
-            }
-            
-            // Remove xmlns:xmlns attribute which Xerces chokes on
-            policyEl.removeAttribute("xmlns:xmlns");
+    private void addPolicy(PolicyAttachment pa) {
+        // TODO - do I need to defensively copy this?
+        Element policyEl = pa.getElement();
 
-            UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
-            uee.setElementType(new QName(p.getNamespace(), Constants.ELEM_POLICY));
-            uee.setElement(policyEl);
+        UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
+        uee.setRequired(true);
+        uee.setElementType(DOMUtils.getElementQName(policyEl));
+        uee.setElement(policyEl);
 
-            if (ei.getService().getDescription() == null) {
-                DescriptionInfo description = new DescriptionInfo();
-                description.setName(ei.getService().getName());
-                ei.getService().setDescription(description);
-            }
-            ei.getService().getDescription().addExtensor(uee);
-        } catch (XMLStreamException ex) {
-            throw new RuntimeException("Could not serialize policy", ex);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("Could not serialize policy", e);
+        if (ei.getService().getDescription() == null) {
+            DescriptionInfo description = new DescriptionInfo();
+            description.setName(ei.getService().getName());
+            ei.getService().setDescription(description);
         }
+        ei.getService().getDescription().addExtensor(uee);
     }
 }

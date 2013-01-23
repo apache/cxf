@@ -61,7 +61,14 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     @org.junit.Test
     public void testJavaFirstAttachmentWsdl() throws Exception {
         Document doc = loadWsdl("JavaFirstAttachmentPolicyService");
+        testJavaFirstAttachmentWsdl(doc);
+        
+        // verify that the policy attachment not being defensively copied is working ok still!
+        Document doc2 = loadWsdl("JavaFirstAttachmentPolicyService2");
+        testJavaFirstAttachmentWsdl(doc2);
+    }
 
+    private void testJavaFirstAttachmentWsdl(Document doc) throws Exception {
         Element binding = DOMUtils.getFirstChildWithName(doc.getDocumentElement(), WSDL_NAMESPACE, "binding");
         assertNotNull(binding);
         
@@ -94,8 +101,14 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         assertEquals(1, policyMessages.size());
         
         assertEquals("UsernameToken", getPolicyId(policyMessages.get(0)));
+        
+        Element exactlyOne = DOMUtils.getFirstChildWithName(policyMessages.get(0), "", "ExactlyOne");
+        assertNull(exactlyOne);
+        
+        exactlyOne = DOMUtils.getFirstChildWithName(policyMessages.get(0), Constants.URI_POLICY_13_NS, "ExactlyOne");
+        assertNotNull(exactlyOne);
     }
-    
+
     @org.junit.Test
     public void testJavaFirstWsdl() throws Exception {
         Document doc = loadWsdl("JavaFirstPolicyService");
@@ -123,6 +136,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         
         List<Element> policyMessages = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
                                                                     Constants.URI_POLICY_NS, "Policy");
+        
         assertEquals(2, policyMessages.size());
         
         // validate that both the internal and external policies are included
@@ -135,7 +149,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
                                                          + "/" + serviceName + "?wsdl");
         InputStream is = connection.getInputStream();
         String wsdlContents = IOUtils.toString(is);
-
+        
+        //System.out.println(wsdlContents);
         return DOMUtils.readXml(new StringReader(wsdlContents));
     }
     
