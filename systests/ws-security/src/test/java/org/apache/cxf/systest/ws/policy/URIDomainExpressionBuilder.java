@@ -35,7 +35,7 @@ public class URIDomainExpressionBuilder implements DomainExpressionBuilder {
 
     @Override
     public DomainExpression build(Element paramElement) {
-        return new UriDomainExpression();
+        return new UriDomainExpression(paramElement.getTextContent());
     }
 
     @Override

@@ -19,21 +19,13 @@
 
 package org.apache.cxf.systest.ws.policy;
 
-import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-@WebService(name = "JavaFirstAttachmentPolicyService", 
-targetNamespace = "http://www.example.org/contract/JavaFirstAttachmentPolicyService")
-public interface JavaFirstAttachmentPolicyService {
-    @WebMethod(operationName = "doOperationLevelPolicy")
-    void doOperationLevelPolicy();
+@WebService(endpointInterface = "org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService", 
+serviceName = "SslUsernamePasswordAttachmentService", 
+targetNamespace = "http://www.example.org/contract/SslUsernamePasswordAttachmentService")
+public class SslUsernamePasswordAttachmentServiceImpl implements SslUsernamePasswordAttachmentService {
+    public void doSslAndUsernamePasswordPolicy() {
+    }
 
-    @WebMethod(operationName = "doInputMessagePolicy")
-    void doInputMessagePolicy();
-
-    @WebMethod(operationName = "doOutputMessagePolicy")
-    void doOutputMessagePolicy();
-    
-    @WebMethod(operationName = "doNoPolicy")
-    void doNoPolicy();    
 }

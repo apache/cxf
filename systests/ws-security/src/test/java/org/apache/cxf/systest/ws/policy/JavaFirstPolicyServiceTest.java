@@ -22,21 +22,33 @@ package org.apache.cxf.systest.ws.policy;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.policy.server.JavaFirstPolicyServer;
+import org.apache.cxf.systest.ws.wssec11.client.UTPasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+
 import org.apache.neethi.Constants;
 
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
+
 import org.junit.BeforeClass;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(JavaFirstPolicyServer.class);
@@ -57,7 +69,103 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testUsernameTokenInterceptorNoPasswordValidation() {
+        ClassPathXmlApplicationContext ctx = 
+            new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+        
+        JavaFirstAttachmentPolicyService svc = 
+            (JavaFirstAttachmentPolicyService) ctx.getBean("JavaFirstAttachmentPolicyServiceClient");
+        
+        Client client = ClientProxy.getClient(svc);
+        client.getEndpoint().getEndpointInfo().setAddress(
+                                "http://localhost:" + PORT + "/JavaFirstAttachmentPolicyService");
+       
+        WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
+        client.getEndpoint().getOutInterceptors().add(wssOut);
+        
+        // just some basic sanity tests first to make sure that auth is working where password is provided.
+        wssOut.setProperties(getPasswordProperties("alice", "password"));
+        svc.doInputMessagePolicy();
+        
+        wssOut.setProperties(getPasswordProperties("alice", "passwordX"));
+        try {
+            svc.doInputMessagePolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        
+        wssOut.setProperties(getNoPasswordProperties("alice"));
+        
+        try {
+            svc.doInputMessagePolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testUsernameTokenPolicyValidatorNoPasswordValidation() {
+        ClassPathXmlApplicationContext ctx = 
+            new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+        
+        SslUsernamePasswordAttachmentService svc = 
+            (SslUsernamePasswordAttachmentService) ctx.getBean("SslUsernamePasswordAttachmentServiceClient");
+        
+        Client client = ClientProxy.getClient(svc);
+        client.getEndpoint().getEndpointInfo().setAddress(
+                                "https://localhost:" + PORT2 + "/SslUsernamePasswordAttachmentService");
+       
+        WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
+        client.getEndpoint().getOutInterceptors().add(wssOut);
+        
+        // just some basic sanity tests first to make sure that auth is working where password is provided.
+        wssOut.setProperties(getPasswordProperties("alice", "password"));
+        svc.doSslAndUsernamePasswordPolicy();
+        
+        wssOut.setProperties(getPasswordProperties("alice", "passwordX"));
+        try {
+            svc.doSslAndUsernamePasswordPolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        
+        wssOut.setProperties(getNoPasswordProperties("alice"));
+        
+        try {
+            svc.doSslAndUsernamePasswordPolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+    
+    private Map<String, Object> getPasswordProperties(String username, String password) {
+        UTPasswordCallback callback = new UTPasswordCallback();
+        callback.setAliasPassword(username, password);
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProps.put(WSHandlerConstants.PW_CALLBACK_REF, callback);
+        outProps.put(WSHandlerConstants.USER, username);
+        return outProps;
+    }
+    
+    private Map<String, Object> getNoPasswordProperties(String username) {
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
+        outProps.put(WSHandlerConstants.USER, username);
+        return outProps;
+    }
+    
     @org.junit.Test
     public void testJavaFirstAttachmentWsdl() throws Exception {
         Document doc = loadWsdl("JavaFirstAttachmentPolicyService");
@@ -145,7 +253,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     private Document loadWsdl(String serviceName) throws Exception {
-        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT2
+        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT
                                                          + "/" + serviceName + "?wsdl");
         InputStream is = connection.getInputStream();
         String wsdlContents = IOUtils.toString(is);
