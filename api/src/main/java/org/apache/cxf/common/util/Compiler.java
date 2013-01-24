@@ -83,7 +83,7 @@ public class Compiler {
         classPath = StringUtils.isEmpty(s) ? null : s;
     }
     
-    private void addArgs(List<String> list) {
+    protected void addArgs(List<String> list) {
         if (verbose) {
             list.add("-verbose");
         }
@@ -184,7 +184,7 @@ public class Compiler {
         return internalCompile(list.toArray(new String[list.size()]), idx);
     }
 
-    private boolean useJava6Compiler(String[] files) {
+    protected boolean useJava6Compiler(String[] files) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
         Iterable<? extends JavaFileObject> fileList 
