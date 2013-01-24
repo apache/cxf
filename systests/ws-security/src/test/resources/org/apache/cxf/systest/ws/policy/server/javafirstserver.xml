@@ -35,8 +35,27 @@
 		</cxf:features>
 	</cxf:bus>
 
-	<p:externalAttachment
-		location="classpath:java_first_policies/AttachmentPolicy.xml" />
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.JavaFirstPolicyServer.2}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Bethal.jks"/>
+                </sec:keyManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+	<p:externalAttachment location="classpath:java_first_policies/UsernamePasswordAttachment.xml" />
+	<p:externalAttachment location="classpath:java_first_policies/SslUsernamePasswordAttachment.xml" />
 
 	<!-- register a policy attachment appliesto checker! -->
 	<bean id="uridomainexpressionbuilder"
@@ -45,16 +64,17 @@
 	<bean id="org.apache.cxf.systest.ws.policy.JavaFirstPolicyService"
 		class="org.apache.cxf.systest.ws.policy.JavaFirstPolicyServiceImpl" />
 
-	<bean
-		id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService"
+	<bean id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService"
 		class="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyServiceImpl" />
 
-	<bean
-		id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2"
+	<bean id="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2"
 		class="org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyServiceImpl" />
+
+	<bean id="org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService"
+		class="org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentServiceImpl" />
 
 	<jaxws:endpoint id="JavaFirstPolicyService"
-		address="http://localhost:${testutil.ports.JavaFirstPolicyServer.2}/JavaFirstPolicyService"
+		address="http://localhost:${testutil.ports.JavaFirstPolicyServer}/JavaFirstPolicyService"
 		implementor="#org.apache.cxf.systest.ws.policy.JavaFirstPolicyService">
 
 		<jaxws:properties>
@@ -64,16 +84,12 @@
 	</jaxws:endpoint>
 	
 	<jaxws:endpoint id="JavaFirstAttachmentPolicyService"
-		address="http://localhost:${testutil.ports.JavaFirstPolicyServer.2}/JavaFirstAttachmentPolicyService"
+		address="http://localhost:${testutil.ports.JavaFirstPolicyServer}/JavaFirstAttachmentPolicyService"
 		implementor="#org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService2">
 
 		<jaxws:properties>
 			<entry key="ws-security.callback-handler"
 				value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
-				
-			<entry key="ws-security.ut.validator">
-				<bean class="org.apache.cxf.systest.ws.policy.UsernameTokenValidator" />
-			</entry>
 		</jaxws:properties>
 
 		<jaxws:features>
@@ -82,8 +98,22 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint id="JavaFirstAttachmentPolicyService2"
-		address="http://localhost:${testutil.ports.JavaFirstPolicyServer.2}/JavaFirstAttachmentPolicyService2"
+		address="http://localhost:${testutil.ports.JavaFirstPolicyServer}/JavaFirstAttachmentPolicyService2"
 		implementor="#org.apache.cxf.systest.ws.policy.JavaFirstAttachmentPolicyService">
+
+		<jaxws:properties>
+			<entry key="ws-security.callback-handler"
+				value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+		</jaxws:properties>
+
+		<jaxws:features>
+			<p:policies />
+		</jaxws:features>
+	</jaxws:endpoint>
+	
+	<jaxws:endpoint id="SslUsernamePasswordAttachmentService"
+		address="https://localhost:${testutil.ports.JavaFirstPolicyServer.2}/SslUsernamePasswordAttachmentService"
+		implementor="#org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService">
 
 		<jaxws:properties>
 			<entry key="ws-security.callback-handler"

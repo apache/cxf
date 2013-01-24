@@ -53,8 +53,15 @@
 		<jaxws:properties>
 			<entry key="ws-security.username" value="jason" />
 		</jaxws:properties>
-		
-		
 	</jaxws:client>
 	
+	<jaxws:client 
+		id="SslUsernamePasswordAttachmentServiceClient" serviceClass="org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService">
+		<jaxws:properties>
+			<entry key="ws-security.username" value="jason" />
+		</jaxws:properties>
+	</jaxws:client>
+	
+	
+		
 </beans>

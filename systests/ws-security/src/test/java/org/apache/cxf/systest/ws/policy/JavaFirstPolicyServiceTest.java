@@ -71,7 +71,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
     
     @org.junit.Test
-    public void testExecuteJavaFirstWebService() {
+    @org.junit.Ignore
+    public void testUsernameTokenInterceptorNoPasswordValidation() {
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
         
@@ -80,8 +81,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         
         Client client = ClientProxy.getClient(svc);
         client.getEndpoint().getEndpointInfo().setAddress(
-                                "http://localhost:" + PORT2 + "/JavaFirstAttachmentPolicyService");
-        
+                                "http://localhost:" + PORT + "/JavaFirstAttachmentPolicyService");
        
         WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
         client.getEndpoint().getOutInterceptors().add(wssOut);
@@ -98,11 +98,48 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             assertTrue(true);
         }
         
-        // this test only 'works' because I overrode the default UsernameTokenValidator
         wssOut.setProperties(getNoPasswordProperties("alice"));
         
         try {
             svc.doInputMessagePolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testUsernameTokenPolicyValidatorNoPasswordValidation() {
+        ClassPathXmlApplicationContext ctx = 
+            new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+        
+        SslUsernamePasswordAttachmentService svc = 
+            (SslUsernamePasswordAttachmentService) ctx.getBean("SslUsernamePasswordAttachmentServiceClient");
+        
+        Client client = ClientProxy.getClient(svc);
+        client.getEndpoint().getEndpointInfo().setAddress(
+                                "https://localhost:" + PORT2 + "/SslUsernamePasswordAttachmentService");
+       
+        WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
+        client.getEndpoint().getOutInterceptors().add(wssOut);
+        
+        // just some basic sanity tests first to make sure that auth is working where password is provided.
+        wssOut.setProperties(getPasswordProperties("alice", "password"));
+        svc.doSslAndUsernamePasswordPolicy();
+        
+        wssOut.setProperties(getPasswordProperties("alice", "passwordX"));
+        try {
+            svc.doSslAndUsernamePasswordPolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        
+        wssOut.setProperties(getNoPasswordProperties("alice"));
+        
+        try {
+            svc.doSslAndUsernamePasswordPolicy();
             fail("Expected authentication failure");
         } catch (Exception e) {
             assertTrue(true);
@@ -216,7 +253,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     private Document loadWsdl(String serviceName) throws Exception {
-        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT2
+        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT
                                                          + "/" + serviceName + "?wsdl");
         InputStream is = connection.getInputStream();
         String wsdlContents = IOUtils.toString(is);

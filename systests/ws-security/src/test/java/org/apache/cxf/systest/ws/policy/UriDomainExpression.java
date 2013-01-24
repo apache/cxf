@@ -28,7 +28,10 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.policy.attachment.external.DomainExpression;
 
 public class UriDomainExpression implements DomainExpression {
-    public UriDomainExpression() {
+    private final String url;
+    
+    public UriDomainExpression(final String url) {
+        this.url = url;
     }
 
     @Override
@@ -37,16 +40,30 @@ public class UriDomainExpression implements DomainExpression {
     }
 
     @Override
-    public boolean appliesTo(BindingMessageInfo paramBindingMessageInfo) {
-        return ("doInputMessagePolicy".equals(paramBindingMessageInfo.getBindingOperation().getName().getLocalPart()) 
-            && MessageInfo.Type.INPUT.equals(paramBindingMessageInfo.getMessageInfo().getType()))
-            || ("doOutputMessagePolicy".equals(paramBindingMessageInfo.getBindingOperation().getName().getLocalPart()) 
-            && MessageInfo.Type.OUTPUT.equals(paramBindingMessageInfo.getMessageInfo().getType()));
+    public boolean appliesTo(BindingMessageInfo bmi) {
+        String serviceName = 
+            bmi.getBindingOperation().getBinding().getService().getName().getLocalPart();
+        
+        if ("JavaFirstAttachmentPolicyService".equals(serviceName) && "usernamepassword".equals(url)) {
+            return ("doInputMessagePolicy".equals(bmi.getBindingOperation().getName().getLocalPart()) 
+                && MessageInfo.Type.INPUT.equals(bmi.getMessageInfo().getType()))
+                || ("doOutputMessagePolicy".equals(bmi.getBindingOperation().getName().getLocalPart()) 
+                && MessageInfo.Type.OUTPUT.equals(bmi.getMessageInfo().getType()));
+        } else if ("SslUsernamePasswordAttachmentService".equals(serviceName) 
+            && "sslusernamepassword".equals(url)) {
+            return MessageInfo.Type.INPUT.equals(bmi.getMessageInfo().getType());
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public boolean appliesTo(BindingOperationInfo paramBindingOperationInfo) {
-        return "doOperationLevelPolicy".equals(paramBindingOperationInfo.getName().getLocalPart());
+    public boolean appliesTo(BindingOperationInfo boi) {
+        if ("usernamepassword".equals(url)) {
+            return "doOperationLevelPolicy".equals(boi.getName().getLocalPart());
+        } else {
+            return false;
+        }
     }
 
     @Override

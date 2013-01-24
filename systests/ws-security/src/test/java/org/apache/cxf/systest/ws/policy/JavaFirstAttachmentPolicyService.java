@@ -35,6 +35,5 @@ public interface JavaFirstAttachmentPolicyService {
     void doOutputMessagePolicy();
     
     @WebMethod(operationName = "doNoPolicy")
-    void doNoPolicy();
-    
+    void doNoPolicy();    
 }
