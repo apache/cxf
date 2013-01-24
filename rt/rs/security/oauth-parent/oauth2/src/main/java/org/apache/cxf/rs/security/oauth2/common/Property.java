@@ -49,4 +49,16 @@ public class Property {
         this.value = value;
     }
     
+    public int hashCode() {
+        return name.hashCode() + 37 * value.hashCode();    
+    }
+    
+    public boolean equalsTo(Object o) {
+        if (o instanceof Property) {
+            Property p = (Property)o;
+            return name.equals(p.name) && value.equals(p.value);
+        } else {
+            return false;
+        }
+    }
 }
