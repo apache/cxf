@@ -74,6 +74,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new CustomReaderInterceptor());
         providers.add(new CustomWriterInterceptor());
         providers.add(new CustomDynamicFeature());
+        providers.add(new PostMatchContainerRequestFilter());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -128,11 +129,12 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 || !"true".equals(context.getProperty("DynamicPrematchingFilter"))) {
                 throw new RuntimeException();
             }
-            context.getHeaders().add("BOOK", "123");
+            context.getHeaders().add("BOOK", "12");
         }
         
     }
     
+        
     @PreMatching
     @BindingPriority(2)
     private static class PreMatchDynamicContainerRequestFilter implements ContainerRequestFilter {
@@ -143,6 +145,19 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new RuntimeException();
             }
             context.setProperty("DynamicPrematchingFilter", "true");
+        }
+        
+    }
+    
+    @CustomHeaderAdded
+    private static class PostMatchContainerRequestFilter implements ContainerRequestFilter {
+
+        @Override
+        public void filter(ContainerRequestContext context) throws IOException {
+            String value = context.getHeaders().getFirst("Book");
+            if (value != null) {
+                context.getHeaders().addFirst("Book", value + "3");
+            }
         }
         
     }
