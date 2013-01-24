@@ -64,6 +64,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.FaultAction;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
@@ -370,12 +371,16 @@ final class InternalContextUtils {
             // wsa relevant faults should use the wsa-fault action value
             action = Names.WSA_DEFAULT_FAULT_ACTION;
         } else {
-            action = getActionFromServiceModel(message, fault);    
+            FaultAction annotation = null;
+            if (fault != null) {
+                annotation = fault.getClass().getAnnotation(FaultAction.class);
+            }
+            if ((annotation != null) && (annotation.value() != null)) {
+                action = annotation.value();
+            } else {
+                action = getActionFromServiceModel(message, fault);
+            }
         }
-        // REVISIT: add support for @{Fault}Action annotation (generated
-        // from the wsaw:Action WSDL element). For the moment we just
-        // pick up the wsaw:Action attribute by walking the WSDL model
-        // directly 
         LOG.fine("action: " + action);
         return action != null ? ContextUtils.getAttributedURI(action) : null;
     }
