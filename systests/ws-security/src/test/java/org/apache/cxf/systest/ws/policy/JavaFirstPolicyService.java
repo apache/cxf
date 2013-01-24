@@ -36,7 +36,7 @@ public interface JavaFirstPolicyService {
     void doOperationOne();
 
     @Policies({
-        @Policy(uri = "classpath:/java_first_policies/SslWithUsernamePasswordToken.xml", 
+        @Policy(uri = "classpath:/java_first_policies/UsernamePasswordToken.xml", 
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT)
     })
     @WebMethod(operationName = "doOperationTwo")
@@ -50,7 +50,7 @@ public interface JavaFirstPolicyService {
     void doOperationThree();
     
     @Policies({
-        @Policy(uri = "classpath:/java_first_policies/SslWithUsernamePasswordToken.xml", 
+        @Policy(uri = "classpath:/java_first_policies/UsernamePasswordToken.xml", 
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT)
     })
     @WebMethod(operationName = "doOperationFour")
