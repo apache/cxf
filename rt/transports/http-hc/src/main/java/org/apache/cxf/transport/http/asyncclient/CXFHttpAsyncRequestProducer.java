@@ -59,11 +59,7 @@ public class CXFHttpAsyncRequestProducer implements HttpAsyncRequestProducer {
         if (!uri.isAbsolute()) {
             throw new IllegalStateException("Request URI is not absolute");
         }
-        int i = uri.getPort();
-        if (i == -1) {
-            i = 80;
-        }
-        return new HttpHost(uri.getHost(), i, uri.getScheme());
+        return new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
     }
     
     public HttpRequest generateRequest() throws IOException, HttpException {
