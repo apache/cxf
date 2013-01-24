@@ -32,6 +32,7 @@ import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
@@ -187,13 +188,19 @@ public class Compiler {
     protected boolean useJava6Compiler(String[] files) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-        Iterable<? extends JavaFileObject> fileList 
-            = fileManager.getJavaFileObjectsFromStrings(Arrays.asList(files));
-        
-        
-        List<String> args = new ArrayList<String>();
-        addArgs(args);
-        DiagnosticListener<JavaFileObject> listener = new DiagnosticListener<JavaFileObject>() {
+        Iterable<? extends JavaFileObject> fileList = fileManager.getJavaFileObjectsFromStrings(Arrays
+            .asList(files));
+
+        return internalJava6Compile(compiler, wrapJavaFileManager(fileManager), setupDiagnosticListener(),
+                                    fileList);
+    }
+    
+    protected JavaFileManager wrapJavaFileManager(StandardJavaFileManager standardJavaFileManger) {
+        return standardJavaFileManger;
+    }
+    
+    protected DiagnosticListener<JavaFileObject> setupDiagnosticListener() {
+        return new DiagnosticListener<JavaFileObject>() {
             public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
                 switch (diagnostic.getKind()) {
                 case ERROR:
@@ -214,7 +221,14 @@ public class Compiler {
                 }   
             }
         };
-        CompilationTask task = compiler.getTask(null, fileManager, listener , args, null, fileList);
+    }
+    
+    protected boolean internalJava6Compile(JavaCompiler compiler, JavaFileManager fileManager,
+                                           DiagnosticListener<JavaFileObject> listener,
+                                           Iterable<? extends JavaFileObject> fileList) {
+        List<String> args = new ArrayList<String>();
+        addArgs(args);
+        CompilationTask task = compiler.getTask(null, fileManager, listener, args, null, fileList);
         Boolean ret = task.call();
         try {
             fileManager.close();
@@ -222,7 +236,6 @@ public class Compiler {
             System.err.print("[ERROR] IOException during compiling.");
             e.printStackTrace();
         }
-        
         return ret;
     }
 
