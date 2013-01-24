@@ -22,20 +22,33 @@ package org.apache.cxf.systest.ws.policy;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.policy.server.JavaFirstPolicyServer;
+import org.apache.cxf.systest.ws.wssec11.client.UTPasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+
 import org.apache.neethi.Constants;
 
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
+
 import org.junit.BeforeClass;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(JavaFirstPolicyServer.class);
@@ -56,15 +69,106 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testUsernameTokenInterceptorNoPasswordValidation() {
+        ClassPathXmlApplicationContext ctx = 
+            new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+        
+        JavaFirstAttachmentPolicyService svc = 
+            (JavaFirstAttachmentPolicyService) ctx.getBean("JavaFirstAttachmentPolicyServiceClient");
+        
+        Client client = ClientProxy.getClient(svc);
+        client.getEndpoint().getEndpointInfo().setAddress(
+                                "http://localhost:" + PORT + "/JavaFirstAttachmentPolicyService");
+       
+        WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
+        client.getEndpoint().getOutInterceptors().add(wssOut);
+        
+        // just some basic sanity tests first to make sure that auth is working where password is provided.
+        wssOut.setProperties(getPasswordProperties("alice", "password"));
+        svc.doInputMessagePolicy();
+        
+        wssOut.setProperties(getPasswordProperties("alice", "passwordX"));
+        try {
+            svc.doInputMessagePolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        
+        wssOut.setProperties(getNoPasswordProperties("alice"));
+        
+        try {
+            svc.doInputMessagePolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testUsernameTokenPolicyValidatorNoPasswordValidation() {
+        ClassPathXmlApplicationContext ctx = 
+            new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
+        
+        SslUsernamePasswordAttachmentService svc = 
+            (SslUsernamePasswordAttachmentService) ctx.getBean("SslUsernamePasswordAttachmentServiceClient");
+        
+        Client client = ClientProxy.getClient(svc);
+        client.getEndpoint().getEndpointInfo().setAddress(
+                                "https://localhost:" + PORT2 + "/SslUsernamePasswordAttachmentService");
+       
+        WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
+        client.getEndpoint().getOutInterceptors().add(wssOut);
+        
+        // just some basic sanity tests first to make sure that auth is working where password is provided.
+        wssOut.setProperties(getPasswordProperties("alice", "password"));
+        svc.doSslAndUsernamePasswordPolicy();
+        
+        wssOut.setProperties(getPasswordProperties("alice", "passwordX"));
+        try {
+            svc.doSslAndUsernamePasswordPolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        
+        wssOut.setProperties(getNoPasswordProperties("alice"));
+        
+        try {
+            svc.doSslAndUsernamePasswordPolicy();
+            fail("Expected authentication failure");
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+    }
+    
+    private Map<String, Object> getPasswordProperties(String username, String password) {
+        UTPasswordCallback callback = new UTPasswordCallback();
+        callback.setAliasPassword(username, password);
+        
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+        outProps.put(WSHandlerConstants.PW_CALLBACK_REF, callback);
+        outProps.put(WSHandlerConstants.USER, username);
+        return outProps;
+    }
+    
+    private Map<String, Object> getNoPasswordProperties(String username) {
+        Map<String, Object> outProps = new HashMap<String, Object>();
+        outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
+        outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
+        outProps.put(WSHandlerConstants.USER, username);
+        return outProps;
+    }
 
     @org.junit.Test
     public void testJavaFirstWsdl() throws Exception {
-        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT2
-                                                         + "/JavaFirstPolicyService?wsdl");
-        InputStream is = connection.getInputStream();
-        String wsdlContents = IOUtils.toString(is);
-
-        Document doc = DOMUtils.readXml(new StringReader(wsdlContents));
+        Document doc = loadWsdl("JavaFirstPolicyService");
 
         Element portType = DOMUtils.getFirstChildWithName(doc.getDocumentElement(), WSDL_NAMESPACE, "portType");
         assertNotNull(portType);
@@ -72,24 +176,39 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         List<Element> operationMessages = DOMUtils.getChildrenWithName(portType, WSDL_NAMESPACE, "operation");
         assertEquals(5, operationMessages.size());
         
-        Element operationOne = getOperationMessage("doOperationOne", operationMessages);
-        assertEquals("#InternalTransportAndUsernamePolicy", getPolicyReferenceId(operationOne));
-        Element operationTwo = getOperationMessage("doOperationTwo", operationMessages);
-        assertEquals("#TransportAndUsernamePolicy", getPolicyReferenceId(operationTwo));
-        Element operationThree = getOperationMessage("doOperationThree", operationMessages);
-        assertEquals("#InternalTransportAndUsernamePolicy", getPolicyReferenceId(operationThree));
-        Element operationFour = getOperationMessage("doOperationFour", operationMessages);
-        assertEquals("#TransportAndUsernamePolicy", getPolicyReferenceId(operationFour));
-        Element operationPing = getOperationMessage("doPing", operationMessages);
-        assertNull(getPolicyReferenceId(operationPing));
+        Element operationOne = getOperationElement("doOperationOne", operationMessages);
+        assertEquals("#InternalTransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationOne, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationTwo = getOperationElement("doOperationTwo", operationMessages);
+        assertEquals("#TransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationTwo, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationThree = getOperationElement("doOperationThree", operationMessages);
+        assertEquals("#InternalTransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationThree, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationFour = getOperationElement("doOperationFour", operationMessages);
+        assertEquals("#TransportAndUsernamePolicy", 
+                     getMessagePolicyReferenceId(operationFour, Type.INPUT, Constants.URI_POLICY_NS));
+        Element operationPing = getOperationElement("doPing", operationMessages);
+        assertNull(getMessagePolicyReferenceId(operationPing, Type.INPUT, Constants.URI_POLICY_NS));
         
         List<Element> policyMessages = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
                                                                     Constants.URI_POLICY_NS, "Policy");
+        
         assertEquals(2, policyMessages.size());
         
         // validate that both the internal and external policies are included
         assertEquals("TransportAndUsernamePolicy", getPolicyId(policyMessages.get(0)));
         assertEquals("InternalTransportAndUsernamePolicy", getPolicyId(policyMessages.get(1)));
+    }
+
+    private Document loadWsdl(String serviceName) throws Exception {
+        HttpURLConnection connection = getHttpConnection("http://localhost:" + PORT
+                                                         + "/" + serviceName + "?wsdl");
+        InputStream is = connection.getInputStream();
+        String wsdlContents = IOUtils.toString(is);
+        
+        //System.out.println(wsdlContents);
+        return DOMUtils.readXml(new StringReader(wsdlContents));
     }
     
     private String getPolicyId(Element element) {
@@ -97,7 +216,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
                                      PolicyConstants.WSU_ID_ATTR_NAME);
     }
     
-    private Element getOperationMessage(String operationName, List<Element> operationMessages) {
+    private Element getOperationElement(String operationName, List<Element> operationMessages) {
         Element operationElement = null;
         for (Element operation : operationMessages) {
             if (operationName.equals(operation.getAttribute("name"))) {
@@ -109,10 +228,11 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         return operationElement;
     }
     
-    private String getPolicyReferenceId(Element operationMessage) {
-        Element inputMessage = DOMUtils.getFirstChildWithName(operationMessage, WSDL_NAMESPACE, "input");
-        assertNotNull(inputMessage);
-        Element policyReference = DOMUtils.getFirstChildWithName(inputMessage, Constants.URI_POLICY_NS, 
+    private String getMessagePolicyReferenceId(Element operationElement, Type type, String policyNamespace) {
+        Element messageElement = DOMUtils.getFirstChildWithName(operationElement, WSDL_NAMESPACE, 
+                                                              type.name().toLowerCase());
+        assertNotNull(messageElement);
+        Element policyReference = DOMUtils.getFirstChildWithName(messageElement, policyNamespace, 
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttribute("URI");
