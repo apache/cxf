@@ -144,14 +144,6 @@ public class JAXRSInvoker extends AbstractInvoker {
         
         if (!wasSuspended) {
             
-            // Global and name-bound request filters
-            if (!ori.isSubResourceLocator() && JAXRSUtils.runContainerRequestFilters(
-                                                  providerFactory,
-                                                  exchange.getInMessage(),
-                                                  false, ori.getNameBindings())) {
-                return new MessageContentsList(exchange.get(Response.class));
-            }
-            
             pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), inMessage);
             
             final boolean contextsAvailable = cri.contextsAvailable();
@@ -217,16 +209,15 @@ public class JAXRSInvoker extends AbstractInvoker {
         ClassResourceInfo subCri = null;
         if (ori.isSubResourceLocator()) {
             try {
-                Message msg = exchange.getInMessage();
-                MultivaluedMap<String, String> values = getTemplateValues(msg);
+                MultivaluedMap<String, String> values = getTemplateValues(inMessage);
                 String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
-                String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD);
-                String contentType = (String)msg.get(Message.CONTENT_TYPE);
+                String httpMethod = (String)inMessage.get(Message.HTTP_REQUEST_METHOD);
+                String contentType = (String)inMessage.get(Message.CONTENT_TYPE);
                 if (contentType == null) {
                     contentType = "*/*";
                 }
                 List<MediaType> acceptContentType =
-                    (List<MediaType>)msg.getExchange().get(Message.ACCEPT_CONTENT_TYPE);
+                    (List<MediaType>)exchange.get(Message.ACCEPT_CONTENT_TYPE);
 
                 result = checkResultObject(result, subResourcePath);
 
@@ -242,18 +233,25 @@ public class JAXRSInvoker extends AbstractInvoker {
                 }
 
                 OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri,
-                                                         exchange.getInMessage(),
+                                                         inMessage,
                                                          httpMethod,
                                                          values,
                                                          contentType,
                                                          acceptContentType,
                                                          true);
                 exchange.put(OperationResourceInfo.class, subOri);
-                msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
+                inMessage.put(URITemplate.TEMPLATE_PARAMETERS, values);
+            
+                if (JAXRSUtils.runContainerRequestFilters(providerFactory,
+                                                      inMessage,
+                                                      false, subOri.getNameBindings())) {
+                    return new MessageContentsList(exchange.get(Response.class));
+                }
+                
                 // work out request parameters for the sub-resource class. Here we
                 // presume InputStream has not been consumed yet by the root resource class.
-                List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
-                msg.setContent(List.class, newParams);
+                List<Object> newParams = JAXRSUtils.processParameters(subOri, values, inMessage);
+                inMessage.setContent(List.class, newParams);
 
                 return this.invoke(exchange, newParams, result);
             } catch (IOException ex) {
