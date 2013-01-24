@@ -136,11 +136,15 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
             p.setProxyServerType(p2.getProxyServerType());
         }
         p.setReferer(StringUtils.combine(p1.getReferer(), p2.getReferer()));
-        if (p1.isSetConnectionTimeout() || p2.isSetConnectionTimeout()) {
-            p.setConnectionTimeout(Math.min(p1.getConnectionTimeout(), p2.getConnectionTimeout()));
+        if (p1.isSetConnectionTimeout()) {
+            p.setConnectionTimeout(p1.getConnectionTimeout());
+        } else if (p2.isSetConnectionTimeout()) {
+            p.setConnectionTimeout(p2.getConnectionTimeout());
         }
-        if (p1.isSetReceiveTimeout() || p2.isSetReceiveTimeout()) {
-            p.setReceiveTimeout(Math.min(p1.getReceiveTimeout(), p2.getReceiveTimeout()));
+        if (p1.isSetReceiveTimeout()) {
+            p.setReceiveTimeout(p1.getReceiveTimeout());
+        } else if (p2.isSetReceiveTimeout()) {
+            p.setReceiveTimeout(p2.getReceiveTimeout());
         }
 
         return p;
