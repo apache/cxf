@@ -853,16 +853,18 @@ public class HTTPConduit
     
     public HTTPClientPolicy getClient(Message message) {
         ClientPolicyCalculator cpc = new ClientPolicyCalculator();
-        HTTPClientPolicy messagePol = message.get(HTTPClientPolicy.class);
-        if (messagePol != null) {
-            return cpc.intersect(messagePol, clientSidePolicy);
+        HTTPClientPolicy pol = message.get(HTTPClientPolicy.class);
+        if (pol != null) {
+            pol = cpc.intersect(pol, clientSidePolicy);
+        } else {
+            pol = clientSidePolicy;
         }
 
         PolicyDataEngine policyDataEngine = bus.getExtension(PolicyDataEngine.class);
         if (policyDataEngine == null) {
-            return clientSidePolicy;
+            return pol;
         }
-        return policyDataEngine.getPolicy(message, clientSidePolicy, cpc);
+        return policyDataEngine.getPolicy(message, pol, cpc);
     }
 
     /**
