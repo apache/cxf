@@ -222,6 +222,15 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         setExchangeProperties(message, ori, values, resources.size());
         
+        // Global and name-bound post-match request filters
+        if (JAXRSUtils.runContainerRequestFilters(providerFactory,
+                                                  message,
+                                                  false, 
+                                                  ori.getNameBindings())) {
+            return;
+        }
+        
+        
         //Process parameters
         try {
             List<Object> params = JAXRSUtils.processParameters(ori, values, message);
