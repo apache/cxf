@@ -43,6 +43,7 @@ import org.apache.cxf.rs.security.oauth2.common.Property;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.provider.ResourceOwnerNameProvider;
 import org.apache.cxf.rs.security.oauth2.provider.SessionAuthenticityTokenProvider;
 import org.apache.cxf.rs.security.oauth2.provider.SubjectCreator;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -59,6 +60,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private boolean isClientConfidential;
     private SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider;
     private SubjectCreator subjectCreator;
+    private ResourceOwnerNameProvider resourceOwnerNameProvider;
     
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType,
@@ -193,8 +195,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     
     protected void personalizeData(OAuthAuthorizationData data, UserSubject userSubject) {
-        // at the moment the only option to map a subject login name 
-        // to an actual name is to extend this method, a mapper interface can be introduced too
+        if (resourceOwnerNameProvider != null) {
+            data.setEndUserName(resourceOwnerNameProvider.getName(userSubject));
+        }
     }
     
     /**
@@ -368,5 +371,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         }
         return client;
         
+    }
+
+    public void setResourceOwnerNameProvider(ResourceOwnerNameProvider resourceOwnerNameProvider) {
+        this.resourceOwnerNameProvider = resourceOwnerNameProvider;
     }
 }
