@@ -50,6 +50,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private Map<String, String> outAppendMap;
     private List<String> outDropElements;
     private boolean attributesToElements;
+    private boolean skipOnFault;
     private String contextPropertyName;
     private String defaultNamespace;
     
@@ -84,7 +85,7 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
-        if (null != message.getContent(Exception.class)) {
+        if (skipOnFault && null != message.getContent(Exception.class)) {
             return;
         }
         
@@ -127,6 +128,10 @@ public class TransformOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void setAttributesToElements(boolean value) {
         this.attributesToElements = value;
+    }
+    
+    public void setSkipOnFault(boolean value) {
+        this.skipOnFault = value;
     }
     
     protected boolean isHttpVerbSupported(Message message) {
