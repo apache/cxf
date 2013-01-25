@@ -107,4 +107,7 @@ public class MacAccessTokenValidator implements AccessTokenValidator {
         this.dataProvider = dataProvider;
     }
 
+    public void setNonceVerifier(NonceVerifier nonceVerifier) {
+        this.nonceVerifier = nonceVerifier;
+    }
 }
