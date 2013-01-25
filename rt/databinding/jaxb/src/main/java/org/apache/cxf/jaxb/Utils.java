@@ -148,21 +148,26 @@ final class Utils {
     }
     
     private static boolean isGetter(Method m) {
-        Class<?> declaringClass = m.getDeclaringClass();
-        if (m.getReturnType() != Void.class && m.getParameterTypes().length == 0) {
-            final int index = getterIndex(m.getName());
-            if (index != -1) {
-                String setterName = "set" + m.getName().substring(index);
-                Class<?> paramTypes = m.getReturnType();
-                Method setter = getDeclaredMethod(declaringClass, setterName, paramTypes);
-                
-                if (setter != null && setter.isAnnotationPresent(XmlTransient.class)) {
-                    return false;
-                } 
+        if (m.getReturnType() != Void.class && m.getReturnType() != Void.TYPE && m.getParameterTypes().length == 0) {
+            Method setter = getSetter(m);
+            if (setter != null) {
+                return !setter.isAnnotationPresent(XmlTransient.class);
+            }
+            if (getterIndex(m.getName()) > -1) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static Method getSetter(Method m) {
+        final int index = getterIndex(m.getName());
+        if (index != -1) {
+            String setterName = "set" + m.getName().substring(index);
+            Class<?> paramTypes = m.getReturnType();
+            return getDeclaredMethod(m.getDeclaringClass(), setterName, paramTypes);
+        }
+        return null;
     }
     
     private static boolean isSetter(Method m) {
@@ -266,6 +271,12 @@ final class Utils {
     static XmlJavaTypeAdapter getMethodXJTA(final Method m) {
         XmlJavaTypeAdapter adapter = m.getAnnotation(XmlJavaTypeAdapter.class);
         if (adapter == null) {
+            Method setter = getSetter(m);
+            if (setter != null) {
+                adapter = setter.getAnnotation(XmlJavaTypeAdapter.class);
+            }
+        }
+        if (adapter == null) {
             adapter = m.getReturnType().getAnnotation(XmlJavaTypeAdapter.class);
         }
         if (adapter == null) {
@@ -281,7 +292,7 @@ final class Utils {
         }
         return adapter;
     }
-
+    
     static Type getTypeFromXmlAdapter(XmlJavaTypeAdapter xjta) {
         if (xjta != null) {
             Class<?> c2 = xjta.value();
