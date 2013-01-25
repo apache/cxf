@@ -56,7 +56,6 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenInterceptorNoPasswordValidation() {
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
@@ -94,7 +93,6 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenPolicyValidatorNoPasswordValidation() {
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/policy/client/javafirstclient.xml");
