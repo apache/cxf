@@ -153,7 +153,9 @@ final class Utils {
             if (setter != null) {
                 return !setter.isAnnotationPresent(XmlTransient.class);
             }
-            return true;
+            if (getterIndex(m.getName()) > -1) {
+                return true;
+            }
         }
         return false;
     }
