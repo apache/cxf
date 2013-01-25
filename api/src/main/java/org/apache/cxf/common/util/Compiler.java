@@ -68,7 +68,7 @@ public class Compiler {
         classPath = StringUtils.isEmpty(s) ? null : s;
     }
     
-    private void addArgs(List<String> list) {
+    protected void addArgs(List<String> list) {
         if (verbose) {
             list.add("-verbose");
         }
@@ -174,7 +174,7 @@ public class Compiler {
         return internalCompile(list.toArray(new String[list.size()]), idx);
     }
 
-    private boolean useJava6Compiler(String[] files) 
+    protected boolean useJava6Compiler(String[] files) 
         throws Exception {
         
         Object compiler = Class.forName("javax.tools.ToolProvider")
@@ -200,6 +200,7 @@ public class Compiler {
                                                             args, null, fileList);
         Boolean ret = (Boolean)task.getClass().getMethod("call").invoke(task);
         fileManager.getClass().getMethod("close").invoke(fileManager);
+
         return ret;
     }
 

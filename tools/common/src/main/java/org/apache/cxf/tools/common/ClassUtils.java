@@ -40,8 +40,11 @@ public class ClassUtils {
     protected static final Logger LOG = LogUtils.getL7dLogger(ClassUtils.class);
     
     public void compile(ToolContext context) throws ToolException {
-        Compiler compiler = new Compiler();
-        
+        Compiler compiler = (Compiler)context.get(ToolConstants.COMPILER);
+        if (compiler == null) {
+            compiler = new Compiler();
+        }
+
         if (context.isVerbose()) {
             compiler.setVerbose(true);
         }
