@@ -55,6 +55,7 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
@@ -263,8 +264,11 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
             tok = (UsernameToken)ai.getAssertion();
             if (princ != null && tok.isHashPassword() != princ.isPasswordDigest()) {
                 ai.setNotAsserted("Password hashing policy not enforced");
+            } else if (princ != null && !tok.isNoPassword() && (princ.getPassword() == null)
+                && isNonEndorsingSupportingToken(tok)) {
+                ai.setNotAsserted("Username Token No Password supplied");
             } else {
-                ai.setAsserted(true);                
+                ai.setAsserted(true);         
             }
         }
         ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
@@ -276,6 +280,26 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
             ai.setAsserted(true);
         }
         return tok;
+    }
+    
+    /**
+     * Return true if this UsernameToken policy is a (non-endorsing)SupportingToken. If this is
+     * true then the corresponding UsernameToken must have a password element.
+     */
+    private boolean isNonEndorsingSupportingToken(
+        org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy
+    ) {
+        SupportingToken supportingToken = usernameTokenPolicy.getSupportingToken();
+        if (supportingToken != null) {
+            SPConstants.SupportTokenType type = supportingToken.getTokenType();
+            if (type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SUPPORTING
+                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED
+                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED
+                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void addUsernameToken(SoapMessage message) {

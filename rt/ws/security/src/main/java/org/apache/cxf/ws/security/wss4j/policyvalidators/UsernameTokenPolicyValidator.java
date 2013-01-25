@@ -29,6 +29,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -94,10 +96,15 @@ public class UsernameTokenPolicyValidator
                 ai.setNotAsserted("Password hashing policy not enforced");
                 return false;
             }
-            if (usernameTokenPolicy.isNoPassword() && usernameToken.getPassword() != null) {
+            if (usernameTokenPolicy.isNoPassword() && (usernameToken.getPassword() != null)) {
                 ai.setNotAsserted("Username Token NoPassword policy not enforced");
                 return false;
+            } else if (!usernameTokenPolicy.isNoPassword() && (usernameToken.getPassword() == null)
+                && isNonEndorsingSupportingToken(usernameTokenPolicy)) {
+                ai.setNotAsserted("Username Token No Password supplied");
+                return false;
             }
+            
             if (usernameTokenPolicy.isRequireCreated() 
                 && (usernameToken.getCreated() == null || usernameToken.isHashed())) {
                 ai.setNotAsserted("Username Token Created policy not enforced");
@@ -110,6 +117,26 @@ public class UsernameTokenPolicyValidator
             }
         }
         return true;
+    }
+    
+    /**
+     * Return true if this UsernameToken policy is a (non-endorsing)SupportingToken. If this is
+     * true then the corresponding UsernameToken must have a password element.
+     */
+    private boolean isNonEndorsingSupportingToken(
+        org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy
+    ) {
+        SupportingToken supportingToken = usernameTokenPolicy.getSupportingToken();
+        if (supportingToken != null) {
+            SPConstants.SupportTokenType type = supportingToken.getTokenType();
+            if (type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SUPPORTING
+                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED
+                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED
+                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }
