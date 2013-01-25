@@ -63,6 +63,10 @@ public class StaxTransformFeature extends AbstractFeature {
     public void setAttributesToElements(boolean value) {
         out.setAttributesToElements(value);
     }
+
+    public void setSkipOnFault(boolean value) {
+        out.setAttributesToElements(value);
+    }
     
     public void setOutAppendElements(Map<String, String> map) {
         out.setOutAppendElements(map);
