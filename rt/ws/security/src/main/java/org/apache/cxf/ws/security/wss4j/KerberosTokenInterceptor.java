@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -37,14 +36,12 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -75,7 +72,8 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
         Element el = (Element)h.getObject();
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
-            if ("BinarySecurityToken".equals(child.getLocalName())) {
+            if (WSConstants.BINARY_TOKEN_LN.equals(child.getLocalName())
+                && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
                 try {
                     List<WSSecurityEngineResult> bstResults = processToken(child, message);
                     if (bstResults != null) {
@@ -88,7 +86,7 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
                         WSHandlerResult rResult = new WSHandlerResult(null, bstResults);
                         results.add(0, rResult);
 
-                        assertTokens(message);
+                        assertTokens(message, SP12Constants.KERBEROS_TOKEN, false);
                         
                         Principal principal = 
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -145,24 +143,8 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected Token assertTokens(SoapMessage message) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.KERBEROS_TOKEN);
-        KerberosToken tok = null;
-        for (AssertionInfo ai : ais) {
-            tok = (KerberosToken)ai.getAssertion();
-            ai.setAsserted(true);                
-        }
-        ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
-        ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
-        return tok;
+        return assertTokens(message, SP12Constants.KERBEROS_TOKEN, true);
     }
-
 
     protected void addToken(SoapMessage message) {
         SecurityToken securityToken = getSecurityToken(message);
