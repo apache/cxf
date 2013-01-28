@@ -42,8 +42,8 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
+import org.apache.cxf.ws.security.wss4j.KerberosTokenInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
-import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.KerberosTokenPolicyValidator;
 import org.apache.ws.security.WSConstants;
@@ -62,16 +62,14 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
 
     public KerberosTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.KERBEROS_TOKEN, SP12Constants.KERBEROS_TOKEN));
-        
-        this.getOutInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
-        this.getOutFaultInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
-        this.getInInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
-        this.getInFaultInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
-        
+       
         this.getOutInterceptors().add(new KerberosTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new KerberosTokenOutInterceptor());
         this.getInInterceptors().add(new KerberosTokenInInterceptor());
         this.getInFaultInterceptors().add(new KerberosTokenInInterceptor());
+        
+        this.getOutInterceptors().add(new KerberosTokenInterceptor());
+        this.getInInterceptors().add(new KerberosTokenInterceptor());
     }
     
     

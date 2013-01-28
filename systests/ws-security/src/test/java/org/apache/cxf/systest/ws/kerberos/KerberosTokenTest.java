@@ -155,6 +155,35 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
+    public void testKerberosSupporting() throws Exception {
+        
+        if (!unrestrictedPoliciesInstalled) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = KerberosTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = KerberosTokenTest.class.getResource("DoubleItKerberos.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItKerberosSupportingPort");
+        DoubleItPortType kerberosPort = 
+                service.getPort(portQName, DoubleItPortType.class);
+
+        updateAddressPort(kerberosPort, PORT);
+        
+        int result = kerberosPort.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)kerberosPort).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
     public void testKerberosOverAsymmetric() throws Exception {
         
         if (!unrestrictedPoliciesInstalled) {
@@ -395,6 +424,5 @@ public class KerberosTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }
-    
     
 }

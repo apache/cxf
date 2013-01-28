@@ -90,6 +90,24 @@
         </wsdl:operation>
     </wsdl:binding>
     
+    <wsdl:binding name="DoubleItKerberosSupportingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItKerberosSupportingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    
     <wsdl:binding name="DoubleItKerberosAsymmetricBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItKerberosAsymmetricPolicy" />
         <soap:binding style="document"
@@ -282,6 +300,10 @@
                    binding="tns:DoubleItKerberosSymmetricSupportingBinding">
             <soap:address location="http://localhost:9001/DoubleItKerberosSymmetricSupporting" />
         </wsdl:port>
+        <wsdl:port name="DoubleItKerberosSupportingPort" 
+                   binding="tns:DoubleItKerberosSupportingBinding">
+            <soap:address location="http://localhost:9001/DoubleItKerberosSupporting" />
+        </wsdl:port>
         <wsdl:port name="DoubleItKerberosAsymmetricPort"
                    binding="tns:DoubleItKerberosAsymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItKerberosAsymmetric" />
@@ -447,6 +469,23 @@
                   <sp:MustSupportRefEncryptedKey/>
                </wsp:Policy>
             </sp:Wss11>
+            <sp:SupportingTokens>
+                <wsp:Policy>
+                    <sp:KerberosToken
+                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Once">
+                        <wsp:Policy>
+                            <sp:WssGssKerberosV5ApReqToken11/>
+                        </wsp:Policy>
+                    </sp:KerberosToken>
+                </wsp:Policy>
+            </sp:SupportingTokens>
+         </wsp:All>
+      </wsp:ExactlyOne>
+    </wsp:Policy>
+    
+    <wsp:Policy wsu:Id="DoubleItKerberosSupportingPolicy">
+      <wsp:ExactlyOne>
+         <wsp:All>
             <sp:SupportingTokens>
                 <wsp:Policy>
                     <sp:KerberosToken
