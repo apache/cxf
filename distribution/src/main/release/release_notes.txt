@@ -1,4 +1,4 @@
-Apache CXF 2.7.2 Release Notes
+Apache CXF 2.7.3 Release Notes
 
 1. Overview
 
@@ -28,7 +28,7 @@ In particular, Apache CXF no longer supports Java5.   Users must upgrade to
 Java 6 in order to upgrade to Apache CXF 2.7.x.
 
 
-2.7.2 fixes over 30 JIRA issues reported by users and the community.
+2.7.3 fixes over 35 JIRA issues reported by users and the community.
 
 
 
@@ -73,41 +73,48 @@ for caveats when upgrading from CXF 2.6.x to 2.7.x.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-    * [CXF-4680] - Fault properties not ordered correctly in WSDL according to JAX-WS spec
-    * [CXF-4684] - SOAPFault message improvement in CXF when there is unchecked NPE
-    * [CXF-4687] - cxf-codegen-plugin breaks mvn deploy when proxy exists
-    * [CXF-4689] - stax outTransform feature may fail to remove the default namespace from an element
-    * [CXF-4690] - stax's inTransform feature does not work with a generic provider's Source based service
-    * [CXF-4694] - WS-RM is not returning a correct soap fault message to the client
-    * [CXF-4695] - autoRewriteSoapAddressForAllServices does not work for relative enpoint addresses
-    * [CXF-4697] - IllegalArgumentException thrown if I have a MultivaluedMap parameter in multipart/mixed Content Type
-    * [CXF-4699] - Schema validation on Weblogic 10.3 fails with AssertionError
-    * [CXF-4704] - Class loading problem using CXFNonSpringJaxrsServlet in OSGi environment
-    * [CXF-4706] - javax.xml.bind.UnmarshalException at server startup
-    * [CXF-4707] - OasisCatalogManager throws exception with backslash URL reference to jax-ws-catalog.xml
-    * [CXF-4708] - Unnable to publish service when XmlAdapter has generic parameter
-    * [CXF-4713] - Method inherited from super interface can not be part of operations in wsdl 
-    * [CXF-4714] - CopyingOutputStream may loop in some cases 
-    * [CXF-4715] - WS-security encrypted elements with XPath . CXF generates wsu:Id attribute, XSD validation on Metro fails
-    * [CXF-4716] - WS-security policies enforcement with CXF server, bad policy selected
-    * [CXF-4718] - UsernameTokenInterceptor is not caching nonces
-    * [CXF-4720] - Binary size is equal with MTOM threshold should not be sent as attachment
-    * [CXF-4723] - stax outTransform may generate duplicate namespace declarations for global attributes
-    * [CXF-4725] - duplicated message key found
-    * [CXF-4727] - NPE in org.apache.cxf.resource.ExtendedURIResolver
-    * [CXF-4728] - STS KeyIdentifier AttachedReference shouldn't use a URI fragment
+    * [CXF-4676] - Partial WSDL support in CXF 
+    * [CXF-4730] - unwanted {0} in the NO_SETTER_OR_FIELD_FOR_RESOURCE from cxf-api \org\apache\cxf\common\injection\Messages.properties
+    * [CXF-4732] - Wrong port address generated in wsdl when using autoRewriteSoapAddressForAllServices
+    * [CXF-4735] - @XmlJavaTypeAdapter ignored on exception setters
+    * [CXF-4742] - Not possible to disable token renewal in STS client
+    * [CXF-4745] - jaxb errors when calling with @WebParam and header=true
+    * [CXF-4746] - STS issues invalid SAML 1.1 Assertions under certain conditions
+    * [CXF-4750] - Wrong return type for enumeration in generated service interface using xmlbeans
+    * [CXF-4752] - TransformOutInterceptor does not transform SoapFaults
+    * [CXF-4753] - stax outTransform cannot deep-drop an element that has some attributes
+    * [CXF-4755] - StackOverflowError when ASMHelper tries to getClassCode from a parametrized type <E extends Enum>
+    * [CXF-4758] - Receive error message when trying to connect to crm 2011 Webservices with https binding - javax.xml.ws.soap.SOAPFaultException: An error occurred when verifying security for the message.
+    * [CXF-4762] - HTTPS does not work with asynch client unless you specify port number 
+    * [CXF-4765] - can't set timeout in message HTTPClientPolicy if it is not set in conduit
+    * [CXF-4766] - WADL to Java generator does not strip custom regular expressions from method names
+    * [CXF-4767] - JAX-RS endpoints fail to register properly with ws-discovery service
+    * [CXF-4769] - Refactor STSClient
+    * [CXF-4770] - When passing NULL @PathParam to JAXRS Client Proxy it now throws NullPointerException instead of IllegalArgumentException as in prior releases (2.7.0)
+    * [CXF-4773] - StackOverflowError when JAXBSchemaInitializer tries to process  parametrized type Enum<E>
+    * [CXF-4774] - Java First ws policy attachments are not being serialised correctly
+    * [CXF-4775] - HttpHeaders.getRequestHeader splits complex header values
+    * [CXF-4776] - UsernameTokenValidator do not validate that password is not provided.
+    * [CXF-4781] - MacAccessTokenValidator needs a setter for the nonceVerifier variable
+    * [CXF-4784] - enhance CXF to follow jaxws spec 3.6.2.3 when using RI or Axis2 client
+    * [CXF-4787] - WADL to Java generator uses the system encoding to create the files
 
 ** Improvement
-    * [CXF-2335] - Support @Context injection for JAX-RS Subresources
-    * [CXF-4289] - Coping Request SOAP Headers to Fault response
-    * [CXF-4668] - STS: provide callback to modify AssertionWrapper before signing
-    * [CXF-4693] - Search visitors are not thread safe
-    * [CXF-4700] - Add an operation for manually removing WS-RM messages and sequences over JMX
-    * [CXF-4701] - MultipartProvider should be able to let InputStream be handled by default providers
-    * [CXF-4702] - Make it possible to get global JAX-RS providers registered on the bus
-    * [CXF-4703] - CXF loading performance
-    * [CXF-4705] - Allow STS to configure signature + encryption crypto objects via URL + Properties object
-    * [CXF-4712] - Minor performance improvements (bus start and service build from wsdl)
-    * [CXF-4717] - should add dependency='true' for javamail bundle in cxf features.xml
-    * [CXF-4724] - cxf-codegen-plugin should be able to use proxy.user/proxy.password from maven settings.xml
+    * [CXF-4731] - add dependency='true' for stax-api bundle in cxf features.xml
+    * [CXF-4748] - getMessage from java.lang.Throwable is excluded from accepted method
+    * [CXF-4760] - Provide ability to disable chunked transfer encoding for BinaryDataProvider
+    * [CXF-4768] - Refact SwaOutInterceptor for more compatible JAXB Impl usage
+    * [CXF-4777] - Allow providing CXF compiler instance to be used in WSDLToJava
+    * [CXF-4786] - Support KerberosToken SupportingToken policies without a security binding
+
+** New Feature
+    * [CXF-4756] - Introduce @FaultAction annotation to specify WSA Action for Faults
+
+** Task
+    * [CXF-4744] - Upgrade to Jettison 1.3.3
+    * [CXF-4783] - Provide default OAuth2 MAC token nonce verifier
+
+** Test
+    * [CXF-4761] - ensure CXF follow jaxws spec 3.6.2.3
+
 
