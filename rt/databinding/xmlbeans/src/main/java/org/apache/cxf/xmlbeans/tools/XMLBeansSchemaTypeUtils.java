@@ -90,13 +90,8 @@ public final class XMLBeansSchemaTypeUtils {
     public static String getNaturalJavaClassName(SchemaType st) {
         SchemaType schemaType = st;
         String result = null;
-        if (st.getBaseEnumType() != null) {
-            if (hasBase(st)) {
-                schemaType = st.getBaseEnumType();
-                return schemaType.getFullJavaName().replace('$', '.') + ".Enum";
-            } else {
-                return st.getFullJavaName().replace('$', '.') + ".Enum";
-            }
+        if (st.getBaseEnumType() != null && !hasBase(st)) {
+            return st.getFullJavaName().replace('$', '.') + ".Enum";
         } else if (st.isSimpleType() && !st.isBuiltinType()) {
             schemaType = st.getBaseType();
             while (schemaType != null && !schemaType.isBuiltinType()) {
