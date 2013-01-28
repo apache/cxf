@@ -1,4 +1,4 @@
-Apache CXF 2.5.8 Release Notes
+Apache CXF 2.5.9 Release Notes
 
 1. Overview
 
@@ -20,7 +20,7 @@ http://cxf.apache.org/docs/25-migration-guide.html
 for further information and requirements for upgrading to 2.5.x.
 
 
-2.5.8 fixes over 20 JIRA issues reported by users and the community.
+2.5.9 fixes over 18 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -64,28 +64,27 @@ for caveats when upgrading from CXF 2.4.x to 2.5.x.
 
 
 ** Bug
-    * [CXF-4680] - Fault properties not ordered correctly in WSDL according to JAX-WS spec
-    * [CXF-4684] - SOAPFault message improvement in CXF when there is unchecked NPE
-    * [CXF-4687] - cxf-codegen-plugin breaks mvn deploy when proxy exists
-    * [CXF-4689] - stax outTransform feature may fail to remove the default namespace from an element
-    * [CXF-4690] - stax's inTransform feature does not work with a generic provider's Source based service
-    * [CXF-4694] - WS-RM is not returning a correct soap fault message to the client
-    * [CXF-4697] - IllegalArgumentException thrown if I have a MultivaluedMap parameter in multipart/mixed Content Type
-    * [CXF-4699] - Schema validation on Weblogic 10.3 fails with AssertionError
-    * [CXF-4707] - OasisCatalogManager throws exception with backslash URL reference to jax-ws-catalog.xml
-    * [CXF-4708] - Unnable to publish service when XmlAdapter has generic parameter
-    * [CXF-4715] - WS-security encrypted elements with XPath . CXF generates wsu:Id attribute, XSD validation on Metro fails
-    * [CXF-4716] - WS-security policies enforcement with CXF server, bad policy selected
-    * [CXF-4718] - UsernameTokenInterceptor is not caching nonces
-    * [CXF-4720] - Binary size is equal with MTOM threshold should not be sent as attachment
-    * [CXF-4723] - stax outTransform may generate duplicate namespace declarations for global attributes
-    * [CXF-4725] - duplicated message key found
-    * [CXF-4727] - NPE in org.apache.cxf.resource.ExtendedURIResolver
-    * [CXF-4728] - STS KeyIdentifier AttachedReference shouldn't use a URI fragment
-
+    * [CXF-4676] - Partial WSDL support in CXF 
+    * [CXF-4730] - unwanted {0} in the NO_SETTER_OR_FIELD_FOR_RESOURCE from cxf-api \org\apache\cxf\common\injection\Messages.properties
+    * [CXF-4735] - @XmlJavaTypeAdapter ignored on exception setters
+    * [CXF-4746] - STS issues invalid SAML 1.1 Assertions under certain conditions
+    * [CXF-4750] - Wrong return type for enumeration in generated service interface using xmlbeans
+    * [CXF-4752] - TransformOutInterceptor does not transform SoapFaults
+    * [CXF-4753] - stax outTransform cannot deep-drop an element that has some attributes
+    * [CXF-4758] - Receive error message when trying to connect to crm 2011 Webservices with https binding - javax.xml.ws.soap.SOAPFaultException: An error occurred when verifying security for the message.
+    * [CXF-4766] - WADL to Java generator does not strip custom regular expressions from method names
+    * [CXF-4773] - StackOverflowError when JAXBSchemaInitializer tries to process  parametrized type Enum<E>
+    * [CXF-4775] - HttpHeaders.getRequestHeader splits complex header values
+    * [CXF-4776] - UsernameTokenValidator do not validate that password is not provided.
+    * [CXF-4784] - enhance CXF to follow jaxws spec 3.6.2.3 when using RI or Axis2 client
+    * [CXF-4787] - WADL to Java generator uses the system encoding to create the files
 
 ** Improvement
-    * [CXF-4703] - CXF loading performance
-    * [CXF-4717] - should add dependency='true' for javamail bundle in cxf features.xml
-    * [CXF-4724] - cxf-codegen-plugin should be able to use proxy.user/proxy.password from maven settings.xml
+    * [CXF-4731] - add dependency='true' for stax-api bundle in cxf features.xml
+    * [CXF-4768] - Refact SwaOutInterceptor for more compatible JAXB Impl usage
+    * [CXF-4786] - Support KerberosToken SupportingToken policies without a security binding
+
+** Test
+    * [CXF-4761] - ensure CXF follow jaxws spec 3.6.2.3
+
 
