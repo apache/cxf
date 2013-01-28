@@ -51,6 +51,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
@@ -86,7 +87,9 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         Element el = (Element)h.getObject();
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
-            if ("Assertion".equals(child.getLocalName())) {
+            if ("Assertion".equals(child.getLocalName())
+                && (WSConstants.SAML_NS.equals(child.getNamespaceURI())
+                    || WSConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
                 try {
                     List<WSSecurityEngineResult> samlResults = processToken(child, message);
                     if (samlResults != null) {
@@ -99,7 +102,16 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         WSHandlerResult rResult = new WSHandlerResult(null, samlResults);
                         results.add(0, rResult);
 
-                        assertTokens(message);
+                        boolean signed = false;
+                        for (WSSecurityEngineResult result : samlResults) {
+                            AssertionWrapper wrapper = 
+                                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                            if (wrapper.isSigned()) {
+                                signed = true;
+                                break;
+                            }
+                        }
+                        assertTokens(message, SP12Constants.SAML_TOKEN, signed);
                         
                         Principal principal = 
                             (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -163,24 +175,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     protected Token assertTokens(SoapMessage message) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SAML_TOKEN);
-        SamlToken tok = null;
-        for (AssertionInfo ai : ais) {
-            tok = (SamlToken)ai.getAssertion();
-            ai.setAsserted(true);                
-        }
-        ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
-        ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
-        return tok;
+        return assertTokens(message, SP12Constants.SAML_TOKEN, true);
     }
-
 
     protected void addToken(SoapMessage message) {
         WSSConfig.init();

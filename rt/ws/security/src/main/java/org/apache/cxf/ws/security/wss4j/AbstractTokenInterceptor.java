@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -42,11 +42,13 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSConstants;
@@ -58,11 +60,8 @@ import org.apache.ws.security.WSPasswordCallback;
  */
 public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSoapInterceptor.class);
-    private static final Set<QName> HEADERS = new HashSet<QName>();
-    static {
-        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
-        HEADERS.add(new QName(WSConstants.WSSE11_NS, "Security"));
-    }
+    private static final Set<QName> HEADERS = 
+        Collections.singleton(new QName(WSConstants.WSSE_NS, "Security"));
 
     /**
      * @param p
@@ -108,6 +107,37 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     protected abstract void addToken(SoapMessage message);
     
     protected abstract Token assertTokens(SoapMessage message);
+    
+    protected Token assertTokens(SoapMessage message, QName assertion, boolean signed) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(assertion);
+        Token tok = null;
+        for (AssertionInfo ai : ais) {
+            tok = (Token)ai.getAssertion();
+            ai.setAsserted(true);                
+        }
+        ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
+        for (AssertionInfo ai : ais) {
+            ai.setAsserted(true);
+        }
+        
+        if (signed || isTLSInUse(message)) {
+            ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
+        }
+        return tok;
+    }
+    
+    protected boolean isTLSInUse(SoapMessage message) {
+        // See whether TLS is in use or not
+        TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
+        if (tlsInfo != null) {
+            return true;
+        }
+        return false;
+    }
     
     protected CallbackHandler getCallback(SoapMessage message) {
         //Then try to get the password from the given callback handler

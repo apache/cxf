@@ -78,7 +78,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         Element el = (Element)h.getObject();
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
-            if (SPConstants.USERNAME_TOKEN.equals(child.getLocalName())) {
+            if (SPConstants.USERNAME_TOKEN.equals(child.getLocalName())
+                && WSConstants.WSSE_NS.equals(child.getNamespaceURI())) {
                 try  {
                     final WSUsernameTokenPrincipal princ = getPrincipal(child, message);
                     if (princ != null) {
@@ -97,7 +98,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                         WSHandlerResult rResult = new WSHandlerResult(null, v);
                         results.add(0, rResult);
 
-                        assertTokens(message, princ);
+                        assertTokens(message, princ, false);
                         message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, princ);                   
                         
                         SecurityContext sc = message.get(SecurityContext.class);
@@ -205,10 +206,14 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected UsernameToken assertTokens(SoapMessage message) {
-        return (UsernameToken)assertTokens(message, null);
+        return (UsernameToken)assertTokens(message, SP12Constants.USERNAME_TOKEN, true);
     }
     
-    private UsernameToken assertTokens(SoapMessage message, WSUsernameTokenPrincipal princ) {
+    private UsernameToken assertTokens(
+        SoapMessage message, 
+        WSUsernameTokenPrincipal princ,
+        boolean signed
+    ) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
         UsernameToken tok = null;
@@ -227,9 +232,11 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
         }
-        ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
+        if (signed || isTLSInUse(message)) {
+            ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
         }
         return tok;
     }
@@ -255,7 +262,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     protected void addToken(SoapMessage message) {
-        UsernameToken tok = assertTokens(message, null);
+        UsernameToken tok = assertTokens(message);
 
         Header h = findSecurityHeader(message, true);
         WSSecUsernameToken utBuilder = 
