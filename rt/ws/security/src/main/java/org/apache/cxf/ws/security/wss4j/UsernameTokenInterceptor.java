@@ -22,24 +22,15 @@ package org.apache.cxf.ws.security.wss4j;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
@@ -47,11 +38,9 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -75,54 +64,13 @@ import org.apache.ws.security.validate.Validator;
 /**
  * 
  */
-public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
-    private static final Logger LOG = LogUtils.getL7dLogger(UsernameTokenInterceptor.class);
-    private static final Set<QName> HEADERS = new HashSet<QName>();
-    static {
-        HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
-        HEADERS.add(new QName(WSConstants.WSSE11_NS, "Security"));
-    }
+public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
 
-    /**
-     * @param p
-     */
     public UsernameTokenInterceptor() {
-        super(Phase.PRE_PROTOCOL);
-        addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
-        addAfter(PolicyBasedWSS4JOutInterceptor.class.getName());
-    }
-    public Set<QName> getUnderstoodHeaders() {
-        return HEADERS;
+        super();
     }
 
-
-    public void handleMessage(SoapMessage message) throws Fault {
-
-        boolean isReq = MessageUtils.isRequestor(message);
-        boolean isOut = MessageUtils.isOutbound(message);
-        if (isReq != isOut) {
-            //outbound on server side and inbound on client side doesn't need
-            //any username token stuff, assert policies and return
-            assertUsernameTokens(message, null);
-            return;
-        }
-        if (isReq) {
-            if (message.containsKey(PolicyBasedWSS4JOutInterceptor.SECURITY_PROCESSED)) {
-                //The full policy interceptors handled this
-                return;
-            }
-            addUsernameToken(message);
-        } else {
-            if (message.containsKey(WSS4JInInterceptor.SECURITY_PROCESSED)) {
-                //The full policy interceptors handled this
-                return;
-            }
-            processUsernameToken(message);
-        }
-    }
-
-
-    private void processUsernameToken(SoapMessage message) {
+    protected void processToken(SoapMessage message) {
         Header h = findSecurityHeader(message, false);
         if (h == null) {
             return;
@@ -149,7 +97,7 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                         WSHandlerResult rResult = new WSHandlerResult(null, v);
                         results.add(0, rResult);
 
-                        assertUsernameTokens(message, princ);
+                        assertTokens(message, princ);
                         message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, princ);                   
                         
                         SecurityContext sc = message.get(SecurityContext.class);
@@ -256,7 +204,11 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         return null;
     }
     
-    private UsernameToken assertUsernameTokens(SoapMessage message, WSUsernameTokenPrincipal princ) {
+    protected UsernameToken assertTokens(SoapMessage message) {
+        return (UsernameToken)assertTokens(message, null);
+    }
+    
+    private UsernameToken assertTokens(SoapMessage message, WSUsernameTokenPrincipal princ) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
         UsernameToken tok = null;
@@ -302,8 +254,8 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         return false;
     }
 
-    private void addUsernameToken(SoapMessage message) {
-        UsernameToken tok = assertUsernameTokens(message, null);
+    protected void addToken(SoapMessage message) {
+        UsernameToken tok = assertTokens(message, null);
 
         Header h = findSecurityHeader(message, true);
         WSSecUsernameToken utBuilder = 
@@ -324,26 +276,6 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
     }
 
 
-    private Header findSecurityHeader(SoapMessage message, boolean create) {
-        for (Header h : message.getHeaders()) {
-            QName n = h.getName();
-            if (n.getLocalPart().equals("Security")
-                && (n.getNamespaceURI().equals(WSConstants.WSSE_NS) 
-                    || n.getNamespaceURI().equals(WSConstants.WSSE11_NS))) {
-                return h;
-            }
-        }
-        if (!create) {
-            return null;
-        }
-        Document doc = DOMUtils.createDocument();
-        Element el = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
-        el.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
-        SoapHeader sh = new SoapHeader(new QName(WSConstants.WSSE_NS, "Security"), el);
-        sh.setMustUnderstand(true);
-        message.getHeaders().add(sh);
-        return sh;
-    }
     protected WSSecUsernameToken addUsernameToken(SoapMessage message, UsernameToken token) {
         String userName = (String)message.getContextualProperty(SecurityConstants.USERNAME);
         WSSConfig wssConfig = (WSSConfig)message.getContextualProperty(WSSConfig.class.getName());
@@ -384,78 +316,6 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         }
         return null;
     }
-    private CallbackHandler getCallback(SoapMessage message) {
-        //Then try to get the password from the given callback handler
-        Object o = message.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-    
-        CallbackHandler handler = null;
-        if (o instanceof CallbackHandler) {
-            handler = (CallbackHandler)o;
-        } else if (o instanceof String) {
-            try {
-                handler = (CallbackHandler)ClassLoaderUtils
-                    .loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                handler = null;
-            }
-        }
-        return handler;
-    }
-    public String getPassword(String userName, UsernameToken info, int type, SoapMessage message) {
-        //Then try to get the password from the given callback handler
-    
-        CallbackHandler handler = getCallback(message);
-        if (handler == null) {
-            policyNotAsserted(info, "No callback handler and no password available", message);
-            return null;
-        }
-        
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName,
-                                                          type)};
-        try {
-            handler.handle(cb);
-        } catch (Exception e) {
-            policyNotAsserted(info, e, message);
-        }
-        
-        //get the password
-        return cb[0].getPassword();
-    }
-    protected void policyNotAsserted(UsernameToken assertion, String reason, SoapMessage message) {
-        if (assertion == null) {
-            return;
-        }
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
 
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == assertion) {
-                    ai.setNotAsserted(reason);
-                }
-            }
-        }
-        if (!assertion.isOptional()) {
-            throw new PolicyException(new Message(reason, LOG));
-        }
-    }
-    protected void policyNotAsserted(UsernameToken assertion, Exception reason, SoapMessage message) {
-        if (assertion == null) {
-            return;
-        }
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                if (ai.getAssertion() == assertion) {
-                    ai.setNotAsserted(reason.getMessage());
-                }
-            }
-        }
-        throw new PolicyException(reason);
-    }
-    
     
 }
