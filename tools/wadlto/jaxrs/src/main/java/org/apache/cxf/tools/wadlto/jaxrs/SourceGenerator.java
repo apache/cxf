@@ -24,8 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1255,9 +1257,16 @@ public class SourceGenerator {
         
         try {
             file.createNewFile();
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(content.getBytes());
-            fos.close();
+            Writer writer = null;
+            try {
+                writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+                writer.write(content);
+                writer.flush();
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                }
+            }
         } catch (FileNotFoundException ex) {
             LOG.warning(file.getAbsolutePath() + " is not found");
         } catch (IOException ex) {
