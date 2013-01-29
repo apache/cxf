@@ -51,6 +51,7 @@ import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -73,6 +74,7 @@ import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
@@ -594,15 +596,22 @@ public final class ProviderFactory {
         if (boundFilters.isEmpty()) {
             return Collections.emptyList();
         }
-        boolean namesEmpty = names == null || names.isEmpty();
+        names = names == null ? Collections.<String>emptyList() : names;
         
-        List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
-        // TODO: Replace with a plain array
+        MultivaluedMap<ProviderInfo<T>, String> map = 
+            new MetadataMap<ProviderInfo<T>, String>();
         for (Map.Entry<NameKey, ProviderInfo<T>> entry : boundFilters.entrySet()) {
             String entryName = entry.getKey().getName();
-            if (!namesEmpty && names.contains(entryName)
-                || entryName.equals(DEFAULT_FILTER_NAME_BINDING)) {
-                list.add(entry.getValue());                    
+            if (entryName.equals(DEFAULT_FILTER_NAME_BINDING)) {
+                map.put(entry.getValue(), Collections.<String>emptyList());
+            } else {
+                map.add(entry.getValue(), entryName);
+            }
+        }
+        List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
+        for (Map.Entry<ProviderInfo<T>, List<String>> entry : map.entrySet()) {
+            if (names.containsAll(entry.getValue())) {
+                list.add(entry.getKey());
             }
         }
         return list;

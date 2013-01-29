@@ -88,6 +88,7 @@ import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
 import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
+import org.apache.cxf.systest.jaxrs.BookServer20.PostMatchMode;
 
 @Path("/bookstore")
 @GZIP(threshold = 1)
@@ -493,6 +494,7 @@ public class BookStore {
     @GET
     @Path("/bookheaders/simple/")
     @CustomHeaderAdded
+    @PostMatchMode
     public Response getBookByHeaderSimple(@HeaderParam("BOOK") String headerBook,
         @HeaderParam("Simple") String headerSimple) throws Exception {
         
@@ -503,6 +505,7 @@ public class BookStore {
     @POST
     @Path("/bookheaders/simple/")
     @CustomHeaderAdded
+    @PostMatchMode
     public Response echoBookByHeaderSimple(Book book,
         @HeaderParam("BOOK") String headerBook,
         @HeaderParam("Simple") String headerSimple,
