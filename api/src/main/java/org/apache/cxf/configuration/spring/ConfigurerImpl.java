@@ -38,9 +38,11 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.extension.BusExtension;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.wiring.BeanConfigurerSupport;
 import org.springframework.beans.factory.wiring.BeanWiringInfo;
@@ -58,6 +60,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     private Set<ApplicationContext> appContexts;
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
         = new HashMap<String, List<MatcherHolder>>();
+    private BeanFactory beanFactory;
     
     static class MatcherHolder {
         Matcher matcher;
@@ -76,6 +79,11 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         setApplicationContext(ac);
     }
         
+    public void setBeanFactory(BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
+        super.setBeanFactory(beanFactory);
+    }
+    
     private void initWildcardDefinitionMap() {
         if (null != appContexts) {
             for (ApplicationContext appContext : appContexts) {
@@ -153,6 +161,12 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         }
         
         try {
+            //this will prevent a call into the AbstractBeanFactory.markBeanAsCreated(...)
+            //which saves ALL the names into a HashSet.  For URL based configuration,
+            //this can leak memory
+            if (beanFactory instanceof AbstractBeanFactory) {
+                ((AbstractBeanFactory)beanFactory).getMergedBeanDefinition(bn);
+            }
             super.configureBean(beanInstance);
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Successfully performed injection.");
@@ -228,7 +242,8 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     public final void setApplicationContext(ApplicationContext ac) {
         appContexts = new CopyOnWriteArraySet<ApplicationContext>();
         addApplicationContext(ac);
-        setBeanFactory(ac.getAutowireCapableBeanFactory());
+        this.beanFactory = ac.getAutowireCapableBeanFactory();
+        super.setBeanFactory(this.beanFactory);
     }
     
     public final void addApplicationContext(ApplicationContext ac) {
