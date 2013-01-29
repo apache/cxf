@@ -75,6 +75,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new CustomWriterInterceptor());
         providers.add(new CustomDynamicFeature());
         providers.add(new PostMatchContainerRequestFilter());
+        providers.add(new FaultyContainerRequestFilter());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -162,6 +163,16 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
     }
     
+    @Faulty
+    private static class FaultyContainerRequestFilter implements ContainerRequestFilter {
+
+        @Override
+        public void filter(ContainerRequestContext context) throws IOException {
+            throw new RuntimeException();
+        }
+        
+    }
+    
     @BindingPriority(3)
     public static class PostMatchContainerResponseFilter implements ContainerResponseFilter {
 
@@ -190,6 +201,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     @BindingPriority(4)
     @CustomHeaderAdded
+    @PostMatchMode
     public static class PostMatchContainerResponseFilter3 implements ContainerResponseFilter {
 
         @Override
@@ -221,6 +233,20 @@ public class BookServer20 extends AbstractBusTestServerBase {
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
     public @interface CustomHeaderAdded { 
+        
+    }
+    
+    @Target({ ElementType.TYPE, ElementType.METHOD })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @NameBinding
+    public @interface PostMatchMode { 
+        
+    }
+    
+    @Target({ ElementType.TYPE, ElementType.METHOD })
+    @Retention(value = RetentionPolicy.RUNTIME)
+    @NameBinding
+    public @interface Faulty { 
         
     }
     
