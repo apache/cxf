@@ -28,8 +28,10 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.Soap12FaultOutInterceptor.Soap12FaultOutInterceptorInternal;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
@@ -44,7 +46,11 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
     public void handleMessage(SoapMessage message) throws Fault {
         Fault f = (Fault) message.getContent(Exception.class);
         message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
-        message.getInterceptorChain().add(Soap11FaultOutInterceptorInternal.INSTANCE);
+        if (message.getVersion() == Soap11.getInstance()) {
+            message.getInterceptorChain().add(Soap11FaultOutInterceptorInternal.INSTANCE);
+        } else {
+            message.getInterceptorChain().add(Soap12FaultOutInterceptorInternal.INSTANCE);            
+        }
     }
     
     static class Soap11FaultOutInterceptorInternal extends AbstractSoapInterceptor {
