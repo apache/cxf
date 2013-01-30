@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -34,6 +35,8 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.ClientFaultConverter;
@@ -44,6 +47,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
+    private static final Logger LOG = LogUtils.getL7dLogger(Soap12FaultInInterceptor.class);
     
     public Soap12FaultInInterceptor() {
         super(Phase.UNMARSHAL);
@@ -129,7 +133,12 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                                 e,
                                 message.getVersion().getSender());
         }
-
+        // if the fault's content is invalid and fautlCode is not found, blame the receiver
+        if (faultCode == null) {
+            faultCode = Soap12.getInstance().getReceiver();
+            exMessage = new Message("INVALID_FAULT", LOG).toString();
+        }
+        
         SoapFault fault = new SoapFault(exMessage, faultCode);
         fault.setSubCode(subCode);
         fault.setDetail(detail);

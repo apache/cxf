@@ -19,21 +19,26 @@
 
 package org.apache.cxf.binding.soap.interceptor;
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.ClientFaultConverter;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
-
+    private static final Logger LOG = LogUtils.getL7dLogger(Soap11FaultInInterceptor.class);
     
     public Soap11FaultInInterceptor() {
         super(Phase.UNMARSHAL);
@@ -71,7 +76,11 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
                                 e,
                                 message.getVersion().getSender());
         }
-
+        // if the fault's content is invalid and fautlCode is not found, blame the receiver
+        if (faultCode == null) {
+            faultCode = Soap11.getInstance().getReceiver();
+            exMessage = new Message("INVALID_FAULT", LOG).toString();
+        }
         SoapFault fault = new SoapFault(exMessage, faultCode);
         fault.setDetail(detail);
         fault.setRole(role);

@@ -144,10 +144,9 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 SoapVersion soapVersion = readVersion(xmlReader, message);
                 if (soapVersion == Soap12.getInstance()
                     && version == Soap11.getInstance()) {
-                    throw new SoapFault(new Message("INVALID_11_VERSION", LOG, 
-                                                    Soap12.getInstance().getNamespace(),
-                                                    xmlReader.getLocalName()),
-                                        Soap11.getInstance().getVersionMismatch());                    
+                    message.setVersion(version);
+                    throw new SoapFault(new Message("INVALID_11_VERSION", LOG),
+                                        version.getVersionMismatch());                    
                 }
 
                 XMLStreamReader filteredReader = new PartialXMLStreamReader(xmlReader, message.getVersion()
