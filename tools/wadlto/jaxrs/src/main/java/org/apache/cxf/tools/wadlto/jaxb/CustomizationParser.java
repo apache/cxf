@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -86,6 +87,14 @@ public final class CustomizationParser {
             URL bindingFileUrl = getClass().getResource(name);
             InputSource ins = new InputSource(bindingFileUrl.toString());
             jaxbBindings.add(ins);
+        }
+
+        //pass additional JAXB compiler arguments
+        Object jaxbCompilerArgs = env.get(WadlToolConstants.CFG_XJC_ARGS);
+        if (jaxbCompilerArgs != null) {
+            String[] jaxbArgs = jaxbCompilerArgs instanceof String
+                    ? new String[]{(String)jaxbCompilerArgs} : (String[])jaxbCompilerArgs;
+            compilerArgs.addAll(Arrays.asList(jaxbArgs));
         }
         
         // Schema Namespace to Package customizations
