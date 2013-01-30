@@ -26,7 +26,6 @@ public final class WadlToolConstants {
     public static final String CFG_OUTPUTDIR = ToolConstants.CFG_OUTPUTDIR;
     public static final String CFG_COMPILE = ToolConstants.CFG_COMPILE;
     public static final String CFG_CLASSDIR = ToolConstants.CFG_CLASSDIR;
-    public static final String CFG_XJC_ARGS = ToolConstants.CFG_XJC_ARGS;
     
     /**
      * Default

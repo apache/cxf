@@ -104,7 +104,6 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         set.add(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
         set.add(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
         set.add(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
-        set.add(WadlToolConstants.CFG_XJC_ARGS);
         return set;
     }
     
