@@ -121,7 +121,6 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         // force the info logging for this test
         LOG.setLevel(Level.INFO);
-        System.out.println("### logLevel.info = " + LOG.isLoggable(Level.INFO));
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     
