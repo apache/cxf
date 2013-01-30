@@ -164,6 +164,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     
     @Faulty
+    @CustomHeaderAdded
     private static class FaultyContainerRequestFilter implements ContainerRequestFilter {
 
         @Override
