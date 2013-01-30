@@ -31,6 +31,10 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
+        
+        implementor = new org.apache.hello_world_soap_http.GreeterImpl();
+        address = "http://localhost:" + PORT + "/SoapContext/Soap11Port";
+        ep = Endpoint.publish(address, implementor);
     }
 
 
