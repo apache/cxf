@@ -22,6 +22,7 @@
 package org.apache.cxf.systest.soap12;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +35,9 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -178,6 +181,44 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue(reason.contains("No such operation: greetMe"));        
     }
     
+    @Test
+    public void testSayHiSoap12ToSoap11() throws Exception {
+        HttpURLConnection httpConnection = 
+            getHttpConnection("http://localhost:" + PORT + "/SoapContext/Soap11Port/sayHi");
+        httpConnection.setDoOutput(true);
+        
+        InputStream reqin = Soap12ClientServerTest.class.getResourceAsStream("sayHiSOAP12Req.xml");
+        assertNotNull("could not load test data", reqin);
+
+        httpConnection.setRequestMethod("POST");
+        httpConnection.addRequestProperty("Content-Type", "text/xml");
+        OutputStream reqout = httpConnection.getOutputStream();
+        IOUtils.copy(reqin, reqout);
+        reqout.close();
+
+        assertEquals(500, httpConnection.getResponseCode());
+        
+        InputStream respin = httpConnection.getErrorStream();
+        assertNotNull(respin);
+        
+        // we expect a soap 1.1 fault from the soap 1.1 test service that does not support soap 1.2
+        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
+       
+        Document doc = XMLUtils.parse(respin);
+        assertNotNull(doc);
+
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("soap11", Soap11.SOAP_NAMESPACE);
+        XPathUtils xu = new XPathUtils(ns);
+        Node fault = (Node) xu.getValue("/soap11:Envelope/soap11:Body/soap11:Fault", doc, XPathConstants.NODE);
+        assertNotNull(fault);
+        String codev = (String) xu.getValue("//faultcode/text()", 
+                                            fault, 
+                                            XPathConstants.STRING);
+        
+        assertNotNull(codev);
+        assertTrue("VersionMismatch expected", codev.endsWith("VersionMismatch"));
+    }
 
     private Greeter getGreeter() throws NumberFormatException, MalformedURLException {
         URL wsdl = getClass().getResource("/wsdl/hello_world_soap12.wsdl");

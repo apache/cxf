@@ -37,6 +37,10 @@ public class Server extends AbstractBusTestServerBase {
         ep = Endpoint.publish(address, implementor);
         EndpointImpl epi = (EndpointImpl)ep;
         epi.getService().getInInterceptors().add(new URIMappingInterceptor());
+        
+        implementor = new org.apache.hello_world_soap_http.GreeterImpl();
+        address = "http://localhost:" + PORT + "/SoapContext/Soap11Port";
+        ep = Endpoint.publish(address, implementor);
     }
 
     public void tearDown() throws Exception {
