@@ -25,14 +25,16 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 
 /**
  * 
  */
 public class WSDiscoveryServerListener implements ServerLifeCycleListener {
+    private static final String WS_DISCOVERY_SERVICE_NS = 
+        "http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01";
+    
     final Bus bus;
     volatile WSDiscoveryServiceImpl service;
 
@@ -65,31 +67,22 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
     }
 
     public void startServer(Server server) {
-        QName sn = getServiceQName(server);
-        if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
+        if (isWsDiscoveryServer(server)) {
             return;
         }
         getService().serverStarted(server);
     }
 
     public void stopServer(Server server) {
-        QName sn = getServiceQName(server);
-        if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01".equals(sn.getNamespaceURI())) {
+        if (isWsDiscoveryServer(server)) {
             return;
         }
         getService().serverStopped(server);
     }
     
-    private QName getServiceQName(Server server) {
-        EndpointInfo ei = server.getEndpoint().getEndpointInfo();
-        InterfaceInfo ii = ei.getInterface();
-        if (ii != null) {
-            return ii.getName();
-        } else if (ei.getService() != null) {
-            return ei.getService().getName();
-        } else {
-            return ei.getName();
-        }
+    private boolean isWsDiscoveryServer(Server server) {
+        QName sn = ServiceModelUtil.getServiceQName(server.getEndpoint().getEndpointInfo());
+        return WS_DISCOVERY_SERVICE_NS.equals(sn.getNamespaceURI());
     }
     
 }
