@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -167,6 +168,9 @@ public class ClientConfiguration implements InterceptorProvider {
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
         exchange.put(MessageObserver.class, new ClientMessageObserver(this));
+        if (conduitSelector != null) {
+            exchange.put(Endpoint.class, conduitSelector.getEndpoint());
+        }
         exchange.put(Bus.class, bus);
         prepareConduitSelector(message);
         return getConduitSelector().selectConduit(message);
