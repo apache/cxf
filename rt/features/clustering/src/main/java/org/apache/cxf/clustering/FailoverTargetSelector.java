@@ -74,6 +74,9 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @param message the current Message
      */
     public void prepare(Message message) {
+        if (message.getContent(List.class) == null) {
+            return;
+        }
         Exchange exchange = message.getExchange();
         InvocationKey key = new InvocationKey(exchange);
         if (!inProgress.containsKey(key)) {
