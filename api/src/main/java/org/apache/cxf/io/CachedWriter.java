@@ -481,9 +481,8 @@ public class CachedWriter extends Writer {
                         closed = true;
                     }
                 };
-                Reader r = new InputStreamReader(fileInputStream, "UTF-8");
-                streamList.add(r);
-                return r;
+                streamList.add(fileInputStream);
+                return new InputStreamReader(fileInputStream, "UTF-8");
             } catch (FileNotFoundException e) {
                 throw new IOException("Cached file was deleted, " + e.toString());
             }

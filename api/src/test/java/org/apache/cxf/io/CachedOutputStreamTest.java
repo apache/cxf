@@ -62,6 +62,25 @@ public class CachedOutputStreamTest extends Assert {
     }
 
     @Test
+    public void testDeleteTmpFile2() throws IOException {
+        CachedOutputStream cos = new CachedOutputStream();        
+        //ensure output data size larger then 64k which will generate tmp file
+        String result = initTestData(65);
+        cos.write(result.getBytes());
+        //assert tmp file is generated
+        File tempFile = cos.getTempFile();
+        assertNotNull(tempFile);
+        assertTrue(tempFile.exists());
+        InputStream in = cos.getInputStream();
+        cos.close();
+        //assert tmp file is not deleted when the input stream is open
+        assertTrue(tempFile.exists());
+        in.close();
+        //assert tmp file is deleted after the input stream is closed
+        assertFalse(tempFile.exists());
+    }
+
+    @Test
     public void testEncryptAndDecryptWithDeleteOnClose() throws IOException {
         CachedOutputStream cos = new CachedOutputStream();
         cos.setThreshold(4);
