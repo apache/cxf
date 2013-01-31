@@ -183,4 +183,16 @@ public final class ServiceModelUtil {
 
         return best;
     }
+    
+    public static QName getServiceQName(EndpointInfo ei) {
+        InterfaceInfo ii = ei.getInterface();
+        if (ii != null) {
+            return ii.getName();
+        } else if (ei.getService() != null) {
+            return ei.getService().getName();
+        } else {
+            return ei.getName();
+        }
+        
+    }
 }

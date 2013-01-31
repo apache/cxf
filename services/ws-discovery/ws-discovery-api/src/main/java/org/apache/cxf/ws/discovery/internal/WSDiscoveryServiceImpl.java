@@ -55,6 +55,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.InTransformReader;
 import org.apache.cxf.ws.discovery.WSDiscoveryClient;
@@ -123,7 +124,10 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         HelloType ht = new HelloType();
         ht.setScopes(new ScopesType());
         ht.setMetadataVersion(1);
-        ht.getTypes().add(server.getEndpoint().getEndpointInfo().getInterface().getName());
+        
+        QName sn = ServiceModelUtil.getServiceQName(server.getEndpoint().getEndpointInfo());
+        ht.getTypes().add(sn);
+        
         Object o = server.getEndpoint().get("ws-discovery-scopes");
         if (o != null) {
             setScopes(ht, o);
