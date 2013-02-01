@@ -34,17 +34,12 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
-import javax.crypto.KeyGenerator;
-import javax.crypto.spec.IvParameterSpec;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -92,8 +87,7 @@ public class CachedOutputStream extends OutputStream {
     private File outputDir = DEFAULT_TEMP_DIR;
     private boolean allowDeleteOfFile = true;
     private String cipherTransformation = defaultCipherTransformation;
-    private Cipher enccipher;
-    private Cipher deccipher;
+    private CipherPair ciphers;
 
     private List<CachedOutputStreamCallback> callbacks;
     
@@ -545,7 +539,7 @@ public class CachedOutputStream extends OutputStream {
                 };
                 streamList.add(fileInputStream);
                 if (cipherTransformation != null) {
-                    fileInputStream = new CipherInputStream(fileInputStream, deccipher) {
+                    fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
                         boolean closed;
                         public void close() throws IOException {
                             if (!closed) {
@@ -629,41 +623,17 @@ public class CachedOutputStream extends OutputStream {
         defaultCipherTransformation = n;
     }
 
-    private synchronized void initCiphers() throws GeneralSecurityException {
-        if (enccipher == null) {
-            int d = cipherTransformation.indexOf('/');
-            String a;
-            if (d > 0) {
-                a = cipherTransformation.substring(0, d);
-            } else {
-                a = cipherTransformation;
-            }
-            try {
-                KeyGenerator keygen = KeyGenerator.getInstance(a);
-                keygen.init(new SecureRandom());
-                Key key = keygen.generateKey();
-                enccipher = Cipher.getInstance(cipherTransformation);
-                deccipher = Cipher.getInstance(cipherTransformation);
-                enccipher.init(Cipher.ENCRYPT_MODE, key);
-                final byte[] ivp = enccipher.getIV();
-                deccipher.init(Cipher.DECRYPT_MODE, key, ivp == null ? null : new IvParameterSpec(ivp));
-            } catch (GeneralSecurityException e) {
-                enccipher = null;
-                deccipher = null;
-                throw e;
-            }
-        }
-    }
-
     private OutputStream createOutputStream(File file) throws IOException {
         OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
         if (cipherTransformation != null) {
             try {
-                initCiphers();
+                if (ciphers == null) {
+                    ciphers = new CipherPair(cipherTransformation);
+                }
             } catch (GeneralSecurityException e) {
                 throw new IOException(e.getMessage(), e);
             }
-            out = new CipherOutputStream(out, enccipher) {
+            out = new CipherOutputStream(out, ciphers.getEncryptor()) {
                 boolean closed;
                 public void close() throws IOException {
                     if (!closed) {
@@ -679,7 +649,7 @@ public class CachedOutputStream extends OutputStream {
     private InputStream createInputStream(File file) throws IOException {
         InputStream in = new FileInputStream(file);
         if (cipherTransformation != null) {
-            in = new CipherInputStream(in, deccipher) {
+            in = new CipherInputStream(in, ciphers.getDecryptor()) {
                 boolean closed;
                 public void close() throws IOException {
                     if (!closed) {

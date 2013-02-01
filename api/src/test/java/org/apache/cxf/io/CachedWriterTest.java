@@ -23,67 +23,58 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 
-import org.junit.Assert;
-import org.junit.Test;
+public class CachedWriterTest extends CachedStreamTestBase {
+    @Override
+    protected void reloadDefaultProperties() {
+        CachedWriter.setDefaultThreshold(-1);
+        CachedWriter.setDefaultMaxSize(-1);
+        CachedWriter.setDefaultCipherTransformation(null);
+    }
 
-public class CachedWriterTest extends Assert {    
+    @Override
+    protected Object createCache() {
+        return new CachedWriter();
+    }
     
-    @Test
-    public void testResetOut() throws IOException {
-        CachedWriter cos = new CachedWriter();        
-        String result = initTestData(16);
+    @Override
+    protected Object createCache(long threshold) {
+        return createCache(threshold, null);
+    }
+    
+    @Override
+    protected Object createCache(long threshold, String transformation) {
+        CachedWriter cos = new CachedWriter();
+        cos.setThreshold(threshold);
+        cos.setCipherTransformation(transformation);
+        return cos;
+    }
+    
+    @Override
+    protected String getResetOutValue(String result, Object cache) throws IOException {
+        CachedWriter cos = (CachedWriter)cache;
         cos.write(result);
         StringWriter out = new StringWriter();
         cos.resetOut(out, true);
-        String test = out.toString();
-        assertEquals("The test stream content isn't same ", test , result);
-        cos.close();
+        return out.toString();
     }
     
-    @Test
-    public void testDeleteTmpFile() throws IOException {
-        CachedWriter cos = new CachedWriter();        
-        //ensure output data size larger then 64k which will generate tmp file
-        String result = initTestData(65);
+    @Override
+    protected File getTmpFile(String result, Object cache) throws IOException {
+        CachedWriter cos = (CachedWriter)cache;
         cos.write(result);
-        //assert tmp file is generated
-        File tempFile = cos.getTempFile();
-        assertNotNull(tempFile);
-        assertTrue(tempFile.exists());
-        cos.close();
-        //assert tmp file is deleted after close the CachedOutputStream
-        assertFalse(tempFile.exists());
+        cos.flush();
+        return cos.getTempFile();
     }
 
-    @Test
-    public void testDeleteTmpFile2() throws IOException {
-        CachedWriter cos = new CachedWriter();
-        //ensure output data size larger then 64k which will generate tmp file
-        String result = initTestData(65);
-        cos.write(result);
-        //assert tmp file is generated
-        File tempFile = cos.getTempFile();
-        assertNotNull(tempFile);
-        assertTrue(tempFile.exists());
-        Reader in = cos.getReader();
-        cos.close();
-        //assert tmp file is not deleted when the reader is open
-        assertTrue(tempFile.exists());
-        in.close();
-        //assert tmp file is deleted after the reader is closed
-        assertFalse(tempFile.exists());
+    @Override
+    protected Object getInputStreamObject(Object cache) throws IOException {
+        return ((CachedWriter)cache).getReader();
     }
 
-    String initTestData(int packetSize) {
-        String temp = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+?><[]/0123456789";
-        String result = new String();
-        for (int i = 0; i <  1024 * packetSize / temp.length(); i++) {
-            result = result + temp;
-        }
-        return result;
+    @Override
+    protected String readFromStreamObject(Object obj) throws IOException {
+        return readFromReader((Reader)obj);
     }
-    
-
 }
     
    
