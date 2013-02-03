@@ -21,6 +21,9 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.helpers.FileUtils;
@@ -55,6 +58,89 @@ public class WADLToJavaTest extends ProcessorTestBase {
             fail();
         }
     }
+
+    @Test
+    public void testGenerateJAXBToString() throws Exception {
+
+        try {
+            String[] args = new String[] {
+                "-d",
+                output.getCanonicalPath(),
+                "-p",
+                "custom.service",
+                "-compile",
+                "-xjc-XtoString",
+                getLocation("/wadl/bookstore.xml"),
+            };
+
+            WADLToJava tool = new WADLToJava(args);
+            tool.run(new ToolContext());
+            assertNotNull(output.list());
+
+            verifyFiles("java", true, false, "superbooks", "custom.service");
+            verifyFiles("class", true, false, "superbooks", "custom.service");
+
+            List<Class<?>> schemaClassFiles = getSchemaClassFiles();
+            assertEquals(4, schemaClassFiles.size());
+            for (Class<?> c : schemaClassFiles) {
+                c.getMethod("toString");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
+    private List<Class<?>> getSchemaClassFiles() throws Exception {
+        ClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
+                                            Thread.currentThread().getContextClassLoader());
+           
+        List<Class<?>> files = new ArrayList<Class<?>>(4);
+        files.add(cl.loadClass("superbooks.EnumType"));
+        files.add(cl.loadClass("superbooks.Book"));
+        files.add(cl.loadClass("superbooks.TheBook2"));
+        files.add(cl.loadClass("superbooks.Chapter"));
+        return files;
+    }
+
+    @Test
+    public void testGenerateJAXBToStringAndEqualsAndHashCode() throws Exception {
+
+        try {
+            String[] args = new String[] {
+                "-d",
+                output.getCanonicalPath(),
+                "-p",
+                "custom.service",
+                "-compile",
+                "-xjc-XtoString",
+                "-xjc-Xequals",
+                "-xjc-XhashCode",
+                getLocation("/wadl/bookstore.xml"),
+            };
+
+            WADLToJava tool = new WADLToJava(args);
+            tool.run(new ToolContext());
+            assertNotNull(output.list());
+
+            verifyFiles("java", true, false, "superbooks", "custom.service");
+            verifyFiles("class", true, false, "superbooks", "custom.service");
+
+            List<Class<?>> schemaClassFiles = getSchemaClassFiles();
+            assertEquals(4, schemaClassFiles.size());
+            for (Class<?> c : schemaClassFiles) {
+                c.getMethod("toString");
+                c.getMethod("hashCode");
+                c.getMethod("equals", Object.class);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+
     
     private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
                              String schemaPackage, String resourcePackage) {    
@@ -88,11 +174,15 @@ public class WADLToJavaTest extends ProcessorTestBase {
     
     private boolean checkContains(List<File> clsFiles, String name) {
         for (File f : clsFiles) {
-            if (f.getAbsolutePath().replace(File.separatorChar, '.').endsWith(name)) {
+            if (checkFileContains(f, name)) {
                 return true;
             }
         }
         return false;
+    }
+    
+    private boolean checkFileContains(File f, String name) {
+        return f.getAbsolutePath().replace(File.separatorChar, '.').endsWith(name);
     }
     
     protected String getLocation(String wsdlFile) throws URISyntaxException {
