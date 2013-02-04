@@ -1693,7 +1693,7 @@ public abstract class HTTPConduit
                 } catch (UntrustedURLConnectionIOException untrustedEx) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.log(Level.FINE, "Trust Decider "
-                            + trustDecider.getLogicalName()
+                            + trustDecider != null ? trustDecider.getLogicalName() : decider2.getLogicalName()
                             + " considers Conduit "
                             + conduitName 
                             + " untrusted.", untrustedEx);
