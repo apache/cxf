@@ -92,7 +92,7 @@ final class TrustDecisionUtil {
                 connection.disconnect();
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "Trust Decider "
-                        + trustDecider != null ? trustDecider.getLogicalName() : decider2.getLogicalName()
+                        + (trustDecider != null ? trustDecider.getLogicalName() : decider2.getLogicalName())
                         + " considers Conduit "
                         + conduitName 
                         + " untrusted.", untrustedEx);
