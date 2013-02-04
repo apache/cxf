@@ -51,9 +51,9 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
@@ -348,7 +348,7 @@ public final class InjectionUtils {
                 LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                    BUNDLE, 
                                                                    pClass.getName()).toString());
-                throw new ServerErrorException(HttpUtils.getParameterFailureStatus(pType), ex);
+                throw new ClientErrorException(HttpUtils.getParameterFailureStatus(pType), ex);
             }
         }
         if (result == null) {
