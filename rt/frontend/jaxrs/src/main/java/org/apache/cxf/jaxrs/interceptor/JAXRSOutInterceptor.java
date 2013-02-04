@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
@@ -132,13 +133,27 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         OperationResourceInfo ori = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
             .getName());
         
+        boolean retryHappened = false;
+        try {
+            response = runResponseFilters(providerFactory, message, response, ori);
+        } catch (Throwable ex) {
+            response = handleFilterException(providerFactory, message, response, ori, ex);
+            retryHappened = true;
+        }
+        
+        serializeMessage(message, response, ori, !retryHappened);        
+    }
+
+    private Response runResponseFilters(ProviderFactory providerFactory,
+                                Message message, 
+                                Response response, 
+                                OperationResourceInfo ori) {
         // Global post-match and name-bound response filters
         JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori);
         Response updatedResponse = message.get(Response.class);
         if (updatedResponse != null) {
             response = updatedResponse;
         }
-        
         
         List<ProviderInfo<ResponseHandler>> handlers = 
             ProviderFactory.getInstance(message).getResponseHandlers();
@@ -151,10 +166,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
         }
-        
-        serializeMessage(message, response, ori, true);        
+        return response;
     }
-
+    
     private int getStatus(Message message, int defaultValue) {
         Object customStatus = message.getExchange().get(Message.RESPONSE_CODE);
         return customStatus == null ? defaultValue : (Integer)customStatus;
@@ -354,6 +368,18 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 }
             }
         }
+    }
+    
+    private Response handleFilterException(ProviderFactory pf,
+                                       Message message, 
+                                       Response response, 
+                                       OperationResourceInfo ori,
+                                       Throwable ex) {
+        Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
+        if (excResponse != null) {
+            return runResponseFilters(pf, message, excResponse, ori);
+        }
+        throw new InternalServerErrorException(ex);
     }
     
     private void handleWriteException(Message message, 
