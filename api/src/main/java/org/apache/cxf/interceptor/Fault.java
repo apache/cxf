@@ -44,11 +44,12 @@ public class Fault extends UncheckedException {
     private Element detail;
     private String message;
     private QName code;
+    private String lang;
     /**
      * response http header status code
      */
     private int statusCode = DEFAULT_HTTP_RESPONSE_CODE;
-    
+
     public Fault(Message message, Throwable throwable) {
         super(message, throwable);
         this.message = message.toString();
@@ -184,5 +185,13 @@ public class Fault extends UncheckedException {
      */
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
+    }
+
+    public void setLang(String convertedLang) {
+        lang = convertedLang;
+    }
+
+    public String getLang() {
+        return lang;
     }
 }
