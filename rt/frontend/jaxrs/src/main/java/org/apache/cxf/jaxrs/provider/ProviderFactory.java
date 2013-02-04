@@ -72,7 +72,6 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
-import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -130,7 +129,6 @@ public final class ProviderFactory {
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     
     private ParamConverterProvider newParamConverter;
-    private LegacyParamConverterProvider legacyParamConverter; 
     
     private List<ProviderInfo<MessageBodyReader<?>>> jaxbReaders = 
         new ArrayList<ProviderInfo<MessageBodyReader<?>>>();
@@ -381,8 +379,6 @@ public final class ProviderFactory {
         
         if (newParamConverter != null) {
             return newParamConverter.getConverter(paramType, null, null);
-        } else if (legacyParamConverter != null) {
-            return legacyParamConverter.getConverter(paramType, null, null);
         } else {
             return null;
         }
@@ -796,15 +792,6 @@ public final class ProviderFactory {
             if (ParamConverterProvider.class.isAssignableFrom(oClass)) {
                 newParamConverter = (ParamConverterProvider)o;
             }
-            
-            if (ParameterHandler.class.isAssignableFrom(oClass)) {
-                if (legacyParamConverter == null) {
-                    legacyParamConverter = new LegacyParamConverterProvider();
-                }
-                legacyParamConverter.add(o, bus);
-            }
-            
-            
         }
         sortReaders();
         sortWriters();
@@ -1155,9 +1142,6 @@ public final class ProviderFactory {
         postMatchContainerRequestFilters.clear();
         postMatchContainerResponseFilters.clear();
         preMatchContainerRequestFilters.clear();
-        if (legacyParamConverter != null) {
-            legacyParamConverter.clear();
-        }
         responseExceptionMappers.clear();
         clientRequestFilters.clear();
         clientResponseFilters.clear();
@@ -1662,62 +1646,6 @@ public final class ProviderFactory {
             } catch (Throwable ex) {
                 throw new RuntimeException(ex); 
             }
-        }
-    }
-    
-    private static class LegacyParamConverterProvider implements ParamConverterProvider {
-
-        // ParamConverter and ParamConverterProvider is introduced in JAX-RS 2.0
-        // ParameterHandler will have to be deprecated
-        private List<ProviderInfo<ParameterHandler<?>>> paramHandlers = 
-            new ArrayList<ProviderInfo<ParameterHandler<?>>>(1);
-        
-        @SuppressWarnings({
-            "unchecked", "rawtypes"
-        })
-        @Override
-        public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
-            List<ParameterHandler<?>> candidates = new LinkedList<ParameterHandler<?>>();
-            
-            for (ProviderInfo<ParameterHandler<?>> em : paramHandlers) {
-                handleMapper(candidates, em, rawType, null, ParameterHandler.class, true);
-            }
-            if (candidates.size() == 0) {
-                return null;
-            }
-            Collections.sort(candidates, new ClassComparator());
-            return new LegacyParamConverter((ParameterHandler<T>) candidates.get(0));
-        }
-        
-        public void clear() {
-            paramHandlers.clear();
-        }
-        
-        public void add(Object o, Bus bus) {
-            paramHandlers.add(new ProviderInfo<ParameterHandler<?>>((ParameterHandler<?>)o, bus));
-        }
-    }
-    
-    static class LegacyParamConverter<T> implements ParamConverter<T> {
-
-        private ParameterHandler<T> handler;
-        public LegacyParamConverter(ParameterHandler<T> handler) {
-            this.handler = handler;
-        }
-        
-        @Override
-        public T fromString(String value) throws IllegalArgumentException {
-            return handler.fromString(value);
-        }
-
-        @Override
-        public String toString(Object value) throws IllegalArgumentException {
-            // TODO Auto-generated method stub
-            return null;
-        }
-        
-        ParameterHandler<T> getHandler() {
-            return handler;
         }
     }
 }

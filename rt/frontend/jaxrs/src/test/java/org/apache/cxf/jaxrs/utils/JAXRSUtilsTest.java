@@ -21,7 +21,9 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +48,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 
@@ -66,7 +70,6 @@ import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
 import org.apache.cxf.jaxrs.Timezone;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
-import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -1851,11 +1854,27 @@ public class JAXRSUtilsTest extends Assert {
         return m;
     }
     
-    private static class LocaleParameterHandler implements ParameterHandler<Locale> {
+    private static class LocaleParameterHandler implements ParamConverterProvider, ParamConverter<Locale> {
 
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
+            if (cls == Locale.class) {
+                return (ParamConverter<T>)this;
+            } else {
+                return null;
+            }
+        }
+        
         public Locale fromString(String s) {
             String[] values = s.split("_");
             return values.length == 2 ? new Locale(values[0], values[1]) : new Locale(s);
+        }
+
+        @Override
+        public String toString(Locale arg0) throws IllegalArgumentException {
+            // TODO Auto-generated method stub
+            return null;
         }
         
     }

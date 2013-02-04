@@ -19,11 +19,26 @@
 
 package org.apache.cxf.jaxrs;
 
-import org.apache.cxf.jaxrs.ext.ParameterHandler;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
-public class CustomerParameterHandler implements ParameterHandler<Customer> {
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 
-    public Customer fromString(String s) {
+
+public class CustomerParameterHandler implements ParamConverterProvider, ParamConverter<Customer> {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
+        if (Customer.class.isAssignableFrom(cls)) {
+            return (ParamConverter<T>)this;
+        } else {
+            return null;
+        }
+    }
+
+    public Customer fromString(String s) throws IllegalArgumentException {
         if ("noName".equals(s)) {
             throw new IllegalArgumentException();
         }
@@ -32,4 +47,8 @@ public class CustomerParameterHandler implements ParameterHandler<Customer> {
         return c;
     }
 
+    @Override
+    public String toString(Customer arg0) throws IllegalArgumentException {
+        return null;
+    }
 }

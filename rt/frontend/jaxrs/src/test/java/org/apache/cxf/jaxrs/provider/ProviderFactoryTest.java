@@ -48,6 +48,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
@@ -59,7 +60,6 @@ import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.JAXBContextProvider2;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
@@ -67,7 +67,6 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
-import org.apache.cxf.jaxrs.provider.ProviderFactory.LegacyParamConverter;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.message.Exchange;
@@ -416,11 +415,10 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testParameterHandlerProvider() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
-        ParameterHandler<Customer> h = new CustomerParameterHandler();
+        ParamConverterProvider h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
         ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class);
-        
-        assertSame(((LegacyParamConverter<Customer>)h2).getHandler(), h);
+        assertSame(h2, h);
     }
     
     @Test
