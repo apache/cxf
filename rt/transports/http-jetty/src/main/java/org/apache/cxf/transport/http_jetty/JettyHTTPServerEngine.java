@@ -51,7 +51,7 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.server.ssl.SslConnector;
 import org.eclipse.jetty.util.component.Container;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
@@ -604,7 +604,7 @@ public class JettyHTTPServerEngine
 
     protected void retrieveListenerFactory() {
         if (tlsServerParameters != null) {
-            if (null != connector && !(connector instanceof SslSocketConnector)) {
+            if (null != connector && !(connector instanceof SslConnector)) {
                 LOG.warning("Connector " + connector + " for JettyServerEngine Port " 
                         + port + " does not support SSL connections.");
                 return;
@@ -614,7 +614,7 @@ public class JettyHTTPServerEngine
             protocol = "https";
             
         } else {
-            if (connector instanceof SslSocketConnector) {
+            if (connector instanceof SslConnector) {
                 throw new RuntimeException("Connector " + connector + " for JettyServerEngine Port " 
                       + port + " does not support non-SSL connections.");
             }
