@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.message.MessageImpl;
 
@@ -48,8 +48,8 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         bean.setProviders(providers);
         Server s = bean.create();
         
-        ProviderFactory factory = 
-            (ProviderFactory)s.getEndpoint().get(ProviderFactory.class.getName());
+        ServerProviderFactory factory = 
+            (ServerProviderFactory)s.getEndpoint().get(ServerProviderFactory.class.getName());
         
         ExceptionMapper<Exception> mapper1 = 
             factory.createExceptionMapper(Exception.class, new MessageImpl());

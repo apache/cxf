@@ -28,8 +28,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -44,7 +44,7 @@ public class ClientRequestFilterInterceptor extends AbstractOutDatabindingInterc
     }
     
     public void handleMessage(Message outMessage) throws Fault {
-        ProviderFactory pf = ProviderFactory.getInstance(outMessage);
+        ClientProviderFactory pf = ClientProviderFactory.getInstance(outMessage);
         if (pf == null) {
             return;
         }

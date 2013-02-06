@@ -1590,7 +1590,7 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     private Message createMessage() {
-        ProviderFactory factory = ProviderFactory.getInstance();
+        ServerProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put(Message.ENDPOINT_ADDRESS, "http://localhost:8080/bar");
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
@@ -1606,7 +1606,7 @@ public class JAXBElementProviderTest extends Assert {
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         endpoint.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ProviderFactory.class.getName());
+        endpoint.get(ServerProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);

@@ -37,12 +37,12 @@ public class ProviderFactoryAllTest extends Assert {
 
     @Before
     public void setUp() {
-        ProviderFactory.getInstance().clearProviders();
+        ServerProviderFactory.getInstance().clearProviders();
     }
     
     @Test
     public void testAtomPojoProvider() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ServerProviderFactory.getInstance();
         AtomPojoProvider provider = new AtomPojoProvider();
         pf.registerUserProvider(provider);
         MessageBodyReader<?> feedReader = pf.createMessageBodyReader(Book.class,
@@ -61,7 +61,7 @@ public class ProviderFactoryAllTest extends Assert {
     
     @Test
     public void testCustomJsonProvider() {
-        ProviderFactory pf = ProviderFactory.getInstance();
+        ProviderFactory pf = ServerProviderFactory.getInstance();
         JSONProvider<Book> provider = new JSONProvider<Book>();
         pf.registerUserProvider(provider);
         MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
@@ -73,33 +73,11 @@ public class ProviderFactoryAllTest extends Assert {
         assertSame(customJsonWriter, provider);
     }
     
-    @Test
-    public void testDefaultJsonProviderCloned() {
-        ProviderFactory pf = ProviderFactory.getInstance();
-        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
-                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertTrue(customJsonReader instanceof JSONProvider);
-        
-        MessageBodyReader<?> customJsonReader2 = pf.createMessageBodyReader(Book.class, null, null, 
-                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertSame(customJsonReader, customJsonReader2);
-        
-        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null, 
-                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertSame(customJsonReader, customJsonWriter);
-        
-        MessageBodyReader<?> jsonReader = ProviderFactory.getSharedInstance().createMessageBodyReader(
-            Book.class, null, null, MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
-        assertTrue(jsonReader instanceof JSONProvider);
-        assertNotSame(jsonReader, customJsonReader);
-    }
-    
-        
     private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType) 
         throws Exception {
         
         if (pf == null) {
-            pf = ProviderFactory.getInstance();
+            pf = ServerProviderFactory.getInstance();
         }
         
         MediaType mType = MediaType.valueOf(mediaType);

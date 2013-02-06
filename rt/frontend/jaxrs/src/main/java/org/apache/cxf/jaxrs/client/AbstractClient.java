@@ -371,6 +371,10 @@ public abstract class AbstractClient implements Client, Retryable {
                 }
             }
         }
+        String ct = (String)responseMessage.get(Message.CONTENT_TYPE);
+        if (ct != null) {
+            currentResponseBuilder.type(ct);
+        }
         InputStream mStream = responseMessage.getContent(InputStream.class);
         currentResponseBuilder.entity(mStream);
         
@@ -392,7 +396,7 @@ public abstract class AbstractClient implements Client, Retryable {
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type").toString()); 
         
-        List<WriterInterceptor> writers = ProviderFactory.getInstance(outMessage)
+        List<WriterInterceptor> writers = ClientProviderFactory.getInstance(outMessage)
             .createMessageBodyWriterInterceptor(theClass, type, anns, contentType, outMessage);
         if (writers != null) {
             try {
@@ -463,7 +467,7 @@ public abstract class AbstractClient implements Client, Retryable {
         MediaType contentType = getResponseContentType(r);
         
         List<ReaderInterceptor> readers 
-            = ProviderFactory.getInstance(outMessage).createMessageBodyReaderInterceptor(
+            = ClientProviderFactory.getInstance(outMessage).createMessageBodyReaderInterceptor(
                 cls, type, anns, contentType, outMessage);
         if (readers != null) {
             try {
@@ -687,7 +691,7 @@ public abstract class AbstractClient implements Client, Retryable {
         // so we can keep a map of ParamConverter on the bus, that said
         // it seems an over-optimization at this stage, it's a 5% case;
         // typical requests have a limited number of simple URI parameters
-        ProviderFactory pf = ProviderFactory.getInstance(cfg.getBus());
+        ProviderFactory pf = ClientProviderFactory.getInstance(cfg.getBus());
         if (pf != null) {
             @SuppressWarnings("unchecked")
             ParamConverter<Object> prov = (ParamConverter<Object>)pf.createParameterHandler(pClass);

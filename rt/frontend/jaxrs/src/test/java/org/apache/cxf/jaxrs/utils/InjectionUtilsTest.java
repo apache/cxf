@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -212,7 +213,7 @@ public class InjectionUtilsTest extends Assert {
     }
     
     private Message createMessage() {
-        ProviderFactory factory = ProviderFactory.getInstance();
+        ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();

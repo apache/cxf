@@ -60,7 +60,6 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -307,7 +306,7 @@ public class ClientProxyImpl extends AbstractClient implements
     }
     
     private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
-        ProviderFactory pf = ProviderFactory.getInstance(message);
+        ClientProviderFactory pf = ClientProviderFactory.getInstance(message);
         Class<?>[] exTypes = m.getExceptionTypes();
         if (exTypes.length == 0) {
             exTypes = new Class[]{WebApplicationException.class};
@@ -595,7 +594,7 @@ public class ClientProxyImpl extends AbstractClient implements
             return readBody(r, outMessage, method.getReturnType(), 
                             method.getGenericReturnType(), method.getDeclaredAnnotations());
         } finally {
-            ProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
+            ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
     }
 

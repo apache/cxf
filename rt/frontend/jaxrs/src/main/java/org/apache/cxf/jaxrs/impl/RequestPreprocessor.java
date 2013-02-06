@@ -33,7 +33,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
@@ -207,7 +207,7 @@ public class RequestPreprocessor {
     }
     
     private Response handleMetadataRequest(Message m) { 
-        List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(m).getRequestHandlers();
+        List<ProviderInfo<RequestHandler>> shs = ServerProviderFactory.getInstance(m).getRequestHandlers();
         // this is actually being tested by ProviderFactory unit tests but just in case
         // WadlGenerator, the custom or default one, must be the first one
         if (shs.size() > 0 && shs.get(0).getProvider() instanceof WadlGenerator) {

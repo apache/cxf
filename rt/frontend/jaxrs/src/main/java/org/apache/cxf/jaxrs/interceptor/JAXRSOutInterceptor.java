@@ -60,7 +60,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -82,7 +82,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     public void handleMessage(Message message) {
-        ProviderFactory providerFactory = ProviderFactory.getInstance(message);
+        ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
         try {
             processResponse(providerFactory, message);
         } finally {
@@ -107,7 +107,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
 
     }
     
-    private void processResponse(ProviderFactory providerFactory, Message message) {
+    private void processResponse(ServerProviderFactory providerFactory, Message message) {
         
         if (isResponseAlreadyHandled(message)) {
             return;
@@ -144,7 +144,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         serializeMessage(message, response, ori, !retryHappened);        
     }
 
-    private Response runResponseFilters(ProviderFactory providerFactory,
+    private Response runResponseFilters(ServerProviderFactory providerFactory,
                                 Message message, 
                                 Response response, 
                                 OperationResourceInfo ori) {
@@ -156,7 +156,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         
         List<ProviderInfo<ResponseHandler>> handlers = 
-            ProviderFactory.getInstance(message).getResponseHandlers();
+            ServerProviderFactory.getInstance(message).getResponseHandlers();
         for (ProviderInfo<ResponseHandler> rh : handlers) {
             InjectionUtils.injectContexts(rh.getProvider(), rh, 
                                                message.getExchange().getInMessage());
@@ -244,7 +244,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         List<WriterInterceptor> writers = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
-            writers = ProviderFactory.getInstance(message)
+            writers = ServerProviderFactory.getInstance(message)
                 .createMessageBodyWriterInterceptor(targetType, genericType, annotations, type, message);
             
             if (writers != null) {
@@ -370,7 +370,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
-    private Response handleFilterException(ProviderFactory pf,
+    private Response handleFilterException(ServerProviderFactory pf,
                                        Message message, 
                                        Response response, 
                                        OperationResourceInfo ori,

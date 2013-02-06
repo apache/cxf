@@ -92,7 +92,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -401,7 +401,7 @@ public final class InjectionUtils {
                                                     Message message) {
         T result = null;
         if (message != null) {
-            ParamConverter<T> pm = ProviderFactory.getInstance(message)
+            ParamConverter<T> pm = ServerProviderFactory.getInstance(message)
                 .createParameterHandler(pClass);
             if (pm != null) {
                 result = pm.fromString(value);

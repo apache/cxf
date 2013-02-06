@@ -30,6 +30,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Message;
 
 public class ProvidersImpl implements Providers {
@@ -56,7 +57,7 @@ public class ProvidersImpl implements Providers {
     }
 
     public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
-        return ProviderFactory.getInstance(m).createExceptionMapper(type, m);
+        return ServerProviderFactory.getInstance(m).createExceptionMapper(type, m);
     }
 
 }

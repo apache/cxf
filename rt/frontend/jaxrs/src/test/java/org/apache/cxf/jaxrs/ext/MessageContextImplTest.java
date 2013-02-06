@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -142,7 +143,7 @@ public class MessageContextImplTest extends Assert {
     @Test
     public void testContextResolver() {
         ContextResolver<JAXBContext> resolver = new CustomContextResolver();
-        ProviderFactory factory = ProviderFactory.getInstance();
+        ProviderFactory factory = ServerProviderFactory.getInstance();
         factory.registerUserProvider(resolver);
         
         Message m = new MessageImpl();
@@ -150,7 +151,7 @@ public class MessageContextImplTest extends Assert {
         m.setExchange(ex);
         ex.setInMessage(m);
         Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.get(ProviderFactory.class.getName());
+        e.get(ServerProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
@@ -168,7 +169,7 @@ public class MessageContextImplTest extends Assert {
     }
     
     private Message createMessage() {
-        ProviderFactory factory = ProviderFactory.getInstance();
+        ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
@@ -183,7 +184,7 @@ public class MessageContextImplTest extends Assert {
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         endpoint.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ProviderFactory.class.getName());
+        endpoint.get(ServerProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);

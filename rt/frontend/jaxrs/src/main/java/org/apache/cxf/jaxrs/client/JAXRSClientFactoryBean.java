@@ -361,8 +361,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         if (headers != null && addHeaders) {
             client.headers(headers);
         }
+        ClientProviderFactory factory = ClientProviderFactory.createInstance(getBus()); 
+        setupFactory(factory, ep);
+        getBus().setProperty(ClientProviderFactory.class.getName(), factory);
         
-        setupFactory(ep);
+
     }
     
     protected void applyFeatures(AbstractClient client) {

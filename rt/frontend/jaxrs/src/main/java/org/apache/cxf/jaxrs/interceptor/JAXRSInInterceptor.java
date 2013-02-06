@@ -45,7 +45,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -80,7 +80,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 LOG.warning("Exception occurred during releasing the service instance, " + tex.getMessage());
             }
         }
-        ProviderFactory.getInstance(message).clearThreadLocalProxies();
+        ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
         ClassResourceInfo cri = (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
         if (cri != null) {
             cri.clearThreadLocalProxies();
@@ -99,7 +99,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (RuntimeException ex) {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse == null) {
-                ProviderFactory.getInstance(message).clearThreadLocalProxies();
+                ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
                 message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
                                           JAXRSUtils.propogateException(message));
                 throw ex;
@@ -112,7 +112,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private void processRequest(Message message) {
         
-        ProviderFactory providerFactory = ProviderFactory.getInstance(message);
+        ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
         
         RequestPreprocessor rp = providerFactory.getRequestPreprocessor();
         if (rp != null) {

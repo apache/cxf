@@ -92,6 +92,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -1832,7 +1833,7 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     private Message createMessage() {
-        ProviderFactory factory = ProviderFactory.getInstance();
+        ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
@@ -1847,7 +1848,7 @@ public class JAXRSUtilsTest extends Assert {
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         endpoint.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ProviderFactory.class.getName());
+        endpoint.get(ServerProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);

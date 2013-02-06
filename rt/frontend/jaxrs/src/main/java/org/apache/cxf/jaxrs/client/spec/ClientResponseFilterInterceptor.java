@@ -32,8 +32,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxrs.client.ClientProviderFactory;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -45,7 +45,7 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
     }
     
     public void handleMessage(Message inMessage) throws Fault {
-        ProviderFactory pf = ProviderFactory.getInstance(inMessage);
+        ClientProviderFactory pf = ClientProviderFactory.getInstance(inMessage);
         if (pf == null) {
             return;
         }

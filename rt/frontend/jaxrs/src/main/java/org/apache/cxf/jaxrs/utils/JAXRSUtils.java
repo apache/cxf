@@ -132,6 +132,7 @@ import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -895,7 +896,7 @@ public final class JAXRSUtils {
     }
     
     public static Object createBeanParamValue(Message m, Class<?> clazz, OperationResourceInfo ori) {
-        BeanParamInfo bmi = ProviderFactory.getInstance(m).getBeanParamInfo(clazz);
+        BeanParamInfo bmi = ServerProviderFactory.getInstance(m).getBeanParamInfo(clazz);
         if (bmi == null) {
             // we could've started introspecting now but the fact no bean info 
             // is available indicates that the one created at start up has been 
@@ -952,7 +953,7 @@ public final class JAXRSUtils {
             o = createServletResourceValue(contextMessage, clazz);
             if (o == null) {
                 ContextProvider<?> provider = 
-                    ProviderFactory.getInstance(m).createContextProvider(clazz, contextMessage);
+                    ServerProviderFactory.getInstance(m).createContextProvider(clazz, contextMessage);
                 if (provider != null) {
                     o = provider.createContext(contextMessage);
                 }
@@ -1122,7 +1123,7 @@ public final class JAXRSUtils {
         
         List<MediaType> types = JAXRSUtils.intersectMimeTypes(consumeTypes, contentType);
         
-        final ProviderFactory pf = ProviderFactory.getInstance(m);
+        final ProviderFactory pf = ServerProviderFactory.getInstance(m);
         for (MediaType type : types) { 
             List<ReaderInterceptor> readers = pf.createMessageBodyReaderInterceptor(
                                          targetTypeClass,
@@ -1412,7 +1413,7 @@ public final class JAXRSUtils {
         }
         
         ExceptionMapper<T>  mapper =
-            ProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
+            ServerProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
         if (mapper != null) {
             try {
                 return mapper.toResponse(ex);
@@ -1465,7 +1466,7 @@ public final class JAXRSUtils {
         return XMLUtils.convertStringToQName(name, "");
     }
     
-    public static boolean runContainerRequestFilters(ProviderFactory pf, Message m, boolean preMatch, 
+    public static boolean runContainerRequestFilters(ServerProviderFactory pf, Message m, boolean preMatch, 
                                               List<String> names) {
         List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
             ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);
@@ -1485,7 +1486,7 @@ public final class JAXRSUtils {
         return false;
     }
     
-    public static void runContainerResponseFilters(ProviderFactory pf,
+    public static void runContainerResponseFilters(ServerProviderFactory pf,
                                                    Response r,
                                                    Message m, 
                                                    OperationResourceInfo ori) {

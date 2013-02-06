@@ -55,7 +55,7 @@ import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -104,7 +104,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
             if (!suspended) {
                 if (exchange.isOneWay()) {
-                    ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
+                    ServerProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
                 }
                 if (!isServiceObjectRequestScope(exchange.getInMessage())) {
                     provider.releaseInstance(exchange.getInMessage(), rootInstance);
@@ -138,7 +138,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         final OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         final ClassResourceInfo cri = ori.getClassResourceInfo();
         final Message inMessage = exchange.getInMessage();
-        final ProviderFactory providerFactory = ProviderFactory.getInstance(inMessage);
+        final ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(inMessage);
 
         boolean wasSuspended = exchange.remove(REQUEST_WAS_SUSPENDED) != null;
         
@@ -285,7 +285,7 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
         Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
         if (excResponse == null) {
-            ProviderFactory.getInstance(inMessage).clearThreadLocalProxies();
+            ServerProviderFactory.getInstance(inMessage).clearThreadLocalProxies();
             ClassResourceInfo criRoot =
                 (ClassResourceInfo)inMessage.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
             if (criRoot != null) {

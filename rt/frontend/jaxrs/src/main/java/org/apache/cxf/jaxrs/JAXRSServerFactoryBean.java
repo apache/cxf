@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
@@ -41,9 +42,13 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -164,7 +169,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.getService().setInvoker(invoker);
             }
             
-            ProviderFactory factory = setupFactory(ep);
+            ServerProviderFactory factory = setupFactory(ep);
             ep.put(Application.class.getName(), appProvider);
             factory.setApplicationProvider(appProvider);
             factory.setRequestPreprocessor(
@@ -208,6 +213,31 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         return server;
     }
 
+    protected ServerProviderFactory setupFactory(Endpoint ep) { 
+        ServerProviderFactory factory = ServerProviderFactory.createInstance(getBus()); 
+        setBeanInfo(factory);
+        super.setupFactory(factory, ep);
+        return factory;
+    }
+
+    protected void setBeanInfo(ServerProviderFactory factory) {
+        List<ClassResourceInfo> cris = serviceFactory.getClassResourceInfo();
+        for (ClassResourceInfo cri : cris) {
+            Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
+            for (OperationResourceInfo ori : oris) {
+                List<Parameter> params = ori.getParameters();
+                for (Parameter param : params) {
+                    if (param.getType() == ParameterType.BEAN) {
+                        Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[param.getIndex()];
+                        BeanParamInfo bpi = new BeanParamInfo(cls, getBus());
+                        factory.addBeanParamInfo(bpi);
+                    }
+                }
+            }
+        }
+        
+    }
+    
     protected void applyFeatures() {
         if (getFeatures() != null) {
             for (Feature feature : getFeatures()) {
