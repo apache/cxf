@@ -20,14 +20,14 @@ under the License.
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:http="http://cxf.apache.org/transports/http/configuration"
-       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs-client"
        xmlns:cxf="http://cxf.apache.org/core"
        xmlns:sec="http://cxf.apache.org/configuration/security"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
-        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+        http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
         ">
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.blueprint;
+package org.apache.cxf.jaxrs.client.blueprint;
 
 import java.net.URL;
 import java.util.Set;
@@ -41,15 +41,15 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     }
     
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("/schemas/blueprint/jaxrs.xsd");
+        return getClass().getClassLoader().getResource("/schemas/blueprint/jaxrs-client.xsd");
     }
 
 
     public Metadata parse(Element element, ParserContext context) {
         String s = element.getLocalName();
-        if ("server".equals(s)) {
-            return new JAXRSServerFactoryBeanDefinitionParser().parse(element, context);
-        } 
+        if ("client".equals(s)) {
+            return new JAXRSClientFactoryBeanDefinitionParser().parse(element, context);
+        }
         return null;
     }
 

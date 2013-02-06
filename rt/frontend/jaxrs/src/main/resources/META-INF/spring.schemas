@@ -18,4 +18,6 @@
 #    under the License.
 #
 #
+http\://cxf.apache.org/schemas/jaxrs-common.xsd=schemas/jaxrs-common.xsd
 http\://cxf.apache.org/schemas/jaxrs.xsd=schemas/jaxrs.xsd
+http\://cxf.apache.org/schemas/jaxrs-client.xsd=schemas/jaxrs-client.xsd

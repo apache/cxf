@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.spring;
+package org.apache.cxf.jaxrs.client.spring;
 
 import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("server", new JAXRSServerFactoryBeanDefinitionParser());        
+        registerBeanDefinitionParser("client", new JAXRSClientFactoryBeanDefinitionParser());
         registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());    
     }
 }

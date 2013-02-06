@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.spring;
+package org.apache.cxf.jaxrs.client.spring;
 
 import javax.xml.namespace.QName;
 

@@ -21,6 +21,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client"
   xmlns:jaxws="http://cxf.apache.org/jaxws"
   xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="http://www.springframework.org/schema/beans 
@@ -30,7 +31,9 @@ http://www.springframework.org/schema/util/spring-util.xsd
 http://cxf.apache.org/jaxws
 http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
+http://cxf.apache.org/schemas/jaxrs.xsd
+http://cxf.apache.org/jaxrs-client
+http://cxf.apache.org/schemas/jaxrs-client.xsd">
 
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
@@ -42,14 +45,14 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <property name="enabled" value="true"/>
    </bean>
 
-  <jaxrs:client id="restClient"
+  <jaxrs-client:client id="restClient"
          address="http://localhost:${testutil.ports.BookServerRestSoap}/test/services/rest"
          serviceClass="org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws"
          inheritHeaders="true">
-         <jaxrs:headers>
+         <jaxrs-client:headers>
              <entry key="Accept" value="text/xml"/>
-         </jaxrs:headers>
-  </jaxrs:client>       
+         </jaxrs-client:headers>
+  </jaxrs-client:client>       
          
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl"/>
   <bean id="bookstore-simple" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl">
