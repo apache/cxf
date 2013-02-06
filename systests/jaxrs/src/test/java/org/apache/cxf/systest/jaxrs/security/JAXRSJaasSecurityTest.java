@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import org.junit.BeforeClass;
@@ -64,9 +65,15 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
         String endpointAddress =
             "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123"; 
         WebClient wc = WebClient.create(endpointAddress);
+        AuthorizationPolicy pol = new AuthorizationPolicy();
+        pol.setUserName("foo");
+        pol.setPassword("bar1");
+        WebClient.getConfig(wc).getHttpConduit().setAuthorization(pol);
+        
         wc.accept("text/xml");
-        wc.header(HttpHeaders.AUTHORIZATION, 
-                  "Basic " + base64Encode("foo" + ":" + "bar1"));
+        
+        //wc.header(HttpHeaders.AUTHORIZATION, 
+        //          "Basic " + base64Encode("foo" + ":" + "bar1"));
         Response r = wc.get();
         assertEquals(401, r.getStatus());
         Object wwwAuthHeader = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);
