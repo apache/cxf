@@ -97,10 +97,18 @@ public class CXFAuthenticator extends Authenticator {
                     }
                 } else if (getRequestorType() == RequestorType.SERVER
                     && httpConduit.getAuthorization() != null) {
+                    
+                    if (m.containsKey(PasswordAuthentication.class.getName())
+                        && ("basic".equals(getRequestingScheme())
+                            || "digest".equals(getRequestingScheme()))) {
+                        return null;
+                    }
+                    
                     String un = httpConduit.getAuthorization().getUserName();
                     String pwd =  httpConduit.getAuthorization().getPassword();
                     if (un != null && pwd != null) {
                         auth = new PasswordAuthentication(un, pwd.toCharArray());
+                        m.put(PasswordAuthentication.class.getName(), Boolean.TRUE);
                     }
                 }
             }
