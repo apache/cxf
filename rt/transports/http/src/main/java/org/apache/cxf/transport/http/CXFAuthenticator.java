@@ -97,6 +97,10 @@ public class CXFAuthenticator extends Authenticator {
                     }
                 } else if (getRequestorType() == RequestorType.SERVER
                     && httpConduit.getAuthorization() != null) {
+                    if ("basic".equals(getRequestingScheme()) || "digest".equals(getRequestingScheme())) {
+                        return null;
+                    }
+
                     String un = httpConduit.getAuthorization().getUserName();
                     String pwd =  httpConduit.getAuthorization().getPassword();
                     if (un != null && pwd != null) {
