@@ -46,7 +46,7 @@
 	</http:conduit>
 	
 	<jaxws:client id="BindingSimpleServiceClient" 
-		serviceClass="org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleServiceClient"
+		serviceClass="org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService"
 		address="https://localhost:${testutil.ports.JavaFirstPolicyServer.3}/BindingSimpleService">
 	</jaxws:client>
 	
