@@ -39,7 +39,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
     @Test
     public void testClients() throws Exception {
         ClassPathXmlApplicationContext ctx =
-            new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/spring/clients.xml"});
+            new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/client/spring/clients.xml"});
         
         Object bean = ctx.getBean("client1.proxyFactory");
         assertNotNull(bean);
