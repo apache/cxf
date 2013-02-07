@@ -207,6 +207,43 @@ public class JAXBElementProviderTest extends Assert {
         testXmlList(provider);
     }
     
+    @Test
+    public void testGenericsAndSingleContext2() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(XmlListResource.class, XmlListResource.class, true, true);
+        JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+        provider.setSingleJaxbContext(true);
+        provider.init(Collections.singletonList(cri));
+        
+        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> list = 
+            new ArrayList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>();
+        for (int i = 0; i < 10; i++) {
+            org.apache.cxf.jaxrs.fortest.jaxb.SuperBook o = 
+                new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook();
+            o.setName("name #" + i);
+            list.add(o);
+        }
+        XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> xmlList = 
+            new XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>(list);
+        
+        Method m = XmlListResource.class.getMethod("testJaxb2", new Class[]{});
+        JAXBContext context = provider.getJAXBContext(m.getReturnType(), m.getGenericReturnType());
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream(); 
+        context.createMarshaller().marshal(xmlList, os);
+        @SuppressWarnings("unchecked")
+        XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> list2 = 
+            (XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>)context.createUnmarshaller()
+                .unmarshal(new ByteArrayInputStream(os.toByteArray()));
+        
+        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> actualList = list2.getList();
+        assertEquals(10, actualList.size());
+        for (int i = 0; i < 10; i++) {
+            org.apache.cxf.jaxrs.fortest.jaxb.SuperBook object = actualList.get(i);
+            assertEquals("name #" + i, object.getName());
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     private void testXmlList(JAXBElementProvider<?> provider) throws Exception {
         
@@ -218,7 +255,8 @@ public class JAXBElementProviderTest extends Assert {
         }
         XmlList<XmlObject> xmlList = new XmlList<XmlObject>(list);
         
-        JAXBContext context = provider.getJAXBContext(XmlList.class, XmlList.class);
+        Method m = XmlListResource.class.getMethod("testJaxb", new Class[]{});
+        JAXBContext context = provider.getJAXBContext(m.getReturnType(), m.getGenericReturnType());
         
         ByteArrayOutputStream os = new ByteArrayOutputStream(); 
         context.createMarshaller().marshal(xmlList, os);
@@ -1585,6 +1623,12 @@ public class JAXBElementProviderTest extends Assert {
         @GET
         @Path("/jaxb")
         public XmlList<XmlObject> testJaxb() {
+            return null;
+        }
+        
+        @GET
+        @Path("/jaxb2")
+        public XmlList<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> testJaxb2() {
             return null;
         }
     }
