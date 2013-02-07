@@ -45,7 +45,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
@@ -84,28 +83,30 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             addPolicies(factory, ii, cls);
             break;
         }
+        
         case ENDPOINT_SELECTED: {
             Class<?> cls = (Class<?>)args[2];
+            Class<?> implCls = args.length > 3 ? (Class<?>)args[3] : null;
             Endpoint ep = (Endpoint)args[1];
             if (ep.getEndpointInfo().getInterface() != null) {
                 addPolicies(factory, ep, cls);
+                
+                // this will allow us to support annotations in Implementations, but only for
+                // class level annotations.  Method level annotations are not currently supported
+                // for implementations.  The call has been moved here so that the ServiceInfo
+                // policy stuff is loaded before jaxws factory calls the PolicyEngineImpl
+                addEndpointImplPolicies(factory, ep, implCls);
             }
             break;
         }
-        case SERVER_CREATED: {
-            Class<?> cls = (Class<?>)args[2];
-            Server server = (Server)args[0];
-            if (server.getEndpoint().getEndpointInfo().getInterface() != null) {
-                addPolicies(factory, server, cls);
-            }
-            break;
-        }
+        
         case INTERFACE_OPERATION_BOUND: {
             OperationInfo inf = (OperationInfo)args[0];
             Method m = (Method)args[1];
             addPolicies(factory, inf, m);
             break;
         }
+        
         default:
             //ignore
         }
@@ -161,6 +162,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                     //nothing
                 }
             }
+            
             if (!list.isEmpty()) {
                 List<Policy> stuff = CastUtils.cast((List<?>)inf.getProperty(EXTRA_POLICIES));
                 if (stuff != null) {
@@ -216,15 +218,17 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             }
         }
     }
-    private void addPolicies(AbstractServiceFactoryBean factory, Server server, Class<?> cls) {
-        List<Policy> list = CastUtils.cast((List<?>)server.getEndpoint().getEndpointInfo()
+    
+    private void addEndpointImplPolicies(AbstractServiceFactoryBean factory, Endpoint endpoint, Class<?> cls) {
+        List<Policy> list = CastUtils.cast((List<?>)endpoint.getEndpointInfo()
                                            .getInterface().removeProperty(EXTRA_POLICIES));
         if (list != null) {
-            addPolicies(factory, server.getEndpoint(), cls, list, Policy.Placement.BINDING);
+            addPolicies(factory, endpoint, cls, list, Policy.Placement.BINDING);
         }
         if (cls == null) {
             return;
         }
+        
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
@@ -235,9 +239,8 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             if (ps != null) {
                 list.addAll(Arrays.asList(ps.value()));
             }
-            addPolicies(factory, server.getEndpoint(), cls, list, Policy.Placement.SERVICE);
+            addPolicies(factory, endpoint, cls, list, Policy.Placement.SERVICE);
         }        
-        
     }
 
     private void addPolicies(AbstractServiceFactoryBean factory, Endpoint endpoint, Class<?> cls,
@@ -323,6 +326,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 default:
                 }
             }
+            
             if (!list.isEmpty()) {
                 List<Policy> stuff = CastUtils.cast((List<?>)ii.getProperty(EXTRA_POLICIES));
                 if (stuff != null) {

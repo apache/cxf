@@ -37,7 +37,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
-import org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleServiceClient;
+import org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService;
 import org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleServiceClient;
 import org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleServiceClient;
 import org.apache.cxf.systest.ws.policy.server.JavaFirstPolicyServer;
@@ -52,7 +52,6 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -153,8 +152,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             "org/apache/cxf/systest/ws/policy/client/sslnocertclient.xml"
         });
 
-        BindingSimpleServiceClient simpleService = clientContext.getBean("BindingSimpleServiceClient",
-                                                                         BindingSimpleServiceClient.class);
+        BindingSimpleService simpleService = clientContext.getBean("BindingSimpleServiceClient",
+                                                                         BindingSimpleService.class);
 
         try {
             simpleService.doStuff();
@@ -185,8 +184,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             "org/apache/cxf/systest/ws/policy/client/sslcertclient.xml"
         });
 
-        BindingSimpleServiceClient simpleService = clientContext.getBean("BindingSimpleServiceClient",
-                                                                         BindingSimpleServiceClient.class);
+        BindingSimpleService simpleService = clientContext.getBean("BindingSimpleServiceClient",
+                                                                         BindingSimpleService.class);
 
         try {
             simpleService.doStuff();
