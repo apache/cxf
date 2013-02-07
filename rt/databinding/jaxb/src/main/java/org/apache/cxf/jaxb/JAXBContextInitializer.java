@@ -265,7 +265,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     }
 
 
-    private  void addClass(Class<?> cls) {
+    void addClass(Class<?> cls) {
         if (Throwable.class.isAssignableFrom(cls)) {
             if (!Throwable.class.equals(cls)
                 && !Exception.class.equals(cls)) {

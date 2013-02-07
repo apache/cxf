@@ -22,7 +22,9 @@ package org.apache.cxf.jaxb;
 
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -230,4 +232,24 @@ public class JAXBDataBindingTest extends Assert {
         String xml = stringWriter.toString();
         assertTrue(xml, xml.contains("greenland=\"uri:ultima:thule"));
     }
+    
+    
+    @Test
+    public void testResursiveType() throws Exception {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Collection<Object> typeReferences = new ArrayList<Object>();
+        JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences);
+        init.addClass(Type2.class);
+        assertEquals(2, classes.size());
+    }
+    
+    public abstract static class Type2 extends AddressEntity<Type2> {
+    }
+    
+    public abstract static class AddressEntity<T extends AddressEntity<T>> {
+        public abstract Addressable<T> getEntity();
+    }
+    
+    public interface Addressable<T extends AddressEntity<T>> {
+    }    
 }
