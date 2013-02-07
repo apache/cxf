@@ -539,7 +539,7 @@ public abstract class AbstractSupportingTokenPolicyValidator
                 CastUtils.cast((List<?>)signedResult.get(
                     WSSecurityEngineResult.TAG_DATA_REF_URIS
                 ));
-            if (sl != null && sl.size() == 1) {
+            if (sl != null && sl.size() >= 1) {
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
                     if (WSSecurityEngine.SIGNATURE.equals(signedQName)
