@@ -19,4 +19,3 @@
 #
 #
 http\://cxf.apache.org/jaxrs=org.apache.cxf.jaxrs.spring.NamespaceHandler
-http\://cxf.apache.org/jaxrs-client=org.apache.cxf.jaxrs.client.spring.NamespaceHandler

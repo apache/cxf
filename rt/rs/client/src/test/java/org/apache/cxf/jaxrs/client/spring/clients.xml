@@ -59,7 +59,7 @@ http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xs
   </jaxrs:client>
   
   <jaxrs:client id="ModelClient" 
-    modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
+    modelRef="classpath:/org/apache/cxf/jaxrs/client/spring/resources.xml"
     serviceClass="org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations"
     address="http://localhost:8080/simpleWithAddress"
     username="username"

@@ -126,7 +126,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <artifactId>cxf-rt-rs-client</artifactId>
             <version>${project.version}</version>
         </dependency>
 
