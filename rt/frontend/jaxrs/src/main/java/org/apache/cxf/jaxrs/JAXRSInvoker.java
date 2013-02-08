@@ -85,7 +85,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
                 asyncImpl.prepareContinuation();
                 asyncImpl.handleTimeout();
-                return handleAsyncResponse(exchange, asyncImpl.getResponseObject());
+                return handleAsyncResponse(exchange, asyncImpl);
             }
         }
         if (response != null) {
@@ -118,10 +118,16 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
     }
 
-    private Object handleAsyncResponse(Exchange exchange, Object asyncObj) {
+    private Object handleAsyncResponse(Exchange exchange, AsyncResponseImpl ar) {
+        Object asyncObj = ar.getResponseObject();
         if (asyncObj instanceof Throwable) {
-            return handleFault(new Fault((Throwable)asyncObj), 
-                               exchange.getInMessage(), null, null);    
+            try {
+                return handleFault(new Fault((Throwable)asyncObj), 
+                                   exchange.getInMessage(), null, null);
+            } catch (Fault ex) {
+                ar.reset();
+                throw ex;
+            }
         } else {
             return new MessageContentsList(asyncObj);
         }
@@ -192,7 +198,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             result = invoke(exchange, resourceObject, methodToInvoke, params);
             if (asyncResponse != null && !asyncResponse.suspendContinuationIfNeeded()) {
-                result = handleAsyncResponse(exchange, asyncResponse.getResponseObject());
+                result = handleAsyncResponse(exchange, asyncResponse);
             }
         } catch (Fault ex) {
             return handleFault(ex, inMessage, cri, methodToInvoke);

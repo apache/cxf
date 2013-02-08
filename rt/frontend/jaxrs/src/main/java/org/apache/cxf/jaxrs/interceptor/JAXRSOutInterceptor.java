@@ -53,6 +53,7 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -101,6 +102,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                 (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
             if (cri != null) {
                 cri.clearThreadLocalProxies();
+            }
+            AsyncResponse ar = (AsyncResponse)message.getExchange().get(AsyncResponse.class);
+            if (ar != null) {
+                ((AsyncResponseImpl)ar).reset();
             }
         }
             

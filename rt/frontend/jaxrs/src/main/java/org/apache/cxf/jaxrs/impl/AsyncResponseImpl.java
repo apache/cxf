@@ -247,5 +247,8 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         initContinuation();
     }
     
+    public void reset() {
+        cont.reset();
+    }
     
 }

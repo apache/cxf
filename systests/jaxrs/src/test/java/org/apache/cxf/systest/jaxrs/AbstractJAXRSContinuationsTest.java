@@ -58,6 +58,22 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     }
     
     @Test
+    public void testGetBookNotFound() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + getPort() + "/bookstore/books/notfound");
+        wc.accept("text/plain");
+        Response r = wc.get();
+        assertEquals(404, r.getStatus());
+    }
+    
+    @Test
+    public void testGetBookNotFoundUnmapped() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + getPort() + "/bookstore/books/notfound/unmapped");
+        wc.accept("text/plain");
+        Response r = wc.get();
+        assertEquals(500, r.getStatus());
+    }
+    
+    @Test
     public void testTimeoutAndCancel() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + getPort() + "/bookstore/books/cancel");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);

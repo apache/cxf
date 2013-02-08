@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -101,6 +102,21 @@ public class BookContinuationStore {
         resumeSuspended(id, response);
     }
     
+    @GET
+    @Path("books/notfound")
+    @Produces("text/plain")
+    public void handleContinuationRequestNotFound(AsyncResponse response) {
+        response.register(new CallbackImpl());
+        resumeSuspendedNotFound(response);
+    }
+    
+    @GET
+    @Path("books/notfound/unmapped")
+    @Produces("text/plain")
+    public void handleContinuationRequestNotFoundUnmapped(AsyncResponse response) {
+        response.register(new CallbackImpl());
+        resumeSuspendedNotFoundUnmapped(response);
+    }
     
     
     private void resumeSuspended(final String id, final AsyncResponse response) {
@@ -113,6 +129,35 @@ public class BookContinuationStore {
                     // ignore
                 }       
                 response.resume(books.get(id));
+            }
+        });
+        
+    }
+    
+    private void resumeSuspendedNotFound(final AsyncResponse response) {
+        
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }       
+                response.resume(new NotFoundException());
+            }
+        });
+        
+    }
+    
+    private void resumeSuspendedNotFoundUnmapped(final AsyncResponse response) {
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }       
+                response.resume(new BookNotFoundFault(""));
             }
         });
         
@@ -162,7 +207,6 @@ public class BookContinuationStore {
         @Override
         public void onComplete(Throwable throwable) {
             System.out.println("CompletionCallback: onComplete");
-            
         }
         
     }
