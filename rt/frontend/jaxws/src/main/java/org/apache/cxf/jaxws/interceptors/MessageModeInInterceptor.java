@@ -68,8 +68,8 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     public void handleMessage(Message message) throws Fault {
-        if (!bindingName.equals(message.getExchange().get(BindingOperationInfo.class)
-                               .getBinding().getName())) {
+        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class); 
+        if (bop == null || !bindingName.equals(bop.getBinding().getName())) {
             return;
         }
         Object o = message.getContent(soapMsgClass);
