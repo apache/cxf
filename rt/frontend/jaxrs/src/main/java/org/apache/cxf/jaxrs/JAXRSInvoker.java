@@ -125,8 +125,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                 return handleFault(new Fault((Throwable)asyncObj), 
                                    exchange.getInMessage(), null, null);
             } catch (Fault ex) {
-                ar.reset();
-                throw ex;
+                ar.setUnmappedThrowable(ex.getCause());
+                return new MessageContentsList(Response.serverError().build());
             }
         } else {
             return new MessageContentsList(asyncObj);

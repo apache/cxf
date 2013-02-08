@@ -206,7 +206,7 @@ public class BookContinuationStore {
 
         @Override
         public void onComplete(Throwable throwable) {
-            System.out.println("CompletionCallback: onComplete");
+            System.out.println("CompletionCallback: onComplete, throwable: " + throwable);
         }
         
     }

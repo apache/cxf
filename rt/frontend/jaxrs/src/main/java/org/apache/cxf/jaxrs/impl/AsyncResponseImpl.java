@@ -48,6 +48,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private TimeoutHandler timeoutHandler;
     
     private CompletionCallback completionCallback;
+    private Throwable unmappedThrowable;
     
     public AsyncResponseImpl(Message inMessage) {
         inMessage.put(AsyncResponse.class, this);
@@ -191,7 +192,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     public void onComplete() {
         done = true;
         if (completionCallback != null) {
-            completionCallback.onComplete(null);
+            completionCallback.onComplete(unmappedThrowable);
         }
     }
 
@@ -247,6 +248,9 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         initContinuation();
     }
     
+    public void setUnmappedThrowable(Throwable t) {
+        unmappedThrowable = t;
+    }
     public void reset() {
         cont.reset();
     }
