@@ -124,6 +124,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         boolean bspCompliant = isWsiBSPCompliant(message);
         boolean utWithCallbacks = 
             MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
+        boolean allowNoPassword = isAllowNoPassword(message.get(AssertionInfoMap.class));
         if (utWithCallbacks) {
             UsernameTokenProcessor p = new UsernameTokenProcessor();
             WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
@@ -150,6 +151,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             
             WSSConfig config = WSSConfig.getNewInstance();
             config.setWsiBSPCompliant(bspCompliant);
+            config.setAllowUsernameTokenNoPassword(allowNoPassword);
             data.setWssConfig(config);
             List<WSSecurityEngineResult> results = 
                 p.handleToken(tokenElement, data, wsDocInfo);
@@ -179,6 +181,21 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         String bspc = (String)message.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
         // Default to WSI-BSP compliance enabled
         return !("false".equals(bspc) || "0".equals(bspc));
+    }
+    
+    private boolean isAllowNoPassword(AssertionInfoMap aim) throws WSSecurityException {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
+
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                UsernameToken policy = (UsernameToken)ai.getAssertion();
+                if (policy.isNoPassword()) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
     
     protected SecurityContext createSecurityContext(final Principal p, Subject subject) {
