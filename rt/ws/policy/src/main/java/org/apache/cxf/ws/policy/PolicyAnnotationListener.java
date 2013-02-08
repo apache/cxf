@@ -86,7 +86,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         
         case ENDPOINT_SELECTED: {
             Class<?> cls = (Class<?>)args[2];
-            Class<?> implCls = args.length > 3 ? (Class<?>)args[3] : null;
+            Class<?> implCls = (Class<?>)args[3];
             Endpoint ep = (Endpoint)args[1];
             if (ep.getEndpointInfo().getInterface() != null) {
                 addPolicies(factory, ep, cls);
@@ -107,12 +107,22 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             break;
         }
         
+        case BINDING_OPERATION_CREATED:
+            BindingOperationInfo boi = (BindingOperationInfo) args[1];
+            Method m = (Method)args[2];
+            addPolicies(factory, boi.getOperationInfo(), m);
+            break;
+            
         default:
             //ignore
         }
     }
 
     private void addPolicies(AbstractServiceFactoryBean factory, OperationInfo inf, Method m) {
+        if (m == null) {
+            return;
+        }
+        
         Policy p = m.getAnnotation(Policy.class);
         Policies ps = m.getAnnotation(Policies.class);
         if (p != null || ps != null) {

@@ -100,7 +100,7 @@ public interface FactoryBeanListener {
         SERVER_CREATED, 
         
         /**
-         * BindingInfo, BindingOperationInfo
+         * BindingInfo, BindingOperationInfo, Implementation Method
          */
         BINDING_OPERATION_CREATED,
         

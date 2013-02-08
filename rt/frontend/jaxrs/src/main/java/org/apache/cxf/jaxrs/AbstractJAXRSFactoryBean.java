@@ -184,7 +184,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             BindingInfo bi = bindingFactory.createBindingInfo(serviceFactory.getService(),
                                                               binding, bindingConfig);
             for (BindingOperationInfo boi : bi.getOperations()) {
-                serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_OPERATION_CREATED, boi, boi);
+                serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_OPERATION_CREATED, bi, boi, null);
             }
 
             serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_CREATED, bi);
@@ -244,7 +244,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         for (ClassResourceInfo cri : list) {
             initializeAnnotationInterceptors(ep, cri.getServiceClass());
             serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINT_SELECTED, ei, ep,
-                                     cri.getServiceClass());
+                                     cri.getServiceClass(), null);
         }
         return ep;
     }

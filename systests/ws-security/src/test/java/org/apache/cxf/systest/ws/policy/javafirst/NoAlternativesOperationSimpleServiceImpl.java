@@ -21,15 +21,22 @@ package org.apache.cxf.systest.ws.policy.javafirst;
 
 import javax.jws.WebService;
 
+import org.apache.cxf.annotations.Policy;
+import org.apache.cxf.annotations.Policy.Placement;
+
 @WebService(name = "NoAlternativesOperationSimpleService", 
 endpointInterface = "org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService", 
 serviceName = "NoAlternativesOperationSimpleService", 
 targetNamespace = "http://www.example.org/contract/NoAlternativesOperationSimpleService")
 public class NoAlternativesOperationSimpleServiceImpl implements NoAlternativesOperationSimpleService {
+    @Policy(uri = "classpath:/java_first_policies/UsernamePolicy.xml", 
+        placement = Placement.BINDING_OPERATION)
     @Override
     public void doStuff() {
     }
 
+    @Policy(uri = "classpath:/java_first_policies/UsernamePasswordPolicy.xml", 
+        placement = Placement.BINDING_OPERATION)
     @Override
     public void ping() {
     }

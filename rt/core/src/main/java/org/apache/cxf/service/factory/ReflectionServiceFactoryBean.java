@@ -2325,7 +2325,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return 1;
     }
 
-    protected MethodDispatcher getMethodDispatcher() {
+    public MethodDispatcher getMethodDispatcher() {
         return methodDispatcher;
     }
     protected void setMethodDispatcher(MethodDispatcher m) {

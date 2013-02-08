@@ -22,13 +22,9 @@ package org.apache.cxf.systest.ws.policy.javafirst;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-import org.apache.cxf.annotations.Policy;
-import org.apache.cxf.annotations.Policy.Placement;
-
 @WebService(name = "OperationSimpleService", 
 targetNamespace = "http://www.example.org/contract/OperationSimpleService")
 public interface OperationSimpleService {
-    @Policy(uri = "classpath:/java_first_policies/AlternativesPolicy.xml", placement = Placement.BINDING_OPERATION)
     @WebMethod(operationName = "doStuff")
     void doStuff();
 

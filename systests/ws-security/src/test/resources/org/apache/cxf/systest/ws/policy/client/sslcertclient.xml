@@ -51,12 +51,12 @@
 	</jaxws:client>
 	
 	<jaxws:client id="OperationSimpleServiceClient" 
-		serviceClass="org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleServiceClient"
+		serviceClass="org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService"
 		address="https://localhost:${testutil.ports.JavaFirstPolicyServer.3}/OperationSimpleService">
 	</jaxws:client>
 	
 	<jaxws:client id="NoAlternativesOperationSimpleServiceClient" 
-		serviceClass="org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleServiceClient"
+		serviceClass="org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService"
 		address="https://localhost:${testutil.ports.JavaFirstPolicyServer.3}/NoAlternativesOperationSimpleService">
 	</jaxws:client>
 </beans>
