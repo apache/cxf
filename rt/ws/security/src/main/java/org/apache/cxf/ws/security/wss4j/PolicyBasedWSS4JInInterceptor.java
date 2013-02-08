@@ -64,6 +64,7 @@ import org.apache.cxf.ws.security.policy.model.RequiredElements;
 import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
+import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
@@ -273,6 +274,21 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
 
         return action;
+    }
+    
+    private void checkUsernameToken(
+        AssertionInfoMap aim, SoapMessage message
+    ) throws WSSecurityException {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
+        
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                UsernameToken policy = (UsernameToken)ai.getAssertion();
+                if (policy.isNoPassword()) {
+                    message.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
+                }
+            }
+        }
     }
     
     private String checkSymmetricBinding(
@@ -493,6 +509,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             action = checkAsymmetricBinding(aim, action, message);
             action = checkSymmetricBinding(aim, action, message);
             action = checkTransportBinding(aim, action, message);
+            checkUsernameToken(aim, message);
             
             // stuff we can default to asserted and un-assert if a condition isn't met
             assertPolicy(aim, SP12Constants.KEYVALUE_TOKEN);
