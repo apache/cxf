@@ -31,10 +31,7 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.interceptor.InterceptorChain;
-import org.apache.cxf.message.Attachment;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.*;
 
 public final class TestUtil {
 
@@ -90,6 +87,7 @@ public final class TestUtil {
         messageImpl.setExchange(exchange);
         SoapMessage soapMessage = new SoapMessage(messageImpl);
         soapMessage.setVersion(soapVersion);
-        return soapMessage;        
+        soapMessage.put(Message.HTTP_REQUEST_METHOD, "POST");
+        return soapMessage;
     }
 }
