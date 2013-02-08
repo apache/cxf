@@ -28,6 +28,7 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.message.Message;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -193,6 +194,7 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
     public void testCXF4181() throws Exception {
         //Try WITH SAAJ
         SoapMessage m = new SoapMessage(new MessageImpl());
+        m.put(Message.HTTP_REQUEST_METHOD, "POST");
         m.setVersion(Soap12.getInstance());        
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
                                                                  .getResourceAsStream("cxf4181.xml"));
@@ -242,6 +244,7 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
                                                  .getResourceAsStream("cxf4181.xml"));
 
         m.setContent(XMLStreamReader.class, reader);
+        m.put(Message.HTTP_REQUEST_METHOD, "POST");
 
         new ReadHeadersInterceptor(null).handleMessage(m);
         new StartBodyInterceptor().handleMessage(m);
