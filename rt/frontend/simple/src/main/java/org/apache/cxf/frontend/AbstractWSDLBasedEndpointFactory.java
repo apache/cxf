@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.frontend;
 
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -342,7 +343,8 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             
             for (BindingOperationInfo boi : inf.getOperations()) {
                 serviceFactory.updateBindingOperation(boi);
-                serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_OPERATION_CREATED, inf, boi);
+                Method m = serviceFactory.getMethodDispatcher().getMethod(boi);
+                serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_OPERATION_CREATED, inf, boi, m);
             }
             serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_CREATED, inf);
             return inf;

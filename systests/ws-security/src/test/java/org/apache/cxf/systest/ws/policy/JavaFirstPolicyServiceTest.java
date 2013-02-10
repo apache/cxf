@@ -38,8 +38,8 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService;
-import org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleServiceClient;
-import org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleServiceClient;
+import org.apache.cxf.systest.ws.policy.javafirst.NoAlternativesOperationSimpleService;
+import org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService;
 import org.apache.cxf.systest.ws.policy.server.JavaFirstPolicyServer;
 import org.apache.cxf.systest.ws.wssec11.client.UTPasswordCallback;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -213,9 +213,9 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             "org/apache/cxf/systest/ws/policy/client/sslnocertclient.xml"
         });
 
-        NoAlternativesOperationSimpleServiceClient simpleService = clientContext
+        NoAlternativesOperationSimpleService simpleService = clientContext
             .getBean("NoAlternativesOperationSimpleServiceClient",
-                     NoAlternativesOperationSimpleServiceClient.class);
+                     NoAlternativesOperationSimpleService.class);
 
         try {
             simpleService.doStuff();
@@ -262,9 +262,9 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             "org/apache/cxf/systest/ws/policy/client/sslcertclient.xml"
         });
 
-        NoAlternativesOperationSimpleServiceClient simpleService = clientContext
+        NoAlternativesOperationSimpleService simpleService = clientContext
             .getBean("NoAlternativesOperationSimpleServiceClient",
-                     NoAlternativesOperationSimpleServiceClient.class);
+                     NoAlternativesOperationSimpleService.class);
 
         try {
             simpleService.doStuff();
@@ -307,8 +307,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             "org/apache/cxf/systest/ws/policy/client/sslnocertclient.xml"
         });
 
-        OperationSimpleServiceClient simpleService = clientContext
-            .getBean("OperationSimpleServiceClient", OperationSimpleServiceClient.class);
+        OperationSimpleService simpleService = clientContext
+            .getBean("OperationSimpleServiceClient", OperationSimpleService.class);
 
         try {
             simpleService.doStuff();
@@ -340,8 +340,8 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             "org/apache/cxf/systest/ws/policy/client/sslcertclient.xml"
         });
 
-        OperationSimpleServiceClient simpleService = clientContext
-            .getBean("OperationSimpleServiceClient", OperationSimpleServiceClient.class);
+        OperationSimpleService simpleService = clientContext
+            .getBean("OperationSimpleServiceClient", OperationSimpleService.class);
 
         try {
             simpleService.doStuff();
