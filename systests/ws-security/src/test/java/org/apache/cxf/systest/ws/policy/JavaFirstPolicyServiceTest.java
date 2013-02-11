@@ -299,7 +299,6 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    @Ignore
     public void testOperationNoClientCertAlternativePolicy() {
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
@@ -369,6 +368,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         Client client = ClientProxy.getClient(svc);
         WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor();
         client.getEndpoint().getOutInterceptors().add(wssOut);
+        client.getOutInterceptors().add(wssOut);
         return wssOut;
     }
 
