@@ -118,7 +118,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         super(true);
     }
     
-    private static Properties getProps(Object o, String propsKey, URL propsURL, SoapMessage message) {
+    private static Properties getProps(Object o, URL propsURL, SoapMessage message) {
         Properties properties = null;
         if (o instanceof Properties) {
             properties = (Properties)o;
@@ -370,16 +370,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             encrCrypto = (Crypto)e;
         } else if (e != null) {
             URL propsURL = getPropertiesFileURL(e, message);
-            String propsKey = e.toString();
-            if (propsURL != null) {
-                propsKey = propsURL.getPath();
-            }
-            Properties props = getProps(e, propsKey, propsURL, message);
-            encrCrypto = CryptoFactory.getInstance(props);
-            
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-            synchronized (info) {
-                info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
+            Properties props = getProps(e, propsURL, message);
+            if (props != null) {
+                encrCrypto = CryptoFactory.getInstance(props);
+                
+                EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+                synchronized (info) {
+                    info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
+                }
             }
         }
         return encrCrypto;
@@ -391,16 +389,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             signCrypto = (Crypto)s;
         } else if (s != null) {
             URL propsURL = getPropertiesFileURL(s, message);
-            String propsKey = s.toString();
-            if (propsURL != null) {
-                propsKey = propsURL.getPath();
-            }
-            Properties props = getProps(s, propsKey, propsURL, message);
-            signCrypto = CryptoFactory.getInstance(props);
-            
-            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-            synchronized (info) {
-                info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
+            Properties props = getProps(s, propsURL, message);
+            if (props != null) {
+                signCrypto = CryptoFactory.getInstance(props);
+                
+                EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+                synchronized (info) {
+                    info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
+                }
             }
         }
         return signCrypto;
