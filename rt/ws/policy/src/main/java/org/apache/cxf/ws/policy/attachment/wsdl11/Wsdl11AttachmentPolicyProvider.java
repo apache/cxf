@@ -187,7 +187,11 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
                             Policy policy = builder.getPolicy(e.getElement());
                             String fragement = "#" + uri;
                             registry.register(fragement, policy);
-                            registry.register(di.getBaseURI() + fragement, policy);
+                            if (di.getBaseURI() == null) {
+                                registry.register(Integer.toString(di.hashCode()) + fragement, policy);
+                            } else {
+                                registry.register(di.getBaseURI() + fragement, policy);
+                            }
                         } catch (Exception policyEx) {
                             //ignore the policy can not be built
                             LOG.warning("Failed to build the policy '" + uri + "':" + policyEx.getMessage());
@@ -257,7 +261,11 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     Policy resolveReference(PolicyReference ref, DescriptionInfo di) {
         Policy p = null;
         if (isExternal(ref)) {
-            p = resolveExternal(ref, di.getBaseURI());
+            String uri = di.getBaseURI();
+            if (uri == null) {
+                uri = Integer.toString(di.hashCode());
+            }
+            p = resolveExternal(ref, uri);
         } else {
             p = resolveLocal(ref, di);
         }
@@ -267,7 +275,12 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     
     Policy resolveLocal(PolicyReference ref, DescriptionInfo di) {
         String uri = ref.getURI().substring(1);
-        String absoluteURI = di.getBaseURI() + ref.getURI();
+        String absoluteURI = di.getBaseURI();
+        if (absoluteURI == null) {
+            absoluteURI = Integer.toString(di.hashCode()) + ref.getURI();
+        } else {
+            absoluteURI = absoluteURI + ref.getURI();
+        }
         Policy resolved = registry.lookup(absoluteURI);
         if (null != resolved) {
             return resolved;

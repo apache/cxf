@@ -29,6 +29,9 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.Assert;
 
 public class JavaFirstPolicyServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(JavaFirstPolicyServer.class);
+    public static final String PORT2 = allocatePort(JavaFirstPolicyServer.class, 2);
+    public static final String PORT3 = allocatePort(JavaFirstPolicyServer.class, 3);
 
     public JavaFirstPolicyServer() {
 
@@ -46,5 +49,9 @@ public class JavaFirstPolicyServer extends AbstractBusTestServerBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public static void main(String args[]) {
+        new JavaFirstPolicyServer().start();
     }
 }

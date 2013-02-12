@@ -55,9 +55,9 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase {
-    static final String PORT = allocatePort(JavaFirstPolicyServer.class);
-    static final String PORT2 = allocatePort(JavaFirstPolicyServer.class, 2);
-    static final String PORT3 = allocatePort(JavaFirstPolicyServer.class, 3);
+    static final String PORT = JavaFirstPolicyServer.PORT;
+    static final String PORT2 = JavaFirstPolicyServer.PORT2;
+    static final String PORT3 = JavaFirstPolicyServer.PORT3;
 
     private static final String WSDL_NAMESPACE = "http://schemas.xmlsoap.org/wsdl/";
 

@@ -51,6 +51,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -126,6 +127,10 @@ public class ServiceModelPolicyUpdater {
         if (ei.getService().getDescription() == null) {
             DescriptionInfo description = new DescriptionInfo();
             description.setName(ei.getService().getName());
+            if (!StringUtils.isEmpty(ei.getAddress())) {
+                description.setBaseURI(ei.getAddress() + "?wsdl");
+            }
+            
             ei.getService().setDescription(description);
         }
         ei.getService().getDescription().addExtensor(uee);
