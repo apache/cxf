@@ -28,7 +28,9 @@ import org.apache.cxf.annotations.Policy.Placement;
 endpointInterface = "org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService", 
 serviceName = "OperationSimpleService", targetNamespace = "http://www.example.org/contract/OperationSimpleService")
 public class OperationSimpleServiceImpl implements OperationSimpleService {
-    @Policy(uri = "classpath:/java_first_policies/AlternativesPolicy.xml", placement = Placement.BINDING_OPERATION)
+    @Policy(uri = "classpath:/java_first_policies/AlternativesPolicy.xml", 
+        placement = Placement.BINDING_OPERATION_INPUT)
+
     @Override
     public void doStuff() {
     }

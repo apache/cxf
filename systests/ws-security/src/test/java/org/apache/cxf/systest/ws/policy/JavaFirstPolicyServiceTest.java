@@ -50,7 +50,6 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -206,7 +205,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    public void testNoAltOperationNoClientCertAlternativePolicy() {
+    public void testNoAltOperationNoClientCertPolicy() {
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
@@ -255,7 +254,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     @Test
-    public void testNoAltOperationClientCertAlternativePolicy() {
+    public void testNoAltOperationClientCertPolicy() {
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
         ClassPathXmlApplicationContext clientContext = new ClassPathXmlApplicationContext(new String[] {
@@ -309,6 +308,9 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         OperationSimpleService simpleService = clientContext
             .getBean("OperationSimpleServiceClient", OperationSimpleService.class);
 
+        // no security on ping!
+        simpleService.ping();
+        
         try {
             simpleService.doStuff();
             fail("Expected exception as no credentials");
@@ -326,12 +328,12 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
             assertTrue(true);
         }
 
+        // this is successful because the alternative policy allows a password to be specified.
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
     }
 
     @Test
-    @Ignore
     public void testOperationClientCertAlternativePolicy() {
         System.setProperty("testutil.ports.JavaFirstPolicyServer.3", PORT3);
 
@@ -342,6 +344,9 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         OperationSimpleService simpleService = clientContext
             .getBean("OperationSimpleServiceClient", OperationSimpleService.class);
 
+        // no security on ping!
+        simpleService.ping();
+        
         try {
             simpleService.doStuff();
             fail("Expected exception as no credentials");
@@ -354,14 +359,9 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         wssOut.setProperties(getNoPasswordProperties("alice"));
         simpleService.doStuff();
 
+        // this is successful because the alternative policy allows a password to be specified.
         wssOut.setProperties(getPasswordProperties("alice", "password"));
-
-        try {
-            simpleService.doStuff();
-            fail("Expected exception password is not supported");
-        } catch (SOAPFaultException e) {
-            assertTrue(true);
-        }
+        simpleService.doStuff();
     }
 
     private WSS4JOutInterceptor addToClient(Object svc) {
@@ -528,3 +528,4 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         }
     }
 }
+
