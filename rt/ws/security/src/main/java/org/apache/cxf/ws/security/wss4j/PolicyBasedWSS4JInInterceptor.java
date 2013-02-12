@@ -366,13 +366,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         } else if (e != null) {
             URL propsURL = getPropertiesFileURL(e, message);
             Properties props = getProps(e, propsURL, message);
-            if (props != null) {
-                encrCrypto = CryptoFactory.getInstance(props);
-                
-                EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-                synchronized (info) {
-                    info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
-                }
+            if (props == null) {
+                LOG.fine("Cannot find Crypto Encryption properties: " + e);
+                throw new WSSecurityException("Cannot find Crypto Encryption properties: " + e);
+            }
+            
+            encrCrypto = CryptoFactory.getInstance(props);
+
+            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.ENCRYPT_CRYPTO, encrCrypto);
             }
         }
         return encrCrypto;
@@ -385,13 +388,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         } else if (s != null) {
             URL propsURL = getPropertiesFileURL(s, message);
             Properties props = getProps(s, propsURL, message);
-            if (props != null) {
-                signCrypto = CryptoFactory.getInstance(props);
-                
-                EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-                synchronized (info) {
-                    info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
-                }
+            if (props == null) {
+                LOG.fine("Cannot find Crypto Signature properties: " + s);
+                throw new WSSecurityException("Cannot find Crypto Signature properties: " + s);
+            }
+            
+            signCrypto = CryptoFactory.getInstance(props);
+
+            EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
+            synchronized (info) {
+                info.setProperty(SecurityConstants.SIGNATURE_CRYPTO, signCrypto);
             }
         }
         return signCrypto;
