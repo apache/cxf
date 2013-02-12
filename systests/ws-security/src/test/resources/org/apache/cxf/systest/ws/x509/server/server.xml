@@ -19,6 +19,7 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
     xmlns:jaxws="http://cxf.apache.org/jaxws"
     xmlns:http="http://cxf.apache.org/transports/http/configuration"
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
@@ -27,6 +28,7 @@
     xmlns:p="http://cxf.apache.org/policy"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd
         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
@@ -78,11 +80,18 @@
        <jaxws:properties>
           <entry key="ws-security.callback-handler" 
                   value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
-          <entry key="ws-security.signature.properties" 
-                  value="org/apache/cxf/systest/ws/wssec10/client/bob.properties"/> 
+          <entry key="ws-security.signature.crypto" value-ref="crypto"/>
        </jaxws:properties> 
      
     </jaxws:endpoint> 
+    
+    <bean id="crypto" class="org.apache.ws.security.components.crypto.CryptoFactory" 
+        factory-method="getInstance">
+        <constructor-arg>
+            <util:properties id="cryptoProperties" 
+                     location="classpath:org/apache/cxf/systest/ws/wssec10/client/bob.properties"/>
+        </constructor-arg>
+    </bean>
     
     <jaxws:endpoint 
        id="KeyIdentifier2"
