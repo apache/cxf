@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Context;
@@ -35,7 +36,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.common.util.ReflectionUtil;
-import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -45,7 +45,6 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.service.Service;
 
 /**
  * A single class that provides both an input and an output filter for CORS, following
@@ -263,29 +262,27 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private Method getPreflightMethod(Message m, String httpMethod) {
         String requestUri = HttpUtils.getPathToMatch(m, true);
         
-        Service service = m.getExchange().get(Service.class);
-        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)service).getClassResourceInfos();
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, 
-                                                                    requestUri, 
-                                                                    values,
-                                                                    m);
-        if (resource == null) {
+        List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(m);
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources = 
+            JAXRSUtils.selectResourceClass(resources, requestUri, m);
+        if (matchedResources == null) {
             return null;
         }
-        OperationResourceInfo ori = findPreflightMethod(resource, requestUri, httpMethod, values, m);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        OperationResourceInfo ori = findPreflightMethod(matchedResources, requestUri, httpMethod, values, m);
         return ori == null ? null : ori.getAnnotatedMethod();
     }
     
     
-    private OperationResourceInfo findPreflightMethod(ClassResourceInfo resource, 
+    private OperationResourceInfo findPreflightMethod(
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources, 
                                                       String requestUri,
                                                       String httpMethod,
                                                       MultivaluedMap<String, String> values, 
                                                       Message m) {
         final String contentType = MediaType.WILDCARD;
         final MediaType acceptType = MediaType.WILDCARD_TYPE;
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources, 
                                     m, httpMethod, values, 
                                     contentType, 
                                     Collections.singletonList(acceptType), 
@@ -295,13 +292,13 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
         }
         if (ori.isSubResourceLocator()) {
             Class<?> cls = ori.getMethodToInvoke().getReturnType();
-            ClassResourceInfo subcri = resource.getSubResource(cls, cls);
+            ClassResourceInfo subcri = ori.getClassResourceInfo().getSubResource(cls, cls);
             if (subcri == null) {
                 return null;
             } else {
                 MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
                 newValues.putAll(values);
-                return findPreflightMethod(subcri, 
+                return findPreflightMethod(Collections.singletonMap(subcri, newValues), 
                                            values.getFirst(URITemplate.FINAL_MATCH_GROUP),
                                            httpMethod, 
                                            newValues, 

@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -97,6 +98,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
@@ -136,6 +138,7 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class JAXRSUtils {
@@ -294,19 +297,19 @@ public final class JAXRSUtils {
         
     }
     
-    public static ClassResourceInfo selectResourceClass(List<ClassResourceInfo> resources,
-                                                 String path, 
-                                                 MultivaluedMap<String, String> values,
-                                                 Message message) {
+    public static Map<ClassResourceInfo, MultivaluedMap<String, String>> selectResourceClass(
+        List<ClassResourceInfo> resources, String path, Message message) {
+        
         boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
         if (isFineLevelLoggable) {
             LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH", 
                                                         BUNDLE, 
                                                         path).toString());
         }
-        if (resources.size() == 1) { 
+        if (resources.size() == 1) {
+            MultivaluedMap<String, String> values = new MetadataMap<String, String>();
             return resources.get(0).getURITemplate().match(path, values)
-                   ? resources.get(0) : null;
+                   ? Collections.singletonMap(resources.get(0), values) : null;
         }
         
         SortedMap<ClassResourceInfo, MultivaluedMap<String, String>> candidateList = 
@@ -333,47 +336,43 @@ public final class JAXRSUtils {
         }
         
         if (!candidateList.isEmpty()) {
-            Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> firstEntry = 
-                candidateList.entrySet().iterator().next();
-            values.putAll(firstEntry.getValue());
-            ClassResourceInfo cri = firstEntry.getKey();
-            if (isFineLevelLoggable) {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED", 
-                                                         BUNDLE, 
-                                                         cri.getServiceClass().getName(),
-                                                         path, cri.getURITemplate().getValue()).toString());
+            Map<ClassResourceInfo, MultivaluedMap<String, String>> cris = 
+                new LinkedHashMap<ClassResourceInfo, MultivaluedMap<String, String>>(candidateList.size());
+            ClassResourceInfo firstCri = null;
+            for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> entry : candidateList.entrySet()) {
+                ClassResourceInfo cri = entry.getKey();
+                if (cris.isEmpty()) {
+                    firstCri = cri;
+                    cris.put(cri, entry.getValue());
+                } else if (URITemplate.compareTemplates(firstCri.getURITemplate(), cri.getURITemplate()) == 0) {
+                    cris.put(cri, entry.getValue());
+                } else {
+                    break;
+                }
+                if (isFineLevelLoggable) {
+                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED", 
+                                                             BUNDLE, 
+                                                             cri.getServiceClass().getName(),
+                                                             path, cri.getURITemplate().getValue()).toString());
+                }
             }
-            return cri;
+            return cris;
         }
         
         return null;
     }
-
-    public static OperationResourceInfo findTargetMethod(ClassResourceInfo resource,
-                                                         Message message,
-                                                         String httpMethod, 
-                                                         MultivaluedMap<String, String> values, 
-                                                         String requestContentType, 
-                                                         List<MediaType> acceptContentTypes,
-                                                         boolean logNow) {
-        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
-        if (isFineLevelLoggable) {
-            org.apache.cxf.common.i18n.Message msg = 
-                new org.apache.cxf.common.i18n.Message("START_OPER_MATCH", 
-                                                       BUNDLE,
-                                                       resource.getServiceClass().getName());
-            LOG.fine(msg.toString());
-            
-        }
-        String path = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
-        if (path == null) {
-            path = "/";
-        }
+    
+    public static OperationResourceInfo findTargetMethod(
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
+        Message message,
+        String httpMethod, 
+        MultivaluedMap<String, String> matchedValues,
+        String requestContentType, 
+        List<MediaType> acceptContentTypes,
+        boolean logNow) {
         
-        SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
-            new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
-                new OperationResourceInfoComparator(message, httpMethod));
-
+        final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
+                
         MediaType requestType;
         try {
             requestType = requestContentType == null
@@ -381,72 +380,91 @@ public final class JAXRSUtils {
         } catch (IllegalArgumentException ex) {
             throw new NotSupportedException(ex);
         }
+        
+        SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
+            new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
+                new OperationResourceInfoComparator(message, httpMethod));
 
         int pathMatched = 0;
         int methodMatched = 0;
         int consumeMatched = 0;
         int produceMatched = 0;
         
-        boolean subresourcesOnly = true;
-        for (MediaType acceptType : acceptContentTypes) {
-            for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
-                URITemplate uriTemplate = ori.getURITemplate();
-                MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
-                if (uriTemplate != null && uriTemplate.match(path, map)) {
-                    boolean added = false;
-                    if (ori.isSubResourceLocator()) {
-                        candidateList.put(ori, map);
-                        added = true;
-                    } else {
-                        String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
-                        if (finalGroup == null || StringUtils.isEmpty(finalGroup)
-                            || finalGroup.equals("/")) {
-                            pathMatched++;
-                            boolean mMatched = matchHttpMethod(ori.getHttpMethod(), httpMethod);
-                            boolean cMatched = matchConsumeTypes(requestType, ori);
-                            boolean pMatched = matchProduceTypes(acceptType, ori);
-                            if (mMatched && cMatched && pMatched) {
-                                subresourcesOnly = false;
-                                candidateList.put(ori, map);
-                                added = true;
+        for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
+            ClassResourceInfo resource = rEntry.getKey();
+            MultivaluedMap<String, String> values = rEntry.getValue();
+            
+            String path = getCurrentPath(values);
+            if (isFineLevelLoggable) {
+                org.apache.cxf.common.i18n.Message msg = 
+                    new org.apache.cxf.common.i18n.Message("START_OPER_MATCH", 
+                                                           BUNDLE,
+                                                           resource.getServiceClass().getName());
+                LOG.fine(msg.toString());
+                
+            }
+            
+            boolean subresourcesOnly = true;
+            for (MediaType acceptType : acceptContentTypes) {
+                for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
+                    URITemplate uriTemplate = ori.getURITemplate();
+                    MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
+                    if (uriTemplate != null && uriTemplate.match(path, map)) {
+                        boolean added = false;
+                        if (ori.isSubResourceLocator()) {
+                            candidateList.put(ori, map);
+                            added = true;
+                        } else {
+                            String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
+                            if (finalGroup == null || StringUtils.isEmpty(finalGroup)
+                                || finalGroup.equals("/")) {
+                                pathMatched++;
+                                boolean mMatched = matchHttpMethod(ori.getHttpMethod(), httpMethod);
+                                boolean cMatched = matchConsumeTypes(requestType, ori);
+                                boolean pMatched = matchProduceTypes(acceptType, ori);
+                                if (mMatched && cMatched && pMatched) {
+                                    subresourcesOnly = false;
+                                    candidateList.put(ori, map);
+                                    added = true;
+                                } else {
+                                    methodMatched = mMatched ? methodMatched + 1 : methodMatched;
+                                    produceMatched = pMatched ? produceMatched + 1 : produceMatched;
+                                    consumeMatched = cMatched ? consumeMatched + 1 : consumeMatched;
+                                    logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
+                                }
                             } else {
-                                methodMatched = mMatched ? methodMatched + 1 : methodMatched;
-                                produceMatched = pMatched ? produceMatched + 1 : produceMatched;
-                                consumeMatched = cMatched ? consumeMatched + 1 : consumeMatched;
                                 logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                             }
-                        } else {
-                            logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                         }
+                        if (added && isFineLevelLoggable) {
+                            LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY", 
+                                      BUNDLE, 
+                                      ori.getMethodToInvoke().getName()).toString());
+                        }
+                    } else {
+                        logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                     }
-                    if (added && isFineLevelLoggable) {
-                        LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY", 
-                                  BUNDLE, 
-                                  ori.getMethodToInvoke().getName()).toString());
-                    }
-                } else {
-                    logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                 }
-            }
-            if (!candidateList.isEmpty() && !subresourcesOnly) {
-                break;
+                if (!candidateList.isEmpty() && !subresourcesOnly) {
+                    break;
+                }
             }
         }
         if (!candidateList.isEmpty()) {
             Map.Entry<OperationResourceInfo, MultivaluedMap<String, String>> firstEntry = 
                 candidateList.entrySet().iterator().next();
-            values.clear();
-            values.putAll(firstEntry.getValue());
+            matchedValues.clear();
+            matchedValues.putAll(firstEntry.getValue());
             OperationResourceInfo ori = firstEntry.getKey();
             if (headMethodPossible(ori.getHttpMethod(), httpMethod)) {
                 LOG.info(new org.apache.cxf.common.i18n.Message("GET_INSTEAD_OF_HEAD", 
-                         BUNDLE, resource.getServiceClass().getName(), 
+                         BUNDLE, ori.getClassResourceInfo().getServiceClass().getName(), 
                          ori.getMethodToInvoke().getName()).toString());
             }
             if (isFineLevelLoggable) {
                 LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED", 
                                BUNDLE, ori.getMethodToInvoke().getName(), 
-                               resource.getServiceClass().getName()).toString());
+                               ori.getClassResourceInfo().getServiceClass().getName()).toString());
             }
             return ori;
         }
@@ -464,13 +482,14 @@ public final class JAXRSUtils {
         } else {
             status = 406;
         }
-        
-        String name = resource.isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
+        Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> firstCri = 
+            matchedResources.entrySet().iterator().next();
+        String name = firstCri.getKey().isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
                                                    message.get(Message.REQUEST_URI),
-                                                   path,
+                                                   getCurrentPath(firstCri.getValue()),
                                                    httpMethod,
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
@@ -478,10 +497,20 @@ public final class JAXRSUtils {
             LOG.warning(errorMsg.toString());
         }
         Response response = 
-            createResponse(resource, message, errorMsg.toString(), status, methodMatched == 0);
+            createResponse(getRootResources(message), message, errorMsg.toString(), status, methodMatched == 0);
         throw new ClientErrorException(response);
         
     }    
+
+    private static String getCurrentPath(MultivaluedMap<String, String> values) {
+        String path = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        return path == null ?  "/" : path;
+    }
+    
+    public static List<ClassResourceInfo> getRootResources(Message message) {
+        Service service = message.getExchange().get(Service.class);
+        return ((JAXRSServiceImpl)service).getClassResourceInfos();
+    }
     
     public static boolean noResourceMethodForOptions(Response exResponse, String httpMethod) {
         return exResponse != null && exResponse.getStatus() == 405 
@@ -508,11 +537,15 @@ public final class JAXRSUtils {
         LOG.fine(errorMsg.toString());
     }
 
-    public static Response createResponse(ClassResourceInfo cri, Message msg,
+    public static Response createResponse(List<ClassResourceInfo> cris, Message msg,
                                           String responseMessage, int status, boolean addAllow) {
         ResponseBuilder rb = Response.status(status);
         if (addAllow) {
-            Set<String> allowedMethods = cri.getAllowedMethods();
+            Set<String> allowedMethods = new HashSet<String>();
+            for (ClassResourceInfo cri : cris) {
+                allowedMethods.addAll(cri.getAllowedMethods());
+            }
+            
             for (String m : allowedMethods) {
                 rb.header("Allow", m);
             }

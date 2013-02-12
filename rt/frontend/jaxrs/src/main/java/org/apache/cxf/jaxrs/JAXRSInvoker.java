@@ -234,7 +234,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                     throw new NotFoundException();
                 }
 
-                OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri,
+                OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(
+                                                         Collections.singletonMap(subCri, values),
                                                          inMessage,
                                                          httpMethod,
                                                          values,
@@ -266,7 +267,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                 Response excResponse;
                 if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), 
                         (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
-                    excResponse = JAXRSUtils.createResponse(subCri, null, null, 200, true);
+                    excResponse = JAXRSUtils.createResponse(Collections.singletonList(subCri), 
+                                                            null, null, 200, true);
                 } else {
                     excResponse = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
                 }

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.ServletConfig;
@@ -158,17 +159,21 @@ public class JAXRSUtilsTest extends Assert {
                               org.apache.cxf.jaxrs.resources.BookStore.class);
         sf.create();        
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        ClassResourceInfo bStore = JAXRSUtils.selectResourceClass(resources, "/bookstore", map, null);
+        
+        ClassResourceInfo bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/bookstore", null));
         assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.BookStore.class);
         
-        bStore = JAXRSUtils.selectResourceClass(resources, "/bookstore/", map, null);
+        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/bookstore/", null));
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.BookStore.class);
         
-        bStore = JAXRSUtils.selectResourceClass(resources, "/bookstore/bar", map, null);
+        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/bookstore/bar", null));
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class);
+    }
+    
+    private static ClassResourceInfo firstResource(Map<ClassResourceInfo, MultivaluedMap<String, String>> map) {
+        return map == null ? null : map.entrySet().iterator().next().getKey();
     }
     
     @Test
@@ -266,19 +271,19 @@ public class JAXRSUtilsTest extends Assert {
                               org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class);
         sf.create();        
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        ClassResourceInfo bStore = JAXRSUtils.selectResourceClass(resources, "/1", map, null);
+        
+        ClassResourceInfo bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1", null));
         assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.TestResourceTemplate1.class);
         
-        bStore = JAXRSUtils.selectResourceClass(resources, "/1/", map, null);
+        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1/", null));
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.TestResourceTemplate1.class);
         
-        bStore = JAXRSUtils.selectResourceClass(resources, "/1/foo", map, null);
+        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1/foo", null));
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class);
         
-        bStore = JAXRSUtils.selectResourceClass(resources, "/1/foo/bar", map, null);
+        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1/foo/bar", null));
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class);
     }
@@ -290,11 +295,10 @@ public class JAXRSUtilsTest extends Assert {
                               org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class);
         sf.create();        
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        ClassResourceInfo bStore = JAXRSUtils.selectResourceClass(resources, "/", map, null);
+        ClassResourceInfo bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/", null));
         assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class);
         
-        bStore = JAXRSUtils.selectResourceClass(resources, "/test", map, null);
+        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/test", null));
         assertEquals(bStore.getResourceClass(), 
                      org.apache.cxf.jaxrs.resources.TestResourceTemplate4.class);
         
@@ -1410,6 +1414,11 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("3", list.get(1));
     }
     
+    private Map<ClassResourceInfo, MultivaluedMap<String, String>> getMap(ClassResourceInfo cri) {
+        
+        return Collections.singletonMap(cri, (MultivaluedMap<String, String>)new MetadataMap<String, String>());
+    }
+    
     @Test
     public void testSelectResourceMethod() throws Exception {
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class);
@@ -1428,22 +1437,22 @@ public class JAXRSUtilsTest extends Assert {
         md.bind(ori2, Customer.class.getMethod("getItPlain", new Class[]{}));
         cri.setMethodDispatcher(md);
         
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(cri, null, "GET", 
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", 
               new MetadataMap<String, String>(), "*/*", getTypes("text/plain"), true);
         
         assertSame(ori, ori2);
         
-        ori = JAXRSUtils.findTargetMethod(cri, null, "GET", new MetadataMap<String, String>(), 
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
                                               "*/*", getTypes("text/xml"), true);
                          
         assertSame(ori, ori1);
         
-        ori = JAXRSUtils.findTargetMethod(cri, null, "GET", new MetadataMap<String, String>(), 
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
                                           JAXRSUtils.sortMediaTypes(getTypes("*,text/plain,text/xml")), true);
                      
         assertSame(ori, ori2);
-        ori = JAXRSUtils.findTargetMethod(cri, null, "GET", new MetadataMap<String, String>(), 
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
                                           JAXRSUtils.sortMediaTypes(getTypes("*,text/plain, text/xml,x/y")),
                                           true);
@@ -1818,11 +1827,11 @@ public class JAXRSUtilsTest extends Assert {
                                                                 String requestContentType, 
                                                                 List<MediaType> acceptContentTypes) {
         
-        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values,
-                                                                    new MessageImpl());
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources 
+            = JAXRSUtils.selectResourceClass(resources, path, new MessageImpl());
         
-        if (resource != null) {
-            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, null, httpMethod, 
+        if (mResources != null) {
+            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, null, httpMethod, 
                                                    values, requestContentType, acceptContentTypes, true);
             if (ori != null) {
                 return ori;

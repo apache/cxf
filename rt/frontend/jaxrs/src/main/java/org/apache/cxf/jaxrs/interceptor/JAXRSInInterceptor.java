@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.interceptor;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +36,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
@@ -53,7 +53,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.Service;
 
 public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
@@ -135,8 +134,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         String rawPath = HttpUtils.getPathToMatch(message, true);
         
         //1. Matching target resource class
-        Service service = message.getExchange().get(Service.class);
-        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)service).getClassResourceInfos();
+        List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(message);
 
         String acceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, null);
         if (acceptTypes == null) {
@@ -151,44 +149,47 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
 
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, 
-                                          rawPath, 
-                                          values,
-                                          message);
-        if (resource == null) {
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources = 
+            JAXRSUtils.selectResourceClass(resources, rawPath, message);
+        if (matchedResources == null) {
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC", 
                                                    BUNDLE,
                                                    message.get(Message.REQUEST_URI),
                                                    rawPath);
             LOG.warning(errorMsg.toString());
-            Response resp = JAXRSUtils.createResponse(null, message, errorMsg.toString(), 
+            Response resp = JAXRSUtils.createResponse(resources, message, errorMsg.toString(), 
                     Response.Status.NOT_FOUND.getStatusCode(), false);
             throw new NotFoundException(resp);
         }
 
-        message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
-
         String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
-        OperationResourceInfo ori = null;     
+        MultivaluedMap<String, String> matchedValues = new MetadataMap<String, String>();
         
+        
+        OperationResourceInfo ori = null;     
         boolean operChecked = false;
         List<ProviderInfo<RequestHandler>> shs = providerFactory.getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
             if (ori == null && !operChecked) {
                 try {                
-                    ori = JAXRSUtils.findTargetMethod(resource, 
-                        message, httpMethod, values, 
+                    ori = JAXRSUtils.findTargetMethod(matchedResources, 
+                        message, httpMethod, matchedValues,
                         requestContentType, acceptContentTypes, false);
-                    setExchangeProperties(message, ori, values, resources.size());
+                    setExchangeProperties(message, ori, matchedValues, resources.size());
                 } catch (WebApplicationException ex) {
                     operChecked = true;
                 }
                 
             }
             InjectionUtils.injectContexts(sh.getProvider(), sh, message);
-            Response response = sh.getProvider().handleRequest(message, resource);
+            ClassResourceInfo cri = null;
+            if (ori == null && matchedResources.size() == 1) {
+                cri = matchedResources.keySet().iterator().next();
+            } else {
+                cri = ori.getClassResourceInfo();
+            }
+            Response response = sh.getProvider().handleRequest(message, cri);
             if (response != null) {
                 message.getExchange().put(Response.class, response);
                 return;
@@ -198,12 +199,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         if (ori == null) {
             try {                
-                ori = JAXRSUtils.findTargetMethod(resource, message, 
-                                            httpMethod, values, requestContentType, acceptContentTypes, true);
-                setExchangeProperties(message, ori, values, resources.size());
+                ori = JAXRSUtils.findTargetMethod(matchedResources, message, 
+                                            httpMethod, matchedValues, requestContentType, acceptContentTypes, true);
+                setExchangeProperties(message, ori, matchedValues, resources.size());
             } catch (WebApplicationException ex) {
                 if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
-                    Response response = JAXRSUtils.createResponse(resource, null, null, 200, true);
+                    Response response = JAXRSUtils.createResponse(resources, null, null, 200, true);
                     message.getExchange().put(Response.class, response);
                     return;
                 } else {
@@ -221,7 +222,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         }
         
-        setExchangeProperties(message, ori, values, resources.size());
+        setExchangeProperties(message, ori, matchedValues, resources.size());
         
         // Global and name-bound post-match request filters
         if (JAXRSUtils.runContainerRequestFilters(providerFactory,
@@ -234,7 +235,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         //Process parameters
         try {
-            List<Object> params = JAXRSUtils.processParameters(ori, values, message);
+            List<Object> params = JAXRSUtils.processParameters(ori, matchedValues, message);
             message.setContent(List.class, params);
         } catch (IOException ex) {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
@@ -252,6 +253,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                       int numberOfResources) {
         message.put(Message.REST_MESSAGE, Boolean.TRUE);
         message.getExchange().put(OperationResourceInfo.class, ori);
+        message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, ori.getClassResourceInfo());
         message.put(RESOURCE_METHOD, ori.getMethodToInvoke());
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
         

@@ -41,17 +41,18 @@ public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo
     }
     
     public int compare(ClassResourceInfo cr1, ClassResourceInfo cr2) {
-        
+        int result = 0;
         if (rc != null) {
-            int result = rc.compare(cr1, cr2, message);
+            result = rc.compare(cr1, cr2, message);
             if (result != 0) {
                 return result;
             }
         }
         
-        return URITemplate.compareTemplates(
-               cr1.getURITemplate(), 
+        result = URITemplate.compareTemplates(
+               cr1.getURITemplate(),
                cr2.getURITemplate());
+        return result == 0 ? -1 : result;
     }
 }
     
