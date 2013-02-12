@@ -100,12 +100,19 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         } else if (assertion instanceof Assertion) {
             Assertion ass = (Assertion)assertion;
             Collection<AssertionInfo> ail = getAssertionInfo(ass.getName());
+            boolean found = false;
             for (AssertionInfo ai : ail) {
-                if (ai.getAssertion().equal(ass)
-                    && !ai.isAsserted() && !ass.isOptional()) {
-                    errors.add(ass.getName());
-                    pass = false;                    
+                if (ai.getAssertion().equal(ass)) {
+                    found = true;
+                    if (!ai.isAsserted() && !ass.isOptional()) {
+                        errors.add(ass.getName());
+                        pass = false;                    
+                    }
                 }
+            }
+            if (!found) {
+                errors.add(ass.getName());
+                return false;
             }
         }
         if (assertion instanceof PolicyContainingAssertion) {
@@ -149,6 +156,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         
         for (QName name : errors) {
             Collection<AssertionInfo> ais = getAssertionInfo(name);
+            boolean found = false;
             for (AssertionInfo ai : ais) {
                 if (!ai.isAsserted()) {
                     String s = name.toString();
@@ -156,7 +164,11 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
                         s += ": " + ai.getErrorMessage();
                     }
                     msgs.add(s);
+                    found = true;
                 }
+            }
+            if (!found) {
+                msgs.add(name.toString());
             }
         }
         StringBuilder error = new StringBuilder();
