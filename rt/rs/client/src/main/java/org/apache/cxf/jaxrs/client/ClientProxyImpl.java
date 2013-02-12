@@ -275,9 +275,6 @@ public class ClientProxyImpl extends AbstractClient implements
         int status = r.getStatus();
         
         if (status >= 300) {
-            if (m.getReturnType() == Response.class && m.getExceptionTypes().length == 0) {
-                return;
-            }            
             ResponseExceptionMapper<?> mapper = findExceptionMapper(m, inMessage);
             if (mapper != null) {
                 t = mapper.fromResponse(r);
@@ -285,7 +282,11 @@ public class ClientProxyImpl extends AbstractClient implements
                     throw t;
                 }
             } 
-                        
+                 
+            if ((t == null) && (m.getReturnType() == Response.class) && (m.getExceptionTypes().length == 0)) {
+                return;
+            }
+
             t = convertToWebApplicationException(r);
             
             if (inMessage.getExchange().get(Message.RESPONSE_CODE) == null) {

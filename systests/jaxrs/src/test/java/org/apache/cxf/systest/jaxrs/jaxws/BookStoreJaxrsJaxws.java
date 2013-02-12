@@ -28,6 +28,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
@@ -66,4 +67,8 @@ public interface BookStoreJaxrsJaxws {
     @Path("/fastinfoset2")
     @Produces({"application/fastinfoset", "text/xml", "application/xml" })
     Book getFastinfoBook();
+
+    @GET
+    @Path("/check/{id}")
+    Response checkBook(@PathParam("id") Long id);
 }

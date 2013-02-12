@@ -40,6 +40,7 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundDetails;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 import org.apache.cxf.systest.jaxrs.BookSubresource;
 import org.apache.cxf.systest.jaxrs.BookSubresourceImpl;
+import org.apache.http.HttpStatus;
 
 @SchemaValidation
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
@@ -149,6 +150,15 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     
     public Book getFastinfoBook() {
         return new Book("CXF2", 2L);
+    }
+
+    @Override
+    public Response checkBook(Long id) {
+        if (id.longValue() != 0L) {
+            return Response.status(HttpStatus.SC_NOT_FOUND).build();
+        } else {
+            return Response.ok().build();
+        }
     }
     
 }

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -81,6 +82,7 @@ import org.apache.cxf.systest.jaxrs.jaxws.UserImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.http.HttpStatus;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -436,7 +438,28 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             assertEquals("No Book with id 356 is available", ex.getMessage());
         }
     }
-    
+
+    @Test(expected = NotFoundException.class)   
+    public void testCheckBookClientException() {
+        
+        String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                          BookStoreJaxrsJaxws.class,
+                                          Collections.singletonList(new NotFoundResponseExceptionMapper()));
+        proxy.checkBook(100L);
+    }
+
+    @Test 
+    public void testCheckBookClientErrorResponse() {
+        
+        String baseAddress = "http://localhost:" + PORT + "/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                          BookStoreJaxrsJaxws.class,
+                                          Collections.singletonList(new DummyResponseExceptionMapper()));
+        Response response = proxy.checkBook(100L);
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+    }
+
     @Test
     public void testNoBook357WebClient() throws Exception {
         
@@ -926,6 +949,26 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             throw new WebApplicationException();
         }
         
+    }
+
+    @Ignore
+    public static class NotFoundResponseExceptionMapper implements ResponseExceptionMapper<Exception> {
+        
+        public Exception fromResponse(Response r) {
+            if (r.getStatus() == HttpStatus.SC_NOT_FOUND) {
+                return new NotFoundException();
+            } else {
+                return null;
+            }
+        }
+    }
+
+    @Ignore
+    public static class DummyResponseExceptionMapper implements ResponseExceptionMapper<Exception> {
+        
+        public Exception fromResponse(Response r) {
+            return null;
+        }
     }
 
     @Ignore 
