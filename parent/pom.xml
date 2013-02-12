@@ -104,6 +104,7 @@
         <cxf.geronimo.servlet25.version>1.1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
         <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
+        <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
 
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
