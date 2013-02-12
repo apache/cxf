@@ -110,8 +110,14 @@ public class EffectivePolicyImpl implements EffectivePolicy {
                     PolicyEngineImpl engine, 
                     boolean requestor, boolean request) {
         Assertor assertor = initialisePolicy(ei, boi, engine, requestor, request, null);
-        chooseAlternative(engine, assertor);
-        initialiseInterceptors(engine, requestor);  
+        if (requestor || !request) {
+            chooseAlternative(engine, assertor);
+            initialiseInterceptors(engine, requestor);
+        } else {
+            //incoming server should not choose an alternative, need to include all the policies
+            Collection<Assertion> alternative = engine.getAssertions(this.policy, true);
+            this.setChosenAlternative(alternative);
+        }
     }
     
     public void initialise(EndpointInfo ei, 
