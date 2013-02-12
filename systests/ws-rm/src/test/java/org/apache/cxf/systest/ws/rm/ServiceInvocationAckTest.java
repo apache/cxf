@@ -29,7 +29,7 @@ public class ServiceInvocationAckTest extends ServiceInvocationAckBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        startServer(PORT);
+        startServer(PORT, "");
     }
     public String getPort() {
         return PORT;

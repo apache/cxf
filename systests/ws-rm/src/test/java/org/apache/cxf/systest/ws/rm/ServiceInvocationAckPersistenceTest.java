@@ -33,14 +33,19 @@ public class ServiceInvocationAckPersistenceTest extends ServiceInvocationAckBas
     @BeforeClass
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles("synack", true);
-        startServer(PORT);
+        RMTxStore.deleteDatabaseFiles("synack-server", true);
+        startServer(PORT, "synack");
     }
     public String getPort() {
         return PORT;
     }
+    public String getPrefix() {
+        return "synack";
+    }
     @AfterClass
     public static void cleanUpDerby() throws Exception {
         RMTxStore.deleteDatabaseFiles("synack", true);
+        RMTxStore.deleteDatabaseFiles("synack-server", true);
     }
 
     protected void setupGreeter() throws Exception {
