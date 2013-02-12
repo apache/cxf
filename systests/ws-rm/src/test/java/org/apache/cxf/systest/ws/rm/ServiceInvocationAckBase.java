@@ -51,9 +51,11 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
 
     public static class Server extends AbstractBusTestServerBase {
         String port;
+        String pfx;
         Endpoint ep;
         public Server(String args[]) {
             port = args[0];
+            pfx = args[1];
         }
         protected void run() {
             SpringBusFactory factory = new SpringBusFactory();
@@ -62,11 +64,14 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
             setBus(bus);
 
             ControlImpl implementor = new ControlImpl();
+            implementor.setDbName(pfx + "-server");
             implementor.setAddress("http://localhost:" + port + "/SoapContext/GreeterPort");
             GreeterImpl greeterImplementor = new GreeterImpl();
             implementor.setImplementor(greeterImplementor);
             ep = Endpoint.publish("http://localhost:" + port + "/SoapContext/ControlPort", implementor);
             LOG.fine("Published control endpoint.");
+            BusFactory.setDefaultBus(null);
+            BusFactory.setThreadDefaultBus(null);            
         }
         public void tearDown() {
             ep.stop();
@@ -80,10 +85,14 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
     private Greeter greeter;
     
     public abstract String getPort();
+    
+    public String getPrefix() {
+        return "rmdb";
+    }
 
-    public static void startServer(String port) throws Exception {
+    public static void startServer(String port, String pfx) throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, null, new String[] {port}, true));
+                   launchServer(Server.class, null, new String[] {port, pfx}, true));
     }
     
     
@@ -202,8 +211,10 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
         
         assertTrue("Failed to start greeter", control.startGreeter(cfgResource));
         
+        System.setProperty("db.name", getPrefix());
         greeterBus = bf.createBus(cfgResource);
         BusFactory.setDefaultBus(greeterBus);
+        System.clearProperty("db.name");
         LOG.fine("Initialised greeter bus with configuration: " + cfgResource);
         
         GreeterService gs = new GreeterService();
