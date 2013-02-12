@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -156,17 +157,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
     
                 if (xmlReader == null || !StaxUtils.toNextElement(xmlReader)) {
                     // empty input
-    
-                    // TO DO : check duplicate operation with no input
-                    for (OperationInfo op : operations) {
-                        MessageInfo bmsg = op.getInput();
-                        if (bmsg.getMessageParts().size() == 0) {
-                            BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
-                            exchange.put(BindingOperationInfo.class, boi);
-                            exchange.put(OperationInfo.class, op);
-                            exchange.setOneWay(op.isOneWay());
-                        }
-                    }
+                    getBindingOperationForEmptyBody(operations, ep, exchange);
                     return;
                 }
     
@@ -225,7 +216,23 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             throw f;
         }
     }
-    
+
+    private void getBindingOperationForEmptyBody(Collection<OperationInfo> operations, Endpoint ep, Exchange exchange) {
+        // TO DO : check duplicate operation with no input and also check if the action matches 
+        for (OperationInfo op : operations) {
+            MessageInfo bmsg = op.getInput();
+            List<MessagePartInfo> bparts = bmsg.getMessageParts();
+            if (bparts.size() == 0
+                || (bparts.size() == 1 
+                    && XMLSchemaQNames.XSD_ANY.equals(bparts.get(0).getTypeQName()))) {
+                BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
+                exchange.put(BindingOperationInfo.class, boi);
+                exchange.put(OperationInfo.class, op);
+                exchange.setOneWay(op.isOneWay());
+            }
+        }
+    }
+
     private void validatePart(MessagePartInfo p, QName elName, Message m) {
         if (p == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
