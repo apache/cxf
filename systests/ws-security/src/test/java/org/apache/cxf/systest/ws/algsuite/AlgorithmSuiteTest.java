@@ -112,7 +112,6 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testCombinedPolicy() throws Exception {
         
         if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
