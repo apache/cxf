@@ -126,6 +126,16 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             LOG.fine("ReadHeadersInterceptor skipped in HTTP GET method");
             return;
         }
+
+        /*
+         * Reject OPTIONS, and any other noise that is not allowed in SOAP.
+         */
+        if (!"POST".equals((String)message.get(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD))) {
+            Fault formula405 = new Fault("HTTP verb was not GET or POST", LOG);
+            formula405.setStatusCode(405);
+            throw formula405;
+        }
+
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
         boolean closeNeeded = false;
         if (xmlReader == null) {
