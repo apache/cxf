@@ -73,6 +73,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         URL wsdl = AlgorithmSuiteTest.class.getResource("DoubleItAlgSuite.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port");
+        
         DoubleItPortType port = 
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
@@ -106,6 +107,34 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
                 // expected
             }
         }
+
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testCombinedPolicy() throws Exception {
+        
+        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = AlgorithmSuiteTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = AlgorithmSuiteTest.class.getResource("DoubleItAlgSuite.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+
+        // The client + server use Basic256 (but there is a sp:TripleDesRsa15 policy in the 
+        // WSDL as well)
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricCombinedPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        port.doubleIt(25);
         
         bus.shutdown(true);
     }

@@ -70,6 +70,12 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 assertPolicy(aim, binding.getTransportToken());
             }
             
+            // Check the AlgorithmSuite
+            AlgorithmSuitePolicyValidator algorithmValidator = new AlgorithmSuitePolicyValidator(results);
+            if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
+                continue;
+            }
+            
             // Check the IncludeTimestamp
             if (!validateTimestamp(binding.isIncludeTimestamp(), true, results, signedResults, message)) {
                 String error = "Received Timestamp does not match the requirements";
