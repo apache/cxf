@@ -29,6 +29,7 @@ import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.interceptor.Fault;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
@@ -62,6 +63,19 @@ public class ReadHeaderInterceptorTest extends TestBase {
         sbi = new StartBodyInterceptor("phase1");
         chain.add(sbi);
         chain.add(new CheckFaultInterceptor("phase2"));
+    }
+
+    @Test
+    public void testBadHttpVerb() throws Exception {
+        prepareSoapMessage("test-soap-header.xml");
+        soapMessage.put(Message.HTTP_REQUEST_METHOD, "OPTIONS");
+        ReadHeadersInterceptor r = new ReadHeadersInterceptor(BusFactory.getDefaultBus());
+        try {
+            r.handleMessage(soapMessage);
+            fail("Did not throw exception");
+        } catch (Fault f) {
+            assertEquals(405, f.getStatusCode());
+        }
     }
 
     @Test

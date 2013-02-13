@@ -33,7 +33,7 @@ import org.apache.cxf.message.MessageUtils;
  * participate in phased message processing. Developers should extend from 
  * this class when implementing custom interceptors.
  * Developers need to provide an implementation for handleMessage() and 
- * can overide the handleFault() implementation. They should not overide 
+ * can override the handleFault() implementation. They should not override
  * the other methods.
  */
 public abstract class AbstractPhaseInterceptor<T extends Message> implements PhaseInterceptor<T> {
