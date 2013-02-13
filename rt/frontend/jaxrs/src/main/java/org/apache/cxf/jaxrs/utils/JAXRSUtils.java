@@ -647,38 +647,36 @@ public final class JAXRSUtils {
             defaultValue = ori.getDefaultParameterValue();
         }
         
-        Object result = null;
-        
         if (parameter.getType() == ParameterType.PATH) {
-            result = readFromUriParam(message, parameter.getName(), parameterClass, genericParam,
+            return readFromUriParam(message, parameter.getName(), parameterClass, genericParam,
                                       paramAnns, values, defaultValue, !isEncoded);
         } 
         
         if (parameter.getType() == ParameterType.QUERY) {
-            result = readQueryString(parameter.getName(), parameterClass, genericParam, 
+            return readQueryString(parameter.getName(), parameterClass, genericParam, 
                                      paramAnns, message, defaultValue, !isEncoded);
         }
         
         if (parameter.getType() == ParameterType.MATRIX) {
-            result = processMatrixParam(message, parameter.getName(), parameterClass, genericParam,
+            return processMatrixParam(message, parameter.getName(), parameterClass, genericParam,
                                         paramAnns, defaultValue, !isEncoded);
         }
         
         if (parameter.getType() == ParameterType.FORM) {
-            result = processFormParam(message, parameter.getName(), parameterClass, genericParam, 
+            return processFormParam(message, parameter.getName(), parameterClass, genericParam, 
                                       paramAnns, defaultValue, !isEncoded);
         }
         
         if (parameter.getType() == ParameterType.COOKIE) {
-            result = processCookieParam(message, parameter.getName(), parameterClass, genericParam,
+            return processCookieParam(message, parameter.getName(), parameterClass, genericParam,
                                         paramAnns, defaultValue);
         } 
         
+        Object result = null;
         if (parameter.getType() == ParameterType.HEADER) {
             result = processHeaderParam(message, parameter.getName(), parameterClass, genericParam,
                                         paramAnns, defaultValue);
-        } 
-
+        }
         return result;
     }
     
