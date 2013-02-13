@@ -1123,8 +1123,8 @@ public abstract class HTTPConduit
                         handleResponseInternal();
                     } catch (Throwable e) {
                         ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
-                        ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
                         outMessage.setContent(Exception.class, e);
+                        ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
                         MessageObserver mo = outMessage.getInterceptorChain().getFaultObserver();
                         if (mo == null) {
                             mo = outMessage.getExchange().get(MessageObserver.class);
