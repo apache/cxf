@@ -277,7 +277,7 @@ public class BeanTypeInfo {
                 // do nothing
             } else if (RuntimeException.class.isAssignableFrom(beanClass)) {
                 beanInfo = Introspector.getBeanInfo(beanClass, RuntimeException.class);
-            } else if (Exception.class.isAssignableFrom(beanClass)) {
+            } else if (Exception.class.isAssignableFrom(beanClass) && !Exception.class.equals(beanClass)) {
                 beanInfo = Introspector.getBeanInfo(beanClass, Exception.class);
             } else if (Throwable.class.isAssignableFrom(beanClass)) {
                 beanInfo = Introspector.getBeanInfo(beanClass, Throwable.class);
