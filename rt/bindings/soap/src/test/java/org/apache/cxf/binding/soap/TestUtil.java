@@ -31,7 +31,11 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.interceptor.InterceptorChain;
-import org.apache.cxf.message.*;
+import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 public final class TestUtil {
 
