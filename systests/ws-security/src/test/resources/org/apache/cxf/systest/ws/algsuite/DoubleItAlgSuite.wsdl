@@ -57,6 +57,9 @@
         <wsdl:port name="DoubleItSymmetric128Port3" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="http://localhost:9010/DoubleItSymmetric128no3" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricCombinedPort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="http://localhost:9010/DoubleItSymmetricCombined" />
+        </wsdl:port>
         <wsdl:port name="DoubleItEncryptionOAEPPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="http://localhost:9010/DoubleItEncryptionOAEP" />
         </wsdl:port>
@@ -73,5 +76,5 @@
             <soap:address location="http://localhost:9010/DoubleItSignatureno2" />
         </wsdl:port>
     </wsdl:service>
-
+    
 </wsdl:definitions>

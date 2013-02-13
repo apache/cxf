@@ -98,6 +98,25 @@
     </jaxws:client>
     
     <jaxws:client
+        name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricCombinedPort"
+        createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice" />
+            <entry key="ws-security.callback-handler"
+                value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback" />
+            <entry key="ws-security.encryption.properties"
+                value="org/apache/cxf/systest/ws/wssec10/client/bob.properties" />
+            <entry key="ws-security.encryption.username" value="bob" />
+        </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" 
+                    URI="#DoubleItSymmetric256Policy" />
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
+    
+    <jaxws:client
         name="{http://www.example.org/contract/DoubleIt}DoubleItEncryptionOAEPPort"
         createdFromAPI="true">
         <jaxws:outInterceptors>
