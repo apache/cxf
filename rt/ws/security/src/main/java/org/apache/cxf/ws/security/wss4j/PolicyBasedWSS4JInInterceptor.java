@@ -64,6 +64,7 @@ import org.apache.cxf.ws.security.policy.model.RequiredElements;
 import org.apache.cxf.ws.security.policy.model.RequiredParts;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
 import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
+import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
