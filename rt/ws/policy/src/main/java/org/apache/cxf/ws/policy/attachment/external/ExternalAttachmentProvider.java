@@ -83,9 +83,12 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
 
     public Policy getEffectivePolicy(BindingFaultInfo bfi) {
         readDocument();
-        Policy p = new Policy();
+        Policy p = null;
         for (PolicyAttachment pa : attachments) {
             if (pa.appliesTo(bfi)) {
+                if (p == null) {
+                    p = new Policy();
+                }
                 p = p.merge(pa.getPolicy());
             }
         }
@@ -95,21 +98,26 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
 
     public Policy getEffectivePolicy(BindingMessageInfo bmi) {
         readDocument();
-        Policy p = new Policy();
+        Policy p = null;
         for (PolicyAttachment pa : attachments) {
             if (pa.appliesTo(bmi)) {
+                if (p == null) {
+                    p = new Policy();
+                }
                 p = p.merge(pa.getPolicy());
             }
         }
-                
         return p;
     }
 
     public Policy getEffectivePolicy(BindingOperationInfo boi) {
         readDocument();
-        Policy p = new Policy();
+        Policy p = null;
         for (PolicyAttachment pa : attachments) {
             if (pa.appliesTo(boi)) {
+                if (p == null) {
+                    p = new Policy();
+                }
                 p = p.merge(pa.getPolicy());
             }
         }
@@ -119,9 +127,12 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
 
     public Policy getEffectivePolicy(EndpointInfo ei) {
         readDocument();
-        Policy p = new Policy();
+        Policy p = null;
         for (PolicyAttachment pa : attachments) {
             if (pa.appliesTo(ei)) {
+                if (p == null) {
+                    p = new Policy();
+                }
                 p = p.merge(pa.getPolicy());
             }
         }
@@ -131,9 +142,12 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
 
     public Policy getEffectivePolicy(ServiceInfo si) {
         readDocument();
-        Policy p = new Policy();
+        Policy p = null;
         for (PolicyAttachment pa : attachments) {
             if (pa.appliesTo(si)) {
+                if (p == null) {
+                    p = new Policy();
+                }
                 p = p.merge(pa.getPolicy());
             }
         }
