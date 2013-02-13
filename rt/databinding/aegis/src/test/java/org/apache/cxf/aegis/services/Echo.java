@@ -30,7 +30,7 @@ public class Echo {
         return echo;
     }
     
-    public String simpleEcho(String string) {
+    public String simpleEcho(String string) throws Exception {
         return string;
     }
     @WebMethod
