@@ -60,6 +60,9 @@ public class PrimitiveAssertion
     
     @Override
     protected Assertion clone(boolean opt) {
+        if (opt == this.optional) {
+            return this;
+        }
         return new PrimitiveAssertion(name, opt, ignorable);
     }
 

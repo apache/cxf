@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
@@ -137,7 +136,7 @@ public class TransportBinding extends Binding {
             all.addPolicyComponent(transportToken);
         }
         if (isIncludeTimestamp()) {
-            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
+            all.addPolicyComponent(SP12Constants.INCLUDE_TIMESTAMP_ASSERTION);
         }
         if (getLayout() != null) {
             all.addPolicyComponent(getLayout());

@@ -33,6 +33,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
@@ -139,7 +140,7 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
     private Policy initializeEndpointPolicy(Endpoint endpoint, Bus bus) {
         
         initialize(bus);
-        
+        DescriptionInfo i = endpoint.getEndpointInfo().getDescription();
         Collection<Policy> loadedPolicies = null;
         if (policyElements != null || policyReferenceElements != null) {
             loadedPolicies = new ArrayList<Policy>();
@@ -152,7 +153,7 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
             if (null != policyReferenceElements) {
                 for (Element e : policyReferenceElements) {
                     PolicyReference pr = builder.getPolicyReference(e);
-                    Policy resolved = resolveReference(pr, e, builder, bus);
+                    Policy resolved = resolveReference(pr, builder, bus, i);
                     if (null != resolved) {
                         loadedPolicies.add(resolved);
                     }
@@ -219,12 +220,12 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         alternativeSelector = as;
     }
     
-    Policy resolveReference(PolicyReference ref, Element e, PolicyBuilder builder, Bus bus) {
+    Policy resolveReference(PolicyReference ref, PolicyBuilder builder, Bus bus, DescriptionInfo i) {
         Policy p = null;
         if (!ref.getURI().startsWith("#")) {
-            p = resolveExternal(ref, e.getBaseURI(), bus);
+            p = resolveExternal(ref, i.getBaseURI(), bus);
         } else {
-            p = resolveLocal(ref, e, bus);
+            p = resolveLocal(ref, bus, i);
         }
         if (null == p) {
             throw new PolicyException(new Message("UNRESOLVED_POLICY_REFERENCE_EXC", BUNDLE, ref.getURI()));
@@ -233,9 +234,9 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         return p;
     }   
     
-    Policy resolveLocal(PolicyReference ref, Element e, final Bus bus) {
+    Policy resolveLocal(PolicyReference ref, final Bus bus, DescriptionInfo i) {
         String uri = ref.getURI().substring(1);
-        String absoluteURI = e.getBaseURI() + uri;
+        String absoluteURI = i.getBaseURI() + uri;
         PolicyRegistry registry = bus.getExtension(PolicyEngine.class).getRegistry();
         Policy resolved = registry.lookup(absoluteURI);
         if (null != resolved) {
