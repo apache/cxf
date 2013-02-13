@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.policy;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 
 public final class SP12Constants extends SPConstants {
 
@@ -346,6 +347,9 @@ public final class SP12Constants extends SPConstants {
     public static final QName ATTACHMENTS = new QName(SP12Constants.SP_NS, SPConstants.ATTACHMENTS);
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public static final PrimitiveAssertion INCLUDE_TIMESTAMP_ASSERTION = new PrimitiveAssertion(INCLUDE_TIMESTAMP);
+    
     private SP12Constants() {
         
     }
