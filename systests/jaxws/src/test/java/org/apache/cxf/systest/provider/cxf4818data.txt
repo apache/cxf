@@ -1,0 +1,11 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:inb="http://cxf.apache.org/soapheader/inband">
+   <soapenv:Header>
+      <Action xmlns="http://www.w3.org/2005/08/addressing">http://cxf.apache.org/output</Action>
+      <MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:472f7066-56a3-4807-b1eb-ae1c786c081c</MessageID>
+      <To xmlns="http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing/anonymous</To>
+      <RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:9e58b03c-3253-4bd8-8faa-855d15e217e0</RelatesTo>
+   </soapenv:Header>
+   <soapenv:Body>
+      <inb:FooRequest/>
+   </soapenv:Body>
+</soapenv:Envelope>
