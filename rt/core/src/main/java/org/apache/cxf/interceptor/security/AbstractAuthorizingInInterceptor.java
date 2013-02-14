@@ -48,7 +48,6 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
             Method method = getTargetMethod(message);
-            
             if (authorize(sc, method)) {
                 return;
             }

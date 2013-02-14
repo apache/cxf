@@ -31,9 +31,9 @@ import org.apache.cxf.security.SecurityContext;
 
 public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInInterceptor {
 
-    private Map<String, List<String>> methodRolesMap = new HashMap<String, List<String>>();
-    private Map<String, List<String>> userRolesMap = Collections.emptyMap();
-    private List<String> globalRoles = Collections.emptyList();
+    protected Map<String, List<String>> methodRolesMap = new HashMap<String, List<String>>();
+    protected Map<String, List<String>> userRolesMap = Collections.emptyMap();
+    protected List<String> globalRoles = Collections.emptyList();
     private boolean checkConfiguredRolesOnly;
     
     @Override 
