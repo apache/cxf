@@ -126,7 +126,11 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
 
             } else {
                 // TODO: wsdl2.0 support
+                throw new ToolException("Only WSDL 1.1 supported");
             }
+        }
+        if (serviceList.isEmpty()) {
+            throw new ToolException("Did not find any services in WSDL");
         }
         Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
         
