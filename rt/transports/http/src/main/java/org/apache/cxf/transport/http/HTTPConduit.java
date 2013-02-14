@@ -1537,8 +1537,8 @@ public class HTTPConduit
                             handleResponseInternal();
                         } catch (Exception e) {
                             ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
-                            ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
                             outMessage.setContent(Exception.class, e);
+                            ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
                             outMessage.getInterceptorChain().getFaultObserver().onMessage(outMessage);
                         }
                     }
