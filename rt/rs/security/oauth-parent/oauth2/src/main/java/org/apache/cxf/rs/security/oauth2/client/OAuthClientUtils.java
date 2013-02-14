@@ -24,7 +24,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -164,7 +165,7 @@ public final class OAuthClientUtils {
                     String data = consumer.getKey() + ":" + consumer.getSecret();
                     sb.append(Base64Utility.encode(data.getBytes("UTF-8")));
                 } catch (Exception ex) {
-                    throw new ClientException(ex);
+                    throw new ProcessingException(ex);
                 }
                 accessTokenService.header("Authorization", sb.toString());
             } else {
@@ -180,7 +181,7 @@ public final class OAuthClientUtils {
         try {
             map = new OAuthJSONProvider().readJSONResponse((InputStream)response.getEntity());
         } catch (IOException ex) {
-            throw new ClientException(ex);
+            throw new ResponseProcessingException(response, ex);
         }
         if (200 == response.getStatus()) {
             ClientAccessToken token = fromMapToClientToken(map);
@@ -284,7 +285,7 @@ public final class OAuthClientUtils {
             String macKey = token.getParameters().get(OAuthConstants.MAC_TOKEN_KEY);
             sb.append(macAuthData.toAuthorizationHeader(macAlgo, macKey));
         } else {
-            throw new ClientException(new OAuthServiceException("Unsupported token type"));
+            throw new ProcessingException(new OAuthServiceException("Unsupported token type"));
         }
         
     }

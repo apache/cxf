@@ -23,8 +23,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
@@ -41,6 +41,7 @@ import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -64,7 +65,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             assertEquals(123L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -89,7 +90,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             assertEquals(125L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -121,7 +122,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             assertEquals(123L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -146,7 +147,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             assertEquals(125L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -172,7 +173,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
             assertEquals(125L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {

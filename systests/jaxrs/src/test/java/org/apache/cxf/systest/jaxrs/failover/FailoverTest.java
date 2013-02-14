@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.clustering.FailoverFeature;
@@ -151,7 +151,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, true, false, false);
     }
     
-    @Test(expected = ClientException.class)    
+    @Test(expected = ProcessingException.class)    
     public void testSequentialStrategyFailure() throws Exception {
         FailoverFeature feature = 
             getFeature(false, false, "http://localhost:" + NON_PORT + "/non-existent"); 
@@ -176,7 +176,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         try {
             store.getBook("1");
             fail("Exception expected");
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             assertEquals(10, strategy.getTotalCount());
             assertEquals(5, strategy.getAddressCount(address));
             assertEquals(5, strategy.getAddressCount(address2));

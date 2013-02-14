@@ -29,12 +29,12 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BeanParam;
-import javax.ws.rs.BindingPriority;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -45,6 +45,7 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.NameBinding;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.ResourceContext;
@@ -130,8 +131,8 @@ public final class AnnotationUtils {
     }
 
     public static int getBindingPriority(Class<?> providerCls) {
-        BindingPriority b = providerCls.getAnnotation(BindingPriority.class);
-        return b == null ? BindingPriority.USER : b.value();
+        Priority b = providerCls.getAnnotation(Priority.class);
+        return b == null ? Priorities.USER : b.value();
     }
     public static List<String> getNameBindings(Annotation[] targetAnns) {
         if (targetAnns.length == 0) {

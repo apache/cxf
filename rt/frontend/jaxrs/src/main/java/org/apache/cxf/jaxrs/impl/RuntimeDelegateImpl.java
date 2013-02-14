@@ -113,6 +113,13 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         Server server = bean.create();
         return endpointType.cast(server);
     }
+
+
+
+    @Override
+    public Link.Builder createLinkBuilder() {
+        return new LinkBuilderImpl();
+    }
     
 
 }

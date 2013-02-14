@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
@@ -62,7 +62,7 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
                 try {
                     filter.getProvider().filter(reqContext, respContext);
                 } catch (IOException ex) {
-                    throw new ClientException(ex);
+                    throw new ProcessingException(ex);
                 }
             }
         }

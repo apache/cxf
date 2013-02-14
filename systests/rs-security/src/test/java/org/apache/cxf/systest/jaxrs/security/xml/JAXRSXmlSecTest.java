@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -88,7 +88,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             assertEquals(126L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -138,7 +138,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             assertEquals(126L, book.getId());
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {
@@ -300,7 +300,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             } else {
                 fail(ex.getMessage());
             }
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             if (ex.getCause() != null && ex.getCause().getMessage() != null) {
                 fail(ex.getCause().getMessage());
             } else {

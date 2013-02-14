@@ -37,8 +37,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -610,7 +610,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                                    m.getDeclaringClass().getName(), 
                                                    m.getName());
         LOG.severe(errorMsg.toString());
-        throw new ClientException(errorMsg.toString());
+        throw new ProcessingException(errorMsg.toString());
     }
     
     private class BodyWriter extends AbstractBodyWriter {

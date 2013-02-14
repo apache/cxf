@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.InvocationCallback;
 
 import org.apache.cxf.endpoint.ClientCallback;
@@ -104,13 +104,13 @@ class JaxrsClientCallback<T> extends ClientCallback {
     @Override
     public void handleException(Map<String, Object> ctx, final Throwable ex) {
         context = ctx;
-        if (ex instanceof ClientException) {
+        if (ex instanceof ProcessingException) {
             exception = ex;
         } else {
-            exception = new ClientException(ex);
+            exception = new ProcessingException(ex);
         }
         if (handler != null) {
-            handler.failed((ClientException)exception);
+            handler.failed((ProcessingException)exception);
         }
         done = true;
         synchronized (this) {

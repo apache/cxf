@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.UriBuilder;
 
 import net.oauth.OAuth;
@@ -172,7 +172,7 @@ public final class OAuthClientUtils {
             }
             return sb.toString();
         } catch (Exception ex) {
-            throw new ClientException(ex);
+            throw new ProcessingException(ex);
         }
     }
     

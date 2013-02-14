@@ -38,8 +38,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -479,7 +480,7 @@ public abstract class AbstractClient implements Client, Retryable {
                 reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
             }
         } else {
-            reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, null);
+            reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, r);
         }
         return null;                                                
     }
@@ -520,10 +521,10 @@ public abstract class AbstractClient implements Client, Retryable {
     protected void checkClientException(Message outMessage, Exception ex) throws Exception {
         Integer responseCode = getResponseCode(outMessage.getExchange());
         if (responseCode == null) {
-            if (ex instanceof ClientException) {
+            if (ex instanceof ProcessingException) {
                 throw ex;
             } else if (ex != null) {
-                throw new ClientException(ex);
+                throw new ProcessingException(ex);
             } else if (!outMessage.getExchange().isOneWay() || cfg.isResponseExpectedForOneway()) {
                 waitForResponseCode(outMessage.getExchange());
             }
@@ -544,7 +545,7 @@ public abstract class AbstractClient implements Client, Retryable {
         }
         
         if (getResponseCode(exchange) == null) {
-            throw new ClientException("Response timeout");
+            throw new ProcessingException("Response timeout");
         }
     }
     
@@ -710,7 +711,11 @@ public abstract class AbstractClient implements Client, Retryable {
                                                    cls,
                                                    ct.toString());
         LOG.severe(errorMsg.toString());
-        throw new ClientException(errorMsg.toString(), cause);
+        if (response == null) {
+            throw new ProcessingException(errorMsg.toString(), cause);
+        } else {
+            throw new ResponseProcessingException(response, errorMsg.toString(), cause);
+        }
     }
     
     private static MediaType getResponseContentType(Response r) {

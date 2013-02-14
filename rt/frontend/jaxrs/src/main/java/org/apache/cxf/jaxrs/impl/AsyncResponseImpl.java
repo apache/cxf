@@ -18,7 +18,13 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ServiceUnavailableException;
@@ -47,7 +53,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     private boolean resumedByApplication;
     private TimeoutHandler timeoutHandler;
     
-    private CompletionCallback completionCallback;
+    private List<CompletionCallback> completionCallbacks;
     private Throwable unmappedThrowable;
     
     public AsyncResponseImpl(Message inMessage) {
@@ -131,14 +137,15 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
 
     @Override
-    public synchronized void setTimeout(long time, TimeUnit unit) throws IllegalStateException {
+    public synchronized boolean setTimeout(long time, TimeUnit unit) throws IllegalStateException {
         if (isCancelledOrNotSuspended()) {
-            throw new IllegalStateException();
+            return false;
         }
         inMessage.getExchange().put(AsyncResponse.class, this);
         long timeout = TimeUnit.MILLISECONDS.convert(time, unit);
         initialSuspend = false;
         cont.suspend(timeout);
+        return true;
     }
 
     @Override
@@ -147,62 +154,80 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
     }
 
     @Override
-    public boolean register(Class<?> callback) throws NullPointerException {
-        return register(callback, CompletionCallback.class)[0];
+    public Collection<Class<?>> register(Class<?> callback) throws NullPointerException {
+        return register(callback, new Class<?>[]{}).get(callback);
     }
 
     @Override
-    public boolean[] register(Class<?> callback, Class<?>... callbacks) throws NullPointerException {
+    public Map<Class<?>, Collection<Class<?>>> register(Class<?> callback, Class<?>... callbacks) 
+        throws NullPointerException {
         try {
-            return register(callback.newInstance(), CompletionCallback.class);    
+            Object[] extraCallbacks = new Object[callbacks.length];
+            for (int i = 0; i < callbacks.length; i++) {
+                extraCallbacks[i] = callbacks[i].newInstance();
+            }
+            return register(callback.newInstance(), extraCallbacks);    
         } catch (Throwable t) {
-            return new boolean[]{false};
+            return Collections.emptyMap();
         }
         
     }
 
-    //TODO: API bug, boolean[] needs to be returned...
     @Override
-    public boolean register(Object callback) throws NullPointerException {
-        return register(callback, CompletionCallback.class)[0];
+    public Collection<Class<?>> register(Object callback) throws NullPointerException {
+        return register(callback, new Object[]{}).get(callback.getClass());
     }
 
-    //TODO: API bug, has to be Class<?>...
     @Override
-    public boolean[] register(Object callback, Object... callbacks) throws NullPointerException {
-        boolean[] result = new boolean[callbacks.length];
+    public Map<Class<?>, Collection<Class<?>>> register(Object callback, Object... callbacks) 
+        throws NullPointerException {
+        Map<Class<?>, Collection<Class<?>>> map = 
+            new HashMap<Class<?>, Collection<Class<?>>>();
+    
+        Object[] allCallbacks = new Object[1 + callbacks.length];
+        allCallbacks[0] = callback;
+        System.arraycopy(allCallbacks, 1, callbacks, 0, callbacks.length);
         
-        for (int i = 0; i < callbacks.length; i++) {
-            Object interf = callbacks[i];
-            if (interf == null) {
+        for (int i = 0; i < allCallbacks.length; i++) {
+            if (allCallbacks[i] == null) {
                 throw new NullPointerException();
             }
-            Class<?> cls = (Class<?>)interf;
-            if (cls == CompletionCallback.class && callback instanceof CompletionCallback) {
-                completionCallback = (CompletionCallback)callback;
-                result[i] = true;
-            } else {
-                result[i] = false;
+            Class<?> callbackCls = allCallbacks[i].getClass();
+            Collection<Class<?>> knownCallbacks = map.get(callbackCls);
+            if (knownCallbacks == null) {
+                knownCallbacks = new LinkedList<Class<?>>();
+                map.put(callbackCls, knownCallbacks);
+            }
+            
+            if (allCallbacks[i] instanceof CompletionCallback) {
+                knownCallbacks.add(CompletionCallback.class);
+                if (completionCallbacks == null) {
+                    completionCallbacks = new LinkedList<CompletionCallback>();
+                    completionCallbacks.add((CompletionCallback)allCallbacks[i]);        
+                }
             }
         }
-        return result;
+        return map;
     }
     
     @Override
     public void onComplete() {
         done = true;
-        if (completionCallback != null) {
-            completionCallback.onComplete(unmappedThrowable);
-        }
+        updateCompletionCallbacks(unmappedThrowable);
     }
 
     @Override
     public void onError(Throwable error) {
-        if (completionCallback != null) {
+        updateCompletionCallbacks(error);
+    }
+    
+    private void updateCompletionCallbacks(Throwable error) {
+        if (completionCallbacks != null) {
             Throwable actualError = error instanceof Fault ? ((Fault)error).getCause() : error;
-            completionCallback.onComplete(actualError);
+            for (CompletionCallback completionCallback : completionCallbacks) {
+                completionCallback.onComplete(actualError);
+            }
         }
-        
     }
     
     public synchronized boolean suspendContinuationIfNeeded() {

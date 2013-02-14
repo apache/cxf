@@ -34,7 +34,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.MessageProcessingException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -267,28 +268,28 @@ public final class ResponseImpl extends Response {
         }
     }
     
-    public <T> T readEntity(Class<T> cls) throws MessageProcessingException, IllegalStateException {
+    public <T> T readEntity(Class<T> cls) throws ProcessingException, IllegalStateException {
         return readEntity(cls, new Annotation[]{});
     }
 
-    public <T> T readEntity(GenericType<T> genType) throws MessageProcessingException, IllegalStateException {
+    public <T> T readEntity(GenericType<T> genType) throws ProcessingException, IllegalStateException {
         return readEntity(genType, new Annotation[]{});
     }
 
-    public <T> T readEntity(Class<T> cls, Annotation[] anns) throws MessageProcessingException,
+    public <T> T readEntity(Class<T> cls, Annotation[] anns) throws ProcessingException,
         IllegalStateException {
         
         return doReadEntity(cls, cls, anns);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T readEntity(GenericType<T> genType, Annotation[] anns) throws MessageProcessingException,
+    public <T> T readEntity(GenericType<T> genType, Annotation[] anns) throws ProcessingException,
         IllegalStateException {
         return doReadEntity((Class<T>)genType.getRawType(), 
                             genType.getType(), anns);
     }
     
-    public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns) throws MessageProcessingException,
+    public <T> T doReadEntity(Class<T> cls, Type t, Annotation[] anns) throws ProcessingException,
         IllegalStateException {
         
         checkEntityIsClosed();
@@ -321,14 +322,14 @@ public final class ResponseImpl extends Response {
                                                                 mediaType, 
                                                                 responseMessage));
                 } catch (Exception ex) {
-                    throw new MessageProcessingException(ex);
+                    throw new ResponseProcessingException(this, ex);
                 } finally {
                     closeIfNotBufferred(cls);
                 }
             }
         }
         
-        throw new MessageProcessingException("No Message Body reader is available");
+        throw new ResponseProcessingException(this, "No Message Body reader is available");
     }
     
     private void closeIfNotBufferred(Class<?> responseCls) {
@@ -337,7 +338,7 @@ public final class ResponseImpl extends Response {
         }
     }
     
-    public boolean bufferEntity() throws MessageProcessingException {
+    public boolean bufferEntity() throws ProcessingException {
         if (entityClosed) {
             throw new IllegalStateException();
         }
@@ -347,20 +348,20 @@ public final class ResponseImpl extends Response {
                 entity = IOUtils.loadIntoBAIS(oldEntity);
                 entityBufferred = true;
             } catch (IOException ex) {
-                throw new MessageProcessingException(ex);
+                throw new ResponseProcessingException(this, ex);
             }
         }
         return entityBufferred;
     }
 
-    public void close() throws MessageProcessingException {
+    public void close() throws ProcessingException {
         if (!entityClosed) {
             if (entity instanceof InputStream) {
                 try {
                     ((InputStream)entity).close();
                     entity = null;
                 } catch (IOException ex) {
-                    throw new MessageProcessingException(ex);
+                    throw new ResponseProcessingException(this, ex);
                 }
             }
             entityClosed = true;

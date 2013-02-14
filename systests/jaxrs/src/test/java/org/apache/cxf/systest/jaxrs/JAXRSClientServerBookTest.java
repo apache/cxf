@@ -32,9 +32,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -187,7 +188,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         try {
             store.getBook("123");
             fail("ClientException expected");
-        } catch (ClientException ex) {
+        } catch (ProcessingException ex) {
             // expected
         }
     }
@@ -1142,12 +1143,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(444L, book.getId());
     }
     
-    @Test(expected = ClientException.class)
+    @Test(expected = ResponseProcessingException.class)
     public void testEmptyJSON() {
         doTestEmptyResponse("application/json");
     }
     
-    @Test(expected = ClientException.class)
+    @Test(expected = ResponseProcessingException.class)
     public void testEmptyJAXB() {
         doTestEmptyResponse("application/xml");
     }
@@ -1159,7 +1160,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         wc.get(Book.class);
     }
     
-    @Test(expected = ClientException.class)
+    @Test(expected = ResponseProcessingException.class)
     public void testEmptyResponseProxy() {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         WebClient.getConfig(store).getInInterceptors().add(new ReplaceStatusInterceptor());

@@ -28,7 +28,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.BindingPriority;
+import javax.annotation.Priority;
 import javax.ws.rs.NameBinding;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -104,7 +104,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     
     @PreMatching
-    @BindingPriority(1)
+    @Priority(1)
     private static class PreMatchContainerRequestFilter implements ContainerRequestFilter {
 
         @Override
@@ -121,7 +121,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
     }
     
     @PreMatching
-    @BindingPriority(3)
+    @Priority(3)
     private static class PreMatchContainerRequestFilter2 implements ContainerRequestFilter {
 
         @Override
@@ -137,7 +137,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
     
         
     @PreMatching
-    @BindingPriority(2)
+    @Priority(2)
     private static class PreMatchDynamicContainerRequestFilter implements ContainerRequestFilter {
 
         @Override
@@ -174,7 +174,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
     }
     
-    @BindingPriority(3)
+    @Priority(3)
     public static class PostMatchContainerResponseFilter implements ContainerResponseFilter {
 
         @Override
@@ -185,7 +185,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
     }
     
-    @BindingPriority(1)
+    @Priority(1)
     public static class PostMatchContainerResponseFilter2 implements ContainerResponseFilter {
 
         @Override
@@ -200,7 +200,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         }
         
     }
-    @BindingPriority(4)
+    @Priority(4)
     @CustomHeaderAdded
     @PostMatchMode
     public static class PostMatchContainerResponseFilter3 implements ContainerResponseFilter {
@@ -215,7 +215,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         
     }
     
-    @BindingPriority(2)
+    @Priority(2)
     public static class PostMatchDynamicContainerResponseFilter implements ContainerResponseFilter {
 
         @Override

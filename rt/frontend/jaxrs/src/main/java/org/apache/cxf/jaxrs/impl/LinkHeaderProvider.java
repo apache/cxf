@@ -50,7 +50,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         if (!value.startsWith("<") || closeIndex < 2) {
             throw new IllegalArgumentException("Link URI is missing");
         }
-        Link.Builder builder = new Link.Builder();
+        Link.Builder builder = new LinkBuilderImpl();
         builder.uri(value.substring(1, closeIndex).trim());
         if (closeIndex < value.length() - 1) {
             

@@ -100,4 +100,24 @@ public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo>
         return get().getMatchedURIs(decode);
     }
 
+    @Override
+    public URI relativize(URI uri) {
+        return get().relativize(uri);
+    }
+
+    @Override
+    public URI relativize(URI uri1, URI uri2) {
+        return get().relativize(uri1, uri2);
+    }
+
+    @Override
+    public URI resolve(URI uri) {
+        return get().resolve(uri);
+    }
+
+    @Override
+    public URI resolve(URI uri1, URI uri2) {
+        return get().resolve(uri1, uri2);
+    }
+
 }

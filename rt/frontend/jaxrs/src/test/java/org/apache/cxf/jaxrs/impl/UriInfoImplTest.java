@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -47,6 +48,43 @@ public class UriInfoImplTest extends Assert {
     public void setUp() {
         control = EasyMock.createNiceControl();
         control.makeThreadSafe(true);
+    }
+    
+    @Test
+    public void testResolve() {
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", null), null);
+        assertEquals("Wrong base path", "http://localhost:8080/baz", 
+                     u.getBaseUri().toString());
+        URI resolved = u.resolve(URI.create("a"));
+        assertEquals("http://localhost:8080/baz/a", resolved.toString());
+    }
+    
+    @Test
+    public void testResolveNormalizeSimple() {
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", null), null);
+        assertEquals("Wrong base path", "http://localhost:8080/baz", 
+                     u.getBaseUri().toString());
+        URI resolved = u.resolve(URI.create("./a"));
+        assertEquals("http://localhost:8080/baz/a", resolved.toString());
+    }
+    
+    @Test
+    public void testRelativize() {
+        UriInfoImpl u = new UriInfoImpl(
+            mockMessage("http://localhost:8080/app/root", "/a/b/c"), null);
+        assertEquals("Wrong Request Uri", "http://localhost:8080/app/root/a/b/c", 
+                     u.getRequestUri().toString());
+        URI relativized = u.relativize(URI.create("http://localhost:8080/app/root/a/d/e"));
+        assertEquals("../../d/e", relativized.toString());
+    }
+    
+    @Test
+    public void testResolveNormalizeComplex() throws Exception {
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/1/2/3/", null), null);
+        assertEquals("Wrong base path", "http://localhost:8080/baz/1/2/3/", 
+                     u.getBaseUri().toString());
+        URI resolved = u.resolve(new URI("../../a"));
+        assertEquals("http://localhost:8080/baz/1/a", resolved.toString());
     }
     
     @Test

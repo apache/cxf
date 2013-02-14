@@ -52,9 +52,10 @@ public class LinkHeaderProviderTest extends Assert {
     @Test
     public void testToString() {
         String headerValue = "<http://bar>;rel=next;title=\"Next Link\";type=text/xml;method=get";
+        String expected = "<http://bar>;rel=\"next\";title=\"Next Link\";type=\"text/xml\";method=\"get\"";
         Link l = Link.valueOf(headerValue);
         String result = l.toString();
-        assertEquals(result, headerValue);
+        assertEquals(expected, result);
     }
     
         

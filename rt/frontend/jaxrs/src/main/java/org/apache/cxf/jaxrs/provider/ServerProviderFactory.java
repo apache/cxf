@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.BindingPriority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -458,7 +458,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         
         @Override
         public FeatureContext register(Object provider, Class<?>... contracts) {
-            return register(provider, BindingPriority.USER, contracts);
+            return register(provider, Priorities.USER, contracts);
         }
         
         //@Override
@@ -487,7 +487,7 @@ public final class ServerProviderFactory extends ProviderFactory {
 
         @Override
         public FeatureContext register(Class<?> providerClass, Class<?>... contracts) {
-            return register(providerClass, BindingPriority.USER, contracts);
+            return register(providerClass, Priorities.USER, contracts);
         }
 
         @Override
@@ -686,18 +686,18 @@ public final class ServerProviderFactory extends ProviderFactory {
             return false;
         }
         
-        @Override
-        public FeatureContext setProperty(String name, Object value) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-        
         private Object createProvider(Class<?> cls) {
             try {
                 return cls.newInstance();
             } catch (Throwable ex) {
                 throw new RuntimeException(ex); 
             }
+        }
+
+        @Override
+        public FeatureContext property(String arg0, Object arg1) {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
     

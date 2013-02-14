@@ -102,7 +102,7 @@
         <cxf.httpcomponents.core.version.range>[4.2.1,4.3.0)</cxf.httpcomponents.core.version.range>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.mina.version>2.0.5</cxf.mina.version>
-        <cxf.geronimo.annotation.version>1.1.1</cxf.geronimo.annotation.version>
+        <cxf.javax.annotation-api.version>1.2-b02</cxf.javax.annotation-api.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
@@ -110,7 +110,7 @@
         <cxf.geronimo.servlet25.version>1.1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
         <cxf.geronimo.ws.metadata.version>1.1.3</cxf.geronimo.ws.metadata.version>
-        <cxf.javax.ws.rs.version>2.0-m15</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.0-m16</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
         <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
@@ -1223,9 +1223,9 @@
                 <version>0.5.1</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-annotation_1.0_spec</artifactId>
-                <version>${cxf.geronimo.annotation.version}</version>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${cxf.javax.annotation-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>${cxf.servlet-api.group}</groupId>

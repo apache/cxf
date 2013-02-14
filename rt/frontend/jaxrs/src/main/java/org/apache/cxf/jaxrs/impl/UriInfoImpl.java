@@ -45,7 +45,9 @@ import org.apache.cxf.message.MessageUtils;
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
     private static final String CASE_INSENSITIVE_QUERIES = "org.apache.cxf.http.case_insensitive_queries";
-
+    private static final String CURRENT_PATH_SEGMENT = ".";
+    private static final String PARENT_PATH_SEGMENT = "..";
+    
     private MultivaluedMap<String, String> templateParams;
     private Message message;
     private OperationResourceInfoStack stack;
@@ -213,5 +215,88 @@ public class UriInfoImpl implements UriInfo {
             address = address.substring(0, address.length() - 1);
         }
         return address + path;
+    }
+
+    @Override
+    public URI relativize(URI uri) {
+        URI resolved = resolve(uri);
+        URI requestURI = getRequestUri();
+        if (!getUriPrefix(resolved).equals(getUriPrefix(requestURI))) {
+            return resolved;
+        }
+        List<PathSegment> resolvedSegments = JAXRSUtils.getPathSegments(resolved.getRawPath(), false);
+        List<PathSegment> requestSegments = JAXRSUtils.getPathSegments(requestURI.getRawPath(), false);
+        
+        int count = 0;
+        for (int i = resolvedSegments.size() - 1; i >= 0; i--) {
+            if (i <= requestSegments.size() - 1) {
+                String resolvedPath = resolvedSegments.get(i).getPath();
+                String requestPath = requestSegments.get(i).getPath();
+                if (!resolvedPath.equals(requestPath)) {
+                    count++;
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        
+        for (int i = 0; i < count; i++) {
+            if (i != 0) {
+                sb.append("/");
+            }
+            sb.append(PARENT_PATH_SEGMENT);
+        }
+        for (int i = count + 1; i < resolvedSegments.size(); i++) {
+            if (i != 0) {
+                sb.append("/");
+            }
+            sb.append(resolvedSegments.get(i).getPath());
+        }
+        return URI.create(sb.toString());
+    }
+    
+    private static String getUriPrefix(URI uri) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(uri.getScheme()).append(uri.getHost()).append(uri.getPort());
+        
+        return sb.toString();
+    }
+
+    @Override
+    public URI resolve(URI uri) {
+        if (!uri.isAbsolute()) {
+            String uriValue = uri.toString();
+            boolean parentPathSegmentAvail = uriValue.contains(PARENT_PATH_SEGMENT)
+                || uriValue.contains(CURRENT_PATH_SEGMENT); 
+            uri = getBaseUriBuilder().path(uriValue).build();
+            if (parentPathSegmentAvail) {
+                List<PathSegment> segments = JAXRSUtils.getPathSegments(uri.getRawPath(), false);
+                List<PathSegment> actualSegments = new LinkedList<PathSegment>();
+                UriBuilder ub = UriBuilder.fromUri(uri).replacePath(null);
+                for (PathSegment ps : segments) {
+                    if (PARENT_PATH_SEGMENT.equals(ps.getPath()) && !actualSegments.isEmpty()) {
+                        actualSegments.remove(actualSegments.size() - 1);
+                    } else if (!CURRENT_PATH_SEGMENT.equals(ps.getPath())) {
+                        actualSegments.add(ps);
+                    }
+                }
+                for (PathSegment ps : actualSegments) {
+                    ub.segment(ps.toString());
+                }
+                uri = ub.build();
+            }
+        }
+        return uri;
+    }
+    
+    @Override
+    public URI relativize(URI arg0, URI arg1) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public URI resolve(URI arg0, URI arg1) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.client.spec;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.client.ClientException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.Response;
@@ -74,7 +74,7 @@ public class ClientRequestFilterInterceptor extends AbstractOutDatabindingInterc
                         return;
                     }
                 } catch (IOException ex) {
-                    throw new ClientException(ex);
+                    throw new ProcessingException(ex);
                 }
             }
         }

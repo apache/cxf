@@ -81,6 +81,10 @@
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
         <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-bindings-xml</artifactId>
             <version>${project.version}</version>

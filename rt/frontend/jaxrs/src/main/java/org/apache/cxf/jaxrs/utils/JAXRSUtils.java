@@ -52,6 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotAllowedException;
@@ -161,6 +162,7 @@ public final class JAXRSUtils {
         EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
         EXCEPTIONS_MAP.put(400, BadRequestException.class);
         EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
+        EXCEPTIONS_MAP.put(403, ForbiddenException.class);
         EXCEPTIONS_MAP.put(404, NotFoundException.class);
         EXCEPTIONS_MAP.put(405, NotAllowedException.class);
         EXCEPTIONS_MAP.put(406, NotAcceptableException.class);

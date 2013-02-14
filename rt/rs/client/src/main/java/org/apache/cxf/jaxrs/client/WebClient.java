@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.AsyncInvoker;
-import javax.ws.rs.client.ClientException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Cookie;
@@ -944,8 +944,8 @@ public class WebClient extends AbstractClient {
         } catch (Exception ex) {
             throw ex instanceof WebApplicationException 
                 ? (WebApplicationException)ex 
-                : ex instanceof ClientException 
-                ? new ClientException(ex) : new RuntimeException(ex); 
+                : ex instanceof ProcessingException 
+                ? (ProcessingException)ex : new ProcessingException(ex); 
         }
         
         Response response = null;
@@ -988,8 +988,8 @@ public class WebClient extends AbstractClient {
             
             return r;
         } catch (Throwable ex) {
-            throw (ex instanceof ClientException) ? (ClientException)ex
-                                                  : new ClientException(ex);
+            throw (ex instanceof ProcessingException) ? (ProcessingException)ex
+                                                  : new ProcessingException(ex);
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
