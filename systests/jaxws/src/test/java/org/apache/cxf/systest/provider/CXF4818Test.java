@@ -1,0 +1,154 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.apache.cxf.systest.provider;
+
+
+import java.io.InputStream;
+import java.io.StringReader;
+
+import javax.annotation.Resource;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Provider;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.soap.Addressing;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+public class CXF4818Test extends AbstractBusClientServerTestBase {
+
+    public static final String ADDRESS 
+        = "http://localhost:" + TestUtil.getPortNumber(Server.class)
+            + "/AddressProvider/AddressProvider";
+    
+    public static class Server extends AbstractBusTestServerBase {
+
+        protected void run() {
+            Object implementor = new CXF4818Provider();
+            Endpoint.publish(ADDRESS, implementor);                                 
+        }
+
+        public static void main(String[] args) {
+            try {
+                Server s = new Server();
+                s.start();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.exit(-1);
+            } finally {
+                System.out.println("done!");
+            }
+        }
+    }
+
+    @BeforeClass
+    public static void startServers() throws Exception {
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+    }
+    
+    @Test
+    public void testCXF4818() throws Exception {
+        InputStream body = getClass().getResourceAsStream("cxf4818data.txt");
+        HttpClient client = new HttpClient();
+        PostMethod post = new PostMethod(ADDRESS);
+        post.setRequestEntity(new InputStreamRequestEntity(body, "text/xml"));
+        client.executeMethod(post); 
+
+        Document doc = StaxUtils.read(post.getResponseBodyAsStream());
+        //System.out.println(StaxUtils.toString(doc));
+        Element root = doc.getDocumentElement();
+        Node child = root.getFirstChild();
+        
+        boolean foundBody = false;
+        boolean foundHeader = false;
+        while (child != null) {
+            if ("Header".equals(child.getLocalName())) {
+                foundHeader = true;
+                assertFalse("Already found body", foundBody);
+            } else if ("Body".equals(child.getLocalName())) {
+                foundBody = true;
+                assertTrue("Did not find header before the body", foundHeader);
+            }
+            child = child.getNextSibling();
+        }
+        assertTrue("Did not find the soap:Body element", foundBody);
+        assertTrue("Did not find the soap:Header element", foundHeader);
+    }
+
+    
+    
+    @WebServiceProvider(serviceName = "GenericService",
+        targetNamespace = "http://cxf.apache.org/basictest", 
+        portName = "GenericServicePosrt")
+    @ServiceMode(value = javax.xml.ws.Service.Mode.MESSAGE)
+    @Addressing
+    public static class CXF4818Provider implements Provider<SOAPMessage> {
+
+        @Resource
+        protected WebServiceContext context;
+
+        public SOAPMessage invoke(SOAPMessage request) {
+            try {
+                String responseText = "<SOAP-ENV:Envelope "
+                    + "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                    + "<SOAP-ENV:Body>"
+                    + "<ns2:FooResponse xmlns:ns2=\"http://cxf.apache.org/soapheader/inband\">"
+                    + "<ns2:Return>Foo Response Body</ns2:Return>"
+                    + "</ns2:FooResponse>"
+                    + "</SOAP-ENV:Body>" 
+                    + "</SOAP-ENV:Envelope>\n";
+
+
+                // Create a SOAP request message
+                MessageFactory soapmsgfactory = MessageFactory.newInstance();
+                SOAPMessage responseMessage = soapmsgfactory.createMessage();
+                StreamSource responseMessageSrc = null;
+
+                responseMessageSrc = new StreamSource(new StringReader(responseText));
+                responseMessage.getSOAPPart().setContent(responseMessageSrc);
+                responseMessage.saveChanges();
+
+                return responseMessage;
+
+            } catch (Exception e) {
+                throw new WebServiceException(e);
+            }
+
+        }
+
+    }    
+}

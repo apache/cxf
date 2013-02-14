@@ -48,6 +48,9 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     public OverlayW3CDOMStreamWriter(Element e) {
         super(e);
     }
+    public OverlayW3CDOMStreamWriter(Document doc, Element e) {
+        super(doc, e);
+    }
     
     @Override
     public void writeEndElement() throws XMLStreamException {
@@ -68,6 +71,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 if (nd2.getNodeType() == Node.ELEMENT_NODE 
                     && local.equals(nd2.getLocalName())
                     && StringUtils.isEmpty(nd2.getNamespaceURI())) {
+                    adjustOverlaidNode(nd2, null);
                     setChild((Element)nd2, false);
                     return;
                 }
@@ -76,6 +80,9 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         }
         isOverlaid = false;
         super.writeStartElement(local);
+    }
+
+    protected void adjustOverlaidNode(Node nd2, String pfx) {
     }
 
     public void writeStartElement(String namespace, String local) throws XMLStreamException {
@@ -92,6 +99,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 if (nd2.getNodeType() == Node.ELEMENT_NODE 
                     && local.equals(nd2.getLocalName())
                     && namespace.equals(nd2.getNamespaceURI())) {
+                    adjustOverlaidNode(nd2, "");
                     setChild((Element)nd2, false);
                     return;
                 }
@@ -121,6 +129,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                     if (nd2.getNodeType() == Node.ELEMENT_NODE 
                         && local.equals(nd2.getLocalName())
                         && namespace.equals(nd2.getNamespaceURI())) {
+                        adjustOverlaidNode(nd2, prefix);
                         setChild((Element)nd2, false);
                         return;
                     }

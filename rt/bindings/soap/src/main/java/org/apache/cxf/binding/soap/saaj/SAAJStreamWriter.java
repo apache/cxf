@@ -27,9 +27,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 
-public final class SAAJStreamWriter extends W3CDOMStreamWriter {
+public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
     private final SOAPPart part;
 
     public SAAJStreamWriter(SOAPPart part) {
@@ -56,6 +56,18 @@ public final class SAAJStreamWriter extends W3CDOMStreamWriter {
         }
         return e;
     }
+    protected void adjustOverlaidNode(Node nd2, String pfx) {
+        String namespace = nd2.getNamespaceURI();
+        try {
+            if (namespace != null 
+                && namespace.equals(part.getEnvelope().getElementName().getURI())) {
+                adjustPrefix((SOAPElement)nd2, pfx);
+            }
+        } catch (SOAPException e) {
+            //ignore, fallback
+        }
+        super.adjustOverlaidNode(nd2, pfx);
+    }
     
     protected void createAndAddElement(String prefix, String local, String namespace) {
         try {
@@ -69,6 +81,9 @@ public final class SAAJStreamWriter extends W3CDOMStreamWriter {
                     setChild(adjustPrefix(part.getEnvelope().getBody(), prefix), false);
                     return;
                 } else if ("Header".equals(local)) {
+                    if (part.getEnvelope().getHeader() == null) {
+                        part.getEnvelope().addHeader();
+                    }
                     setChild(adjustPrefix(part.getEnvelope().getHeader(), prefix), false);
                     return;
                 } else if ("Fault".equals(local)) {

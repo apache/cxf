@@ -60,7 +60,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
@@ -238,7 +237,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
                 message.put(SAAJOutInterceptor.ORIGINAL_XML_WRITER, origWriter);
             }
-            W3CDOMStreamWriter writer = new OverlayW3CDOMStreamWriter(soapMessage.getSOAPPart());
+            W3CDOMStreamWriter writer = new SAAJStreamWriter(soapMessage.getSOAPPart());
             // Replace stax writer with DomStreamWriter
             message.setContent(XMLStreamWriter.class, writer);
             message.setContent(SOAPMessage.class, soapMessage);
