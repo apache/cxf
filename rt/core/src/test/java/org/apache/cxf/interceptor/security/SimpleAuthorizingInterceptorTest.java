@@ -39,16 +39,14 @@ import org.junit.Test;
 
 public class SimpleAuthorizingInterceptorTest extends Assert {
 
+    protected Message message = new MessageImpl();
     private Method method;
-    private Message message = new MessageImpl();
+
     
     @Before
     public void setUp() throws Exception {
         method = TestService.class.getMethod("echo", new Class[]{});
-        message.put(SecurityContext.class, new TestSecurityContext());
-        Exchange ex = new ExchangeImpl();
-        message.setExchange(ex);
-        
+        Exchange ex = setUpExchange();
         Service service = EasyMock.createMock(Service.class);
         ex.put(Service.class, service);
         MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
@@ -62,33 +60,54 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
         EasyMock.replay(service, md);
     }
     
+    protected Exchange setUpExchange() {
+        message.put(SecurityContext.class, new TestSecurityContext());
+        Exchange ex = new ExchangeImpl();
+        message.setExchange(ex);
+        return ex;
+    }
+    
+    protected SimpleAuthorizingInterceptor createSimpleAuthorizingInterceptor() {
+        return new SimpleAuthorizingInterceptor();
+    }
+    
+    protected SimpleAuthorizingInterceptor createSimpleAuthorizingInterceptorWithDenyRoles(final String role) {
+        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor() {
+            @Override
+            public List<String> getDenyRoles(Method m) {
+                return Collections.singletonList(role);
+            }
+        };
+        return in;
+    }
+    
     @Test(expected = AccessDeniedException.class)
     public void testNoSecurityContext() {
         message.put(SecurityContext.class, null);
-        new SimpleAuthorizingInterceptor().handleMessage(message);
+        createSimpleAuthorizingInterceptor().handleMessage(message);
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testIncompleteSecurityContext() {
         message.put(SecurityContext.class, new IncompleteSecurityContext());
-        new SimpleAuthorizingInterceptor().handleMessage(message);    
+        createSimpleAuthorizingInterceptor().handleMessage(message);    
     }
     
     @Test
     public void testPermitWithNoRoles() {
-        new SimpleAuthorizingInterceptor().handleMessage(message);    
+        createSimpleAuthorizingInterceptor().handleMessage(message);    
     }
     
     @Test
     public void testPermitWithMethodRoles() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setMethodRolesMap(Collections.singletonMap("echo", "role1 testRole"));
         in.handleMessage(message);    
     }
     
     @Test
     public void testPermitWithMethodRolesConfigurationOnly() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setCheckConfiguredRolesOnly(true);
         in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
         in.setMethodRolesMap(Collections.singletonMap("echo", "role1 role2"));
@@ -97,7 +116,7 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyWithMethodRolesConfigurationOnly() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setCheckConfiguredRolesOnly(true);
         in.setUserRolesMap(Collections.singletonMap("testUser", "role1"));
         in.setMethodRolesMap(Collections.singletonMap("echo", "role2 role3"));
@@ -106,7 +125,7 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     
     @Test(expected = AccessDeniedException.class)
     public void testEmptyRolesConfigurationOnly() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setCheckConfiguredRolesOnly(true);
         in.setMethodRolesMap(Collections.singletonMap("echo", "role1 role2"));
         in.handleMessage(message);    
@@ -114,65 +133,47 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     
     @Test
     public void testPermitAll() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setMethodRolesMap(Collections.singletonMap("echo", "*"));
         in.handleMessage(message);    
     }
     
     @Test
     public void testPermitWithClassRoles() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setGlobalRoles("role1 testRole");
         in.handleMessage(message);    
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyWithMethodRoles() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setMethodRolesMap(Collections.singletonMap("echo", "role1 role2"));
         in.handleMessage(message);    
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyWithClassRoles() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptor(); 
         in.setGlobalRoles("role1 role2");
         in.handleMessage(message);    
     }
     
     @Test
     public void testPermitWithDenyRoles() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor() {
-            @Override
-            public List<String> getDenyRoles(Method m) {
-                return Collections.singletonList("frogs");
-            }
-           
-        };
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("frogs");
         in.handleMessage(message);    
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyWithDenyRoles() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor() {
-            @Override
-            public List<String> getDenyRoles(Method m) {
-                return Collections.singletonList("testRole");
-            }
-           
-        };
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("testRole");
         in.handleMessage(message);    
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyAll() {
-        SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor() {
-            @Override
-            public List<String> getDenyRoles(Method m) {
-                return Collections.singletonList("*");
-            }
-           
-        };
+        SimpleAuthorizingInterceptor in = createSimpleAuthorizingInterceptorWithDenyRoles("*"); 
         in.handleMessage(message);    
     }
     
