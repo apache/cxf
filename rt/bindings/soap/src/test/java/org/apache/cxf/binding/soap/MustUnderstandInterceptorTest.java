@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -99,12 +100,11 @@ public class MustUnderstandInterceptorTest extends TestBase {
         assertEquals("DummaySoapInterceptor getUnderstood has been called!", true, dsi
             .isCalledGetUnderstood());
 
-        SoapFault ie = (SoapFault)soapMessage.get(MustUnderstandInterceptor.FAULT);
+        Set<QName> ie = CastUtils.cast((Set<?>)soapMessage.get(MustUnderstandInterceptor.UNKNOWNS));
         if (ie == null) {
-            fail("InBound Exception Missing! Exception should be Can't understands QNames: " + PASSENGER);
+            fail("InBound unknowns missing! Exception should be Can't understands QNames: " + PASSENGER);
         } else {
-            assertEquals(soapMessage.getVersion().getMustUnderstand(), ie.getFaultCode());
-            assertTrue(ie.getMessage().toString().contains(PASSENGER.toString()));
+            assertTrue(ie.contains(PASSENGER));
         }
     }
 

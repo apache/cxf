@@ -47,7 +47,7 @@ import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
-    public static final String FAULT = "MustUnderstand.Fault";
+    public static final String UNKNOWNS = "MustUnderstand.UNKNOWNS";
 
     private static final Logger LOG = LogUtils.getL7dLogger(MustUnderstandInterceptor.class);
 
@@ -83,35 +83,25 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames, notUnderstandHeaders);
         
         if (!notUnderstandHeaders.isEmpty()) {
-            SoapFault soapFault = new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notUnderstandHeaders),
-                                                soapVersion.getMustUnderstand());
             if (!isRequestor(soapMessage)) {
-                soapMessage.put(MustUnderstandInterceptor.FAULT, soapFault);
+                soapMessage.put(MustUnderstandInterceptor.UNKNOWNS, notUnderstandHeaders);
                 soapMessage.getInterceptorChain().add(ending);
             } else {
-                throw soapFault;
+                throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notUnderstandHeaders),
+                                                    soapVersion.getMustUnderstand());
             }
         }
         if (!ultimateReceiverHeaders.isEmpty() && !isRequestor(soapMessage)) {
             checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
         }
     }
-    public void handleFault(SoapMessage message) {
-        SoapFault soapFault = (SoapFault)message.get(MustUnderstandInterceptor.FAULT);
-        if (soapFault != null
-            && !message.getExchange().isOneWay()
-            && soapFault != message.getContent(Exception.class)) {
-            
-            message.setContent(Exception.class, soapFault);
-        }
-    }
-
 
     private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
                                               Set<QName> mustUnderstandQNames, 
                                               SoapMessage soapMessage) {
         soapMessage.getInterceptorChain()
             .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
+
         Object o = soapMessage.getContextualProperty("endpoint-processes-headers");
         if (o == null) {
             o = Collections.EMPTY_LIST;
@@ -147,9 +137,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             if (!notFound.isEmpty()) {
                 // Defer throwing soap fault exception in SOAPHeaderInterceptor once the isOneway can
                 // be detected
-                SoapFault soapFault = new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
-                                                    soapMessage.getVersion().getMustUnderstand());
-                soapMessage.put(MustUnderstandInterceptor.FAULT, soapFault);
+                soapMessage.put(MustUnderstandInterceptor.UNKNOWNS, notFound);
                 soapMessage.getInterceptorChain().add(ending);
             }
         }
@@ -267,9 +255,20 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         
         public void handleMessage(SoapMessage message) throws Fault {
             // throws soapFault after the response code 202 is set in OneWayProcessorInterceptor
-            if (message.get(MustUnderstandInterceptor.FAULT) != null) {
-                SoapFault soapFault = (SoapFault)message.get(MustUnderstandInterceptor.FAULT);
-                throw soapFault;
+            if (message.get(MustUnderstandInterceptor.UNKNOWNS) != null) {
+                //we may not have known the Operation in the main interceptor and thus may not 
+                //have been able to get the parameter based headers.   We now know the
+                //operation and thus can remove those.
+                Set<QName> unknowns = CastUtils.cast((Set<?>)message.get(MustUnderstandInterceptor.UNKNOWNS));
+                Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(message);
+                unknowns.removeAll(paramHeaders);
+                
+                if (!unknowns.isEmpty()) {
+                    throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, unknowns),
+                                        message.getVersion().getMustUnderstand());
+                } else {
+                    message.remove(MustUnderstandInterceptor.UNKNOWNS);
+                }
             }
         }
     }
