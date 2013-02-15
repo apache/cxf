@@ -28,10 +28,13 @@ import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.operation.AbstractOperation;
 import org.apache.cxf.sts.operation.TokenIssueOperation;
+import org.apache.cxf.sts.operation.TokenRenewOperation;
 import org.apache.cxf.sts.operation.TokenValidateOperation;
 import org.apache.cxf.sts.service.ServiceMBean;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
+import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
+import org.apache.cxf.sts.token.renewer.TokenRenewer;
 import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
@@ -42,7 +45,8 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 /**
  * A "default" SecurityTokenServiceProvider implementation that defines the Issue and Validate
  * Operations of the STS and adds support for issuing and validating SAML Assertions, and
- * validating UsernameTokens and X.509 Tokens.
+ * validating UsernameTokens and X.509 Tokens. It also defines the Renew Operation for SAML
+ * tokens.
  */
 public class DefaultSecurityTokenServiceProvider extends SecurityTokenServiceProvider {
     
@@ -89,6 +93,9 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
         if (getValidateOperation() == null) {
             setValidateOperation(createTokenValidateOperation());
         }
+        if (getRenewOperation() == null) {
+            setRenewOperation(createTokenRenewOperation());
+        }
         return super.invoke(request);
     }
     
@@ -104,6 +111,17 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
         populateAbstractOperation(validateOperation);
         
         return validateOperation;
+    }
+    
+    private TokenRenewOperation createTokenRenewOperation() {
+        TokenRenewOperation renewOperation = new TokenRenewOperation();
+        populateAbstractOperation(renewOperation);
+        
+        List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
+        tokenRenewers.add(new SAMLTokenRenewer());
+        renewOperation.setTokenRenewers(tokenRenewers);
+        
+        return renewOperation;
     }
     
     private void populateAbstractOperation(AbstractOperation abstractOperation) {
