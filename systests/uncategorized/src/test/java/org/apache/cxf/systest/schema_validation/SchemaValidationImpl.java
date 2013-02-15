@@ -27,8 +27,11 @@ import javax.jws.WebService;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.types.ComplexStruct;
 import org.apache.schema_validation.types.OccuringStruct;
+import org.apache.schema_validation.types.SomeHeader;
 import org.apache.schema_validation.types.SomeRequest;
+import org.apache.schema_validation.types.SomeRequestWithHeader;
 import org.apache.schema_validation.types.SomeResponse;
+import org.apache.schema_validation.types.SomeResponseWithHeader;
 
 @WebService(serviceName = "SchemaValidationService", 
             portName = "SoapPort",
@@ -75,5 +78,12 @@ public class SchemaValidationImpl implements SchemaValidation {
         }
         
         return response;
+    }
+
+
+    public SomeResponseWithHeader doSomethingWithHeader(SomeRequestWithHeader in,
+                                                        SomeHeader inHeader) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

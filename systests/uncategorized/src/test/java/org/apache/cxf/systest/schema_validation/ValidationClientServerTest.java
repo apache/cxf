@@ -20,11 +20,16 @@
 package org.apache.cxf.systest.schema_validation;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
+import javax.xml.ws.Service.Mode;
 import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
@@ -179,6 +184,24 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         assertIgnoredResponseValidation(SchemaValidationType.OUT.name());
     }
 
+    @Test
+    public void testHeaderValidation() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/schema_validation.wsdl");
+        assertNotNull(wsdl);
+        SchemaValidationService service = new SchemaValidationService(wsdl, serviceName);
+        assertNotNull(service);
+
+        
+        String smsg = "<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'><soap:Header>"
+            + "<SomeHeader soap:mustUnderstand='1' xmlns='http://apache.org/schema_validation/types'>"
+            + "<id>1111111111</id></SomeHeader>"
+            + "</soap:Header><soap:Body><SomeRequestWithHeader xmlns='http://apache.org/schema_validation/types'>"
+            + "<id>1111111111</id></SomeRequestWithHeader></soap:Body></soap:Envelope>";
+        Dispatch<Source> dsp = service.createDispatch(SchemaValidationService.SoapPort, Source.class, Mode.MESSAGE);
+        updateAddressPort(dsp, PORT);
+        dsp.invoke(new StreamSource(new StringReader(smsg)));
+    }
+    
     private SomeResponse execute(SchemaValidation service, String id) throws Exception { 
         SomeRequest request = new SomeRequest();
         request.setId(id);
