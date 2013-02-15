@@ -56,7 +56,30 @@
 	            	</sequence>
     	        </complexType>
 	    	</element>
+            <element name="SomeRequestWithHeader">
+                <complexType>
+                    <sequence>
+                        <element name="id" type="x1:RequestIdType"/>
+                    </sequence>
+                </complexType>
+            </element>
+                        
+            <element name="SomeResponseWithHeader">
+                <complexType>
+                    <sequence>
+                        <element name="transactionId" type="x1:ResponseTransactionType"/>
+                    </sequence>
+                </complexType>
+            </element>   
+            <element name="SomeHeader">
+                <complexType>
+                    <sequence>
+                        <element name="id" type="x1:RequestIdType"/>
+                    </sequence>
+                </complexType>
+            </element>
             
+
             <complexType name="ComplexStruct">
                 <sequence>
                     <element name="elem1" type="string"/>
@@ -137,6 +160,14 @@
         <wsdl:part element="x1:SomeResponse" name="in"/>
     </wsdl:message>
     
+    <wsdl:message name="doSomethingRequestWithHeader">
+        <wsdl:part element="x1:SomeRequestWithHeader" name="in"/>
+        <wsdl:part element="x1:SomeHeader" name="inHeader"/>
+    </wsdl:message>
+    <wsdl:message name="doSomethingResponseWithHeader">
+        <wsdl:part element="x1:SomeResponseWithHeader" name="in"/>
+    </wsdl:message>
+
     <wsdl:message name="setComplexStructRequest">
         <wsdl:part element="x1:setComplexStruct" name="in"/>
     </wsdl:message>
@@ -188,6 +219,10 @@
             <wsdl:input message="tns:getOccuringStructRequest" name="getOccuringStructRequest"/>
             <wsdl:output message="tns:getOccuringStructResponse" name="getOccuringStructResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="doSomethingWithHeader">
+            <wsdl:input message="tns:doSomethingRequestWithHeader" name="doSomethingRequestWithHeader"/>
+            <wsdl:output message="tns:doSomethingResponseWithHeader" name="doSomethingResponseWithHeader"/>
+        </wsdl:operation>
     </wsdl:portType>
 
     <wsdl:binding name="SchemaValidationBinding" type="tns:SchemaValidation">
@@ -196,6 +231,16 @@
         <wsdl:operation name="doSomething">
             <soap:operation style="document"/>
             <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="doSomethingWithHeader">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:header message="tns:doSomethingRequestWithHeader" part="inHeader" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>

@@ -229,8 +229,12 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                                                            dataBinding);
                         String mu = hel.getAttributeNS(soapVersion.getNamespace(),
                                                       soapVersion.getAttrNameMustUnderstand());
+                        hel.removeAttributeNS(soapVersion.getNamespace(),
+                                           soapVersion.getAttrNameMustUnderstand());
                         String act = hel.getAttributeNS(soapVersion.getNamespace(),
                                                         soapVersion.getAttrNameRole());
+                        hel.removeAttributeNS(soapVersion.getNamespace(),
+                                              soapVersion.getAttrNameRole());
 
                         if (!StringUtils.isEmpty(act)) {
                             shead.setActor(act);

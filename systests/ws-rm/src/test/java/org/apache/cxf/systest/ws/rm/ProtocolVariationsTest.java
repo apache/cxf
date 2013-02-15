@@ -287,12 +287,8 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             fail("invalid wsrm header");
         } catch (Exception e) {
             assertTrue(e.getCause() instanceof SoapFault);
-            // verify a partial error text match to exclude an unexpected exception
-            // because there is a mustUnderstand header that is not understood,
-            // the corresponding error is returned.
-            final String text = "MustUnderstand headers: " 
-                                + "[{http://cxf.apache.org/invalid}Sequence] are not understood.";
-            assertTrue(e.getCause().getMessage() != null 
+            final String text = "WS-ReliableMessaging is required";
+            assertTrue(e.getCause().getMessage(), e.getCause().getMessage() != null 
                 && e.getCause().getMessage().indexOf(text) >= 0);
         }
     }
