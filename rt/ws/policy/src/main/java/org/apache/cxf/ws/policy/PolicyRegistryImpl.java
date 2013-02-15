@@ -37,7 +37,9 @@ public class PolicyRegistryImpl implements PolicyRegistry {
     }
 
     public void register(String key, Policy policy) {
-        reg.put(key, policy);        
+        if (!reg.containsKey(key)) {
+            reg.put(key, policy);
+        }
     }
 
     public void remove(String key) {
