@@ -183,18 +183,20 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
                     
                     if (Constants.isPolicyElement(e.getElementType())
                         && !StringUtils.isEmpty(uri)) {
-                        try {
-                            Policy policy = builder.getPolicy(e.getElement());
-                            String fragement = "#" + uri;
-                            registry.register(fragement, policy);
-                            if (di.getBaseURI() == null) {
-                                registry.register(Integer.toString(di.hashCode()) + fragement, policy);
-                            } else {
-                                registry.register(di.getBaseURI() + fragement, policy);
+                        
+                        String id = (di.getBaseURI() == null ? Integer.toString(di.hashCode()) : di.getBaseURI()) 
+                                + "#" + uri;
+                        Policy policy = registry.lookup(id);
+                        if (policy == null) {
+                            try {
+                                policy = builder.getPolicy(e.getElement());
+                                String fragement = "#" + uri;
+                                registry.register(fragement, policy);
+                                registry.register(id, policy);
+                            } catch (Exception policyEx) {
+                                //ignore the policy can not be built
+                                LOG.warning("Failed to build the policy '" + uri + "':" + policyEx.getMessage());
                             }
-                        } catch (Exception policyEx) {
-                            //ignore the policy can not be built
-                            LOG.warning("Failed to build the policy '" + uri + "':" + policyEx.getMessage());
                         }
                     }
                 }
