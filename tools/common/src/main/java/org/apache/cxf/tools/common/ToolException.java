@@ -117,7 +117,7 @@ public class ToolException extends RuntimeException {
 
         // Print cause, if any
         Throwable ourCause = getCause();
-        if (ourCause != null &&  ourCause != suppressed.get(0)) {
+        if (ourCause != null && (!hasSuppressed || ourCause != suppressed.get(0))) {
             printThrowable(ourCause, ps, pfx + "/t", "Caused by: ");
         }
     }    
