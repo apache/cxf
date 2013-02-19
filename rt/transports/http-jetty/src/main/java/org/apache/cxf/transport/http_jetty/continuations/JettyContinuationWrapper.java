@@ -81,7 +81,12 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     }
 
     public void reset() {
-        continuation.complete();
+        try {
+            continuation.complete();
+        } catch (Throwable ex) {
+            // explicit complete call does not seem to work 
+            // with the non-Servlet3 Jetty Continuation
+        }
         obj = null;
         pendingTimeout = 0;
     }
