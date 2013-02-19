@@ -95,6 +95,18 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
         }
     }
+    @Override
+    public void handleFault(SoapMessage msg) {
+        Set<QName> unknowns = CastUtils.cast((Set<?>)msg.get(MustUnderstandInterceptor.UNKNOWNS));
+        if (msg.getExchange().getBindingOperationInfo() == null 
+            && unknowns != null && !unknowns.isEmpty()) {
+            //per jaxws spec, if there are must understands that we didn't understand, but couldn't map
+            //to an operation either, we need to throw the mustunderstand fault, not the one related to
+            //an unknown operation
+            msg.setContent(Exception.class, new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, unknowns),
+                                                          msg.getVersion().getMustUnderstand()));
+        }
+    }
 
     private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
                                               Set<QName> mustUnderstandQNames, 
@@ -236,6 +248,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             
             
             if (!notFound.isEmpty()) {
+                soapMessage.remove(UNKNOWNS);
                 throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
                                 soapVersion.getMustUnderstand());
             }            
@@ -263,11 +276,10 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                 Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(message);
                 unknowns.removeAll(paramHeaders);
                 
+                message.remove(MustUnderstandInterceptor.UNKNOWNS);
                 if (!unknowns.isEmpty()) {
                     throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, unknowns),
                                         message.getVersion().getMustUnderstand());
-                } else {
-                    message.remove(MustUnderstandInterceptor.UNKNOWNS);
                 }
             }
         }
