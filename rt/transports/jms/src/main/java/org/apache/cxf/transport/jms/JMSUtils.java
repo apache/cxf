@@ -614,7 +614,7 @@ public final class JMSUtils {
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         
         boolean isSoapMessage = 
-            !MessageUtils.isTrue(outMessage.get(org.apache.cxf.message.Message.REST_MESSAGE));
+            !MessageUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
         
         if (isSoapMessage) {
             if (!messageProperties.isSetSOAPJMSTargetService()) {

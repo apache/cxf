@@ -847,8 +847,6 @@ public abstract class AbstractClient implements Client, Retryable {
         m.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         m.put(Message.INBOUND_MESSAGE, Boolean.FALSE);
         
-        m.put(Message.REST_MESSAGE, Boolean.TRUE);
-        
         m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
         m.put(Message.PROTOCOL_HEADERS, headers);
         if (currentURI.isAbsolute() && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
@@ -877,6 +875,7 @@ public abstract class AbstractClient implements Client, Retryable {
         m.setInterceptorChain(chain);
         
         exchange = createExchange(m, exchange);
+        exchange.put(Message.REST_MESSAGE, Boolean.TRUE);
         exchange.setOneWay("true".equals(headers.getFirst(Message.ONE_WAY_REQUEST)));
         exchange.put(Retryable.class, this);
         

@@ -671,7 +671,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         throw read ? new BadRequestException(r, t) : new InternalServerErrorException(r, t);
     }
     
-    protected static void handleJAXBException(JAXBException e, boolean read) {
+    protected void handleJAXBException(JAXBException e, boolean read) {
         StringBuilder sb = handleExceptionStart(e);
         if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
             sb.append(e.getLinkedException().getMessage()).append(". ");
@@ -683,7 +683,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         handleExceptionEnd(t, message, read);
     }
     
-    protected static void handleXMLStreamException(XMLStreamException e, boolean read) {
+    protected void handleXMLStreamException(XMLStreamException e, boolean read) {
         StringBuilder sb = handleExceptionStart(e);
         handleExceptionEnd(e, sb.toString(), read);
     }
