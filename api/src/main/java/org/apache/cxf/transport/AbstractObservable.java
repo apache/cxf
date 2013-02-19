@@ -40,8 +40,9 @@ public abstract class AbstractObservable implements Observable {
     public synchronized void setMessageObserver(MessageObserver observer) {
         if (observer != incomingObserver) {
             MessageObserver old = incomingObserver;
-            incomingObserver = observer;
+            // the observer switch must take place before activation or after deactivation
             if (observer != null) {
+                incomingObserver = observer;
                 getLogger().fine("registering incoming observer: " + observer);
                 if (old == null) {
                     try {
@@ -56,6 +57,7 @@ public abstract class AbstractObservable implements Observable {
                     getLogger().fine("unregistering incoming observer: " + old);
                     deactivate();
                 }
+                incomingObserver = observer;
             }
         }
     }
