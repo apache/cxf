@@ -2590,6 +2590,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         try {
             definition = getBus().getExtension(WSDLManager.class).getDefinition(wsdlUrl);
         } catch (WSDLException e) {
+            LOG.log(Level.WARNING, "Failed to parse WSDL", e);
             return true;
         }
         if (definition.getPortTypes().isEmpty() && definition.getImports().isEmpty()) {
