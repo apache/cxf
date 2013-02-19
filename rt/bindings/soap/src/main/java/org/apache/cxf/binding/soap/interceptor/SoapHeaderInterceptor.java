@@ -27,11 +27,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
+import javax.xml.validation.Validator;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -162,21 +165,38 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         }
     }
 
-    private void validateHeader(SoapMessage message, MessagePartInfo mpi, Schema schema) {
+    private void validateHeader(final SoapMessage message, MessagePartInfo mpi, Schema schema) {
         Header param = findHeader(message, mpi);
-        Element el = null;
         if (param != null
             && param.getDataBinding() == null) {
             Node source = (Node)param.getObject();
-            if (source instanceof Element) {
-                el = (Element)source;
-            } else {
+            if (!(source instanceof Element)) {
                 return;
             }
             if (schema != null) {
+                final Element el = (Element)source;
                 DOMSource ds = new DOMSource(el);
                 try {
-                    schema.newValidator().validate(ds);
+                    Validator v = schema.newValidator();
+                    ErrorHandler errorHandler = new ErrorHandler() {
+                        public void warning(SAXParseException exception) throws SAXException {
+                        }
+                        public void error(SAXParseException exception) throws SAXException {
+                            String msg = exception.getMessage();
+                            if (msg.contains(el.getLocalName())
+                                && (msg.contains(":" + message.getVersion().getAttrNameRole())
+                                    || msg.contains(":" + message.getVersion().getAttrNameMustUnderstand()))) {
+                                return;
+                            }
+                            System.out.println("2");
+                            throw exception;
+                        }
+                        public void fatalError(SAXParseException exception) throws SAXException {
+                            throw exception;
+                        }
+                    };
+                    v.setErrorHandler(errorHandler);
+                    v.validate(ds);
                 } catch (SAXException e) {
                     throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
                         .getCanonicalName(), e.getMessage());
