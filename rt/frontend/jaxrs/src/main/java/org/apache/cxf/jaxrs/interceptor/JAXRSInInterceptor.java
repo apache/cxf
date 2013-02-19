@@ -251,7 +251,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     private void setExchangeProperties(Message message, OperationResourceInfo ori, 
                                       MultivaluedMap<String, String> values,
                                       int numberOfResources) {
-        message.put(Message.REST_MESSAGE, Boolean.TRUE);
+        message.getExchange().put(Message.REST_MESSAGE, Boolean.TRUE);
         message.getExchange().put(OperationResourceInfo.class, ori);
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, ori.getClassResourceInfo());
         message.put(RESOURCE_METHOD, ori.getMethodToInvoke());
