@@ -104,12 +104,12 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         
         boolean supportsNode = this.supportsDataReader(message, Node.class);
         Service service = ServiceModelUtil.getService(message.getExchange());
-        Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0), message
-                                                         .getExchange().getBus());
         for (SoapHeaderInfo header : headers) {
             MessagePartInfo mpi = header.getPart();
             try {
                 if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)) {
+                    Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0), message
+                                                                     .getExchange().getBus());
                     validateHeader(message, mpi, schema);
                 }
             } catch (Fault f) {
