@@ -158,19 +158,21 @@ public class ServletController {
                             generateNotFound(request, res);
                         }
                         return false;
-                    }  else { // the request should be a restful service request
-                        updateDestination(request, d);
-                        invokeDestination(request, res, d);
                     }
                 }
-            } else {
-                EndpointInfo ei = d.getEndpointInfo();
+            }
+            if (d != null) {
                 Bus bus = d.getBus();
                 ClassLoaderHolder orig = null;
                 try {
-                    ResourceManager manager = bus.getExtension(ResourceManager.class);
-                    if (manager != null) {
-                        ClassLoader loader = manager.resolveResource("", ClassLoader.class);
+                    if (bus != null) {
+                        ClassLoader loader = bus.getExtension(ClassLoader.class);
+                        if (loader == null) {
+                            ResourceManager manager = bus.getExtension(ResourceManager.class);
+                            if (manager != null) {
+                                loader = manager.resolveResource("", ClassLoader.class);
+                            }
+                        }
                         if (loader != null) {
                             //need to set the context classloader to the loader of the bundle
                             orig = ClassLoaderUtils.setThreadContextClassloader(loader);
@@ -178,21 +180,24 @@ public class ServletController {
                     }
                     updateDestination(request, d);
                     
-                    QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
-                    if ("GET".equals(request.getMethod()) 
-                        && !StringUtils.isEmpty(request.getQueryString()) 
-                        && queryHandlerRegistry != null) {
-                        
-                        String ctxUri = request.getPathInfo();
-                        String baseUri = request.getRequestURL().toString()
-                            + "?" + request.getQueryString();
-
-                        QueryHandler selectedHandler = 
-                            findQueryHandler(queryHandlerRegistry, ei, ctxUri, baseUri);
-                        
-                        if (selectedHandler != null) {
-                            respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
-                            return true;
+                    if (bus != null) {
+                        QueryHandlerRegistry queryHandlerRegistry = bus.getExtension(QueryHandlerRegistry.class);
+                        if ("GET".equals(request.getMethod()) 
+                            && !StringUtils.isEmpty(request.getQueryString()) 
+                            && queryHandlerRegistry != null) {
+                            
+                            EndpointInfo ei = d.getEndpointInfo();
+                            String ctxUri = request.getPathInfo();
+                            String baseUri = request.getRequestURL().toString()
+                                + "?" + request.getQueryString();
+    
+                            QueryHandler selectedHandler = 
+                                findQueryHandler(queryHandlerRegistry, ei, ctxUri, baseUri);
+                            
+                            if (selectedHandler != null) {
+                                respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
+                                return true;
+                            }
                         }
                     }
                     invokeDestination(request, res, d);
