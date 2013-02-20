@@ -68,6 +68,7 @@ public class SpnegoContextTokenBuilder implements AssertionBuilder<Element> {
             QName qn = DOMUtils.getElementQName(elem);
             if (Constants.isPolicyElement(qn)) {
                 foundPolicy = true;
+                spnegoContextToken.setPolicy(elem);
                 if (DOMUtils.getFirstChildWithName(elem, consts.getNamespace(),
                         SPConstants.REQUIRE_DERIVED_KEYS) != null) {
                     spnegoContextToken.setDerivedKeys(true);
