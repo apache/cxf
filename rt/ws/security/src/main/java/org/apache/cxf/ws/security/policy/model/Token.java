@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 
@@ -38,6 +40,11 @@ public abstract class Token extends AbstractSecurityAssertion {
     private boolean explicitDerivedKeys;
     
     private String issuerName;
+    
+    /**
+     * A reference to the DOM wsp:Policy child Element
+     */
+    private Element policy;
     
     /**
      * A Reference to a parent SupportingToken assertion
@@ -115,5 +122,13 @@ public abstract class Token extends AbstractSecurityAssertion {
 
     public void setSupportingToken(SupportingToken supportingToken) {
         this.supportingToken = supportingToken;
+    }
+
+    public Element getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(Element policy) {
+        this.policy = policy;
     }
 }

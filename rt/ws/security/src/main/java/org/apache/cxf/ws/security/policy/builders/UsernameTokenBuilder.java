@@ -65,6 +65,7 @@ public class UsernameTokenBuilder implements AssertionBuilder<Element> {
             );
         }
         if (polEl != null) {
+            usernameToken.setPolicy(polEl);
             NodeList children = polEl.getChildNodes();
             if (children != null) {
                 for (int i = 0; i < children.getLength(); i++) {

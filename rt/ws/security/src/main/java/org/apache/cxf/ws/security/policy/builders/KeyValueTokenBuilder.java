@@ -66,6 +66,8 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
                 "sp:KeyValueToken/wsp:Policy must have a value"
             );
         }
+        
+        token.setPolicy(polEl);
         Element child = DOMUtils.getFirstElement(polEl);
         if (child != null) {
             QName qname = new QName(child.getNamespaceURI(), child.getLocalName());

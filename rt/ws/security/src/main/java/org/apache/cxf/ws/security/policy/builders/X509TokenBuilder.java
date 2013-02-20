@@ -70,6 +70,7 @@ public class X509TokenBuilder implements AssertionBuilder<Element> {
         }
 
         if (policyElement != null) {
+            x509Token.setPolicy(policyElement);
             if (DOMUtils.getFirstChildWithName(policyElement, consts.getRequiredDerivedKeys()) != null) {
                 x509Token.setDerivedKeys(true);
             } else if (DOMUtils.getFirstChildWithName(policyElement, 

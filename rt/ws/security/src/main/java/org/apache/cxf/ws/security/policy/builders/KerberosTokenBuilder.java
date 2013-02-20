@@ -64,6 +64,7 @@ public class KerberosTokenBuilder implements AssertionBuilder<Element> {
             String ln = child.getLocalName();
             if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
                 foundPolicy = true;
+                kerberosToken.setPolicy(child);
                 NodeList policyChildren = child.getChildNodes();
                 if (policyChildren != null) {
                     for (int i = 0; i < policyChildren.getLength(); i++) {
