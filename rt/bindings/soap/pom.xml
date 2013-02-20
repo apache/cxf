@@ -33,7 +33,8 @@
 
     <properties>
         <cxf.osgi.import>
-            org.apache.aries*;version="${cxf.aries.version.range}"
+            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
         </cxf.osgi.import>
     </properties>
 
