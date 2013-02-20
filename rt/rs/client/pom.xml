@@ -32,7 +32,12 @@
         <version>2.8.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-
+    <properties>
+        <cxf.osgi.import>
+            org.apache.aries*;version="${cxf.aries.version.range}",
+            org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}"
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
