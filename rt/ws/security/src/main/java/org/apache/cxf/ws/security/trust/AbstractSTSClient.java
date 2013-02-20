@@ -155,7 +155,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected Element claims;
     protected AlgorithmSuite algorithmSuite;
     protected String namespace = STSUtils.WST_NS_05_12;
-    protected String addressingNamespace;
+    protected String addressingNamespace = "http://www.w3.org/2005/08/addressing";
     protected Object onBehalfOf;
     protected boolean enableAppliesTo = true;
 
@@ -974,10 +974,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             tokentype = namespace + "/RSTR/Status";
         }
 
-        if (addressingNamespace == null) {
-            addressingNamespace = "http://www.w3.org/2005/08/addressing";
-        }
-
         Policy validatePolicy = new Policy();
         ExactlyOne one = new ExactlyOne();
         validatePolicy.addPolicyComponent(one);
@@ -1028,10 +1024,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected STSResponse cancel(SecurityToken token) throws Exception {
         createClient();
 
-        if (addressingNamespace == null) {
-            addressingNamespace = "http://www.w3.org/2005/08/addressing";
-        }
-
         client.getRequestContext().clear();
         client.getRequestContext().putAll(ctx);
         client.getRequestContext().put(SecurityConstants.TOKEN, token);
@@ -1067,13 +1059,19 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             SignedEncryptedParts parts = new SignedEncryptedParts(true);
             parts.setOptional(true);
             parts.setBody(true);
-            parts.addHeader(new Header("To", addressingNamespace));
-            parts.addHeader(new Header("From", addressingNamespace));
-            parts.addHeader(new Header("FaultTo", addressingNamespace));
-            parts.addHeader(new Header("ReplyTo", addressingNamespace));
-            parts.addHeader(new Header("Action", addressingNamespace));
-            parts.addHeader(new Header("MessageID", addressingNamespace));
-            parts.addHeader(new Header("RelatesTo", addressingNamespace));
+            
+            String addrNamespace = addressingNamespace;
+            if (addrNamespace == null) {
+                addrNamespace = "http://www.w3.org/2005/08/addressing";
+            }
+            
+            parts.addHeader(new Header("To", addrNamespace));
+            parts.addHeader(new Header("From", addrNamespace));
+            parts.addHeader(new Header("FaultTo", addrNamespace));
+            parts.addHeader(new Header("ReplyTo", addrNamespace));
+            parts.addHeader(new Header("Action", addrNamespace));
+            parts.addHeader(new Header("MessageID", addrNamespace));
+            parts.addHeader(new Header("RelatesTo", addrNamespace));
             all.addPolicyComponent(parts);
             
             client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, cancelPolicy);
