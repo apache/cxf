@@ -135,6 +135,8 @@ public class ServletControllerTest extends Assert {
         AbstractHTTPDestination dest = EasyMock.createMock(AbstractHTTPDestination.class);
         registry.checkRestfulRequest("");
         EasyMock.expectLastCall().andReturn(dest).atLeastOnce();
+        dest.getBus();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         dest.getMessageObserver();
         EasyMock.expectLastCall().andReturn(EasyMock.createMock(MessageObserver.class)).atLeastOnce();
         
