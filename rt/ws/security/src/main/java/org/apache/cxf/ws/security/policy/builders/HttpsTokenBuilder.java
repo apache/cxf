@@ -81,6 +81,7 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
             if (polEl == null) {
                 LOG.warning("sp:HttpsToken/wsp:Policy should have a value!");
             } else {
+                httpsToken.setPolicy(polEl);
                 Element child = DOMUtils.getFirstElement(polEl);
                 if (child != null) {
                     if (SP12Constants.HTTP_BASIC_AUTHENTICATION.equals(DOMUtils.getElementQName(child))) {

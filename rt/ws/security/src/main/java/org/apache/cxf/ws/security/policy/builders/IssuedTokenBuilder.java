@@ -86,6 +86,7 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
                 foundPolicy = true;
                 Policy policy = builder.getPolicy(child);
                 policy = policy.normalize(builder.getPolicyRegistry(), false);
+                issuedToken.setPolicy(child);
 
                 for (Iterator<List<Assertion>> iterator = policy.getAlternatives(); iterator.hasNext();) {
                     processAlternative(iterator.next(), issuedToken);
