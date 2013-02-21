@@ -63,6 +63,14 @@ public class FormEncodingProvider<T> implements
 
     private boolean expectEncoded;
     
+    public FormEncodingProvider() {
+        
+    }
+    
+    public FormEncodingProvider(boolean expectEncoded) {
+        this.expectEncoded = expectEncoded;
+    }
+    
     public void setExpectedEncoded(boolean expect) {
         this.expectEncoded = expect;
     }

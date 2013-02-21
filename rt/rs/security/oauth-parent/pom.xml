@@ -44,6 +44,7 @@
     <modules>
         <module>oauth</module>
         <module>oauth2</module> 
+        <module>oauth2-saml</module> 
     </modules>
 
 </project>

@@ -41,6 +41,15 @@ public class CryptoLoader {
     
     private static final String CRYPTO_CACHE = "rs-security-xml-crypto.cache";
     
+    public Crypto loadCrypto(String cryptoResource) throws IOException, WSSecurityException {
+        URL url = ClassLoaderUtils.getResource(cryptoResource, this.getClass());
+        if (url != null) {
+            return loadCryptoFromURL(url);
+        } else {
+            return null;
+        }
+    }
+    
     public Crypto getCrypto(Message message,
                             String cryptoKey, 
                             String propKey) 
@@ -54,8 +63,8 @@ public class CryptoLoader {
         if (o == null) {
             return null;
         }
-        
-        crypto = getCryptoCache(message).get(o);
+        Map<Object, Crypto> cryptoCache = getCryptoCache(message); 
+        crypto = cryptoCache != null ? cryptoCache.get(o) : null;
         if (crypto != null) {
             return crypto;
         }
@@ -73,15 +82,13 @@ public class CryptoLoader {
                 url = manager.resolveResource((String)o, URL.class);
             }
             if (url != null) {
-                Properties props = new Properties();
-                InputStream in = url.openStream(); 
-                props.load(in);
-                in.close();
-                crypto = CryptoFactory.getInstance(props);
+                crypto = loadCryptoFromURL(url);
             } else {
                 crypto = CryptoFactory.getInstance((String)o);
             }
-            getCryptoCache(message).put(o, crypto);
+            if (cryptoCache != null) {
+                cryptoCache.put(o, crypto);
+            }
             return crypto;
         } finally {
             if (orig != null) {
@@ -90,16 +97,29 @@ public class CryptoLoader {
         }
     }
     
+    public static Crypto loadCryptoFromURL(URL url) throws IOException, WSSecurityException {
+        Properties props = new Properties();
+        InputStream in = url.openStream(); 
+        props.load(in);
+        in.close();
+        return CryptoFactory.getInstance(props);
+    }
+    
     public final Map<Object, Crypto> getCryptoCache(Message message) {
-        EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
-        synchronized (info) {
-            Map<Object, Crypto> o = 
-                CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
-            if (o == null) {
-                o = new ConcurrentHashMap<Object, Crypto>();
-                info.setProperty(CRYPTO_CACHE, o);
+        Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        if (endpoint != null) {
+            EndpointInfo info  = endpoint.getEndpointInfo();
+            synchronized (info) {
+                Map<Object, Crypto> o = 
+                    CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
+                if (o == null) {
+                    o = new ConcurrentHashMap<Object, Crypto>();
+                    info.setProperty(CRYPTO_CACHE, o);
+                }
+                return o;
             }
-            return o;
+        } else {
+            return null;
         }
     }
 }
