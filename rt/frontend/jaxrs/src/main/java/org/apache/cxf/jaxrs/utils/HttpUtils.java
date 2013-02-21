@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -75,6 +77,10 @@ public final class HttpUtils {
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/";
     
+    private static final String CURRENT_PATH_SEGMENT = ".";
+    private static final String PARENT_PATH_SEGMENT = "..";
+    
+    
     private HttpUtils() {
     }
     
@@ -89,7 +95,7 @@ public final class HttpUtils {
     public static String pathDecode(String value) {
         return UrlUtils.pathDecode(value);
     }
-    
+
     private static String componentEncode(String reservedChars, String value) {
         
         StringBuilder buffer = new StringBuilder();
@@ -454,5 +460,72 @@ public final class HttpUtils {
     public static String getEncoding(MediaType mt, String defaultEncoding) {
         String charset = mt == null ? "UTF-8" : mt.getParameters().get("charset");
         return charset == null ? "UTF-8" : charset;
+    }
+    
+    public static URI resolve(UriBuilder baseBuilder, URI uri) {
+        if (!uri.isAbsolute()) {
+            String uriValue = uri.toString();
+            boolean parentPathSegmentAvail = uriValue.contains(PARENT_PATH_SEGMENT)
+                || uriValue.contains(CURRENT_PATH_SEGMENT); 
+            uri = baseBuilder.path(uriValue).build();
+            if (parentPathSegmentAvail) {
+                List<PathSegment> segments = JAXRSUtils.getPathSegments(uri.getRawPath(), false);
+                List<PathSegment> actualSegments = new LinkedList<PathSegment>();
+                UriBuilder ub = UriBuilder.fromUri(uri).replacePath(null);
+                for (PathSegment ps : segments) {
+                    if (PARENT_PATH_SEGMENT.equals(ps.getPath()) && !actualSegments.isEmpty()) {
+                        actualSegments.remove(actualSegments.size() - 1);
+                    } else if (!CURRENT_PATH_SEGMENT.equals(ps.getPath())) {
+                        actualSegments.add(ps);
+                    }
+                }
+                for (PathSegment ps : actualSegments) {
+                    ub.segment(ps.toString());
+                }
+                uri = ub.build();
+            }
+        }
+        return uri;
+    }
+    
+    public static URI relativize(URI requestURI, URI resolved) {
+        if (!getUriPrefix(resolved).equals(getUriPrefix(requestURI))) {
+            return resolved;
+        }
+        List<PathSegment> resolvedSegments = JAXRSUtils.getPathSegments(resolved.getRawPath(), false);
+        List<PathSegment> requestSegments = JAXRSUtils.getPathSegments(requestURI.getRawPath(), false);
+        
+        int count = 0;
+        for (int i = resolvedSegments.size() - 1; i >= 0; i--) {
+            if (i <= requestSegments.size() - 1) {
+                String resolvedPath = resolvedSegments.get(i).getPath();
+                String requestPath = requestSegments.get(i).getPath();
+                if (!resolvedPath.equals(requestPath)) {
+                    count++;
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        
+        for (int i = 0; i < count; i++) {
+            if (i != 0) {
+                sb.append("/");
+            }
+            sb.append(PARENT_PATH_SEGMENT);
+        }
+        for (int i = count + 1; i < resolvedSegments.size(); i++) {
+            if (i != 0) {
+                sb.append("/");
+            }
+            sb.append(resolvedSegments.get(i).getPath());
+        }
+        return URI.create(sb.toString());
+    }
+    
+    private static String getUriPrefix(URI uri) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(uri.getScheme()).append(uri.getHost()).append(uri.getPort());
+        
+        return sb.toString();
     }
 }

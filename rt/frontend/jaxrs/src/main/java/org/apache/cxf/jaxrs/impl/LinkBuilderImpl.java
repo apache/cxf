@@ -31,9 +31,9 @@ import java.util.Set;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class LinkBuilderImpl implements Builder {
     private static final String DOUBLE_QUOTE = "\"";
@@ -47,15 +47,17 @@ public class LinkBuilderImpl implements Builder {
     }
 
     @Override
-    public Link buildRelativized(UriInfo uriInfo, Object... values) {
+    public Link buildRelativized(URI requestUri, Object... values) {
         URI uri = ub.build(values);
-        return new LinkImpl(uriInfo.relativize(uri), params);
+        URI relativized = HttpUtils.relativize(requestUri, uri);
+        return new LinkImpl(relativized, params);
     }
 
     @Override
-    public Link buildResolved(UriInfo uriInfo, Object... values) {
+    public Link buildResolved(URI baseUri, Object... values) {
         URI uri = ub.build(values);
-        return new LinkImpl(uriInfo.resolve(uri), params);
+        URI resolved = HttpUtils.resolve(UriBuilder.fromUri(baseUri), uri);
+        return new LinkImpl(resolved, params);
     }
 
     @Override
@@ -232,5 +234,4 @@ public class LinkBuilderImpl implements Builder {
             }
         }
     }
-    
 }
