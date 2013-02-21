@@ -43,7 +43,6 @@ For Java2WSDL and WSDL2Java:
         JAXB code generation)
 
 For JAX-WS support:
-- geronimo-ws-metadata.jar [6]
 - geronimo-jaxws_2.2_spec-1.0.jar (Or the Sun equivalent) [6]
 - saaj-api.jar [6]
 - saaj-impl.jar [6]

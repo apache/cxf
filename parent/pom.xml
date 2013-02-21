@@ -110,7 +110,6 @@
         <cxf.geronimo.servlet.version>1.0</cxf.geronimo.servlet.version>
         <cxf.geronimo.servlet25.version>1.1.2</cxf.geronimo.servlet25.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
-        <cxf.geronimo.ws.metadata.version>1.1.3</cxf.geronimo.ws.metadata.version>
         <cxf.javax.ws.rs.version>2.0-rc1</cxf.javax.ws.rs.version>
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
@@ -1267,11 +1266,6 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-ejb_3.0_spec</artifactId>
                 <version>1.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-                <version>${cxf.geronimo.ws.metadata.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
