@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -34,15 +35,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -55,6 +61,30 @@ public final class FormUtils {
     private static final String CONTENT_DISPOSITION_FILES_PARAM = "files";    
     private FormUtils() {
         
+    }
+    
+    public static void restoreForm(FormEncodingProvider<Form> provider, 
+                                   Form form, 
+                                   Message message)
+        throws Exception {
+        CachedOutputStream os = new CachedOutputStream();
+        writeForm(provider, form, os);
+        message.setContent(InputStream.class, os.getInputStream());
+    }
+    
+    public static void writeForm(FormEncodingProvider<Form> provider, 
+                                 Form form, OutputStream os)
+        throws Exception {
+        provider.writeTo(form, Form.class, Form.class, new Annotation[]{}, 
+                         MediaType.APPLICATION_FORM_URLENCODED_TYPE, new MetadataMap<String, Object>(), os);
+    }
+    
+    public static Form readForm(FormEncodingProvider<Form> provider, Message message) 
+        throws Exception {
+        return provider.readFrom(Form.class, Form.class, 
+                              new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
+                              new MetadataMap<String, String>(), 
+                              message.getContent(InputStream.class));
     }
     
     public static void addPropertyToForm(MultivaluedMap<String, String> map, String name, Object value) {

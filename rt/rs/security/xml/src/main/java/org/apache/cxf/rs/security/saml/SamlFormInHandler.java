@@ -19,19 +19,15 @@
 
 package org.apache.cxf.rs.security.saml;
 
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.net.URI;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
+import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.message.Message;
 
 public class SamlFormInHandler extends AbstractSamlBase64InHandler {
@@ -39,10 +35,9 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     private static final String SAML_ELEMENT = "SAMLToken";
     private static final String SAML_RELAY_STATE = "RelayState";
    
-    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>();
+    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
     
     public SamlFormInHandler() {
-        provider.setExpectedEncoded(true);
     }
     
     public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
@@ -63,14 +58,12 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
                 return Response.status(302).location(URI.create(samlRequestURI)).build();
             }
         }
-        // restore input stream
-        CachedOutputStream os = new CachedOutputStream(); 
         form.getData().remove(SAML_ELEMENT);
         form.getData().remove(SAML_RELAY_STATE);
+        
+        // restore input stream
         try {
-            provider.writeTo(form, Form.class, Form.class, new Annotation[]{}, 
-                MediaType.APPLICATION_FORM_URLENCODED_TYPE, new MetadataMap<String, Object>(), os);
-            message.setContent(InputStream.class, os.getInputStream());
+            FormUtils.restoreForm(provider, form, message);
         } catch (Exception ex) {
             throwFault(ex.getMessage(), ex);
         }
@@ -79,10 +72,7 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     
     private Form readFormData(Message message) {
         try {
-            return provider.readFrom(Form.class, Form.class, 
-                              new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
-                              new MetadataMap<String, String>(), 
-                              message.getContent(InputStream.class));
+            return FormUtils.readForm(provider, message);
         } catch (Exception ex) {
             throwFault("Error reading the form", ex);    
         }

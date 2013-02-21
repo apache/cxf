@@ -57,7 +57,7 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
             
             String encodedToken = encodeToken(assertionWrapper.assertionToString());
                 
-            form.set(SAML_ELEMENT, encodedToken);
+            updateForm(form, encodedToken);
         } catch (Exception ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
@@ -67,8 +67,12 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
         
     }
         
+    protected void updateForm(Form form, String encodedToken) {
+        form.set(SAML_ELEMENT, encodedToken);
+    }
+    
     @SuppressWarnings("unchecked")
-    private Form getRequestForm(Message message) {
+    protected Form getRequestForm(Message message) {
         Object ct = message.get(Message.CONTENT_TYPE);
         if (ct == null || !MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(ct.toString())) {
             return null;

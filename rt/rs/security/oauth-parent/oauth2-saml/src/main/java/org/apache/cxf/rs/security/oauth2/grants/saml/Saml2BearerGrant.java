@@ -16,42 +16,63 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.oauth2.grants.owner;
+package org.apache.cxf.rs.security.oauth2.grants.saml;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oauth2.saml.Base64UrlUtility;
+import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class ResourceOwnerGrant implements AccessTokenGrant {
-    private String ownerName;
-    private String ownerPassword;
+public class Saml2BearerGrant implements AccessTokenGrant {
+    private String assertion;
     private String scope;
+    private boolean encoded; 
     
-    public ResourceOwnerGrant(String name, String password) {
-        this(name, password, null);
+    public Saml2BearerGrant(String assertion) {
+        this(assertion, false);
     }
     
-    public ResourceOwnerGrant(String name, String password, String scope) {
-        this.ownerName = name;
-        this.ownerPassword = password;
+    public Saml2BearerGrant(String assertion, boolean encoded) {
+        this(assertion, false, null);
+    }
+    
+    public Saml2BearerGrant(String assertion, String scope) {
+        this(assertion, false, scope);
+    }
+    
+    public Saml2BearerGrant(String assertion, boolean encoded, String scope) {
+        this.assertion = assertion;
+        this.encoded = encoded;
         this.scope = scope;
     }
     
     public String getType() {
-        return OAuthConstants.RESOURCE_OWNER_GRANT;
+        return Constants.SAML2_BEARER_GRANT;
     }
 
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.RESOURCE_OWNER_GRANT);
-        map.putSingle(OAuthConstants.RESOURCE_OWNER_NAME, ownerName);
-        map.putSingle(OAuthConstants.RESOURCE_OWNER_PASSWORD, ownerPassword);
+        map.putSingle(OAuthConstants.GRANT_TYPE, Constants.SAML2_BEARER_GRANT);
+        map.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, encodeAssertion());
         if (scope != null) {
             map.putSingle(OAuthConstants.SCOPE, scope);
         }
         return map;
     }
 
+    protected String encodeAssertion() {
+        if (encoded) {
+            return assertion;
+        }
+        
+        try {
+            return Base64UrlUtility.encode(assertion);
+        } catch (Exception ex) {
+            throw new OAuthServiceException(ex.getMessage(), ex);
+        }
+    }
 }

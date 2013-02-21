@@ -152,11 +152,67 @@ public final class OAuthClientUtils {
     public static ClientAccessToken getAccessToken(WebClient accessTokenService,
                                                    Consumer consumer,
                                                    AccessTokenGrant grant,
+                                                   boolean setAuthorizationHeader) {
+        return getAccessToken(accessTokenService, consumer, grant, null, setAuthorizationHeader);
+    }
+    
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * using the initialized web client 
+     * @param accessTokenService the AccessToken client
+     * @param grant {@link AccessTokenGrant} grant
+     * @param extraParams extra parameters
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
+    public static ClientAccessToken getAccessToken(WebClient accessTokenService,
+                                                   AccessTokenGrant grant) 
+        throws OAuthServiceException {
+        return getAccessToken(accessTokenService, null, grant, null, false);
+    }
+    
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * using the initialized web client 
+     * @param accessTokenService the AccessToken client
+     * @param grant {@link AccessTokenGrant} grant
+     * @param extraParams extra parameters
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
+    public static ClientAccessToken getAccessToken(WebClient accessTokenService,
+                                                   AccessTokenGrant grant,
+                                                   Map<String, String> extraParams) 
+        throws OAuthServiceException {
+        return getAccessToken(accessTokenService, null, grant, extraParams, false);
+    }
+    
+    /**
+     * Obtains the access token from OAuth AccessToken Service 
+     * using the initialized web client 
+     * @param accessTokenService the AccessToken client
+     * @param consumer {@link Consumer} representing the registered client.
+     * @param grant {@link AccessTokenGrant} grant
+     * @param extraParams extra parameters
+     * @param setAuthorizationHeader if set to true then HTTP Basic scheme
+     *           will be used to pass client id and secret, otherwise they will
+     *           be passed in the form payload  
+     * @return {@link ClientAccessToken} access token
+     * @throws OAuthServiceException
+     */
+    public static ClientAccessToken getAccessToken(WebClient accessTokenService,
+                                                   Consumer consumer,
+                                                   AccessTokenGrant grant,
+                                                   Map<String, String> extraParams,
                                                    boolean setAuthorizationHeader) 
         throws OAuthServiceException {
         
         Form form = new Form(grant.toMap());
-    
+        if (extraParams != null) {
+            for (Map.Entry<String, String> entry : extraParams.entrySet()) {
+                form.getData().add(entry.getKey(), entry.getValue());
+            }
+        }
         if (consumer != null) {
             if (setAuthorizationHeader) {
                 StringBuilder sb = new StringBuilder();
@@ -229,18 +285,6 @@ public final class OAuthClientUtils {
         }
     }
     
-    /**
-     * Creates OAuth Authorization header with Bearer scheme
-     * @param consumer represents the registered client
-     * @param accessToken the access token  
-     * @return the header value
-     */
-    @Deprecated
-    public static String createAuthorizationHeader(Consumer consumer,
-                                                   ClientAccessToken accessToken)
-        throws OAuthServiceException {
-        return createAuthorizationHeader(accessToken);
-    }
     
     /**
      * Creates OAuth Authorization header with Bearer scheme

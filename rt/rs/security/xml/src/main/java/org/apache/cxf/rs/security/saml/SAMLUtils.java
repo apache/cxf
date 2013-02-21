@@ -93,15 +93,27 @@ public final class SAMLUtils {
     
     public static AssertionWrapper createAssertion(Message message) throws Fault {
         CallbackHandler handler = SecurityUtils.getCallbackHandler(
-             message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
+            message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
+        boolean selfSignAssertion = 
+            MessageUtils.getContextualBoolean(
+                message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
+            );
+        return createAssertion(message, handler, selfSignAssertion);
+    }
+    
+    public static AssertionWrapper createAssertion(Message message,
+                                                   CallbackHandler handler) {
+        return createAssertion(message, handler, true);
+    }
+    
+    public static AssertionWrapper createAssertion(Message message,
+                                                   CallbackHandler handler,
+                                                   boolean selfSignAssertion) throws Fault {
+            
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(handler);
         try {
             AssertionWrapper assertion = new AssertionWrapper(samlParms);
-            boolean selfSignAssertion = 
-                MessageUtils.getContextualBoolean(
-                    message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
-                );
             if (selfSignAssertion) {
                 //--- This code will be moved to a common utility class
                 Crypto crypto = new CryptoLoader().getCrypto(message, 
@@ -128,5 +140,51 @@ public final class SAMLUtils {
             throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
         }
         
+    }
+    
+    public static AssertionWrapper createAssertion(CallbackHandler handler,
+                                                   SelfSignInfo info) throws Fault {
+            
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(handler);
+        try {
+            AssertionWrapper assertion = new AssertionWrapper(samlParms);
+            assertion.signAssertion(info.getUser(), 
+                                    info.getPassword(), 
+                                    info.getCrypto(), 
+                                    false);
+            return assertion;
+        } catch (Exception ex) {
+            StringWriter sw = new StringWriter();
+            ex.printStackTrace(new PrintWriter(sw));
+            LOG.warning(sw.toString());
+            throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
+        }
+        
+    }
+    
+    public static class SelfSignInfo {
+        private Crypto crypto;
+        private String user;
+        private String password;
+        
+        public SelfSignInfo(Crypto crypto, String user, String password) {
+            this.crypto = crypto;
+            this.user = user;
+            this.password = password;
+        }
+        
+        public Crypto getCrypto() {
+            return crypto;
+        }
+        public String getUser() {
+            return user;
+        }
+        public String getPassword() {
+            return password;
+        }
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }

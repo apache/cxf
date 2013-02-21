@@ -82,20 +82,38 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     
     protected void validateToken(Message message, InputStream tokenStream) {
         
-        Document doc = null;
+        Element token = readToken(message, tokenStream);
+        validateToken(message, token);
+        
+    }
+    
+    protected Element readToken(Message message, InputStream tokenStream) {
+        
         try {
-            doc = DOMUtils.readXml(new InputStreamReader(tokenStream, "UTF-8"));
+            Document doc = DOMUtils.readXml(new InputStreamReader(tokenStream, "UTF-8"));
+            return doc.getDocumentElement();
         } catch (Exception ex) {
             throwFault("Assertion can not be read as XML document", ex);
         }
-        validateToken(message, doc.getDocumentElement());
+        return null;
         
     }
 
     protected void validateToken(Message message, Element tokenElement) {
+        validateToken(message, toWrapper(tokenElement));
+    }
+    
+    protected AssertionWrapper toWrapper(Element tokenElement) {
         try {
-            AssertionWrapper assertion = new AssertionWrapper(tokenElement);
-            
+            return new AssertionWrapper(tokenElement);
+        } catch (Exception ex) {
+            throwFault("Assertion can not be validated", ex);
+        }
+        return null;
+    }
+    
+    protected void validateToken(Message message, AssertionWrapper assertion) {
+        try {
             RequestData data = new RequestData();
             if (assertion.isSigned()) {
                 WSSConfig cfg = WSSConfig.getNewInstance(); 
@@ -112,6 +130,8 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
                 assertion.verifySignature(data, null);
                 assertion.parseHOKSubject(data, null);
+            } else if (getTLSCertificates(message) == null) {
+                throwFault("Assertion must be signed", null);
             }
             if (samlValidator != null) {
                 Credential credential = new Credential();
@@ -158,7 +178,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         // to rt/rs/security
         LOG.warning(error);
         Response response = Response.status(401).entity(error).build();
-        throw ex != null ? new NotAuthorizedException(ex, response) : new NotAuthorizedException(response);
+        throw ex != null ? new NotAuthorizedException(response, ex) : new NotAuthorizedException(response);
     }
     
     /**
