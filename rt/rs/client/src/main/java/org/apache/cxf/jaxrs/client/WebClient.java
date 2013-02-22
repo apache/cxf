@@ -38,6 +38,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -765,7 +766,15 @@ public class WebClient extends AbstractClient {
                                 Type inGenericType,
                                 Class<?> responseClass, 
                                 Type outGenericType) {
-        
+        if (body instanceof GenericEntity) {
+            GenericEntity<?> genericEntity = (GenericEntity<?>)body;
+            body = genericEntity.getEntity();
+            requestClass = genericEntity.getRawType();
+            if (inGenericType != null && genericEntity.getType() != inGenericType) {
+                throw new IllegalArgumentException("Illegal type");    
+            }
+            inGenericType = genericEntity.getType();
+        }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
         Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
