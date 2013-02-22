@@ -58,6 +58,7 @@ import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.message.Exchange;
@@ -347,6 +348,21 @@ public class WebClient extends AbstractClient {
      * Does HTTP invocation and returns types response object 
      * @param httpMethod HTTP method 
      * @param body request body, can be null
+     * @param responseType generic response type
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
+    public <T> T invoke(String httpMethod, Object body, GenericType<T> responseType) {
+        @SuppressWarnings("unchecked")
+        Class<T> responseClass = (Class<T>)responseType.getRawType();
+        Response r = doInvoke(httpMethod, body, null, responseClass, responseType.getType());
+        return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
+    }
+    
+    /**
+     * Does HTTP invocation and returns types response object 
+     * @param httpMethod HTTP method 
+     * @param body request body, can be null
      * @param responseClass expected type of response object
      * @return typed object, can be null. Response status code and headers 
      *         can be obtained too, see Client.getResponse()
@@ -382,6 +398,17 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Does HTTP POST invocation and returns typed response object
+     * @param body request body, can be null
+     * @param responseType generic response type
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
+    public <T> T post(Object body, GenericType<T> responseType) {
+        return invoke("POST", body, responseType);
+    }
+    
+    /**
      * Does HTTP Async POST invocation and returns Future.
      * Shortcut for async().post(Entity, InvocationCallback)
      * @param callback invocation callback 
@@ -400,6 +427,18 @@ public class WebClient extends AbstractClient {
      */
     public <T> T put(Object body, Class<T> responseClass) {
         return invoke("PUT", body, responseClass);
+    }
+    
+
+    /**
+     * Does HTTP PUT invocation and returns typed response object
+     * @param body request body, can be null
+     * @param responseType generic response type
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
+    public <T> T put(Object body, GenericType<T> responseType) {
+        return invoke("PUT", body, responseType);
     }
     
     /**
@@ -509,6 +548,17 @@ public class WebClient extends AbstractClient {
      */
     public <T> T get(Class<T> responseClass) {
         return invoke("GET", null, responseClass);
+    }
+    
+
+    /**
+     * Does HTTP GET invocation and returns typed response object
+     * @param responseType generic response type
+     * @return typed object, can be null. Response status code and headers 
+     *         can be obtained too, see Client.getResponse()
+     */
+    public <T> T get(GenericType<T> responseType) {
+        return invoke("GET", null, responseType);
     }
     
     /**
@@ -805,8 +855,8 @@ public class WebClient extends AbstractClient {
     }
     private Type getCallbackType(InvocationCallback<?> callback) {
         Class<?> cls = callback.getClass();
-        ParameterizedType t = findCallbackType(cls);
-        for (Type tp : t.getActualTypeArguments()) {
+        ParameterizedType pt = findCallbackType(cls);
+        for (Type tp : pt.getActualTypeArguments()) {
             return tp;
         }
         return null;
@@ -819,7 +869,16 @@ public class WebClient extends AbstractClient {
                                                   InvocationCallback<T> callback) {
         
         Type outType = getCallbackType(callback);
-        Class<?> respClass = outType instanceof Class ? (Class<?>) outType : null;
+        Class<?> respClass = null;
+        if (outType instanceof Class) {
+            respClass = (Class<?>)outType;
+        } else if (outType instanceof ParameterizedType) { 
+            ParameterizedType pt = (ParameterizedType)outType;
+            if (pt.getRawType() instanceof Class) {
+                respClass = (Class<?>)pt.getRawType();
+                outType = InjectionUtils.getActualType(pt);
+            }
+        } 
         
         return doInvokeAsync(httpMethod, body, requestClass, inType, respClass, outType, callback);
     }
