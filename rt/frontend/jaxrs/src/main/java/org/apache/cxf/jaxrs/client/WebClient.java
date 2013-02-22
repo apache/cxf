@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -729,12 +730,25 @@ public class WebClient extends AbstractClient {
             responseClass, outGenericType);
     }
     
+    private static Type getGenericEntityType(GenericEntity<?> genericEntity, Type inGenericType) {
+        if (inGenericType != null && genericEntity.getType() != inGenericType) {
+            throw new IllegalArgumentException("Illegal type");    
+        }
+        return genericEntity.getType();
+    }
+
     protected Response doInvoke(String httpMethod, 
                                 Object body, 
                                 Class<?> requestClass,
                                 Type inGenericType,
                                 Class<?> responseClass, 
                                 Type outGenericType) {
+        if (body instanceof GenericEntity) {
+            GenericEntity<?> genericEntity = (GenericEntity<?>)body;
+            body = genericEntity.getEntity();
+            requestClass = genericEntity.getRawType();
+            inGenericType = getGenericEntityType(genericEntity, inGenericType);
+        }
         
         MultivaluedMap<String, String> headers = getHeaders();
         boolean contentTypeNotSet = headers.getFirst(HttpHeaders.CONTENT_TYPE) == null;

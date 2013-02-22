@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -273,6 +274,28 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         books.add(b1);
         books.add(b2);
         Book book = wc.postCollection(books, Book.class, Book.class);
+        assertEquals(200, wc.getResponse().getStatus());
+        assertNotSame(b1, book);
+        assertEquals(b1.getName(), book.getName());
+    }
+    
+    @Test
+    public void testPostCollectionGenericEntityWebClient() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections3"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b1);
+        books.add(b2);
+        GenericEntity<List<Book>> genericCollectionEntity = 
+            new GenericEntity<List<Book>>(books) {
+            };
+        
+        Book book = wc.post(genericCollectionEntity, Book.class);
         assertEquals(200, wc.getResponse().getStatus());
         assertNotSame(b1, book);
         assertEquals(b1.getName(), book.getName());
