@@ -388,7 +388,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> post(Object body, InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("POST", body, body.getClass(), getClass(), callback);
+        return doInvokeAsyncCallback("POST", body, body.getClass(), body.getClass(), callback);
     }
     
     /**
@@ -409,7 +409,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> put(Object body, InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("PUT", body, body.getClass(), getClass(), callback);
+        return doInvokeAsyncCallback("PUT", body, body.getClass(), body.getClass(), callback);
     }
     
     /**
@@ -760,6 +760,13 @@ public class WebClient extends AbstractClient {
             responseClass, outGenericType);
     }
     
+    private static Type getGenericEntityType(GenericEntity<?> genericEntity, Type inGenericType) {
+        if (inGenericType != null && genericEntity.getType() != inGenericType) {
+            throw new IllegalArgumentException("Illegal type");    
+        }
+        return genericEntity.getType();
+    }
+    
     protected Response doInvoke(String httpMethod, 
                                 Object body, 
                                 Class<?> requestClass,
@@ -770,10 +777,7 @@ public class WebClient extends AbstractClient {
             GenericEntity<?> genericEntity = (GenericEntity<?>)body;
             body = genericEntity.getEntity();
             requestClass = genericEntity.getRawType();
-            if (inGenericType != null && genericEntity.getType() != inGenericType) {
-                throw new IllegalArgumentException("Illegal type");    
-            }
-            inGenericType = genericEntity.getType();
+            inGenericType = getGenericEntityType(genericEntity, inGenericType);
         }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
