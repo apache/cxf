@@ -33,6 +33,8 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -102,6 +104,147 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         doTestGetBookAsync(address, false);
     }
     
+    @Test
+    public void testPostCollectionGenericEntity() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections3"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        
+        GenericEntity<List<Book>> collectionEntity = createGenericEntity();
+        final Holder<Book> holder = new Holder<Book>();
+        InvocationCallback<Book> callback = createCallback(holder);        
+            
+        Future<Book> future = wc.post(collectionEntity, callback);
+        Book book = future.get();
+        assertEquals(200, wc.getResponse().getStatus());
+        assertSame(book, holder.value);
+        assertNotSame(collectionEntity.getEntity().get(0), book);
+        assertEquals(collectionEntity.getEntity().get(0).getName(), book.getName());
+    }
+    
+    @Test
+    public void testPostCollectionGenericEntityAsEntity() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections3"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml");
+        
+        GenericEntity<List<Book>> collectionEntity = createGenericEntity();
+        
+        final Holder<Book> holder = new Holder<Book>();
+        InvocationCallback<Book> callback = createCallback(holder);        
+            
+        Future<Book> future = wc.async().post(Entity.entity(collectionEntity, "application/xml"),
+                                              callback);
+        Book book = future.get();
+        assertEquals(200, wc.getResponse().getStatus());
+        assertSame(book, holder.value);
+        assertNotSame(collectionEntity.getEntity().get(0), book);
+        assertEquals(collectionEntity.getEntity().get(0).getName(), book.getName());
+    }
+    
+    @Test
+    public void testPostGetCollectionGenericEntityAndType() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        GenericEntity<List<Book>> collectionEntity = createGenericEntity();
+        final Holder<List<Book>> holder = new Holder<List<Book>>();
+        InvocationCallback<List<Book>> callback = new CustomInvocationCallback(holder);
+            
+        Future<List<Book>> future = wc.async().post(Entity.entity(collectionEntity, "application/xml"),
+                                                    callback);    
+            
+        List<Book> books2 = future.get();
+        assertNotNull(books2);
+        
+        List<Book> books = collectionEntity.getEntity();
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+        assertEquals(200, wc.getResponse().getStatus());
+    }
+    
+    @Test
+    public void testPostGetCollectionGenericEntityAndType2() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml").type("application/xml");
+        GenericEntity<List<Book>> collectionEntity = createGenericEntity();
+        GenericType<List<Book>> genericResponseType = new GenericType<List<Book>>() {        
+        };
+            
+        Future<List<Book>> future = wc.async().post(Entity.entity(collectionEntity, "application/xml"),
+                                                    genericResponseType);    
+            
+        List<Book> books2 = future.get();
+        assertNotNull(books2);
+        
+        List<Book> books = collectionEntity.getEntity();
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+        assertEquals(200, wc.getResponse().getStatus());
+    }
+    
+    private GenericEntity<List<Book>> createGenericEntity() {
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b1);
+        books.add(b2);
+        return new GenericEntity<List<Book>>(books) {
+            };
+    }
+    
+    private InvocationCallback<Book> createCallback(final Holder<Book> holder) {
+        return new InvocationCallback<Book>() {
+            public void completed(Book response) {
+                holder.value = response;
+            }
+            public void failed(ClientException error) {
+            }
+        };
+    }
+    
+    
+    private static class CustomInvocationCallback implements InvocationCallback<List<Book>> {
+        private Holder<List<Book>> holder;
+        public CustomInvocationCallback(Holder<List<Book>> holder) {
+            this.holder = holder;
+        }
+        
+        @Override
+        public void completed(List<Book> books) {
+            holder.value = books;
+            
+        }
+
+        @Override
+        public void failed(ClientException arg0) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+    }
+    
     private void doTestGetBook(String address) {
         WebClient wc = createWebClient(address);
         Book book = wc.get(Book.class);
@@ -135,13 +278,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient wc = createWebClient(address);
         
         final Holder<Book> holder = new Holder<Book>();
-        final InvocationCallback<Book> callback = new InvocationCallback<Book>() {
-            public void completed(Book response) {
-                holder.value = response;
-            }
-            public void failed(ClientException error) {
-            }
-        };
+        InvocationCallback<Book> callback = createCallback(holder);
         
         Future<Book> future = asyncInvoker ? wc.async().get(callback) : wc.get(callback);
         Book book = future.get();
