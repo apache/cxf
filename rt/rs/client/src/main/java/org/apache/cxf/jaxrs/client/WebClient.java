@@ -388,7 +388,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> post(Object body, InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("POST", body, body.getClass(), body.getClass(), callback);
+        return doInvokeAsyncCallback("POST", body, body.getClass(), null, callback);
     }
     
     /**
@@ -409,7 +409,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> put(Object body, InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("PUT", body, body.getClass(), body.getClass(), callback);
+        return doInvokeAsyncCallback("PUT", body, body.getClass(), null, callback);
     }
     
     /**
@@ -832,6 +832,13 @@ public class WebClient extends AbstractClient {
                                           Type outType,
                                           InvocationCallback<T> callback) {
         
+        if (body instanceof GenericEntity) {
+            GenericEntity<?> genericEntity = (GenericEntity<?>)body;
+            body = genericEntity.getEntity();
+            requestClass = genericEntity.getRawType();
+            inType = getGenericEntityType(genericEntity, inType);
+        }
+        
         MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
         resetResponse();
 
@@ -869,9 +876,23 @@ public class WebClient extends AbstractClient {
     
     private void handleAsyncResponse(Message message) {
         JaxrsClientCallback<?> cb = message.getExchange().get(JaxrsClientCallback.class);
-        Response r = handleResponse(message.getExchange().getOutMessage(),
-                                    cb.getResponseClass(),
-                                    cb.getOutGenericType());
+        Response r = null;
+        try {
+            Object[] results = preProcessResult(message);
+            if (results != null && results.length == 1) {
+                r = (Response)results[0];
+            }
+        } catch (Exception ex) {
+            throw ex instanceof WebApplicationException 
+                ? (WebApplicationException)ex 
+                : ex instanceof ProcessingException 
+                ? (ProcessingException)ex : new ProcessingException(ex); 
+        }
+        if (r == null) {
+            r = handleResponse(message.getExchange().getOutMessage(),
+                                        cb.getResponseClass(),
+                                        cb.getOutGenericType());
+        }
         
         if (cb.getResponseClass() == null || Response.class.equals(cb.getResponseClass())) {
             cb.handleResponse(message, new Object[] {r});
@@ -1258,22 +1279,33 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, Class<T> responseType) {
-            return doInvokeAsync(name, entity.getEntity(), entity.getClass(), entity.getClass(), 
+            setEntityHeaders(entity);
+            return doInvokeAsync(name, entity.getEntity(), entity.getEntity().getClass(), null, 
                                  responseType, responseType, null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-            return doInvokeAsync(name, entity.getEntity(), entity.getClass(), entity.getClass(), 
+            setEntityHeaders(entity);
+            return doInvokeAsync(name, entity.getEntity(), entity.getEntity().getClass(), null, 
                                  responseType.getRawType(), responseType.getType(), null);
         }
 
         @Override
         public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
-            return doInvokeAsync(name, entity.getEntity(), entity.getClass(), entity.getClass(), 
-                                 Response.class, Response.class, callback);
+            setEntityHeaders(entity);
+            return doInvokeAsyncCallback(name, entity.getEntity(), entity.getEntity().getClass(), null, 
+                callback);
         }
-        
+        private void setEntityHeaders(Entity<?> entity) {
+            WebClient.this.type(entity.getMediaType());
+            if (entity.getLanguage() != null) {
+                WebClient.this.language(entity.getLanguage().toString());
+            }
+            if (entity.getEncoding() != null) {
+                WebClient.this.encoding(entity.getEncoding());
+            }
+        }
     }
     
 }
