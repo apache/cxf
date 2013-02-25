@@ -72,7 +72,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     @Override
     public void setEntityStream(InputStream is) {
         checkContext();
-        m.put(InputStream.class, is);
+        m.setContent(InputStream.class, is);
     }
 
     @SuppressWarnings("unchecked")
@@ -85,6 +85,22 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public void setRequestUri(URI requestUri) throws IllegalStateException {
+        if (requestUri.isAbsolute()) {
+            String baseUriString = new UriInfoImpl(m).getBaseUri().toString();
+            String requestUriString = new UriInfoImpl(m).getBaseUri().toString();
+            if (!requestUriString.startsWith(baseUriString)) {
+                setRequestUri(requestUri, URI.create("/"));
+                return;
+            } else {
+                requestUriString = requestUriString.substring(baseUriString.length() + 1);
+                requestUri = URI.create(requestUriString);
+            }
+                
+        }
+        doSetRequestUri(requestUri);
+    }
+    
+    public void doSetRequestUri(URI requestUri) throws IllegalStateException {
         if (!preMatch) {
             throw new IllegalStateException();
         }
@@ -93,7 +109,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public void setRequestUri(URI baseUri, URI requestUri) throws IllegalStateException {
-        setRequestUri(requestUri);
+        doSetRequestUri(requestUri);
         Object servletRequest = m.get("HTTP.REQUEST");
         if (servletRequest != null) {
             ((javax.servlet.http.HttpServletRequest)servletRequest)
