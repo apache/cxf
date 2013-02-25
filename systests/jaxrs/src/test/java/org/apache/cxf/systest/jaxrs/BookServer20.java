@@ -19,7 +19,9 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -76,6 +78,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new CustomDynamicFeature());
         providers.add(new PostMatchContainerRequestFilter());
         providers.add(new FaultyContainerRequestFilter());
+        providers.add(new PreMatchReplaceStreamOrAddress());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -133,6 +136,27 @@ public class BookServer20 extends AbstractBusTestServerBase {
             context.getHeaders().add("BOOK", "12");
         }
         
+    }
+    
+    @PreMatching
+    private static class PreMatchReplaceStreamOrAddress implements ContainerRequestFilter {
+        @Context
+        private UriInfo ui;
+        @Override
+        public void filter(ContainerRequestContext context) throws IOException {
+            String path = ui.getPath();
+            if (path.endsWith("books/checkN")) {
+                URI requestURI = URI.create(path.replace("N", "2"));
+                context.setRequestUri(requestURI);
+                replaceStream(context);
+            } else if (path.endsWith("books/check2")) {
+                replaceStream(context);
+            }
+        }
+        private void replaceStream(ContainerRequestContext context) {
+            InputStream is = new ByteArrayInputStream("123".getBytes());
+            context.setEntityStream(is);
+        }
     }
     
         
