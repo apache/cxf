@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -162,12 +163,23 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         protected void setupWrappedStream() throws IOException {
             // If we need to cache for retransmission, store data in a
             // CacheAndWriteOutputStream. Otherwise write directly to the output stream.
+            OutputStream cout = null;
+            try {
+                cout = connection.getOutputStream();
+            } catch (SocketException e) {
+                if ("Socket Closed".equals(e.getMessage())) {
+                    connection.connect();
+                    cout = connection.getOutputStream();
+                } else {
+                    throw e;
+                }
+            }
             if (cachingForRetransmission) {
                 cachedStream =
-                    new CacheAndWriteOutputStream(connection.getOutputStream());
+                    new CacheAndWriteOutputStream(cout);
                 wrappedStream = cachedStream;
             } else {
-                wrappedStream = connection.getOutputStream();
+                wrappedStream = cout;
             }
         }
 
