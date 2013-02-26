@@ -84,6 +84,16 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
                 continue;
             }
+            
+            Element claims = issuedToken.getClaims();
+            if (claims != null) {
+                String dialect = claims.getAttributeNS(null, "Dialect");
+                if (claimsValidator.getDialect().equals(dialect)
+                    && !claimsValidator.validatePolicy(claims, assertionWrapper)) {
+                    ai.setNotAsserted("Error in validating the Claims policy");
+                    continue;
+                }
+            }
 
             TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
             Certificate[] tlsCerts = null;

@@ -47,6 +47,11 @@ public abstract class Token extends AbstractSecurityAssertion {
     private Element policy;
     
     /**
+     * A reference to the DOM wst:Claims child Element
+     */
+    private Element claims;
+    
+    /**
      * A Reference to a parent SupportingToken assertion
      */
     private SupportingToken supportingToken;
@@ -130,5 +135,13 @@ public abstract class Token extends AbstractSecurityAssertion {
 
     public void setPolicy(Element policy) {
         this.policy = policy;
+    }
+
+    public Element getClaims() {
+        return claims;
+    }
+
+    public void setClaims(Element claims) {
+        this.claims = claims;
     }
 }
