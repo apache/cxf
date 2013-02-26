@@ -28,6 +28,7 @@ import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Proxy;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
@@ -1396,12 +1397,23 @@ public class HTTPConduit
             
             // If we need to cache for retransmission, store data in a
             // CacheAndWriteOutputStream. Otherwise write directly to the output stream.
+            OutputStream cout = null;
+            try {
+                cout = connection.getOutputStream();
+            } catch (SocketException e) {
+                if ("Socket Closed".equals(e.getMessage())) {
+                    connection.connect();
+                    cout = connection.getOutputStream();
+                } else {
+                    throw e;
+                }
+            }
             if (cachingForRetransmission) {
                 cachedStream =
-                    new CacheAndWriteOutputStream(connection.getOutputStream());
+                    new CacheAndWriteOutputStream(cout);
                 wrappedStream = cachedStream;
             } else {
-                wrappedStream = connection.getOutputStream();
+                wrappedStream = cout;
             }
             
         }
