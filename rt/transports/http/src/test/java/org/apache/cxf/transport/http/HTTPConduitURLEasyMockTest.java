@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.http;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -308,6 +309,9 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             proxy = null;
             connection =
                 control.createMock(HttpURLConnection.class);
+            connection.getURL();
+            EasyMock.expectLastCall().andReturn(new URL(NOWHERE + "bar/foo")).anyTimes();
+           
             connectionFactory.createConnection((TLSClientParameters)EasyMock.isNull(),
                                       EasyMock.eq(proxy), 
                                       EasyMock.eq(new URL(NOWHERE + "bar/foo")));
@@ -534,17 +538,18 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             connection.getResponseCode();
             EasyMock.expectLastCall().andReturn(301).once().andReturn(responseCode).anyTimes();
             connection.getURL();
-            EasyMock.expectLastCall().andReturn(new URL(NOWHERE + "bar/foo/redirect")).once();
+            EasyMock.expectLastCall().andReturn(new URL(NOWHERE + "bar/foo/redirect")).anyTimes();
         } else {
             connection.getResponseCode();
             EasyMock.expectLastCall().andReturn(responseCode).anyTimes();
         }
-        is = control.createMock(InputStream.class);
-        connection.getInputStream();
-        EasyMock.expectLastCall().andReturn(is).anyTimes();
+        
         switch (style) {
         case NONE:            
         case DECOUPLED:
+            is = control.createMock(InputStream.class);
+            connection.getInputStream();
+            EasyMock.expectLastCall().andReturn(is).anyTimes();
             connection.getContentLength();
             if (delimiter == ResponseDelimiter.CHUNKED 
                 || delimiter == ResponseDelimiter.EOF) {
@@ -572,16 +577,22 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             break;
             
         case BACK_CHANNEL:
+            is = EasyMock.createMock(InputStream.class);
+            connection.getInputStream();
+            EasyMock.expectLastCall().andReturn(is).anyTimes();
             break;
             
         case BACK_CHANNEL_ERROR:
+            is = EasyMock.createMock(InputStream.class);
+            connection.getInputStream();
+            EasyMock.expectLastCall().andReturn(is).anyTimes();
             connection.getErrorStream();
             EasyMock.expectLastCall().andReturn(null);
             break; 
             
         case ONEWAY_NONE:
-            is.close();
-            EasyMock.expectLastCall();
+            connection.getInputStream();
+            EasyMock.expectLastCall().andReturn(new ByteArrayInputStream(new byte[0])).anyTimes();
             break;
             
         default:
