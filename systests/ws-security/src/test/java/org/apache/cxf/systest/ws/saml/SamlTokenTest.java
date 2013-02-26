@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
+import org.apache.cxf.systest.ws.saml.client.SamlElementCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -99,6 +100,40 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
 
         ((BindingProvider)saml1Port).getRequestContext().put(
             "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        int result = saml1Port.doubleIt(25);
+        assertTrue(result == 50);
+        
+        ((java.io.Closeable)saml1Port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSaml1ElementOverTransport() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SamlTokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort");
+        DoubleItPortType saml1Port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        
+        try {
+            saml1Port.doubleIt(25);
+            fail("Expected failure on an invocation with no SAML Assertion");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("No SAML CallbackHandler available"));
+        }
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlElementCallbackHandler(false)
         );
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
@@ -610,6 +645,5 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
     }
-    
     
 }
