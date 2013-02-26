@@ -1092,15 +1092,7 @@ public class HTTPConduit
             return connection;
         }
         try {
-            //try and consume any content so that the connection might be reusable
-            InputStream ins = connection.getErrorStream();
-            if (ins == null) {
-                ins = connection.getInputStream();
-            }
-            if (ins != null) {
-                IOUtils.consume(ins);
-                ins.close();
-            }
+            closeInputStream(connection);
         } catch (Throwable t) {
             //ignore
         }
@@ -1630,7 +1622,10 @@ public class HTTPConduit
                 if ((in == null) || (!doProcessResponse(outMessage))) {
                     // oneway operation or decoupled MEP without 
                     // partial response
-                    connection.getInputStream().close();
+                    closeInputStream(connection);
+                    if (isOneway(exchange) && responseCode > 300) {
+                        throw new HTTPException(responseCode, connection.getResponseMessage(), connection.getURL());
+                    }
                     ClientCallback cc = exchange.get(ClientCallback.class);
                     if (null != cc) {
                         //REVISIT move the decoupled destination property name into api
@@ -1764,6 +1759,18 @@ public class HTTPConduit
         policyDataEngine.assertMessage(message, getClient(), new ClientPolicyCalculator());
     }
     
+    protected void closeInputStream(HttpURLConnection connection) throws IOException {
+        //try and consume any content so that the connection might be reusable
+        InputStream ins = connection.getErrorStream();
+        if (ins == null) {
+            ins = connection.getInputStream();
+        }
+        if (ins != null) {
+            IOUtils.consume(ins);
+            ins.close();
+        }
+    }
+
     public boolean canAssert(QName type) {
         return new ClientPolicyCalculator().equals(type);  
     }
