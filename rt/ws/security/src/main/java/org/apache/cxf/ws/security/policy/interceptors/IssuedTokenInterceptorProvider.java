@@ -350,6 +350,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             if (maps != null && maps.getNamespaceURI() != null) {
                 client.setAddressingNamespace(maps.getNamespaceURI());
             }
+            if (itok.getClaims() != null) {
+                client.setClaims(itok.getClaims());
+            }
             return client.requestSecurityToken(appliesTo);
         }
         

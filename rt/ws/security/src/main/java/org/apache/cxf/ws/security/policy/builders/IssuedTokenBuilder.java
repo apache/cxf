@@ -82,6 +82,8 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
             } else if (SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE.equals(ln)) {
                 foundRST = true;
                 issuedToken.setRstTemplate(child);
+            } else if (SPConstants.CLAIMS.equals(ln)) {
+                issuedToken.setClaims(child);
             } else if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
                 foundPolicy = true;
                 Policy policy = builder.getPolicy(child);
