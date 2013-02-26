@@ -115,6 +115,25 @@
       </jaxws:properties> 
    </jaxws:endpoint>
    
+   <jaxws:endpoint id="doubleittransportsaml2childclaims"
+      implementor="org.apache.cxf.systest.sts.common.DoubleItPortTypeImpl"
+      endpointName="s:DoubleItTransportSAML2ChildClaimsPort"
+      serviceName="s:DoubleItService"
+      depends-on="ClientAuthHttpsSettings"
+      address="https://localhost:${testutil.ports.Server}/doubleit/services/doubleittransportsaml2childclaims"
+      wsdlLocation="org/apache/cxf/systest/sts/claims/DoubleIt.wsdl"
+      xmlns:s="http://www.example.org/contract/DoubleIt">
+        
+      <jaxws:properties>
+         <entry key="ws-security.callback-handler" 
+                value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
+         <entry key="ws-security.signature.properties" value="serviceKeystore.properties"/>
+         <entry key="ws-security.saml2.validator">
+            <bean class="org.apache.cxf.systest.sts.claims.ClaimsValidator"/>
+         </entry>
+      </jaxws:properties> 
+   </jaxws:endpoint>
+   
    <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
    <httpj:engine port="${testutil.ports.Server}">
     <httpj:tlsServerParameters>

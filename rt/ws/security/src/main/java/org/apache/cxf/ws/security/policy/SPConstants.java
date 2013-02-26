@@ -396,6 +396,8 @@ public abstract class SPConstants {
     
     public static final String ISSUER_NAME = "IssuerName";
     
+    public static final String CLAIMS = "Claims";
+    
     public static final String REQUIRE_DERIVED_KEYS = "RequireDerivedKeys";
     
     public static final String REQUIRE_IMPLIED_DERIVED_KEYS = "RequireImpliedDerivedKeys";
