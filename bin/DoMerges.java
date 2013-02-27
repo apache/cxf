@@ -78,6 +78,7 @@ public class DoMerges {
     public static Ranges blocked = new Ranges();
     
     public static String maxRev;
+    public static String username;
     
     static class Ranges extends TreeSet<Range> {
         private static final long serialVersionUID = 1L;
@@ -564,7 +565,7 @@ public class DoMerges {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "svn", "log", 
                                                                        "--oneline", "-r",
                                                                        min + ":" + maxRev,
-                                                                       gitSource})); 
+                                                                       gitSource}));
         } else {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svn", "log", 
                                                                        "--quiet", "-r",
@@ -738,6 +739,10 @@ public class DoMerges {
                 auto = true;
             } else if ("-from".equals(args[0])) {
                 fromVersion = Integer.valueOf(args[1]);
+            } else if ("-me".equals(args[0])) {
+                username = System.getProperty("user.name");
+            } else if ("-user".equals(args[0])) {
+                username = args[1];
             } else {
                 onlyVersion = Integer.valueOf(args[0]);
             }
@@ -793,10 +798,16 @@ public class DoMerges {
         for (int cur = 0; cur < verArray.length; cur++) {
             jiras.clear();
             int ver = verArray[cur];
+            String[] logLines = getLog(ver, jiras);
+            if (logLines.length > 1
+                && username != null
+                && !logLines[1].contains("| " + username + " |")) {
+                continue;
+            }
+            
             System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
             System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
             
-            String[] logLines = getLog(ver, jiras);
             
             for (String s : jiras) {
                 System.out.println("https://issues.apache.org/jira/browse/" + s);
