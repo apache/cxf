@@ -203,17 +203,14 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         java.io.InputStream is = null;
         String result = null;
         //
-        // Check to ensure that a well-formed request will pass
+        // Old Created Date should result in a Fault
         //
         dispatcher = createUsernameTokenDispatcher();
         is = getClass().getResourceAsStream(
             "test-data/UsernameTokenRequest.xml"
         );
         result = source2String(dispatcher.invoke(new StreamSource(is)));
-        assertTrue(result.indexOf("Bonjour") != -1);
-        //make sure the principal was set
-        assertNotNull(GreeterImpl.getUser());
-        assertEquals("alice", GreeterImpl.getUser().getName());
+        assertTrue(result.indexOf("Fault") != -1);
         
         //
         // Sending no security headers should result in a Fault
