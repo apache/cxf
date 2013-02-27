@@ -334,11 +334,11 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         }
         
         @Override
-        public String getParameter(String name) {
+        public Object getAttribute(String name) {
             if (AbstractHTTPDestination.SERVICE_REDIRECTION.equals(name)) {
                 return "true";
             }
-            return super.getParameter(name);
+            return super.getAttribute(name);
         }
     }
 
