@@ -173,6 +173,18 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (ttl != null) {
             msg.setContextualProperty(WSHandlerConstants.TTL_TIMESTAMP, ttl);
         }
+        
+        String utFutureTTL = 
+            (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_FUTURE_TTL);
+        if (utFutureTTL != null) {
+            msg.setContextualProperty(WSHandlerConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
+        }
+        String utTTL = 
+            (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_TTL);
+        if (utTTL != null) {
+            msg.setContextualProperty(WSHandlerConstants.TTL_USERNAMETOKEN, utTTL);
+        }
+        
         String certConstraints = 
             (String)msg.getContextualProperty(SecurityConstants.SUBJECT_CERT_CONSTRAINTS);
         if (certConstraints != null) {
