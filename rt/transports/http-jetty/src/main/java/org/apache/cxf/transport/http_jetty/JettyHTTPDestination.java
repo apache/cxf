@@ -418,6 +418,13 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             written = true;
             out.write(b, off, len);
         }
+
+        @Override
+        public void close() throws IOException {
+            // Avoid calling flush() here. It interferes with
+            // content length calculation in the generator.
+            out.close();
+        }
     }
     static class CountingInputStream extends FilterInputStream {
         int count;
