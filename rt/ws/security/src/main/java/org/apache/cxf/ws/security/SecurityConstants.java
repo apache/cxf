@@ -200,6 +200,19 @@ public final class SecurityConstants {
     public static final String TIMESTAMP_FUTURE_TTL = "ws-security.timestamp.futureTimeToLive";
     
     /**
+     * The time in seconds to append to the Creation value of an incoming UsernameToken to determine
+     * whether to accept the UsernameToken as valid or not. The default value is 300 seconds (5 minutes).
+     */
+    public static final String USERNAMETOKEN_TTL = "ws-security.usernametoken.timeToLive";
+    
+    /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * UsernameToken is valid. The default value is "60", to avoid problems where clocks are 
+     * slightly askew. To reject all future-created UsernameTokens, set this value to "0". 
+     */
+    public static final String USERNAMETOKEN_FUTURE_TTL = "ws-security.usernametoken.futureTimeToLive";
+    
+    /**
      * The attribute URI of the SAML AttributeStatement where the role information is stored.
      * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
      */
