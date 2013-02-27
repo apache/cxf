@@ -233,7 +233,7 @@ public abstract class AbstractHTTPDestination
             LOG.fine("Get the message from the request for processing");
         }
 
-        copyKnownRequestParameters(req, inMessage);
+        copyKnownRequestAttributes(req, inMessage);
         
         try {    
             incomingObserver.onMessage(inMessage);
@@ -247,8 +247,8 @@ public abstract class AbstractHTTPDestination
  
     }
 
-    private void copyKnownRequestParameters(HttpServletRequest request, Message message) {
-        message.put(SERVICE_REDIRECTION, request.getParameter(SERVICE_REDIRECTION));
+    private void copyKnownRequestAttributes(HttpServletRequest request, Message message) {
+        message.put(SERVICE_REDIRECTION, request.getAttribute(SERVICE_REDIRECTION));
     }
     
     protected void setupMessage(Message inMessage,
