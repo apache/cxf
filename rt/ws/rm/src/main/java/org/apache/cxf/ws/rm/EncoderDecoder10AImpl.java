@@ -86,6 +86,10 @@ public final class EncoderDecoder10AImpl implements EncoderDecoder {
         return org.apache.cxf.ws.rm.v200502wsa15.TerminateSequenceType.class;
     }
 
+    public Class<?> getTerminateSequenceResponseType() {
+        return null;
+    }
+
     private static JAXBContext getContext() throws JAXBException {
         synchronized (EncoderDecoder10AImpl.class) {
             if (jaxbContext == null) {

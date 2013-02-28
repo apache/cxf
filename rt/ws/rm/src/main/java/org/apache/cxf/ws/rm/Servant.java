@@ -34,6 +34,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.v200702.AcceptType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
@@ -41,6 +42,7 @@ import org.apache.cxf.ws.rm.v200702.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200702.Expires;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.OfferType;
+import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
@@ -84,7 +86,10 @@ public class Servant implements Invoker {
             createSequenceResponse(createResponse, protocol);
         } else if (RM10Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())
             || RM11Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())) {
-            terminateSequence(exchange.getInMessage());
+            Object tsr = terminateSequence(exchange.getInMessage());
+            if (tsr != null) {
+                return Collections.singletonList(tsr);
+            }
         }
         
         return null;
@@ -196,7 +201,7 @@ public class Servant implements Invoker {
         }
     }
 
-    public void terminateSequence(Message message) {
+    public Object terminateSequence(Message message) {
         LOG.fine("Terminating sequence");
         final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
         
@@ -212,7 +217,7 @@ public class Servant implements Invoker {
         if (null == terminatedSeq) {
             //  TODO
             LOG.severe("No such sequence.");
-            return;
+            return null;
         } 
 
         destination.removeSequence(terminatedSeq);
@@ -246,7 +251,23 @@ public class Servant implements Invoker {
                 break;
             }
         }
-        
+        TerminateSequenceResponseType terminateResponse = null;
+        if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
+            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
+            Message outMessage = message.getExchange().getOutMessage();
+
+            if (null == outMessage) {
+                // outMessage may be null e.g. if ReplyTo is not set for TS 
+                outMessage = ContextUtils.createMessage(message.getExchange());
+                message.getExchange().setOutMessage(outMessage);
+            }
+            if (null != outMessage) {
+                RMContextUtils.storeMAPs(maps, outMessage, false, false);
+            }
+            terminateResponse = new TerminateSequenceResponseType();        
+            terminateResponse.setIdentifier(sid);
+        }
+        return terminateResponse;
     }
 
     Object getParameter(Message message) {
