@@ -74,6 +74,8 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
     private static final String GREETME_RESPONSE_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeResponse";
+    private static final String GREETME_ONEWAY_ACTION
+        = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
 
     private static String decoupledEndpoint;
     private static int decoupledCount = 1;
@@ -380,6 +382,81 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names.WSA_NAMESPACE_NAME, RM11Constants.INSTANCE);
     }
+
+    @Test
+    public void testTerminateSequenceDefault() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+
+        RMManager manager = greeterBus.getExtension(RMManager.class);
+        manager.getSourcePolicy().getSequenceTerminationPolicy().setMaxLength(1);
+
+        greeter.greetMeOneWay("one");
+        
+        verifyTerminateSequence(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
+    }
+
+    @Test
+    public void testTerminateSequenceRM11() throws Exception {
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
+
+        RMManager manager = greeterBus.getExtension(RMManager.class);
+        manager.getSourcePolicy().getSequenceTerminationPolicy().setMaxLength(1);
+
+        // WS-RM 1.1 and WS-A 1.0
+        Client client = ClientProxy.getClient(greeter);
+        client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM11Constants.NAMESPACE_URI);
+        client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names.WSA_NAMESPACE_NAME);
+
+        greeter.greetMeOneWay("one");
+        
+        verifyTerminateSequence(Names.WSA_NAMESPACE_NAME, RM11Constants.INSTANCE);
+    }
+    
+
+    private void verifyTerminateSequence(String wsaUri, RMConstants consts) throws Exception {
+        if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
+            awaitMessages(3, 3);
+        } else {
+            awaitMessages(3, 2);
+        }
+        
+        MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
+            inRecorder.getInboundMessages(), wsaUri, consts.getWSRMNamespace());
+        
+        mf.verifyMessages(3, true);
+        String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
+                                                 GREETME_ONEWAY_ACTION,
+                                                 consts.getTerminateSequenceAction()};
+        mf.verifyActions(expectedActions, true);
+        mf.verifyMessageNumbers(new String[] {null, "1", null}, true);
+        if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
+            // no LastMessage
+            mf.verifyLastMessage(new boolean[] {false, false, false}, true);
+        } else {
+            // uses LastMessage
+            mf.verifyLastMessage(new boolean[] {false, true, false}, true);
+        }
+
+        if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
+            // CSR, ACK, TSR
+            mf.verifyMessages(3, false);
+            expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
+                                            consts.getSequenceAckAction(),
+                                            RM11Constants.INSTANCE.getTerminateSequenceResponseAction()};
+            mf.verifyActions(expectedActions, false);
+            mf.verifyAcknowledgements(new boolean[] {false, true, false}, false);
+
+        } else {
+            // CSR, ACK, PR
+            mf.verifyMessages(2, false);
+            expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
+                                            consts.getSequenceAckAction()};
+            mf.verifyActions(expectedActions, false);
+            mf.verifyAcknowledgements(new boolean[] {false, true}, false);
+        }
+    }
+
+
 
     private void verifyTwowayNonAnonymous(String wsaUri, RMConstants consts) throws Exception {
     

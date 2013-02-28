@@ -412,6 +412,10 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
             boi = bi.getOperation(consts.getSequenceAckOperationName()); 
         } else if (consts.getTerminateSequenceAction().equals(action)) {
             boi = bi.getOperation(consts.getTerminateSequenceOperationName()); 
+        } else if (RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)) {
+            //TODO add server-side TSR handling
+            boi = bi.getOperation(RM11Constants.INSTANCE.getTerminateSequenceOperationName());
+            isOneway = false;
         } else if (consts.getCloseSequenceAction().equals(action)) {
             boi = bi.getOperation(consts.getCloseSequenceOperationName()); 
         }
@@ -427,7 +431,8 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
         // server originated oneway RM protocol messages.        
         // 
         
-        if (!consts.getCreateSequenceResponseAction().equals(action)) {
+        if (!consts.getCreateSequenceResponseAction().equals(action)
+            && !RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)) {
             LOG.fine("Changing requestor role from " + message.get(Message.REQUESTOR_ROLE)
                      + " to false");
             Object originalRequestorRole = message.get(Message.REQUESTOR_ROLE);

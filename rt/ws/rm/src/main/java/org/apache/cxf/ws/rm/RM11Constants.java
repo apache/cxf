@@ -64,6 +64,9 @@ public final class RM11Constants extends RMConstants {
     public static final QName TERMINATE_SEQUENCE_QNAME =
         new QName(NAMESPACE_URI, "TerminateSequence");
     
+    public static final QName TERMINATE_SEQUENCE_RESPONSE_QNAME =
+        new QName(NAMESPACE_URI, "TerminateSequenceResponse");
+    
     public static final QName TERMINATE_SEQUENCE_ANONYMOUS_QNAME =
         new QName(NAMESPACE_URI, "TerminateSequenceAnonymous");
     
@@ -181,6 +184,10 @@ public final class RM11Constants extends RMConstants {
         return TERMINATE_SEQUENCE_ACTION;
     }
     
+    public String getTerminateSequenceResponseAction() {
+        return TERMINATE_SEQUENCE_RESPONSE_ACTION;
+    }
+    
     public String getCloseSequenceAction() {
         return CLOSE_SEQUENCE_ACTION;
     }
@@ -221,6 +228,10 @@ public final class RM11Constants extends RMConstants {
     
     public QName getTerminateSequenceOperationName() {
         return TERMINATE_SEQUENCE_QNAME;
+    }
+    
+    public QName getTerminateSequenceResponseOperationName() {
+        return TERMINATE_SEQUENCE_RESPONSE_QNAME;
     }
     
     public QName getTerminateSequenceAnonymousOperationName() {

@@ -83,6 +83,7 @@ public class RMEndpoint {
     private static final String CREATE_PART_NAME = "create";
     private static final String CREATE_RESPONSE_PART_NAME = "createResponse";
     private static final String TERMINATE_PART_NAME = "terminate";
+    private static final String TERMINATE_RESPONSE_PART_NAME = "terminateResponse";
     
     private static Schema rmSchema;
 
@@ -481,6 +482,7 @@ public class RMEndpoint {
 
         RMConstants consts = protocol.getConstants();
         operationInfo = ii.addOperation(consts.getTerminateSequenceOperationName());
+
         messageInfo = operationInfo.createMessage(consts.getTerminateSequenceOperationName(),
                                                   MessageInfo.Type.INPUT);
         operationInfo.setInput(messageInfo.getName().getLocalPart(), messageInfo);
@@ -488,6 +490,17 @@ public class RMEndpoint {
         partInfo.setElementQName(consts.getTerminateSequenceOperationName());
         partInfo.setElement(true);
         partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
+        if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
+            messageInfo = operationInfo.createMessage(
+                RM11Constants.INSTANCE.getTerminateSequenceResponseOperationName(),
+                MessageInfo.Type.OUTPUT);
+            operationInfo.setOutput(messageInfo.getName().getLocalPart(), messageInfo);
+            partInfo = messageInfo.addMessagePart(TERMINATE_RESPONSE_PART_NAME);
+            partInfo.setElementQName(RM11Constants.INSTANCE.getTerminateSequenceResponseOperationName());
+            partInfo.setElement(true);
+            partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceResponseType());
+            partInfo.setIndex(0);
+        }
         
         // for the TerminateSequence operation to an anonymous endpoint
         operationInfo = ii.addOperation(consts.getTerminateSequenceAnonymousOperationName());
@@ -560,7 +573,13 @@ public class RMEndpoint {
 
             boi = bi.buildOperation(consts.getTerminateSequenceOperationName(),
                                     consts.getTerminateSequenceOperationName().getLocalPart(), null);
-            addAction(boi, consts.getTerminateSequenceAction());
+
+            if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
+                addAction(boi, consts.getTerminateSequenceAction(), 
+                          RM11Constants.INSTANCE.getTerminateSequenceResponseAction());
+            } else {
+                addAction(boi, consts.getTerminateSequenceAction());
+            }
             bi.addOperation(boi);
 
             boi = bi.buildOperation(consts.getTerminateSequenceAnonymousOperationName(),

@@ -38,7 +38,10 @@ import org.apache.cxf.ws.rm.manager.DestinationPolicyType;
 import org.apache.cxf.ws.rm.v200502.CreateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200502.CreateSequenceType;
 import org.apache.cxf.ws.rm.v200502.Expires;
+import org.apache.cxf.ws.rm.v200502.Identifier;
 import org.apache.cxf.ws.rm.v200502.OfferType;
+import org.apache.cxf.ws.rm.v200502.TerminateSequenceType;
+import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -213,4 +216,91 @@ public class ServantTest extends Assert {
         
         return message;
     }
+
+    @Test
+    public void testTerminateSequence() throws SequenceFault {
+        RMEndpoint rme = control.createMock(RMEndpoint.class);
+        RMManager manager = new RMManager();
+        Destination destination = new Destination(rme);
+        Source source = new Source(rme);
+        DestinationSequence seq = control.createMock(DestinationSequence.class);
+        org.apache.cxf.ws.rm.v200702.Identifier sid = new org.apache.cxf.ws.rm.v200702.Identifier();
+        sid.setValue("123");
+        EasyMock.expect(seq.getIdentifier()).andReturn(sid).anyTimes();
+        
+        EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
+        EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
+        EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
+        
+        control.replay();
+        
+        Servant servant = new Servant(rme);
+
+        destination.addSequence(seq, false);        
+        verifyTerminateSequenceDefault(servant, manager, "123", ProtocolVariation.RM10WSA200408);
+        
+        destination.addSequence(seq, false);
+        verifyTerminateSequenceDefault(servant, manager, "123", ProtocolVariation.RM11WSA200508);
+    }
+    
+    private static Message createTestTerminateSequenceMessage(String sidstr, ProtocolVariation protocol) {
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        exchange.setInMessage(message);
+
+        message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
+        
+        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        String msgId = "urn:uuid:12345-" + Math.random();
+        AttributedURIType id = ContextUtils.getAttributedURI(msgId);
+        maps.setMessageID(id);
+
+        maps.setAction(ContextUtils.getAttributedURI(RM10Constants.INSTANCE.getTerminateSequenceAction()));
+        maps.setTo(ContextUtils.getAttributedURI(SERVICE_URL));
+
+        maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
+        
+        message.put(JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND, maps);
+
+        TerminateSequenceType ts = new TerminateSequenceType();
+        Identifier sid = new Identifier();
+        sid.setValue(sidstr);
+        ts.setIdentifier(sid);
+        Object tst = ProtocolVariation.RM10WSA200408.getWSRMNamespace().equals(protocol.getWSRMNamespace()) 
+            ? ts : ProtocolVariation.RM10WSA200408.getCodec().convertReceivedTerminateSequence(ts);
+        MessageContentsList contents = new MessageContentsList();
+        contents.add(tst);
+        message.setContent(List.class, contents);
+
+        RMContextUtils.setProtocolVariation(message, protocol);
+        
+        return message;
+    }
+
+    private void verifyTerminateSequenceDefault(Servant servant, RMManager manager, 
+                                                String sidstr, ProtocolVariation protocol) throws SequenceFault {
+        DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
+        AcksPolicyType ap = RMMANGER_FACTORY.createAcksPolicyType();
+        dp.setAcksPolicy(ap);
+        
+        manager.setDestinationPolicy(dp);
+        
+        Message message = createTestTerminateSequenceMessage(sidstr, protocol);
+
+        Object tsr = servant.terminateSequence(message);
+        
+        if (ProtocolVariation.RM10WSA200408.getWSRMNamespace().equals(protocol.getWSRMNamespace())) {
+            // rm 1.0
+            assertNull(tsr);
+        } else {
+            // rm 1.1
+            assertTrue(tsr instanceof TerminateSequenceResponseType);
+            org.apache.cxf.ws.rm.v200702.Identifier sid = ((TerminateSequenceResponseType)tsr).getIdentifier();
+            assertNotNull(sid);
+            assertEquals(sidstr, sid.getValue());
+        }
+        
+    }
+
+
 }
