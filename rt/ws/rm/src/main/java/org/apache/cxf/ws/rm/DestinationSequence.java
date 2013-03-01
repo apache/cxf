@@ -62,8 +62,8 @@ public class DestinationSequence extends AbstractSequence {
     private List<DeferredAcknowledgment> deferredAcknowledgments;
     private SequenceTermination scheduledTermination;
     private String correlationID;
-    private long inProcessNumber;
-    private long highNumberCompleted;
+    private volatile long inProcessNumber;
+    private volatile long highNumberCompleted;
     private List<Continuation> continuations = new LinkedList<Continuation>();
     private Set<Long> deliveringMessageNumbers = new HashSet<Long>();
     
