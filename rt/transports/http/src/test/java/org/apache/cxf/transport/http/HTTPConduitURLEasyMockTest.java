@@ -278,11 +278,11 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         message.put(AuthorizationPolicy.class, authPolicy);        
     }
 
-    private void setUpOneway(Message message) {
+    private void setUpExchange(Message message, boolean oneway) {
         Exchange exchange = control.createMock(Exchange.class);
         message.setExchange(exchange);
         exchange.isOneWay();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        EasyMock.expectLastCall().andReturn(oneway).anyTimes();
         exchange.isSynchronous();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
         exchange.isEmpty();
@@ -441,9 +441,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             EasyMock.expectLastCall();
         }
         
-        if ((style == ResponseStyle.NONE) || (style == ResponseStyle.ONEWAY_NONE)) {
-            setUpOneway(message);
-        }
+        setUpExchange(message, style == ResponseStyle.NONE || style == ResponseStyle.ONEWAY_NONE);
         
         connection.getRequestMethod();
         EasyMock.expectLastCall().andReturn(method).anyTimes();
@@ -455,7 +453,9 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         wrappedOS.flush();
         wrappedOS.close();
 
-        if (style != ResponseStyle.ONEWAY_NONE) {
+        if ((style == ResponseStyle.NONE && !emptyResponse) 
+            || style == ResponseStyle.BACK_CHANNEL
+            || style == ResponseStyle.BACK_CHANNEL_ERROR) {
             assertNotNull("expected in message", inMessage);
             Map<?, ?> headerMap = (Map<?, ?>) inMessage.get(Message.PROTOCOL_HEADERS);
             assertEquals("unexpected response headers", headerMap.size(), 0);
@@ -539,7 +539,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             connection.getResponseCode();
             EasyMock.expectLastCall().andReturn(responseCode).anyTimes();
         }
-        is = EasyMock.createMock(InputStream.class);
+        is = control.createMock(InputStream.class);
         connection.getInputStream();
         EasyMock.expectLastCall().andReturn(is).anyTimes();
         switch (style) {
@@ -557,7 +557,11 @@ public class HTTPConduitURLEasyMockTest extends Assert {
                     EasyMock.expectLastCall().andReturn("close");
                 }
                 is.read();
-                EasyMock.expectLastCall().andReturn(emptyResponse ? -1 : (int)'<');
+                if (emptyResponse) {
+                    EasyMock.expectLastCall().andReturn(-1).anyTimes();    
+                } else {
+                    EasyMock.expectLastCall().andReturn((int)'<');
+                }
             } else {
                 EasyMock.expectLastCall().andReturn(123).anyTimes();
             }
