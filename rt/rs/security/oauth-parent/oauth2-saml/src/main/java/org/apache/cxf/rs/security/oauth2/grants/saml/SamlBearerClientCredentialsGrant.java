@@ -21,28 +21,20 @@ package org.apache.cxf.rs.security.oauth2.grants.saml;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
-public class Saml2BearerGrant extends AbstractSaml2BearerGrant {
-    public Saml2BearerGrant(String assertion) {
-        this(assertion, false);
-    }
+public class SamlBearerClientCredentialsGrant extends AbstractSaml2BearerGrant {
     
-    public Saml2BearerGrant(String assertion, boolean encoded) {
-        this(assertion, false, null);
-    }
-    
-    public Saml2BearerGrant(String assertion, String scope) {
-        this(assertion, false, scope);
-    }
-    
-    public Saml2BearerGrant(String assertion, boolean encoded, String scope) {
-        super(Constants.SAML2_BEARER_GRANT, assertion, encoded, scope);
+    public SamlBearerClientCredentialsGrant(String assertion, boolean encoded, String scope) {
+        super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, assertion, encoded, scope);
     }
     
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = initMap();
-        map.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, encodeAssertion());
+        map.putSingle(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        map.putSingle(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodeAssertion());
         addScope(map);
         return map;
     }
+
 }
