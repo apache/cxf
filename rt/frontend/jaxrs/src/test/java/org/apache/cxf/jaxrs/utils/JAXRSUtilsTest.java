@@ -54,6 +54,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.Customer.CustomerContext;
+import org.apache.cxf.jaxrs.Customer.Query;
 import org.apache.cxf.jaxrs.Customer2;
 import org.apache.cxf.jaxrs.CustomerApplication;
 import org.apache.cxf.jaxrs.CustomerGender;
@@ -881,6 +882,24 @@ public class JAXRSUtilsTest extends Assert {
         Locale l = (Locale)params.get(0);
         assertEquals("en", l.getLanguage());
         assertEquals("US", l.getCountry());
+    }
+    
+    @Test
+    public void testQueryParameter() throws Exception {
+        Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+            new GenericObjectParameterHandler());
+        Class<?>[] argType = {Query.class};
+        Method m = Customer.class.getMethod("testGenericObjectParam", argType);
+        
+        messageImpl.put(Message.QUERY_STRING, "p1=thequery");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        @SuppressWarnings("unchecked")
+        Query<String> query = (Query<String>)params.get(0);
+        assertEquals("thequery", query.getEntity());
     }
     
     @Test
@@ -1859,4 +1878,31 @@ public class JAXRSUtilsTest extends Assert {
         }
         
     }
+    
+    private static class GenericObjectParameterHandler implements ParamConverterProvider, 
+        ParamConverter<Query<String>> {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> ParamConverter<T> getConverter(Class<T> cls, Type arg1, Annotation[] arg2) {
+            if (cls == Query.class) {
+                return (ParamConverter<T>)this;
+            } else {
+                return null;
+            }
+        }
+        
+        public Query<String> fromString(String s) {
+            return new Query<String>(s);
+        }
+
+        @Override
+        public String toString(Query<String> arg0) throws IllegalArgumentException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    
+    
 }

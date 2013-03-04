@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -203,6 +204,10 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     public void testLocaleParam(@QueryParam("p1") Locale l) {
+        
+    }
+    
+    public void testGenericObjectParam(@QueryParam("p1") Query<String> query) {
         
     }
     
@@ -533,4 +538,16 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         }
     }
     
+    public static class Query<T> implements Serializable {
+        
+        private static final long serialVersionUID = -1600323678121423761L;
+        private T entity;
+        public Query(T entity) {
+            this.entity = entity;
+        }
+        
+        public T getEntity() {
+            return entity;
+        }
+    }
 };
