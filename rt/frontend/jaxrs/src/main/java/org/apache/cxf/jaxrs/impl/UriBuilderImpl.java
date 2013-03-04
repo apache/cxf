@@ -88,7 +88,16 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     }
     
     private URI doBuild(boolean fromEncoded, boolean encodePathSlash, Object... values) {
-        UriParts parts = doBuildUriParts(fromEncoded, encodePathSlash, values);
+        if (values == null) {
+            throw new IllegalArgumentException("Template parameter values are set to null");
+        }
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                throw new IllegalArgumentException("Template parameter value is set to null");
+            }
+        }
+        
+        UriParts parts = doBuildUriParts(fromEncoded, encodePathSlash, false, values);
         try {
             return buildURI(fromEncoded, parts.path, parts.query, parts.fragment);
         } catch (URISyntaxException ex) {
@@ -96,7 +105,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
     
-    private UriParts doBuildUriParts(boolean fromEncoded, boolean encodePathSlash, Object... values) {
+    private UriParts doBuildUriParts(boolean fromEncoded, boolean encodePathSlash, 
+                                     boolean allowUnresolved, Object... values) {
         
         Map<String, Object> alreadyResolvedTs = getResolvedTemplates(resolvedTemplates);
         Map<String, Object> alreadyResolvedTsPathEnc = getResolvedTemplates(resolvedTemplatesPathEnc);
@@ -105,37 +115,38 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             + alreadyResolvedEncTs.size()
             + alreadyResolvedTsPathEnc.size();
         
-        String thePath = buildPath(fromEncoded);
+        String thePath = buildPath();
         URITemplate pathTempl = new URITemplate(thePath);
         thePath = substituteVarargs(pathTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
-                                    alreadyResolvedEncTs, values, 0, false, fromEncoded, encodePathSlash);
+                                    alreadyResolvedEncTs, values, 0, false, fromEncoded, 
+                                    allowUnresolved, encodePathSlash);
         int pathTemplateVarsSize = pathTempl.getVariables().size();
         
-        String theQuery = buildQuery(fromEncoded);
+        String theQuery = buildQuery();
         int queryTemplateVarsSize = 0;
         if (theQuery != null) {
             URITemplate queryTempl = new URITemplate(theQuery);
-            int lengthDiff = values.length + resolvedTsSize 
-                - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size() 
-                - pathTemplateVarsSize; 
-            if (lengthDiff > 0) {
-                queryTemplateVarsSize = queryTempl.getVariables().size();
+            queryTemplateVarsSize = queryTempl.getVariables().size();
+            if (queryTemplateVarsSize > 0) {
+                int lengthDiff = values.length + resolvedTsSize 
+                    - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size() 
+                    - pathTemplateVarsSize; 
                 theQuery = substituteVarargs(queryTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
                                              alreadyResolvedEncTs, values, values.length - lengthDiff, 
-                                             true, fromEncoded, false);
+                                             true, fromEncoded, allowUnresolved, false);
             }
         }
         
         String theFragment = fragment;
         if (theFragment != null) {
             URITemplate fragmentTempl = new URITemplate(theFragment);
-            int lengthDiff = values.length  + resolvedTsSize 
-                - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size()
-                - pathTemplateVarsSize - queryTemplateVarsSize; 
-            if (lengthDiff > 0) {
+            if (fragmentTempl.getVariables().size() > 0) {
+                int lengthDiff = values.length  + resolvedTsSize 
+                    - alreadyResolvedTs.size() - alreadyResolvedTsPathEnc.size() - alreadyResolvedEncTs.size()
+                    - pathTemplateVarsSize - queryTemplateVarsSize; 
                 theFragment = substituteVarargs(fragmentTempl, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
                                                 alreadyResolvedEncTs, values, values.length - lengthDiff, 
-                                                true, fromEncoded, false);
+                                                true, fromEncoded, allowUnresolved, false);
             }
         }
         
@@ -144,19 +155,17 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     
     private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment) 
         throws URISyntaxException {
-        if (fromEncoded) {
+        if (fromEncoded) { 
             return buildURIFromEncoded(thePath, theQuery, theFragment);
         } else if (!isSchemeOpaque()) {
             if ((scheme != null || host != null || userInfo != null)
                 && thePath.length() != 0 && !thePath.startsWith("/")) {
                 thePath = "/" + thePath;
             }
-            if (theQuery != null && HttpUtils.isPartiallyEncoded(theQuery)) {
-                try {
-                    return buildURIFromEncoded(thePath, theQuery, theFragment);
-                } catch (Exception ex) {
-                    // lets try the option below
-                }
+            try {
+                return buildURIFromEncoded(thePath, theQuery, theFragment);
+            } catch (Exception ex) {
+                // lets try the option below
             }
             URI uri = new URI(scheme, userInfo, host, port, 
                            thePath, theQuery, theFragment);
@@ -216,22 +225,6 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     
     @Override
     public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
-        // Problem: multi-arg URI c-tor always forces encoding, operation contract would be broken;
-        // use os single-arg URI c-tor requires unnecessary concatenate-parse roundtrip.
-        // While decoding back given values and passing as non-decoded to regular build() method
-        // is promising unfortunatley it causes the loss of encoded reserved values such as +,
-        // which might cause problems if consumers do rely on URLEncoder which would turn '+' into
-        // ' ' or would break the contract in when query parameters are expected to have %2B 
-        if (values == null) {
-            throw new IllegalArgumentException("Template parameter values are set to null");
-        }
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] == null) {
-                throw new IllegalArgumentException("Template parameter value is set to null");
-            }
-            
-            values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
-        }
         return doBuild(true, false, values);
     }
 
@@ -249,11 +242,11 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             Map<String, Object> alreadyResolvedTsPathEnc = getResolvedTemplates(resolvedTemplatesPathEnc);
             Map<String, Object> alreadyResolvedEncTs = getResolvedTemplates(resolvedEncodedTemplates);
                         
-            String thePath = buildPath(fromEncoded);
+            String thePath = buildPath();
             thePath = substituteMapped(thePath, map, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
                                        alreadyResolvedEncTs, false, fromEncoded, encodePathSlash);
             
-            String theQuery = buildQuery(fromEncoded);
+            String theQuery = buildQuery();
             if (theQuery != null) {
                 theQuery = substituteMapped(theQuery, map, alreadyResolvedTs, alreadyResolvedTsPathEnc, 
                                             alreadyResolvedEncTs, true, fromEncoded, false);
@@ -277,13 +270,15 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                                      int ind,
                                      boolean isQuery,
                                      boolean fromEncoded,
+                                     boolean allowUnresolved,
                                      boolean encodePathSlash) {
+        
    //CHECKSTYLE:ON     
         Map<String, String> varValueMap = new HashMap<String, String>();
         
         // vars in set are properly ordered due to linking in hash set
         Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
-        if (values.length + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
+        if (!allowUnresolved && values.length + alreadyResolvedTs.size() + alreadyResolvedTsEnc.size()
             + alreadyResolvedTsPathEnc.size() < uniqueVars.size()) {
             throw new IllegalArgumentException("Unresolved variables; only " + values.length
                                                + " value(s) given for " + uniqueVars.size()
@@ -301,21 +296,30 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 : isPathEncVar ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
             Object oval = resolved.isEmpty() ? null : resolved.remove(var);
             if (oval == null) {
+                if (allowUnresolved) {
+                    continue;
+                }
                 oval = values[idx++];
-            } else if (fromEncoded) {
-                oval = HttpUtils.encodePartiallyEncoded(oval.toString(), isQuery);
-            }
+            } 
+            
             if (oval == null) {
                 throw new IllegalArgumentException("No object for " + var);
             }
             String value = oval.toString();
+            if (fromEncoded) {
+                value = HttpUtils.encodePartiallyEncoded(value, isQuery);
+            } else {
+                value = isQuery ? HttpUtils.queryEncode(value) : HttpUtils.pathEncode(value);
+            }
+            
             varValueMap.put(var, value);
             
             if (!isQuery && (isPathEncVar || encodePathSlash)) {
                 pathEncodeVars.add(var);
             }
+            
         }
-        return templ.substitute(varValueMap, pathEncodeVars);
+        return templ.substitute(varValueMap, pathEncodeVars, allowUnresolved);
     }
     
     //CHECKSTYLE:OFF
@@ -351,18 +355,21 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             Object oval = resolved.isEmpty() ? null : resolved.remove(var);
             if (oval == null) {
                 oval = varValueMap.get(var);
-            } else if (fromEncoded) {
-                oval = HttpUtils.encodePartiallyEncoded(oval.toString(), isQuery);
-            }
+            }  
             if (oval == null) {
                 throw new IllegalArgumentException("No object for " + var);
+            }
+            if (fromEncoded) {
+                oval = HttpUtils.encodePartiallyEncoded(oval.toString(), isQuery);
+            } else {
+                oval = isQuery ? HttpUtils.queryEncode(oval.toString()) : HttpUtils.pathEncode(oval.toString());
             }
             theMap.put(var, oval);
             if (!isQuery && (isPathEncVar || encodePathSlash)) {
                 pathEncodeVars.add(var);
             }
         }
-        return templ.substitute(theMap, pathEncodeVars);
+        return templ.substitute(theMap, pathEncodeVars, false);
     }
 
     @Override
@@ -609,14 +616,14 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         }
     }
     
-    private String buildPath(boolean fromEncoded) {
+    private String buildPath() {
         StringBuilder sb = new StringBuilder();
         Iterator<PathSegment> iter = paths.iterator();
         while (iter.hasNext()) {
             PathSegment ps = iter.next();
             String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
-                p = fromEncoded ? new URITemplate(p).encodeLiteralCharacters() : p;
+                p = new URITemplate(p).encodeLiteralCharacters(false);
                 if (sb.length() == 0 && leadingSlash) {
                     sb.append('/');
                 } else if (!p.startsWith("/") && sb.length() > 0) {
@@ -624,16 +631,16 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 }
                 sb.append(p);
                 if (iter.hasNext()) {
-                    buildMatrix(sb, ps.getMatrixParameters(), fromEncoded);
+                    buildMatrix(sb, ps.getMatrixParameters());
                 }
             }
         }
-        buildMatrix(sb, matrix, fromEncoded);
+        buildMatrix(sb, matrix);
         return sb.toString();
     }
 
-    private String buildQuery(boolean fromEncoded) {
-        return buildParams(query, '&', fromEncoded);
+    private String buildQuery() {
+        return buildParams(query, '&');
     }
 
     @Override
@@ -783,16 +790,18 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      * @param fromEncoded if true then values will be decoded 
      * @return stringified params.
      */
-    private String buildParams(MultivaluedMap<String, String> map, char separator,
-                                      boolean fromEncoded) {
+    private String buildParams(MultivaluedMap<String, String> map, char separator) {
         boolean isQuery = separator == '&';
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
-                if (fromEncoded  || (isQuery && !val.startsWith("{") && !val.endsWith("}"))) { 
+                boolean templateValue = val.startsWith("{") && val.endsWith("}");
+                if (!templateValue) { 
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                } else {
+                    val = new URITemplate(val).encodeLiteralCharacters(isQuery);
                 }
                 b.append(entry.getKey());
                 if (val.length() != 0) {
@@ -812,18 +821,17 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
      * @param sb buffer to add the matrix part to, will get ';' added if map is not empty 
      * @param map matrix multivalued map
      */    
-    private void buildMatrix(StringBuilder sb, MultivaluedMap<String, String> map,
-                                    boolean fromEncoded) {
+    private void buildMatrix(StringBuilder sb, MultivaluedMap<String, String> map) {
         if (!map.isEmpty()) {
             sb.append(';');
-            sb.append(buildParams(map, ';', fromEncoded));
+            sb.append(buildParams(map, ';'));
         }
     }
     
     private PathSegment replacePathSegment(PathSegment ps) {
         StringBuilder sb = new StringBuilder();
         sb.append(ps.getPath());
-        buildMatrix(sb, matrix, false);
+        buildMatrix(sb, matrix);
         return new PathSegmentImpl(sb.toString());
     }
 
@@ -857,7 +865,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public String toTemplate() {
-        UriParts parts = doBuildUriParts(false, false);
+        UriParts parts = doBuildUriParts(false, false, true);
         return buildUriString(parts.path, parts.query, parts.fragment);
     }
     

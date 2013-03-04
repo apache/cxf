@@ -40,6 +40,76 @@ import org.junit.Test;
 public class UriBuilderImplTest extends Assert {
 
     @Test
+    public void testBuildWithNonEncodedSubstitutionValue() {
+        URI uri;
+        uri = UriBuilder.fromPath("/{a}").build("{}");
+        assertEquals("/%7B%7D", uri.toString());        
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue2() {
+        URI uri;
+        uri = UriBuilder.fromPath("/{a}").buildFromEncoded("{}");
+        assertEquals("/%7B%7D", uri.toString());        
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue3() {
+        UriBuilder ub = UriBuilder.fromPath("/");
+        URI uri = ub.path("{a}").buildFromEncoded("%");
+        assertEquals("/%25", uri.toString());
+        uri = ub.path("{token}").buildFromEncoded("%", "{}");
+        assertEquals("/%25/%7B%7D", uri.toString());        
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue4() {
+        UriBuilder ub = UriBuilder.fromPath("/");
+        URI uri = ub.path("{a}").build("%");
+        assertEquals("/%25", uri.toString());
+        uri = ub.path("{token}").build("%", "{}");
+        assertEquals("/%25/%7B%7D", uri.toString());        
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue5() {
+        UriBuilder ub = UriBuilder.fromUri("/%25");
+        URI uri = ub.build();
+        assertEquals("/%25", uri.toString());
+        uri = ub.replacePath("/%/{token}").build("{}");
+        assertEquals("/%25/%7B%7D", uri.toString());        
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue6() {
+        UriBuilder ub = UriBuilder.fromPath("/");
+        URI uri = ub.path("%").build();
+        assertEquals("/%25", uri.toString());
+        uri = ub.replacePath("/%/{token}").build("{}");
+        assertEquals("/%25/%7B%7D", uri.toString());        
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue7() {
+        UriBuilder ub = UriBuilder.fromPath("/");
+        URI uri = ub.replaceQueryParam("a", "%").buildFromEncoded();
+        assertEquals("/?a=%25", uri.toString());
+        uri = ub.replaceQueryParam("a2", "{token}").buildFromEncoded("{}");
+        assertEquals("/?a=%25&a2=%7B%7D", uri.toString());
+    }
+    
+    @Test
+    public void testBuildWithNonEncodedSubstitutionValue8() {
+        UriBuilder ub = UriBuilder.fromPath("/");
+        URI uri = ub.replaceQueryParam("a", "%").build();
+        assertEquals("/?a=%25", uri.toString());
+        uri = ub.replaceQueryParam("a2", "{token}").build("{}");
+        assertEquals("/?a=%25&a2=%7B%7D", uri.toString());
+    }
+       
+    
+    
+    @Test
     public void testResolveTemplate() {
         URI uri;
         uri = ((UriBuilderImpl)UriBuilder.fromPath("/{a}")).resolveTemplate("a", "1").build();
@@ -107,6 +177,11 @@ public class UriBuilderImplTest extends Assert {
     public void testQueryParamWithMissingTemplateValues() {
         UriBuilder.fromPath("/index.jsp").queryParam("a", "{a}").queryParam("b", "{b}")
             .build("valueA");
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testQueryParamWithMissingTemplateValues2() {
+        UriBuilder.fromPath("/index.jsp").queryParam("a", "{a}").build();
     }
 
     @Test
@@ -1122,7 +1197,7 @@ public class UriBuilderImplTest extends Assert {
     
     @Test
     public void testNullScheme() {
-        String expected = "//localhost:8080";
+        String expected = "localhost:8080";
         URI uri = UriBuilder.fromUri("http://localhost:8080")
                             .scheme(null)
                             .build();
