@@ -446,6 +446,21 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testDropRootElementFromDocument() throws Exception {
+        JSONProvider<Document> p = new JSONProvider<Document>();
+        Document doc = DOMUtils.readXml(new StringReader("<a><b>2</b></a>"));
+        p.setDropRootElement(true);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(doc, Document.class, Document.class, new Annotation[]{}, 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"b\":2}", s);
+        
+    }
+    
+    @Test
     public void testWriteQualifiedCollection() throws Exception {
         String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
@@ -950,7 +965,7 @@ public class JSONProviderTest extends Assert {
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected = 
             "{\"tagholders\":["
-            + "{\"tagholder\":{\"attr\":\"attribute\",\"thetag\":{\"group\":\"B\",\"name\":\"A\"}}}"
+            + "{\"attr\":\"attribute\",\"thetag\":{\"group\":\"B\",\"name\":\"A\"}}"
             + "]}";
         assertEquals(expected, bos.toString());
     }
