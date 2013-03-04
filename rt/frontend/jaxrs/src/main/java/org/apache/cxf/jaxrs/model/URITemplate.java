@@ -279,7 +279,7 @@ public final class URITemplate {
                     sb.append(value);
                 } else {
                     throw new IllegalArgumentException("Template variable " + var.getName() 
-                        + " has no matching value"); 
+                                                       + " has no matching value"); 
                 }
             } else {
                 sb.append(chunk);
@@ -293,13 +293,13 @@ public final class URITemplate {
      * ex. "a {id} b" will be encoded to "a%20{id}%20b" 
      * @return encoded value
      */
-    public String encodeLiteralCharacters() {
+    public String encodeLiteralCharacters(boolean isQuery) {
         final float encodedRatio = 1.5f;
         StringBuilder sb = new StringBuilder((int)(encodedRatio * template.length()));
         for (UriChunk chunk : uriChunks) {
             String val = chunk.getValue();
             if (chunk instanceof Literal) {
-                sb.append(HttpUtils.encodePartiallyEncoded(val, false));
+                sb.append(HttpUtils.encodePartiallyEncoded(val, isQuery));
             } else { 
                 sb.append(val);
             }

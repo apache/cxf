@@ -190,7 +190,7 @@ public class UriInfoImpl implements UriInfo {
                 }
                 UriBuilder ub = UriBuilder.fromPath(sum);
                 objects.addAll(invocation.getTemplateValues());
-                uris.add(0, ub.build(objects.toArray()).normalize().getPath());
+                uris.add(0, ub.build(objects.toArray()).normalize().getRawPath());
             }
             return uris;
         }

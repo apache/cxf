@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -77,28 +78,38 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private URI doBuild(boolean fromEncoded, Object... values) {
+        if (values == null) {
+            throw new IllegalArgumentException("Template parameter values are set to null");
+        }
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                throw new IllegalArgumentException("Template parameter value is set to null");
+            }
+        }
         
-        String thePath = buildPath(fromEncoded);
+        String thePath = buildPath();
         URITemplate pathTempl = new URITemplate(thePath);
-        thePath = substituteVarargs(pathTempl, values, 0);
+        thePath = substituteVarargs(pathTempl, values, 0, false, fromEncoded);
         
-        String theQuery = buildQuery(fromEncoded);
+        String theQuery = buildQuery();
         int queryTemplateVarsSize = 0;
         if (theQuery != null) {
             URITemplate queryTempl = new URITemplate(theQuery);
-            int lengthDiff = values.length - pathTempl.getVariables().size(); 
-            if (lengthDiff > 0) {
+            queryTemplateVarsSize = queryTempl.getVariables().size();
+            if (queryTemplateVarsSize > 0) {
+                int lengthDiff = values.length - pathTempl.getVariables().size(); 
                 queryTemplateVarsSize = queryTempl.getVariables().size(); 
-                theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
+                theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff, true, fromEncoded);
             }
         }
         
         String theFragment = fragment;
         if (theFragment != null) {
             URITemplate fragmentTempl = new URITemplate(theFragment);
-            int lengthDiff = values.length - pathTempl.getVariables().size() - queryTemplateVarsSize; 
-            if (lengthDiff > 0) {
-                theFragment = substituteVarargs(fragmentTempl, values, values.length - lengthDiff);
+            if (fragmentTempl.getVariables().size() > 0) {
+                int lengthDiff = values.length - pathTempl.getVariables().size() - queryTemplateVarsSize; 
+                theFragment = substituteVarargs(fragmentTempl, values, 
+                    values.length - lengthDiff, true, fromEncoded);
             }
         }
         
@@ -111,19 +122,17 @@ public class UriBuilderImpl extends UriBuilder {
     
     private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment) 
         throws URISyntaxException {
-        if (fromEncoded) {
+        if (fromEncoded) { 
             return buildURIFromEncoded(thePath, theQuery, theFragment);
         } else if (!isSchemeOpaque()) {
             if ((scheme != null || host != null || userInfo != null)
                 && thePath.length() != 0 && !thePath.startsWith("/")) {
                 thePath = "/" + thePath;
             }
-            if (theQuery != null && HttpUtils.isPartiallyEncoded(theQuery)) {
-                try {
-                    return buildURIFromEncoded(thePath, theQuery, theFragment);
-                } catch (Exception ex) {
-                    // lets try the option below
-                }
+            try {
+                return buildURIFromEncoded(thePath, theQuery, theFragment);
+            } catch (Exception ex) {
+                // lets try the option below
             }
             URI uri = new URI(scheme, userInfo, host, port, 
                            thePath, theQuery, theFragment);
@@ -177,45 +186,8 @@ public class UriBuilderImpl extends UriBuilder {
         return schemeSpecificPart != null;
     }
     
-    private String substituteVarargs(URITemplate templ, Object[] values, int ind) {
-        Map<String, String> varValueMap = new HashMap<String, String>();
-        
-        // vars in set are properly ordered due to linking in hash set
-        Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
-        if (values.length < uniqueVars.size()) {
-            throw new IllegalArgumentException("Unresolved variables; only " + values.length
-                                               + " value(s) given for " + uniqueVars.size()
-                                               + " unique variable(s)");
-        }
-        int idx = ind;
-        for (String var : uniqueVars) {
-            Object oval = values[idx++];
-            if (oval == null) {
-                throw new IllegalArgumentException("No object for " + var);
-            }
-            varValueMap.put(var, oval.toString());
-        }
-        return templ.substitute(varValueMap);
-    }
-
     @Override
     public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
-        // Problem: multi-arg URI c-tor always forces encoding, operation contract would be broken;
-        // use os single-arg URI c-tor requires unnecessary concatenate-parse roundtrip.
-        // While decoding back given values and passing as non-decoded to regular build() method
-        // is promising unfortunatley it causes the loss of encoded reserved values such as +,
-        // which might cause problems if consumers do rely on URLEncoder which would turn '+' into
-        // ' ' or would break the contract in when query parameters are expected to have %2B 
-        if (values == null) {
-            throw new IllegalArgumentException("Template parameter values are set to null");
-        }
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] == null) {
-                throw new IllegalArgumentException("Template parameter value is set to null");
-            }
-            
-            values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
-        }
         return doBuild(true, values);
     }
 
@@ -228,23 +200,59 @@ public class UriBuilderImpl extends UriBuilder {
     private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded) 
         throws IllegalArgumentException, UriBuilderException {
         try {
-            String thePath = buildPath(fromEncoded);
-            thePath = substituteMapped(thePath, map);
+            String thePath = buildPath();
+            thePath = substituteMapped(thePath, map, false, fromEncoded);
             
-            String theQuery = buildQuery(fromEncoded);
+            String theQuery = buildQuery();
             if (theQuery != null) {
-                theQuery = substituteMapped(theQuery, map);
+                theQuery = substituteMapped(theQuery, map, true, fromEncoded);
             }
             
-            String theFragment = fragment == null ? null : substituteMapped(fragment, map);
+            String theFragment = fragment == null ? null 
+                : substituteMapped(fragment, map, true, fromEncoded);
             
             return buildURI(fromEncoded, thePath, theQuery, theFragment);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
     }
+    private String substituteVarargs(URITemplate templ, 
+                                     Object[] values, 
+                                     int ind,
+                                     boolean isQuery,
+                                     boolean fromEncoded) {
+        
+        Map<String, String> varValueMap = new HashMap<String, String>();
+        
+        // vars in set are properly ordered due to linking in hash set
+        Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
+        if (values.length < uniqueVars.size()) {
+            throw new IllegalArgumentException("Unresolved variables; only " + values.length
+                                               + " value(s) given for " + uniqueVars.size()
+                                               + " unique variable(s)");
+        }
+        int idx = ind;
+        for (String var : uniqueVars) {
+            
+            Object oval = values[idx++];
+            if (oval == null) {
+                throw new IllegalArgumentException("No object for " + var);
+            }
+            String value = oval.toString();
+            if (fromEncoded) {
+                value = HttpUtils.encodePartiallyEncoded(value, isQuery);
+            } else {
+                value = isQuery ? HttpUtils.queryEncode(value) : HttpUtils.pathEncode(value);
+            }
+            
+            varValueMap.put(var, value);
+            
+        }
+        return templ.substitute(varValueMap);
+    }
     
-    private String substituteMapped(String path, Map<String, ? extends Object> varValueMap) {
+    private String substituteMapped(String path, Map<String, ? extends Object> varValueMap,
+        boolean isQuery, boolean fromEncoded) {
     
         URITemplate templ = new URITemplate(path);
         
@@ -254,7 +262,20 @@ public class UriBuilderImpl extends UriBuilder {
                                                + " value(s) given for " + uniqueVars.size()
                                                + " unique variable(s)");
         }
-        return templ.substitute(varValueMap);
+        Map<String, Object> theMap = new LinkedHashMap<String, Object>(); 
+        for (String var : uniqueVars) {
+            Object oval = varValueMap.get(var);
+            if (oval == null) {
+                throw new IllegalArgumentException("No object for " + var);
+            }
+            if (fromEncoded) {
+                oval = HttpUtils.encodePartiallyEncoded(oval.toString(), isQuery);
+            } else {
+                oval = isQuery ? HttpUtils.queryEncode(oval.toString()) : HttpUtils.pathEncode(oval.toString());
+            }
+            theMap.put(var, oval);
+        }
+        return templ.substitute(theMap);
     }
 
     @Override
@@ -500,14 +521,14 @@ public class UriBuilderImpl extends UriBuilder {
         }
     }
     
-    private String buildPath(boolean fromEncoded) {
+    private String buildPath() {
         StringBuilder sb = new StringBuilder();
         Iterator<PathSegment> iter = paths.iterator();
         while (iter.hasNext()) {
             PathSegment ps = iter.next();
             String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
-                p = fromEncoded ? new URITemplate(p).encodeLiteralCharacters() : p;
+                p = new URITemplate(p).encodeLiteralCharacters(false);
                 if (sb.length() == 0 && leadingSlash) {
                     sb.append('/');
                 } else if (!p.startsWith("/") && sb.length() > 0) {
@@ -515,16 +536,16 @@ public class UriBuilderImpl extends UriBuilder {
                 }
                 sb.append(p);
                 if (iter.hasNext()) {
-                    buildMatrix(sb, ps.getMatrixParameters(), fromEncoded);
+                    buildMatrix(sb, ps.getMatrixParameters());
                 }
             }
         }
-        buildMatrix(sb, matrix, fromEncoded);
+        buildMatrix(sb, matrix);
         return sb.toString();
     }
 
-    private String buildQuery(boolean fromEncoded) {
-        return buildParams(query, '&', fromEncoded);
+    private String buildQuery() {
+        return buildParams(query, '&');
     }
 
     @Override
@@ -674,16 +695,18 @@ public class UriBuilderImpl extends UriBuilder {
      * @param fromEncoded if true then values will be decoded 
      * @return stringified params.
      */
-    private String buildParams(MultivaluedMap<String, String> map, char separator,
-                                      boolean fromEncoded) {
+    private String buildParams(MultivaluedMap<String, String> map, char separator) {
         boolean isQuery = separator == '&';
         StringBuilder b = new StringBuilder();
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
-                if (fromEncoded  || (isQuery && !val.startsWith("{") && !val.endsWith("}"))) { 
+                boolean templateValue = val.startsWith("{") && val.endsWith("}");
+                if (!templateValue) { 
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                } else {
+                    val = new URITemplate(val).encodeLiteralCharacters(isQuery);
                 }
                 b.append(entry.getKey());
                 if (val.length() != 0) {
@@ -703,18 +726,17 @@ public class UriBuilderImpl extends UriBuilder {
      * @param sb buffer to add the matrix part to, will get ';' added if map is not empty 
      * @param map matrix multivalued map
      */    
-    private void buildMatrix(StringBuilder sb, MultivaluedMap<String, String> map,
-                                    boolean fromEncoded) {
+    private void buildMatrix(StringBuilder sb, MultivaluedMap<String, String> map) {
         if (!map.isEmpty()) {
             sb.append(';');
-            sb.append(buildParams(map, ';', fromEncoded));
+            sb.append(buildParams(map, ';'));
         }
     }
     
     private PathSegment replacePathSegment(PathSegment ps) {
         StringBuilder sb = new StringBuilder();
         sb.append(ps.getPath());
-        buildMatrix(sb, matrix, false);
+        buildMatrix(sb, matrix);
         return new PathSegmentImpl(sb.toString());
     }
 }
