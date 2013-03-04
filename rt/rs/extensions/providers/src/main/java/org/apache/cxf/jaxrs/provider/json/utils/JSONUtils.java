@@ -90,14 +90,13 @@ public final class JSONUtils {
                 for (String key : arrayKeys) {
                     xsw.serializeAsArray(key);
                 }
-            } else {
+            } else if (qname != null) {
                 String key = getKey(convention, qname);
                 xsw.serializeAsArray(key);
             }
         }
         XMLStreamWriter writer = !writeXsiType || dropRootElement 
-            ? new IgnoreContentJettisonWriter(xsw, writeXsiType, 
-                                              dropRootElement ? qname : null) : xsw;
+            ? new IgnoreContentJettisonWriter(xsw, writeXsiType, dropRootElement) : xsw;
         
         return writer;
     }    
@@ -217,14 +216,15 @@ public final class JSONUtils {
     private static class IgnoreContentJettisonWriter extends DelegatingXMLStreamWriter {
         
         private boolean writeXsiType;
-        private QName ignoredQName;
+        private boolean dropRootElement;
         private boolean rootDropped;
         private int index; 
                 
-        public IgnoreContentJettisonWriter(XMLStreamWriter writer, boolean writeXsiType, QName qname) {
+        public IgnoreContentJettisonWriter(XMLStreamWriter writer, boolean writeXsiType, 
+                                           boolean dropRootElement) {
             super(writer);
             this.writeXsiType = writeXsiType;
-            ignoredQName = qname;
+            this.dropRootElement = dropRootElement;
         }
         
         public void writeAttribute(String prefix, String uri,
@@ -240,8 +240,7 @@ public final class JSONUtils {
         @Override
         public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
             index++;
-            if (ignoredQName != null && ignoredQName.getLocalPart().equals(local) 
-                && ignoredQName.getNamespaceURI().equals(uri)) {
+            if (dropRootElement && index - 1 == 0) {
                 rootDropped = true;
                 return;
             }

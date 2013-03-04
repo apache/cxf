@@ -490,7 +490,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
-        QName qname = getQName(actualClass, genericType, actualObject);
+        QName qname = actualClass == Document.class ? null : getQName(actualClass, genericType, actualObject);
         if (ignoreNamespaces && (isCollection  || dropRootElement)) {        
             qname = new QName(qname.getLocalPart());
         }
