@@ -21,7 +21,9 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +48,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 
@@ -889,6 +893,24 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new GenericObjectParameterHandler());
+        Class<?>[] argType = {Query.class};
+        Method m = Customer.class.getMethod("testGenericObjectParam", argType);
+        
+        messageImpl.put(Message.QUERY_STRING, "p1=thequery");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        @SuppressWarnings("unchecked")
+        Query<String> query = (Query<String>)params.get(0);
+        assertEquals("thequery", query.getEntity());
+    }
+    
+    @Test
+    public void testQueryParameter2() throws Exception {
+        Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+            new GenericObjectParameterHandlerExtension());
         Class<?>[] argType = {Query.class};
         Method m = Customer.class.getMethod("testGenericObjectParam", argType);
         
@@ -1875,6 +1897,14 @@ public class JAXRSUtilsTest extends Assert {
         public Locale fromString(String s) {
             String[] values = s.split("_");
             return values.length == 2 ? new Locale(values[0], values[1]) : new Locale(s);
+        }
+        
+    }
+    
+    private static class GenericObjectParameterHandlerExtension implements ParameterHandler<Query<String>> {
+
+        public Query<String> fromString(String s) {
+            return new Query<String>(s);
         }
         
     }
