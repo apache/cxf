@@ -698,13 +698,13 @@ public class URITemplateTest extends Assert {
     @Test
     public void testEncodeLiteralCharacters() {
         URITemplate ut = new URITemplate("a {id} b");
-        assertEquals("a%20{id}%20b", ut.encodeLiteralCharacters());
+        assertEquals("a%20{id}%20b", ut.encodeLiteralCharacters(false));
     }
 
     @Test
     public void testEncodeLiteralCharactersNotVariable() {
         URITemplate ut = new URITemplate("a {digit:[0-9]} b");
         //System.out.println(ut.encodeLiteralCharacters());
-        assertEquals("a%20{digit:[0-9]}%20b", ut.encodeLiteralCharacters());
+        assertEquals("a%20{digit:[0-9]}%20b", ut.encodeLiteralCharacters(false));
     }
 }
