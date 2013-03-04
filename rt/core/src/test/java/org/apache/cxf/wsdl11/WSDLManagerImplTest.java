@@ -96,4 +96,14 @@ public class WSDLManagerImplTest extends Assert {
         assertNotNull(part);
         assertEquals(new QName("http://apache.org/hello_world/types", "sayHi"), part.getElementName());
     }    
+
+    @Test
+    public void testLocalNamespacedWSDL() throws Exception {
+        String wsdlUrl = getClass().getResource("hello_world_local_nsdecl.wsdl").toString();
+        
+        WSDLManagerImpl builder = new WSDLManagerImpl();
+        Definition def = builder.getDefinition(wsdlUrl);
+        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream(); 
+        builder.getWSDLFactory().newWSDLWriter().writeWSDL(def, bos);
+    }
 }
