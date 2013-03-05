@@ -58,37 +58,42 @@ public final class FileUtils {
             }
         }
         if (defaultTempDir == null) {
-            int x = (int)(Math.random() * 1000000);
-            s = SystemPropertyAction.getProperty("java.io.tmpdir");
-            File checkExists = new File(s);
-            if (!checkExists.exists() || !checkExists.isDirectory()) {
-                throw new RuntimeException("The directory " 
-                                       + checkExists.getAbsolutePath() 
-                                       + " does not exist, please set java.io.tempdir"
-                                       + " to an existing directory");
-            }
-            if (!checkExists.canWrite()) {
-                throw new RuntimeException("The directory " 
-                                       + checkExists.getAbsolutePath() 
-                                       + " is now writable, please set java.io.tempdir"
-                                       + " to an writable directory");
-            }
-            File f = new File(s, "cxf-tmp-" + x);
-            while (!f.mkdir()) {
-                x = (int)(Math.random() * 1000000);
-                f = new File(s, "cxf-tmp-" + x);
-            }
-            defaultTempDir = f;
-            final File f2 = f;
-            Thread hook = new Thread() {
-                @Override
-                public void run() {
-                    removeDir(f2, true);
-                }
-            };
-            Runtime.getRuntime().addShutdownHook(hook);            
+            defaultTempDir = createTmpDir();         
         }
         return defaultTempDir;
+    }
+    
+    public static File createTmpDir() {
+        int x = (int)(Math.random() * 1000000);
+        String s = SystemPropertyAction.getProperty("java.io.tmpdir");
+        File checkExists = new File(s);
+        if (!checkExists.exists() || !checkExists.isDirectory()) {
+            throw new RuntimeException("The directory " 
+                                   + checkExists.getAbsolutePath() 
+                                   + " does not exist, please set java.io.tempdir"
+                                   + " to an existing directory");
+        }
+        if (!checkExists.canWrite()) {
+            throw new RuntimeException("The directory " 
+                                   + checkExists.getAbsolutePath() 
+                                   + " is now writable, please set java.io.tempdir"
+                                   + " to an writable directory");
+        }
+        File f = new File(s, "cxf-tmp-" + x);
+        while (!f.mkdir()) {
+            x = (int)(Math.random() * 1000000);
+            f = new File(s, "cxf-tmp-" + x);
+        }
+        File newTmpDir  = f;
+        final File f2 = f;
+        Thread hook = new Thread() {
+            @Override
+            public void run() {
+                removeDir(f2, true);
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(hook); 
+        return newTmpDir;
     }
 
     public static void mkDir(File dir) {
