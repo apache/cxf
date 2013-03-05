@@ -752,5 +752,26 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(summaryIndex > idIndex && idIndex > fromIndex);        
     }
     
+    @Test
+    public void testExceptionList() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_list.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.exception.Echo2Impl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+        try {
+            processor.setEnvironment(env);
+            processor.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        File wsdlFile = new File(output, "exception_list.wsdl");
+        assertTrue(wsdlFile.exists());
+        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
+        int unboundIndex = wsdlContent
+            .indexOf("<xs:element maxOccurs=\"unbounded\" minOccurs=\"0\" name=\"names\" type=\"tns:myData\"/>");
+        assertTrue(unboundIndex > -1);
+    }
+    
+    
     
 }
