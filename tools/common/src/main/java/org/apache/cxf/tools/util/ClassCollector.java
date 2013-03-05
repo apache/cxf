@@ -29,12 +29,12 @@ import java.util.TreeSet;
 
 public class ClassCollector {
 
-    private final Map<String, String> seiClassNames 
+    private Map<String, String> seiClassNames 
         = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-    private final Map<String, String> typesClassNames = new HashMap<String, String>();
-    private final Map<String, String> exceptionClassNames = new HashMap<String, String>();
-    private final Map<String, String> serviceClassNames = new HashMap<String, String>();
-    private final Map<String, String> implClassNames = new HashMap<String, String>();
+    private Map<String, String> typesClassNames = new HashMap<String, String>();
+    private Map<String, String> exceptionClassNames = new HashMap<String, String>();
+    private Map<String, String> serviceClassNames = new HashMap<String, String>();
+    private Map<String, String> implClassNames = new HashMap<String, String>();
     private final Map<String, String> clientClassNames = new HashMap<String, String>();
     private final Map<String, String> serverClassNames = new HashMap<String, String>();
     private final Map<String, String> reservedClassNames = new HashMap<String, String>();
@@ -154,5 +154,36 @@ public class ClassCollector {
         generatedFileList.addAll(clientClassNames.values());
         return generatedFileList;
     }
-
+    
+    public Map<String, String> getSeiClassNames() {
+        return seiClassNames;
+    }
+    public void setSeiClassNames(Map<String, String> seiClassNames) {
+        this.seiClassNames = seiClassNames;
+    }
+    public Map<String, String> getTypesClassNames() {
+        return typesClassNames;
+    }
+    public void setTypesClassNames(Map<String, String> typesClassNames) {
+        this.typesClassNames = typesClassNames;
+    }
+    public Map<String, String> getExceptionClassNames() {
+        return exceptionClassNames;
+    }
+    public void setExceptionClassNames(Map<String, String> exceptionClassNames) {
+        this.exceptionClassNames = exceptionClassNames;
+    }
+    public Map<String, String> getServiceClassNames() {
+        return serviceClassNames;
+    }
+    public void setServiceClassNames(Map<String, String> serviceClassNames) {
+        this.serviceClassNames = serviceClassNames;
+    }
+    public Map<String, String> getImplClassNames() {
+        return implClassNames;
+    }
+    public void setImplClassNames(Map<String, String> implClassNames) {
+        this.implClassNames = implClassNames;
+    }
+    
 }
