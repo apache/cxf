@@ -96,7 +96,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         BindingProvider p = (BindingProvider)port;
-        clearSTSClient(p);
+        clearSTSClient(p, bus);
         
         // This should succeed as the token is cached
         doubleIt(port, 30);
@@ -145,7 +145,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         
         // Change the STSClient so that it can no longer find the STS
         BindingProvider p = (BindingProvider)port;
-        clearSTSClient(p);
+        clearSTSClient(p, bus);
         
         // This should fail as it can't get the token
         try {
@@ -159,11 +159,8 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {
-        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
-        stsClient.getClient().destroy();
-        stsClient.setWsdlLocation(null);
-        stsClient.setLocation(null);
+    private void clearSTSClient(BindingProvider p, Bus bus) throws BusException, EndpointException {
+        p.getRequestContext().put(SecurityConstants.STS_CLIENT, new STSClient(bus));
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
