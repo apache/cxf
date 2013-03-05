@@ -24,7 +24,7 @@
 	<servlet>
 		<servlet-name>sts</servlet-name>
 		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-		<!-- <load-on-startup>1</load-on-startup> -->
+		<load-on-startup>1</load-on-startup>
 		<init-param>
 			<param-name>config-location</param-name>
 			<param-value>WEB-INF/cxf-servlet.xml</param-value>
