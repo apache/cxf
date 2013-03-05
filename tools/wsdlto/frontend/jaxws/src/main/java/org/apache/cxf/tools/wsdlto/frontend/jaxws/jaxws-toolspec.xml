@@ -166,6 +166,16 @@ Examples:
                 </annotation>
                 <switch>client</switch>
             </option>
+            
+            <option id="clientjar" maxOccurs="1">
+                <annotation>
+                    Package all the client classes and wsdl in a jar file
+                </annotation>
+                <associatedArgument placement="afterSpace">
+                    <annotation>jar-file-name</annotation>
+                </associatedArgument>
+                <switch>clientjar</switch>
+            </option>
 
             <option id="all" maxOccurs="1">
                 <annotation>

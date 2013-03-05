@@ -50,6 +50,7 @@ public final class ToolConstants {
     public static final String CFG_WEBSERVICE = "webservice";
     public static final String CFG_SERVER = "server";
     public static final String CFG_CLIENT = "client";
+    public static final String CFG_CLIENT_JAR = "clientjar";
     public static final String CFG_ALL = "all";
     public static final String CFG_IMPL = "impl";
     public static final String CFG_PACKAGENAME = "packagename";
