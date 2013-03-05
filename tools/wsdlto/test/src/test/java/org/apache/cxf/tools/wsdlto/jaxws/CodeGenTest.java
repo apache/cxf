@@ -19,6 +19,7 @@
 package org.apache.cxf.tools.wsdlto.jaxws;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.ObjectStreamClass;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -26,8 +27,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 import javax.jws.HandlerChain;
 import javax.jws.Oneway;
@@ -1637,6 +1641,31 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(generateFromBindingFile.exists());
         File seiFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
         assertTrue(seiFile.exists());
+    }
+    
+    @Test
+    public void testClientJar() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_wsdl_import.wsdl"));
+        env.put(ToolConstants.CFG_CLIENT_JAR, "test-client.jar");
+        processor.setContext(env);
+        processor.execute();
+        File clientjarFile = new File(output, "test-client.jar");
+        assertTrue(clientjarFile.exists());
+        
+        List<String> jarEntries = new ArrayList<String>();
+        JarInputStream jarIns = new JarInputStream(new FileInputStream(clientjarFile));
+        JarEntry entry = null;
+        while ((entry = jarIns.getNextJarEntry()) != null) {
+            if (entry.getName().endsWith(".wsdl") || entry.getName().endsWith(".class")) {
+                jarEntries.add(entry.getName());
+            }
+        }
+        jarIns.close();
+        assertEquals("15 files including wsdl and class files are expected", 15, jarEntries.size());
+        assertTrue("hello_world_messages.wsdl is expected",
+                     jarEntries.contains("hello_world_messages.wsdl"));
+        assertTrue("org/apache/cxf/w2j/hello_world/SOAPService.class is expected",
+                     jarEntries.contains("org/apache/cxf/w2j/hello_world/SOAPService.class"));
     }
     
 }
