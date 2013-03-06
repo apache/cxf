@@ -94,8 +94,8 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         }
 
         String requiredType = X509_V3_VALUETYPE;
-        if (SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10.equals(requiredType)
-            || SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11.equals(requiredType)) {
+        if (SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10.equals(requiredVersionAndType)
+            || SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11.equals(requiredVersionAndType)) {
             requiredType = PKI_VALUETYPE;
         }
 

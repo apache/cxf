@@ -420,7 +420,7 @@ public abstract class AbstractBindingBuilder {
                     }
                 } else if (SPConstants.Layout.LaxTimestampFirst == layout.getValue()) {
                     if (timestamp == null) {
-                        ai.setNotAsserted(SPConstants.Layout.LaxTimestampLast + " requires a timestamp");
+                        ai.setNotAsserted(SPConstants.Layout.LaxTimestampFirst + " requires a timestamp");
                     } else {
                         addTopDownElement(timestampEl.getElement());
                     }
