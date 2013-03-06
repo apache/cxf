@@ -26,7 +26,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.KerberosToken;
-import org.apache.ws.security.message.token.KerberosSecurity;
+import org.apache.wss4j.dom.message.token.KerberosSecurity;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Kerberos Token

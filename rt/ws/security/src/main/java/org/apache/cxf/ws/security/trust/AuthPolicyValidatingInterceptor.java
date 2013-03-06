@@ -33,9 +33,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.validate.Credential;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.validate.Credential;
 
 public class AuthPolicyValidatingInterceptor extends AbstractPhaseInterceptor<Message> {
 

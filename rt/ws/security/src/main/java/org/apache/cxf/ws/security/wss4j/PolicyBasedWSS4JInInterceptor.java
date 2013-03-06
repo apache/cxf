@@ -87,16 +87,16 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.TransportBindingPolicyV
 import org.apache.cxf.ws.security.wss4j.policyvalidators.UsernameTokenPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.WSS11PolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.X509TokenPolicyValidator;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.message.token.Timestamp;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * 
@@ -368,7 +368,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             Properties props = getProps(e, propsURL, message);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Encryption properties: " + e);
-                throw new WSSecurityException("Cannot find Crypto Encryption properties: " + e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                              "Cannot find Crypto Encryption properties: " + e);
             }
             
             encrCrypto = CryptoFactory.getInstance(props);
@@ -390,7 +391,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             Properties props = getProps(s, propsURL, message);
             if (props == null) {
                 LOG.fine("Cannot find Crypto Signature properties: " + s);
-                throw new WSSecurityException("Cannot find Crypto Signature properties: " + s);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                              "Cannot find Crypto Signature properties: " + s);
             }
             
             signCrypto = CryptoFactory.getInstance(props);

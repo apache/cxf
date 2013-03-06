@@ -162,7 +162,7 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
 
     /*
      * (non-Javadoc)
-     * @see org.apache.ws.security.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
+     * @see org.apache.wss4j.dom.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
      */
     public void setToken(Token tok) {
         this.addToken(tok);

@@ -101,35 +101,37 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.neethi.Assertion;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.WSSecBase;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecSignatureConfirmation;
-import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.WSSecBase;
+import org.apache.wss4j.dom.message.WSSecDKSign;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.PKIPathSecurity;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 import org.opensaml.common.SAMLVersion;
 
@@ -544,7 +546,7 @@ public abstract class AbstractBindingBuilder {
                         throw new Fault(e1);
                     }
 
-                    String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+                    String password = getPassword(uname, token, WSPasswordCallback.Usage.SIGNATURE);
                     sig.setUserInfo(uname, password);
                     try {
                         sig.prepare(saaj.getSOAPPart(), secToken.getCrypto(), secHeader);
@@ -577,7 +579,7 @@ public abstract class AbstractBindingBuilder {
                 }
                 ret.put(token, sig);                
             } else if (token instanceof SamlToken) {
-                AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
                 if (assertionWrapper != null) {
                     Element assertionElement = assertionWrapper.toDOM(saaj.getSOAPPart());
                     addSupportingElement(assertionElement);
@@ -682,13 +684,13 @@ public abstract class AbstractBindingBuilder {
                 BinarySecurity bst = (BinarySecurity)tempTok;
                 part = new WSEncryptionPart(bst.getID());
                 part.setElement(bst.getElement());
-            } else if (tempTok instanceof AssertionWrapper) {
+            } else if (tempTok instanceof SamlAssertionWrapper) {
                 boolean selfSignAssertion = 
                     MessageUtils.getContextualBoolean(
                         message, SecurityConstants.SELF_SIGN_SAML_ASSERTION, false
                     );
                 if (!selfSignAssertion) {
-                    AssertionWrapper assertionWrapper = (AssertionWrapper)tempTok;
+                    SamlAssertionWrapper assertionWrapper = (SamlAssertionWrapper)tempTok;
                     
                     Document doc = assertionWrapper.getElement().getOwnerDocument();
                     boolean saml1 = assertionWrapper.getSaml1() != null;
@@ -760,8 +762,8 @@ public abstract class AbstractBindingBuilder {
         secRefSaml.setID(secRefID);
 
         if (useDirectReferenceToAssertion) {
-            org.apache.ws.security.message.token.Reference ref = 
-                new org.apache.ws.security.message.token.Reference(doc);
+            org.apache.wss4j.dom.message.token.Reference ref = 
+                new org.apache.wss4j.dom.message.token.Reference(doc);
             ref.setURI("#" + id);
             if (saml1) {
                 ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
@@ -813,7 +815,7 @@ public abstract class AbstractBindingBuilder {
             } else {
                 String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
                 if (StringUtils.isEmpty(password)) {
-                    password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
+                    password = getPassword(userName, token, WSPasswordCallback.Usage.USERNAME_TOKEN);
                 }
             
                 if (!StringUtils.isEmpty(password)) {
@@ -864,7 +866,7 @@ public abstract class AbstractBindingBuilder {
             
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
+                password = getPassword(userName, token, WSPasswordCallback.Usage.USERNAME_TOKEN);
             }
 
             if (!StringUtils.isEmpty(password)) {
@@ -885,7 +887,7 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    protected AssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
+    protected SamlAssertionWrapper addSamlToken(SamlToken token) throws WSSecurityException {
         AssertionInfo info = null;
         Collection<AssertionInfo> ais = aim.getAssertionInfo(token.getName());
         for (AssertionInfo ai : ais) {
@@ -919,15 +921,16 @@ public abstract class AbstractBindingBuilder {
             return null;
         }
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
-        if (token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11()) {
-            samlParms.setSAMLVersion(SAMLVersion.VERSION_11);
-        } else if (token.isUseSamlVersion20Profile11()) {
-            samlParms.setSAMLVersion(SAMLVersion.VERSION_20);
-        }
         info.setAsserted(true);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        if (token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11()) {
+            samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+        } else if (token.isUseSamlVersion20Profile11()) {
+            samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        }
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         boolean selfSignAssertion = 
             MessageUtils.getContextualBoolean(
@@ -950,7 +953,7 @@ public abstract class AbstractBindingBuilder {
                 return null;
             }
     
-            String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
+            String password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE);
          
             // TODO configure using a KeyValue here
             assertion.signAssertion(user, password, crypto, false);
@@ -962,7 +965,7 @@ public abstract class AbstractBindingBuilder {
     /**
      * Store a SAML Assertion as a SecurityToken
      */
-    protected void storeAssertionAsSecurityToken(AssertionWrapper assertion) {
+    protected void storeAssertionAsSecurityToken(SamlAssertionWrapper assertion) {
         String id = findIDFromSamlToken(assertion.getElement());
         if (id == null) {
             return;
@@ -996,7 +999,7 @@ public abstract class AbstractBindingBuilder {
         return id;
     }
     
-    public String getPassword(String userName, Assertion info, int type) {
+    public String getPassword(String userName, Assertion info, WSPasswordCallback.Usage usage) {
         //Then try to get the password from the given callback handler
         CallbackHandler handler = getCallbackHandler();
         if (handler == null) {
@@ -1004,7 +1007,7 @@ public abstract class AbstractBindingBuilder {
             return null;
         }
         
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, type)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, usage)};
         try {
             handler.handle(cb);
         } catch (Exception e) {
@@ -1738,7 +1741,7 @@ public abstract class AbstractBindingBuilder {
             
             if (ref != null) {
                 SecurityTokenReference secRef = 
-                    new SecurityTokenReference(cloneElement(ref), false);
+                    new SecurityTokenReference(cloneElement(ref), new BSPEnforcer());
                 sig.setSecurityTokenReference(secRef);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             } else {
@@ -1825,7 +1828,7 @@ public abstract class AbstractBindingBuilder {
             }
         }
 
-        String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
+        String password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE);
         sig.setUserInfo(user, password);
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         sig.setDigestAlgo(binding.getAlgorithmSuite().getDigest());

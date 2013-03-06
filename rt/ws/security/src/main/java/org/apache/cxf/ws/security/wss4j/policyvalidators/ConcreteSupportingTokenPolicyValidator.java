@@ -36,7 +36,7 @@ import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
-import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 
 /**
  * Validate SupportingToken policies.

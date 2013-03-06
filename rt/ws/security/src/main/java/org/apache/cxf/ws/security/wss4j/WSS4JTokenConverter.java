@@ -22,7 +22,7 @@ import java.security.Principal;
 
 import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.message.Message;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
+import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
 
 public final class WSS4JTokenConverter {
 

@@ -29,11 +29,11 @@ import java.util.List;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.transform.STRTransform;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.transform.STRTransform;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Signature, EncryptedKey or

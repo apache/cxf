@@ -31,10 +31,10 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * Validate a UsernameToken policy.

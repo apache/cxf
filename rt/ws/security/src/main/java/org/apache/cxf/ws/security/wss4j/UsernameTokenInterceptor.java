@@ -46,20 +46,19 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.cache.ReplayCache;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.processor.UsernameTokenProcessor;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
+import org.apache.wss4j.dom.cache.ReplayCache;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.processor.UsernameTokenProcessor;
+import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * 
@@ -165,8 +164,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     
     protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
         throws WSSecurityException {
-        org.apache.ws.security.message.token.UsernameToken ut = 
-            new org.apache.ws.security.message.token.UsernameToken(tokenElement, false, bspCompliant);
+        org.apache.wss4j.dom.message.token.UsernameToken ut = 
+            new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, false, bspCompliant);
         
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
         principal.setNonce(ut.getNonce());
@@ -318,7 +317,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN, message);
+                password = getPassword(userName, token, WSPasswordCallback.Usage.USERNAME_TOKEN, message);
             }
             
             if (!StringUtils.isEmpty(password)) {

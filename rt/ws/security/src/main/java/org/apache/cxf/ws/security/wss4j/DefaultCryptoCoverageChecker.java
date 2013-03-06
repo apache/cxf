@@ -22,7 +22,7 @@ package org.apache.cxf.ws.security.wss4j;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * This utility extends the CryptoCoverageChecker to provide an easy way to check to see

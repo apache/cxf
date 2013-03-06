@@ -53,28 +53,29 @@ import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.WSSecBase;
-import org.apache.ws.security.message.WSSecDKEncrypt;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecEncrypt;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.WSSecBase;
+import org.apache.wss4j.dom.message.WSSecDKEncrypt;
+import org.apache.wss4j.dom.message.WSSecDKSign;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -553,7 +554,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         String tokenType = encrTok.getTokenType();
                         if (ref != null) {
                             SecurityTokenReference secRef = 
-                                new SecurityTokenReference(cloneElement(ref), false);
+                                new SecurityTokenReference(cloneElement(ref), new BSPEnforcer());
                             encr.setSecurityTokenReference(secRef);
                         } else if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
                             || WSConstants.SAML_NS.equals(tokenType)) {
@@ -679,7 +680,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         try {
             dkSign.prepare(doc, secHeader);
         } catch (ConversationException e) {
-            throw new WSSecurityException(e.getMessage(), e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         
         if (sbinding.isTokenProtection()) {
@@ -754,7 +755,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 
                 if (ref != null) {
                     SecurityTokenReference secRef = 
-                        new SecurityTokenReference(cloneElement(ref), false);
+                        new SecurityTokenReference(cloneElement(ref), new BSPEnforcer());
                     sig.setSecurityTokenReference(secRef);
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
                 } else {

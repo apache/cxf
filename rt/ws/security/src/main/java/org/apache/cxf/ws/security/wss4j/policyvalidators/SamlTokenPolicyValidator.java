@@ -33,10 +33,10 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -83,8 +83,8 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             
             // All of the received SAML Assertions must conform to the policy
             for (WSSecurityEngineResult result : samlResults) {
-                AssertionWrapper assertionWrapper = 
-                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                SamlAssertionWrapper assertionWrapper = 
+                    (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 
                 if (!checkVersion(samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
@@ -131,7 +131,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
     /**
      * Check the policy version against the received assertion
      */
-    private boolean checkVersion(SamlToken samlToken, AssertionWrapper assertionWrapper) {
+    private boolean checkVersion(SamlToken samlToken, SamlAssertionWrapper assertionWrapper) {
         if ((samlToken.isUseSamlVersion11Profile10()
             || samlToken.isUseSamlVersion11Profile11())
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {

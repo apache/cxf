@@ -32,10 +32,10 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 
 /**

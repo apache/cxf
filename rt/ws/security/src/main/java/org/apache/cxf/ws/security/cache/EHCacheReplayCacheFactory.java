@@ -22,7 +22,7 @@ package org.apache.cxf.ws.security.cache;
 import java.net.URL;
 
 import org.apache.cxf.message.Message;
-import org.apache.ws.security.cache.ReplayCache;
+import org.apache.wss4j.dom.cache.ReplayCache;
 
 /**
  * A factory to return an EHCacheReplayCache instance.

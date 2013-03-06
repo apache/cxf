@@ -59,21 +59,22 @@ import org.apache.cxf.ws.security.policy.model.TransportToken;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSEncryptionPart;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.conversation.ConversationConstants;
-import org.apache.ws.security.message.WSSecDKSign;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.WSSecSignature;
-import org.apache.ws.security.message.WSSecTimestamp;
-import org.apache.ws.security.message.WSSecUsernameToken;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.message.WSSecDKSign;
+import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 
 /**
  * 
@@ -108,7 +109,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                     addEncryptedKeyElement(cloneElement(secTok.getToken()));
                 }
             } else if (token instanceof SamlToken) {
-                AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+                SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
                 if (assertionWrapper != null) {
                     addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
                 }
@@ -289,7 +290,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             || token instanceof KeyValueToken) {
             addSig(doX509TokenSignature(token, wrapper));
         } else if (token instanceof SamlToken) {
-            AssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
+            SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
             assertionWrapper.toDOM(saaj.getSOAPPart());
             storeAssertionAsSecurityToken(assertionWrapper);
             addSig(doIssuedTokenSignature(token, wrapper));
@@ -378,7 +379,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         SecurityToken secTok = getSecurityToken();
         if (secTok == null) {
             LOG.fine("The retrieved SecurityToken was null");
-            throw new WSSecurityException("The retrieved SecurityToken was null");
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, "The retrieved SecurityToken was null"
+            );
         }
         
         if (includeToken(token.getInclusion())) {
@@ -471,7 +474,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         
         if (ref != null) {
             SecurityTokenReference secRef = 
-                new SecurityTokenReference(cloneElement(ref), false);
+                new SecurityTokenReference(cloneElement(ref), new BSPEnforcer());
             sig.setSecurityTokenReference(secRef);
             sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         } else if (token instanceof UsernameToken) {
@@ -518,7 +521,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
                 String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
                 uname = (String)message.getContextualProperty(userNameKey);
             }
-            String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+            String password = getPassword(uname, token, WSPasswordCallback.Usage.SIGNATURE);
             if (password == null) {
                 password = "";
             }

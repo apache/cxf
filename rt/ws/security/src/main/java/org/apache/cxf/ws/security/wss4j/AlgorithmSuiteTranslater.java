@@ -30,10 +30,10 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.AlgorithmSuite;
-import org.apache.ws.security.handler.RequestData;
+import org.apache.wss4j.common.crypto.AlgorithmSuite;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.RequestData;
 
 /**
  * Translate any AlgorithmSuite policy that may be operative into a WSS4J AlgorithmSuite object

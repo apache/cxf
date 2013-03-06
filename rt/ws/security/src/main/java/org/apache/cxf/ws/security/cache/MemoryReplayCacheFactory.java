@@ -20,8 +20,8 @@
 package org.apache.cxf.ws.security.cache;
 
 import org.apache.cxf.message.Message;
-import org.apache.ws.security.cache.MemoryReplayCache;
-import org.apache.ws.security.cache.ReplayCache;
+import org.apache.wss4j.dom.cache.MemoryReplayCache;
+import org.apache.wss4j.dom.cache.ReplayCache;
 
 /**
  * A factory to return a MemoryReplayCache instance.

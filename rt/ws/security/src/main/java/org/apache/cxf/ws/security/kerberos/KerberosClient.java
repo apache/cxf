@@ -30,10 +30,10 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.message.token.KerberosSecurity;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * A class that obtains a ticket from a KDC and wraps it in a SecurityToken object.

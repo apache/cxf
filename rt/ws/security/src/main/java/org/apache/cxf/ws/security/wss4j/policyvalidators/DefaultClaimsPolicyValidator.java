@@ -25,7 +25,7 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**
  * Validate a WS-SecurityPolicy Claims policy for the 
@@ -42,7 +42,7 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
      */
     public boolean validatePolicy(
         Element claimsPolicy,
-        AssertionWrapper assertion
+        SamlAssertionWrapper assertion
     ) {
         if (claimsPolicy == null) {
             return false;
@@ -78,7 +78,7 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
         return DEFAULT_CLAIMS_NAMESPACE;
     }
     
-    private boolean findClaimInAssertion(AssertionWrapper assertion, URI claimURI) {
+    private boolean findClaimInAssertion(SamlAssertionWrapper assertion, URI claimURI) {
         if (assertion.getSaml1() != null) {
             return findClaimInAssertion(assertion.getSaml1(), claimURI);
         } else if (assertion.getSaml2() != null) {

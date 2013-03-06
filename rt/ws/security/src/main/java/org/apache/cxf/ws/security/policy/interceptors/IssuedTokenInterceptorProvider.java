@@ -56,14 +56,14 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * 
@@ -520,7 +520,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 new IssuedTokenPolicyValidator(signedResults, message);
             Collection<AssertionInfo> issuedAis = aim.get(SP12Constants.ISSUED_TOKEN);
 
-            for (AssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
+            for (SamlAssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);
                 if (valid) {
                     SecurityToken token = createSecurityToken(assertionWrapper);
@@ -542,15 +542,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         
-        private List<AssertionWrapper> findSamlTokenResults(
+        private List<SamlAssertionWrapper> findSamlTokenResults(
             List<WSSecurityEngineResult> wsSecEngineResults
         ) {
-            List<AssertionWrapper> results = new ArrayList<AssertionWrapper>();
+            List<SamlAssertionWrapper> results = new ArrayList<SamlAssertionWrapper>();
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                    results.add((AssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION));
+                    results.add((SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION));
                 }
             }
             return results;
@@ -570,7 +570,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         }
         
         private SecurityToken createSecurityToken(
-            AssertionWrapper assertionWrapper
+            SamlAssertionWrapper assertionWrapper
         ) {
             SecurityToken token = new SecurityToken(assertionWrapper.getId());
 

@@ -35,15 +35,15 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.xml.XMLObject;
 
@@ -58,19 +58,19 @@ public final class SAMLUtils {
     }
     
     public static List<String> parseRolesInAssertion(Object assertion, String roleAttributeName) {
-        if (((AssertionWrapper) assertion).getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-            return parseRolesInAssertion(((AssertionWrapper)assertion).getSaml2(), roleAttributeName);
+        if (((SamlAssertionWrapper) assertion).getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            return parseRolesInAssertion(((SamlAssertionWrapper)assertion).getSaml2(), roleAttributeName);
         } else {
-            return parseRolesInAssertion(((AssertionWrapper)assertion).getSaml1(), roleAttributeName);
+            return parseRolesInAssertion(((SamlAssertionWrapper)assertion).getSaml1(), roleAttributeName);
         }
     }
     
     public static String getIssuer(Object assertion) {
-        return ((AssertionWrapper)assertion).getIssuerString();
+        return ((SamlAssertionWrapper)assertion).getIssuerString();
     }
     
     public static Element getAssertionElement(Object assertion) {
-        return ((AssertionWrapper)assertion).getElement();
+        return ((SamlAssertionWrapper)assertion).getElement();
     }
     
     //
@@ -167,8 +167,8 @@ public final class SAMLUtils {
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
         
         for (WSSecurityEngineResult samlResult : samlResults) {
-            AssertionWrapper assertionWrapper = 
-                (AssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+            SamlAssertionWrapper assertionWrapper = 
+                (SamlAssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             
             TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
             Certificate[] tlsCerts = null;
@@ -177,11 +177,11 @@ public final class SAMLUtils {
             }
             if (!SAMLUtils.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
                 LOG.warning("Assertion fails holder-of-key requirements");
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
             if (!SAMLUtils.checkSenderVouches(assertionWrapper, tlsCerts, body, signedResults)) {
                 LOG.warning("Assertion fails sender-vouches requirements");
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         }
         
@@ -197,7 +197,7 @@ public final class SAMLUtils {
      * @param signedResults a list of all of the signed results
      */
     public static boolean checkHolderOfKey(
-        AssertionWrapper assertionWrapper,
+        SamlAssertionWrapper assertionWrapper,
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
@@ -295,7 +295,7 @@ public final class SAMLUtils {
      * Assertion and the SOAP Body must be signed by the same signature.
      */
     public static boolean checkSenderVouches(
-        AssertionWrapper assertionWrapper,
+        SamlAssertionWrapper assertionWrapper,
         Certificate[] tlsCerts,
         Element body,
         List<WSSecurityEngineResult> signed
@@ -323,13 +323,13 @@ public final class SAMLUtils {
 
     /**
      * Return true if there is a signature which references the Assertion and the SOAP Body.
-     * @param assertionWrapper the AssertionWrapper object
+     * @param assertionWrapper the SamlAssertionWrapper object
      * @param body The SOAP body
      * @param signed The List of signed results
      * @return true if there is a signature which references the Assertion and the SOAP Body.
      */
     private static boolean checkAssertionAndBodyAreSigned(
-        AssertionWrapper assertionWrapper,
+        SamlAssertionWrapper assertionWrapper,
         Element body,
         List<WSSecurityEngineResult> signed
     ) {

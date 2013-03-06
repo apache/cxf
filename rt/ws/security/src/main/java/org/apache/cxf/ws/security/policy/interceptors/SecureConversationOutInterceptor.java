@@ -39,7 +39,7 @@ import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 
 class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public SecureConversationOutInterceptor() {

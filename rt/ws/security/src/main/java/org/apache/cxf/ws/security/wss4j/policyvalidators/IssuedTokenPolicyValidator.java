@@ -30,11 +30,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.model.IssuedToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
 
 import org.opensaml.common.SAMLVersion;
 
@@ -58,7 +58,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     
     public boolean validatePolicy(
         Collection<AssertionInfo> ais,
-        AssertionWrapper assertionWrapper
+        SamlAssertionWrapper assertionWrapper
     ) {
         if (ais == null || ais.isEmpty()) {
             return true;
@@ -142,7 +142,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
     /**
      * Check the issued token template against the received assertion
      */
-    private boolean checkIssuedTokenTemplate(Element template, AssertionWrapper assertionWrapper) {
+    private boolean checkIssuedTokenTemplate(Element template, SamlAssertionWrapper assertionWrapper) {
         Element child = DOMUtils.getFirstElement(template);
         while (child != null) {
             if ("TokenType".equals(child.getLocalName())) {

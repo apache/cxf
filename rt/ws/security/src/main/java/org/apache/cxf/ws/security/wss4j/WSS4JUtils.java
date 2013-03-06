@@ -23,7 +23,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.cache.ReplayCacheFactory;
-import org.apache.ws.security.cache.ReplayCache;
+import org.apache.wss4j.dom.cache.ReplayCache;
 
 /**
  * Some common functionality that can be shared between the WSS4JInInterceptor and the

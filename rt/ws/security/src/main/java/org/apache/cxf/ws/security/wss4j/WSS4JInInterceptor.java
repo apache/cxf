@@ -66,24 +66,24 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.cache.ReplayCache;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.SecurityTokenReference;
-import org.apache.ws.security.processor.Processor;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.apache.ws.security.validate.NoOpValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.cache.ReplayCache;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.validate.NoOpValidator;
+import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * Performs WS-Security inbound actions.
@@ -355,7 +355,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         // now check the security actions: do they match, in any order?
         if (!checkReceiverResultsAnyOrder(wsResult, actions)) {
             LOG.warning("Security processing failed (actions mismatch)");
-            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         // Now check to see if SIGNATURE_PARTS are specified
@@ -637,7 +637,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 try {
                     o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
                 } catch (Exception e) {
-                    throw new WSSecurityException(e.getMessage(), e);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
             }            
             if (o instanceof CallbackHandler) {
@@ -802,8 +802,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     }
                 } catch (RuntimeException t) {
                     throw t;
-                } catch (Throwable t) {
-                    throw new WSSecurityException(t.getMessage(), t);
+                } catch (Exception ex) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                 }
             }
             return super.getValidator(qName);

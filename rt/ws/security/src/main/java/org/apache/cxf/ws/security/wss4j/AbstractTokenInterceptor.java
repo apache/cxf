@@ -51,8 +51,8 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * An abstract interceptor that can be used to form the basis of an interceptor to add and process
@@ -190,7 +190,8 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         return sh;
     }
     
-    protected String getPassword(String userName, Token info, int type, SoapMessage message) {
+    protected String getPassword(String userName, Token info, 
+                                 WSPasswordCallback.Usage usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
     
         CallbackHandler handler = getCallback(message);
@@ -199,7 +200,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             return null;
         }
         
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, type)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, usage)};
         try {
             handler.handle(cb);
         } catch (Exception e) {

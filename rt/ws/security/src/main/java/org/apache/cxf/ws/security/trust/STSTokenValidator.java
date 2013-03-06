@@ -31,11 +31,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.Validator;
 
 /**
  * 
@@ -70,13 +70,13 @@ public class STSTokenValidator implements Validator {
             SecurityToken token = new SecurityToken();
             Element tokenElement = null;
             int hash = 0;
-            if (credential.getAssertion() != null) {
-                AssertionWrapper assertion = credential.getAssertion();
+            if (credential.getSamlAssertion() != null) {
+                SamlAssertionWrapper assertion = credential.getSamlAssertion();
                 byte[] signatureValue = assertion.getSignatureValue();
                 if (signatureValue != null && signatureValue.length > 0) {
                     hash = Arrays.hashCode(signatureValue);
                 }
-                tokenElement = credential.getAssertion().getElement();
+                tokenElement = credential.getSamlAssertion().getElement();
             } else if (credential.getUsernametoken() != null) {
                 tokenElement = credential.getUsernametoken().getElement();
                 hash = credential.getUsernametoken().hashCode();
@@ -93,7 +93,7 @@ public class STSTokenValidator implements Validator {
             if (tokenStore != null && hash != 0) {
                 SecurityToken transformedToken = getTransformedToken(tokenStore, hash);
                 if (transformedToken != null) {
-                    AssertionWrapper assertion = new AssertionWrapper(transformedToken.getToken());
+                    SamlAssertionWrapper assertion = new SamlAssertionWrapper(transformedToken.getToken());
                     credential.setTransformedToken(assertion);
                     return credential;
                 }
@@ -106,7 +106,7 @@ public class STSTokenValidator implements Validator {
                 List<SecurityToken> tokens = c.validateSecurityToken(token);
                 SecurityToken returnedToken = tokens.get(0);
                 if (returnedToken != token) {
-                    AssertionWrapper assertion = new AssertionWrapper(returnedToken.getToken());
+                    SamlAssertionWrapper assertion = new SamlAssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
                     if (hash != 0) {
                         tokenStore.add(returnedToken);
@@ -119,7 +119,7 @@ public class STSTokenValidator implements Validator {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e);
         }
     }
     
@@ -147,14 +147,14 @@ public class STSTokenValidator implements Validator {
     protected boolean isValidatedLocally(Credential credential, RequestData data) 
         throws WSSecurityException {
         
-        if (!alwaysValidateToSts && credential.getAssertion() != null) {
+        if (!alwaysValidateToSts && credential.getSamlAssertion() != null) {
             try {
                 samlValidator.validate(credential, data);
                 return samlValidator.isTrustVerificationSucceeded();
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity", null, e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e);
             }
         }
         return false;

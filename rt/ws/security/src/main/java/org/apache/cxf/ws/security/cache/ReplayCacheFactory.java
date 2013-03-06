@@ -27,7 +27,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.cache.ReplayCache;
+import org.apache.wss4j.dom.cache.ReplayCache;
 
 /**
  * An abstract factory to return a ReplayCache instance. It returns an EHCacheReplayCacheFactory

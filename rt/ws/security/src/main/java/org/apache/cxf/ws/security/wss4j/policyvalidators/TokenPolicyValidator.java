@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 
 /**
  * Validate a WS-SecurityPolicy corresponding to a received token.

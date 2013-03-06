@@ -37,7 +37,7 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSSConfig;
+import org.apache.wss4j.dom.WSSConfig;
 
 /**
  * 

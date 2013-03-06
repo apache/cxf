@@ -33,7 +33,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
-import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 
 /**
  * Validate a TransportBinding policy.

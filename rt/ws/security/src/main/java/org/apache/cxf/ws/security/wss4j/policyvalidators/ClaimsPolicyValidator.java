@@ -21,7 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import org.w3c.dom.Element;
 
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**
  * Validate a WS-SecurityPolicy Claims policy.
@@ -34,7 +34,7 @@ public interface ClaimsPolicyValidator {
      */
     boolean validatePolicy(
         Element claimsPolicy,
-        AssertionWrapper assertion
+        SamlAssertionWrapper assertion
     );
     
     /**

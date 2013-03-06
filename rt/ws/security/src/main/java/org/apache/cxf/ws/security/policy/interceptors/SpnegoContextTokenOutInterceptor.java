@@ -38,10 +38,10 @@ import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.spnego.SpnegoClientAction;
-import org.apache.ws.security.spnego.SpnegoTokenContext;
-import org.apache.ws.security.util.Base64;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.spnego.SpnegoClientAction;
+import org.apache.wss4j.common.spnego.SpnegoTokenContext;
+import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public SpnegoContextTokenOutInterceptor() {

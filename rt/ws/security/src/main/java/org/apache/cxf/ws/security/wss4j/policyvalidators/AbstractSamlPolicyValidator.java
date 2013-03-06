@@ -27,9 +27,9 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 
 /**
  * Some abstract functionality for validating SAML Assertions
@@ -73,7 +73,7 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
      * @param signedResults a list of all of the signed results
      */
     public boolean checkHolderOfKey(
-        AssertionWrapper assertionWrapper,
+        SamlAssertionWrapper assertionWrapper,
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {

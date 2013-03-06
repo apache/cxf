@@ -31,7 +31,7 @@ import net.sf.ehcache.config.CacheConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.ws.security.cache.ReplayCache;
+import org.apache.wss4j.dom.cache.ReplayCache;
 
 /**
  * An in-memory EHCache implementation of the ReplayCache interface. The default TTL is 60 minutes and the

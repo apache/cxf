@@ -52,12 +52,12 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.SecurityContextToken;
-import org.apache.ws.security.spnego.SpnegoTokenContext;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.spnego.SpnegoTokenContext;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     static final Logger LOG = LogUtils.getL7dLogger(SpnegoContextTokenInInterceptor.class);

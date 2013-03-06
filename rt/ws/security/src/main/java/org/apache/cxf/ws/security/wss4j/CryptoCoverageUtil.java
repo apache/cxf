@@ -37,9 +37,9 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDataRef;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
 
 
 /**
@@ -125,7 +125,8 @@ public final class CryptoCoverageUtil {
         CoverageScope scope
     ) throws WSSecurityException {
         if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
-            throw new WSSecurityException("The " + getCoverageTypeString(type)
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                    "The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
         }
     }
@@ -172,7 +173,8 @@ public final class CryptoCoverageUtil {
         
         for (Element el : elements) {
             if (!CryptoCoverageUtil.matchElement(refs, type, scope, el)) {
-                throw new WSSecurityException("The " + getCoverageTypeString(type)
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                        "The " + getCoverageTypeString(type)
                         + " does not cover the required elements ({"
                         + namespace + "}" + name + ").");
             }
@@ -282,7 +284,7 @@ public final class CryptoCoverageUtil {
                         XPathConstants.NODESET);
             } catch (XPathExpressionException e) {
                 // The xpath's are not valid in the config.
-                throw new WSSecurityException(WSSecurityException.FAILURE);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             
             // If we found nodes then we need to do the check.
@@ -298,7 +300,8 @@ public final class CryptoCoverageUtil {
                     // We looked through all of the refs, but the element was
                     // not signed.
                     if (!instanceMatched) {
-                        throw new WSSecurityException("The " + getCoverageTypeString(type)
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                "The " + getCoverageTypeString(type)
                                 + " does not cover the required elements ("
                                 + xpathString + ").");
                     }
