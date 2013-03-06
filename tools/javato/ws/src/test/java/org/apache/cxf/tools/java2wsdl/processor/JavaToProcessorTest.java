@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.java2wsdl.processor;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.WSDLHelper;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -587,7 +589,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(getStringFromFile(requestWrapperClass).indexOf(expectedString) != -1);
     }
 
-    // Generated schema should use unquolified form in the jaxws case
+    // Generated schema should use unqualified form in the jaxws case
     @Test
     public void testAction() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/action.wsdl");
@@ -772,6 +774,20 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(unboundIndex > -1);
     }
     
+    @Test
+    public void testCXF4877() throws Exception {
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/testwsdl.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.cxf4877.HelloImpl");
+        env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
+
+        processor.setEnvironment(env);
+        processor.process();
+        
+        File wsdlFile = new File(output, "HelloWorld.wsdl");
+        assertTrue(wsdlFile.exists());
+        //if the test works, this won't throw an exception.  CXF-4877 generated bad XML at this point
+        StaxUtils.read(new FileInputStream(wsdlFile));
+    }
     
     
 }
