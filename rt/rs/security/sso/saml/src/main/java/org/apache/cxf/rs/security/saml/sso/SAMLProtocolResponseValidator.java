@@ -335,7 +335,7 @@ public class SAMLProtocolResponseValidator {
         credential.setSamlAssertion(assertion);
         
         RequestData requestData = new RequestData();
-        requestData.setSigCrypto(sigCrypto);
+        requestData.setSigVerCrypto(sigCrypto);
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);

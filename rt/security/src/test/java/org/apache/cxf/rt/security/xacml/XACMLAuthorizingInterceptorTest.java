@@ -29,7 +29,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 
 
 /**
@@ -38,7 +37,7 @@ import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
     
     static {
-        OpenSAMLUtil.initSamlEngine();
+        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
     }
 
     @org.junit.Test

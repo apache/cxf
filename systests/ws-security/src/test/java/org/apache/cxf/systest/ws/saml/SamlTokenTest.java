@@ -33,8 +33,8 @@ import org.apache.cxf.systest.ws.saml.client.SamlElementCallbackHandler;
 import org.apache.cxf.systest.ws.saml.client.SamlRoleCallbackHandler;
 import org.apache.cxf.systest.ws.saml.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.saml.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 

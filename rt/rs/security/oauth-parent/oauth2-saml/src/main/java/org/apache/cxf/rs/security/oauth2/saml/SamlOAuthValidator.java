@@ -28,8 +28,8 @@ import javax.ws.rs.core.UriBuilder;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.opensaml.saml2.core.Audience;
 import org.opensaml.saml2.core.AudienceRestriction;
 import org.opensaml.saml2.core.Conditions;
@@ -62,7 +62,7 @@ public class SamlOAuthValidator {
         issuer = value;
     }
     
-    public void validate(Message message, AssertionWrapper wrapper) {
+    public void validate(Message message, SamlAssertionWrapper wrapper) {
         
         Conditions cs = wrapper.getSaml2().getConditions();
         validateAudience(message, cs);
@@ -80,7 +80,7 @@ public class SamlOAuthValidator {
         }
     }
     
-    private String getIssuer(AssertionWrapper assertionW) {
+    private String getIssuer(SamlAssertionWrapper assertionW) {
         Issuer samlIssuer = assertionW.getSaml2().getIssuer();
         return samlIssuer == null ? null : samlIssuer.getValue();
     }

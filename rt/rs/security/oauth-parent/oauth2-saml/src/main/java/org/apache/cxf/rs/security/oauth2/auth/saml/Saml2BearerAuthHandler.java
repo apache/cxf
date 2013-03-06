@@ -41,7 +41,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.AbstractSamlInHandler;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
@@ -105,7 +105,7 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     
     protected void validateToken(Message message, Element element, String clientId) {
         
-        AssertionWrapper wrapper = toWrapper(element);
+        SamlAssertionWrapper wrapper = toWrapper(element);
         // The common SAML assertion validation:
         // signature, subject confirmation, etc
         super.validateToken(message, wrapper);

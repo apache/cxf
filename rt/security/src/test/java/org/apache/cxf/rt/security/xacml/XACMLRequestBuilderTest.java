@@ -24,7 +24,6 @@ import java.util.Collections;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.xacml.ctx.RequestType;
 
 
@@ -34,7 +33,7 @@ import org.opensaml.xacml.ctx.RequestType;
 public class XACMLRequestBuilderTest extends org.junit.Assert {
     
     static {
-        OpenSAMLUtil.initSamlEngine();
+        org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
     }
 
     @org.junit.Test

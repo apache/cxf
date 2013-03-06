@@ -40,6 +40,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.dom.WSSConfig;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Status;
@@ -55,6 +56,7 @@ import org.opensaml.xml.signature.SignatureConstants;
 public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     static {
+        WSSConfig.init();
         OpenSAMLUtil.initSamlEngine();
     }
 

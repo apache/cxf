@@ -40,7 +40,7 @@ import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.fault.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 

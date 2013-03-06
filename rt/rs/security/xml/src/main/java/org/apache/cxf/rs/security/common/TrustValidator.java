@@ -32,7 +32,7 @@ public class TrustValidator {
         throws WSSecurityException {
         SignatureTrustValidator validator = new SignatureTrustValidator();
         RequestData data = new RequestData();
-        data.setSigCrypto(crypto);
+        data.setSigVerCrypto(crypto);
         
         Credential trustCredential = new Credential();
         trustCredential.setPublicKey(publicKey);
