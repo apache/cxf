@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml2.core.AuthnContextComparisonTypeEnumeration;

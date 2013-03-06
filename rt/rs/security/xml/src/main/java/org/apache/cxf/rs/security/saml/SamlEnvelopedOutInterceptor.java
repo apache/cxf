@@ -30,7 +30,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 
 public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
@@ -71,7 +71,7 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
         throws Exception {
         
         Element docEl = payloadDoc.getDocumentElement();
-        AssertionWrapper assertion = SAMLUtils.createAssertion(message);
+        SamlAssertionWrapper assertion = SAMLUtils.createAssertion(message);
         
         QName rootName = DOMUtils.getElementQName(payloadDoc.getDocumentElement());
         if (rootName.equals(envelopeQName)) {

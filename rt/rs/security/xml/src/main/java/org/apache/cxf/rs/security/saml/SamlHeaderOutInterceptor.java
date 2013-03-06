@@ -32,7 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
     private static final Logger LOG = 
@@ -42,9 +42,9 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         try {
             Element samlToken = 
                 (Element)message.getContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT);
-            AssertionWrapper assertionWrapper;
+            SamlAssertionWrapper assertionWrapper;
             if (samlToken != null) {
-                assertionWrapper = new AssertionWrapper(samlToken);
+                assertionWrapper = new SamlAssertionWrapper(samlToken);
             } else {
                 assertionWrapper = createAssertion(message);
             }

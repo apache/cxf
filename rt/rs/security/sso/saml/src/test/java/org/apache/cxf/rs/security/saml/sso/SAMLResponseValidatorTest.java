@@ -30,15 +30,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.components.crypto.Merlin;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.Loader;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.Loader;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Status;
@@ -79,9 +80,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         response.getAssertions().add(assertion.getSaml2());
         
@@ -118,9 +119,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         response.getAssertions().add(assertion.getSaml2());
         
@@ -162,9 +163,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -220,9 +221,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(callbackHandler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -258,13 +259,14 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     /**
      * Sign a SAML Response
+     * @throws Exception 
      */
     private void signResponse(
         Response response,
         String issuerKeyName,
         String issuerKeyPassword,
         Crypto issuerCrypto
-    ) throws WSSecurityException {
+    ) throws Exception {
         //
         // Create the signature
         //
@@ -276,7 +278,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         cryptoType.setAlias(issuerKeyName);
         X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
-            throw new WSSecurityException(
+            throw new Exception(
                     "No issuer certs were found to sign the SAML Assertion using issuer name: "
                             + issuerKeyName);
         }
@@ -288,12 +290,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
             sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
         }
         
-        PrivateKey privateKey = null;
-        try {
-            privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
-        } catch (Exception ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
-        }
+        PrivateKey privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
 
         signature.setSignatureAlgorithm(sigAlgo);
 
@@ -310,7 +307,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
             KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
             signature.setKeyInfo(keyInfo);
         } catch (org.opensaml.xml.security.SecurityException ex) {
-            throw new WSSecurityException(
+            throw new Exception(
                     "Error generating KeyInfo from signing credential", ex);
         }
 

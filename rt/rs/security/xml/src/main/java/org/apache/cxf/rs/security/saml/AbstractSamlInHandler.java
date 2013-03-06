@@ -47,17 +47,20 @@ import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.saml.SAMLKeyInfo;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
-import org.apache.ws.security.validate.Validator;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.signature.XMLSignature;
-
+import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.Signature;
 
 public abstract class AbstractSamlInHandler implements RequestHandler {
 
@@ -103,16 +106,16 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         validateToken(message, toWrapper(tokenElement));
     }
     
-    protected AssertionWrapper toWrapper(Element tokenElement) {
+    protected SamlAssertionWrapper toWrapper(Element tokenElement) {
         try {
-            return new AssertionWrapper(tokenElement);
+            return new SamlAssertionWrapper(tokenElement);
         } catch (Exception ex) {
             throwFault("Assertion can not be validated", ex);
         }
         return null;
     }
     
-    protected void validateToken(Message message, AssertionWrapper assertion) {
+    protected void validateToken(Message message, SamlAssertionWrapper assertion) {
         try {
             RequestData data = new RequestData();
             if (assertion.isSigned()) {
@@ -120,7 +123,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                 data.setWssConfig(cfg);
                 data.setCallbackHandler(SecurityUtils.getCallbackHandler(message, this.getClass()));
                 try {
-                    data.setSigCrypto(new CryptoLoader().getCrypto(message,
+                    data.setSigVerCrypto(new CryptoLoader().getCrypto(message,
                                                 SecurityConstants.SIGNATURE_CRYPTO,
                                                 SecurityConstants.SIGNATURE_PROPERTIES));
                 } catch (IOException ex) {
@@ -128,14 +131,25 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
                 }
                 data.setEnableRevocation(MessageUtils.isTrue(
                     message.getContextualProperty(WSHandlerConstants.ENABLE_REVOCATION)));
-                assertion.verifySignature(data, null);
-                assertion.parseHOKSubject(data, null);
+                
+                Signature sig = assertion.getSignature();
+                KeyInfo keyInfo = sig.getKeyInfo();
+                SAMLKeyInfo samlKeyInfo = 
+                    SAMLUtil.getCredentialDirectlyFromKeyInfo(
+                        keyInfo.getDOM(), data.getSigVerCrypto()
+                    );
+                
+                assertion.verifySignature(samlKeyInfo);
+                assertion.parseHOKSubject(
+                    new WSSSAMLKeyInfoProcessor(data, null), data.getSigVerCrypto(), 
+                    data.getCallbackHandler()
+                );
             } else if (getTLSCertificates(message) == null) {
                 throwFault("Assertion must be signed", null);
             }
             if (samlValidator != null) {
                 Credential credential = new Credential();
-                credential.setAssertion(assertion);
+                credential.setSamlAssertion(assertion);
                 samlValidator.validate(credential, data);
             }
                 
@@ -148,7 +162,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         }
     }
     
-    protected void checkSubjectConfirmationData(Message message, AssertionWrapper assertion) {
+    protected void checkSubjectConfirmationData(Message message, SamlAssertionWrapper assertion) {
         Certificate[] tlsCerts = getTLSCertificates(message);
         if (!checkHolderOfKey(message, assertion, tlsCerts)) {
             throwFault("Holder Of Key claim fails", null);
@@ -161,7 +175,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         }
     }
     
-    protected void setSecurityContext(Message message, AssertionWrapper wrapper) {
+    protected void setSecurityContext(Message message, SamlAssertionWrapper wrapper) {
         if (scProvider != null) {
             SecurityContext sc = scProvider.getSecurityContext(message, wrapper);
             message.put(SecurityContext.class, sc);
@@ -187,7 +201,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
      */
     protected boolean checkSenderVouches(
         Message message,
-        AssertionWrapper assertionWrapper,
+        SamlAssertionWrapper assertionWrapper,
         Certificate[] tlsCerts
     ) {
         //
@@ -230,7 +244,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
     
     
     protected boolean checkHolderOfKey(Message message,
-                                    AssertionWrapper assertionWrapper,
+                                    SamlAssertionWrapper assertionWrapper,
                                     Certificate[] tlsCerts) {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         for (String confirmationMethod : confirmationMethods) {
@@ -297,7 +311,7 @@ public abstract class AbstractSamlInHandler implements RequestHandler {
         return false;
     }
     
-    protected boolean checkBearer(AssertionWrapper assertionWrapper, Certificate[] tlsCerts) {
+    protected boolean checkBearer(SamlAssertionWrapper assertionWrapper, Certificate[] tlsCerts) {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         for (String confirmationMethod : confirmationMethods) {
             boolean isBearer = isMethodBearer(confirmationMethod);

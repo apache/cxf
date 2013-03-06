@@ -36,10 +36,10 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.utils.Constants;
 
 public final class SecurityUtils {
@@ -82,12 +82,12 @@ public final class SecurityUtils {
     }
     
     public static X509Certificate[] getCertificates(Crypto crypto, String user)
-        throws WSSecurityException {
+        throws Exception {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(user);
         X509Certificate[] issuerCerts = crypto.getX509Certificates(cryptoType);
         if (issuerCerts == null || issuerCerts.length == 0) {
-            throw new WSSecurityException(
+            throw new Exception(
                 "No issuer certs were found using issuer name: " + user);
         }
         return issuerCerts;
@@ -117,7 +117,7 @@ public final class SecurityUtils {
     }
     
     public static String getPassword(Message message, String userName, 
-                                     int type, Class<?> callingClass) {
+                                     WSPasswordCallback.Usage type, Class<?> callingClass) {
         CallbackHandler handler = getCallbackHandler(message, callingClass);
         if (handler == null) {
             return null;

@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.saml2.core.AudienceRestriction;
 import org.opensaml.saml2.core.AuthnStatement;
 
@@ -79,7 +79,7 @@ public class SAMLSSOResponseValidator {
         // The Response must contain at least one Assertion.
         if (samlResponse.getAssertions() == null || samlResponse.getAssertions().isEmpty()) {
             LOG.fine("The Response must contain at least one Assertion");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // The Response must contain a Destination that matches the assertionConsumerURL if it is
@@ -88,7 +88,7 @@ public class SAMLSSOResponseValidator {
         if (samlResponse.isSigned()
             && (destination == null || !destination.equals(assertionConsumerURL))) {
             LOG.fine("The Response must contain a destination that matches the assertion consumer URL");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // Validate Assertions
@@ -98,14 +98,14 @@ public class SAMLSSOResponseValidator {
             // Check the Issuer
             if (assertion.getIssuer() == null) {
                 LOG.fine("Assertion Issuer must not be null");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
             validateIssuer(assertion.getIssuer());
             
             if (enforceAssertionsSigned && postBinding && assertion.getSignature() == null) {
                 LOG.fine("If the HTTP Post binding is used to deliver the Response, "
                          + "the enclosed assertions must be signed");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
             
             // Check for AuthnStatements and validate the Subject accordingly
@@ -129,7 +129,7 @@ public class SAMLSSOResponseValidator {
         if (!foundValidSubject) {
             LOG.fine("The Response did not contain any Authentication Statement that matched "
                      + "the Subject Confirmation criteria");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         SSOValidatorResponse validatorResponse = new SSOValidatorResponse();
@@ -153,7 +153,7 @@ public class SAMLSSOResponseValidator {
         if (enforceKnownIssuer && !issuerIDP.startsWith(issuer.getValue())) {
             LOG.fine("Issuer value: " + issuer.getValue() + " does not match issuer IDP: " 
                 + issuerIDP);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // Format must be nameid-format-entity
@@ -161,7 +161,7 @@ public class SAMLSSOResponseValidator {
             && !SAML2Constants.NAMEID_FORMAT_ENTITY.equals(issuer.getFormat())) {
             LOG.fine("Issuer format is not null and does not equal: " 
                 + SAML2Constants.NAMEID_FORMAT_ENTITY);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
@@ -193,7 +193,7 @@ public class SAMLSSOResponseValidator {
     ) throws WSSecurityException {
         if (subjectConfData == null) {
             LOG.fine("Subject Confirmation Data of a Bearer Subject Confirmation is null");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // Recipient must match assertion consumer URL
@@ -201,14 +201,14 @@ public class SAMLSSOResponseValidator {
         if (recipient == null || !recipient.equals(assertionConsumerURL)) {
             LOG.fine("Recipient " + recipient + " does not match assertion consumer URL "
                 + assertionConsumerURL);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // We must have a NotOnOrAfter timestamp
         if (subjectConfData.getNotOnOrAfter() == null
             || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
             LOG.fine("Subject Conf Data does not contain NotOnOrAfter or it has expired");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // Need to keep bearer assertion IDs based on NotOnOrAfter to detect replay attacks
@@ -220,7 +220,7 @@ public class SAMLSSOResponseValidator {
                 replayCache.putId(id, ttl / 1000L);
             } else {
                 LOG.fine("Replay attack with token id: " + id);
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
         
@@ -229,19 +229,19 @@ public class SAMLSSOResponseValidator {
             && !subjectConfData.getAddress().equals(clientAddress)) {
             LOG.fine("Subject Conf Data address " + subjectConfData.getAddress() + " does match"
                      + " client address " + clientAddress);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // It must not contain a NotBefore timestamp
         if (subjectConfData.getNotBefore() != null) {
             LOG.fine("The Subject Conf Data must not contain a NotBefore timestamp");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         // InResponseTo must match the AuthnRequest request Id
         if (requestId != null && !requestId.equals(subjectConfData.getInResponseTo())) {
             LOG.fine("The InResponseTo String does match the original request id " + requestId);
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
     }
@@ -251,13 +251,13 @@ public class SAMLSSOResponseValidator {
     ) throws WSSecurityException {
         if (conditions == null) {
             LOG.fine("Conditions are null");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         List<AudienceRestriction> audienceRestrs = conditions.getAudienceRestrictions();
         if (!matchSaml2AudienceRestriction(spIdentifier, audienceRestrs)) {
             LOG.fine("Assertion does not contain unique subject provider identifier " 
                      + spIdentifier + " in the audience restriction conditions");
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     

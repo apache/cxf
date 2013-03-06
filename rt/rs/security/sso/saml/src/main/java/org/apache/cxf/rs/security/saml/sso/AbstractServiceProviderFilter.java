@@ -51,8 +51,8 @@ import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.rs.security.saml.sso.state.RequestState;
 import org.apache.cxf.rs.security.saml.sso.state.ResponseState;
 import org.apache.cxf.security.SecurityContext;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.saml2.core.AuthnRequest;
 
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
@@ -163,8 +163,8 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         }
         try {
             String assertion = responseState.getAssertion();
-            AssertionWrapper assertionWrapper = 
-                new AssertionWrapper(
+            SamlAssertionWrapper assertionWrapper = 
+                new SamlAssertionWrapper(
                     DOMUtils.readXml(new StringReader(assertion)).getDocumentElement());
             setSecurityContext(m, assertionWrapper);
         } catch (Exception ex) {
@@ -174,7 +174,7 @@ public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler
         return true;
     }
     
-    protected void setSecurityContext(Message m, AssertionWrapper assertionWrapper) {
+    protected void setSecurityContext(Message m, SamlAssertionWrapper assertionWrapper) {
         // don't worry about roles/claims for now, just set a basic SecurityContext
         Subject subject = SAMLUtils.getSubject(m, assertionWrapper);
         final String name = subject.getName();

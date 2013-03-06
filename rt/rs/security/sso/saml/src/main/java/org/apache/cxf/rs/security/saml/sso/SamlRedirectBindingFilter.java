@@ -36,12 +36,11 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoType;
-import org.apache.ws.security.util.Base64;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.xml.security.utils.Base64;
 import org.opensaml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
@@ -121,7 +120,7 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         cryptoType.setAlias(signatureUser);
         X509Certificate[] issuerCerts = crypto.getX509Certificates(cryptoType);
         if (issuerCerts == null) {
-            throw new WSSecurityException(
+            throw new Exception(
                 "No issuer certs were found to sign the request using name: " + signatureUser
             );
         }
@@ -138,17 +137,12 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
         ub.queryParam(SSOConstants.SIG_ALG, URLEncoder.encode(sigAlgo, "UTF-8"));
         
         // Get the password
-        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.SIGNATURE)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(signatureUser, WSPasswordCallback.Usage.SIGNATURE)};
         callbackHandler.handle(cb);
         String password = cb[0].getPassword();
         
         // Get the private key
-        PrivateKey privateKey = null;
-        try {
-            privateKey = crypto.getPrivateKey(signatureUser, password);
-        } catch (Exception ex) {
-            throw new WSSecurityException(ex.getMessage(), ex);
-        }
+        PrivateKey privateKey = crypto.getPrivateKey(signatureUser, password);
         
         // Sign the request
         Signature signature = Signature.getInstance(jceSigAlgo);

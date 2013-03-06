@@ -176,6 +176,13 @@ public class SAMLTokenValidator implements TokenValidator {
                     SAMLUtil.getCredentialDirectlyFromKeyInfo(
                         keyInfo.getDOM(), sigCrypto
                     );
+                assertion.verifySignature(samlKeyInfo);
+                
+                RequestData requestData = new RequestData();
+                requestData.setSigVerCrypto(sigCrypto);
+                WSSConfig wssConfig = WSSConfig.getNewInstance();
+                requestData.setWssConfig(wssConfig);
+                requestData.setCallbackHandler(callbackHandler);
                 
                 // Validate the assertion against schemas/profiles
                 validateAssertion(assertion);
@@ -185,12 +192,6 @@ public class SAMLTokenValidator implements TokenValidator {
                 trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
                 trustCredential.setCertificates(samlKeyInfo.getCerts());
     
-                RequestData requestData = new RequestData();
-                requestData.setSigVerCrypto(sigCrypto);
-                WSSConfig wssConfig = WSSConfig.getNewInstance();
-                requestData.setWssConfig(wssConfig);
-                requestData.setCallbackHandler(callbackHandler);
-                
                 validator.validate(trustCredential, requestData);
 
                 // Finally check that subject DN of the signing certificate matches a known constraint

@@ -40,7 +40,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
-import org.apache.ws.security.WSSConfig;
+import org.apache.wss4j.dom.WSSConfig;
 
 
 public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {

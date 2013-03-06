@@ -33,10 +33,11 @@ import org.apache.cxf.rs.security.saml.SAMLConstants;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
 import org.apache.cxf.rs.security.saml.SamlHeaderOutInterceptor;
 
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSConfig;
 
 /**
  * An Interceptor to "retrieve" a SAML Token, i.e. create one and set it on the message
@@ -58,10 +59,11 @@ public class SamlRetrievalInterceptor extends AbstractPhaseInterceptor<Message> 
     public void handleMessage(Message message) throws Fault {
         
         // Create a SAML Token
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(new SamlCallbackHandler());
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(new SamlCallbackHandler(), samlCallback);
+        
         try {
-            AssertionWrapper assertion = new AssertionWrapper(samlParms);
+            SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
             Document doc = DOMUtils.createDocument();
             Element token = assertion.toDOM(doc);
             message.setContextualProperty(SAMLConstants.SAML_TOKEN_ELEMENT, token);

@@ -37,10 +37,11 @@ import org.apache.cxf.rs.security.saml.assertion.Claim;
 import org.apache.cxf.rs.security.saml.assertion.Claims;
 import org.apache.cxf.rs.security.saml.assertion.Subject;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.NameID;
@@ -54,7 +55,7 @@ public final class SAMLUtils {
         
     }
     
-    public static Subject getSubject(Message message, AssertionWrapper assertionW) {
+    public static Subject getSubject(Message message, SamlAssertionWrapper assertionW) {
         org.opensaml.saml2.core.Subject s = assertionW.getSaml2().getSubject();
         Subject subject = new Subject();
         NameID nameId = s.getNameID();
@@ -70,7 +71,7 @@ public final class SAMLUtils {
     }
     
     
-    public static Claims getClaims(AssertionWrapper assertionW) {
+    public static Claims getClaims(SamlAssertionWrapper assertionW) {
         // Should we just do a simple DOM parsing without even relying on
         // OpenSaml
         List<Claim> claims = new ArrayList<Claim>();
@@ -91,7 +92,7 @@ public final class SAMLUtils {
         return new Claims(claims);
     }
     
-    public static AssertionWrapper createAssertion(Message message) throws Fault {
+    public static SamlAssertionWrapper createAssertion(Message message) throws Fault {
         CallbackHandler handler = SecurityUtils.getCallbackHandler(
             message, SAMLUtils.class, SecurityConstants.SAML_CALLBACK_HANDLER);
         boolean selfSignAssertion = 
@@ -101,19 +102,20 @@ public final class SAMLUtils {
         return createAssertion(message, handler, selfSignAssertion);
     }
     
-    public static AssertionWrapper createAssertion(Message message,
+    public static SamlAssertionWrapper createAssertion(Message message,
                                                    CallbackHandler handler) {
         return createAssertion(message, handler, true);
     }
     
-    public static AssertionWrapper createAssertion(Message message,
+    public static SamlAssertionWrapper createAssertion(Message message,
                                                    CallbackHandler handler,
                                                    boolean selfSignAssertion) throws Fault {
             
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        
         try {
-            AssertionWrapper assertion = new AssertionWrapper(samlParms);
+            SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
             if (selfSignAssertion) {
                 //--- This code will be moved to a common utility class
                 Crypto crypto = new CryptoLoader().getCrypto(message, 
@@ -127,7 +129,7 @@ public final class SAMLUtils {
                 }
         
                 String password = 
-                    SecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, 
+                    SecurityUtils.getPassword(message, user, WSPasswordCallback.Usage.SIGNATURE, 
                             SAMLUtils.class);
                 
                 assertion.signAssertion(user, password, crypto, false);
@@ -142,13 +144,14 @@ public final class SAMLUtils {
         
     }
     
-    public static AssertionWrapper createAssertion(CallbackHandler handler,
+    public static SamlAssertionWrapper createAssertion(CallbackHandler handler,
                                                    SelfSignInfo info) throws Fault {
             
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        
         try {
-            AssertionWrapper assertion = new AssertionWrapper(samlParms);
+            SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
             assertion.signAssertion(info.getUser(), 
                                     info.getPassword(), 
                                     info.getCrypto(), 
