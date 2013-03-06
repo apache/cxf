@@ -63,6 +63,9 @@ public class ProxyFactory {
         // Retrieve system properties (if any)
         HTTPClientPolicy systemProxyConfiguration = null;
         String proxyHost = SystemPropertyAction.getPropertyOrNull(HTTP_PROXY_HOST);
+        if (StringUtils.isEmpty(proxyHost)) {
+            proxyHost = null;
+        }
         if (proxyHost != null) {
             // System is configured with a proxy, use it
 
@@ -72,6 +75,10 @@ public class ProxyFactory {
 
             // 8080 is the default proxy port value as per some documentation
             String proxyPort = SystemPropertyAction.getProperty(HTTP_PROXY_PORT, "8080");
+            if (StringUtils.isEmpty(proxyPort)) {
+                proxyPort = null;
+            }
+            
             systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));
 
             // Load non proxy hosts
