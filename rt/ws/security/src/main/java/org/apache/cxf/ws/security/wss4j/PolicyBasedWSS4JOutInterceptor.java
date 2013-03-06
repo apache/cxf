@@ -52,6 +52,7 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 
 public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -153,7 +154,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     if (config == null) {
                         config = WSSConfig.getNewInstance();
                     }
-                    translateProperties(message, config);
+                    translateProperties(message);
 
                     if (transport instanceof TransportBinding) {
                         new TransportBindingHandler(config, (TransportBinding)transport, saaj,
@@ -213,12 +214,10 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             return null;
         }
         
-        private void translateProperties(SoapMessage msg, WSSConfig config) {
+        private void translateProperties(SoapMessage msg) {
             String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
-            if ("1".equals(bspCompliant) || "true".equals(bspCompliant)) {
-                config.setWsiBSPCompliant(true);
-            } else if ("0".equals(bspCompliant) || "false".equals(bspCompliant)) {
-                config.setWsiBSPCompliant(false);
+            if (bspCompliant != null) {
+                msg.setContextualProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
             }
         }
     }

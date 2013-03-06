@@ -46,12 +46,14 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.UsernameToken;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSUsernameTokenPrincipal;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.cache.ReplayCache;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -149,9 +151,11 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             data.setNonceReplayCache(nonceCache);
             
             WSSConfig config = WSSConfig.getNewInstance();
-            config.setWsiBSPCompliant(bspCompliant);
             config.setAllowUsernameTokenNoPassword(allowNoPassword);
             data.setWssConfig(config);
+            if (!bspCompliant) {
+                data.setDisableBSPEnforcement(true);
+            }
             List<WSSecurityEngineResult> results = 
                 p.handleToken(tokenElement, data, wsDocInfo);
             return (WSUsernameTokenPrincipal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -164,8 +168,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     
     protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement, boolean bspCompliant) 
         throws WSSecurityException {
+        BSPEnforcer bspEnforcer = new BSPEnforcer(!bspCompliant);
         org.apache.wss4j.dom.message.token.UsernameToken ut = 
-            new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, false, bspCompliant);
+            new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, false, bspEnforcer);
         
         WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
         principal.setNonce(ut.getNonce());

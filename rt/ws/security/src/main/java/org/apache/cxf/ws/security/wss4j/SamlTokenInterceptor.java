@@ -51,6 +51,13 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
@@ -98,8 +105,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
                         boolean signed = false;
                         for (WSSecurityEngineResult result : samlResults) {
-                            AssertionWrapper wrapper = 
-                                (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                            SamlAssertionWrapper wrapper = 
+                                (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                             if (wrapper.isSigned()) {
                                 signed = true;
                                 break;
@@ -153,8 +160,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         }
                     } catch (RuntimeException t) {
                         throw t;
-                    } catch (Throwable t) {
-                        throw new WSSecurityException(t.getMessage(), t);
+                    } catch (Exception ex) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                     }
                 }
                 return super.getValidator(qName);
@@ -178,7 +185,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
         Header h = findSecurityHeader(message, true);
         try {
-            AssertionWrapper wrapper = addSamlToken(tok, message);
+            SamlAssertionWrapper wrapper = addSamlToken(tok, message);
             if (wrapper == null) {
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
                 Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SAML_TOKEN);
@@ -197,7 +204,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     
-    private AssertionWrapper addSamlToken(
+    private SamlAssertionWrapper addSamlToken(
         SamlToken token, SoapMessage message
     ) throws WSSecurityException {
         //
@@ -220,14 +227,14 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             return null;
         }
 
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
+        SAMLCallback samlCallback = new SAMLCallback();
         if (token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11()) {
-            samlParms.setSAMLVersion(SAMLVersion.VERSION_11);
+            samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
         } else if (token.isUseSamlVersion20Profile11()) {
-            samlParms.setSAMLVersion(SAMLVersion.VERSION_20);
+            samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
         }
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
 
         boolean selfSignAssertion = 
             MessageUtils.getContextualBoolean(
@@ -255,7 +262,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
             String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
             if (StringUtils.isEmpty(password)) {
-                password = getPassword(user, token, WSPasswordCallback.SIGNATURE, message);
+                password = getPassword(user, token, WSPasswordCallback.Usage.SIGNATURE, message);
             }
             if (password == null) {
                 password = "";

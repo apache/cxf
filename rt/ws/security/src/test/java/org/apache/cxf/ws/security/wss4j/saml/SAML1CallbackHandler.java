@@ -27,6 +27,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
@@ -57,6 +58,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
+                callback.setIssuer("www.example.com");
                 callback.setSamlVersion(SAMLVersion.VERSION_11);
                 SubjectBean subjectBean = 
                     new SubjectBean(
@@ -71,6 +73,16 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                     }
                 }
                 createAndSetStatement(subjectBean, callback);
+                
+                try {
+                    Crypto crypto = CryptoFactory.getInstance("outsecurity.properties");
+                    callback.setIssuerCrypto(crypto);
+                    callback.setIssuerKeyName("myalias");
+                    callback.setIssuerKeyPassword("myAliasPassword");
+                } catch (WSSecurityException e) {
+                    throw new IOException(e);
+                }
+                
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

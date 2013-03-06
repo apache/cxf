@@ -387,7 +387,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             }
         }
         inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
+        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, 
                 "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
                 "insecurity.properties");

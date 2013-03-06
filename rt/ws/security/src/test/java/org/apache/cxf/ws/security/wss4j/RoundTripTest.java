@@ -55,7 +55,7 @@ public class RoundTripTest extends AbstractSecurityTest {
         service.getOutInterceptors().add(new LoggingOutInterceptor());
 
         wsIn = new WSS4JInInterceptor();
-        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 

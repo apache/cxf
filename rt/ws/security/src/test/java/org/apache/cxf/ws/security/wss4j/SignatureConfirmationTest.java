@@ -122,7 +122,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
 
         inHandler.handleMessage(inmsg);

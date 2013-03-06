@@ -102,7 +102,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -129,7 +129,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -444,7 +444,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "cxfca.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
@@ -487,7 +487,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             WSHandlerConstants.PW_CALLBACK_CLASS, 
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
-        inProperties.put(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         
         List<String> xpaths = new ArrayList<String>();
         xpaths.add("//wsse:Security");
