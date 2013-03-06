@@ -25,8 +25,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.KerberosToken;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.policy.model.KerberosToken;
+import org.apache.wss4j.policy.model.KerberosToken.ApReqTokenType;
 
 /**
  * Validate a WSSecurityEngineResult corresponding to the processing of a Kerberos Token
@@ -66,14 +67,13 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
     }
     
     private boolean checkToken(KerberosToken kerberosTokenPolicy, KerberosSecurity kerberosToken) {
-        boolean isV5ApReq = kerberosTokenPolicy.isV5ApReqToken11();
-        boolean isGssV5ApReq = kerberosTokenPolicy.isGssV5ApReqToken11();
+        ApReqTokenType apReqTokenType = kerberosTokenPolicy.getApReqTokenType();
 
-        if (isV5ApReq && kerberosToken.isV5ApReq()) {
+        if (apReqTokenType == ApReqTokenType.WssKerberosV5ApReqToken11 
+            && kerberosToken.isV5ApReq()) {
             return true;
-        } else if (isGssV5ApReq && kerberosToken.isGssV5ApReq()) {
-            return true;
-        } else if (!(isV5ApReq || isGssV5ApReq)) {
+        } else if (apReqTokenType == ApReqTokenType.WssGssKerberosV5ApReqToken11 
+            && kerberosToken.isGssV5ApReq()) {
             return true;
         }
         return false;

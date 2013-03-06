@@ -26,17 +26,17 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
-import org.apache.cxf.ws.security.policy.model.KerberosToken;
-import org.apache.cxf.ws.security.policy.model.KeyValueToken;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
-import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.UsernameToken;
-import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.KerberosToken;
+import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.X509Token;
 
 /**
  * Validate a SignedEndorsingEncryptedSupportingToken policy. 
@@ -67,11 +67,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
         setEncryptedResults(encryptedResults);
         
         for (AssertionInfo ai : ais) {
-            SupportingToken binding = (SupportingToken)ai.getAssertion();
-            if (SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED 
-                != binding.getTokenType()) {
-                continue;
-            }
+            SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
             
             setSignedParts(binding.getSignedParts());
@@ -79,14 +75,14 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
             setSignedElements(binding.getSignedElements());
             setEncryptedElements(binding.getEncryptedElements());
 
-            List<Token> tokens = binding.getTokens();
-            for (Token token : tokens) {
+            List<AbstractToken> tokens = binding.getTokens();
+            for (AbstractToken token : tokens) {
                 if (!isTokenRequired(token, message)) {
                     continue;
                 }
                 
-                boolean derived = token.isDerivedKeys();
-                setDerived(derived);
+                DerivedKeys derivedKeys = token.getDerivedKeys();
+                setDerived(derivedKeys == DerivedKeys.RequireDerivedKeys);
                 boolean processingFailed = false;
                 if (token instanceof KerberosToken) {
                     if (!processKerberosTokens()) {

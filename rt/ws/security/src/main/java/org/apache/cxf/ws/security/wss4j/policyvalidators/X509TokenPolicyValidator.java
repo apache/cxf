@@ -29,12 +29,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.policy.model.X509Token.TokenType;
 
 /**
  * Validate an X509 Token policy.
@@ -74,7 +74,7 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 continue;
             }
 
-            if (!checkTokenType(x509TokenPolicy.getTokenVersionAndType(), bstResults)) {
+            if (!checkTokenType(x509TokenPolicy.getTokenType(), bstResults)) {
                 ai.setNotAsserted("An incorrect X.509 Token Type is detected");
                 continue;
             }
@@ -86,7 +86,7 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
      * Check that at least one received token matches the token type.
      */
     private boolean checkTokenType(
-        String requiredVersionAndType,
+        TokenType tokenType,
         List<WSSecurityEngineResult> bstResults
     ) {
         if (bstResults.isEmpty()) {
@@ -94,8 +94,8 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         }
 
         String requiredType = X509_V3_VALUETYPE;
-        if (SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10.equals(requiredType)
-            || SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11.equals(requiredType)) {
+        if (tokenType == TokenType.WssX509PkiPathV1Token10
+            || tokenType == TokenType.WssX509PkiPathV1Token11) {
             requiredType = PKI_VALUETYPE;
         }
 

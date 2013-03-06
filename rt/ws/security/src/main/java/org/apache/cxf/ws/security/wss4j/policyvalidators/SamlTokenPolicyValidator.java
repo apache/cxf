@@ -31,12 +31,13 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -132,11 +133,12 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
      * Check the policy version against the received assertion
      */
     private boolean checkVersion(SamlToken samlToken, SamlAssertionWrapper assertionWrapper) {
-        if ((samlToken.isUseSamlVersion11Profile10()
-            || samlToken.isUseSamlVersion11Profile11())
+        SamlTokenType samlTokenType = samlToken.getSamlTokenType();
+        if ((samlTokenType == SamlTokenType.WssSamlV11Token10
+            || samlTokenType == SamlTokenType.WssSamlV11Token11)
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
             return false;
-        } else if (samlToken.isUseSamlVersion20Profile11()
+        } else if (samlTokenType == SamlTokenType.WssSamlV20Token11
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }

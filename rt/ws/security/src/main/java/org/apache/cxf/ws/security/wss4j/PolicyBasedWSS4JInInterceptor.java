@@ -58,14 +58,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
-import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.RequiredElements;
-import org.apache.cxf.ws.security.policy.model.RequiredParts;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedElements;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
-import org.apache.cxf.ws.security.policy.model.UsernameToken;
-import org.apache.cxf.ws.security.policy.model.Wss11;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
@@ -97,6 +89,13 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.RequiredElements;
+import org.apache.wss4j.policy.model.RequiredParts;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
+import org.apache.wss4j.policy.model.Wss11;
 
 /**
  * 
@@ -284,7 +283,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (ais != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 UsernameToken policy = (UsernameToken)ai.getAssertion();
-                if (policy.isNoPassword()) {
+                if (policy.getPasswordType() == PasswordType.NoPassword) {
                     message.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
                 }
             }
@@ -416,29 +415,28 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
-                Map<String, String> namespaces = null;
-                List<String> xpaths = null;
-                if (CoverageScope.CONTENT.equals(scope)) {
-                    ContentEncryptedElements p = (ContentEncryptedElements)ai.getAssertion();
-                    namespaces = p.getDeclaredNamespaces();
-                    xpaths = p.getXPathExpressions();
-                } else {
-                    SignedEncryptedElements p = (SignedEncryptedElements)ai.getAssertion();
-                    namespaces = p.getDeclaredNamespaces();
-                    xpaths = p.getXPathExpressions();
-                }
                 
-                if (xpaths != null) {
-                    if (namespaces != null) {
-                        xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+                RequiredElements elements = (RequiredElements)ai.getAssertion();
+                
+                if (elements != null && elements.getXPaths() != null 
+                    && !elements.getXPaths().isEmpty()) {
+                    List<String> expressions = new ArrayList<String>();
+                    for (org.apache.wss4j.policy.model.XPath xPath : elements.getXPaths()) {
+                        expressions.add(xPath.getXPath());
+                    }
+
+                    if (elements.getXPaths().get(0).getPrefixNamespaceMap() != null) {
+                        xpath.setNamespaceContext(
+                            new MapNamespaceContext(elements.getXPaths().get(0).getPrefixNamespaceMap())
+                        );
                     }
                     try {
                         CryptoCoverageUtil.checkCoverage(soapEnvelope, refs,
-                                xpath, xpaths, type, scope);
+                                                         xpath, expressions, type, scope);
                     } catch (WSSecurityException e) {
                         ai.setNotAsserted("No " + type 
-                                + " element found matching one of the XPaths " 
-                                + Arrays.toString(xpaths.toArray()));
+                                          + " element found matching one of the XPaths " 
+                                          + Arrays.toString(expressions.toArray()));
                     }
                 }
             }
@@ -458,7 +456,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
-                SignedEncryptedParts p = (SignedEncryptedParts)ai.getAssertion();
+                SignedParts p = (SignedParts)ai.getAssertion();
                 
                 if (p.isBody()) {
                     try {
@@ -483,7 +481,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                 .getNamespace(), h.getName(), type,
                                 CoverageScope.ELEMENT);
                     } catch (WSSecurityException e) {
-                        ai.setNotAsserted(h.getQName() + " not + " + type);
+                        ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + type);
                     }
                 }
             }
@@ -788,9 +786,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 RequiredParts rp = (RequiredParts)ai.getAssertion();
                 ai.setAsserted(true);
                 for (Header h : rp.getHeaders()) {
+                    QName qName = new QName(h.getNamespace(), h.getName());
                     if (header == null 
-                        || DOMUtils.getFirstChildWithName((Element)header, h.getQName()) == null) {
-                        ai.setNotAsserted("No header element of name " + h.getQName() + " found.");
+                        || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
+                        ai.setNotAsserted("No header element of name " + qName + " found.");
                     }
                 }
             }
@@ -800,23 +799,28 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             for (AssertionInfo ai : ais) {
                 RequiredElements rp = (RequiredElements)ai.getAssertion();
                 ai.setAsserted(true);
-                Map<String, String> namespaces = rp.getDeclaredNamespaces();
-                XPathFactory factory = XPathFactory.newInstance();
-                for (String expression : rp.getXPathExpressions()) {
-                    XPath xpath = factory.newXPath();
-                    if (namespaces != null) {
-                        xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
-                    }
-                    NodeList list;
-                    try {
-                        list = (NodeList)xpath.evaluate(expression, 
-                                                                 header,
-                                                                 XPathConstants.NODESET);
-                        if (list.getLength() == 0) {
-                            ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                
+                if (rp != null && rp.getXPaths() != null && !rp.getXPaths().isEmpty()) {
+                    XPathFactory factory = XPathFactory.newInstance();
+                    for (org.apache.wss4j.policy.model.XPath xPath : rp.getXPaths()) {
+                        Map<String, String> namespaces = xPath.getPrefixNamespaceMap();
+                        String expression = xPath.getXPath();
+    
+                        XPath xpath = factory.newXPath();
+                        if (namespaces != null) {
+                            xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
                         }
-                    } catch (XPathExpressionException e) {
-                        ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
+                        NodeList list;
+                        try {
+                            list = (NodeList)xpath.evaluate(expression, 
+                                                                     header,
+                                                                     XPathConstants.NODESET);
+                            if (list.getLength() == 0) {
+                                ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                            }
+                        } catch (XPathExpressionException e) {
+                            ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
+                        }
                     }
                 }
             }

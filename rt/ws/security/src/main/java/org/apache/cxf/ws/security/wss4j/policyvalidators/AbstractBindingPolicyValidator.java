@@ -33,21 +33,23 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.EncryptionToken;
-import org.apache.cxf.ws.security.policy.model.Layout;
-import org.apache.cxf.ws.security.policy.model.ProtectionToken;
-import org.apache.cxf.ws.security.policy.model.SignatureToken;
-import org.apache.cxf.ws.security.policy.model.SymmetricAsymmetricBindingBase;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.TokenWrapper;
-import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
+import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding.ProtectionOrder;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
+import org.apache.wss4j.policy.model.AbstractTokenWrapper;
+import org.apache.wss4j.policy.model.EncryptionToken;
+import org.apache.wss4j.policy.model.Layout;
+import org.apache.wss4j.policy.model.Layout.LayoutType;
+import org.apache.wss4j.policy.model.ProtectionToken;
+import org.apache.wss4j.policy.model.SignatureToken;
+import org.apache.wss4j.policy.model.X509Token;
 
 /**
  * Some abstract functionality for validating a security binding.
@@ -163,7 +165,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Check various properties set in the policy of the binding
      */
     protected boolean checkProperties(
-        SymmetricAsymmetricBindingBase binding, 
+        AbstractSymmetricAsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim,
         List<WSSecurityEngineResult> results,
@@ -187,8 +189,9 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         
         // Check the Layout
         Layout layout = binding.getLayout();
-        boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTimestampFirst;
-        boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
+        LayoutType layoutType = layout.getLayoutType();
+        boolean timestampFirst = layoutType == LayoutType.LaxTsFirst;
+        boolean timestampLast = layoutType == LayoutType.LaxTsLast;
         if (!validateLayout(timestampFirst, timestampLast, results)) {
             String error = "Layout does not match the requirements";
             notAssertPolicy(aim, SP12Constants.LAYOUT, error);
@@ -198,7 +201,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         assertPolicy(aim, SP12Constants.LAYOUT);
         
         // Check the EntireHeaderAndBodySignatures property
-        if (binding.isEntireHeadersAndBodySignatures()
+        if (binding.isOnlySignEntireHeadersAndBody()
             && !validateEntireHeaderAndBodySignatures(signedResults)) {
             String error = "OnlySignEntireHeadersAndBody does not match the requirements";
             ai.setNotAsserted(error);
@@ -206,7 +209,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         }
         
         // Check whether the signatures were encrypted or not
-        if (binding.isSignatureProtection() && !isSignatureEncrypted(results)) {
+        if (binding.isProtectTokens() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
@@ -218,12 +221,13 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Check the Protection Order of the binding
      */
     protected boolean checkProtectionOrder(
-        SymmetricAsymmetricBindingBase binding, 
+        AbstractSymmetricAsymmetricBinding binding, 
         AssertionInfo ai,
         List<WSSecurityEngineResult> results
     ) {
-        if (binding.getProtectionOrder() == SPConstants.ProtectionOrder.EncryptBeforeSigning) {
-            if (!binding.isSignatureProtection() && isSignedBeforeEncrypted(results)) {
+        ProtectionOrder protectionOrder = binding.getProtectionOrder();
+        if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) {
+            if (!binding.isProtectTokens() && isSignedBeforeEncrypted(results)) {
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
@@ -290,14 +294,15 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Check the derived key requirement.
      */
     protected boolean checkDerivedKeys(
-        TokenWrapper tokenWrapper, 
+        AbstractTokenWrapper tokenWrapper, 
         boolean hasDerivedKeys,
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Token token = tokenWrapper.getToken();
+        AbstractToken token = tokenWrapper.getToken();
+        boolean isDerivedKeys = token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys;
         // If derived keys are not required then just return
-        if (!(token instanceof X509Token && token.isDerivedKeys())) {
+        if (!(token instanceof X509Token && isDerivedKeys)) {
             return true;
         }
         if (tokenWrapper instanceof EncryptionToken 

@@ -29,12 +29,12 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.policy.model.IssuedToken;
 
 import org.opensaml.common.SAMLVersion;
 
@@ -79,7 +79,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 continue;
             }
 
-            Element template = issuedToken.getRstTemplate();
+            Element template = issuedToken.getRequestSecurityTokenTemplate();
             if (template != null && !checkIssuedTokenTemplate(template, assertionWrapper)) {
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
                 continue;
@@ -130,7 +130,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 return false;
             }
 
-            Element template = issuedToken.getRstTemplate();
+            Element template = issuedToken.getRequestSecurityTokenTemplate();
             if (template != null && !checkIssuedTokenTemplate(template, binarySecurityToken)) {
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
                 return false;

@@ -246,7 +246,6 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
     /**
      * @return true if the supporting token should be encrypted
      */
-
     public boolean isEncryptedToken() {
         return type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED
             || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED

@@ -21,8 +21,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
-import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * Some abstract functionality for validating a Security Token.
@@ -36,10 +36,10 @@ public abstract class AbstractTokenPolicyValidator {
      * @return true if the token is required
      */
     protected boolean isTokenRequired(
-        Token token,
+        AbstractToken token,
         Message message
     ) {
-        IncludeTokenType inclusion = token.getInclusion();
+        IncludeTokenType inclusion = token.getIncludeTokenType();
         if (inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             return false;
         } else if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {

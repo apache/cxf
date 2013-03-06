@@ -40,20 +40,20 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
+import org.apache.neethi.Policy;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.SymmetricBinding;
+import org.apache.wss4j.policy.model.TransportBinding;
 
 public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public static final String SECURITY_PROCESSED = PolicyBasedWSS4JOutInterceptor.class.getName() + ".DONE";
@@ -104,32 +104,32 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Binding transport = null;
+                AbstractBinding transport = null;
                 ais = aim.get(SP12Constants.TRANSPORT_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
-                        transport = (Binding)ai.getAssertion();
+                        transport = (AbstractBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
                 ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
-                        transport = (Binding)ai.getAssertion();
+                        transport = (AbstractBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
                 ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
-                        transport = (Binding)ai.getAssertion();
+                        transport = (AbstractBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
                 if (transport == null && isRequestor(message)) {
-                    transport = new TransportBinding(SP12Constants.INSTANCE,
-                                                     message.getExchange().getBus()
-                                                         .getExtension(PolicyBuilder.class));
+                    Policy policy = new Policy();
+                    transport = new TransportBinding(org.apache.wss4j.policy.SPConstants.SPVersion.SP12,
+                                                     policy);
                 }
                 
                 if (transport != null) {

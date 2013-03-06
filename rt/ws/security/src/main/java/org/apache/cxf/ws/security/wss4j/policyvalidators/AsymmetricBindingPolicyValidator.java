@@ -29,12 +29,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Token;
-import org.apache.cxf.ws.security.policy.model.TokenWrapper;
-import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.AbstractTokenWrapper;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.apache.wss4j.policy.model.X509Token;
 
 /**
  * Validate an AsymmetricBinding policy.
@@ -128,7 +128,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
     }
     
     private boolean checkInitiatorTokens(
-        TokenWrapper wrapper, 
+        AbstractTokenWrapper wrapper, 
         AsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim, 
@@ -136,7 +136,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults) {
 
-        Token token = wrapper.getToken();
+        AbstractToken token = wrapper.getToken();
         if (token instanceof X509Token) {
             boolean foundCert = false;
             for (WSSecurityEngineResult result : signedResults) {
@@ -164,7 +164,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
     }
 
     private boolean checkRecipientTokens(
-        TokenWrapper wrapper, 
+        AbstractTokenWrapper wrapper, 
         AsymmetricBinding binding, 
         AssertionInfo ai,
         AssertionInfoMap aim, 

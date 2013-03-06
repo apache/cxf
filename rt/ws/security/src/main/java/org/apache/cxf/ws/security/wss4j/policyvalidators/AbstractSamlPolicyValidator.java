@@ -24,12 +24,12 @@ import java.util.List;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * Some abstract functionality for validating SAML Assertions
@@ -43,10 +43,10 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
      * @return true if the token is required
      */
     protected boolean isTokenRequired(
-        Token token,
+        AbstractToken token,
         Message message
     ) {
-        IncludeTokenType inclusion = token.getInclusion();
+        IncludeTokenType inclusion = token.getIncludeTokenType();
         if (inclusion == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             return false;
         } else if (inclusion == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
