@@ -327,9 +327,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             msg.put(SECURITY_PROCESSED, Boolean.TRUE);
 
         } catch (WSSecurityException e) {
-            LOG.log(Level.WARNING, "", e);
-            SoapFault fault = createSoapFault(version, e);
-            throw fault;
+            throw createSoapFault(version, e);
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, version.getSender());
         } catch (SOAPException e) {

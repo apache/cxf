@@ -345,7 +345,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         URL url = ClassLoader.getSystemResource("outsecurity.properties");
         cryptoProps.load(url.openStream());
         Crypto crypto = CryptoFactory.getInstance(cryptoProps);
-        String alias = cryptoProps.getProperty("org.apache.wss4j.dom.crypto.merlin.keystore.alias");
+        String alias = cryptoProps.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(alias);
         issuedToken.setX509Certificate(crypto.getX509Certificates(cryptoType)[0], crypto);

@@ -228,7 +228,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
         final String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
         
         inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
+        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, 
                 "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
                 "insecurity.properties");
