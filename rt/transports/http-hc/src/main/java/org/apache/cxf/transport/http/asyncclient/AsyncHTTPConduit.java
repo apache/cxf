@@ -706,6 +706,24 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             cookies.readFromHeaders(h);
         }
         
+        protected boolean authorizationRetransmit() throws IOException {
+            boolean b = super.authorizationRetransmit();
+            if (!b) {
+                //HTTPClient may be handling the authorization things instead of us, we
+                //just need to make sure we set the cookies and proceed and HC 
+                //will do the negotiation and such.
+                try {
+                    closeInputStream();
+                } catch (Throwable t) {
+                    //ignore
+                }
+                cookies.writeToMessageHeaders(outMessage);
+                retransmit(url.toString());
+                return true;
+            }
+            return b;
+        }        
+        
         protected void retransmitStream() throws IOException {
             cachingForRetransmission = false; //already cached
             setupWrappedStream();
