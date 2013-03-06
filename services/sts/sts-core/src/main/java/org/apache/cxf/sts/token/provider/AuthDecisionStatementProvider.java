@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 
 /**
  * An interface that allows a pluggable way of obtaining an AuthDecisionStatementBean.

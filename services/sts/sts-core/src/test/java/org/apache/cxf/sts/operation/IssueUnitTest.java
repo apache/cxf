@@ -46,8 +46,8 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 /**
  * Some unit tests for the issue operation.

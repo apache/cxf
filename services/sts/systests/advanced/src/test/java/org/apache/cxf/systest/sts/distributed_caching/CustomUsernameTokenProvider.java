@@ -27,8 +27,8 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.message.token.UsernameToken;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
  * A TokenProvider implementation that creates a UsernameToken.

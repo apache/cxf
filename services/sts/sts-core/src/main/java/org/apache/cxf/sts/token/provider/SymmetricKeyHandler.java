@@ -30,12 +30,11 @@ import org.apache.cxf.sts.request.BinarySecret;
 import org.apache.cxf.sts.request.Entropy;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.conversation.ConversationException;
-import org.apache.ws.security.conversation.dkalgo.P_SHA1;
-import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.wss4j.common.derivedKey.ConversationException;
+import org.apache.wss4j.common.derivedKey.P_SHA1;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * Some common functionality relating to parsing and generating Symmetric Keys.

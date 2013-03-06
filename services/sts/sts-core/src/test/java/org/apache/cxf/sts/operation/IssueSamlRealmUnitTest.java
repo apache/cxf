@@ -52,11 +52,11 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.util.DOM2Writer;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * Some unit tests for the issue operation to issue SAML tokens in a specific realm.
@@ -528,10 +528,10 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         
         return properties;
     }
@@ -539,12 +539,12 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
     private Properties getEncryptionPropertiesPKCS12() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "security");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "x509.p12");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "pkcs12");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.private.password", "security");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "security");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "x509.p12");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.type", "pkcs12");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.private.password", "security");
         
         return properties;
     }

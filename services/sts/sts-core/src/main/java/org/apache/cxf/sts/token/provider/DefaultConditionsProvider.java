@@ -25,8 +25,8 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.Lifetime;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.joda.time.DateTime;
 
 /**

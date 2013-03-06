@@ -28,14 +28,13 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.TokenRequirements;
-
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.saml.ext.SAMLCallback;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.common.SAMLVersion;
 
 /**

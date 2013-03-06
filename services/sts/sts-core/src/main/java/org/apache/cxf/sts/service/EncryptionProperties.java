@@ -21,7 +21,7 @@ package org.apache.cxf.sts.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * This class contains various configuration properties that can be used to encrypt an issued token.

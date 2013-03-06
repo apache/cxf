@@ -20,8 +20,8 @@ package org.apache.cxf.sts.token.provider;
 
 import java.util.Collections;
 
-import org.apache.ws.security.saml.ext.bean.ActionBean;
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.common.saml.bean.ActionBean;
+import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 
 /**
  * A custom AuthDecisionStatementProvider implementation for use in the tests.

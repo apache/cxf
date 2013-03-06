@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.token.realm.Relationship;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.xml.XMLObject;
 
@@ -147,8 +147,8 @@ public class ClaimsManager {
             
             // Get the claims of the received token (only SAML supported)
             // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
-            AssertionWrapper assertion = 
-                (AssertionWrapper)parameters.getAdditionalProperties().get(AssertionWrapper.class.getName());
+            SamlAssertionWrapper assertion = 
+                (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
             List<Claim> claimList = null;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
                 claimList = this.parseClaimsInAssertion(assertion.getSaml2());

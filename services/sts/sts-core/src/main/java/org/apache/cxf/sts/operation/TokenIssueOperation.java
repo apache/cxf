@@ -53,7 +53,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
-import org.apache.ws.security.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
  * An implementation of the IssueOperation interface.

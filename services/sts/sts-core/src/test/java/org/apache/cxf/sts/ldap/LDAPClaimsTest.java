@@ -42,7 +42,7 @@ import org.apache.cxf.sts.claims.LdapClaimsHandler;
 import org.apache.cxf.sts.claims.RequestClaim;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.wss4j.dom.CustomTokenPrincipal;
 import org.junit.BeforeClass;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.ldap.core.AttributesMapper;

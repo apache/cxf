@@ -46,18 +46,17 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.token.realm.SAMLRealm;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
-import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
-
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
+import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.WSConstants;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 
@@ -124,7 +123,7 @@ public class SAMLTokenProvider implements TokenProvider {
         
         try {
             Document doc = DOMUtils.createDocument();
-            AssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
+            SamlAssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
             Element token = assertion.toDOM(doc);
             
             // set the token in cache (only if the token is signed)
@@ -317,7 +316,7 @@ public class SAMLTokenProvider implements TokenProvider {
         this.samlCustomHandler = samlCustomHandler;
     }
 
-    private AssertionWrapper createSamlToken(
+    private SamlAssertionWrapper createSamlToken(
         TokenProviderParameters tokenParameters, byte[] secret, Document doc
     ) throws Exception {
         String realm = tokenParameters.getRealm();
@@ -328,9 +327,10 @@ public class SAMLTokenProvider implements TokenProvider {
         
         SamlCallbackHandler handler = createCallbackHandler(tokenParameters, secret, samlRealm, doc);
         
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         
         if (samlCustomHandler != null) {
             samlCustomHandler.handle(assertion, tokenParameters);
@@ -394,7 +394,7 @@ public class SAMLTokenProvider implements TokenProvider {
                 LOG.fine("Signature alias is null so using default alias: " + alias);
             }
             // Get the password
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE)};
             LOG.fine("Creating SAML Token");
             callbackHandler.handle(cb);
             String password = cb[0].getPassword();

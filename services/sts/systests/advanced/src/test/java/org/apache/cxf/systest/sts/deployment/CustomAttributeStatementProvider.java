@@ -29,10 +29,10 @@ import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.saml.ext.bean.AttributeBean;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.wss4j.common.saml.bean.AttributeBean;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.dom.WSConstants;
 
 public class CustomAttributeStatementProvider implements AttributeStatementProvider {
     

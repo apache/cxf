@@ -19,10 +19,10 @@
 package org.apache.cxf.systest.sts.realms;
 
 import org.apache.cxf.ws.security.trust.STSTokenValidator;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
 import org.opensaml.saml2.core.Assertion;
 
 /**
@@ -35,15 +35,15 @@ public class DifferentRealmValidator extends STSTokenValidator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         
-        AssertionWrapper transformedToken = validatedCredential.getTransformedToken();
+        SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"B-Issuer".equals(transformedToken.getIssuerString())) {
-            throw new WSSecurityException(WSSecurityException.FAILURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
 
         Assertion assertion = transformedToken.getSaml2();
         if (!"B-Principal".equals(assertion.getSubject().getNameID().getValue())) {
-            throw new WSSecurityException(WSSecurityException.FAILURE);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
         
         return validatedCredential;

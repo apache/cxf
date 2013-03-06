@@ -47,15 +47,14 @@ import org.apache.cxf.sts.common.PasswordCallbackHandler;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.ws.security.util.DOM2Writer;
-
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.xml.XMLObject;
 
@@ -247,7 +246,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
         
-        AssertionWrapper assertion = new AssertionWrapper(token);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         List<Attribute> attributes = assertion.getSaml2().getAttributeStatements().get(0).getAttributes();
         assertEquals(attributes.size(), 1);
         assertEquals(attributes.get(0).getName(), CLAIM_STATIC_COMPANY.toString());
@@ -304,7 +303,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
         
-        AssertionWrapper assertion = new AssertionWrapper(token);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         List<Attribute> attributes = assertion.getSaml2().getAttributeStatements().get(0).getAttributes();
         assertEquals(attributes.size(), 1);
         assertEquals(attributes.get(0).getName(), CLAIM_APPLICATION.toString());
@@ -407,10 +406,10 @@ public class SAMLClaimsTest extends org.junit.Assert {
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         
         return properties;
     }

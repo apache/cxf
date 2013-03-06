@@ -23,11 +23,11 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.sts.claims.ClaimTypes;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SamlAssertionValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.validate.Credential;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.opensaml.xml.XMLObject;
 
 /**
@@ -41,7 +41,7 @@ public class ClaimsValidator extends SamlAssertionValidator {
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        AssertionWrapper assertion = validatedCredential.getAssertion();
+        SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
         
         boolean valid = false;
         if (assertion.getSaml1() != null) {
@@ -54,7 +54,7 @@ public class ClaimsValidator extends SamlAssertionValidator {
             return validatedCredential;
         }
 
-        throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
     }
     
     private boolean handleSAML1Assertion(
@@ -63,7 +63,7 @@ public class ClaimsValidator extends SamlAssertionValidator {
         List<org.opensaml.saml1.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
 
         for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
@@ -92,7 +92,7 @@ public class ClaimsValidator extends SamlAssertionValidator {
         List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         
         for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {

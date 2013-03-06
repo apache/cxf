@@ -41,10 +41,10 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
@@ -146,9 +146,9 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         ep.getEndpointInfo().setProperty(SecurityConstants.TOKEN_ID, id);
         TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
 
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(new Saml2CallbackHandler());
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(new Saml2CallbackHandler(), samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();

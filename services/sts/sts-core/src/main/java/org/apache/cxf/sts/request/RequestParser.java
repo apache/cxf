@@ -73,16 +73,16 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferen
 import org.apache.cxf.ws.security.sts.provider.model.wstrust14.ActAsType;
 import org.apache.cxf.ws.security.sts.provider.model.xmldsig.KeyInfoType;
 import org.apache.cxf.ws.security.sts.provider.model.xmldsig.X509DataType;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.handler.WSHandlerConstants;
-import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.SecurityContextToken;
-import org.apache.ws.security.processor.EncryptedKeyProcessor;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.xml.security.utils.Constants;
 
 /**

@@ -45,14 +45,14 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.SCTValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.saml.ext.SAMLParms;
-import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
-import org.apache.ws.security.saml.ext.bean.ConditionsBean;
-import org.apache.ws.security.saml.ext.bean.SubjectBean;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A TokenProvider implementation that provides a SAML Token that contains a Symmetric Key that is obtained
@@ -101,7 +101,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
 
         try {
             Document doc = DOMUtils.createDocument();
-            AssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
+            SamlAssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
             Element token = assertion.toDOM(doc);
 
             TokenProviderResponse response = new TokenProviderResponse();
@@ -183,21 +183,21 @@ public class SCTSAMLTokenProvider implements TokenProvider {
         this.signToken = signToken;
     }
 
-    private AssertionWrapper createSamlToken(
+    private SamlAssertionWrapper createSamlToken(
         TokenProviderParameters tokenParameters, byte[] secret, Document doc
     ) throws Exception {
         SamlCallbackHandler handler = createCallbackHandler(tokenParameters, secret, doc);
 
-        SAMLParms samlParms = new SAMLParms();
-        samlParms.setCallbackHandler(handler);
-        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(handler, samlCallback);
+        SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
 
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
 
             // Get the password
             String alias = stsProperties.getSignatureUsername();
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE)};
             LOG.fine("Creating SAML Token");
             stsProperties.getCallbackHandler().handle(cb);
             String password = cb[0].getPassword();

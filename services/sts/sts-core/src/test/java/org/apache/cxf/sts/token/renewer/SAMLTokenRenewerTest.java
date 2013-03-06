@@ -50,13 +50,13 @@ import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.ws.security.CustomTokenPrincipal;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
 /**
@@ -122,8 +122,8 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
         
-        String oldId = new AssertionWrapper(samlToken).getId();
-        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        String oldId = new SamlAssertionWrapper(samlToken).getId();
+        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
         
         // Now validate it again
@@ -252,8 +252,8 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
         
-        String oldId = new AssertionWrapper(samlToken).getId();
-        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        String oldId = new SamlAssertionWrapper(samlToken).getId();
+        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
         
         // Now validate it again
@@ -328,8 +328,8 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
         
-        String oldId = new AssertionWrapper(samlToken).getId();
-        String newId = new AssertionWrapper((Element)renewerResponse.getToken()).getId();
+        String oldId = new SamlAssertionWrapper(samlToken).getId();
+        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
         
         // Now validate it again
@@ -626,10 +626,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
-            "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
+            "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", "stsstore.jks");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
         
         return properties;
     }

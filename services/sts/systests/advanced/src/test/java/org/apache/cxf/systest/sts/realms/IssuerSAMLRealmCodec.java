@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.sts.realms;
 
 import org.apache.cxf.sts.token.realm.SAMLRealmCodec;
-import org.apache.ws.security.saml.ext.AssertionWrapper;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 
 /**
@@ -29,11 +29,11 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 public class IssuerSAMLRealmCodec implements SAMLRealmCodec {
     
     /**
-     * Get the realm associated with the AssertionWrapper parameter
+     * Get the realm associated with the SamlAssertionWrapper parameter
      * @param assertion a SAML Assertion wrapper object
-     * @return the realm associated with the AssertionWrapper parameter
+     * @return the realm associated with the SamlAssertionWrapper parameter
      */
-    public String getRealmFromToken(AssertionWrapper assertion) {
+    public String getRealmFromToken(SamlAssertionWrapper assertion) {
         if ("A-Issuer".equals(assertion.getIssuerString())) {
             return "A";
         } else if ("B-Issuer".equals(assertion.getIssuerString())) {
