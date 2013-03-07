@@ -53,4 +53,10 @@ interface B extends C {
     @javax.jws.WebMethod
     @javax.jws.Oneway
     void oneWayOperation();
+    
+    @javax.jws.WebMethod
+    String bye(String bye);
+    
+    @javax.jws.WebMethod
+    String hello(String hello);
 }
