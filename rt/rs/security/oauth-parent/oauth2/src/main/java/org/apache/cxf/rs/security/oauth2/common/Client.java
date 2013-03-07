@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.common;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,10 +35,10 @@ public class Client {
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
-    private List<String> redirectUris = Collections.emptyList();
+    private List<String> redirectUris = new LinkedList<String>();
     
     private boolean isConfidential;
-    private List<String> allowedGrantTypes = Collections.emptyList();
+    private List<String> allowedGrantTypes = new LinkedList<String>();
     private List<Property> properties = new LinkedList<Property>();
     private UserSubject subject;
         
