@@ -24,12 +24,13 @@ import java.io.InputStream;
 
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -57,22 +58,23 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
-        Form form = readFormData(message);    
-        String assertionType = form.getData().getFirst(Constants.CLIENT_AUTH_ASSERTION_TYPE);
+        Form form = readFormData(message);
+        MultivaluedMap<String, String> formData = form.asMap();
+        String assertionType = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_TYPE);
         String decodedAssertionType = assertionType != null ? HttpUtils.urlDecode(assertionType) : null;
         if (decodedAssertionType == null || !Constants.CLIENT_AUTH_SAML2_BEARER.equals(decodedAssertionType)) {
             throw new NotAuthorizedException(errorResponse());
         }
-        String assertion = form.getData().getFirst(Constants.CLIENT_AUTH_ASSERTION_PARAM);
+        String assertion = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_PARAM);
         
         Element token = readToken(message, assertion);         
-        String clientId = form.getData().getFirst(OAuthConstants.CLIENT_ID);
+        String clientId = formData.getFirst(OAuthConstants.CLIENT_ID);
         validateToken(message, token, clientId);
         
         
-        form.getData().remove(OAuthConstants.CLIENT_ID);
-        form.getData().remove(Constants.CLIENT_AUTH_ASSERTION_PARAM);
-        form.getData().remove(Constants.CLIENT_AUTH_ASSERTION_TYPE);
+        formData.remove(OAuthConstants.CLIENT_ID);
+        formData.remove(Constants.CLIENT_AUTH_ASSERTION_PARAM);
+        formData.remove(Constants.CLIENT_AUTH_ASSERTION_TYPE);
         
         // restore input stream
         try {

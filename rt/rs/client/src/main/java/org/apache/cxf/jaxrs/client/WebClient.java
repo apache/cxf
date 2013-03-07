@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.AsyncInvoker;
@@ -38,6 +39,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -53,7 +55,6 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
@@ -280,7 +281,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response post(Object body) {
-        return invoke("POST", body);
+        return invoke(HttpMethod.POST, body);
     }
     
     /**
@@ -289,7 +290,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response put(Object body) {
-        return invoke("PUT", body);
+        return invoke(HttpMethod.PUT, body);
     }
 
     /**
@@ -297,7 +298,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response get() {
-        return invoke("GET", null);
+        return invoke(HttpMethod.GET, null);
     }
 
     /**
@@ -305,7 +306,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response head() {
-        return invoke("HEAD", null);
+        return invoke(HttpMethod.HEAD, null);
     }
 
     /**
@@ -313,7 +314,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response options() {
-        return invoke("OPTIONS", null);
+        return invoke(HttpMethod.OPTIONS, null);
     }
 
     /**
@@ -321,7 +322,7 @@ public class WebClient extends AbstractClient {
      * @return JAXRS Response
      */
     public Response delete() {
-        return invoke("DELETE", null);
+        return invoke(HttpMethod.DELETE, null);
     }
 
     /**
@@ -331,7 +332,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Map<String, List<Object>> values) {
         type(MediaType.APPLICATION_FORM_URLENCODED);
-        return doInvoke("POST", values, null, Response.class, Response.class);
+        return doInvoke(HttpMethod.POST, values, null, Response.class, Response.class);
     }
     
     /**
@@ -341,7 +342,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Form form) {
         type(MediaType.APPLICATION_FORM_URLENCODED);
-        return doInvoke("POST", form.getData(), null, Response.class, Response.class);
+        return doInvoke(HttpMethod.POST, form.asMap(), null, Response.class, Response.class);
     }
     
     /**
@@ -394,7 +395,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T post(Object body, Class<T> responseClass) {
-        return invoke("POST", body, responseClass);
+        return invoke(HttpMethod.POST, body, responseClass);
     }
     
     /**
@@ -405,7 +406,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T post(Object body, GenericType<T> responseType) {
-        return invoke("POST", body, responseType);
+        return invoke(HttpMethod.POST, body, responseType);
     }
     
     /**
@@ -415,7 +416,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> post(Object body, InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("POST", body, body.getClass(), null, callback);
+        return doInvokeAsyncCallback(HttpMethod.POST, body, body.getClass(), null, callback);
     }
     
     /**
@@ -426,7 +427,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T put(Object body, Class<T> responseClass) {
-        return invoke("PUT", body, responseClass);
+        return invoke(HttpMethod.PUT, body, responseClass);
     }
     
 
@@ -438,7 +439,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T put(Object body, GenericType<T> responseType) {
-        return invoke("PUT", body, responseType);
+        return invoke(HttpMethod.PUT, body, responseType);
     }
     
     /**
@@ -448,7 +449,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> put(Object body, InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("PUT", body, body.getClass(), null, callback);
+        return doInvokeAsyncCallback(HttpMethod.PUT, body, body.getClass(), null, callback);
     }
     
     /**
@@ -472,7 +473,7 @@ public class WebClient extends AbstractClient {
      * @return JAX-RS Response
      */
     public <T> Response postCollection(Object collection, Class<T> memberClass) {
-        return doInvoke("POST", collection, new ParameterizedCollectionType<T>(memberClass),
+        return doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType<T>(memberClass),
                         Response.class, Response.class);
     }
     
@@ -485,7 +486,7 @@ public class WebClient extends AbstractClient {
      */
     public <T1, T2> T2 postCollection(Object collection, Class<T1> memberClass, 
                                             Class<T2> responseClass) {
-        Response r = doInvoke("POST", collection, new ParameterizedCollectionType<T1>(memberClass),
+        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType<T1>(memberClass),
                               responseClass, responseClass);
         return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
     }
@@ -500,7 +501,7 @@ public class WebClient extends AbstractClient {
     public <T1, T2> Collection<? extends T2> postAndGetCollection(Object collection, 
                                                                   Class<T1> memberClass, 
                                                                   Class<T2> responseClass) {
-        Response r = doInvoke("POST", collection, new ParameterizedCollectionType<T1>(memberClass), 
+        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType<T1>(memberClass), 
                               Collection.class, new ParameterizedCollectionType<T2>(responseClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
@@ -514,7 +515,7 @@ public class WebClient extends AbstractClient {
      */
     public <T> Collection<? extends T> postObjectGetCollection(Object body, 
                                                                   Class<T> responseClass) {
-        Response r = doInvoke("POST", body, null, Collection.class, 
+        Response r = doInvoke(HttpMethod.POST, body, null, Collection.class, 
                               new ParameterizedCollectionType<T>(responseClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
@@ -526,7 +527,7 @@ public class WebClient extends AbstractClient {
      * @return typed collection
      */
     public <T> Collection<? extends T> postAndGetCollection(Object body, Class<T> memberClass) {
-        return invokeAndGetCollection("POST", body, memberClass);
+        return invokeAndGetCollection(HttpMethod.POST, body, memberClass);
     }
     
     /**
@@ -536,7 +537,7 @@ public class WebClient extends AbstractClient {
      * @return typed collection
      */
     public <T> Collection<? extends T> getCollection(Class<T> memberClass) {
-        return invokeAndGetCollection("GET", null, memberClass);
+        return invokeAndGetCollection(HttpMethod.GET, null, memberClass);
     }
     
     /**
@@ -547,7 +548,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T get(Class<T> responseClass) {
-        return invoke("GET", null, responseClass);
+        return invoke(HttpMethod.GET, null, responseClass);
     }
     
 
@@ -558,7 +559,7 @@ public class WebClient extends AbstractClient {
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T get(GenericType<T> responseType) {
-        return invoke("GET", null, responseType);
+        return invoke(HttpMethod.GET, null, responseType);
     }
     
     /**
@@ -568,7 +569,7 @@ public class WebClient extends AbstractClient {
      * @return the future
      */
     public <T> Future<T> get(InvocationCallback<T> callback) {
-        return doInvokeAsyncCallback("GET", null, null, null, callback);
+        return doInvokeAsyncCallback(HttpMethod.GET, null, null, null, callback);
     }
     
     /**
@@ -1187,17 +1188,17 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> get(Class<T> responseType) {
-            return method("GET", responseType);
+            return method(HttpMethod.GET, responseType);
         }
 
         @Override
         public <T> Future<T> get(GenericType<T> responseType) {
-            return method("GET", responseType);
+            return method(HttpMethod.GET, responseType);
         }
 
         @Override
         public <T> Future<T> get(InvocationCallback<T> callback) {
-            return method("GET", callback);
+            return method(HttpMethod.GET, callback);
         }
 
         @Override
@@ -1207,17 +1208,17 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> put(Entity<?> entity, Class<T> responseType) {
-            return method("PUT", entity, responseType);
+            return method(HttpMethod.PUT, entity, responseType);
         }
 
         @Override
         public <T> Future<T> put(Entity<?> entity, GenericType<T> responseType) {
-            return method("PUT", entity, responseType);
+            return method(HttpMethod.PUT, entity, responseType);
         }
 
         @Override
         public <T> Future<T> put(Entity<?> entity, InvocationCallback<T> callback) {
-            return method("PUT", entity, callback);
+            return method(HttpMethod.PUT, entity, callback);
         }
 
         @Override
@@ -1227,17 +1228,17 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> post(Entity<?> entity, Class<T> responseType) {
-            return method("POST", entity, responseType);
+            return method(HttpMethod.POST, entity, responseType);
         }
 
         @Override
         public <T> Future<T> post(Entity<?> entity, GenericType<T> responseType) {
-            return method("POST", entity, responseType);
+            return method(HttpMethod.POST, entity, responseType);
         }
 
         @Override
         public <T> Future<T> post(Entity<?> entity, InvocationCallback<T> callback) {
-            return method("POST", entity, callback);
+            return method(HttpMethod.POST, entity, callback);
         }
 
         @Override
@@ -1247,27 +1248,27 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> delete(Class<T> responseType) {
-            return method("DELETE", responseType);
+            return method(HttpMethod.DELETE, responseType);
         }
 
         @Override
         public <T> Future<T> delete(GenericType<T> responseType) {
-            return method("DELETE", responseType);
+            return method(HttpMethod.DELETE, responseType);
         }
 
         @Override
         public <T> Future<T> delete(InvocationCallback<T> callback) {
-            return method("DELETE", callback);
+            return method(HttpMethod.DELETE, callback);
         }
 
         @Override
         public Future<Response> head() {
-            return method("HEAD");
+            return method(HttpMethod.HEAD);
         }
 
         @Override
         public Future<Response> head(InvocationCallback<Response> callback) {
-            return method("HEAD", callback);
+            return method(HttpMethod.HEAD, callback);
         }
 
         @Override
@@ -1277,17 +1278,17 @@ public class WebClient extends AbstractClient {
 
         @Override
         public <T> Future<T> options(Class<T> responseType) {
-            return method("OPTIONS", responseType);
+            return method(HttpMethod.OPTIONS, responseType);
         }
 
         @Override
         public <T> Future<T> options(GenericType<T> responseType) {
-            return method("OPTIONS", responseType);
+            return method(HttpMethod.OPTIONS, responseType);
         }
 
         @Override
         public <T> Future<T> options(InvocationCallback<T> callback) {
-            return method("OPTIONS", callback);
+            return method(HttpMethod.OPTIONS, callback);
         }
 
         @Override

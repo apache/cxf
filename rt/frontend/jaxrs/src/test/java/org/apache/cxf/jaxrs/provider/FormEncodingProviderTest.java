@@ -28,10 +28,10 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
@@ -62,7 +62,7 @@ public class FormEncodingProviderTest extends Assert {
         InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
         Form form = ferp.readFrom(Form.class, null, 
                 new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
-        MultivaluedMap<String, String> mvMap = form.getData();
+        MultivaluedMap<String, String> mvMap = form.asMap();
         assertEquals("Wrong entry for foo", "bar", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "far", mvMap.getFirst("boo"));
 
@@ -190,11 +190,11 @@ public class FormEncodingProviderTest extends Assert {
     
     @Test
     public void testWriteForm() throws Exception {
-        Form form = new Form();
+        Form form = new Form(new MetadataMap<String, String>());
         ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
         FormEncodingProvider<Form> ferp 
             = new FormEncodingProvider<Form>();
-        ferp.writeTo(form.set("a", "a1").set("b", "b1"), Form.class, Form.class, 
+        ferp.writeTo(form.param("a", "a1").param("b", "b1"), Form.class, Form.class, 
                      new Annotation[0], MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
                      new MetadataMap<String, Object>(), bos);
         String result = bos.toString();

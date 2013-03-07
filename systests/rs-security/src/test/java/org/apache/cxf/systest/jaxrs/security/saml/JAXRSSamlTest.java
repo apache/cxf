@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
@@ -32,7 +33,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
@@ -85,7 +86,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_XML);
         try {
-            Book book = wc.post(new Form().set("name", "CXF").set("id", 125),
+            Book book = wc.post(new Form(new MetadataMap<String, String>()).param("name", "CXF").param("id", "125"),
                                 Book.class);                
             assertEquals(125L, book.getId());
         } catch (WebApplicationException ex) {
@@ -142,7 +143,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_XML);
         try {
-            Book book = wc.post(new Form().set("name", "CXF").set("id", 125),
+            Book book = wc.post(new Form(new MetadataMap<String, String>()).param("name", "CXF").param("id", "125"),
                                 Book.class);                
             assertEquals(125L, book.getId());
         } catch (WebApplicationException ex) {

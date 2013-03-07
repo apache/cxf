@@ -31,6 +31,7 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -38,7 +39,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -209,7 +209,7 @@ public class FormEncodingProvider<T> implements
         throws IOException, WebApplicationException {
         
         MultivaluedMap<String, String> map = 
-            (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).getData() : obj);
+            (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).asMap() : obj);
         boolean encoded = keepEncoded(anns);
         
         String enc = HttpUtils.getSetEncoding(mt, headers, "UTF-8");

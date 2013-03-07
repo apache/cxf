@@ -21,12 +21,12 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.io.InputStream;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.systest.jaxrs.Book;
 
 import org.junit.BeforeClass;
@@ -54,7 +54,7 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms", 
                                         "foo", "bar", null);
         wc.accept("application/xml");
-        Response r = wc.form(new Form().set("name", "CXF Rocks").set("id", "123"));
+        Response r = wc.form(new Form().param("name", "CXF Rocks").param("id", "123"));
         
         Book b = readBook((InputStream)r.getEntity());
         assertEquals("CXF Rocks", b.getName());
@@ -67,7 +67,7 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms2", 
                                         "foo", "bar", null);
         wc.accept("application/xml");
-        Response r = wc.form(new Form().set("name", "CXF Rocks").set("id", "123"));
+        Response r = wc.form(new Form().param("name", "CXF Rocks").param("id", "123"));
         
         Book b = readBook((InputStream)r.getEntity());
         assertEquals("CXF Rocks", b.getName());

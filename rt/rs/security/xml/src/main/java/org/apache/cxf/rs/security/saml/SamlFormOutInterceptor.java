@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -29,7 +30,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -68,7 +68,7 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
     }
         
     protected void updateForm(Form form, String encodedToken) {
-        form.set(SAML_ELEMENT, encodedToken);
+        form.param(SAML_ELEMENT, encodedToken);
     }
     
     @SuppressWarnings("unchecked")

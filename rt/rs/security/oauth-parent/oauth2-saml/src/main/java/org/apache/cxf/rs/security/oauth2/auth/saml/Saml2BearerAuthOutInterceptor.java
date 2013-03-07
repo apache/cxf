@@ -18,8 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth2.auth.saml;
 
+import javax.ws.rs.core.Form;
+
 import org.apache.cxf.common.util.Base64Exception;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.rs.security.oauth2.saml.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.saml.SamlFormOutInterceptor;
@@ -28,8 +29,8 @@ public class Saml2BearerAuthOutInterceptor extends SamlFormOutInterceptor {
 
     @Override
     protected void updateForm(Form form, String encodedToken) {
-        form.set(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
-        form.set(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedToken);
+        form.param(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
+        form.param(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedToken);
     }
     
     @Override

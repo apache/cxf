@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.UriBuilder;
 
 import net.oauth.OAuth;
@@ -33,7 +34,6 @@ import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 
 /**
@@ -185,8 +185,8 @@ public final class OAuthClientUtils {
         try {
             tokenService.replaceHeader("Authorization", header);
             Form form = tokenService.post(null, Form.class);
-            return new Token(form.getData().getFirst("oauth_token"),
-                    form.getData().getFirst("oauth_token_secret"));
+            return new Token(form.asMap().getFirst("oauth_token"),
+                    form.asMap().getFirst("oauth_token_secret"));
         } catch (WebApplicationException ex) {
             throw new OAuthServiceException(ex);
         }

@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -36,7 +37,7 @@ import javax.ws.rs.ext.Provider;
 
 import net.oauth.OAuth;
 
-import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 
@@ -57,7 +58,7 @@ public class OOBResponseProvider implements
         Class<OOBAuthorizationResponse> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         Form form = formProvider.readFrom(Form.class, Form.class, annotations, mt, headers, is);
-        MultivaluedMap<String, String> data = form.getData();
+        MultivaluedMap<String, String> data = form.asMap();
         OOBAuthorizationResponse resp = new OOBAuthorizationResponse();
         
         resp.setRequestToken(data.getFirst(OAuth.OAUTH_TOKEN));
@@ -84,11 +85,11 @@ public class OOBResponseProvider implements
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
         
-        Form form = new Form();
-        form.set(OAuth.OAUTH_VERIFIER, obj.getVerifier());
-        form.set(OAuth.OAUTH_TOKEN, obj.getRequestToken());
+        Form form = new Form(new MetadataMap<String, String>());
+        form.param(OAuth.OAUTH_VERIFIER, obj.getVerifier());
+        form.param(OAuth.OAUTH_TOKEN, obj.getRequestToken());
         if (obj.getState() != null) {
-            form.set(OAuthConstants.X_OAUTH_STATE, obj.getState());
+            form.param(OAuthConstants.X_OAUTH_STATE, obj.getState());
         }
         formProvider.writeTo(form, Form.class, Form.class, anns, mt, headers, os);
     }

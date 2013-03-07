@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -65,7 +66,6 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -579,7 +579,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         client.path("/bookstore/books/139/subresource4/139/CXF Rocks");
         Book bean = new Book("CXF Rocks", 139L);
         Form form = new Form();
-        form.set("name", "CXF Rocks").set("id", Long.valueOf(139L));
+        form.param("name", "CXF Rocks").param("id", Long.toString(139L));
         Book b = readBook((InputStream)client.matrix("", bean).query("", bean).form(form).getEntity());
         assertEquals(139, b.getId());
         assertEquals("CXF Rocks", b.getName());
@@ -668,9 +668,9 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:" + PORT 
             + "/test/services/rest/bookstore/books/679/subresource3";
         WebClient wc = WebClient.create(baseAddress);
-        Form f = new Form();
-        f.set("id", "679").set("name", "CXF in Action - ")
-            .set("name", "679");
+        Form f = new Form(new MetadataMap<String, String>());
+        f.param("id", "679").param("name", "CXF in Action - ")
+            .param("name", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
                           .form(f).getEntity());
         assertEquals(679, b.getId());

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -49,7 +50,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
@@ -300,9 +300,9 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks9/depth-form"; 
         WebClient wc = WebClient.create(endpointAddress);
-        Response r = wc.form(new Form().set("a", "b"));
+        Response r = wc.form(new Form().param("a", "b"));
         assertEquals(204, r.getStatus());
-        r = wc.form(new Form().set("a", "b").set("c", "b"));
+        r = wc.form(new Form().param("a", "b").param("c", "b"));
         assertEquals(413, r.getStatus());
     }
     

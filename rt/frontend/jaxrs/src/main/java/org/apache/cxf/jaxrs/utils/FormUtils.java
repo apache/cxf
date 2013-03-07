@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -43,7 +44,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
@@ -61,6 +61,17 @@ public final class FormUtils {
     private static final String CONTENT_DISPOSITION_FILES_PARAM = "files";    
     private FormUtils() {
         
+    }
+    
+    public static String formToString(Form form) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            FormUtils.writeMapToOutputStream(form.asMap(), bos, "UTF-8", false);
+            return bos.toString("UTF-8");
+        } catch (Exception ex) {
+            // will not happen
+        }
+        return "";
     }
     
     public static void restoreForm(FormEncodingProvider<Form> provider, 

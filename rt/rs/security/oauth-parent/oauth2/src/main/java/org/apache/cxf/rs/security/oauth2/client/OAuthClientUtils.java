@@ -26,12 +26,12 @@ import java.util.Map;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -210,7 +210,7 @@ public final class OAuthClientUtils {
         Form form = new Form(grant.toMap());
         if (extraParams != null) {
             for (Map.Entry<String, String> entry : extraParams.entrySet()) {
-                form.getData().add(entry.getKey(), entry.getValue());
+                form.param(entry.getKey(), entry.getValue());
             }
         }
         if (consumer != null) {
@@ -225,8 +225,8 @@ public final class OAuthClientUtils {
                 }
                 accessTokenService.header("Authorization", sb.toString());
             } else {
-                form.set(OAuthConstants.CLIENT_ID, consumer.getKey());
-                form.set(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
+                form.param(OAuthConstants.CLIENT_ID, consumer.getKey());
+                form.param(OAuthConstants.CLIENT_SECRET, consumer.getSecret());
             }
         } else {
             // in this case the AccessToken service is expected to find a mapping between
