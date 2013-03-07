@@ -23,16 +23,17 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.saml.Base64UrlUtility;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
@@ -54,8 +55,8 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         samlOAuthValidator = validator;
     }
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
-        
+    public void filter(ContainerRequestContext context) {
+        Message message = JAXRSUtils.getCurrentMessage();
         Form form = readFormData(message);    
         String assertionType = form.getData().getFirst(Constants.CLIENT_AUTH_ASSERTION_TYPE);
         String decodedAssertionType = assertionType != null ? HttpUtils.urlDecode(assertionType) : null;
@@ -79,7 +80,6 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         } catch (Exception ex) {
             throw new NotAuthorizedException(errorResponse());
         }
-        return null;
     }
     
     private Form readFormData(Message message) {

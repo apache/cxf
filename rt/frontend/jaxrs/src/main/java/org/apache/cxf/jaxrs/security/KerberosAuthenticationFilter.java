@@ -29,6 +29,9 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -40,8 +43,7 @@ import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -50,8 +52,8 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
-
-public class KerberosAuthenticationFilter implements RequestHandler {
+@PreMatching
+public class KerberosAuthenticationFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(KerberosAuthenticationFilter.class);
     
@@ -67,7 +69,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
     private String servicePrincipalName;
     private String realm;
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
         
         List<String> authHeaders = messageContext.getHttpHeaders()
             .getRequestHeader(HttpHeaders.AUTHORIZATION);
@@ -106,7 +108,7 @@ public class KerberosAuthenticationFilter implements RequestHandler {
                 gssContext.dispose();
                 gssContext = null;
             }
-
+            Message m = JAXRSUtils.getCurrentMessage();
             m.put(SecurityContext.class, 
                 new KerberosSecurityContext(new KerberosPrincipal(simpleUserName,
                                                                   complexUserName),
@@ -122,8 +124,6 @@ public class KerberosAuthenticationFilter implements RequestHandler {
             LOG.fine("PrivilegedActionException: " + e.getMessage());
             throw new NotAuthorizedException(getFaultResponse());
         }
-        
-        return null;
     }
 
     protected GSSContext createGSSContext() throws GSSException {

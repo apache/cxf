@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -31,7 +32,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.ws.security.WSPasswordCallback;
@@ -56,9 +57,10 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
         this.useDeflateEncoding = useDeflateEncoding;
     }
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {
-            return null;
+            return;
         } else {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
@@ -76,11 +78,11 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                 new MessageContextImpl(m).getHttpServletResponse().addHeader(
                     HttpHeaders.SET_COOKIE, contextCookie);
                 
-                return Response.ok(info)
+                context.abortWith(Response.ok(info)
                                .type("text/html")
                                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                                .header("Pragma", "no-cache") 
-                               .build();
+                               .build());
                 
             } catch (Exception ex) {
                 throw new InternalServerErrorException(ex);

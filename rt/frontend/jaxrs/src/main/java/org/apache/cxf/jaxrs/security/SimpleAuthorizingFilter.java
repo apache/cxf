@@ -18,24 +18,23 @@
  */
 package org.apache.cxf.jaxrs.security;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.interceptor.security.AbstractAuthorizingInInterceptor;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-public class SimpleAuthorizingFilter implements RequestHandler {
+public class SimpleAuthorizingFilter implements ContainerRequestFilter {
 
     private AbstractAuthorizingInInterceptor interceptor;
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
         try {
-            interceptor.handleMessage(m);
-            return null;
+            interceptor.handleMessage(JAXRSUtils.getCurrentMessage());
         } catch (AccessDeniedException ex) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            context.abortWith(Response.status(Response.Status.FORBIDDEN).build());
         }
     }
 

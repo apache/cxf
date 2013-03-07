@@ -24,22 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.jaxrs.JAXRSServiceImpl;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
@@ -76,20 +66,6 @@ public class RequestPreprocessorTest extends Assert {
         RequestPreprocessor sqh = new RequestPreprocessor();
         sqh.preprocess(m, new UriInfoImpl(m, null));
         assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
-    }
-    
-    @Test
-    public void testWadlQuery() {
-        Message m = mockMessage("http://localhost:8080/bar", "/bar", "_wadl", "GET");
-        ClassResourceInfo cri = 
-            ResourceUtils.createClassResourceInfo(TestResource.class, TestResource.class, true, true);
-        m.getExchange().put(Service.class, new JAXRSServiceImpl(Collections.singletonList(cri)));
-        RequestPreprocessor sqh = new RequestPreprocessor();
-        sqh.preprocess(m, new UriInfoImpl(m, null));
-        Response r = m.getExchange().get(Response.class);
-        assertNotNull(r);
-        assertEquals(MediaType.APPLICATION_XML,
-                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
     }
     
     @Test
@@ -149,14 +125,4 @@ public class RequestPreprocessorTest extends Assert {
         return m;
     }
     
-    @Path("/test")
-    private static class TestResource {
-        //suppress the unused get method warning in eclipse.   The class is private
-        //so nothing really calls the "get" method, but this is needed for the
-        //test case
-        @GET
-        public String get() {
-            return "test";
-        }
-    }
 }

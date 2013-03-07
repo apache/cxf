@@ -52,14 +52,12 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -155,21 +153,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         JAXRSUtils.runContainerResponseFilters(providerFactory, response, message, ori);
         Response updatedResponse = message.get(Response.class);
         if (updatedResponse != null) {
-            response = updatedResponse;
+            return updatedResponse;
+        } else {
+            return response;
         }
-        
-        List<ProviderInfo<ResponseHandler>> handlers = 
-            ServerProviderFactory.getInstance(message).getResponseHandlers();
-        for (ProviderInfo<ResponseHandler> rh : handlers) {
-            InjectionUtils.injectContexts(rh.getProvider(), rh, 
-                                               message.getExchange().getInMessage());
-            Response r = rh.getProvider().handleResponse(message, ori, response);
-            if (r != null) {
-                response = r;
-            }
-            
-        }
-        return response;
     }
     
     private int getStatus(Message message, int defaultValue) {

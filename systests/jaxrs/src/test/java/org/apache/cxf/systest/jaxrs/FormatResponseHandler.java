@@ -18,24 +18,27 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.xml.bind.Marshaller;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.ResponseHandler;
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.message.Message;
 
-public class FormatResponseHandler implements ResponseHandler {
+public class FormatResponseHandler implements ContainerResponseFilter {
     @Context
     private MessageContext mc;
     
-    public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
+    @Override
+    public void filter(ContainerRequestContext reqC, ContainerResponseContext respC) 
+        throws IOException {
         if (mc.getUriInfo().getQueryParameters().containsKey("_format")) {
             mc.put(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         }
-        return null;
+        
     }
 
 }

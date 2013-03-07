@@ -21,13 +21,14 @@ package org.apache.cxf.rs.security.saml;
 
 import java.net.URI;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.utils.FormUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class SamlFormInHandler extends AbstractSamlBase64InHandler {
@@ -40,7 +41,8 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
     public SamlFormInHandler() {
     }
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message message = JAXRSUtils.getCurrentMessage();
         
         Form form = readFormData(message);    
         String assertion = form.getData().getFirst(SAML_ELEMENT);
@@ -55,7 +57,8 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
             // back to IDP - at the moment assume it's URI
             UriInfoImpl ui = new UriInfoImpl(message); 
             if (!samlRequestURI.startsWith(ui.getBaseUri().toString())) {
-                return Response.status(302).location(URI.create(samlRequestURI)).build();
+                context.abortWith(Response.status(302).location(URI.create(samlRequestURI)).build());
+                return;
             }
         }
         form.getData().remove(SAML_ELEMENT);
@@ -67,7 +70,6 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
         } catch (Exception ex) {
             throwFault(ex.getMessage(), ex);
         }
-        return null;
     }
     
     private Form readFormData(Message message) {

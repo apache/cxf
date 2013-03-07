@@ -489,7 +489,7 @@ public class SelectMethodCandidatesTest extends Assert {
          
         if (mResources != null) {
             OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, null, httpMethod, 
-                                                    values, requestContentType, acceptContentTypes, true);
+                                                    values, requestContentType, acceptContentTypes);
             if (ori != null) {
                 return ori;
             }

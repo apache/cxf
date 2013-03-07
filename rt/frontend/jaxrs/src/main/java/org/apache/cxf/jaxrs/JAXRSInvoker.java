@@ -240,14 +240,15 @@ public class JAXRSInvoker extends AbstractInvoker {
                                                          httpMethod,
                                                          values,
                                                          contentType,
-                                                         acceptContentType,
-                                                         true);
+                                                         acceptContentType);
                 exchange.put(OperationResourceInfo.class, subOri);
                 inMessage.put(URITemplate.TEMPLATE_PARAMETERS, values);
             
                 if (JAXRSUtils.runContainerRequestFilters(providerFactory,
                                                       inMessage,
-                                                      false, subOri.getNameBindings())) {
+                                                      false, 
+                                                      subOri.getNameBindings(),
+                                                      true)) {
                     return new MessageContentsList(exchange.get(Response.class));
                 }
                 

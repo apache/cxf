@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -33,6 +34,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
@@ -65,19 +67,23 @@ public class WadlGeneratorTest extends Assert {
     
     @Test
     public void testWadlInJsonFormat() throws Exception {
-        WadlGenerator wg = new WadlGenerator();
-        wg.setUseJaxbContextForQnames(false);
-        wg.setIgnoreMessageWriters(false);
-        
-        wg.setExternalLinks(Collections.singletonList("json.schema"));
-        
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        final Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
         Map<String, List<String>> headers = new HashMap<String, List<String>>();
         headers.put("Accept", Collections.singletonList("application/json"));
         m.put(Message.PROTOCOL_HEADERS, headers);
-        Response r = wg.handleRequest(m, cri);
+        
+        WadlGenerator wg = new WadlGenerator() {
+            public void filter(ContainerRequestContext context) {
+                super.doFilter(context, m);
+            }
+        };
+        wg.setUseJaxbContextForQnames(false);
+        wg.setIgnoreMessageWriters(false);
+        wg.setExternalLinks(Collections.singletonList("json.schema"));
+        
+        Response r = handleRequest(wg, m);
         assertEquals("application/json",
                 r.getMetadata().getFirst("Content-Type").toString());
         
@@ -98,12 +104,15 @@ public class WadlGeneratorTest extends Assert {
             + "{\"@element\":\"Chapter\",\"@mediaType\":\"application\\/json\"}]}";
         assertTrue(s.contains(expected2));
     }
-    
+    private Response handleRequest(WadlGenerator wg, Message m) {
+        wg.filter(new ContainerRequestContextImpl(m, true, false));
+        return m.getExchange().get(Response.class);
+    }
     private Message mockMessage(String baseAddress, String pathInfo, String query,
-                                List<ClassResourceInfo> cris) throws Exception {
+                                ClassResourceInfo cri) throws Exception {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
-        e.put(Service.class, new JAXRSServiceImpl(cris));
+        e.put(Service.class, new JAXRSServiceImpl(Collections.singletonList(cri)));
         m.setExchange(e);
         control.reset();
         ServletDestination d = control.createMock(ServletDestination.class);

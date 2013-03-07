@@ -18,15 +18,17 @@
  */
 package org.apache.cxf.rs.security.oauth.filters;
 
-import javax.ws.rs.core.Context;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import net.oauth.OAuthProblemException;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
@@ -35,25 +37,24 @@ import org.apache.cxf.security.SecurityContext;
  * JAX-RS OAuth filter which can be used to protect end user endpoints
  */
 @Provider
-public class OAuthRequestFilter extends AbstractAuthFilter implements RequestHandler {
-    @Context
-    private MessageContext mc;
-   
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+@PreMatching
+public class OAuthRequestFilter extends AbstractAuthFilter implements ContainerRequestFilter {
+    
+    public void filter(ContainerRequestContext context) {
         try {
-            
+            Message m = JAXRSUtils.getCurrentMessage();
+            MessageContext mc = new MessageContextImpl(m);
             OAuthInfo info = handleOAuthRequest(mc.getHttpServletRequest());
-            setSecurityContext(m, info);
+            setSecurityContext(mc, m, info);
             
         } catch (OAuthProblemException e) {
-            return Response.status(401).header("WWW-Authenticate", "OAuth").build();
+            context.abortWith(Response.status(401).header("WWW-Authenticate", "OAuth").build());
         } catch (Exception e) {
-            return Response.status(401).header("WWW-Authenticate", "OAuth").build();
+            context.abortWith(Response.status(401).header("WWW-Authenticate", "OAuth").build());
         }
-        return null;
     }
 
-    private void setSecurityContext(Message m, OAuthInfo info) {
+    private void setSecurityContext(MessageContext mc, Message m, OAuthInfo info) {
         
         SecurityContext sc = createSecurityContext(mc.getHttpServletRequest(), info);
         m.setContent(SecurityContext.class, sc);

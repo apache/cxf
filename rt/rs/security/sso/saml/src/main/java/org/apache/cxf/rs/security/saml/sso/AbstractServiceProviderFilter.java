@@ -31,6 +31,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.PreDestroy;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
@@ -42,7 +44,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.message.Message;
@@ -55,8 +56,9 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.opensaml.saml2.core.AuthnRequest;
 
+@PreMatching
 public abstract class AbstractServiceProviderFilter extends AbstractSSOSpHandler 
-    implements RequestHandler {
+    implements ContainerRequestFilter {
     
     protected static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractServiceProviderFilter.class);

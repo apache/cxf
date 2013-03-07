@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
@@ -101,7 +100,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     @Test
     public void testPetStoreWadl() throws Exception {
         List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/resources",
-            "http://localhost:" + PORT + "/webapp/resources/petstore", 1);
+            "http://localhost:" + PORT + "/webapp/resources/", 1);
         checkPetStoreInfo(resourceEls.get(0));
     }
     
@@ -132,6 +131,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     
     private List<Element> getWadlResourcesInfo(String baseURI, String requestURI, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000);
         Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());

@@ -36,18 +36,15 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -116,13 +113,10 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         RequestPreprocessor rp = providerFactory.getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
-            if (message.getExchange().get(Response.class) != null) {
-                return;
-            }
         }
         
         // Global pre-match request filters
-        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null)) {
+        if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null, false)) {
             return;
         }
         
@@ -168,50 +162,21 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         
         OperationResourceInfo ori = null;     
-        boolean operChecked = false;
-        List<ProviderInfo<RequestHandler>> shs = providerFactory.getRequestHandlers();
-        for (ProviderInfo<RequestHandler> sh : shs) {
-            if (ori == null && !operChecked) {
-                try {                
-                    ori = JAXRSUtils.findTargetMethod(matchedResources, 
-                        message, httpMethod, matchedValues,
-                        requestContentType, acceptContentTypes, false);
-                    setExchangeProperties(message, ori, matchedValues, resources.size());
-                } catch (WebApplicationException ex) {
-                    operChecked = true;
-                }
-                
-            }
-            InjectionUtils.injectContexts(sh.getProvider(), sh, message);
-            ClassResourceInfo cri = null;
-            if (ori == null && matchedResources.size() == 1) {
-                cri = matchedResources.keySet().iterator().next();
-            } else {
-                cri = ori.getClassResourceInfo();
-            }
-            Response response = sh.getProvider().handleRequest(message, cri);
-            if (response != null) {
+        
+        try {                
+            ori = JAXRSUtils.findTargetMethod(matchedResources, message, 
+                      httpMethod, matchedValues, requestContentType, acceptContentTypes, true);
+            setExchangeProperties(message, ori, matchedValues, resources.size());
+        } catch (WebApplicationException ex) {
+            if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
+                Response response = JAXRSUtils.createResponse(resources, null, null, 200, true);
                 message.getExchange().put(Response.class, response);
                 return;
+            } else {
+                throw ex;
             }
-            
         }
         
-        if (ori == null) {
-            try {                
-                ori = JAXRSUtils.findTargetMethod(matchedResources, message, 
-                                            httpMethod, matchedValues, requestContentType, acceptContentTypes, true);
-                setExchangeProperties(message, ori, matchedValues, resources.size());
-            } catch (WebApplicationException ex) {
-                if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
-                    Response response = JAXRSUtils.createResponse(resources, null, null, 200, true);
-                    message.getExchange().put(Response.class, response);
-                    return;
-                } else {
-                    throw ex;
-                }
-            }
-        }
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Request path is: " + rawPath);
@@ -228,7 +193,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (JAXRSUtils.runContainerRequestFilters(providerFactory,
                                                   message,
                                                   false, 
-                                                  ori.getNameBindings())) {
+                                                  ori.getNameBindings(),
+                                                  false)) {
             return;
         }
         

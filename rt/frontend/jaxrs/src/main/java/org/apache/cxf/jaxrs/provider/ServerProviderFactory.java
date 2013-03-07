@@ -49,8 +49,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
@@ -70,20 +68,11 @@ public final class ServerProviderFactory extends ProviderFactory {
                         ContainerResponseFilter.class,
                         ReaderInterceptor.class,
                         WriterInterceptor.class};
-    // Server specific providers
     private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
     
-    // RequestHandler & ResponseHandler will have to be deprecated for 2.7.0
-    private List<ProviderInfo<RequestHandler>> requestHandlers = 
-        new ArrayList<ProviderInfo<RequestHandler>>(1);
-    private List<ProviderInfo<ResponseHandler>> responseHandlers = 
-        new ArrayList<ProviderInfo<ResponseHandler>>(1);
-    
-    // ContainerRequestFilter & ContainerResponseFilter are introduced in JAX-RS 2.0
     private List<ProviderInfo<ContainerRequestFilter>> preMatchContainerRequestFilters = 
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
-    //TODO: consider using List as a value type for postmatching filters
     private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters = 
         new LinkedHashMap<NameKey, ProviderInfo<ContainerRequestFilter>>();
     private Map<NameKey, ProviderInfo<ContainerResponseFilter>> postMatchContainerResponseFilters = 
@@ -92,12 +81,14 @@ public final class ServerProviderFactory extends ProviderFactory {
     private ProviderInfo<Application> application;
     private List<DynamicFeature> dynamicFeatures = new LinkedList<DynamicFeature>();
     
-    // This may be better be kept at OperationResourceInfo ? Though we may have many methods
-    // across different resources that use the same BeanParam. 
     private Map<Class<?>, BeanParamInfo> beanParams = new HashMap<Class<?>, BeanParamInfo>();
-    
+    private ProviderInfo<ContainerRequestFilter> wadlGenerator;
+        
     private ServerProviderFactory(ProviderFactory baseFactory, Bus bus) {
         super(baseFactory, bus);
+        if (baseFactory == null) {
+            wadlGenerator = new ProviderInfo<ContainerRequestFilter>(new WadlGenerator(), bus);
+        }
     }
     
     public static ServerProviderFactory getInstance() {
@@ -126,19 +117,38 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         factory = new ServerProviderFactory(null, bus);
         ProviderFactory.initBaseFactory(factory);
-        factory.setProviders(new WebApplicationExceptionMapper(),
-                             new WadlGenerator());
+        factory.setProviders(new WebApplicationExceptionMapper());
+        
         bus.setProperty(SHARED_SERVER_FACTORY, factory);
         return factory;
     }
     
     public List<ProviderInfo<ContainerRequestFilter>> getPreMatchContainerRequestFilters() {
-        return Collections.unmodifiableList(preMatchContainerRequestFilters);
+        return getContainerRequestFilters(preMatchContainerRequestFilters, true);
     }
     
     public List<ProviderInfo<ContainerRequestFilter>> getPostMatchContainerRequestFilters(List<String> names) {
-        return getPostMatchContainerFilters(postMatchContainerRequestFilters, 
-                                            names);
+        return getPostMatchContainerFilters(postMatchContainerRequestFilters, names);
+        
+    }
+    
+    private List<ProviderInfo<ContainerRequestFilter>> getContainerRequestFilters(
+        List<ProviderInfo<ContainerRequestFilter>> filters, boolean syncNeeded) {
+        ProviderInfo<ContainerRequestFilter> generator = wadlGenerator != null ? wadlGenerator 
+            : ((ServerProviderFactory)getBaseFactory()).wadlGenerator;
+        if (filters.size() == 0) {
+            return Collections.singletonList(generator);
+        } else if (!syncNeeded) {
+            filters.add(0, generator);
+            return filters;
+        } else {
+            synchronized (filters) {
+                if (filters.get(0) != generator) {
+                    filters.add(0, generator);
+                }
+            }
+            return filters;
+        }
     }
     
     public List<ProviderInfo<ContainerResponseFilter>> getContainerResponseFilters(List<String> names) {
@@ -171,34 +181,6 @@ public final class ServerProviderFactory extends ProviderFactory {
             }
         }
         return list;
-    }
-    
-    public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
-        List<ProviderInfo<RequestHandler>> handlers = null;
-        if (requestHandlers.size() == 0) {
-            handlers = ((ServerProviderFactory)getBaseFactory()).requestHandlers;
-        } else {
-            handlers = new ArrayList<ProviderInfo<RequestHandler>>();
-            boolean customWADLHandler = false;
-            for (int i = 0; i < requestHandlers.size(); i++) {
-                if (requestHandlers.get(i).getProvider() instanceof WadlGenerator) {
-                    customWADLHandler = true;
-                    break;
-                }
-            }
-            if (!customWADLHandler) {
-                // TODO : this works only because we know we only have a single 
-                // system handler which is a default WADLGenerator, think of a better approach
-                handlers.addAll(((ServerProviderFactory)getBaseFactory()).requestHandlers);    
-            }
-            handlers.addAll(requestHandlers);
-            
-        }
-        return Collections.unmodifiableList(handlers);
-    }
-    
-    public List<ProviderInfo<ResponseHandler>> getResponseHandlers() {
-        return Collections.unmodifiableList(responseHandlers);
     }
     
     public void addBeanParamInfo(BeanParamInfo bpi) {
@@ -248,26 +230,15 @@ public final class ServerProviderFactory extends ProviderFactory {
                 continue;
             }
             Class<?> oClass = ClassHelper.getRealClass(o);
-            
-            
-            if (RequestHandler.class.isAssignableFrom(oClass)) {
-                requestHandlers.add(new ProviderInfo<RequestHandler>((RequestHandler)o, getBus())); 
-            }
-            
-            if (ResponseHandler.class.isAssignableFrom(oClass)) {
-                responseHandlers.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o, getBus())); 
-            }
-            
+                        
             if (ContainerRequestFilter.class.isAssignableFrom(oClass)) {
-                addContainerFilter(postMatchRequestFilters,
-                   new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)o, getBus()),
-                   preMatchContainerRequestFilters);
+                addContainerRequestFilter(postMatchRequestFilters,
+                    new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)o, getBus()));
             }
             
             if (ContainerResponseFilter.class.isAssignableFrom(oClass)) {
-                addContainerFilter(postMatchResponseFilters,
-                   new ProviderInfo<ContainerResponseFilter>((ContainerResponseFilter)o, getBus()),
-                   null); 
+                postMatchResponseFilters.add(
+                   new ProviderInfo<ContainerResponseFilter>((ContainerResponseFilter)o, getBus())); 
             }
             
             if (DynamicFeature.class.isAssignableFrom(oClass)) {
@@ -286,21 +257,25 @@ public final class ServerProviderFactory extends ProviderFactory {
         mapContainerFilters(postMatchContainerResponseFilters, postMatchResponseFilters, false);
         
         injectContextProxies( 
-            requestHandlers, responseHandlers, exceptionMappers,
+            exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
             postMatchContainerResponseFilters.values(),
             readerInterceptors, writerInterceptors);
     }
 //CHECKSTYLE:ON
     
-    private static <T> void addContainerFilter(List<ProviderInfo<T>> postMatchFilters,
-                                               ProviderInfo<T> p,
-                                               List<ProviderInfo<T>> preMatchFilters) {
-        T filter = p.getProvider();
-        if (preMatchFilters != null && isPrematching(filter.getClass())) {
-            preMatchFilters.add(p);
+    private void addContainerRequestFilter(
+        List<ProviderInfo<ContainerRequestFilter>> postMatchFilters,
+        ProviderInfo<ContainerRequestFilter> p) {
+        ContainerRequestFilter filter = p.getProvider();
+        if (filter instanceof WadlGenerator) {
+            wadlGenerator = p; 
         } else {
-            postMatchFilters.add(p);
+            if (isPrematching(filter.getClass())) {
+                preMatchContainerRequestFilters.add(p);
+            } else {
+                postMatchFilters.add(p);
+            }
         }
         
     }
@@ -325,8 +300,6 @@ public final class ServerProviderFactory extends ProviderFactory {
     public void clearProviders() {
         super.clearProviders();
         exceptionMappers.clear();
-        requestHandlers.clear();
-        responseHandlers.clear();
         postMatchContainerRequestFilters.clear();
         postMatchContainerResponseFilters.clear();
         preMatchContainerRequestFilters.clear();
@@ -365,8 +338,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
     protected static boolean isPrematching(Class<?> filterCls) {
-        return AnnotationUtils.getAnnotation(filterCls.getAnnotations(), 
-                                      PreMatching.class) != null;
+        return AnnotationUtils.getClassAnnotation(filterCls, PreMatching.class) != null;
     }
     
     private static <T> void mapContainerFilters(Map<NameKey, ProviderInfo<T>> map,

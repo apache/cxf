@@ -131,7 +131,7 @@ public final class AnnotationUtils {
     }
 
     public static int getBindingPriority(Class<?> providerCls) {
-        Priority b = providerCls.getAnnotation(Priority.class);
+        Priority b = getClassAnnotation(providerCls, Priority.class);
         return b == null ? Priorities.USER : b.value();
     }
     public static List<String> getNameBindings(Annotation[] targetAnns) {

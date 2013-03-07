@@ -19,18 +19,20 @@
 
 package org.apache.cxf.rs.security.xml;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-public class XmlSigInHandler extends AbstractXmlSigInHandler implements RequestHandler {
+@PreMatching
+public class XmlSigInHandler extends AbstractXmlSigInHandler implements ContainerRequestFilter {
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message message = JAXRSUtils.getCurrentMessage();
         
         checkSignature(message);
         
-        return null;
     }
 }

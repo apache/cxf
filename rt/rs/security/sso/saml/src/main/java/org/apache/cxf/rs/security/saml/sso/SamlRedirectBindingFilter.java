@@ -26,6 +26,7 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -33,7 +34,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.util.Base64Utility;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.saml.DeflateEncoderDecoder;
 import org.apache.ws.security.WSPasswordCallback;
@@ -46,9 +47,10 @@ import org.opensaml.saml2.core.AuthnRequest;
 
 public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message m = JAXRSUtils.getCurrentMessage();
         if (checkSecurityContext(m)) {
-            return null;
+            return;
         } else {
             try {
                 SamlRequestInfo info = createSamlRequestInfo(m);
@@ -68,11 +70,11 @@ public class SamlRedirectBindingFilter extends AbstractServiceProviderFilter {
                                                     info.getWebAppContext(),
                                                     info.getWebAppDomain());
                 
-                return Response.seeOther(ub.build())
+                context.abortWith(Response.seeOther(ub.build())
                                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
                                .header("Pragma", "no-cache") 
                                .header(HttpHeaders.SET_COOKIE, contextCookie)
-                               .build();
+                               .build());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 throw new InternalServerErrorException(ex);

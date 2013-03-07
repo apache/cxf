@@ -139,6 +139,7 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
@@ -363,7 +364,16 @@ public final class JAXRSUtils {
         
         return null;
     }
-    
+    public static OperationResourceInfo findTargetMethod(
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
+        Message message,
+        String httpMethod, 
+        MultivaluedMap<String, String> matchedValues,
+        String requestContentType, 
+        List<MediaType> acceptContentTypes) {
+        return findTargetMethod(matchedResources, message, httpMethod, matchedValues,
+                                requestContentType, acceptContentTypes, true);
+    }
     public static OperationResourceInfo findTargetMethod(
         Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
         Message message,
@@ -371,7 +381,7 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> matchedValues,
         String requestContentType, 
         List<MediaType> acceptContentTypes,
-        boolean logNow) {
+        boolean throwException) {
         
         final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
                 
@@ -471,6 +481,10 @@ public final class JAXRSUtils {
             return ori;
         }
         
+        if (!throwException) {
+            return null;
+        }
+        
         int status;
         
         // criteria matched the least number of times will determine the error code;
@@ -495,7 +509,7 @@ public final class JAXRSUtils {
                                                    httpMethod,
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
-        if (!"OPTIONS".equalsIgnoreCase(httpMethod) && logNow) {
+        if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
             LOG.warning(errorMsg.toString());
         }
         Response response = 
@@ -1501,8 +1515,11 @@ public final class JAXRSUtils {
         return XMLUtils.convertStringToQName(name, "");
     }
     
-    public static boolean runContainerRequestFilters(ServerProviderFactory pf, Message m, boolean preMatch, 
-                                              List<String> names) {
+    public static boolean runContainerRequestFilters(ServerProviderFactory pf, 
+                                                     Message m, 
+                                                     boolean preMatch, 
+                                                     List<String> names,
+                                                     boolean sub) {
         List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
             ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);
         if (!containerFilters.isEmpty()) {
@@ -1544,5 +1561,13 @@ public final class JAXRSUtils {
                 }
             }
         }
+    }
+    
+    public static Message getCurrentMessage() {
+        return PhaseInterceptorChain.getCurrentMessage();
+    }
+    
+    public static ClassResourceInfo getRootResource(Message m) {
+        return (ClassResourceInfo)m.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
     }
 }

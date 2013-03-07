@@ -18,25 +18,26 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class XmlStreamReaderProvider implements RequestHandler {
+public class XmlStreamReaderProvider implements ContainerRequestFilter {
 
     @Context
     private MessageContext context;
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext c) throws IOException {
         String method = context.get(Message.HTTP_REQUEST_METHOD).toString();
         
         if ("PUT".equals(method)) {
@@ -44,11 +45,12 @@ public class XmlStreamReaderProvider implements RequestHandler {
             if (!"123".equals(map.getFirst("id"))) {
                 throw new RuntimeException();
             }
+            Message m = JAXRSUtils.getCurrentMessage();
             XMLStreamReader reader = 
                 StaxUtils.createXMLStreamReader(m.getContent(InputStream.class));
-            m.setContent(XMLStreamReader.class, new CustomXmlStreamReader(reader));
+            m.setContent(XMLStreamReader.class, 
+                                                      new CustomXmlStreamReader(reader));
         }
-        return null;
     }
 
 }

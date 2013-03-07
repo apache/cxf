@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 
 import org.w3c.dom.Document;
@@ -37,7 +39,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -58,8 +59,8 @@ import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.ws.security.validate.Validator;
 import org.apache.xml.security.signature.XMLSignature;
 
-
-public abstract class AbstractSamlInHandler implements RequestHandler {
+@PreMatching
+public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
 
     private static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractSamlInHandler.class);

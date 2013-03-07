@@ -24,6 +24,9 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.Configuration;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,15 +37,13 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.security.AuthenticationException;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.interceptor.security.NamePasswordCallbackHandler;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-
-public class JAASAuthenticationFilter implements RequestHandler {
+@PreMatching
+public class JAASAuthenticationFilter implements ContainerRequestFilter {
 
     private static final List<MediaType> HTML_MEDIA_TYPES = 
         Arrays.asList(MediaType.APPLICATION_XHTML_XML_TYPE, MediaType.TEXT_HTML_TYPE);
@@ -57,6 +58,12 @@ public class JAASAuthenticationFilter implements RequestHandler {
         }    
     };
     
+    @Deprecated
+    public void setRolePrefix(String name) {
+        interceptor.setRolePrefix(name);
+    }
+
+    
     public void setIgnoreBasePath(boolean ignore) {
         this.ignoreBasePath = ignore;
     }
@@ -67,11 +74,6 @@ public class JAASAuthenticationFilter implements RequestHandler {
     
     public void setLoginConfig(Configuration config) {
         interceptor.setLoginConfig(config);
-    }
-    
-    @Deprecated
-    public void setRolePrefix(String name) {
-        interceptor.setRolePrefix(name);
     }
     
     public void setRedirectURI(String uri) {
@@ -86,14 +88,14 @@ public class JAASAuthenticationFilter implements RequestHandler {
         return new NamePasswordCallbackHandler(name, password);
     }
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message m = JAXRSUtils.getCurrentMessage();
         try {
             interceptor.handleMessage(m);
-            return null;
         } catch (AuthenticationException ex) {
-            return handleAuthenticationException(ex, m);
+            context.abortWith(handleAuthenticationException(ex, m));
         } catch (SecurityException ex) {
-            return handleAuthenticationException(ex, m);
+            context.abortWith(handleAuthenticationException(ex, m));
         }
     }
 

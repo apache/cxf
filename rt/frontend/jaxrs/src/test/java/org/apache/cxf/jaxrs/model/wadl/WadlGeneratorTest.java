@@ -44,6 +44,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
@@ -74,7 +75,9 @@ public class WadlGeneratorTest extends Assert {
     @Test
     public void testNoWadl() {
         WadlGenerator wg = new WadlGenerator();
-        assertNull(wg.handleRequest(new MessageImpl(), null));
+        Message m = new MessageImpl();
+        m.setExchange(new ExchangeImpl());
+        assertNull(handleRequest(wg, m));
     }
     
     @Test
@@ -84,9 +87,8 @@ public class WadlGeneratorTest extends Assert {
         
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
@@ -101,9 +103,8 @@ public class WadlGeneratorTest extends Assert {
         
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         List<Element> grammarEls = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
@@ -137,9 +138,8 @@ public class WadlGeneratorTest extends Assert {
         
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkGrammarsWithLinks(doc.getDocumentElement(), Collections.singletonList("http://books.xsd"));
@@ -154,9 +154,8 @@ public class WadlGeneratorTest extends Assert {
         
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkGrammarsWithLinks(doc.getDocumentElement(), 
@@ -173,9 +172,8 @@ public class WadlGeneratorTest extends Assert {
         
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkGrammarsWithLinks(doc.getDocumentElement(), 
@@ -192,9 +190,8 @@ public class WadlGeneratorTest extends Assert {
         
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter");
@@ -209,9 +206,8 @@ public class WadlGeneratorTest extends Assert {
         wg.setNamespacePrefix("ns");
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
@@ -231,9 +227,8 @@ public class WadlGeneratorTest extends Assert {
         wg.setNamespacePrefix("ns");
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(TestResource.class, TestResource.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         checkDocs(doc.getDocumentElement(), "My Application", "", "");
@@ -259,9 +254,8 @@ public class WadlGeneratorTest extends Assert {
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStoreWithSingleSlash.class, 
                                                   BookStoreWithSingleSlash.class, true, true);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
-        
-        Response r = wg.handleRequest(m, cri);
+        Message m = mockMessage("http://localhost:8080/baz", "/", WadlGenerator.WADL_QUERY, cri);
+        Response r = handleRequest(wg, m);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
         List<Element> rootEls = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
@@ -303,8 +297,8 @@ public class WadlGeneratorTest extends Assert {
         List<ClassResourceInfo> cris = new ArrayList<ClassResourceInfo>();
         cris.add(cri1);
         cris.add(cri2);
-        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, cris);
-        Response r = wg.handleRequest(m, null);
+        Message m = mockMessage("http://localhost:8080/baz", "", WadlGenerator.WADL_QUERY, cris);
+        Response r = handleRequest(wg, m);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
         String wadl = r.getEntity().toString();
@@ -316,6 +310,11 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
+    private Response handleRequest(WadlGenerator wg, Message m) {
+        wg.doFilter(new ContainerRequestContextImpl(m, true, false), m);
+        return m.getExchange().get(Response.class);
+    }
+    
     private void checkGrammars(Element appElement, 
                                String bookEl,
                                String book2El, 
@@ -752,7 +751,11 @@ public class WadlGeneratorTest extends Assert {
         return resourceEls;
     }
     
-    
+    private Message mockMessage(String baseAddress, String pathInfo, String query,
+                                ClassResourceInfo cri) throws Exception {
+        return mockMessage(baseAddress, pathInfo, query, Collections.singletonList(cri));
+        
+    }
     private Message mockMessage(String baseAddress, String pathInfo, String query,
                                 List<ClassResourceInfo> cris) throws Exception {
         Message m = new MessageImpl();

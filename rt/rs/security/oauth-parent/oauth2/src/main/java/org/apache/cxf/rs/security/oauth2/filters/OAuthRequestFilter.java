@@ -25,13 +25,14 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
@@ -46,15 +47,17 @@ import org.apache.cxf.security.SecurityContext;
  * JAX-RS OAuth2 filter which can be used to protect the end-user endpoints
  */
 @Provider
-public class OAuthRequestFilter extends AbstractAccessTokenValidator implements RequestHandler {
+@PreMatching
+public class OAuthRequestFilter extends AbstractAccessTokenValidator 
+    implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthRequestFilter.class);
     
     private boolean useUserSubject;
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
-        
+    public void filter(ContainerRequestContext context) {
+        Message m = JAXRSUtils.getCurrentMessage();
         if (isCorsRequest(m)) {
-            return null;
+            return;
         }
         
         // Get the access token
@@ -94,8 +97,6 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator implements 
         oauthContext.setTokenKey(accessTokenV.getTokenKey());
         
         m.setContent(OAuthContext.class, oauthContext);
-        
-        return null;
     }
 
     protected boolean checkHttpVerb(HttpServletRequest req, List<String> verbs) {

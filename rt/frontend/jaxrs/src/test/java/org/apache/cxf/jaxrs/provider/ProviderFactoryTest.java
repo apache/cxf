@@ -35,6 +35,9 @@ import javax.activation.DataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -54,11 +57,9 @@ import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.JAXBContextProvider2;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.resources.Book;
@@ -90,34 +91,34 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomWadlHandler() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        assertEquals(1, pf.getRequestHandlers().size());
-        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
+        assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
         
         WadlGenerator wg = new WadlGenerator();
         pf.setUserProviders(Collections.singletonList(wg));
-        assertEquals(1, pf.getRequestHandlers().size());
-        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
-        assertSame(wg, pf.getRequestHandlers().get(0).getProvider());
+        assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
+        assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
+        assertSame(wg, pf.getPreMatchContainerRequestFilters().get(0).getProvider());
     }
     
     @Test
     public void testCustomTestHandler() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        assertEquals(1, pf.getRequestHandlers().size());
-        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
+        assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
         
         TestHandler th = new TestHandler();
         pf.setUserProviders(Collections.singletonList(th));
-        assertEquals(2, pf.getRequestHandlers().size());
-        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
-        assertSame(th, pf.getRequestHandlers().get(1).getProvider());
+        assertEquals(2, pf.getPreMatchContainerRequestFilters().size());
+        assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
+        assertSame(th, pf.getPreMatchContainerRequestFilters().get(1).getProvider());
     }
     
     @Test
     public void testCustomTestAndWadlHandler() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        assertEquals(1, pf.getRequestHandlers().size());
-        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
+        assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
         
         List<Object> providers = new ArrayList<Object>();
         WadlGenerator wg = new WadlGenerator();
@@ -125,9 +126,9 @@ public class ProviderFactoryTest extends Assert {
         TestHandler th = new TestHandler();
         providers.add(th);
         pf.setUserProviders(providers);
-        assertEquals(2, pf.getRequestHandlers().size());
-        assertSame(wg, pf.getRequestHandlers().get(0).getProvider());
-        assertSame(th, pf.getRequestHandlers().get(1).getProvider());
+        assertEquals(2, pf.getPreMatchContainerRequestFilters().size());
+        assertSame(wg, pf.getPreMatchContainerRequestFilters().get(0).getProvider());
+        assertSame(th, pf.getPreMatchContainerRequestFilters().get(1).getProvider());
     }
     
     
@@ -731,10 +732,11 @@ public class ProviderFactoryTest extends Assert {
         
     }
     
-    private static class TestHandler implements RequestHandler {
+    @PreMatching
+    private static class TestHandler implements ContainerRequestFilter {
 
-        public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
-            return null;
+        public void filter(ContainerRequestContext context) {
+            // complete
         }
         
     }

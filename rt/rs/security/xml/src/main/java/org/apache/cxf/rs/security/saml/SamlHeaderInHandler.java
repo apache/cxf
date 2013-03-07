@@ -21,12 +21,12 @@ package org.apache.cxf.rs.security.saml;
 
 import java.util.List;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class SamlHeaderInHandler extends AbstractSamlBase64InHandler {
@@ -36,7 +36,8 @@ public class SamlHeaderInHandler extends AbstractSamlBase64InHandler {
     @Context
     private HttpHeaders headers;
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message message = JAXRSUtils.getCurrentMessage();
         
         List<String> values = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (values == null || values.size() != 1 || !values.get(0).startsWith(SAML_AUTH)) {
@@ -49,7 +50,6 @@ public class SamlHeaderInHandler extends AbstractSamlBase64InHandler {
         }
         
         handleToken(message, parts[1]);         
-        return null;
     }
 
     

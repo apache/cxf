@@ -21,23 +21,24 @@ package org.apache.cxf.rs.security.saml.authorization;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.interceptor.security.AccessDeniedException;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-public class ClaimsAuthorizingFilter implements RequestHandler {
+public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
 
     private ClaimsAuthorizingInterceptor interceptor = new ClaimsAuthorizingInterceptor();
     
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message message = JAXRSUtils.getCurrentMessage();
         try {
-            interceptor.handleMessage(m);
-            return null;
+            interceptor.handleMessage(message);
         } catch (AccessDeniedException ex) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            context.abortWith(Response.status(Response.Status.FORBIDDEN).build());
         }
     }
 

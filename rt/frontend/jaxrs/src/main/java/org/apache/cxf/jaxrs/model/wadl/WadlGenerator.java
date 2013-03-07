@@ -48,6 +48,8 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -88,11 +90,10 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.Oneway;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -111,7 +112,7 @@ import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 
-public class WadlGenerator implements RequestHandler {
+public class WadlGenerator implements ContainerRequestFilter {
 
     public static final String WADL_QUERY = "_wadl";
     public static final MediaType WADL_TYPE = MediaType.valueOf("application/vnd.sun.wadl+xml");
@@ -166,13 +167,18 @@ public class WadlGenerator implements RequestHandler {
         this.useSingleSlashResource = other.useSingleSlashResource;
     }
 
-    public Response handleRequest(Message m, ClassResourceInfo resource) {
-
+    public void filter(ContainerRequestContext context) {
+    
+        Message m = JAXRSUtils.getCurrentMessage();
+        doFilter(context, m);
+    }
+    
+    protected void doFilter(ContainerRequestContext context, Message m) {
         if (!"GET".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
-            return null;
+            return;
         }
 
-        UriInfo ui = new UriInfoImpl(m);
+        UriInfo ui = context.getUriInfo();
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
             if (!schemaLocationMap.isEmpty()) {
                 String path = ui.getPath(false);
@@ -180,14 +186,15 @@ public class WadlGenerator implements RequestHandler {
                     path = path.substring(1);
                 }
                 if (schemaLocationMap.containsKey(path)) {
-                    return getExistingSchema(m, ui, path);
+                    context.abortWith(getExistingSchema(m, ui, path));
                 }
             }
-            return null;
+            return;
         }
 
         if (ignoreRequests) {
-            return Response.status(404).build();
+            context.abortWith(Response.status(404).build());
+            return;
         }
 
         HttpHeaders headers = new HttpHeadersImpl(m);
@@ -198,7 +205,8 @@ public class WadlGenerator implements RequestHandler {
         
         Response response = getExistingWadl(m, ui, type);
         if (response != null) {
-            return response;
+            context.abortWith(response);
+            return;
         }
         
         boolean isJson = type == MediaType.APPLICATION_JSON_TYPE; 
@@ -215,18 +223,18 @@ public class WadlGenerator implements RequestHandler {
         StringBuilder sbResources = new StringBuilder();
         sbResources.append("<resources base=\"").append(getBaseURI(m, ui)).append("\">");
 
-        List<ClassResourceInfo> cris = getResourcesList(m, resource);
+        List<ClassResourceInfo> cris = getResourcesList(m, ui);
 
         ResourceTypes resourceTypes =
             ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames);
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
         
-        JAXBContext context = useJaxbContextForQnames 
+        JAXBContext jaxbContext = useJaxbContextForQnames 
             ? ResourceUtils.createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
         
-        SchemaWriter schemaWriter = createSchemaWriter(resourceTypes, context, ui);
+        SchemaWriter schemaWriter = createSchemaWriter(resourceTypes, jaxbContext, ui);
         ElementQNameResolver qnameResolver =
-            schemaWriter == null ? null : createElementQNameResolver(context);
+            schemaWriter == null ? null : createElementQNameResolver(jaxbContext);
 
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
         Set<ClassResourceInfo> visitedResources = new LinkedHashSet<ClassResourceInfo>();
@@ -256,10 +264,11 @@ public class WadlGenerator implements RequestHandler {
         sbMain.append("</application>");
 
         m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, ignoreMessageWriters);
-        return Response.ok().type(type).entity(
+        Response r = Response.ok().type(type).entity(
                 createResponseEntity(sbMain.toString(), isJson)).build();
+        context.abortWith(r);
     }
-
+    
     private Object createResponseEntity(String entity, boolean isJson) {
         if (!isJson) {
             return entity;
@@ -841,9 +850,26 @@ public class WadlGenerator implements RequestHandler {
         return opsWithSamePath;
     }
 
-    public List<ClassResourceInfo> getResourcesList(Message m, ClassResourceInfo cri) {
-        return cri != null ? Collections.singletonList(cri)
-               : ((JAXRSServiceImpl)m.getExchange().get(Service.class)).getClassResourceInfos();
+    public List<ClassResourceInfo> getResourcesList(Message m, UriInfo ui) {
+        final String slash = "/";
+        String path = ui.getPath();
+        if (!path.startsWith(slash)) {
+            path = slash + path;
+        }
+        List<ClassResourceInfo> all = ((JAXRSServiceImpl)m.getExchange().get(Service.class))
+            .getClassResourceInfos();
+        if (slash.equals(path) && !ui.getAbsolutePath().getPath().endsWith(slash)) {
+            return all;
+        }
+        List<ClassResourceInfo> cris = new LinkedList<ClassResourceInfo>();
+        for (ClassResourceInfo cri : all) {
+            MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+            if (cri.getURITemplate().match(path, map)
+                && slash.equals(map.getFirst(URITemplate.FINAL_MATCH_GROUP))) {
+                cris.add(cri);
+            }
+        }
+        return cris;
     }
     
     //TODO: deal with caching later on

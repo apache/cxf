@@ -22,16 +22,16 @@ package org.apache.cxf.rs.security.saml;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
@@ -46,10 +46,11 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
     public SamlEnvelopedInHandler() {
     }
     
-    public Response handleRequest(Message message, ClassResourceInfo resourceClass) {
+    public void filter(ContainerRequestContext context) {
+        Message message = JAXRSUtils.getCurrentMessage();
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
-            return null;
+        if (HttpMethod.GET.equals(method)) {
+            return;
         }
         
         Document doc = null;
@@ -95,8 +96,6 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
                 message.setContent(InputStream.class, null);
             }
         }
-        
-        return null;
     }
     
     private Element getActualBody(Element root) {

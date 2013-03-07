@@ -18,26 +18,30 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public class XmlStreamWriterProvider implements ResponseHandler {
+public class XmlStreamWriterProvider implements ContainerResponseFilter {
 
-    public Response handleResponse(Message m, OperationResourceInfo ori, Response response) {
+    public void filter(ContainerRequestContext reqC, ContainerResponseContext respC) throws IOException {
+        Message m = JAXRSUtils.getCurrentMessage();
+        OperationResourceInfo ori = m.getExchange().get(OperationResourceInfo.class);
         String method = ori.getHttpMethod();
         if ("PUT".equals(method)) {
             XMLStreamWriter writer = 
                 StaxUtils.createXMLStreamWriter(m.getContent(OutputStream.class));
             m.setContent(XMLStreamWriter.class, new CustomXmlStreamWriter(writer));
         }
-        return null;
     }
 
 }

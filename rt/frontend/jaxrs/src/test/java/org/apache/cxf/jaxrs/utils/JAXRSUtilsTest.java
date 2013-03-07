@@ -1457,24 +1457,23 @@ public class JAXRSUtilsTest extends Assert {
         cri.setMethodDispatcher(md);
         
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", 
-              new MetadataMap<String, String>(), "*/*", getTypes("text/plain"), true);
+              new MetadataMap<String, String>(), "*/*", getTypes("text/plain"));
         
         assertSame(ori, ori2);
         
         ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
-                                              "*/*", getTypes("text/xml"), true);
+                                              "*/*", getTypes("text/xml"));
                          
         assertSame(ori, ori1);
         
         ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
-                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain,text/xml")), true);
+                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain,text/xml")));
                      
         assertSame(ori, ori2);
         ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
-                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain, text/xml,x/y")),
-                                          true);
+                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain, text/xml,x/y")));
                      
         assertSame(ori, ori2);
     }
@@ -1851,7 +1850,7 @@ public class JAXRSUtilsTest extends Assert {
         
         if (mResources != null) {
             OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, null, httpMethod, 
-                                                   values, requestContentType, acceptContentTypes, true);
+                                                   values, requestContentType, acceptContentTypes);
             if (ori != null) {
                 return ori;
             }
