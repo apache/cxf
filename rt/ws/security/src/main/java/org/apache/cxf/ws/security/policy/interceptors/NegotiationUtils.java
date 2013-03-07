@@ -46,12 +46,6 @@ import org.apache.cxf.ws.policy.EndpointPolicy;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
@@ -65,6 +59,12 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 
 /**
  * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation 
@@ -145,23 +145,23 @@ final class NegotiationUtils {
     }
 
     static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
-        Binding transport = null;
+        AbstractBinding transport = null;
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
-                transport = (Binding)ai.getAssertion();
+                transport = (AbstractBinding)ai.getAssertion();
             }                    
         } else {
             ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
             if (ais != null) {
                 for (AssertionInfo ai : ais) {
-                    transport = (Binding)ai.getAssertion();
+                    transport = (AbstractBinding)ai.getAssertion();
                 }                    
             } else {
                 ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
-                        transport = (Binding)ai.getAssertion();
+                        transport = (AbstractBinding)ai.getAssertion();
                     }                    
                 }
             }

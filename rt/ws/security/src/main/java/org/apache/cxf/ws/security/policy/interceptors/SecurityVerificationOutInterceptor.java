@@ -33,7 +33,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
-import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.wss4j.policy.SP12Constants;
 
 /**
  * Interceptor verifies critical policy security assertions for client side

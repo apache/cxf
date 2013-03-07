@@ -48,9 +48,6 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.SamlToken;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -68,6 +65,10 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AbstractToken;
+import org.apache.wss4j.policy.model.SamlToken;
+import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -175,7 +176,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         return results;
     }
 
-    protected Token assertTokens(SoapMessage message) {
+    protected AbstractToken assertTokens(SoapMessage message) {
         return assertTokens(message, SP12Constants.SAML_TOKEN, true);
     }
 
@@ -228,9 +229,10 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         }
 
         SAMLCallback samlCallback = new SAMLCallback();
-        if (token.isUseSamlVersion11Profile10() || token.isUseSamlVersion11Profile11()) {
+        SamlTokenType tokenType = token.getSamlTokenType();
+        if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
-        } else if (token.isUseSamlVersion20Profile11()) {
+        } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);

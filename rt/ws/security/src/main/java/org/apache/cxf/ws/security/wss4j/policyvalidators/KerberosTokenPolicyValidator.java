@@ -24,8 +24,8 @@ import java.util.Collection;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KerberosToken.ApReqTokenType;
 

@@ -37,8 +37,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -51,6 +49,8 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * An interceptor to add a Kerberos token to the security header of an outbound request, and to
@@ -142,7 +142,7 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
         return results;
     }
     
-    protected Token assertTokens(SoapMessage message) {
+    protected AbstractToken assertTokens(SoapMessage message) {
         return assertTokens(message, SP12Constants.KERBEROS_TOKEN, true);
     }
 

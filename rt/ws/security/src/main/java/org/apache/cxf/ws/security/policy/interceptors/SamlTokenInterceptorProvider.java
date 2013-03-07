@@ -25,8 +25,8 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.SamlTokenInterceptor;
+import org.apache.wss4j.policy.SP12Constants;
 
 /**
  * 

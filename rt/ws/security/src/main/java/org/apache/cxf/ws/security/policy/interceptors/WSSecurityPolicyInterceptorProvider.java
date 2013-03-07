@@ -25,8 +25,8 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 
 /**
  * 
@@ -61,10 +61,10 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP12Constants.ENCRYPTED_ELEMENTS);
         ASSERTION_TYPES.add(SP12Constants.SIGNED_ELEMENTS);
         ASSERTION_TYPES.add(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
-        ASSERTION_TYPES.add(SP12Constants.INSTANCE.getSupportingTokens());
-        ASSERTION_TYPES.add(SP12Constants.INSTANCE.getSignedSupportingTokens());
-        ASSERTION_TYPES.add(SP12Constants.INSTANCE.getEndorsingSupportingTokens());
-        ASSERTION_TYPES.add(SP12Constants.INSTANCE.getSignedEndorsingSupportingTokens());
+        ASSERTION_TYPES.add(SP12Constants.SUPPORTING_TOKENS);
+        ASSERTION_TYPES.add(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+        ASSERTION_TYPES.add(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        ASSERTION_TYPES.add(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
         ASSERTION_TYPES.add(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
         ASSERTION_TYPES.add(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         ASSERTION_TYPES.add(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);

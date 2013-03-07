@@ -59,8 +59,6 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -76,6 +74,8 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AsymmetricBinding;
 
 public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     protected PolicyBuilder policyBuilder;
@@ -470,8 +470,9 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         
         final AsymmetricBinding binding = (AsymmetricBinding) assertInfo.getAssertion();
         final String expectedSignatureMethod = binding.getAlgorithmSuite().getAsymmetricSignature();
-        final String expectedDigestAlgorithm = binding.getAlgorithmSuite().getDigest();
-        final String expectedCanonAlgorithm  = binding.getAlgorithmSuite().getInclusiveC14n();
+        final String expectedDigestAlgorithm = 
+            binding.getAlgorithmSuite().getAlgorithmSuiteType().getDigest();
+        final String expectedCanonAlgorithm  = binding.getAlgorithmSuite().getC14n().getValue();
             
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();

@@ -19,8 +19,10 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
@@ -40,19 +42,10 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Header;
-import org.apache.cxf.ws.security.policy.model.ProtectionToken;
-import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
-import org.apache.cxf.ws.security.policy.model.SignedEncryptedParts;
-import org.apache.cxf.ws.security.policy.model.SymmetricBinding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.cxf.ws.security.trust.DefaultSymmetricBinding;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
@@ -61,6 +54,16 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SPConstants.SPVersion;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.Header;
+import org.apache.wss4j.policy.model.ProtectionToken;
+import org.apache.wss4j.policy.model.SecureConversationToken;
+import org.apache.wss4j.policy.model.SignedParts;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.utils.Base64;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -70,18 +73,18 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     public SecureConversationInInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
-    private Binding getBinding(AssertionInfoMap aim) {
+    private AbstractBinding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
         if (ais != null && !ais.isEmpty()) {
-            return (Binding)ais.iterator().next().getAssertion();
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
         if (ais != null && !ais.isEmpty()) {
-            return (Binding)ais.iterator().next().getAssertion();
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         ais = aim.get(SP12Constants.TRANSPORT_BINDING);
         if (ais != null && !ais.isEmpty()) {
-            return (Binding)ais.iterator().next().getAssertion();
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         return null;
     }
@@ -135,31 +138,52 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
-                    PolicyBuilder pbuilder = message.getExchange().getBus()
-                        .getExtension(PolicyBuilder.class);
-                    SymmetricBinding binding = new SymmetricBinding(SP12Constants.INSTANCE, pbuilder);
-                    binding.setIncludeTimestamp(true);
-                    ProtectionToken token = new ProtectionToken(SP12Constants.INSTANCE, pbuilder);
-                    token.setToken(new SecureConversationToken(SP12Constants.INSTANCE));
-                    binding.setProtectionToken(token);
-                    binding.setEntireHeadersAndBodySignatures(true);
                     
-                    Binding origBinding = getBinding(aim);
+                    final SecureConversationToken secureConversationToken = 
+                        new SecureConversationToken(
+                            SPConstants.SPVersion.SP12,
+                            SPConstants.IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT,
+                            null,
+                            null,
+                            null,
+                            null
+                        );
+                    secureConversationToken.setOptional(true);
+                    
+                    class InternalProtectionToken extends ProtectionToken {
+                        public InternalProtectionToken(SPVersion version, Policy nestedPolicy) {
+                            super(version, nestedPolicy);
+                            super.setToken(secureConversationToken);
+                        }
+                    }
+                    
+                    DefaultSymmetricBinding binding = 
+                        new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, new Policy());
+                    binding.setProtectionToken(
+                        new InternalProtectionToken(SPConstants.SPVersion.SP12, new Policy())
+                    );
+                    binding.setIncludeTimestamp(true);
+                    binding.setOnlySignEntireHeadersAndBody(true);
+                    binding.setProtectTokens(false);
+                    
+                    AbstractBinding origBinding = getBinding(aim);
                     binding.setAlgorithmSuite(origBinding.getAlgorithmSuite());
                     all.addPolicyComponent(binding);
                     
-                    SignedEncryptedParts parts = new SignedEncryptedParts(true, 
-                                                                          SP12Constants.INSTANCE);
-                    parts.setBody(true);
+                    List<Header> headers = null;
                     if (addNs != null) {
-                        parts.addHeader(new Header("To", addNs));
-                        parts.addHeader(new Header("From", addNs));
-                        parts.addHeader(new Header("FaultTo", addNs));
-                        parts.addHeader(new Header("ReplyTO", addNs));
-                        parts.addHeader(new Header("MessageID", addNs));
-                        parts.addHeader(new Header("RelatesTo", addNs));
-                        parts.addHeader(new Header("Action", addNs));
+                        headers = new ArrayList<Header>();
+                        headers.add(new Header("To", addNs));
+                        headers.add(new Header("From", addNs));
+                        headers.add(new Header("FaultTo", addNs));
+                        headers.add(new Header("ReplyTo", addNs));
+                        headers.add(new Header("Action", addNs));
+                        headers.add(new Header("MessageID", addNs));
+                        headers.add(new Header("RelatesTo", addNs));
                     }
+                    
+                    SignedParts parts = 
+                        new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
                     all.addPolicyComponent(parts);
                     pol = p;
                     message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);

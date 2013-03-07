@@ -40,6 +40,8 @@ import org.apache.cxf.ws.security.policy.interceptors.SpnegoTokenInterceptorProv
 import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
@@ -160,10 +162,8 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP11Constants.REQUIRE_INTERNAL_REFERENCE,
             SP12Constants.REQUIRE_ISSUER_SERIAL_REFERENCE,
             SP11Constants.REQUIRE_ISSUER_SERIAL_REFERENCE,
-            new QName(SP12Constants.SP_NS, SP12Constants.ENCRYPT_BEFORE_SIGNING),
-            new QName(SP11Constants.SP_NS, SP11Constants.ENCRYPT_BEFORE_SIGNING),
-            new QName(SP12Constants.SP_NS, SP12Constants.SIGN_BEFORE_ENCRYPTING),
-            new QName(SP11Constants.SP_NS, SP11Constants.SIGN_BEFORE_ENCRYPTING),
+            SP12Constants.ENCRYPT_BEFORE_SIGNING,
+            SP12Constants.SIGN_BEFORE_ENCRYPTING,
             SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
         });

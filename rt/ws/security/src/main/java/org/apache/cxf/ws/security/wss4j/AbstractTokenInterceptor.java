@@ -48,11 +48,11 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * An abstract interceptor that can be used to form the basis of an interceptor to add and process
@@ -106,14 +106,14 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     
     protected abstract void addToken(SoapMessage message);
     
-    protected abstract Token assertTokens(SoapMessage message);
+    protected abstract AbstractToken assertTokens(SoapMessage message);
     
-    protected Token assertTokens(SoapMessage message, QName assertion, boolean signed) {
+    protected AbstractToken assertTokens(SoapMessage message, QName assertion, boolean signed) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(assertion);
-        Token tok = null;
+        AbstractToken tok = null;
         for (AssertionInfo ai : ais) {
-            tok = (Token)ai.getAssertion();
+            tok = (AbstractToken)ai.getAssertion();
             ai.setAsserted(true);                
         }
         ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
@@ -190,7 +190,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         return sh;
     }
     
-    protected String getPassword(String userName, Token info, 
+    protected String getPassword(String userName, AbstractToken info, 
                                  WSPasswordCallback.Usage usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
     
@@ -211,7 +211,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         return cb[0].getPassword();
     }
     
-    protected void policyNotAsserted(Token assertion, String reason, SoapMessage message) {
+    protected void policyNotAsserted(AbstractToken assertion, String reason, SoapMessage message) {
         if (assertion == null) {
             return;
         }
@@ -231,7 +231,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         }
     }
     
-    protected void policyNotAsserted(Token assertion, Exception reason, SoapMessage message) {
+    protected void policyNotAsserted(AbstractToken assertion, Exception reason, SoapMessage message) {
         if (assertion == null) {
             return;
         }

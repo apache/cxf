@@ -283,7 +283,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
     private void doSignBeforeEncrypt() {
         AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
         AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
-        
         String sigTokId = null;
         Element sigTokElem = null;
         

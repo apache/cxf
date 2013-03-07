@@ -42,9 +42,9 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.HttpsToken;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.HttpsToken;
 
 /**
  * 
@@ -101,7 +101,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);
                 
                 if ("https".equals(scheme)) {
-                    if (token.isRequireClientCertificate()) {
+                    if (token.getAuthenticationType() 
+                        == HttpsToken.AuthenticationType.RequireClientCertificate) {
                         final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
                         MessageTrustDecider trust = new MessageTrustDecider() {
                             public void establishTrust(String conduitName,
@@ -123,14 +124,14 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         };
                         message.put(MessageTrustDecider.class, trust);
                     }
-                    if (token.isHttpBasicAuthentication()) {
+                    if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Basic")) {
                             ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
                         }
                     }
-                    if (token.isHttpDigestAuthentication()) {
+                    if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Digest")) {
@@ -193,14 +194,14 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 HttpsToken token = (HttpsToken)ai.getAssertion();
                 
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);                
-                if (token.isHttpBasicAuthentication()) {
+                if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                     List<String> auth = headers.get("Authorization");
                     if (auth == null || auth.size() == 0 
                         || !auth.get(0).startsWith("Basic")) {
                         asserted = false;
                     }
                 }
-                if (token.isHttpDigestAuthentication()) {
+                if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
                     List<String> auth = headers.get("Authorization");
                     if (auth == null || auth.size() == 0 
                         || !auth.get(0).startsWith("Digest")) {
@@ -210,7 +211,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
 
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);                
                 if (tlsInfo != null) {
-                    if (token.isRequireClientCertificate()
+                    if (token.getAuthenticationType() 
+                        == HttpsToken.AuthenticationType.RequireClientCertificate
                         && (tlsInfo.getPeerCertificates() == null 
                             || tlsInfo.getPeerCertificates().length == 0)) {
                         asserted = false;

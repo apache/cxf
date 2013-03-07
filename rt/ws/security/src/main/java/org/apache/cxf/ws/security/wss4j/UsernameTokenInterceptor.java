@@ -42,10 +42,6 @@ import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.SupportingToken;
-import org.apache.cxf.ws.security.policy.model.UsernameToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -61,6 +57,11 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.processor.UsernameTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.UsernameToken;
 
 /**
  * 
@@ -193,7 +194,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         if (ais != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 UsernameToken policy = (UsernameToken)ai.getAssertion();
-                if (policy.isNoPassword()) {
+                if (policy.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
                     return true;
                 }
             }
@@ -240,9 +241,12 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         UsernameToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (UsernameToken)ai.getAssertion();
-            if (princ != null && tok.isHashPassword() != princ.isPasswordDigest()) {
+            if (princ != null 
+                && (tok.getPasswordType() == UsernameToken.PasswordType.HashPassword) 
+                != princ.isPasswordDigest()) {
                 ai.setNotAsserted("Password hashing policy not enforced");
-            } else if (princ != null && !tok.isNoPassword() && (princ.getPassword() == null)
+            } else if (princ != null && tok.getPasswordType() != UsernameToken.PasswordType.NoPassword 
+                && (princ.getPassword() == null)
                 && isNonEndorsingSupportingToken(tok)) {
                 ai.setNotAsserted("Username Token No Password supplied");
             } else {
@@ -267,19 +271,14 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
      * true then the corresponding UsernameToken must have a password element.
      */
     private boolean isNonEndorsingSupportingToken(
-        org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy
+        org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy
     ) {
-        SupportingToken supportingToken = usernameTokenPolicy.getSupportingToken();
-        if (supportingToken != null) {
-            SPConstants.SupportTokenType type = supportingToken.getTokenType();
-            if (type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SUPPORTING
-                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED
-                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED
-                || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED) {
-                return true;
-            }
+        AbstractSecurityAssertion supportingToken = usernameTokenPolicy.getParentAssertion();
+        if (supportingToken instanceof SupportingTokens
+            && ((SupportingTokens)supportingToken).isEndorsing()) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     protected void addToken(SoapMessage message) {
@@ -313,7 +312,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
 
         if (!StringUtils.isEmpty(userName)) {
             // If NoPassword property is set we don't need to set the password
-            if (token.isNoPassword()) {
+            if (token.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
                 WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
@@ -328,7 +327,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             if (!StringUtils.isEmpty(password)) {
                 //If the password is available then build the token
                 WSSecUsernameToken utBuilder = new WSSecUsernameToken(wssConfig);
-                if (token.isHashPassword()) {
+                if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
                 } else {
                     utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);

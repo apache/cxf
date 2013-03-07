@@ -42,11 +42,6 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.model.IssuedToken;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
@@ -64,6 +59,11 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 
 /**
  * 
@@ -342,10 +342,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         ) throws Exception {
             client.setTrust(getTrust10(aim));
             client.setTrust(getTrust13(aim));
-            client.setTemplate(itok.getRstTemplate());
-            Element policy = itok.getPolicy();
-            if (policy != null && policy.getNamespaceURI() != null) {
-                client.setWspNamespace(policy.getNamespaceURI());
+            client.setTemplate(itok.getRequestSecurityTokenTemplate());
+            String namespace = itok.getVersion().getNamespace();
+            if (namespace != null) {
+                client.setWspNamespace(namespace);
             }
             if (maps != null && maps.getNamespaceURI() != null) {
                 client.setAddressingNamespace(maps.getNamespaceURI());
@@ -395,7 +395,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     client.setTrust(getTrust10(aim));
                     client.setTrust(getTrust13(aim));
                     
-                    client.setTemplate(itok.getRstTemplate());
+                    client.setTemplate(itok.getRequestSecurityTokenTemplate());
                     return client.renewSecurityToken(tok);
                 } catch (RuntimeException e) {
                     throw e;

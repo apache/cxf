@@ -56,8 +56,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.AsymmetricBindingPolicyValidator;
@@ -89,6 +87,8 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Header;
 import org.apache.wss4j.policy.model.RequiredElements;
 import org.apache.wss4j.policy.model.RequiredParts;
@@ -514,7 +514,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             checkUsernameToken(aim, message);
             
             // stuff we can default to asserted and un-assert if a condition isn't met
-            assertPolicy(aim, SP12Constants.KEYVALUE_TOKEN);
+            assertPolicy(aim, SP12Constants.KEY_VALUE_TOKEN);
 
             message.put(WSHandlerConstants.ACTION, action.trim());
         }
