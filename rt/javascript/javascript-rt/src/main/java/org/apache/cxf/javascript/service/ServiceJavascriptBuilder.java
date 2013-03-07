@@ -55,11 +55,9 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
@@ -532,13 +530,18 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                     .appendLine("var returnObject = "
                                 + typeObjectName
                                 + "_deserialize (cxfjsutils, partElement);\n");
+                utils.appendLine("return returnObject;");
             } else if (type instanceof XmlSchemaSimpleType) {
                 XmlSchemaSimpleType simpleType = (XmlSchemaSimpleType)type;
                 utils.appendLine("var returnText = cxfjsutils.getNodeText(partElement);");
                 utils.appendLine("var returnObject = "
                                  + utils.javascriptParseExpression(simpleType, "returnText") + ";");
+                utils.appendLine("return returnObject;");
+            } else if (type != null) {
+                utils.appendLine("// Unsupported construct " + type.getClass());
+            } else {
+                utils.appendLine("// No type for element " + element.getXmlName());
             }
-            utils.appendLine("return returnObject;");
         }
         code.append("}\n");
     }
@@ -680,19 +683,6 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         return false;
     }
 
-    private XmlSchemaParticle getBuriedElement(XmlSchemaComplexType type,
-                                              QName parentName) {
-        XmlSchemaSequence sequence = getTypeSequence(type, parentName);
-        List<XmlSchemaSequenceMember> insides = sequence.getItems();
-        if (insides.size() == 1) {
-            XmlSchemaSequenceMember item = insides.get(0);
-            if (item instanceof XmlSchemaElement || item instanceof XmlSchemaAny) {
-                return (XmlSchemaParticle) item;
-            }
-        }
-        return null;
-    }
-
     /**
      * Collect information about the parts of an unwrapped message.
      * @param parts
@@ -728,32 +718,6 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
             }
 
             boolean empty = isEmptyType(type, diagnosticName);
-            // There's something funny about doc/bare. Since it's doc, there is no
-            // element in the part. There is a type. However, for some reason,
-            // it tends to be an anonymous complex type containing an element, and that
-            // element corresponds to the type of the parameter. So, we refocus on that.
-            if (!empty
-                && type instanceof XmlSchemaComplexType
-                && type.getName() == null
-                && !isWrapped) {
-                XmlSchemaParticle betterElement = getBuriedElement((XmlSchemaComplexType) type,
-                                                                  diagnosticName);
-                if (betterElement instanceof XmlSchemaElement) {
-                    element = (XmlSchemaElement)betterElement;
-                    if (element.getSchemaType() == null) {
-                        if (element.getSchemaTypeName() != null) {
-                            element.setSchemaType(xmlSchemaCollection
-                                                  .getTypeByQName(element.getSchemaTypeName()));
-                        } else if (element.getRef().getTargetQName() != null
-                            && element.getRef().getTarget().getSchemaTypeName() != null) {
-                            element = element.getRef().getTarget();
-                            element.setSchemaType(xmlSchemaCollection
-                                                  .getTypeByQName(element.getSchemaTypeName()));
-                        }
-                    }
-                    type = element.getSchemaType();
-                }
-            }
 
             String partJavascriptVar =
                 JavascriptUtils.javaScriptNameToken(mpi.getConcreteName().getLocalPart());
