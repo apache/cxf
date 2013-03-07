@@ -374,7 +374,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 URI relativePath = parentFile.relativize(new URI(file.getPath()));
                 String name = relativePath.toString().replace("\\", "/");
                 if (file.isDirectory()) {
-                    if (!name.isEmpty()) {
+                    if (!StringUtils.isEmpty(name)) {
                         if (!name.endsWith("/")) {
                             name += "/";
                         }
