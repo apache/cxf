@@ -89,6 +89,10 @@ public class JavascriptTestUtilities extends TestUtilities {
 
         public Trace() {
         }
+        //when acting as a function
+        public Trace(String msg) {
+            jsStaticFunction_trace(msg);
+        }
 
         @Override
         public String getClassName() {
