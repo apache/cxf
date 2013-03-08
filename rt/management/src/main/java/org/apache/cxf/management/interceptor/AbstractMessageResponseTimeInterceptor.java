@@ -41,6 +41,8 @@ import org.apache.cxf.service.model.OperationInfo;
 
 public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractMessageResponseTimeInterceptor.class);
+    private static final String QUESTION_MARK = "?";
+    private static final String ESCAPED_QUESTION_MARK = "\\?";
     
     AbstractMessageResponseTimeInterceptor(String phase) {
         super(phase);
@@ -114,7 +116,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             if (operationName == null) {
                 Object nameProperty = ex.get("org.apache.cxf.resource.operation.name");
                 if (nameProperty != null) {
-                    operationName = "\"" + nameProperty.toString() + "\"";
+                    operationName = "\"" + escapePatternChars(nameProperty.toString()) + "\"";
                 }
             }
             
@@ -147,4 +149,11 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         }
     }
         
+    protected String escapePatternChars(String value) {  
+        // This can be replaced if really needed with pattern-based matching
+        if (value.lastIndexOf(QUESTION_MARK) != -1) {
+            value.replace(QUESTION_MARK, ESCAPED_QUESTION_MARK);
+        }
+        return value;
+    }
 }
