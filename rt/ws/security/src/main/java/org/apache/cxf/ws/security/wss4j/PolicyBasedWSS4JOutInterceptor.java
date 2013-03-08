@@ -128,7 +128,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 }
                 if (transport == null && isRequestor(message)) {
                     Policy policy = new Policy();
-                    transport = new TransportBinding(org.apache.wss4j.policy.SPConstants.SPVersion.SP12,
+                    transport = new TransportBinding(org.apache.wss4j.policy.SPConstants.SPVersion.SP11,
                                                      policy);
                 }
                 
