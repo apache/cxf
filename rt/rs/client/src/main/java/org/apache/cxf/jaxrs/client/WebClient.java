@@ -1023,12 +1023,7 @@ public class WebClient extends AbstractClient {
         if (body != null) {
             m.getInterceptorChain().add(new BodyWriter());
         }
-        String uriString = uri.toString();
-        int questionMarkIndex = uriString.lastIndexOf("?");
-        if (questionMarkIndex != -1) {
-            uriString = uriString.replace("?", "\\?");
-        }
-        setPlainOperationNameProperty(m, httpMethod + ":" + uriString);
+        setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
         return m;
     }
     
