@@ -19,10 +19,15 @@
 
 package org.apache.cxf.ws.security.policy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -30,6 +35,7 @@ import org.apache.cxf.ws.policy.AssertionBuilderLoader;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderLoader;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
+import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider;
@@ -40,8 +46,12 @@ import org.apache.cxf.ws.security.policy.interceptors.SpnegoTokenInterceptorProv
 import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
@@ -77,6 +87,7 @@ import org.apache.wss4j.policy.builders.UsernameTokenBuilder;
 import org.apache.wss4j.policy.builders.WSS10Builder;
 import org.apache.wss4j.policy.builders.WSS11Builder;
 import org.apache.wss4j.policy.builders.X509TokenBuilder;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 @NoJSR250Annotations
 public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
@@ -166,8 +177,35 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.SIGN_BEFORE_ENCRYPTING,
             SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
+            
+            SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST,
+            SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST,
+            SP11Constants.WSS_USERNAME_TOKEN10, SP12Constants.WSS_USERNAME_TOKEN10,  
+            SP11Constants.WSS_USERNAME_TOKEN11, SP12Constants.WSS_USERNAME_TOKEN11,
+            
+            SP12Constants.HASH_PASSWORD, SP12Constants.NO_PASSWORD,
+            SP13Constants.CREATED, SP13Constants.NONCE,    
         });
-        reg.registerBuilder(new PrimitiveAssertionBuilder(others));
+        final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+        for (QName q : others) {
+            assertions.put(q, new PrimitiveAssertion(q));
+        }
+        for (String s : AlgorithmSuite.getSupportedAlgorithmSuiteNames()) {
+            QName q = new QName(SP11Constants.SP_NS, s);
+            assertions.put(q, new PrimitiveAssertion(q));
+            q = new QName(SP12Constants.SP_NS, s);
+            assertions.put(q, new PrimitiveAssertion(q));
+        }
+        reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
+            public Assertion build(Element element, AssertionBuilderFactory fact) {
+                if (XMLPrimitiveAssertionBuilder.isOptional(element)
+                    || XMLPrimitiveAssertionBuilder.isIgnorable(element)) {
+                    return super.build(element, fact);
+                }
+                QName q = new QName(element.getNamespaceURI(), element.getLocalName());
+                return assertions.get(q);
+            }            
+        });
     }
     
     public void registerProviders() {
