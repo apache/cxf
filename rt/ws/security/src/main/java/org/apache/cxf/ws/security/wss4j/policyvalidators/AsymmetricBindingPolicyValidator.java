@@ -68,7 +68,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, ai, results)) {
+            if (!checkProtectionOrder(binding, aim, ai, results)) {
                 continue;
             }
             

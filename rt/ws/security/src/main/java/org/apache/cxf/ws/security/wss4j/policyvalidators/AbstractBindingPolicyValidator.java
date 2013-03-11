@@ -241,18 +241,23 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      */
     protected boolean checkProtectionOrder(
         AbstractSymmetricAsymmetricBinding binding, 
+        AssertionInfoMap aim,
         AssertionInfo ai,
         List<WSSecurityEngineResult> results
     ) {
         ProtectionOrder protectionOrder = binding.getProtectionOrder();
-        if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) {
+        if (protectionOrder == ProtectionOrder.EncryptBeforeSigning) {
             if (!binding.isProtectTokens() && isSignedBeforeEncrypted(results)) {
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
-        } else if (isEncryptedBeforeSigned(results)) {
-            ai.setNotAsserted("Not signed before encrypted");
-            return false;
+            assertPolicy(aim, SP12Constants.ENCRYPT_BEFORE_SIGNING);
+        } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) { 
+            if (isEncryptedBeforeSigned(results)) {
+                ai.setNotAsserted("Not signed before encrypted");
+                return false;
+            }
+            assertPolicy(aim, SP12Constants.SIGN_BEFORE_ENCRYPTING);
         }
         return true;
     }

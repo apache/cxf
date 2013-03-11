@@ -64,7 +64,7 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, ai, results)) {
+            if (!checkProtectionOrder(binding, aim, ai, results)) {
                 continue;
             }
             
