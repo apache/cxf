@@ -103,9 +103,17 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
             headers.putSingle(HttpHeaders.CONTENT_TYPE, mt);
             m.put(Message.CONTENT_TYPE, mt.toString());
         }
-        m.put(List.class, entity == null ? new MessageContentsList() : new MessageContentsList(entity));
+        doSetEntity(entity);
+    }
+    
+    @Override
+    public void setEntity(Object entity) {
+        doSetEntity(entity);
     }
 
+    private void doSetEntity(Object entity) {
+        m.put(List.class, entity == null ? new MessageContentsList() : new MessageContentsList(entity));
+    }
     
     @Override
     public URI getUri() {

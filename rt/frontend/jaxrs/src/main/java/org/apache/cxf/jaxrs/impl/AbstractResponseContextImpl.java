@@ -133,6 +133,11 @@ public abstract class AbstractResponseContextImpl {
         updateMessageResponse();
     }
     
+    public void setEntity(Object entity) {
+        ((ResponseImpl)r).setEntity(entity, null);
+        updateMessageResponse();
+    }
+    
     protected Annotation[] getResponseEntityAnnotations() {
         return ((ResponseImpl)r).getEntityAnnotations();
     }

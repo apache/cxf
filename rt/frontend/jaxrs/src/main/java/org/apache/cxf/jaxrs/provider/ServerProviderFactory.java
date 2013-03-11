@@ -430,13 +430,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         
         @Override
         public FeatureContext register(Object provider, Class<?>... contracts) {
-            return register(provider, Priorities.USER, contracts);
+            return doRegister(provider, Priorities.USER, contracts);
         }
         
-        //@Override
-        public FeatureContext register(Object provider, int priority, Class<?>... contracts) {
-            return register(provider, priority, contracts);
-        }
         
         @Override
         public FeatureContext register(Object provider, Map<Class<?>, Integer> contracts) {
@@ -459,7 +455,7 @@ public final class ServerProviderFactory extends ProviderFactory {
 
         @Override
         public FeatureContext register(Class<?> providerClass, Class<?>... contracts) {
-            return register(providerClass, Priorities.USER, contracts);
+            return doRegister(providerClass, Priorities.USER, contracts);
         }
 
         @Override
@@ -469,17 +465,6 @@ public final class ServerProviderFactory extends ProviderFactory {
                 doRegister(provider, entry.getValue(), entry.getKey());
             }
             return this;
-        }
-        
-        public FeatureContext replaceWith(Configuration config) {
-            // nothing to do in this case
-            return this;
-        }
-        
-        //@Override
-        public FeatureContext register(Class<?> providerClass, int bindingPriority,
-                                         Class<?>... contracts) {
-            return doRegister(createProvider(providerClass), bindingPriority, contracts);
         }
         
         private FeatureContext doRegister(Object provider, int bindingPriority, Class<?>... contracts) {

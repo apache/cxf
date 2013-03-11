@@ -38,6 +38,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 public class LinkBuilderImpl implements Builder {
     private static final String DOUBLE_QUOTE = "\"";
     private UriBuilder ub;
+    private URI baseUri;
     private Map<String, String> params = new HashMap<String, String>(6);
     
     @Override
@@ -49,15 +50,11 @@ public class LinkBuilderImpl implements Builder {
     @Override
     public Link buildRelativized(URI requestUri, Object... values) {
         URI uri = ub.build(values);
-        URI relativized = HttpUtils.relativize(requestUri, uri);
+        
+        URI resolvedLinkUri = baseUri != null 
+            ? HttpUtils.resolve(UriBuilder.fromUri(baseUri), uri) : uri;
+        URI relativized = HttpUtils.relativize(requestUri, resolvedLinkUri);
         return new LinkImpl(relativized, params);
-    }
-
-    @Override
-    public Link buildResolved(URI baseUri, Object... values) {
-        URI uri = ub.build(values);
-        URI resolved = HttpUtils.resolve(UriBuilder.fromUri(baseUri), uri);
-        return new LinkImpl(resolved, params);
     }
 
     @Override
@@ -233,5 +230,17 @@ public class LinkBuilderImpl implements Builder {
                 return false;
             }
         }
+    }
+
+    @Override
+    public Builder baseUri(URI uri) {
+        this.baseUri = uri;
+        return this;
+    }
+
+    @Override
+    public Builder baseUri(String uri) {
+        baseUri = URI.create(uri);
+        return this;   
     }
 }

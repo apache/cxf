@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.ext.form;
 
 import javax.ws.rs.core.Form;
 
-import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 
 import org.junit.Assert;
@@ -30,7 +29,7 @@ public class FormTest extends Assert {
 
     @Test
     public void testToString() {
-        Form form = new Form(new MetadataMap<String, String>()).param("a", "b").param("c", "d");
+        Form form = new Form().param("a", "b").param("c", "d");
         assertEquals("a=b&c=d", FormUtils.formToString(form));
     }
 
