@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
@@ -33,6 +35,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.SupportingTokens;
@@ -64,7 +67,6 @@ public class UsernameTokenPolicyValidator
             org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
                 (org.apache.wss4j.policy.model.UsernameToken)ai.getAssertion();
             ai.setAsserted(true);
-
             if (!isTokenRequired(usernameTokenPolicy, message)) {
                 continue;
             }
@@ -80,6 +82,14 @@ public class UsernameTokenPolicyValidator
                 continue;
             }
         }
+        
+        assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.CREATED));
+        assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.NONCE));
+        assertPolicy(aim, SP12Constants.NO_PASSWORD);
+        assertPolicy(aim, SP12Constants.HASH_PASSWORD);
+        assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN10);
+        assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN11);
+        
         return true;
     }
     
@@ -101,6 +111,7 @@ public class UsernameTokenPolicyValidator
                 ai.setNotAsserted("Password hashing policy not enforced");
                 return false;
             }
+            
             if (isNoPassword && (usernameToken.getPassword() != null)) {
                 ai.setNotAsserted("Username Token NoPassword policy not enforced");
                 return false;
@@ -115,6 +126,7 @@ public class UsernameTokenPolicyValidator
                 ai.setNotAsserted("Username Token Created policy not enforced");
                 return false;
             }
+            
             if (usernameTokenPolicy.isNonce() 
                 && (usernameToken.getNonce() == null || usernameToken.isHashed())) {
                 ai.setNotAsserted("Username Token Nonce policy not enforced");

@@ -515,6 +515,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             
             // stuff we can default to asserted and un-assert if a condition isn't met
             assertPolicy(aim, SP12Constants.KEY_VALUE_TOKEN);
+            assertPolicy(aim, SP12Constants.RSA_KEY_VALUE);
+            assertPolicy(aim, SP12Constants.REQUIRE_ISSUER_SERIAL_REFERENCE);
+            assertPolicy(aim, SP12Constants.REQUIRE_THUMBPRINT_REFERENCE);
+            assertPolicy(aim, SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
+            
 
             message.put(WSHandlerConstants.ACTION, action.trim());
         }

@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
@@ -52,7 +54,6 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
         if (ais == null || ais.isEmpty()) {                       
             return true;
         }
-        
         for (AssertionInfo ai : ais) {
             TransportBinding binding = (TransportBinding)ai.getAssertion();
             ai.setAsserted(true);
@@ -75,6 +76,13 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
                 continue;
             }
+            assertPolicy(aim, SP12Constants.ALGORITHM_SUITE);
+            String namespace = binding.getAlgorithmSuite().getVersion().getNamespace();
+            String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
+            Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
+            for (AssertionInfo algSuiteAi : algSuiteAis) {
+                algSuiteAi.setAsserted(true);
+            }
             
             // Check the IncludeTimestamp
             if (!validateTimestamp(binding.isIncludeTimestamp(), true, results, signedResults, message)) {
@@ -90,7 +98,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             LayoutType layoutType = layout.getLayoutType();
             boolean timestampFirst = layoutType == LayoutType.LaxTsFirst;
             boolean timestampLast = layoutType == LayoutType.LaxTsLast;
-            if (!validateLayout(timestampFirst, timestampLast, results)) {
+            if (!validateLayout(aim, timestampFirst, timestampLast, results)) {
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, SP12Constants.LAYOUT, error);
                 ai.setNotAsserted(error);

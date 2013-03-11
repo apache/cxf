@@ -19,8 +19,14 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.util.Collection;
+
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -56,4 +62,14 @@ public abstract class AbstractTokenPolicyValidator {
         }
     }
     
+    protected boolean assertPolicy(AssertionInfoMap aim, QName q) {
+        Collection<AssertionInfo> ais = aim.get(q);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
 }

@@ -79,6 +79,14 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 continue;
             }
         }
+        
+        assertPolicy(aim, SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_10);
+        assertPolicy(aim, SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_11);
+        assertPolicy(aim, SP12Constants.WSS_X509_V1_TOKEN_10);
+        assertPolicy(aim, SP12Constants.WSS_X509_V1_TOKEN_11);
+        assertPolicy(aim, SP12Constants.WSS_X509_V3_TOKEN_10);
+        assertPolicy(aim, SP12Constants.WSS_X509_V3_TOKEN_11);
+        
         return true;
     }
     

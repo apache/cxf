@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
@@ -87,7 +89,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                 SamlAssertionWrapper assertionWrapper = 
                     (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 
-                if (!checkVersion(samlToken, assertionWrapper)) {
+                if (!checkVersion(aim, samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
                     continue;
                 }
@@ -132,7 +134,11 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
     /**
      * Check the policy version against the received assertion
      */
-    private boolean checkVersion(SamlToken samlToken, SamlAssertionWrapper assertionWrapper) {
+    private boolean checkVersion(
+        AssertionInfoMap aim,
+        SamlToken samlToken, 
+        SamlAssertionWrapper assertionWrapper
+    ) {
         SamlTokenType samlTokenType = samlToken.getSamlTokenType();
         if ((samlTokenType == SamlTokenType.WssSamlV11Token10
             || samlTokenType == SamlTokenType.WssSamlV11Token11)
@@ -142,6 +148,8 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }
+        
+        assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
         return true;
     }
     
