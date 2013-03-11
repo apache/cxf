@@ -133,7 +133,7 @@ public final class OAuthClientUtils {
         WebClient accessTokenService = 
             WebClient.create(accessTokenServiceUri, Collections.singletonList(provider));
         accessTokenService.accept("application/json");
-        return getAccessToken(accessTokenService, consumer, grant, true);
+        return getAccessToken(accessTokenService, consumer, grant, setAuthorizationHeader);
     }
     
     /**
