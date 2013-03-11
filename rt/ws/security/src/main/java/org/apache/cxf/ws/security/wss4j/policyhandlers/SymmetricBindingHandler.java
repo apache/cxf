@@ -954,10 +954,20 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (ais != null && ais.size() > 0) {
             return true;
         }
+        ais = aim.getAssertionInfo(SP11Constants.SIGNED_PARTS);
+        if (ais != null && ais.size() > 0) {
+            return true;
+        }
+        
         ais = aim.getAssertionInfo(SP12Constants.SIGNED_ELEMENTS);
         if (ais != null && ais.size() > 0) {
             return true;
         }
+        ais = aim.getAssertionInfo(SP11Constants.SIGNED_ELEMENTS);
+        if (ais != null && ais.size() > 0) {
+            return true;
+        }
+        
         return false;
     }
 

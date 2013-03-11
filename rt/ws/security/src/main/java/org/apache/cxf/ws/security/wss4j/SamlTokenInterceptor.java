@@ -65,6 +65,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SamlToken;
@@ -114,6 +115,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                             }
                         }
                         assertTokens(message, SP12Constants.SAML_TOKEN, signed);
+                        assertTokens(message, SP11Constants.SAML_TOKEN, signed);
                         
                         Principal principal = 
                             (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -177,7 +179,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     protected AbstractToken assertTokens(SoapMessage message) {
-        return assertTokens(message, SP12Constants.SAML_TOKEN, true);
+        AbstractToken token = assertTokens(message, SP12Constants.SAML_TOKEN, true);
+        if (token == null) {
+            token = assertTokens11(message, SP11Constants.SAML_TOKEN, true);
+        }
+        return token;
     }
 
     protected void addToken(SoapMessage message) {
@@ -190,6 +196,12 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             if (wrapper == null) {
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
                 Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SAML_TOKEN);
+                for (AssertionInfo ai : ais) {
+                    if (ai.isAsserted()) {
+                        ai.setAsserted(false);
+                    }
+                }
+                ais = aim.getAssertionInfo(SP11Constants.SAML_TOKEN);
                 for (AssertionInfo ai : ais) {
                     if (ai.isAsserted()) {
                         ai.setAsserted(false);

@@ -38,6 +38,7 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding.ProtectionOrder;
@@ -135,37 +136,27 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
      * Validate the layout assertion. It just checks the LaxTsFirst and LaxTsLast properties
      */
     protected boolean validateLayout(
-        AssertionInfoMap aim,
         boolean laxTimestampFirst,
         boolean laxTimestampLast,
         List<WSSecurityEngineResult> results
     ) {
         if (laxTimestampFirst) {
             if (results.isEmpty()) {
-                notAssertPolicy(aim, SP12Constants.LAXTSFIRST, "Layout does not match the requirements");
                 return false;
             }
             Integer firstAction = (Integer)results.get(0).get(WSSecurityEngineResult.TAG_ACTION);
             if (firstAction.intValue() != WSConstants.TS) {
-                notAssertPolicy(aim, SP12Constants.LAXTSFIRST, "Layout does not match the requirements");
                 return false;
             }
-            assertPolicy(aim, SP12Constants.LAXTSFIRST);
         } else if (laxTimestampLast) {
             if (results.isEmpty()) {
-                notAssertPolicy(aim, SP12Constants.LAXTSLAST, "Layout does not match the requirements");
                 return false;
             }
             Integer lastAction = 
                 (Integer)results.get(results.size() - 1).get(WSSecurityEngineResult.TAG_ACTION);
             if (lastAction.intValue() != WSConstants.TS) {
-                notAssertPolicy(aim, SP12Constants.LAXTSLAST, "Layout does not match the requirements");
                 return false;
             }
-            assertPolicy(aim, SP12Constants.LAXTSLAST);
-        } else {
-            assertPolicy(aim, SP12Constants.LAX);
-            assertPolicy(aim, SP12Constants.STRICT);
         }
         return true;
         
@@ -187,7 +178,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
             return false;
         }
-        assertPolicy(aim, SP12Constants.ALGORITHM_SUITE);
+        assertPolicy(aim, binding.getAlgorithmSuite());
         String namespace = binding.getAlgorithmSuite().getVersion().getNamespace();
         String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
         Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
@@ -198,24 +189,28 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         // Check the IncludeTimestamp
         if (!validateTimestamp(binding.isIncludeTimestamp(), false, results, signedResults, message)) {
             String error = "Received Timestamp does not match the requirements";
-            notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
             ai.setNotAsserted(error);
             return false;
         }
         assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
+        assertPolicy(aim, SP11Constants.INCLUDE_TIMESTAMP);
         
         // Check the Layout
         Layout layout = binding.getLayout();
         LayoutType layoutType = layout.getLayoutType();
         boolean timestampFirst = layoutType == LayoutType.LaxTsFirst;
         boolean timestampLast = layoutType == LayoutType.LaxTsLast;
-        if (!validateLayout(aim, timestampFirst, timestampLast, results)) {
+        if (!validateLayout(timestampFirst, timestampLast, results)) {
             String error = "Layout does not match the requirements";
-            notAssertPolicy(aim, SP12Constants.LAYOUT, error);
+            notAssertPolicy(aim, layout, error);
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SP12Constants.LAYOUT);
+        assertPolicy(aim, layout);
+        assertPolicy(aim, SP12Constants.LAX);
+        assertPolicy(aim, SP12Constants.STRICT);
+        assertPolicy(aim, SP11Constants.LAX);
+        assertPolicy(aim, SP11Constants.STRICT);
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isOnlySignEntireHeadersAndBody()
@@ -225,6 +220,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
+        assertPolicy(aim, SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         
         // Check whether the signatures were encrypted or not
         if (binding.isProtectTokens() && !isSignatureEncrypted(results)) {
@@ -232,6 +228,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, SP12Constants.PROTECT_TOKENS);
+        assertPolicy(aim, SP11Constants.PROTECT_TOKENS);
         
         return true;
     }
@@ -398,6 +395,17 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == token) {
                     ai.setAsserted(true);
+                }
+            }    
+        }
+    }
+    
+    protected void notAssertPolicy(AssertionInfoMap aim, Assertion token, String msg) {
+        Collection<AssertionInfo> ais = aim.get(token.getName());
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == token) {
+                    ai.setNotAsserted(msg);
                 }
             }    
         }

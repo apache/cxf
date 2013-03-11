@@ -30,6 +30,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
@@ -50,10 +51,27 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         List<WSSecurityEngineResult> encryptedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-        if (ais == null || ais.isEmpty()) {                       
-            return true;
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
         }
         
+        ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim,
+        Collection<AssertionInfo> ais,
+        Message message,
+        Element soapBody,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults,
+        List<WSSecurityEngineResult> encryptedResults
+    ) {
         boolean hasDerivedKeys = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
@@ -82,10 +100,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
                 continue;
             }
         }
-        
-        return true;
     }
-    
     
     /**
      * Check various tokens of the binding

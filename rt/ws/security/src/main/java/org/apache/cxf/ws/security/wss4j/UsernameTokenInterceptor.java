@@ -57,6 +57,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.processor.UsernameTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
@@ -200,6 +201,17 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             }
         }
         
+        ais = aim.get(SP11Constants.USERNAME_TOKEN);
+
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                UsernameToken policy = (UsernameToken)ai.getAssertion();
+                if (policy.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
+                    return true;
+                }
+            }
+        }
+        
         return false;
     }
     
@@ -228,7 +240,12 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected UsernameToken assertTokens(SoapMessage message) {
-        return (UsernameToken)assertTokens(message, SP12Constants.USERNAME_TOKEN, true);
+        UsernameToken usernameToken = 
+            (UsernameToken)assertTokens(message, SP12Constants.USERNAME_TOKEN, true);
+        if (usernameToken == null) {
+            usernameToken = (UsernameToken)assertTokens11(message, SP11Constants.USERNAME_TOKEN, true);
+        }
+        return usernameToken;
     }
     
     private UsernameToken assertTokens(
@@ -238,6 +255,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     ) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
+        if (ais == null) {
+            ais = aim.getAssertionInfo(SP11Constants.USERNAME_TOKEN);
+        }
         UsernameToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (UsernameToken)ai.getAssertion();
@@ -257,8 +277,16 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
         }
+        ais = aim.getAssertionInfo(SP11Constants.SUPPORTING_TOKENS);
+        for (AssertionInfo ai : ais) {
+            ai.setAsserted(true);
+        }
         if (signed || isTLSInUse(message)) {
             ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
+            ais = aim.getAssertionInfo(SP11Constants.SIGNED_SUPPORTING_TOKENS);
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }
@@ -290,6 +318,12 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         if (utBuilder == null) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
+            for (AssertionInfo ai : ais) {
+                if (ai.isAsserted()) {
+                    ai.setAsserted(false);
+                }
+            }
+            ais = aim.getAssertionInfo(SP11Constants.USERNAME_TOKEN);
             for (AssertionInfo ai : ais) {
                 if (ai.isAsserted()) {
                     ai.setAsserted(false);

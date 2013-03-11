@@ -54,6 +54,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.SPVersion;
@@ -75,14 +76,23 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     }
     private AbstractBinding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
+        }
         if (ais != null && !ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+        }
         if (ais != null && !ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+        }
         if (ais != null && !ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
@@ -94,6 +104,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         // extract Assertion information
         if (aim != null) {
             Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
+            if (ais == null) {
+                ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
+            }
             if (ais == null || ais.isEmpty()) {
                 return;
             }
@@ -328,6 +341,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
+                }
                 if (ais == null || ais.isEmpty()) {
                     return;
                 }
@@ -358,6 +374,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 return;
             }
             Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
+            if (ais == null) {
+                ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
+            }
             if (ais == null || ais.isEmpty()) {
                 return;
             }

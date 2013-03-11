@@ -138,6 +138,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.ISSUED_TOKEN);
+                }
                 if (ais == null || ais.isEmpty()) {
                     return;
                 }
@@ -488,6 +491,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.ISSUED_TOKEN);
+                }
                 if (ais == null) {
                     return;
                 }

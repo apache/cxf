@@ -81,6 +81,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
                 if (ais == null) {
+                    ais = aim.get(SP11Constants.HTTPS_TOKEN);
+                }
+                if (ais == null) {
                     return;
                 }
                 if (isRequestor(message)) {
@@ -159,6 +162,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.HTTPS_TOKEN);
+                }
                 if (ais == null) {
                     return;
                 }

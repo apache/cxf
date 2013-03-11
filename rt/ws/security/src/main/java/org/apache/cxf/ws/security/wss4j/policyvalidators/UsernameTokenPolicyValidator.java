@@ -34,6 +34,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -55,10 +56,30 @@ public class UsernameTokenPolicyValidator
         List<WSSecurityEngineResult> signedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
         }
         
+        ais = aim.get(SP11Constants.USERNAME_TOKEN);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+        }
+        
+        assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.CREATED));
+        assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.NONCE));
+        assertPolicy(aim, SP12Constants.NO_PASSWORD);
+        assertPolicy(aim, SP12Constants.HASH_PASSWORD);
+        assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN10);
+        assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN11);
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results
+    ) {
         List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
@@ -82,15 +103,6 @@ public class UsernameTokenPolicyValidator
                 continue;
             }
         }
-        
-        assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.CREATED));
-        assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.NONCE));
-        assertPolicy(aim, SP12Constants.NO_PASSWORD);
-        assertPolicy(aim, SP12Constants.HASH_PASSWORD);
-        assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN10);
-        assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN11);
-        
-        return true;
     }
     
     /**

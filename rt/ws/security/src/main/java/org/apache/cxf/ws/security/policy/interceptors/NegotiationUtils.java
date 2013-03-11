@@ -147,18 +147,27 @@ final class NegotiationUtils {
     static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
         AbstractBinding transport = null;
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+        }
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 transport = (AbstractBinding)ai.getAssertion();
             }                    
         } else {
             ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+            if (ais == null) {
+                ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+            }
             if (ais != null) {
                 for (AssertionInfo ai : ais) {
                     transport = (AbstractBinding)ai.getAssertion();
                 }                    
             } else {
                 ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
+                }
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
                         transport = (AbstractBinding)ai.getAssertion();

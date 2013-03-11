@@ -49,6 +49,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
@@ -112,6 +113,13 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         ai.setAsserted(true);
                     }                    
                 }
+                ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        transport = (AbstractBinding)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }                    
+                }
                 ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
@@ -119,7 +127,21 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         ai.setAsserted(true);
                     }                    
                 }
+                ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        transport = (AbstractBinding)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }                    
+                }
                 ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        transport = (AbstractBinding)ai.getAssertion();
+                        ai.setAsserted(true);
+                    }                    
+                }
+                ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
                         transport = (AbstractBinding)ai.getAssertion();
@@ -173,6 +195,12 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 }
                 
                 ais = aim.get(SP12Constants.WSS10);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        ai.setAsserted(true);
+                    }                    
+                }
+                ais = aim.get(SP11Constants.WSS10);
                 if (ais != null) {
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);

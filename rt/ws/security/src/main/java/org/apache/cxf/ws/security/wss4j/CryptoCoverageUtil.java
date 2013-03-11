@@ -125,9 +125,9 @@ public final class CryptoCoverageUtil {
         CoverageScope scope
     ) throws WSSecurityException {
         if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, null,
-                    "The " + getCoverageTypeString(type)
+            Exception ex = new Exception("The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
     }
 

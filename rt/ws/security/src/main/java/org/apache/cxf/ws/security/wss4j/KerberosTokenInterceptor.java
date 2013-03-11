@@ -49,6 +49,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -87,6 +88,7 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
                         results.add(0, rResult);
 
                         assertTokens(message, SP12Constants.KERBEROS_TOKEN, false);
+                        assertTokens(message, SP11Constants.KERBEROS_TOKEN, false);
                         
                         Principal principal = 
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -143,7 +145,11 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected AbstractToken assertTokens(SoapMessage message) {
-        return assertTokens(message, SP12Constants.KERBEROS_TOKEN, true);
+        AbstractToken token = assertTokens(message, SP12Constants.KERBEROS_TOKEN, true);
+        if (token == null) {
+            token = assertTokens11(message, SP11Constants.KERBEROS_TOKEN, true);
+        }
+        return token;
     }
 
     protected void addToken(SoapMessage message) {

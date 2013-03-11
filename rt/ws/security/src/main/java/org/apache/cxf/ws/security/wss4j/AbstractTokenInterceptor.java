@@ -51,6 +51,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -123,6 +124,28 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         
         if (signed || isTLSInUse(message)) {
             ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
+        }
+        return tok;
+    }
+    
+    protected AbstractToken assertTokens11(SoapMessage message, QName assertion, boolean signed) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(assertion);
+        AbstractToken tok = null;
+        for (AssertionInfo ai : ais) {
+            tok = (AbstractToken)ai.getAssertion();
+            ai.setAsserted(true);                
+        }
+        ais = aim.getAssertionInfo(SP11Constants.SUPPORTING_TOKENS);
+        for (AssertionInfo ai : ais) {
+            ai.setAsserted(true);
+        }
+        
+        if (signed || isTLSInUse(message)) {
+            ais = aim.getAssertionInfo(SP11Constants.SIGNED_SUPPORTING_TOKENS);
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }

@@ -165,6 +165,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     }
                 }
             }
+            
+            ais = aim.get(SP11Constants.WSS11);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    Wss11 wss11 = (Wss11)ai.getAssertion();
+                    if (wss11.isRequireSignatureConfirmation()) {
+                        message.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -193,6 +204,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim, String action, SoapMessage message
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+        }
         if (ais == null || ais.isEmpty()) {
             return action;
         }
@@ -236,6 +250,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim, String action, SoapMessage message
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+        }
         if (ais == null || ais.isEmpty()) {
             return action;
         }
@@ -288,12 +305,26 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
             }
         }
+        
+        ais = aim.get(SP11Constants.USERNAME_TOKEN);
+        
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                UsernameToken policy = (UsernameToken)ai.getAssertion();
+                if (policy.getPasswordType() == PasswordType.NoPassword) {
+                    message.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
+                }
+            }
+        }
     }
     
     private String checkSymmetricBinding(
         AssertionInfoMap aim, String action, SoapMessage message
     ) throws WSSecurityException {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+        }
         if (ais == null || ais.isEmpty()) {
             return action;
         }
@@ -515,11 +546,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             
             // stuff we can default to asserted and un-assert if a condition isn't met
             assertPolicy(aim, SP12Constants.KEY_VALUE_TOKEN);
+            assertPolicy(aim, SP11Constants.KEY_VALUE_TOKEN);
             assertPolicy(aim, SP12Constants.RSA_KEY_VALUE);
             assertPolicy(aim, SP12Constants.REQUIRE_ISSUER_SERIAL_REFERENCE);
+            assertPolicy(aim, SP11Constants.REQUIRE_ISSUER_SERIAL_REFERENCE);
             assertPolicy(aim, SP12Constants.REQUIRE_THUMBPRINT_REFERENCE);
+            assertPolicy(aim, SP11Constants.REQUIRE_THUMBPRINT_REFERENCE);
             assertPolicy(aim, SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
-            
+            assertPolicy(aim, SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
+            assertPolicy(aim, SP12Constants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
+            assertPolicy(aim, SP11Constants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
 
             message.put(WSHandlerConstants.ACTION, action.trim());
         }
@@ -587,7 +623,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         
         // relatively irrelevant stuff from a verification standpoint
-        assertPolicy(aim, SP12Constants.LAYOUT);
         assertPolicy(aim, SP12Constants.WSS10);
         assertPolicy(aim, SP12Constants.TRUST_13);
         assertPolicy(aim, SP11Constants.TRUST_10);
@@ -616,7 +651,14 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 aim, SP12Constants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED
             );
             check &= assertTokens(
+                aim, SP11Constants.SIGNED_PARTS, signed, msg, soapHeader, soapBody, CoverageType.SIGNED
+            );
+            check &= assertTokens(
                 aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, soapHeader, soapBody, 
+                CoverageType.ENCRYPTED
+            );
+            check &= assertTokens(
+                aim, SP11Constants.ENCRYPTED_PARTS, encrypted, msg, soapHeader, soapBody, 
                 CoverageType.ENCRYPTED
             );
         }
@@ -629,9 +671,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             
             check &= assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, soapEnvelope,
                     CoverageType.SIGNED, CoverageScope.ELEMENT, xpath);
+            check &= assertXPathTokens(aim, SP11Constants.SIGNED_ELEMENTS, signed, soapEnvelope,
+                    CoverageType.SIGNED, CoverageScope.ELEMENT, xpath);
             check &= assertXPathTokens(aim, SP12Constants.ENCRYPTED_ELEMENTS, encrypted, soapEnvelope,
                     CoverageType.ENCRYPTED, CoverageScope.ELEMENT, xpath);
+            check &= assertXPathTokens(aim, SP11Constants.ENCRYPTED_ELEMENTS, encrypted, soapEnvelope,
+                    CoverageType.ENCRYPTED, CoverageScope.ELEMENT, xpath);
             check &= assertXPathTokens(aim, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, 
+                    soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT, xpath);
+            check &= assertXPathTokens(aim, SP11Constants.CONTENT_ENCRYPTED_ELEMENTS, encrypted, 
                     soapEnvelope, CoverageType.ENCRYPTED, CoverageScope.CONTENT, xpath);
         }
         
@@ -799,7 +847,53 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
             }
         }
+        ais = aim.get(SP11Constants.REQUIRED_PARTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                RequiredParts rp = (RequiredParts)ai.getAssertion();
+                ai.setAsserted(true);
+                for (Header h : rp.getHeaders()) {
+                    QName qName = new QName(h.getNamespace(), h.getName());
+                    if (header == null 
+                        || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
+                        ai.setNotAsserted("No header element of name " + qName + " found.");
+                    }
+                }
+            }
+        }
+        
         ais = aim.get(SP12Constants.REQUIRED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                RequiredElements rp = (RequiredElements)ai.getAssertion();
+                ai.setAsserted(true);
+                
+                if (rp != null && rp.getXPaths() != null && !rp.getXPaths().isEmpty()) {
+                    XPathFactory factory = XPathFactory.newInstance();
+                    for (org.apache.wss4j.policy.model.XPath xPath : rp.getXPaths()) {
+                        Map<String, String> namespaces = xPath.getPrefixNamespaceMap();
+                        String expression = xPath.getXPath();
+    
+                        XPath xpath = factory.newXPath();
+                        if (namespaces != null) {
+                            xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
+                        }
+                        NodeList list;
+                        try {
+                            list = (NodeList)xpath.evaluate(expression, 
+                                                                     header,
+                                                                     XPathConstants.NODESET);
+                            if (list.getLength() == 0) {
+                                ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                            }
+                        } catch (XPathExpressionException e) {
+                            ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+        ais = aim.get(SP11Constants.REQUIRED_ELEMENTS);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 RequiredElements rp = (RequiredElements)ai.getAssertion();
@@ -836,12 +930,23 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
 
     private boolean isTransportBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+        }
         if (ais != null && ais.size() > 0) {
             ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
             if (ais != null && ais.size() > 0) {
                 return false;
             }
+            ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
+            if (ais != null && ais.size() > 0) {
+                return false;
+            }
             ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+            if (ais != null && ais.size() > 0) {
+                return false;
+            }
+            ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
             if (ais != null && ais.size() > 0) {
                 return false;
             }
@@ -852,14 +957,23 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     
     private boolean containsXPathPolicy(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SIGNED_ELEMENTS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SIGNED_ELEMENTS);
+        }
         if (ais != null && ais.size() > 0) {
             return true;
         }
         ais = aim.get(SP12Constants.ENCRYPTED_ELEMENTS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.ENCRYPTED_ELEMENTS);
+        }
         if (ais != null && ais.size() > 0) {
             return true;
         }
         ais = aim.get(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.CONTENT_ENCRYPTED_ELEMENTS);
+        }
         if (ais != null && ais.size() > 0) {
             return true;
         }

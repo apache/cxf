@@ -32,6 +32,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.X509Token.TokenType;
@@ -52,10 +53,36 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         List<WSSecurityEngineResult> signedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.X509_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
         }
         
+        ais = aim.get(SP11Constants.X509_TOKEN);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+        }
+        
+        assertPolicy(aim, SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_10);
+        assertPolicy(aim, SP11Constants.WSS_X509_PKI_PATH_V1_TOKEN_10);
+        assertPolicy(aim, SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_11);
+        assertPolicy(aim, SP11Constants.WSS_X509_PKI_PATH_V1_TOKEN_11);
+        assertPolicy(aim, SP12Constants.WSS_X509_V1_TOKEN_10);
+        assertPolicy(aim, SP11Constants.WSS_X509_V1_TOKEN_10);
+        assertPolicy(aim, SP12Constants.WSS_X509_V1_TOKEN_11);
+        assertPolicy(aim, SP11Constants.WSS_X509_V1_TOKEN_11);
+        assertPolicy(aim, SP12Constants.WSS_X509_V3_TOKEN_10);
+        assertPolicy(aim, SP11Constants.WSS_X509_V3_TOKEN_10);
+        assertPolicy(aim, SP12Constants.WSS_X509_V3_TOKEN_11);
+        assertPolicy(aim, SP11Constants.WSS_X509_V3_TOKEN_11);
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results
+    ) {
         List<WSSecurityEngineResult> bstResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST, bstResults);
         
@@ -79,15 +106,6 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
                 continue;
             }
         }
-        
-        assertPolicy(aim, SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_10);
-        assertPolicy(aim, SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_11);
-        assertPolicy(aim, SP12Constants.WSS_X509_V1_TOKEN_10);
-        assertPolicy(aim, SP12Constants.WSS_X509_V1_TOKEN_11);
-        assertPolicy(aim, SP12Constants.WSS_X509_V3_TOKEN_10);
-        assertPolicy(aim, SP12Constants.WSS_X509_V3_TOKEN_11);
-        
-        return true;
     }
     
     /**

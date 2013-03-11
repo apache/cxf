@@ -25,6 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KerberosToken.ApReqTokenType;
@@ -49,21 +50,31 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
     ) {
         Collection<AssertionInfo> krbAis = aim.get(SP12Constants.KERBEROS_TOKEN);
         if (krbAis != null && !krbAis.isEmpty()) {
-            for (AssertionInfo ai : krbAis) {
-                KerberosToken kerberosTokenPolicy = (KerberosToken)ai.getAssertion();
-                ai.setAsserted(true);
-                
-                if (!isTokenRequired(kerberosTokenPolicy, message)) {
-                    continue;
-                }
-                
-                if (!checkToken(kerberosTokenPolicy, kerberosToken)) {
-                    ai.setNotAsserted("An incorrect Kerberos Token Type is detected");
-                    continue;
-                }
+            parsePolicies(krbAis, kerberosToken);
+        }
+        
+        krbAis = aim.get(SP11Constants.KERBEROS_TOKEN);
+        if (krbAis != null && !krbAis.isEmpty()) {
+            parsePolicies(krbAis, kerberosToken);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(Collection<AssertionInfo> ais, KerberosSecurity kerberosToken) {
+        for (AssertionInfo ai : ais) {
+            KerberosToken kerberosTokenPolicy = (KerberosToken)ai.getAssertion();
+            ai.setAsserted(true);
+            
+            if (!isTokenRequired(kerberosTokenPolicy, message)) {
+                continue;
+            }
+            
+            if (!checkToken(kerberosTokenPolicy, kerberosToken)) {
+                ai.setNotAsserted("An incorrect Kerberos Token Type is detected");
+                continue;
             }
         }
-        return true;
     }
     
     private boolean checkToken(KerberosToken kerberosTokenPolicy, KerberosSecurity kerberosToken) {

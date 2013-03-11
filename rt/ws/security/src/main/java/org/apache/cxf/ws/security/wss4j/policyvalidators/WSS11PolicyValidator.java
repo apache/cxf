@@ -32,6 +32,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Wss11;
 
@@ -48,10 +49,23 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
         List<WSSecurityEngineResult> signedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.WSS11);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
         }
         
+        ais = aim.get(SP11Constants.WSS11);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,  
+        List<WSSecurityEngineResult> results
+    ) {
         List<WSSecurityEngineResult> scResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC, scResults);
         
@@ -70,7 +84,6 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
                 continue;
             }
         }
-        return true;
     }
     
 }

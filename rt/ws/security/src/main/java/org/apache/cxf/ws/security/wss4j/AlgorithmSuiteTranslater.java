@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -58,6 +59,9 @@ public final class AlgorithmSuiteTranslater {
 
         // Now look for an AlgorithmSuite for a SAML Assertion
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SAML_TOKEN);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SAML_TOKEN);
+        }
         if (ais != null && !ais.isEmpty()) {
             List<org.apache.wss4j.policy.model.AlgorithmSuite> samlAlgorithmSuites
                 = new ArrayList<org.apache.wss4j.policy.model.AlgorithmSuite>();
@@ -152,13 +156,31 @@ public final class AlgorithmSuiteTranslater {
                     bindings.add((AbstractBinding)ai.getAssertion());
                 }
             }
+            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+            if (ais != null && !ais.isEmpty()) {
+                for (AssertionInfo ai : ais) {
+                    bindings.add((AbstractBinding)ai.getAssertion());
+                }
+            }
             ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
             if (ais != null && !ais.isEmpty()) {     
                 for (AssertionInfo ai : ais) {
                     bindings.add((AbstractBinding)ai.getAssertion());
                 }
             }
+            ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+            if (ais != null && !ais.isEmpty()) {     
+                for (AssertionInfo ai : ais) {
+                    bindings.add((AbstractBinding)ai.getAssertion());
+                }
+            }
             ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+            if (ais != null && !ais.isEmpty()) {     
+                for (AssertionInfo ai : ais) {
+                    bindings.add((AbstractBinding)ai.getAssertion());
+                }
+            }
+            ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
             if (ais != null && !ais.isEmpty()) {     
                 for (AssertionInfo ai : ais) {
                     bindings.add((AbstractBinding)ai.getAssertion());

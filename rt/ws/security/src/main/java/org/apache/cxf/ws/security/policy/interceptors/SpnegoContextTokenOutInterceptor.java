@@ -38,6 +38,7 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.spnego.SpnegoClientAction;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
@@ -52,6 +53,9 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         // extract Assertion information
         if (aim != null) {
             Collection<AssertionInfo> ais = aim.get(SP12Constants.SPNEGO_CONTEXT_TOKEN);
+            if (ais == null) {
+                ais = aim.get(SP11Constants.SPNEGO_CONTEXT_TOKEN);
+            }
             if (ais == null || ais.isEmpty()) {
                 return;
             }

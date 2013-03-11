@@ -37,6 +37,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
@@ -57,14 +58,29 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SAML_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
-        }
-        
         body = soapBody;
         signed = signedResults;
         
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.SAML_TOKEN);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results, signedResults);
+        }
+        
+        ais = aim.get(SP11Constants.SAML_TOKEN);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results, signedResults);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim, 
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
         List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
@@ -113,8 +129,6 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                  */
             }
         }
-        
-        return true;
     }
     
     /**

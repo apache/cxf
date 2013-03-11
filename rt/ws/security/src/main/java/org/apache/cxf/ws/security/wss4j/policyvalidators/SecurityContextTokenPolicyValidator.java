@@ -31,6 +31,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 
@@ -48,10 +49,23 @@ public class SecurityContextTokenPolicyValidator
         List<WSSecurityEngineResult> signedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURITY_CONTEXT_TOKEN);
-        if (ais == null || ais.isEmpty()) {
-            return true;
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
+        }
+        
+        ais = aim.get(SP11Constants.SECURITY_CONTEXT_TOKEN);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message, results);
         }
 
+        return true;
+    }
+    
+    private void parsePolicies(
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results
+    ) {
         List<WSSecurityEngineResult> sctResults = new ArrayList<WSSecurityEngineResult>();
         WSSecurityUtil.fetchAllActionResults(results, WSConstants.SCT, sctResults);
 
@@ -70,7 +84,5 @@ public class SecurityContextTokenPolicyValidator
                 continue;
             }
         }
-        return true;
     }
-    
 }

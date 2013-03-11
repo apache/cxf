@@ -103,6 +103,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.KERBEROS_TOKEN);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.KERBEROS_TOKEN);
+                }
                 if (ais == null || ais.isEmpty()) {
                     return;
                 }
@@ -157,6 +160,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
             // extract Assertion information
             if (aim != null) {
                 Collection<AssertionInfo> ais = aim.get(SP12Constants.KERBEROS_TOKEN);
+                if (ais == null) {
+                    ais = aim.get(SP11Constants.KERBEROS_TOKEN);
+                }
                 if (ais == null) {
                     return;
                 }

@@ -109,6 +109,7 @@ import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
@@ -395,8 +396,10 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected WSSecTimestamp createTimestamp() {
-        Collection<AssertionInfo> ais;
-        ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.INCLUDE_TIMESTAMP);
+        }
         if (ais != null) {
             Object o = message.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
             int ttl = 300;  //default is 300 seconds
@@ -419,8 +422,10 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected WSSecTimestamp handleLayout(WSSecTimestamp timestamp) {
-        Collection<AssertionInfo> ais;
-        ais = aim.get(SP12Constants.LAYOUT);
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.LAYOUT);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.LAYOUT);
+        }
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 Layout layout = (Layout)ai.getAssertion();
@@ -1122,6 +1127,14 @@ public abstract class AbstractBindingBuilder {
                 ai.setAsserted(true);
             }            
         }
+        ais = aim.getAssertionInfo(SP11Constants.ENCRYPTED_PARTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                parts = (EncryptedParts)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        
         ais = aim.getAssertionInfo(SP12Constants.ENCRYPTED_ELEMENTS);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
@@ -1129,7 +1142,22 @@ public abstract class AbstractBindingBuilder {
                 ai.setAsserted(true);
             }            
         }
+        ais = aim.getAssertionInfo(SP11Constants.ENCRYPTED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                elements = (EncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        
         ais = aim.getAssertionInfo(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                celements = (ContentEncryptedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        ais = aim.getAssertionInfo(SP11Constants.CONTENT_ENCRYPTED_ELEMENTS);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 celements = (ContentEncryptedElements)ai.getAssertion();
@@ -1174,7 +1202,22 @@ public abstract class AbstractBindingBuilder {
                 ai.setAsserted(true);
             }            
         }
+        ais = aim.getAssertionInfo(SP11Constants.SIGNED_PARTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                parts = (SignedParts)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        
         ais = aim.getAssertionInfo(SP12Constants.SIGNED_ELEMENTS);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                elements = (SignedElements)ai.getAssertion();
+                ai.setAsserted(true);
+            }            
+        }
+        ais = aim.getAssertionInfo(SP11Constants.SIGNED_ELEMENTS);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 elements = (SignedElements)ai.getAssertion();
@@ -1691,13 +1734,27 @@ public abstract class AbstractBindingBuilder {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
             }            
-        }        
+        }
         ais = aim.getAssertionInfo(SP12Constants.WSS11);
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
             }            
-        }   
+        }
+        
+        ais = aim.getAssertionInfo(SP11Constants.WSS10);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                return (Wss10)ai.getAssertion();
+            }            
+        }  
+        ais = aim.getAssertionInfo(SP11Constants.WSS11);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                return (Wss10)ai.getAssertion();
+            }            
+        }
+        
         return null;
     }
 
@@ -2093,13 +2150,17 @@ public abstract class AbstractBindingBuilder {
     
     protected void assertSupportingTokens(List<WSEncryptionPart> sigs) {
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS));
+        assertSupportingTokens(findAndAssertPolicy(SP11Constants.SIGNED_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS));
+        assertSupportingTokens(findAndAssertPolicy(SP11Constants.ENDORSING_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS));
+        assertSupportingTokens(findAndAssertPolicy(SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants
                                                        .SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS));
+        assertSupportingTokens(findAndAssertPolicy(SP11Constants.SUPPORTING_TOKENS));
         assertSupportingTokens(findAndAssertPolicy(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS));
     }
     
@@ -2107,17 +2168,21 @@ public abstract class AbstractBindingBuilder {
         
         Collection<Assertion> sgndSuppTokens = 
             findAndAssertPolicy(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-        
-        Map<AbstractToken, Object> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens, false);           
+        Map<AbstractToken, Object> sigSuppTokMap = this.handleSupportingTokens(sgndSuppTokens, false);
+        sgndSuppTokens = findAndAssertPolicy(SP11Constants.SIGNED_SUPPORTING_TOKENS);
+        sigSuppTokMap.putAll(this.handleSupportingTokens(sgndSuppTokens, false));
         
         Collection<Assertion> endSuppTokens = 
             findAndAssertPolicy(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
-
         endSuppTokMap = this.handleSupportingTokens(endSuppTokens, true);
+        endSuppTokens = findAndAssertPolicy(SP11Constants.ENDORSING_SUPPORTING_TOKENS);
+        endSuppTokMap.putAll(this.handleSupportingTokens(endSuppTokens, true));
 
         Collection<Assertion> sgndEndSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true);
+        sgndEndSuppTokens = findAndAssertPolicy(SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        sgndEndSuppTokMap.putAll(this.handleSupportingTokens(sgndEndSuppTokens, true));
         
         Collection<Assertion> sgndEncryptedSuppTokens 
             = findAndAssertPolicy(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
@@ -2136,6 +2201,8 @@ public abstract class AbstractBindingBuilder {
 
         Collection<Assertion> supportingToks 
             = findAndAssertPolicy(SP12Constants.SUPPORTING_TOKENS);
+        this.handleSupportingTokens(supportingToks, false);
+        supportingToks = findAndAssertPolicy(SP11Constants.SUPPORTING_TOKENS);
         this.handleSupportingTokens(supportingToks, false);
 
         Collection<Assertion> encryptedSupportingToks 

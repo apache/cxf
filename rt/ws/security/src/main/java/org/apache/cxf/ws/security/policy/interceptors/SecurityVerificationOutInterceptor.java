@@ -33,6 +33,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 
 /**
@@ -60,25 +61,48 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             if (aim != null) {
                 Collection<AssertionInfo> aisTransport = aim.get(SP12Constants.TRANSPORT_BINDING);
+                if (aisTransport == null) {
+                    aisTransport = aim.get(SP11Constants.TRANSPORT_BINDING);
+                }
                 Collection<AssertionInfo> aisAssymetric = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+                if (aisAssymetric == null) {
+                    aisAssymetric = aim.get(SP11Constants.ASYMMETRIC_BINDING);
+                }
                 Collection<AssertionInfo> aisSymetric = aim.get(SP12Constants.SYMMETRIC_BINDING);
+                if (aisSymetric == null) {
+                    aisSymetric = aim.get(SP11Constants.SYMMETRIC_BINDING);
+                }
+                
                 if (((aisTransport == null) || aisTransport.isEmpty()) 
                     && ((aisAssymetric == null) || aisAssymetric.isEmpty()) 
                     && ((aisSymetric == null) || aisSymetric.isEmpty())) {
                     
                     Collection<AssertionInfo> aisSignedParts = aim.get(SP12Constants.SIGNED_PARTS);
                     checkAssertion(aisSignedParts, SP12Constants.SIGNED_PARTS);
+                    aisSignedParts = aim.get(SP11Constants.SIGNED_PARTS);
+                    checkAssertion(aisSignedParts, SP11Constants.SIGNED_PARTS);
+                    
                     Collection<AssertionInfo> aisSignedElements = aim.get(SP12Constants.SIGNED_ELEMENTS);
                     checkAssertion(aisSignedElements, SP12Constants.SIGNED_ELEMENTS);
+                    aisSignedElements = aim.get(SP11Constants.SIGNED_ELEMENTS);
+                    checkAssertion(aisSignedElements, SP11Constants.SIGNED_ELEMENTS);
                     
                     Collection<AssertionInfo> aisEncryptedParts = aim.get(SP12Constants.ENCRYPTED_PARTS);
                     checkAssertion(aisEncryptedParts, SP12Constants.ENCRYPTED_PARTS);
+                    aisEncryptedParts = aim.get(SP11Constants.ENCRYPTED_PARTS);
+                    checkAssertion(aisEncryptedParts, SP11Constants.ENCRYPTED_PARTS);
+                    
                     Collection<AssertionInfo> aisEncryptedElements = 
                         aim.get(SP12Constants.ENCRYPTED_ELEMENTS);
                     checkAssertion(aisEncryptedElements, SP12Constants.ENCRYPTED_ELEMENTS);
+                    aisEncryptedElements = aim.get(SP11Constants.ENCRYPTED_ELEMENTS);
+                    checkAssertion(aisEncryptedElements, SP11Constants.ENCRYPTED_ELEMENTS);
+                    
                     Collection<AssertionInfo> aisContentEncryptedElements = 
                         aim.get(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
                     checkAssertion(aisContentEncryptedElements, SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+                    aisContentEncryptedElements = aim.get(SP11Constants.CONTENT_ENCRYPTED_ELEMENTS);
+                    checkAssertion(aisContentEncryptedElements, SP11Constants.CONTENT_ENCRYPTED_ELEMENTS);
                 }
             }
         }

@@ -55,6 +55,7 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -169,6 +170,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         Collection<AssertionInfo> ais;
         
         ais = aim.get(SP12Constants.SIGNED_SUPPORTING_TOKENS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SIGNED_SUPPORTING_TOKENS);
+        }
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens sgndSuppTokens = (SupportingTokens)ai.getAssertion();
@@ -180,6 +184,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
         ais = aim.get(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        }
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens sgndSuppTokens = (SupportingTokens)ai.getAssertion();
@@ -191,6 +198,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
         ais = aim.get(SP12Constants.ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.ENCRYPTED_SUPPORTING_TOKENS);
+        }
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens encrSuppTokens = (SupportingTokens)ai.getAssertion();
@@ -202,6 +212,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
         ais = aim.get(SP12Constants.SUPPORTING_TOKENS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SUPPORTING_TOKENS);
+        }
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 SupportingTokens suppTokens = (SupportingTokens)ai.getAssertion();
@@ -221,6 +234,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         Collection<AssertionInfo> ais;
         
         ais = aim.get(SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        }
         if (ais != null) {
             SupportingTokens sgndSuppTokens = null;
             for (AssertionInfo ai : ais) {
@@ -235,6 +251,9 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         }
         
         ais = aim.get(SP12Constants.ENDORSING_SUPPORTING_TOKENS);
+        if (ais == null) {
+            ais = aim.get(SP11Constants.ENDORSING_SUPPORTING_TOKENS);
+        }
         if (ais != null) {
             SupportingTokens endSuppTokens = null;
             for (AssertionInfo ai : ais) {

@@ -32,6 +32,7 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
@@ -51,9 +52,36 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
         List<WSSecurityEngineResult> encryptedResults
     ) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        if (ais == null || ais.isEmpty()) {                       
-            return true;
+        boolean policyFound = false;
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results, signedResults);
+            policyFound = true;
         }
+        
+        ais = aim.get(SP11Constants.TRANSPORT_BINDING);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(aim, ais, message, results, signedResults);
+            policyFound = true;
+        }
+        
+        // We don't need to check these policies for the Transport binding
+        if (policyFound) {
+            assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
+            assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
+            assertPolicy(aim, SP12Constants.SIGNED_PARTS);
+            assertPolicy(aim, SP11Constants.SIGNED_PARTS);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(
+        AssertionInfoMap aim,
+        Collection<AssertionInfo> ais, 
+        Message message,
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
         for (AssertionInfo ai : ais) {
             TransportBinding binding = (TransportBinding)ai.getAssertion();
             ai.setAsserted(true);
@@ -76,7 +104,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             if (!algorithmValidator.validatePolicy(ai, binding.getAlgorithmSuite())) {
                 continue;
             }
-            assertPolicy(aim, SP12Constants.ALGORITHM_SUITE);
+            assertPolicy(aim, binding.getAlgorithmSuite());
             String namespace = binding.getAlgorithmSuite().getVersion().getNamespace();
             String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
             Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
@@ -92,26 +120,26 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 continue;
             }
             assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
+            assertPolicy(aim, SP11Constants.INCLUDE_TIMESTAMP);
             
             // Check the Layout
             Layout layout = binding.getLayout();
             LayoutType layoutType = layout.getLayoutType();
             boolean timestampFirst = layoutType == LayoutType.LaxTsFirst;
             boolean timestampLast = layoutType == LayoutType.LaxTsLast;
-            if (!validateLayout(aim, timestampFirst, timestampLast, results)) {
+            if (!validateLayout(timestampFirst, timestampLast, results)) {
                 String error = "Layout does not match the requirements";
-                notAssertPolicy(aim, SP12Constants.LAYOUT, error);
+                notAssertPolicy(aim, binding.getLayout(), error);
                 ai.setNotAsserted(error);
                 continue;
             }
-            assertPolicy(aim, SP12Constants.LAYOUT);
+            assertPolicy(aim, binding.getLayout());
+            assertPolicy(aim, SP12Constants.LAX);
+            assertPolicy(aim, SP12Constants.STRICT);
+            assertPolicy(aim, SP11Constants.LAX);
+            assertPolicy(aim, SP11Constants.STRICT);
         }
-        
-        // We don't need to check these policies for the Transport binding
-        assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
-        assertPolicy(aim, SP12Constants.SIGNED_PARTS);
-        
-        return true;
+
     }
     
 }

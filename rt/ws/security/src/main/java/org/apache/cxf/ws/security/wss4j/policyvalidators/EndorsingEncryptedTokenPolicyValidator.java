@@ -26,6 +26,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
@@ -55,16 +56,25 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        if (ais == null || ais.isEmpty()) {                       
-            return true;
-        }
-        
         setMessage(message);
         setResults(results);
         setSignedResults(signedResults);
         setEncryptedResults(encryptedResults);
-
+        
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message);
+        }
+        
+        ais = aim.get(SP11Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        if (ais != null && !ais.isEmpty()) {
+            parsePolicies(ais, message);
+        }
+        
+        return true;
+    }
+    
+    private void parsePolicies(Collection<AssertionInfo> ais, Message message) {
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
@@ -120,8 +130,6 @@ public class EndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTo
                 }
             }
         }
-        
-        return true;
     }
     
 }
