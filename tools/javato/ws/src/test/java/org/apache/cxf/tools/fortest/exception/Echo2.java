@@ -23,4 +23,5 @@ import javax.jws.WebService;
 @WebService(targetNamespace = "http://cxf.apache.org/test/ListService", name = "ListService")
 public interface Echo2 {
     String echo(String request) throws ListException;
+    String echo2(String request) throws ListException2;
 }

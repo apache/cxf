@@ -772,6 +772,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         int unboundIndex = wsdlContent
             .indexOf("<xs:element maxOccurs=\"unbounded\" minOccurs=\"0\" name=\"names\" type=\"tns:myData\"/>");
         assertTrue(unboundIndex > -1);
+        unboundIndex = wsdlContent
+            .indexOf("<xs:element maxOccurs=\"unbounded\" minOccurs=\"0\" name=\"address\" type=\"tns:myData\"/>");
+        assertTrue(unboundIndex > -1);
     }
     
     @Test

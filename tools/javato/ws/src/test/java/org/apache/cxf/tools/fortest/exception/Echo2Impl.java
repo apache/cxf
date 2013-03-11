@@ -28,5 +28,10 @@ public class Echo2Impl implements Echo2 {
         return "Response";
 
     }
+    
+    public String echo2(String request) throws ListException2 {
+        return "Response";
+
+    }
 
 }
