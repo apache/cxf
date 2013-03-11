@@ -229,7 +229,7 @@ public class WSPolicyFeature extends AbstractFeature {
     
     Policy resolveLocal(PolicyReference ref, final Bus bus, DescriptionInfo i) {
         String uri = ref.getURI().substring(1);
-        String absoluteURI = i.getBaseURI() + uri;
+        String absoluteURI = i == null ? uri : i.getBaseURI() + uri;
         PolicyRegistry registry = bus.getExtension(PolicyEngine.class).getRegistry();
         Policy resolved = registry.lookup(absoluteURI);
         if (null != resolved) {
