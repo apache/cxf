@@ -20,18 +20,10 @@ package org.apache.cxf.tools.fortest.exception;
 
 import java.util.List;
 
-import javax.xml.ws.WebFault;
-
-@WebFault
-public class ListException extends Exception {
+public class ListException2 extends Exception {
 
     private static final long serialVersionUID = 1L;
-    private List<MyData> names;
-    public List<MyData> getNames() {
-        return names;
-    }
-
-    public void setNames(List<MyData> names) {
-        this.names = names;
-    }
+    //CHECKSTYLE:OFF
+    public List<MyData> address;
+    //CHECKSTYLE:ON
 }

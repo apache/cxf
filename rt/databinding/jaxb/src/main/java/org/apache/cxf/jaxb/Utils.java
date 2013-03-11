@@ -205,6 +205,9 @@ final class Utils {
 
     static Class<?> getFieldType(Field f) {
         XmlJavaTypeAdapter adapter = getFieldXJTA(f);
+        if (adapter == null && f.getGenericType() instanceof ParameterizedType) {
+            return null;
+        }
         Class<?> adapterType = (Class<?>)getTypeFromXmlAdapter(adapter);
         return adapterType != null ? adapterType : f.getType();
     }
