@@ -36,6 +36,7 @@ import org.apache.cxf.ws.policy.PolicyInterceptorProviderLoader;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
+import org.apache.cxf.ws.security.policy.custom.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.KerberosTokenInterceptorProvider;
@@ -51,7 +52,6 @@ import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
-import org.apache.wss4j.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedElementsBuilder;
@@ -110,7 +110,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         if (reg == null) {
             return;
         }
-        reg.registerBuilder(new AlgorithmSuiteBuilder());
+        reg.registerBuilder(new AlgorithmSuiteBuilder(bus));
         reg.registerBuilder(new AsymmetricBindingBuilder());
         reg.registerBuilder(new ContentEncryptedElementsBuilder());
         reg.registerBuilder(new EncryptedElementsBuilder());

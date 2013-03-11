@@ -28,7 +28,7 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
+// import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
@@ -78,8 +78,10 @@ public class TransportBindingBuilder implements AssertionBuilder<Element> {
                     String name = child.getLocalName();
                     if (name.equals(SPConstants.ALGO_SUITE)) {
                         foundAlgorithmSuite = true;
+                        /*
                         parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder(bus)
                             .build(child, factory));
+                            */
                     } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
                         foundTransportToken = true;
                         parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)

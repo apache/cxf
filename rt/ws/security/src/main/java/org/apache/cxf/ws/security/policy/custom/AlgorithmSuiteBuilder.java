@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.security.policy.builders;
-
-
+package org.apache.cxf.ws.security.policy.custom;
 
 import javax.xml.namespace.QName;
 
@@ -26,17 +24,15 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.ws.security.policy.SP11Constants;
-import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.WSSPolicyException;
-import org.apache.cxf.ws.security.policy.custom.AlgorithmSuiteLoader;
-import org.apache.cxf.ws.security.policy.custom.DefaultAlgorithmSuiteLoader;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
+import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
-
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP13Constants;
+import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SPUtils;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
     
@@ -46,41 +42,36 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
         this.bus = bus;
     }
     
-    public Assertion build(Element element, AssertionBuilderFactory factory)
-        throws IllegalArgumentException {
-        
-        SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
-            ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
+    @Override
+    public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
+        final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
+        final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
+        if (nestedPolicyElement == null) {
+            throw new IllegalArgumentException("sp:AlgorithmSuite must have an inner wsp:Policy element");
+        }
+        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
+        
         AlgorithmSuiteLoader loader = bus.getExtension(AlgorithmSuiteLoader.class);
         if (loader == null) {
             loader = new DefaultAlgorithmSuiteLoader();
-        } 
-        Element policyElement = DOMUtils.getFirstElement(element);
-        if (policyElement == null) {
-            throw new IllegalArgumentException(
-                "sp:AlgorithmSuite/wsp:Policy must have a value"
-            );
         }
-        AlgorithmSuite algorithmSuite = null;
-        try {
-            algorithmSuite = loader.getAlgorithmSuite(policyElement, consts);
-        } catch (WSSPolicyException e) {
-            throw new IllegalArgumentException(e);
-        }
-        
-        if (algorithmSuite == null && consts != SP11Constants.INSTANCE) {
-            String algorithmSuiteName = DOMUtils.getFirstElement(policyElement).getLocalName();
+        AlgorithmSuite algorithmSuite = loader.getAlgorithmSuite(spVersion, nestedPolicy);
+        if (algorithmSuite == null) {
+            String algorithmSuiteName = DOMUtils.getFirstElement(nestedPolicyElement).getLocalName();
             throw new IllegalArgumentException(
                 "Algorithm suite \"" + algorithmSuiteName + "\" is not registered"
             );
         }
 
+        algorithmSuite.setOptional(SPUtils.isOptional(element));
+        algorithmSuite.setIgnorable(SPUtils.isIgnorable(element));
         return algorithmSuite;
     }
 
+    @Override
     public QName[] getKnownElements() {
-        return new QName[]{SP11Constants.ALGORITHM_SUITE, SP12Constants.ALGORITHM_SUITE};
+        return new QName[]{SP13Constants.ALGORITHM_SUITE, SP11Constants.ALGORITHM_SUITE};
     }
 
 }
