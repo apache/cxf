@@ -582,7 +582,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         
         // relatively irrelevant stuff from a verification standpoint
-        assertPolicy(aim, SP12Constants.LAYOUT);
         assertPolicy(aim, SP12Constants.WSS10);
         assertPolicy(aim, SP12Constants.TRUST_13);
         assertPolicy(aim, SP11Constants.TRUST_10);

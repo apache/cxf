@@ -91,11 +91,11 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
             if (!validateLayout(timestampFirst, timestampLast, results)) {
                 String error = "Layout does not match the requirements";
-                notAssertPolicy(aim, SP12Constants.LAYOUT, error);
+                notAssertPolicy(aim, layout, error);
                 ai.setNotAsserted(error);
                 continue;
             }
-            assertPolicy(aim, SP12Constants.LAYOUT);
+            assertPolicy(aim, layout);
         }
         
         // We don't need to check these policies for the Transport binding
