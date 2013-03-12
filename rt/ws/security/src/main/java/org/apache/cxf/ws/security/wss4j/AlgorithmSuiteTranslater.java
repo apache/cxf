@@ -21,15 +21,18 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -58,11 +61,8 @@ public final class AlgorithmSuiteTranslater {
         }
 
         // Now look for an AlgorithmSuite for a SAML Assertion
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SAML_TOKEN);
-        if (ais == null) {
-            ais = aim.get(SP11Constants.SAML_TOKEN);
-        }
-        if (ais != null && !ais.isEmpty()) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+        if (!ais.isEmpty()) {
             List<org.apache.wss4j.policy.model.AlgorithmSuite> samlAlgorithmSuites
                 = new ArrayList<org.apache.wss4j.policy.model.AlgorithmSuite>();
             for (AssertionInfo ai : ais) {
@@ -150,38 +150,21 @@ public final class AlgorithmSuiteTranslater {
     private List<AbstractBinding> getBindings(AssertionInfoMap aim) {
         List<AbstractBinding> bindings = new ArrayList<AbstractBinding>();
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-            if (ais != null && !ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+            if (!ais.isEmpty()) {
                 for (AssertionInfo ai : ais) {
                     bindings.add((AbstractBinding)ai.getAssertion());
                 }
             }
-            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
-            if (ais != null && !ais.isEmpty()) {
+            ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+            if (!ais.isEmpty()) {     
                 for (AssertionInfo ai : ais) {
                     bindings.add((AbstractBinding)ai.getAssertion());
                 }
             }
-            ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-            if (ais != null && !ais.isEmpty()) {     
-                for (AssertionInfo ai : ais) {
-                    bindings.add((AbstractBinding)ai.getAssertion());
-                }
-            }
-            ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
-            if (ais != null && !ais.isEmpty()) {     
-                for (AssertionInfo ai : ais) {
-                    bindings.add((AbstractBinding)ai.getAssertion());
-                }
-            }
-            ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-            if (ais != null && !ais.isEmpty()) {     
-                for (AssertionInfo ai : ais) {
-                    bindings.add((AbstractBinding)ai.getAssertion());
-                }
-            }
-            ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
-            if (ais != null && !ais.isEmpty()) {     
+            ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+            if (!ais.isEmpty()) {     
                 for (AssertionInfo ai : ais) {
                     bindings.add((AbstractBinding)ai.getAssertion());
                 }
@@ -204,6 +187,24 @@ public final class AlgorithmSuiteTranslater {
             }
         }
         return algorithmSuites;
+    }
+    
+    private Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            ais.addAll(sp11Ais);
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            ais.addAll(sp12Ais);
+        }
+
+        return ais;
     }
 
 }

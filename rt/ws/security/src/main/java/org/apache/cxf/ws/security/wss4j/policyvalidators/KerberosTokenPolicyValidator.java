@@ -25,8 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KerberosToken.ApReqTokenType;
 
@@ -48,13 +47,8 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
         AssertionInfoMap aim,
         KerberosSecurity kerberosToken
     ) {
-        Collection<AssertionInfo> krbAis = aim.get(SP12Constants.KERBEROS_TOKEN);
-        if (krbAis != null && !krbAis.isEmpty()) {
-            parsePolicies(krbAis, kerberosToken);
-        }
-        
-        krbAis = aim.get(SP11Constants.KERBEROS_TOKEN);
-        if (krbAis != null && !krbAis.isEmpty()) {
+        Collection<AssertionInfo> krbAis = getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
+        if (!krbAis.isEmpty()) {
             parsePolicies(krbAis, kerberosToken);
         }
         

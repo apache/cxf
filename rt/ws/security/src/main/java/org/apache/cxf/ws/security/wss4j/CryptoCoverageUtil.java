@@ -173,10 +173,10 @@ public final class CryptoCoverageUtil {
         
         for (Element el : elements) {
             if (!CryptoCoverageUtil.matchElement(refs, type, scope, el)) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, null,
-                        "The " + getCoverageTypeString(type)
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                        new Exception("The " + getCoverageTypeString(type)
                         + " does not cover the required elements ({"
-                        + namespace + "}" + name + ").");
+                        + namespace + "}" + name + ")."));
             }
         }          
     }
@@ -300,10 +300,10 @@ public final class CryptoCoverageUtil {
                     // We looked through all of the refs, but the element was
                     // not signed.
                     if (!instanceMatched) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, null,
-                                "The " + getCoverageTypeString(type)
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                new Exception("The " + getCoverageTypeString(type)
                                 + " does not cover the required elements ("
-                                + xpathString + ").");
+                                + xpathString + ")."));
                     }
                 }
             }

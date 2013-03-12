@@ -57,8 +57,6 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.processor.UsernameTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.SupportingTokens;
@@ -190,20 +188,9 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     private boolean isAllowNoPassword(AssertionInfoMap aim) throws WSSecurityException {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.USERNAME_TOKEN);
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
 
-        if (ais != null && !ais.isEmpty()) {
-            for (AssertionInfo ai : ais) {
-                UsernameToken policy = (UsernameToken)ai.getAssertion();
-                if (policy.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
-                    return true;
-                }
-            }
-        }
-        
-        ais = aim.get(SP11Constants.USERNAME_TOKEN);
-
-        if (ais != null && !ais.isEmpty()) {
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 UsernameToken policy = (UsernameToken)ai.getAssertion();
                 if (policy.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
@@ -240,12 +227,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected UsernameToken assertTokens(SoapMessage message) {
-        UsernameToken usernameToken = 
-            (UsernameToken)assertTokens(message, SP12Constants.USERNAME_TOKEN, true);
-        if (usernameToken == null) {
-            usernameToken = (UsernameToken)assertTokens11(message, SP11Constants.USERNAME_TOKEN, true);
-        }
-        return usernameToken;
+        return (UsernameToken)assertTokens(message, SPConstants.USERNAME_TOKEN, true);
     }
     
     private UsernameToken assertTokens(
@@ -254,10 +236,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         boolean signed
     ) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
-        if (ais == null) {
-            ais = aim.getAssertionInfo(SP11Constants.USERNAME_TOKEN);
-        }
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
         UsernameToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (UsernameToken)ai.getAssertion();
@@ -273,20 +252,12 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 ai.setAsserted(true);         
             }
         }
-        ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
-        ais = aim.getAssertionInfo(SP11Constants.SUPPORTING_TOKENS);
+        ais = getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
         }
         if (signed || isTLSInUse(message)) {
-            ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
-            ais = aim.getAssertionInfo(SP11Constants.SIGNED_SUPPORTING_TOKENS);
+            ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }
@@ -317,13 +288,8 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
             addUsernameToken(message, tok);
         if (utBuilder == null) {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-            Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
-            for (AssertionInfo ai : ais) {
-                if (ai.isAsserted()) {
-                    ai.setAsserted(false);
-                }
-            }
-            ais = aim.getAssertionInfo(SP11Constants.USERNAME_TOKEN);
+            Collection<AssertionInfo> ais = 
+                getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
             for (AssertionInfo ai : ais) {
                 if (ai.isAsserted()) {
                     ai.setAsserted(false);

@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import javax.xml.namespace.QName;
 
@@ -27,6 +28,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -62,14 +65,43 @@ public abstract class AbstractTokenPolicyValidator {
         }
     }
     
-    protected boolean assertPolicy(AssertionInfoMap aim, QName q) {
-        Collection<AssertionInfo> ais = aim.get(q);
-        if (ais != null && !ais.isEmpty()) {
+    protected boolean assertPolicy(AssertionInfoMap aim, QName name) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
+        if (aim != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }    
             return true;
         }
         return false;
+    }
+    
+    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            ais.addAll(sp11Ais);
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            ais.addAll(sp12Ais);
+        }
+
+        return ais;
     }
 }

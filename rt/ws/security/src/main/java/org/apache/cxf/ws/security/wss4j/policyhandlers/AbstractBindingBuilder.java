@@ -285,13 +285,27 @@ public abstract class AbstractBindingBuilder {
         return MessageUtils.isRequestor(message);
     }
     
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(String localname) {
+        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            ais.addAll(sp11Ais);
+        }
+        
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            ais.addAll(sp12Ais);
+        }
+        
+        return ais;
+    }
+    
     protected void policyNotAsserted(Assertion assertion, Exception reason) {
         if (assertion == null) {
             return;
         }
         LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {
@@ -309,8 +323,7 @@ public abstract class AbstractBindingBuilder {
             return;
         }
         LOG.log(Level.FINE, "Not asserting " + assertion.getName() + ": " + reason);
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {
@@ -328,8 +341,7 @@ public abstract class AbstractBindingBuilder {
             return;
         }
         LOG.log(Level.FINE, "Asserting " + assertion.getName());
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {
@@ -396,11 +408,8 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected WSSecTimestamp createTimestamp() {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.INCLUDE_TIMESTAMP);
-        if (ais == null) {
-            ais = aim.get(SP11Constants.INCLUDE_TIMESTAMP);
-        }
-        if (ais != null) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.INCLUDE_TIMESTAMP);
+        if (!ais.isEmpty()) {
             Object o = message.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
             int ttl = 300;  //default is 300 seconds
             if (o instanceof Number) {
@@ -422,11 +431,8 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected WSSecTimestamp handleLayout(WSSecTimestamp timestamp) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.LAYOUT);
-        if (ais == null) {
-            ais = aim.get(SP11Constants.LAYOUT);
-        }
-        if (ais != null) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.LAYOUT);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 Layout layout = (Layout)ai.getAssertion();
                 ai.setAsserted(true);
@@ -1120,45 +1126,24 @@ public abstract class AbstractBindingBuilder {
         EncryptedElements elements = null;
         ContentEncryptedElements celements = null;
 
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.ENCRYPTED_PARTS);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                parts = (EncryptedParts)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
-        }
-        ais = aim.getAssertionInfo(SP11Constants.ENCRYPTED_PARTS);
-        if (ais != null) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.ENCRYPTED_PARTS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 parts = (EncryptedParts)ai.getAssertion();
                 ai.setAsserted(true);
             }            
         }
         
-        ais = aim.getAssertionInfo(SP12Constants.ENCRYPTED_ELEMENTS);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                elements = (EncryptedElements)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
-        }
-        ais = aim.getAssertionInfo(SP11Constants.ENCRYPTED_ELEMENTS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.ENCRYPTED_ELEMENTS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 elements = (EncryptedElements)ai.getAssertion();
                 ai.setAsserted(true);
             }            
         }
         
-        ais = aim.getAssertionInfo(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                celements = (ContentEncryptedElements)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
-        }
-        ais = aim.getAssertionInfo(SP11Constants.CONTENT_ENCRYPTED_ELEMENTS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 celements = (ContentEncryptedElements)ai.getAssertion();
                 ai.setAsserted(true);
@@ -1195,30 +1180,16 @@ public abstract class AbstractBindingBuilder {
         SignedParts parts = null;
         SignedElements elements = null;
         
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.SIGNED_PARTS);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                parts = (SignedParts)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
-        }
-        ais = aim.getAssertionInfo(SP11Constants.SIGNED_PARTS);
-        if (ais != null) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.SIGNED_PARTS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 parts = (SignedParts)ai.getAssertion();
                 ai.setAsserted(true);
             }            
         }
         
-        ais = aim.getAssertionInfo(SP12Constants.SIGNED_ELEMENTS);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                elements = (SignedElements)ai.getAssertion();
-                ai.setAsserted(true);
-            }            
-        }
-        ais = aim.getAssertionInfo(SP11Constants.SIGNED_ELEMENTS);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.SIGNED_ELEMENTS);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 elements = (SignedElements)ai.getAssertion();
                 ai.setAsserted(true);
@@ -1729,31 +1700,19 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected Wss10 getWss10() {
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.WSS10);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }
-        ais = aim.getAssertionInfo(SP12Constants.WSS11);
-        if (ais != null) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(SPConstants.WSS10);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
             }            
         }
         
-        ais = aim.getAssertionInfo(SP11Constants.WSS10);
-        if (ais != null) {
+        ais = getAllAssertionsByLocalname(SPConstants.WSS10);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
             }            
         }  
-        ais = aim.getAssertionInfo(SP11Constants.WSS11);
-        if (ais != null) {
-            for (AssertionInfo ai : ais) {
-                return (Wss10)ai.getAssertion();
-            }            
-        }
         
         return null;
     }

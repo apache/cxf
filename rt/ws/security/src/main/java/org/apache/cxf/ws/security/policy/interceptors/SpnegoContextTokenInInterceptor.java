@@ -56,8 +56,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.xml.security.utils.Base64;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -71,11 +70,9 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SPNEGO_CONTEXT_TOKEN);
-            if (ais == null) {
-                ais = aim.get(SP11Constants.SPNEGO_CONTEXT_TOKEN);
-            }
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             if (isRequestor(message)) {
@@ -352,8 +349,9 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.SPNEGO_CONTEXT_TOKEN);
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 for (AssertionInfo inf : ais) {

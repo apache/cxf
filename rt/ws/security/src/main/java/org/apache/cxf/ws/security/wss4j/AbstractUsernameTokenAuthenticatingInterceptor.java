@@ -140,14 +140,14 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
             String errorMessage = "Failed Authentication : Subject has not been created";
             LOG.severe(errorMessage);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, 
-                                          errorMessage, ex);
+                                          ex);
         }
         if (subject == null || subject.getPrincipals().size() == 0
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
             String errorMessage = "Failed Authentication : Invalid Subject";
             LOG.severe(errorMessage);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, 
-                                          errorMessage);
+                                          new Exception(errorMessage));
         }
         msg.put(Subject.class, subject);
     }

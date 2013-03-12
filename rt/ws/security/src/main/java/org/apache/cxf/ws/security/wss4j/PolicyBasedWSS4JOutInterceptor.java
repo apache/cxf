@@ -20,9 +20,11 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
@@ -51,6 +53,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.SymmetricBinding;
@@ -101,53 +104,32 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             boolean mustUnderstand = true;
             String actor = null;
             
-
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
                 AbstractBinding transport = null;
-                ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-                if (ais != null) {
+                ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+                if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
                         transport = (AbstractBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
-                ais = aim.get(SP11Constants.TRANSPORT_BINDING);
-                if (ais != null) {
+                ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+                if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
                         transport = (AbstractBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
-                ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-                if (ais != null) {
+                ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+                if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
                         transport = (AbstractBinding)ai.getAssertion();
                         ai.setAsserted(true);
                     }                    
                 }
-                ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }                    
-                }
-                ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }                    
-                }
-                ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        transport = (AbstractBinding)ai.getAssertion();
-                        ai.setAsserted(true);
-                    }                    
-                }
+
                 if (transport == null && isRequestor(message)) {
                     Policy policy = new Policy();
                     transport = new TransportBinding(org.apache.wss4j.policy.SPConstants.SPVersion.SP11,
@@ -194,20 +176,14 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     }
                 }
                 
-                ais = aim.get(SP12Constants.WSS10);
-                if (ais != null) {
+                ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
+                if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }                    
                 }
-                ais = aim.get(SP11Constants.WSS10);
-                if (ais != null) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }                    
-                }
-                ais = aim.get(SP12Constants.WSS11);
-                if (ais != null) {
+                ais = getAllAssertionsByLocalname(aim, SPConstants.WSS10);
+                if (!ais.isEmpty()) {
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }                    
@@ -247,6 +223,24 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             if (bspCompliant != null) {
                 msg.setContextualProperty(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
             }
+        }
+        
+        private Collection<AssertionInfo> getAllAssertionsByLocalname(
+            AssertionInfoMap aim,
+            String localname
+        ) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+            if (sp11Ais != null && !sp11Ais.isEmpty()) {
+                ais.addAll(sp11Ais);
+            }
+
+            Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+            if (sp12Ais != null && !sp12Ais.isEmpty()) {
+                ais.addAll(sp12Ais);
+            }
+
+            return ais;
         }
     }
 }

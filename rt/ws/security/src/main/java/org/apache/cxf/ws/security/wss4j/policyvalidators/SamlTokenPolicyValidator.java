@@ -37,8 +37,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.model.SamlToken.SamlTokenType;
 import org.opensaml.common.SAMLVersion;
@@ -61,13 +60,8 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         body = soapBody;
         signed = signedResults;
         
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SAML_TOKEN);
-        if (ais != null && !ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results, signedResults);
-        }
-        
-        ais = aim.get(SP11Constants.SAML_TOKEN);
-        if (ais != null && !ais.isEmpty()) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+        if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
         }
         

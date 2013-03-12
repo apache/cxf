@@ -32,14 +32,14 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.Wss11;
 
 /**
  * Validate a WSS11 policy.
  */
-public class WSS11PolicyValidator implements TokenPolicyValidator {
+public class WSS11PolicyValidator 
+    extends AbstractTokenPolicyValidator implements TokenPolicyValidator {
     
     public boolean validatePolicy(
         AssertionInfoMap aim,
@@ -48,14 +48,13 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.WSS11);
-        if (ais != null && !ais.isEmpty()) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.WSS11);
+        if (!ais.isEmpty()) {
             parsePolicies(ais, message, results);
-        }
-        
-        ais = aim.get(SP11Constants.WSS11);
-        if (ais != null && !ais.isEmpty()) {
-            parsePolicies(ais, message, results);
+            
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
+            assertPolicy(aim, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
         }
         
         return true;

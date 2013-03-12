@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -411,6 +412,17 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         }
     }
     
+    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
     protected boolean assertPolicy(AssertionInfoMap aim, QName q) {
         Collection<AssertionInfo> ais = aim.get(q);
         if (ais != null && !ais.isEmpty()) {
@@ -429,5 +441,23 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 ai.setNotAsserted(msg);
             }    
         }
+    }
+    
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            ais.addAll(sp11Ais);
+        }
+
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            ais.addAll(sp12Ais);
+        }
+
+        return ais;
     }
 }

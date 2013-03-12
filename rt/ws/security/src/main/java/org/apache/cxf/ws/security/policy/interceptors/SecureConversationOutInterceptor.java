@@ -36,8 +36,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
@@ -50,11 +49,9 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-            if (ais == null) {
-                ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
-            }
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             if (isRequestor(message)) {

@@ -29,8 +29,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 
 /**
@@ -46,13 +45,8 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-        if (ais != null && !ais.isEmpty()) {                       
-            parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
-        }
-        
-        ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
-        if (ais != null && !ais.isEmpty()) {                       
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {                       
             parsePolicies(aim, ais, message, soapBody, results, signedResults, encryptedResults);
         }
         
@@ -117,6 +111,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
+            assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
         }
         
         if (binding.getSignatureToken() != null) {
@@ -127,6 +124,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
+            assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
         }
         
         if (binding.getProtectionToken() != null) {
@@ -137,6 +137,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
+            assertPolicy(aim, SPConstants.REQUIRE_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_IMPLIED_DERIVED_KEYS);
+            assertPolicy(aim, SPConstants.REQUIRE_EXPLICIT_DERIVED_KEYS);
         }
         
         return true;

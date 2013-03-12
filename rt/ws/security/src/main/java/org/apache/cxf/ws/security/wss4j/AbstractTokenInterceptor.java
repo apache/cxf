@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,6 +54,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
@@ -109,43 +111,46 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     
     protected abstract AbstractToken assertTokens(SoapMessage message);
     
-    protected AbstractToken assertTokens(SoapMessage message, QName assertion, boolean signed) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(assertion);
-        AbstractToken tok = null;
-        for (AssertionInfo ai : ais) {
-            tok = (AbstractToken)ai.getAssertion();
-            ai.setAsserted(true);                
-        }
-        ais = aim.getAssertionInfo(SP12Constants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
+    protected Collection<AssertionInfo> getAllAssertionsByLocalname(
+        AssertionInfoMap aim,
+        String localname
+    ) {
+        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+        Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
+        if (sp11Ais != null && !sp11Ais.isEmpty()) {
+            ais.addAll(sp11Ais);
         }
         
-        if (signed || isTLSInUse(message)) {
-            ais = aim.getAssertionInfo(SP12Constants.SIGNED_SUPPORTING_TOKENS);
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
+        Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
+        if (sp12Ais != null && !sp12Ais.isEmpty()) {
+            ais.addAll(sp12Ais);
         }
-        return tok;
+        
+        return ais;
     }
     
-    protected AbstractToken assertTokens11(SoapMessage message, QName assertion, boolean signed) {
+    protected AbstractToken assertTokens(SoapMessage message, String localname, boolean signed) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(assertion);
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(new QName(SP11Constants.SP_NS, localname));
         AbstractToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (AbstractToken)ai.getAssertion();
             ai.setAsserted(true);                
         }
-        ais = aim.getAssertionInfo(SP11Constants.SUPPORTING_TOKENS);
+        
+        ais = aim.getAssertionInfo(new QName(SP12Constants.SP_NS, localname));
+        for (AssertionInfo ai : ais) {
+            tok = (AbstractToken)ai.getAssertion();
+            ai.setAsserted(true);                
+        }
+        
+        ais = getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
         }
         
         if (signed || isTLSInUse(message)) {
-            ais = aim.getAssertionInfo(SP11Constants.SIGNED_SUPPORTING_TOKENS);
+            ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }
@@ -240,8 +245,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         }
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
 
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {
@@ -259,8 +263,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             return;
         }
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais;
-        ais = aim.get(assertion.getName());
+        Collection<AssertionInfo> ais = aim.get(assertion.getName());
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == assertion) {

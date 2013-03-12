@@ -34,6 +34,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.Layout.LayoutType;
 import org.apache.wss4j.policy.model.TransportBinding;
@@ -51,21 +52,11 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
     ) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        boolean policyFound = false;
-        if (ais != null && !ais.isEmpty()) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (!ais.isEmpty()) {
             parsePolicies(aim, ais, message, results, signedResults);
-            policyFound = true;
-        }
-        
-        ais = aim.get(SP11Constants.TRANSPORT_BINDING);
-        if (ais != null && !ais.isEmpty()) {
-            parsePolicies(aim, ais, message, results, signedResults);
-            policyFound = true;
-        }
-        
-        // We don't need to check these policies for the Transport binding
-        if (policyFound) {
+            
+            // We don't need to check these policies for the Transport binding
             assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
             assertPolicy(aim, SP11Constants.ENCRYPTED_PARTS);
             assertPolicy(aim, SP12Constants.SIGNED_PARTS);

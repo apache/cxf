@@ -61,6 +61,7 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
@@ -136,12 +137,12 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
+            
+            System.out.println("IT!!!");
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
-                if (ais == null) {
-                    ais = aim.get(SP11Constants.ISSUED_TOKEN);
-                }
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
@@ -182,15 +183,17 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
         private Trust10 getTrust10(AssertionInfoMap aim) {
-            Collection<AssertionInfo> ais = aim.get(SP11Constants.TRUST_10);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_10);
+            if (ais.isEmpty()) {
                 return null;
             }
             return (Trust10)ais.iterator().next().getAssertion();
         }
         private Trust13 getTrust13(AssertionInfoMap aim) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.TRUST_13);
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRUST_13);
+            if (ais.isEmpty()) {
                 return null;
             }
             return (Trust13)ais.iterator().next().getAssertion();
@@ -490,11 +493,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
-                if (ais == null) {
-                    ais = aim.get(SP11Constants.ISSUED_TOKEN);
-                }
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (!isRequestor(message)) {
@@ -524,7 +525,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             
             IssuedTokenPolicyValidator issuedValidator = 
                 new IssuedTokenPolicyValidator(signedResults, message);
-            Collection<AssertionInfo> issuedAis = aim.get(SP12Constants.ISSUED_TOKEN);
+            Collection<AssertionInfo> issuedAis = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
 
             for (SamlAssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
                 boolean valid = issuedValidator.validatePolicy(issuedAis, assertionWrapper);

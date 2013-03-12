@@ -54,8 +54,6 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.SPVersion;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -75,25 +73,17 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         super(Phase.PRE_PROTOCOL);
     }
     private AbstractBinding getBinding(AssertionInfoMap aim) {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
-        if (ais == null) {
-            ais = aim.get(SP11Constants.SYMMETRIC_BINDING);
-        }
-        if (ais != null && !ais.isEmpty()) {
+        Collection<AssertionInfo> ais = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
-        ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
-        if (ais == null) {
-            ais = aim.get(SP11Constants.ASYMMETRIC_BINDING);
-        }
-        if (ais != null && !ais.isEmpty()) {
+        ais = NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (!ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
-        ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        if (ais == null) {
-            ais = aim.get(SP11Constants.TRANSPORT_BINDING);
-        }
-        if (ais != null && !ais.isEmpty()) {
+        ais = NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (!ais.isEmpty()) {
             return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         return null;
@@ -103,11 +93,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-            if (ais == null) {
-                ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
-            }
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             if (isRequestor(message)) {
@@ -340,11 +328,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-                if (ais == null) {
-                    ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
-                }
-                if (ais == null || ais.isEmpty()) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 for (AssertionInfo inf : ais) {
@@ -373,11 +359,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (aim == null) {
                 return;
             }
-            Collection<AssertionInfo> ais = aim.get(SP12Constants.SECURE_CONVERSATION_TOKEN);
-            if (ais == null) {
-                ais = aim.get(SP11Constants.SECURE_CONVERSATION_TOKEN);
-            }
-            if (ais == null || ais.isEmpty()) {
+            Collection<AssertionInfo> ais = 
+                NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
+            if (ais.isEmpty()) {
                 return;
             }
             

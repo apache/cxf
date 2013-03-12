@@ -180,15 +180,67 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP12Constants.PROTECT_TOKENS,
             SP11Constants.PROTECT_TOKENS,
+            SP11Constants.PROTECT_TOKENS,
             SP12Constants.RSA_KEY_VALUE,
             
-            SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST,
-            SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST,
+            // Layout
+            SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST, SP11Constants.STRICT, 
+            SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST, SP11Constants.STRICT,
+            
+            // UsernameToken
             SP11Constants.WSS_USERNAME_TOKEN10, SP12Constants.WSS_USERNAME_TOKEN10,  
             SP11Constants.WSS_USERNAME_TOKEN11, SP12Constants.WSS_USERNAME_TOKEN11,
-            
             SP12Constants.HASH_PASSWORD, SP12Constants.NO_PASSWORD,
-            SP13Constants.CREATED, SP13Constants.NONCE,    
+            SP13Constants.CREATED, SP13Constants.NONCE,
+            
+            SP12Constants.REQUIRE_INTERNAL_REFERENCE, SP11Constants.REQUIRE_INTERNAL_REFERENCE,
+            SP12Constants.REQUIRE_EXTERNAL_REFERNCE, SP11Constants.REQUIRE_EXTERNAL_REFERNCE,
+            
+            // Spnego
+            SP12Constants.MUST_NOT_SEND_AMEND,
+            SP12Constants.MUST_NOT_SEND_CANCEL,
+            SP12Constants.MUST_NOT_SEND_RENEW,
+            
+            // SCT
+            SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE,
+            SP12Constants.SC13_SECURITY_CONTEXT_TOKEN,
+            SP11Constants.SC10_SECURITY_CONTEXT_TOKEN,
+            
+            // WSS10
+            SP12Constants.MUST_SUPPORT_REF_KEY_IDENTIFIER, SP11Constants.MUST_SUPPORT_REF_KEY_IDENTIFIER,
+            SP12Constants.MUST_SUPPORT_REF_ISSUER_SERIAL, SP11Constants.MUST_SUPPORT_REF_ISSUER_SERIAL,
+            SP12Constants.MUST_SUPPORT_REF_EXTERNAL_URI, SP12Constants.MUST_SUPPORT_REF_EXTERNAL_URI,
+            SP12Constants.MUST_SUPPORT_REF_EMBEDDED_TOKEN, SP11Constants.MUST_SUPPORT_REF_EMBEDDED_TOKEN,
+            
+            // WSS11
+            SP12Constants.MUST_SUPPORT_REF_THUMBPRINT, SP11Constants.MUST_SUPPORT_REF_THUMBPRINT,
+            SP12Constants.MUST_SUPPORT_REF_ENCRYPTED_KEY, SP11Constants.MUST_SUPPORT_REF_ENCRYPTED_KEY,
+            SP12Constants.REQUIRE_SIGNATURE_CONFIRMATION, SP11Constants.REQUIRE_SIGNATURE_CONFIRMATION,
+            
+            // SAML
+            new QName(SP11Constants.SP_NS, "WssSamlV11Token10"),
+            new QName(SP12Constants.SP_NS, "WssSamlV11Token10"),
+            new QName(SP11Constants.SP_NS, "WssSamlV11Token11"),
+            new QName(SP12Constants.SP_NS, "WssSamlV11Token11"),
+            new QName(SP11Constants.SP_NS, "WssSamlV20Token11"),
+            new QName(SP12Constants.SP_NS, "WssSamlV20Token11"),
+            
+            // HTTPs
+            SP12Constants.HTTP_BASIC_AUTHENTICATION, SP11Constants.HTTP_BASIC_AUTHENTICATION,
+            SP12Constants.HTTP_DIGEST_AUTHENTICATION, SP11Constants.HTTP_DIGEST_AUTHENTICATION,
+            SP12Constants.REQUIRE_CLIENT_CERTIFICATE, SP11Constants.REQUIRE_CLIENT_CERTIFICATE,
+            
+            // Trust13
+            SP12Constants.MUST_SUPPORT_CLIENT_CHALLENGE, SP11Constants.MUST_SUPPORT_CLIENT_CHALLENGE,
+            SP12Constants.MUST_SUPPORT_SERVER_CHALLENGE, SP11Constants.MUST_SUPPORT_SERVER_CHALLENGE,
+            SP12Constants.REQUIRE_CLIENT_ENTROPY, SP11Constants.REQUIRE_CLIENT_ENTROPY,
+            SP12Constants.REQUIRE_SERVER_ENTROPY, SP11Constants.REQUIRE_SERVER_ENTROPY,
+            SP12Constants.MUST_SUPPORT_ISSUED_TOKENS, SP11Constants.MUST_SUPPORT_ISSUED_TOKENS,
+            SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION,
+            SP12Constants.REQUIRE_APPLIES_TO,
+            SP13Constants.SCOPE_POLICY_15,
+            SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE,
+            
         });
         final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
         for (QName q : others) {

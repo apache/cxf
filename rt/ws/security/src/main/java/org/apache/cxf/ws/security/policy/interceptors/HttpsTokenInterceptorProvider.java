@@ -44,6 +44,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.HttpsToken;
 
 /**
@@ -79,11 +80,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
-                if (ais == null) {
-                    ais = aim.get(SP11Constants.HTTPS_TOKEN);
-                }
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
@@ -161,11 +160,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = aim.get(SP12Constants.HTTPS_TOKEN);
-                if (ais == null) {
-                    ais = aim.get(SP11Constants.HTTPS_TOKEN);
-                }
-                if (ais == null) {
+                Collection<AssertionInfo> ais = 
+                    NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.HTTPS_TOKEN);
+                if (ais.isEmpty()) {
                     return;
                 }
                 if (!isRequestor(message)) {
