@@ -97,7 +97,7 @@ public class SamlTokenBuilder implements AssertionBuilder<Element> {
         
         if (!foundPolicy && consts != SP11Constants.INSTANCE) {
             throw new IllegalArgumentException(
-                "sp:SpnegoContextToken/wsp:Policy must have a value"
+                "sp:SamlToken/wsp:Policy must have a value"
             );
         }
         

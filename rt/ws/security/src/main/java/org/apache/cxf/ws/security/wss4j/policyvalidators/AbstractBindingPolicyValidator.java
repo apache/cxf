@@ -191,11 +191,11 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
         if (!validateLayout(timestampFirst, timestampLast, results)) {
             String error = "Layout does not match the requirements";
-            notAssertPolicy(aim, SP12Constants.LAYOUT, error);
+            notAssertPolicy(aim, layout, error);
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SP12Constants.LAYOUT);
+        assertPolicy(aim, layout);
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isEntireHeadersAndBodySignatures()
@@ -369,6 +369,17 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             for (AssertionInfo ai : ais) {
                 if (ai.getAssertion() == token) {
                     ai.setAsserted(true);
+                }
+            }    
+        }
+    }
+    
+    protected void notAssertPolicy(AssertionInfoMap aim, Assertion token, String msg) {
+        Collection<AssertionInfo> ais = aim.get(token.getName());
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                if (ai.getAssertion() == token) {
+                    ai.setNotAsserted(msg);
                 }
             }    
         }
