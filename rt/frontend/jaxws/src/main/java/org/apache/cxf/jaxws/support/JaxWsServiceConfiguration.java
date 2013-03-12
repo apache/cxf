@@ -163,7 +163,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if ((wm != null) && wm.exclude()) {
             return Boolean.FALSE;
         }
-        if ((wm != null && !wm.exclude()) || (cls.isInterface() 
+        if ((wm != null && !wm.exclude()) 
+            || (implInfo.getSEIClass() != null
+                && cls.isInterface() 
                 && cls.isAssignableFrom(implInfo.getSEIClass()))) {
             return Boolean.TRUE;
         }
