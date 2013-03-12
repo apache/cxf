@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.policy.custom;
 
+import org.apache.cxf.Bus;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -28,6 +29,6 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  */
 public interface AlgorithmSuiteLoader {
 
-    AlgorithmSuite getAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy);
+    AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy);
 
 }

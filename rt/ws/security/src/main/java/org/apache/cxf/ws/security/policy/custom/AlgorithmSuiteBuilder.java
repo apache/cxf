@@ -56,7 +56,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
         if (loader == null) {
             loader = new DefaultAlgorithmSuiteLoader();
         }
-        AlgorithmSuite algorithmSuite = loader.getAlgorithmSuite(spVersion, nestedPolicy);
+        AlgorithmSuite algorithmSuite = loader.getAlgorithmSuite(bus, spVersion, nestedPolicy);
         if (algorithmSuite == null) {
             String algorithmSuiteName = DOMUtils.getFirstElement(nestedPolicyElement).getLocalName();
             throw new IllegalArgumentException(

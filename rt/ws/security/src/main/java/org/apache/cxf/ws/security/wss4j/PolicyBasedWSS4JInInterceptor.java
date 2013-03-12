@@ -555,8 +555,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
             assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
             assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
-            assertPolicy(aim, SPConstants.TRUST_10);
-            assertPolicy(aim, SPConstants.WSS10);
             
             // WSS10
             assertPolicy(aim, SPConstants.WSS10);
@@ -565,13 +563,16 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI);
             assertPolicy(aim, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN);
             
+            // Trust 1.0
+            assertPolicy(aim, SPConstants.TRUST_10);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE);
+            assertPolicy(aim, SPConstants.REQUIRE_CLIENT_ENTROPY);
+            assertPolicy(aim, SPConstants.REQUIRE_SERVER_ENTROPY);
+            assertPolicy(aim, SPConstants.MUST_SUPPORT_ISSUED_TOKENS);
+            
             // Trust 1.3
             assertPolicy(aim, SPConstants.TRUST_13);
-            assertPolicy(aim, SP12Constants.MUST_SUPPORT_CLIENT_CHALLENGE);
-            assertPolicy(aim, SP12Constants.MUST_SUPPORT_SERVER_CHALLENGE);
-            assertPolicy(aim, SP12Constants.REQUIRE_CLIENT_ENTROPY);
-            assertPolicy(aim, SP12Constants.REQUIRE_SERVER_ENTROPY);
-            assertPolicy(aim, SP12Constants.MUST_SUPPORT_ISSUED_TOKENS);
             assertPolicy(aim, SP12Constants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION);
             assertPolicy(aim, SP12Constants.REQUIRE_APPLIES_TO);
             assertPolicy(aim, SP13Constants.SCOPE_POLICY_15);

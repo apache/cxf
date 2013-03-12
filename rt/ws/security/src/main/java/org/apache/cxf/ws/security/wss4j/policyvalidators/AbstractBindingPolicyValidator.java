@@ -41,6 +41,7 @@ import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding.ProtectionOrder;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -180,11 +181,13 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, binding.getAlgorithmSuite());
-        String namespace = binding.getAlgorithmSuite().getVersion().getNamespace();
+        String namespace = binding.getAlgorithmSuite().getAlgorithmSuiteType().getNamespace();
         String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
         Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
-        for (AssertionInfo algSuiteAi : algSuiteAis) {
-            algSuiteAi.setAsserted(true);
+        if (algSuiteAis != null) {
+            for (AssertionInfo algSuiteAi : algSuiteAis) {
+                algSuiteAi.setAsserted(true);
+            }
         }
         
         // Check the IncludeTimestamp
@@ -193,8 +196,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
-        assertPolicy(aim, SP11Constants.INCLUDE_TIMESTAMP);
+        assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
         
         // Check the Layout
         Layout layout = binding.getLayout();
@@ -220,16 +222,14 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             ai.setNotAsserted(error);
             return false;
         }
-        assertPolicy(aim, SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
-        assertPolicy(aim, SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
+        assertPolicy(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         
         // Check whether the signatures were encrypted or not
         if (binding.isProtectTokens() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
-        assertPolicy(aim, SP12Constants.PROTECT_TOKENS);
-        assertPolicy(aim, SP11Constants.PROTECT_TOKENS);
+        assertPolicy(aim, SPConstants.PROTECT_TOKENS);
         
         return true;
     }
@@ -249,13 +249,13 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
-            assertPolicy(aim, SP12Constants.ENCRYPT_BEFORE_SIGNING);
+            assertPolicy(aim, SPConstants.ENCRYPT_BEFORE_SIGNING);
         } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) { 
             if (isEncryptedBeforeSigned(results)) {
                 ai.setNotAsserted("Not signed before encrypted");
                 return false;
             }
-            assertPolicy(aim, SP12Constants.SIGN_BEFORE_ENCRYPTING);
+            assertPolicy(aim, SPConstants.SIGN_BEFORE_ENCRYPTING);
         }
         return true;
     }

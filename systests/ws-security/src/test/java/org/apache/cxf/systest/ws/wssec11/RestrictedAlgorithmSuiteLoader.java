@@ -35,7 +35,7 @@ public class RestrictedAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         bus.setExtension(this, AlgorithmSuiteLoader.class);
     }
 
-    public AlgorithmSuite getAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
+    public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
         return new CustomAlgorithmSuite(version, nestedPolicy); 
     }
 

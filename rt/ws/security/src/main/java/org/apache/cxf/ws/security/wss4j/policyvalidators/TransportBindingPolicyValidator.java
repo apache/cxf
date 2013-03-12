@@ -99,8 +99,10 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             String namespace = binding.getAlgorithmSuite().getVersion().getNamespace();
             String name = binding.getAlgorithmSuite().getAlgorithmSuiteType().getName();
             Collection<AssertionInfo> algSuiteAis = aim.get(new QName(namespace, name));
-            for (AssertionInfo algSuiteAi : algSuiteAis) {
-                algSuiteAi.setAsserted(true);
+            if (algSuiteAis != null) {
+                for (AssertionInfo algSuiteAi : algSuiteAis) {
+                    algSuiteAi.setAsserted(true);
+                }
             }
             
             // Check the IncludeTimestamp
