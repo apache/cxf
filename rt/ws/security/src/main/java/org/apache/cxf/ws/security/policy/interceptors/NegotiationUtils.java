@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -295,22 +296,48 @@ final class NegotiationUtils {
         return handler;
     }
     
+    static boolean assertPolicy(AssertionInfoMap aim, QName name) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    static boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = 
+            NegotiationUtils.getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
     static Collection<AssertionInfo> getAllAssertionsByLocalname(
         AssertionInfoMap aim,
         String localname
     ) {
-        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
         Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            ais.addAll(sp11Ais);
-        }
-
         Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        if (sp12Ais != null && !sp12Ais.isEmpty()) {
-            ais.addAll(sp12Ais);
+        
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
         }
-
-        return ais;
+            
+        return Collections.emptySet();
     }
 
 }

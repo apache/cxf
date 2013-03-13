@@ -226,9 +226,9 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             new QName(SP12Constants.SP_NS, "WssSamlV20Token11"),
             
             // HTTPs
-            SP12Constants.HTTP_BASIC_AUTHENTICATION, SP11Constants.HTTP_BASIC_AUTHENTICATION,
-            SP12Constants.HTTP_DIGEST_AUTHENTICATION, SP11Constants.HTTP_DIGEST_AUTHENTICATION,
-            SP12Constants.REQUIRE_CLIENT_CERTIFICATE, SP11Constants.REQUIRE_CLIENT_CERTIFICATE,
+            SP12Constants.HTTP_BASIC_AUTHENTICATION,
+            SP12Constants.HTTP_DIGEST_AUTHENTICATION,
+            SP12Constants.REQUIRE_CLIENT_CERTIFICATE,
             
             // Trust13
             SP12Constants.MUST_SUPPORT_CLIENT_CHALLENGE, SP11Constants.MUST_SUPPORT_CLIENT_CHALLENGE,

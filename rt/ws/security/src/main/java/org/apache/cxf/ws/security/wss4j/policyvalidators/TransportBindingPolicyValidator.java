@@ -108,12 +108,10 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             // Check the IncludeTimestamp
             if (!validateTimestamp(binding.isIncludeTimestamp(), true, results, signedResults, message)) {
                 String error = "Received Timestamp does not match the requirements";
-                notAssertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP, error);
                 ai.setNotAsserted(error);
                 continue;
             }
-            assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
-            assertPolicy(aim, SP11Constants.INCLUDE_TIMESTAMP);
+            assertPolicy(aim, SPConstants.INCLUDE_TIMESTAMP);
             
             // Check the Layout
             Layout layout = binding.getLayout();
@@ -127,10 +125,10 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 continue;
             }
             assertPolicy(aim, binding.getLayout());
-            assertPolicy(aim, SP12Constants.LAX);
-            assertPolicy(aim, SP12Constants.STRICT);
-            assertPolicy(aim, SP11Constants.LAX);
-            assertPolicy(aim, SP11Constants.STRICT);
+            assertPolicy(aim, SPConstants.LAYOUT_LAX);
+            assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
+            assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
+            assertPolicy(aim, SPConstants.LAYOUT_STRICT);
         }
 
     }

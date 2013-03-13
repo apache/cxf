@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.message.Message;
@@ -34,7 +32,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
@@ -58,12 +55,12 @@ public class UsernameTokenPolicyValidator
         if (!ais.isEmpty()) {
             parsePolicies(ais, message, results);
             
-            assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.CREATED));
-            assertPolicy(aim, new QName(SP13Constants.SP_NS, SP12Constants.NONCE));
+            assertPolicy(aim, SP13Constants.CREATED);
+            assertPolicy(aim, SP13Constants.NONCE);
             assertPolicy(aim, SPConstants.NO_PASSWORD);
             assertPolicy(aim, SPConstants.HASH_PASSWORD);
-            assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN10);
-            assertPolicy(aim, SP12Constants.WSS_USERNAME_TOKEN11);
+            assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+            assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
         }
         
         return true;

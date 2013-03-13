@@ -57,6 +57,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.processor.UsernameTokenProcessor;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.SupportingTokens;
@@ -227,6 +228,14 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected UsernameToken assertTokens(SoapMessage message) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+        assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
+        assertPolicy(aim, SPConstants.HASH_PASSWORD);
+        assertPolicy(aim, SPConstants.NO_PASSWORD);
+        assertPolicy(aim, SP13Constants.NONCE);
+        assertPolicy(aim, SP13Constants.CREATED);
+
         return (UsernameToken)assertTokens(message, SPConstants.USERNAME_TOKEN, true);
     }
     
@@ -240,27 +249,41 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         UsernameToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (UsernameToken)ai.getAssertion();
-            if (princ != null 
-                && (tok.getPasswordType() == UsernameToken.PasswordType.HashPassword) 
-                != princ.isPasswordDigest()) {
+            ai.setAsserted(true);
+            if ((tok.getPasswordType() == UsernameToken.PasswordType.HashPassword)
+                && (princ == null || !princ.isPasswordDigest())) {
                 ai.setNotAsserted("Password hashing policy not enforced");
-            } else if (princ != null && tok.getPasswordType() != UsernameToken.PasswordType.NoPassword 
-                && (princ.getPassword() == null)
-                && isNonEndorsingSupportingToken(tok)) {
+            } else {
+                assertPolicy(aim, SPConstants.HASH_PASSWORD);
+            }
+            
+            if ((tok.getPasswordType() == UsernameToken.PasswordType.NoPassword)
+                && isNonEndorsingSupportingToken(tok)
+                && (princ == null || princ.getPassword() == null)) {
                 ai.setNotAsserted("Username Token No Password supplied");
             } else {
-                ai.setAsserted(true);         
+                assertPolicy(aim, SPConstants.NO_PASSWORD);
+            }
+            
+            if (tok.isCreated() && princ.getCreatedTime() == null) {
+                ai.setNotAsserted("No Created Time");
+            } else {
+                assertPolicy(aim, SP13Constants.CREATED);
+            }
+            
+            if (tok.isNonce() && princ.getNonce() == null) {
+                ai.setNotAsserted("No Nonce");
+            } else {
+                assertPolicy(aim, SP13Constants.NONCE);
             }
         }
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
+        
+        assertPolicy(aim, SPConstants.USERNAME_TOKEN10);
+        assertPolicy(aim, SPConstants.USERNAME_TOKEN11);
+        assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
+
         if (signed || isTLSInUse(message)) {
-            ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
+            assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         }
         return tok;
     }

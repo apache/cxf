@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -210,10 +211,10 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         assertPolicy(aim, layout);
-        assertPolicy(aim, SP12Constants.LAX);
-        assertPolicy(aim, SP12Constants.STRICT);
-        assertPolicy(aim, SP11Constants.LAX);
-        assertPolicy(aim, SP11Constants.STRICT);
+        assertPolicy(aim, SPConstants.LAYOUT_LAX);
+        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
+        assertPolicy(aim, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
+        assertPolicy(aim, SPConstants.LAYOUT_STRICT);
         
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isOnlySignEntireHeadersAndBody()
@@ -225,10 +226,11 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         assertPolicy(aim, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         
         // Check whether the signatures were encrypted or not
-        if (binding.isProtectTokens() && !isSignatureEncrypted(results)) {
+        if (binding.isEncryptSignature() && !isSignatureEncrypted(results)) {
             ai.setNotAsserted("The signature is not protected");
             return false;
         }
+        assertPolicy(aim, SPConstants.ENCRYPT_SIGNATURE);
         assertPolicy(aim, SPConstants.PROTECT_TOKENS);
         
         return true;
@@ -447,17 +449,20 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         AssertionInfoMap aim,
         String localname
     ) {
-        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
         Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            ais.addAll(sp11Ais);
-        }
-
         Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        if (sp12Ais != null && !sp12Ais.isEmpty()) {
-            ais.addAll(sp12Ais);
+        
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
         }
-
-        return ais;
+            
+        return Collections.emptySet();
     }
 }

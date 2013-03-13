@@ -61,8 +61,6 @@ import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.policy.SP11Constants;
-import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
@@ -125,12 +123,14 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         if (sbinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
+            policyAsserted(SPConstants.ENCRYPT_BEFORE_SIGNING);
         } else {
             doSignBeforeEncrypt();
+            policyAsserted(SPConstants.SIGN_BEFORE_ENCRYPTING);
         }
         //REVIST - what to do with these policies?
-        policyAsserted(SP11Constants.TRUST_10);
-        policyAsserted(SP12Constants.TRUST_13);
+        policyAsserted(SPConstants.TRUST_10);
+        policyAsserted(SPConstants.TRUST_13);
     }
     
     private void initializeTokens()  {
@@ -253,6 +253,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                         if (sigConfList != null && !sigConfList.isEmpty()) {
                             secondEncrParts.addAll(sigConfList);
                         }
+                        policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
                     }
                     
                     if (isRequestor()) {
@@ -385,6 +386,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 if (sigConfList != null && !sigConfList.isEmpty()) {
                     enc.addAll(sigConfList);
                 }
+                policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
             }
             
             if (isRequestor()) {
@@ -700,6 +702,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 }
             }
             sigs.add(new WSEncryptionPart(sigTokId));
+            policyAsserted(SPConstants.PROTECT_TOKENS);
         }
         
         dkSign.setParts(sigs);
@@ -799,6 +802,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                       
             if (included && sbinding.isProtectTokens()) {
                 sigs.add(new WSEncryptionPart(sigTokId));
+                policyAsserted(SPConstants.PROTECT_TOKENS);
             }
             
             sig.setCustomTokenId(sigTokId);

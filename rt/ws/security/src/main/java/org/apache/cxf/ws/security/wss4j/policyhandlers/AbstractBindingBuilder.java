@@ -25,6 +25,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,6 +112,7 @@ import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -286,18 +288,21 @@ public abstract class AbstractBindingBuilder {
     }
     
     protected Collection<AssertionInfo> getAllAssertionsByLocalname(String localname) {
-        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
         Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            ais.addAll(sp11Ais);
-        }
-        
         Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        if (sp12Ais != null && !sp12Ais.isEmpty()) {
-            ais.addAll(sp12Ais);
-        }
         
-        return ais;
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
+        }
+            
+        return Collections.emptySet();
     }
     
     protected void policyNotAsserted(Assertion assertion, Exception reason) {
@@ -354,6 +359,15 @@ public abstract class AbstractBindingBuilder {
     protected void policyAsserted(QName n) {
         Collection<AssertionInfo> ais = aim.getAssertionInfo(n);
         if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }
+        }
+    }
+    
+    protected void policyAsserted(String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(localname);
+        if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
             }
@@ -441,6 +455,7 @@ public abstract class AbstractBindingBuilder {
                         ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST + " requires a timestamp");
                     } else {
                         ai.setAsserted(true);
+                        policyAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_LAST);
                         Element el = timestamp.getElement();
                         secHeader.getSecurityHeader().appendChild(el);
                         if (bottomUpElement == null) {
@@ -452,10 +467,14 @@ public abstract class AbstractBindingBuilder {
                         ai.setNotAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST + " requires a timestamp");
                     } else {
                         addTopDownElement(timestampEl.getElement());
+                        policyAsserted(SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST);
                     }
                 } else if (timestampEl != null) {
                     addTopDownElement(timestampEl.getElement());
                 }
+                
+                policyAsserted(SPConstants.LAYOUT_LAX);
+                policyAsserted(SPConstants.LAYOUT_STRICT);
             }                    
         } else if (timestampEl != null) {
             addTopDownElement(timestampEl.getElement());
@@ -832,6 +851,7 @@ public abstract class AbstractBindingBuilder {
             if (token.getPasswordType() == UsernameToken.PasswordType.NoPassword) {
                 utBuilder.setUserInfo(userName, null);
                 utBuilder.setPasswordType(null);
+                policyAsserted(SPConstants.NO_PASSWORD);
             } else {
                 String password = (String)message.getContextualProperty(SecurityConstants.PASSWORD);
                 if (StringUtils.isEmpty(password)) {
@@ -841,7 +861,8 @@ public abstract class AbstractBindingBuilder {
                 if (!StringUtils.isEmpty(password)) {
                     // If the password is available then build the token
                     if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
-                        utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);  
+                        utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
+                        policyAsserted(SPConstants.HASH_PASSWORD);
                     } else {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_TEXT);
                     }
@@ -854,12 +875,16 @@ public abstract class AbstractBindingBuilder {
             
             if (token.isCreated() && token.getPasswordType() != UsernameToken.PasswordType.HashPassword) {
                 utBuilder.addCreated();
+                policyAsserted(SP13Constants.CREATED);
             }
             if (token.isNonce() && token.getPasswordType() != UsernameToken.PasswordType.HashPassword) {
                 utBuilder.addNonce();
+                policyAsserted(SP13Constants.NONCE);
             }
             
             info.setAsserted(true);
+            policyAsserted(SPConstants.USERNAME_TOKEN10);
+            policyAsserted(SPConstants.USERNAME_TOKEN11);
             return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
@@ -900,6 +925,8 @@ public abstract class AbstractBindingBuilder {
             }
             
             info.setAsserted(true);
+            policyAsserted(SPConstants.USERNAME_TOKEN10);
+            policyAsserted(SPConstants.USERNAME_TOKEN11);
             return utBuilder;
         } else {
             policyNotAsserted(token, "No username available");
@@ -2248,6 +2275,8 @@ public abstract class AbstractBindingBuilder {
                 sigConfList.add(part);
             }
         }
+        
+        policyAsserted(SPConstants.REQUIRE_SIGNATURE_CONFIRMATION);
     }
     
     /**

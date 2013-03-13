@@ -111,49 +111,62 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     
     protected abstract AbstractToken assertTokens(SoapMessage message);
     
+    protected boolean assertPolicy(AssertionInfoMap aim, String localname) {
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
+        if (!ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
+    protected boolean assertPolicy(AssertionInfoMap aim, QName name) {
+        Collection<AssertionInfo> ais = aim.getAssertionInfo(name);
+        if (ais != null && !ais.isEmpty()) {
+            for (AssertionInfo ai : ais) {
+                ai.setAsserted(true);
+            }    
+            return true;
+        }
+        return false;
+    }
+    
     protected Collection<AssertionInfo> getAllAssertionsByLocalname(
         AssertionInfoMap aim,
         String localname
     ) {
-        Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
         Collection<AssertionInfo> sp11Ais = aim.get(new QName(SP11Constants.SP_NS, localname));
-        if (sp11Ais != null && !sp11Ais.isEmpty()) {
-            ais.addAll(sp11Ais);
-        }
-        
         Collection<AssertionInfo> sp12Ais = aim.get(new QName(SP12Constants.SP_NS, localname));
-        if (sp12Ais != null && !sp12Ais.isEmpty()) {
-            ais.addAll(sp12Ais);
-        }
         
-        return ais;
+        if ((sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty())) {
+            Collection<AssertionInfo> ais = new HashSet<AssertionInfo>();
+            if (sp11Ais != null) {
+                ais.addAll(sp11Ais);
+            }
+            if (sp12Ais != null) {
+                ais.addAll(sp12Ais);
+            }
+            return ais;
+        }
+            
+        return Collections.emptySet();
     }
     
     protected AbstractToken assertTokens(SoapMessage message, String localname, boolean signed) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        Collection<AssertionInfo> ais = aim.getAssertionInfo(new QName(SP11Constants.SP_NS, localname));
+        Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
         AbstractToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (AbstractToken)ai.getAssertion();
             ai.setAsserted(true);                
         }
         
-        ais = aim.getAssertionInfo(new QName(SP12Constants.SP_NS, localname));
-        for (AssertionInfo ai : ais) {
-            tok = (AbstractToken)ai.getAssertion();
-            ai.setAsserted(true);                
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SUPPORTING_TOKENS);
-        for (AssertionInfo ai : ais) {
-            ai.setAsserted(true);
-        }
+        assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
         
         if (signed || isTLSInUse(message)) {
-            ais = getAllAssertionsByLocalname(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
-            for (AssertionInfo ai : ais) {
-                ai.setAsserted(true);
-            }
+            assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         }
         return tok;
     }

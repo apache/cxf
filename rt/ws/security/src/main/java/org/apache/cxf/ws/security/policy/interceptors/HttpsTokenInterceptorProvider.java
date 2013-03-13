@@ -86,7 +86,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     return;
                 }
                 if (isRequestor(message)) {
-                    assertHttps(ais, message);
+                    assertHttps(aim, ais, message);
                 } else {
                     //server side should be checked on the way in
                     for (AssertionInfo ai : ais) {
@@ -95,7 +95,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 }
             }
         }
-        private void assertHttps(Collection<AssertionInfo> ais, Message message) {
+        private void assertHttps(AssertionInfoMap aim, Collection<AssertionInfo> ais, Message message) {
             for (AssertionInfo ai : ais) {
                 HttpsToken token = (HttpsToken)ai.getAssertion();
                 String scheme = (String)message.get("http.scheme");
@@ -125,12 +125,15 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             }
                         };
                         message.put(MessageTrustDecider.class, trust);
+                        NegotiationUtils.assertPolicy(aim, SP12Constants.REQUIRE_CLIENT_CERTIFICATE);
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                         List<String> auth = headers.get("Authorization");
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Basic")) {
                             ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
+                        } else {
+                            NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_BASIC_AUTHENTICATION);
                         }
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
@@ -138,7 +141,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         if (auth == null || auth.size() == 0 
                             || !auth.get(0).startsWith("Digest")) {
                             ai.setNotAsserted("HttpDigestAuthentication is set, but not being used");
-                        }                        
+                        } else {
+                            NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_DIGEST_AUTHENTICATION);
+                        }
                     }
                 } else {
                     ai.setNotAsserted("Not an HTTPs connection");
@@ -166,7 +171,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     return;
                 }
                 if (!isRequestor(message)) {
-                    assertHttps(ais, message);
+                    assertHttps(aim, ais, message);
                     // Store the TLS principal on the message context
                     SecurityContext sc = message.get(SecurityContext.class);
                     if (sc == null || sc.getUserPrincipal() == null) {
@@ -191,7 +196,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             }
         }
         
-        private void assertHttps(Collection<AssertionInfo> ais, Message message) {
+        private void assertHttps(AssertionInfoMap aim, Collection<AssertionInfo> ais, Message message) {
             for (AssertionInfo ai : ais) {
                 boolean asserted = true;
                 HttpsToken token = (HttpsToken)ai.getAssertion();
@@ -202,6 +207,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     if (auth == null || auth.size() == 0 
                         || !auth.get(0).startsWith("Basic")) {
                         asserted = false;
+                    } else {
+                        NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_BASIC_AUTHENTICATION);
                     }
                 }
                 if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
@@ -209,7 +216,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     if (auth == null || auth.size() == 0 
                         || !auth.get(0).startsWith("Digest")) {
                         asserted = false;
-                    }                        
+                    } else {
+                        NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_DIGEST_AUTHENTICATION);
+                    }
                 }
 
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);                
@@ -219,6 +228,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         && (tlsInfo.getPeerCertificates() == null 
                             || tlsInfo.getPeerCertificates().length == 0)) {
                         asserted = false;
+                    } else {
+                        NegotiationUtils.assertPolicy(aim, SP12Constants.REQUIRE_CLIENT_CERTIFICATE);
                     }
                 } else {
                     asserted = false;

@@ -56,6 +56,7 @@ import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
@@ -97,8 +98,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         if (abinding.getProtectionOrder() 
             == AbstractSymmetricAsymmetricBinding.ProtectionOrder.EncryptBeforeSigning) {
             doEncryptBeforeSign();
+            policyAsserted(SPConstants.ENCRYPT_BEFORE_SIGNING);
         } else {
             doSignBeforeEncrypt();
+            policyAsserted(SPConstants.SIGN_BEFORE_ENCRYPTING);
         }
     }
 
@@ -174,6 +177,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 if (sigConfList != null && !sigConfList.isEmpty()) {
                     enc.addAll(sigConfList);
                 }
+                policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
             }
             
             //Do encryption
@@ -319,6 +323,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
     private void checkForSignatureProtection(AbstractToken encryptionToken, WSSecBase encrBase) {
         // Check for signature protection
         if (abinding.isEncryptSignature()) {
+            policyAsserted(SPConstants.ENCRYPT_SIGNATURE);
             List<WSEncryptionPart> secondEncrParts = new ArrayList<WSEncryptionPart>();
 
             // Now encrypt the signature using the above token
@@ -514,6 +519,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 dkSign.prepare(saaj.getSOAPPart(), secHeader);
 
                 if (abinding.isProtectTokens()) {
+                    policyAsserted(SPConstants.PROTECT_TOKENS);
                     if (bstElement != null) {
                         WSEncryptionPart bstPart = 
                             new WSEncryptionPart(bstElement.getAttributeNS(WSConstants.WSU_NS, "Id"));
@@ -552,6 +558,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                       
             // This action must occur before sig.prependBSTElementToHeader
             if (abinding.isProtectTokens()) {
+                policyAsserted(SPConstants.PROTECT_TOKENS);
                 if (sig.getBSTTokenId() != null) {
                     WSEncryptionPart bstPart = 
                         new WSEncryptionPart(sig.getBSTTokenId());
