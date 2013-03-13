@@ -63,7 +63,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                         tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
                     }
                 }
-                if (tok == null) {
+                if (tok == null || !tok.isExpired()) {
                     tok = issueToken(message, aim);
                 }
                 if (tok != null) {
