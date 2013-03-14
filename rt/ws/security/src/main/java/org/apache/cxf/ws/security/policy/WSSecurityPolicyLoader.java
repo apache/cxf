@@ -145,6 +145,16 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new WSS10Builder());
         reg.registerBuilder(new WSS11Builder());
         reg.registerBuilder(new X509TokenBuilder());
+
+        //This is for the assertions that would contain nested policies
+        reg.registerBuilder(new XMLPrimitiveAssertionBuilder() {
+            public QName[] getKnownElements() {
+                return new QName[] {
+                    //SecureConversation
+                    SP12Constants.BOOTSTRAP_POLICY, SP11Constants.BOOTSTRAP_POLICY,                                    
+                };
+            }
+        });
         
         //add generic assertions for these known things to prevent warnings
         List<QName> others = Arrays.asList(new QName[] {
@@ -207,11 +217,8 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             // Spnego
             SP12Constants.MUST_NOT_SEND_AMEND,
             SP12Constants.MUST_NOT_SEND_CANCEL,
-            SP12Constants.MUST_NOT_SEND_RENEW,
+            SP12Constants.MUST_NOT_SEND_RENEW,            
             
-            // SecureConversation
-            SP12Constants.BOOTSTRAP_POLICY,
-            SP11Constants.BOOTSTRAP_POLICY,
             // Backwards compatibility thing
             new QName("http://schemas.microsoft.com/ws/2005/07/securitypolicy", "MustNotSendCancel"),
             
