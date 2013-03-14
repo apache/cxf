@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.support;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -78,15 +79,20 @@ import org.apache.cxf.jaxws.interceptors.WrapperClassOutInterceptor;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingMessageInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.Extensible;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.wsdl.WSDLManager;
+
 
 /**
  * A JAX-WS specific implementation of the CXF {@link org.apache.cxf.endpoint.Endpoint} interface.
@@ -202,11 +208,41 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     }
     
     private void extractWsdlExtensibilities(EndpointInfo endpoint) {
-        List<ExtensibilityElement> bindingExtensors 
-            = endpoint.getBinding().getExtensors(ExtensibilityElement.class);
-        List<ExtensibilityElement> portExtensors 
-            = endpoint.getExtensors(ExtensibilityElement.class);
+        List<ExtensibilityElement> portExtensors = getExtensors(endpoint);
+        List<ExtensibilityElement> bindingExtensors = getExtensors(endpoint.getBinding());        
+        
+        //check the extensions under <wsdl:binding>
         checkRespectBindingFeature(bindingExtensors);
+        
+        Collection<BindingOperationInfo> bindingOperations = endpoint.getBinding().getOperations();
+        if (null != bindingOperations) {
+            Iterator<BindingOperationInfo> iterator = bindingOperations.iterator();
+            while (iterator.hasNext()) {
+                BindingOperationInfo operationInfo = iterator.next();
+                BindingMessageInfo inputInfo = operationInfo.getInput();
+                BindingMessageInfo outputnfo = operationInfo.getOutput();
+                Collection<BindingFaultInfo> faults = operationInfo.getFaults();
+                
+                //check the extensions under <wsdl:operation>
+                checkRespectBindingFeature(getExtensors(operationInfo));
+                //check the extensions under <wsdl:input>
+                checkRespectBindingFeature(getExtensors(inputInfo));
+                //check the extensions under <wsdl:output>
+                checkRespectBindingFeature(getExtensors(outputnfo));
+                if (null != faults) {
+                    Iterator<BindingFaultInfo> faultIterator = faults.iterator();
+                    while (faultIterator.hasNext()) {
+                        BindingFaultInfo faultInfo = faultIterator.next();
+                        
+                        //check the extensions under <wsdl:fault>
+                        checkRespectBindingFeature(getExtensors(faultInfo));
+                    }
+                }
+                
+            }
+        }
+
+        
         if (hasUsingAddressing(bindingExtensors) || hasUsingAddressing(portExtensors)) {
             WSAddressingFeature feature = new WSAddressingFeature();
             if (addressingRequired(bindingExtensors)
@@ -216,6 +252,10 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             addAddressingFeature(feature);
         }
         extractWsdlEprs(endpoint);
+    }
+    
+    private List<ExtensibilityElement> getExtensors(Extensible extensibleInfo) {
+        return (null != extensibleInfo) ? extensibleInfo.getExtensors(ExtensibilityElement.class) : null;
     }
     
     private void checkRespectBindingFeature(List<ExtensibilityElement> bindingExtensors) {
