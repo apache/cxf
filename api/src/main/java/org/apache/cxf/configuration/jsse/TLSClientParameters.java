@@ -127,6 +127,11 @@ public class TLSClientParameters extends TLSParameterBase {
     
     public int hashCode() {
         int hash = disableCNCheck ? 37 : 17;
+        if (sslSocketFactory != null) {
+            hash = hash * 41 + System.identityHashCode(sslSocketFactory);
+        }
+        hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
+        hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
         hash = hash(hash, sslCacheTimeout);
         hash = hash(hash, secureRandom);
         hash = hash(hash, protocol);
@@ -170,35 +175,38 @@ public class TLSClientParameters extends TLSParameterBase {
         if (o instanceof TLSClientParameters) {
             TLSClientParameters that = (TLSClientParameters)o;
             boolean eq = disableCNCheck == that.disableCNCheck;
-            eq |= sslCacheTimeout == that.sslCacheTimeout;
-            eq |= secureRandom == that.secureRandom;
-            eq |= equals(certAlias, that.certAlias);
-            eq |= equals(protocol, that.protocol);
-            eq |= equals(provider, that.provider);
-            eq |= equals(ciphersuites, that.ciphersuites);
-            eq |= equals(keyManagers, that.keyManagers);
-            eq |= equals(trustManagers, that.trustManagers);
+            eq &= sslSocketFactory == that.sslSocketFactory;
+            eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
+            eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
+            eq &= sslCacheTimeout == that.sslCacheTimeout;
+            eq &= secureRandom == that.secureRandom;
+            eq &= equals(certAlias, that.certAlias);
+            eq &= equals(protocol, that.protocol);
+            eq &= equals(provider, that.provider);
+            eq &= equals(ciphersuites, that.ciphersuites);
+            eq &= equals(keyManagers, that.keyManagers);
+            eq &= equals(trustManagers, that.trustManagers);
             if (cipherSuiteFilters != null) {
                 if (that.cipherSuiteFilters != null) {
-                    eq |= equals(cipherSuiteFilters.getExclude(), that.cipherSuiteFilters.getExclude());
-                    eq |= equals(cipherSuiteFilters.getInclude(), that.cipherSuiteFilters.getInclude());
+                    eq &= equals(cipherSuiteFilters.getExclude(), that.cipherSuiteFilters.getExclude());
+                    eq &= equals(cipherSuiteFilters.getInclude(), that.cipherSuiteFilters.getInclude());
                 } else {
                     eq = false;
                 }
             } else {
-                eq |= that.cipherSuiteFilters == null;
+                eq &= that.cipherSuiteFilters == null;
             }
             if (certConstraints != null) {
                 if (that.certConstraints != null) {
-                    eq |= equals(certConstraints.getIssuerDNConstraints(), 
+                    eq &= equals(certConstraints.getIssuerDNConstraints(), 
                                  that.certConstraints.getIssuerDNConstraints());
-                    eq |= equals(certConstraints.getSubjectDNConstraints(),
+                    eq &= equals(certConstraints.getSubjectDNConstraints(),
                                  that.certConstraints.getSubjectDNConstraints());
                 } else {
                     eq = false;
                 }
             } else {
-                eq |= that.certConstraints == null;
+                eq &= that.certConstraints == null;
             }
             return eq;
         }
