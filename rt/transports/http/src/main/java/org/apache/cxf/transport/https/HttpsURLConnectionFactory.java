@@ -65,6 +65,7 @@ public class HttpsURLConnectionFactory {
      * Cache the last SSLContext to avoid recreation
      */
     SSLSocketFactory socketFactory;
+    int lastTlsHash;
     
     /**
      * This constructor initialized the factory with the configured TLS
@@ -128,6 +129,13 @@ public class HttpsURLConnectionFactory {
     protected synchronized void decorateWithTLS(TLSClientParameters tlsClientParameters, 
             HttpURLConnection connection) throws GeneralSecurityException {
 
+        
+        int hash = tlsClientParameters.hashCode();
+        if (hash != lastTlsHash) {
+            lastTlsHash = hash;
+            socketFactory = null;
+        }
+        
         // always reload socketFactory from HttpsURLConnection.defaultSSLSocketFactory and 
         // tlsClientParameters.sslSocketFactory to allow runtime configuration change
         if (tlsClientParameters.isUseHttpsURLConnectionDefaultSslSocketFactory()) {

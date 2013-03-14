@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.configuration.jsse;
 
+import java.util.List;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -121,5 +122,124 @@ public class TLSClientParameters extends TLSParameterBase {
     public void setUseHttpsURLConnectionDefaultHostnameVerifier(
                       boolean useHttpsURLConnectionDefaultHostnameVerifier) {
         this.useHttpsURLConnectionDefaultHostnameVerifier = useHttpsURLConnectionDefaultHostnameVerifier;
+    }
+    
+    public int hashCode() {
+        int hash = disableCNCheck ? 37 : 17;
+        if (sslSocketFactory != null) {
+            hash = hash * 41 + System.identityHashCode(sslSocketFactory);
+        }
+        hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
+        hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
+        hash = hash(hash, sslCacheTimeout);
+        hash = hash(hash, secureRandom);
+        hash = hash(hash, protocol);
+        hash = hash(hash, certAlias);
+        hash = hash(hash, provider);
+        for (String cs : ciphersuites) {
+            hash = hash(hash, cs);
+        }
+        hash = hash(hash, keyManagers);
+        hash = hash(hash, trustManagers);
+        if (cipherSuiteFilters != null) {
+            hash = hash(hash, cipherSuiteFilters.getInclude());
+            hash = hash(hash, cipherSuiteFilters.getExclude());
+        }
+        if (certConstraints != null) {
+            hash = hash(hash, certConstraints.getIssuerDNConstraints());
+            hash = hash(hash, certConstraints.getSubjectDNConstraints());
+        }
+        return hash;
+    }
+    private int hash(int i, Object o) {
+        if (o != null) {
+            i = i * 37 + o.hashCode();
+        }
+        return i;
+    }
+    private int hash(int i, Object[] os) {
+        if (os == null) {
+            return i;
+        }
+        for (Object o: os) {
+            i = hash(i, o);
+        }
+        return i;
+    }
+    
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (o instanceof TLSClientParameters) {
+            TLSClientParameters that = (TLSClientParameters)o;
+            boolean eq = disableCNCheck == that.disableCNCheck;
+            eq &= sslSocketFactory == that.sslSocketFactory;
+            eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
+            eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
+            eq &= sslCacheTimeout == that.sslCacheTimeout;
+            eq &= secureRandom == that.secureRandom;
+            eq &= equals(certAlias, that.certAlias);
+            eq &= equals(protocol, that.protocol);
+            eq &= equals(provider, that.provider);
+            eq &= equals(ciphersuites, that.ciphersuites);
+            eq &= equals(keyManagers, that.keyManagers);
+            eq &= equals(trustManagers, that.trustManagers);
+            if (cipherSuiteFilters != null) {
+                if (that.cipherSuiteFilters != null) {
+                    eq &= equals(cipherSuiteFilters.getExclude(), that.cipherSuiteFilters.getExclude());
+                    eq &= equals(cipherSuiteFilters.getInclude(), that.cipherSuiteFilters.getInclude());
+                } else {
+                    eq = false;
+                }
+            } else {
+                eq &= that.cipherSuiteFilters == null;
+            }
+            if (certConstraints != null) {
+                if (that.certConstraints != null) {
+                    eq &= equals(certConstraints.getIssuerDNConstraints(), 
+                                 that.certConstraints.getIssuerDNConstraints());
+                    eq &= equals(certConstraints.getSubjectDNConstraints(),
+                                 that.certConstraints.getSubjectDNConstraints());
+                } else {
+                    eq = false;
+                }
+            } else {
+                eq &= that.certConstraints == null;
+            }
+            return eq;
+        }
+        return false;
+    }
+    
+    private static boolean equals(final List<?> obj1, final List<?> obj2) {
+        if (obj1.size() == obj2.size()) {
+            for (int x = 0; x < obj1.size(); x++) {
+                if (!equals(obj1.get(x), obj2.get(x))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    private static boolean equals(final Object obj1, final Object obj2) {
+        return obj1 == null ? obj2 == null : obj1.equals(obj2);
+    }
+    private static boolean equals(final Object[] a1, final Object[] a2) {
+        if (a1 == null) {
+            return a2 == null;
+        } else {
+            if (a2 != null && a1.length == a2.length) {
+                for (int i = 0; i < a1.length; i++) {
+                    if (!equals(a1[i], a2[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
