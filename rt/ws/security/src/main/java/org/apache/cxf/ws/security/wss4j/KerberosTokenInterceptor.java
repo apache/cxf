@@ -36,6 +36,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -87,6 +88,9 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
                         results.add(0, rResult);
 
                         assertTokens(message, SPConstants.KERBEROS_TOKEN, false);
+                        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                        assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                        assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
                         
                         Principal principal = 
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -143,6 +147,9 @@ public class KerberosTokenInterceptor extends AbstractTokenInterceptor {
     }
     
     protected AbstractToken assertTokens(SoapMessage message) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, "WssKerberosV5ApReqToken11");
+        assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
         return assertTokens(message, SPConstants.KERBEROS_TOKEN, true);
     }
 

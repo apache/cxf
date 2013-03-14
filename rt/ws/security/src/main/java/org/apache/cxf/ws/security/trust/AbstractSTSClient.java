@@ -162,7 +162,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected AlgorithmSuite algorithmSuite;
     protected String namespace = STSUtils.WST_NS_05_12;
     protected String addressingNamespace = "http://www.w3.org/2005/08/addressing";
-    protected String wspNamespace = SPConstants.SPVersion.SP12.getNamespace();
+    protected String wspNamespace = "http://www.w3.org/ns/ws-policy";
     protected Object onBehalfOf;
     protected boolean enableAppliesTo = true;
 

@@ -138,7 +138,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             
-            System.out.println("IT!!!");
             if (aim != null) {
                 Collection<AssertionInfo> ais = 
                     NegotiationUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
@@ -349,9 +348,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             client.setTrust(getTrust10(aim));
             client.setTrust(getTrust13(aim));
             client.setTemplate(itok.getRequestSecurityTokenTemplate());
-            String namespace = itok.getVersion().getNamespace();
-            if (namespace != null) {
-                client.setWspNamespace(namespace);
+            if (itok.getPolicy() != null && itok.getPolicy().getNamespace() != null) {
+                client.setWspNamespace(itok.getPolicy().getNamespace());
             }
             if (maps != null && maps.getNamespaceURI() != null) {
                 client.setAddressingNamespace(maps.getNamespaceURI());

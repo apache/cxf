@@ -84,6 +84,10 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
             ai.setAsserted(true);
 
             if (!isTokenRequired(samlToken, message)) {
+                assertPolicy(
+                    aim, 
+                    new QName(samlToken.getVersion().getNamespace(), samlToken.getSamlTokenType().name())
+                );
                 continue;
             }
 

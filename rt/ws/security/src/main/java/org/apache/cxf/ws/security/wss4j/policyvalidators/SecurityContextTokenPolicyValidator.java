@@ -31,6 +31,8 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.policy.SP11Constants;
+import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SecurityContextToken;
 
@@ -50,13 +52,14 @@ public class SecurityContextTokenPolicyValidator
         Collection<AssertionInfo> ais = 
             getAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
         if (!ais.isEmpty()) {
-            parsePolicies(ais, message, results);
+            parsePolicies(aim, ais, message, results);
         }
         
         return true;
     }
     
     private void parsePolicies(
+        AssertionInfoMap aim,
         Collection<AssertionInfo> ais, 
         Message message,
         List<WSSecurityEngineResult> results
@@ -67,6 +70,10 @@ public class SecurityContextTokenPolicyValidator
         for (AssertionInfo ai : ais) {
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();
             ai.setAsserted(true);
+            
+            assertPolicy(aim, SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE);
+            assertPolicy(aim, SP12Constants.SC13_SECURITY_CONTEXT_TOKEN);
+            assertPolicy(aim, SP11Constants.SC10_SECURITY_CONTEXT_TOKEN);
 
             if (!isTokenRequired(sctPolicy, message)) {
                 continue;

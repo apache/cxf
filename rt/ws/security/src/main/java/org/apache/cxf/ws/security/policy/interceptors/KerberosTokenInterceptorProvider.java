@@ -142,6 +142,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         ai.setAsserted(true);
                     }                    
                 }
+                
+                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         
@@ -175,6 +178,9 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                         ai.setAsserted(true);
                     }                    
                 }
+                
+                NegotiationUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");
+                NegotiationUtils.assertPolicy(aim, "WssGssKerberosV5ApReqToken11");
             }
         }
         

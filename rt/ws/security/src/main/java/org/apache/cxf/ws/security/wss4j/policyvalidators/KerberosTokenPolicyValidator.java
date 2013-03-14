@@ -21,6 +21,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.util.Collection;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -49,38 +51,65 @@ public class KerberosTokenPolicyValidator extends AbstractTokenPolicyValidator {
     ) {
         Collection<AssertionInfo> krbAis = getAllAssertionsByLocalname(aim, SPConstants.KERBEROS_TOKEN);
         if (!krbAis.isEmpty()) {
-            parsePolicies(krbAis, kerberosToken);
+            parsePolicies(aim, krbAis, kerberosToken);
         }
         
         return true;
     }
     
-    private void parsePolicies(Collection<AssertionInfo> ais, KerberosSecurity kerberosToken) {
+    private void parsePolicies(
+        AssertionInfoMap aim, 
+        Collection<AssertionInfo> ais, 
+        KerberosSecurity kerberosToken
+    ) {
         for (AssertionInfo ai : ais) {
             KerberosToken kerberosTokenPolicy = (KerberosToken)ai.getAssertion();
             ai.setAsserted(true);
             
             if (!isTokenRequired(kerberosTokenPolicy, message)) {
+                assertPolicy(
+                    aim, 
+                    new QName(kerberosTokenPolicy.getVersion().getNamespace(), 
+                              "WssKerberosV5ApReqToken11")
+                );
+                assertPolicy(
+                    aim, 
+                    new QName(kerberosTokenPolicy.getVersion().getNamespace(), 
+                              "WssGssKerberosV5ApReqToken11")
+                );
                 continue;
             }
             
-            if (!checkToken(kerberosTokenPolicy, kerberosToken)) {
+            if (!checkToken(aim, kerberosTokenPolicy, kerberosToken)) {
                 ai.setNotAsserted("An incorrect Kerberos Token Type is detected");
                 continue;
             }
         }
     }
     
-    private boolean checkToken(KerberosToken kerberosTokenPolicy, KerberosSecurity kerberosToken) {
+    private boolean checkToken(
+        AssertionInfoMap aim,
+        KerberosToken kerberosTokenPolicy, 
+        KerberosSecurity kerberosToken
+    ) {
         ApReqTokenType apReqTokenType = kerberosTokenPolicy.getApReqTokenType();
 
         if (apReqTokenType == ApReqTokenType.WssKerberosV5ApReqToken11 
             && kerberosToken.isV5ApReq()) {
+            assertPolicy(
+                aim, 
+                new QName(kerberosTokenPolicy.getVersion().getNamespace(), "WssKerberosV5ApReqToken11")
+            );
             return true;
         } else if (apReqTokenType == ApReqTokenType.WssGssKerberosV5ApReqToken11 
             && kerberosToken.isGssV5ApReq()) {
+            assertPolicy(
+                aim, 
+                new QName(kerberosTokenPolicy.getVersion().getNamespace(), "WssGssKerberosV5ApReqToken11")
+            );
             return true;
         }
+        
         return false;
     }
 }

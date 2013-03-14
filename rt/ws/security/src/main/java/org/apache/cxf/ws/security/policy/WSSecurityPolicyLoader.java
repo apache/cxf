@@ -175,7 +175,9 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.REQUIRE_EMBEDDED_TOKEN_REFERENCE,
             SP11Constants.REQUIRE_EMBEDDED_TOKEN_REFERENCE,
             SP12Constants.ENCRYPT_BEFORE_SIGNING,
+            SP11Constants.ENCRYPT_BEFORE_SIGNING,
             SP12Constants.SIGN_BEFORE_ENCRYPTING,
+            SP11Constants.SIGN_BEFORE_ENCRYPTING,
             SP12Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP12Constants.PROTECT_TOKENS,
@@ -196,10 +198,22 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.REQUIRE_INTERNAL_REFERENCE, SP11Constants.REQUIRE_INTERNAL_REFERENCE,
             SP12Constants.REQUIRE_EXTERNAL_REFERNCE, SP11Constants.REQUIRE_EXTERNAL_REFERNCE,
             
+            // Kerberos
+            new QName(SP11Constants.SP_NS, "WssKerberosV5ApReqToken11"),
+            new QName(SP12Constants.SP_NS, "WssKerberosV5ApReqToken11"),
+            new QName(SP11Constants.SP_NS, "WssGssKerberosV5ApReqToken11"),
+            new QName(SP12Constants.SP_NS, "WssGssKerberosV5ApReqToken11"),
+            
             // Spnego
             SP12Constants.MUST_NOT_SEND_AMEND,
             SP12Constants.MUST_NOT_SEND_CANCEL,
             SP12Constants.MUST_NOT_SEND_RENEW,
+            
+            // SecureConversation
+            SP12Constants.BOOTSTRAP_POLICY,
+            SP11Constants.BOOTSTRAP_POLICY,
+            // Backwards compatibility thing
+            new QName("http://schemas.microsoft.com/ws/2005/07/securitypolicy", "MustNotSendCancel"),
             
             // SCT
             SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE,

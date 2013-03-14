@@ -974,8 +974,11 @@ public abstract class AbstractBindingBuilder {
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+            policyAsserted("WssSamlV11Token10");
+            policyAsserted("WssSamlV11Token11");
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            policyAsserted("WssSamlV20Token11");
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);

@@ -559,6 +559,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SPConstants.REQUIRE_THUMBPRINT_REFERENCE);
             assertPolicy(aim, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE);
             assertPolicy(aim, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE);
+            assertPolicy(aim, SPConstants.REQUIRE_INTERNAL_REFERENCE);
             
             // WSS10
             assertPolicy(aim, SPConstants.WSS10);

@@ -114,6 +114,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                             }
                         }
                         assertTokens(message, SPConstants.SAML_TOKEN, signed);
+                        // TODO revisit
+                        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                        assertPolicy(aim, "WssSamlV11Token10");
+                        assertPolicy(aim, "WssSamlV11Token11");
+                        assertPolicy(aim, "WssSamlV20Token11");
                         
                         Principal principal = 
                             (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -229,12 +234,18 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             return null;
         }
 
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+            assertPolicy(aim, "WssSamlV11Token10");
+            assertPolicy(aim, "WssSamlV11Token11");
+            
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+            assertPolicy(aim, "WssSamlV20Token11");
         }
         SAMLUtil.doSAMLCallback(handler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);

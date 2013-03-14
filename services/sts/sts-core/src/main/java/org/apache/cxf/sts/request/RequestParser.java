@@ -146,6 +146,7 @@ public class RequestParser {
                     LOG.log(
                         Level.WARNING, 
                         "An unknown (DOM) element was received: " + element.getLocalName()
+                        + " " + element.getNamespaceURI()
                     );
                     throw new STSException(
                         "An unknown element was received", STSException.BAD_REQUEST
