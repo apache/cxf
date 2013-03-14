@@ -46,7 +46,7 @@
     </cxf:bus>
     
     <jaxws:endpoint 
-       id="3DESEncryption"
+       id="TripleDESEncryption"
        address="http://localhost:${testutil.ports.Server}/DoubleIt3DESEncryption" 
        serviceName="s:DoubleItService"
        endpointName="s:DoubleIt3DESEncryptionPort"
