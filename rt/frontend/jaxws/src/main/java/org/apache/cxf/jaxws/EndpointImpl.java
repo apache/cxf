@@ -690,9 +690,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         }
         public Interceptor<? extends Message> remove(int index) {
             Interceptor<? extends Message> o = orig.remove(index);
-            if (o == null) {
-                other.remove(o);
-            }
+            other.remove(o);
             return o;
         }
         public boolean removeAll(Collection<?> c) {
