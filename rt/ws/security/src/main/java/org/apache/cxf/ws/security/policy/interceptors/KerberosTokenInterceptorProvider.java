@@ -110,21 +110,15 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 }
                 if (isRequestor(message)) {
                     SecurityToken tok = null;
-                    String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                    if (tokId != null) {
-                        tok = getTokenStore(message).getToken(tokId);
-                    }
-                    if (tok == null) {
-                        try {
-                            KerberosClient client = KerberosUtils.getClient(message, "kerberos");
-                            synchronized (client) {
-                                tok = client.requestSecurityToken();
-                            }
-                        } catch (RuntimeException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            throw new Fault(e);
+                    try {
+                        KerberosClient client = KerberosUtils.getClient(message, "kerberos");
+                        synchronized (client) {
+                            tok = client.requestSecurityToken();
                         }
+                    } catch (RuntimeException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new Fault(e);
                     }
                     if (tok != null) {
                         for (AssertionInfo ai : ais) {
