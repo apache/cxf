@@ -79,10 +79,8 @@ public final class ServiceModelUtil {
             return null;
         }
         BindingInfo service = ep.getEndpointInfo().getBinding();
-        Map<QName, BindingOperationInfo> wrapperMap =
-            CastUtils.cast(service.getProperty("ServiceModel.WRAPPER.MAP"
-                                               + (output ? "" : "_OUT"), Map.class));
-
+        Map<QName, BindingOperationInfo> wrapperMap = CastUtils.cast(service.getProperty(output
+            ? "ServiceModel.WRAPPER.MAP_OUT" : "ServiceModel.WRAPPER.MAP", Map.class));
 
         if (wrapperMap == null) {
             wrapperMap = new HashMap<QName, BindingOperationInfo>();
@@ -108,8 +106,7 @@ public final class ServiceModelUtil {
                     }
                 }
             }
-            service.setProperty("ServiceModel.WRAPPER.MAP"
-                                + (output ? "" : "_OUT"), wrapperMap);
+            service.setProperty(output ? "ServiceModel.WRAPPER.MAP_OUT" : "ServiceModel.WRAPPER.MAP", wrapperMap);
         }
         return wrapperMap.get(opName);
     }

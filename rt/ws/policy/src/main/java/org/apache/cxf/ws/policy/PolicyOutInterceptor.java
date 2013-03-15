@@ -76,7 +76,6 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             return;
         }
 
-        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
         Collection<Assertion> assertions = new ArrayList<Assertion>();
 
         // 1. Check overridden policy
@@ -89,7 +88,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
-            interceptors.addAll(effectivePolicy.getInterceptors());
+            addInterceptors(effectivePolicy.getInterceptors(), msg);
             assertions.addAll(effectivePolicy.getChosenAlternative());
         } else if (MessageUtils.isRequestor(msg)) {
             // 2. Process client policy
@@ -102,7 +101,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
                 PolicyUtils.logPolicy(
                     LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy()
                 );
-                interceptors.addAll(effectivePolicy.getInterceptors());
+                addInterceptors(effectivePolicy.getInterceptors(), msg);
                 assertions.addAll(effectivePolicy.getChosenAlternative());
             }
         } else {
@@ -117,18 +116,11 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
                 PolicyUtils.logPolicy(
                     LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy()
                 );
-                interceptors.addAll(effectivePolicy.getInterceptors());
+                addInterceptors(effectivePolicy.getInterceptors(), msg);
                 assertions.addAll(effectivePolicy.getChosenAlternative());
             }
         }
         
-        // add interceptors into message chain
-        for (Interceptor<? extends Message> oi : interceptors) {
-            msg.getInterceptorChain().add(oi);
-            LOG.log(Level.FINE, "Added interceptor of type {0}",
-                    oi.getClass().getSimpleName());           
-        }
-
         // insert assertions of endpoint's fault vocabulary into message        
         if (null != assertions && !assertions.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -143,6 +135,13 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             }
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
             msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);
+        }
+    }
+    
+    private static void addInterceptors(List<Interceptor<? extends Message>> interceptors, Message msg) {
+        for (Interceptor<? extends Message> oi : interceptors) {
+            msg.getInterceptorChain().add(oi);
+            LOG.log(Level.FINE, "Added interceptor of type {0}", oi.getClass().getSimpleName());
         }
     }
 }

@@ -19,9 +19,7 @@
 package org.apache.cxf.staxutils;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
@@ -37,8 +35,6 @@ import javax.xml.stream.XMLStreamReader;
  */
 public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
     protected int currentEvent = XMLStreamConstants.START_DOCUMENT;
-
-    private Map<String, Object> properties = new HashMap<String, Object>();
 
     private FastStack<ElementFrame<T, I>> frames = new FastStack<ElementFrame<T, I>>();
 
@@ -118,7 +114,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
      * @see javax.xml.stream.XMLStreamReader#getProperty(java.lang.String)
      */
     public Object getProperty(String key) throws IllegalArgumentException {
-        return properties.get(key);
+        return null;
     }
 
     /*

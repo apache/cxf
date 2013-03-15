@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 public final class HttpHeaderHelper {
     public static final String ACCEPT_ENCODING = "Accept-Encoding";
@@ -44,6 +45,7 @@ public final class HttpHeaderHelper {
     
     private static Map<String, String> internalHeaders = new HashMap<String, String>();
     private static ConcurrentHashMap<String, String> encodings = new ConcurrentHashMap<String, String>();
+    private static Pattern charsetPattern = Pattern.compile("\"|'");
     
     static {
         internalHeaders.put("Accept-Encoding", "accept-encoding");
@@ -110,8 +112,7 @@ public final class HttpHeaderHelper {
         }
         // Charsets can be quoted. But it's quite certain that they can't have escaped quoted or
         // anything like that.
-        enc = enc.replace("\"", "").trim();
-        enc = enc.replace("'", "");
+        enc = charsetPattern.matcher(enc).replaceAll("").trim();
         if ("".equals(enc)) {
             return deflt;
         }
