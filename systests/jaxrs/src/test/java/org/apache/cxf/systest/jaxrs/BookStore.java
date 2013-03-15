@@ -134,6 +134,13 @@ public class BookStore {
     }
 
     @GET
+    @Path("/customtext")
+    @Produces("text/custom")
+    public String getCustomBookTest() {
+        return "Good book";
+    }
+    
+    @GET
     @Path("/booknames/123")
     @Produces("application/bar")
     public byte[] getBookName123() {

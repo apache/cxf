@@ -63,6 +63,7 @@ public class BookServer extends AbstractBusTestServerBase {
         p.setEnableBuffering(true);
         p.setReportByteArraySize(true);
         providers.add(p);
+        providers.add(new ContentTypeModifyingMBW());
         JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();
         Map<String, String> jaxbElementClassMap = new HashMap<String, String>(); 
         jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
