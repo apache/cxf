@@ -99,6 +99,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     return;
                 }
                 if (isRequestor(message)) {
+<<<<<<< HEAD
                     SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
                     if (tok == null) {
                         String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
@@ -116,7 +117,18 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                             throw e;
                         } catch (Exception e) {
                             throw new Fault(e);
+=======
+                    SecurityToken tok = null;
+                    try {
+                        KerberosClient client = KerberosUtils.getClient(message, "kerberos");
+                        synchronized (client) {
+                            tok = client.requestSecurityToken();
+>>>>>>> 5b53eba... Merged revisions 1456878 via  git cherry-pick from
                         }
+                    } catch (RuntimeException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new Fault(e);
                     }
                     if (tok != null) {
                         for (AssertionInfo ai : ais) {

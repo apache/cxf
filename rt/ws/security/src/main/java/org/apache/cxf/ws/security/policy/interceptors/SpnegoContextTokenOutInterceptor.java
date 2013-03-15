@@ -56,14 +56,28 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 return;
             }
             if (isRequestor(message)) {
+<<<<<<< HEAD
                 SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
                 if (tok == null) {
                     String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
                     if (tokId != null) {
                         tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
+=======
+                String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
+                SecurityToken tok = null;
+                if (tokId != null) {
+                    tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
+                    
+                    if (tok != null && tok.isExpired()) {
+                        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+                        message.getExchange().remove(SecurityConstants.TOKEN_ID);
+                        NegotiationUtils.getTokenStore(message).remove(tokId);
+                        tok = null;
+>>>>>>> 5b53eba... Merged revisions 1456878 via  git cherry-pick from
                     }
                 }
-                if (tok == null || !tok.isExpired()) {
+                
+                if (tok == null) {
                     tok = issueToken(message, aim);
                 }
                 if (tok != null) {
