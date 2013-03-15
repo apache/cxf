@@ -389,50 +389,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             client.setTrust(getTrust10(aim));
             client.setTrust(getTrust13(aim));
             client.setTemplate(itok.getRstTemplate());
-<<<<<<< HEAD
-=======
-            Element policy = itok.getPolicy();
-            if (policy != null && policy.getNamespaceURI() != null) {
-                client.setWspNamespace(policy.getNamespaceURI());
-            }
-            if (maps != null && maps.getNamespaceURI() != null) {
-                client.setAddressingNamespace(maps.getNamespaceURI());
-            }
-            if (itok.getClaims() != null) {
-                client.setClaims(itok.getClaims());
-            }
-            return client.requestSecurityToken(appliesTo);
-        }
-        
-        private SecurityToken renewToken(
-            Message message, 
-            AssertionInfoMap aim,
-            IssuedToken itok,
-            SecurityToken tok
-        ) {
-            // If the token has not expired then we don't need to renew it
-            if (!tok.isExpired()) {
-                return tok;
-            }
-            
-            // Remove token from cache
-            message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
-            message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
-            message.getExchange().remove(SecurityConstants.TOKEN_ID);
-            message.getExchange().remove(SecurityConstants.TOKEN);
-            NegotiationUtils.getTokenStore(message).remove(tok.getId());
-            
-            // If the user has explicitly disabled Renewing then we can't renew a token,
-            // so just get a new one
-            STSClient client = STSUtils.getClient(message, "sts", itok);
-            if (!client.isAllowRenewing()) {
-                return issueToken(message, aim, itok);
-            }
-            
-            AddressingProperties maps =
-                (AddressingProperties)message
-                    .get("javax.xml.ws.addressing.context.outbound");
->>>>>>> 5b53eba... Merged revisions 1456878 via  git cherry-pick from
             if (maps == null) {
                 return client.requestSecurityToken();
             } else {
@@ -440,7 +396,6 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 return client.requestSecurityToken(appliesTo);
             }
         }
-        
     }
     
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
