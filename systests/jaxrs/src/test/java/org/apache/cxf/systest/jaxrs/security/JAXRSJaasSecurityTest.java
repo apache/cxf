@@ -25,7 +25,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.systest.jaxrs.Book;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,7 +72,7 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
         pol.setPassword("bar1");
         WebClient.getConfig(wc).getHttpConduit().setAuthorization(pol);
         
-        wc.accept("text/xml");
+        wc.accept("application/xml");
         
         //wc.header(HttpHeaders.AUTHORIZATION, 
         //          "Basic " + base64Encode("foo" + ":" + "bar1"));
@@ -79,6 +81,42 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
         Object wwwAuthHeader = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);
         assertNotNull(wwwAuthHeader);
         assertEquals("Basic", wwwAuthHeader.toString());
+    }
+    
+    @Test
+    public void testJaasFilterWebClientAuthorizationPolicy() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        AuthorizationPolicy pol = new AuthorizationPolicy();
+        pol.setUserName("bob");
+        pol.setPassword("bobspassword");
+        WebClient.getConfig(wc).getHttpConduit().setAuthorization(pol);
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testJaasFilterWebClientAuthorizationPolicy2() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123"; 
+        WebClient wc = WebClient.create(endpointAddress, "bob", "bobspassword", null);
+        //WebClient.getConfig(wc).getOutInterceptors().add(new LoggingOutInterceptor());
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testJaasFilterProxyAuthorizationPolicy() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/service/jaas2"; 
+        SecureBookStoreNoAnnotations proxy = 
+            JAXRSClientFactory.create(endpointAddress, SecureBookStoreNoAnnotations.class,
+                                      "bob", "bobspassword", null);
+        Book book = proxy.getThatBook(123L);
+        assertEquals(123L, book.getId());
     }
     
     @Test
