@@ -23,20 +23,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
 
 public class WriterInterceptorMBW implements WriterInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WriterInterceptorMBW.class);
     
     private MessageBodyWriter<Object> writer;
-    
-    public WriterInterceptorMBW(MessageBodyWriter<Object> writer) {
+    private Message m;
+    public WriterInterceptorMBW(MessageBodyWriter<Object> writer, Message m) {
         this.writer = writer;
+        this.m = m;
     }
 
     public MessageBodyWriter<Object> getMBW() {
@@ -49,13 +54,16 @@ public class WriterInterceptorMBW implements WriterInterceptor {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
         }
-        
+        MultivaluedMap<String, Object> headers = c.getHeaders();
+        Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
+        MediaType mt = mtObject == null ? c.getMediaType() : MediaType.valueOf(mtObject.toString());
+        m.put(Message.CONTENT_TYPE, mtObject.toString());
         writer.writeTo(c.getEntity(), 
                        c.getType(), 
                        c.getGenericType(), 
                        c.getAnnotations(), 
-                       c.getMediaType(), 
-                       c.getHeaders(), 
+                       mt, 
+                       headers, 
                        c.getOutputStream());
     }
     

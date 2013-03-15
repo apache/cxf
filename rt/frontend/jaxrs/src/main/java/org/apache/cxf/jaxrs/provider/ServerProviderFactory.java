@@ -158,7 +158,6 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     private static <T> List<ProviderInfo<T>> getPostMatchContainerFilters(Map<NameKey, ProviderInfo<T>> boundFilters,
                                                                           List<String> names) {
-        
         if (boundFilters.isEmpty()) {
             return Collections.emptyList();
         }

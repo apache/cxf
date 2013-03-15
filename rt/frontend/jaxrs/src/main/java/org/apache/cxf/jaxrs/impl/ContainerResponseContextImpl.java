@@ -28,12 +28,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 public class ContainerResponseContextImpl extends AbstractResponseContextImpl 
     implements ContainerResponseContext {
 
     private OperationResourceInfo ori;
+    
     public ContainerResponseContextImpl(Response r, 
                                         Message m,
                                         OperationResourceInfo ori) {
@@ -43,22 +45,24 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
     
     @Override
     public Annotation[] getEntityAnnotations() {
-        Annotation[] anns = super.getResponseEntityAnnotations();
-        if (anns == null) {
-            Method method = ori == null ? null : ori.getAnnotatedMethod();
-            anns = method == null ? new Annotation[]{} : method.getAnnotations();
-        }
-        return anns;
+        return super.getResponseEntityAnnotations();
     }
 
     @Override
     public Class<?> getEntityClass() {
-        return ori == null ? getResponseEntityClass() : ori.getMethodToInvoke().getReturnType();
+        return InjectionUtils.getRawResponseClass(super.r.getEntity());
     }
 
     @Override
     public Type getEntityType() {
-        return ori == null ? getResponseEntityClass() : ori.getMethodToInvoke().getGenericReturnType();
+        Method invoked = ori == null ? null : ori.getAnnotatedMethod() != null
+                ? ori.getAnnotatedMethod() : ori.getMethodToInvoke();
+        
+        return InjectionUtils.getGenericResponseType(invoked, 
+                                              super.r.getEntity(), 
+                                              getEntityClass(), 
+                                              ori, 
+                                              super.m.getExchange());
     }
     
     @Override
@@ -76,6 +80,4 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
         m.put(OutputStream.class, os);
 
     }
-
-
 }

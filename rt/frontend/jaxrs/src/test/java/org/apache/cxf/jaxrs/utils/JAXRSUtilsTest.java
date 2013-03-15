@@ -316,44 +316,44 @@ public class JAXRSUtilsTest extends Assert {
         
         //If acceptContentTypes does not specify a specific Mime type, the  
         //method is declared with a most specific ProduceMime type is selected.
-        OperationResourceInfo ori = findTargetResourceClass(resources, null, 
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage2(), 
              "/bookstore/1/books/123/", "GET", new MetadataMap<String, String>(), contentTypes, 
              getTypes("application/json,application/xml"));       
         assertNotNull(ori);
         assertEquals("getBookJSON", ori.getMethodToInvoke().getName());
         
         //test
-        ori = findTargetResourceClass(resources, null, "/bookstore/1/books/123",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books/123",
              "GET", new MetadataMap<String, String>(), contentTypes, getTypes("application/json"));        
         assertNotNull(ori);
         assertEquals("getBookJSON", ori.getMethodToInvoke().getName());
         
         //test 
-        ori = findTargetResourceClass(resources, null, "/bookstore/1/books/123",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books/123",
               "GET", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));        
         assertNotNull(ori);
         assertEquals("getBook", ori.getMethodToInvoke().getName());
         
         //test 
-        ori = findTargetResourceClass(resources, null, "/bookstore/1/books",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books",
                       "GET", new MetadataMap<String, String>(), contentTypes, 
                       getTypes("application/xml"));        
         assertNotNull(ori);
         assertEquals("getBooks", ori.getMethodToInvoke().getName());
         
         //test find POST
-        ori = findTargetResourceClass(resources, null, "/bookstore/1/books",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books",
                  "POST", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));       
         assertNotNull(ori);
         assertEquals("addBook", ori.getMethodToInvoke().getName());
         
         //test find PUT
-        ori = findTargetResourceClass(resources, null, "/bookstore/1/books",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books",
             "PUT", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));  
         assertEquals("updateBook", ori.getMethodToInvoke().getName());
         
         //test find DELETE
-        ori = findTargetResourceClass(resources, null, "/bookstore/1/books/123",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books/123",
              "DELETE", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));        
         assertNotNull(ori);
         assertEquals("deleteBook", ori.getMethodToInvoke().getName());     
@@ -376,7 +376,7 @@ public class JAXRSUtilsTest extends Assert {
         //If acceptContentTypes does not specify a specific Mime type, the  
         //method is declared with a most specific ProduceMime type is selected.
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, null, "/1/2/",
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage2(), "/1/2/",
              "GET", values, contentTypes, getTypes("*/*"));       
         assertNotNull(ori);
         assertEquals("getBooks", ori.getMethodToInvoke().getName());
@@ -388,7 +388,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("Second id is 2", "2", values.get("id").get(1));
         
         values = new MetadataMap<String, String>();
-        ori = findTargetResourceClass(resources, null, "/2",
+        ori = findTargetResourceClass(resources, createMessage2(), "/2",
              "POST", values, contentTypes, getTypes("*/*"));       
         assertNotNull(ori);
         assertEquals("updateBookStoreInfo", ori.getMethodToInvoke().getName());
@@ -399,7 +399,7 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("Only the first {id} should've been picked up", "2", values.getFirst("id"));
         
         values = new MetadataMap<String, String>();
-        ori = findTargetResourceClass(resources, null, "/3/4",
+        ori = findTargetResourceClass(resources, createMessage2(), "/3/4",
              "PUT", values, contentTypes, getTypes("*/*"));       
         assertNotNull(ori);
         assertEquals("updateBook", ori.getMethodToInvoke().getName());
@@ -410,6 +410,29 @@ public class JAXRSUtilsTest extends Assert {
                      values.get(URITemplate.FINAL_MATCH_GROUP).size());
         assertEquals("Only the first {id} should've been picked up", "3", values.getFirst("id"));
         assertEquals("Only the first {id} should've been picked up", "4", values.getFirst("bookId"));
+    }
+    
+    private Message createMessage2() {
+        ProviderFactory factory = ServerProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ServerProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
     }
     
     @Test
@@ -433,17 +456,17 @@ public class JAXRSUtilsTest extends Assert {
         assertNotNull(ori);
         assertEquals("getNewBook", ori.getMethodToInvoke().getName());
         
-        ori = findTargetResourceClass(resources, null, "/bookstore/books",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/books",
             "POST", new MetadataMap<String, String>(), contentTypes, getTypes("*/*"));      
         assertNotNull(ori);
         assertEquals("addBook", ori.getMethodToInvoke().getName());
         
-        ori = findTargetResourceClass(resources, null, "/bookstore/books",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/books",
              "PUT", new MetadataMap<String, String>(), contentTypes, getTypes("*/*"));        
         assertNotNull(ori);
         assertEquals("updateBook", ori.getMethodToInvoke().getName());
         
-        ori = findTargetResourceClass(resources, null, "/bookstore/books/123",
+        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/books/123",
             "DELETE", new MetadataMap<String, String>(), contentTypes, getTypes("*/*"));        
         assertNotNull(ori);
         assertEquals("deleteBook", ori.getMethodToInvoke().getName());
@@ -1456,22 +1479,22 @@ public class JAXRSUtilsTest extends Assert {
         md.bind(ori2, Customer.class.getMethod("getItPlain", new Class[]{}));
         cri.setMethodDispatcher(md);
         
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", 
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", 
               new MetadataMap<String, String>(), "*/*", getTypes("text/plain"));
         
         assertSame(ori, ori2);
         
-        ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(), 
                                               "*/*", getTypes("text/xml"));
                          
         assertSame(ori, ori1);
         
-        ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
                                           JAXRSUtils.sortMediaTypes(getTypes("*,text/plain,text/xml")));
                      
         assertSame(ori, ori2);
-        ori = JAXRSUtils.findTargetMethod(getMap(cri), null, "GET", new MetadataMap<String, String>(), 
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
                                           JAXRSUtils.sortMediaTypes(getTypes("*,text/plain, text/xml,x/y")));
                      
@@ -1849,7 +1872,7 @@ public class JAXRSUtilsTest extends Assert {
             = JAXRSUtils.selectResourceClass(resources, path, new MessageImpl());
         
         if (mResources != null) {
-            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, null, httpMethod, 
+            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, message, httpMethod, 
                                                    values, requestContentType, acceptContentTypes);
             if (ori != null) {
                 return ori;

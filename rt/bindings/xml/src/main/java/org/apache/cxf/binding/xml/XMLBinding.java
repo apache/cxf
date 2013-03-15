@@ -20,6 +20,7 @@ package org.apache.cxf.binding.xml;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.XMLMessage;
@@ -44,7 +45,19 @@ public class XMLBinding extends AbstractBasicInterceptorProvider implements Bind
 
     public Message createMessage(Message m) {
         if (!m.containsKey(Message.CONTENT_TYPE)) {
-            m.put(Message.CONTENT_TYPE, "text/xml");
+            
+            String ct = null;
+            
+            // Should this be done in ServiceInvokerInterceptor to support a case where the 
+            // response content type is detected early on the inbound chain for all the bindings ?
+            Exchange exchange = m.getExchange();
+            if (exchange != null) {
+                ct = (String)exchange.get(Message.CONTENT_TYPE);
+            }
+            if (ct == null) {
+                ct = "text/xml";
+            }
+            m.put(Message.CONTENT_TYPE, ct);
         }
         return new XMLMessage(m);
     }

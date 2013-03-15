@@ -76,16 +76,16 @@ public final class ResponseImpl extends Response {
         this.metadata = meta;
     }
     
-    void setStatus(int s) { 
+    public void setStatus(int s) { 
         this.status = s;
     }
     
-    void setEntity(Object e, Annotation[] anns) { 
+    public void setEntity(Object e, Annotation[] anns) { 
         this.entity = e;
         this.entityAnnotations = anns;
     }
     
-    Annotation[] getEntityAnnotations() {
+    public Annotation[] getEntityAnnotations() {
         return entityAnnotations;
     }
 

@@ -42,6 +42,7 @@ import org.apache.cxf.jaxrs.fortest.GenericEntityImpl4;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.Chapter;
@@ -317,7 +318,7 @@ public class SelectMethodCandidatesTest extends Assert {
         String acceptContentTypes = "text/xml,*/*";
         
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, null, 
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), 
                                                             path,
                                                             "GET",
                                                             values, contentTypes, 
@@ -337,7 +338,7 @@ public class SelectMethodCandidatesTest extends Assert {
         String acceptContentTypes = "application/xml;q=0.5,application/json";
         
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, null, 
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), 
                                                             "/1/2/3/d/resource1",
                                                             "GET",
                                                             values, contentTypes, 
@@ -362,7 +363,7 @@ public class SelectMethodCandidatesTest extends Assert {
         //If acceptContentTypes does not specify a specific Mime type, the  
         //method is declared with a most specific ProduceMime type is selected.
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, null, 
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), 
                                                             "/1/2/3/d",
                                                             "GET",
                                                             values, contentTypes, 
@@ -476,7 +477,30 @@ public class SelectMethodCandidatesTest extends Assert {
         
     }
     
-    private static OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
+    private Message createMessage() {
+        ProviderFactory factory = ServerProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ServerProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
+    }
+    
+    private OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
                                                                  Message message,
                                                                  String path, 
                                                                  String httpMethod,
@@ -488,7 +512,7 @@ public class SelectMethodCandidatesTest extends Assert {
             = JAXRSUtils.selectResourceClass(resources, path, message);
          
         if (mResources != null) {
-            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, null, httpMethod, 
+            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, createMessage(), httpMethod, 
                                                     values, requestContentType, acceptContentTypes);
             if (ori != null) {
                 return ori;

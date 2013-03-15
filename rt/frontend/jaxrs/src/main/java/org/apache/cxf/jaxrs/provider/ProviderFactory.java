@@ -354,7 +354,7 @@ public abstract class ProviderFactory {
             @SuppressWarnings({
                 "unchecked", "rawtypes"
             })
-            WriterInterceptor mbwWriter = new WriterInterceptorMBW((MessageBodyWriter)mw);
+            WriterInterceptor mbwWriter = new WriterInterceptorMBW((MessageBodyWriter)mw, m);
               
             int size = writerInterceptors.size();
             List<WriterInterceptor> interceptors = null;

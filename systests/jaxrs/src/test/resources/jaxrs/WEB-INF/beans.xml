@@ -151,8 +151,12 @@ http://cxf.apache.org/schemas/core.xsd">
   <jaxrs:server id="bookJsonp" address="/jsonp">
     <jaxrs:serviceBeans>
       <ref bean="serviceBean" />
-    </jaxrs:serviceBeans>		  
-
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>		  
+	    <bean class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+	      <property name="produceMediaTypes" ref="jsonTypes"/>
+	    </bean>
+    </jaxrs:providers> 
     <jaxrs:inInterceptors>
        <bean class="org.apache.cxf.jaxrs.provider.jsonp.JsonpInInterceptor"/>
     </jaxrs:inInterceptors>
@@ -276,6 +280,7 @@ http://cxf.apache.org/schemas/core.xsd">
   
   <util:list id="jsonTypes">
     <value>application/json</value>
+    <value>application/x-javascript</value>
     <value>application/vnd.example-com.foo+json</value>
   </util:list>
   
