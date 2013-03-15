@@ -367,6 +367,13 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 return tok;
             }
             
+            // Remove token from cache
+            message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
+            message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+            message.getExchange().remove(SecurityConstants.TOKEN_ID);
+            message.getExchange().remove(SecurityConstants.TOKEN);
+            NegotiationUtils.getTokenStore(message).remove(tok.getId());
+            
             // If the user has explicitly disabled Renewing then we can't renew a token,
             // so just get a new one
             STSClient client = STSUtils.getClient(message, "sts", itok);

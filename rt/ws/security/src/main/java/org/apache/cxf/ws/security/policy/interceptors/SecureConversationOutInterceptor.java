@@ -99,6 +99,14 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             return tok;
         }
         
+        
+        // Remove the old token
+        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
+        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+        message.getExchange().remove(SecurityConstants.TOKEN_ID);
+        message.getExchange().remove(SecurityConstants.TOKEN);
+        NegotiationUtils.getTokenStore(message).remove(tok.getId());
+        
         STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =
             (AddressingProperties)message
