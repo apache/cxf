@@ -990,14 +990,16 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         OperationInfo op = intf.addOperation(getOperationName(intf, m));
         op.setProperty(m.getClass().getName(), m);
         op.setProperty("action", getAction(op, m));
-        op.setProperty(METHOD_ANNOTATIONS, m.getAnnotations());
-        op.setProperty(METHOD_PARAM_ANNOTATIONS, m.getParameterAnnotations());
+        final Annotation[] annotations = m.getAnnotations();
+        final Annotation[][] parAnnotations = m.getParameterAnnotations();
+        op.setProperty(METHOD_ANNOTATIONS, annotations);
+        op.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
 
         boolean isrpc = isRPC(m);
         if (!isrpc && isWrapped(m)) {
             UnwrappedOperationInfo uOp = new UnwrappedOperationInfo(op);
-            uOp.setProperty(METHOD_ANNOTATIONS, m.getAnnotations());
-            uOp.setProperty(METHOD_PARAM_ANNOTATIONS, m.getParameterAnnotations());
+            uOp.setProperty(METHOD_ANNOTATIONS, annotations);
+            uOp.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
             op.setUnwrappedOperation(uOp);
 
             createMessageParts(intf, uOp, m);
@@ -1506,6 +1508,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         op.setProperty(METHOD, method);
         MessageInfo inMsg = op.createMessage(this.getInputMessageName(op, method), MessageInfo.Type.INPUT);
         op.setInput(inMsg.getName().getLocalPart(), inMsg);
+        final Annotation[][] parAnnotations = method.getParameterAnnotations();
+        final Type[] genParTypes = method.getGenericParameterTypes();
         for (int j = 0; j < paramClasses.length; j++) {
             if (Exchange.class.equals(paramClasses[j])) {
                 continue;
@@ -1523,10 +1527,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
 
 
-                initializeParameter(part, paramClasses[j], method.getGenericParameterTypes()[j]);
+                initializeParameter(part, paramClasses[j], genParTypes[j]);
                 //TODO:remove method param annotations
-                part.setProperty(METHOD_PARAM_ANNOTATIONS, method.getParameterAnnotations());
-                part.setProperty(PARAM_ANNOTATION, method.getParameterAnnotations()[j]);
+                part.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
+                part.setProperty(PARAM_ANNOTATION, parAnnotations[j]);
                 if (getJaxbAnnoMap(part).size() > 0) {
                     op.setProperty(WRAPPERGEN_NEEDED, true);
                 }
@@ -1562,8 +1566,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 if (!isRPC(method) && !isWrapped(method)) {
                     part.setProperty(ELEMENT_NAME, q2);
                 }
-                part.setProperty(METHOD_ANNOTATIONS, method.getAnnotations());
-                part.setProperty(PARAM_ANNOTATION, method.getAnnotations());
+                final Annotation[] annotations = method.getAnnotations();
+                part.setProperty(METHOD_ANNOTATIONS, annotations);
+                part.setProperty(PARAM_ANNOTATION, annotations);
                 if (isHeader(method, -1)) {
                     part.setProperty(HEADER, Boolean.TRUE);
                     if (isRPC(method) || !isWrapped(method)) {
@@ -1597,9 +1602,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     }
 
                     MessagePartInfo part = outMsg.addMessagePart(q);
-                    part.setProperty(METHOD_PARAM_ANNOTATIONS, method.getParameterAnnotations());
-                    part.setProperty(PARAM_ANNOTATION, method.getParameterAnnotations()[j]);
-                    initializeParameter(part, paramClasses[j], method.getGenericParameterTypes()[j]);
+                    part.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
+                    part.setProperty(PARAM_ANNOTATION, parAnnotations[j]);
+                    initializeParameter(part, paramClasses[j], genParTypes[j]);
                     part.setIndex(j + 1);
 
                     if (!isRPC(method) && !isWrapped(method)) {
@@ -1806,9 +1811,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 processParameterizedTypes();
             }
             TypeVariable<?> var = (TypeVariable<?>)type;
-            Map<String, Class<?>> mp = parameterizedTypes.get(var.getGenericDeclaration());
+            final Object gd = var.getGenericDeclaration();
+            Map<String, Class<?>> mp = parameterizedTypes.get(gd);
             if (mp != null) {
-                Class<?> c = parameterizedTypes.get(var.getGenericDeclaration()).get(var.getName());
+                Class<?> c = parameterizedTypes.get(gd).get(var.getName());
                 if (c != null) {
                     rawClass = c;
                     type = c;
@@ -2348,8 +2354,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (serviceClass.isInterface()) {
             processTypes(serviceClass, serviceType);
         } else {
-            for (int x = 0; x < serviceClass.getInterfaces().length; x++) {
-                processTypes(serviceClass.getInterfaces()[x], serviceClass.getGenericInterfaces()[x]);
+            final Class<?>[] interfaces = serviceClass.getInterfaces();
+            final Type[] genericInterfaces = serviceClass.getGenericInterfaces();
+            for (int x = 0; x < interfaces.length; x++) {
+                processTypes(interfaces[x], genericInterfaces[x]);
             }
             processTypes(serviceClass.getSuperclass(), serviceClass.getGenericSuperclass());
         }
@@ -2360,9 +2368,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             Type c = ptp.getRawType();
             Map<String, Class<?>> m = new HashMap<String, Class<?>>();
             parameterizedTypes.put(c, m);
-            for (int x = 0; x < ptp.getActualTypeArguments().length; x++) {
-                Type t = ptp.getActualTypeArguments()[x];
-                TypeVariable<?> tv = sc.getTypeParameters()[x];
+            final Type[] ptpActualTypeArgs = ptp.getActualTypeArguments();
+            final TypeVariable<?>[] scTypeArgs = sc.getTypeParameters();
+            for (int x = 0; x < ptpActualTypeArgs.length; x++) {
+                Type t = ptpActualTypeArgs[x];
+                TypeVariable<?> tv = scTypeArgs[x];
                 if (t instanceof Class) {
                     m.put(tv.getName(), (Class<?>)t);
                 }
