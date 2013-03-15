@@ -76,8 +76,9 @@ public class ReflectionInvokationHandler implements InvocationHandler {
     }
     private Class<?>[] getParameterTypes(Method method, Object[] args) {
         Class<?>[] types = method.getParameterTypes();
+        final Annotation[][] parAnnotations = method.getParameterAnnotations();
         for (int x = 0; x < types.length; x++) {
-            UnwrapParam p = getUnwrapParam(method.getParameterAnnotations()[x]);
+            UnwrapParam p = getUnwrapParam(parAnnotations[x]);
             if (p != null) {
                 String s = p.methodName();
                 String tn = p.typeMethodName();
