@@ -86,6 +86,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         createStaticBus();
     }
     
+
+    
+    @Test
+    public void testGetCustomBookText() {
+        String address = "http://localhost:" + PORT + "/bookstore/customtext";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.accept("text/custom").get();
+        String name = r.readEntity(String.class);
+        assertEquals("Good book", name);
+        assertEquals("text/custom;charset=us-ascii", r.getMediaType().toString());
+    }    
+    
     @Test
     public void testGetBookNameAsByteArray() {
         String address = "http://localhost:" + PORT + "/bookstore/booknames/123";
