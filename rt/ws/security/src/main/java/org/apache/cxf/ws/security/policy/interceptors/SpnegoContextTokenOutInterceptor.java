@@ -60,8 +60,16 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 SecurityToken tok = null;
                 if (tokId != null) {
                     tok = NegotiationUtils.getTokenStore(message).getToken(tokId);
+                    
+                    if (tok != null && tok.isExpired()) {
+                        message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
+                        message.getExchange().remove(SecurityConstants.TOKEN_ID);
+                        NegotiationUtils.getTokenStore(message).remove(tokId);
+                        tok = null;
+                    }
                 }
-                if (tok == null || !tok.isExpired()) {
+                
+                if (tok == null) {
                     tok = issueToken(message, aim);
                 }
                 if (tok != null) {
