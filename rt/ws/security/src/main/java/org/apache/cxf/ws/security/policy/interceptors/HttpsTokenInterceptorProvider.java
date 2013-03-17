@@ -125,7 +125,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             }
                         };
                         message.put(MessageTrustDecider.class, trust);
-                        NegotiationUtils.assertPolicy(aim, SP12Constants.REQUIRE_CLIENT_CERTIFICATE);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpBasicAuthentication) {
                         List<String> auth = headers.get("Authorization");
@@ -133,7 +133,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             || !auth.get(0).startsWith("Basic")) {
                             ai.setNotAsserted("HttpBasicAuthentication is set, but not being used");
                         } else {
-                            NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_BASIC_AUTHENTICATION);
+                            NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                         }
                     }
                     if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
@@ -142,7 +142,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             || !auth.get(0).startsWith("Digest")) {
                             ai.setNotAsserted("HttpDigestAuthentication is set, but not being used");
                         } else {
-                            NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_DIGEST_AUTHENTICATION);
+                            NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
                         }
                     }
                 } else {
@@ -191,7 +191,10 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     //client side should be checked on the way out
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
-                    }                    
+                    }
+                    NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
+                    NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
+                    NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                 }
             }
         }
@@ -208,7 +211,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         || !auth.get(0).startsWith("Basic")) {
                         asserted = false;
                     } else {
-                        NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_BASIC_AUTHENTICATION);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                     }
                 }
                 if (token.getAuthenticationType() == HttpsToken.AuthenticationType.HttpDigestAuthentication) {
@@ -217,7 +220,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                         || !auth.get(0).startsWith("Digest")) {
                         asserted = false;
                     } else {
-                        NegotiationUtils.assertPolicy(aim, SP12Constants.HTTP_DIGEST_AUTHENTICATION);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
                     }
                 }
 
@@ -229,7 +232,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             || tlsInfo.getPeerCertificates().length == 0)) {
                         asserted = false;
                     } else {
-                        NegotiationUtils.assertPolicy(aim, SP12Constants.REQUIRE_CLIENT_CERTIFICATE);
+                        NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
                     }
                 } else {
                     asserted = false;

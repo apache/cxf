@@ -80,8 +80,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
                     message.getExchange().put(SecurityConstants.TOKEN, tok);
                     NegotiationUtils.getTokenStore(message).add(tok);
-                    
                 }
+                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
             } else {
                 //server side should be checked on the way in
                 for (AssertionInfo ai : ais) {

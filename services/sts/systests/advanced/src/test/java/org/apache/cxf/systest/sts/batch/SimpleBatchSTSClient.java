@@ -82,10 +82,6 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
-import org.apache.cxf.ws.security.policy.model.Binding;
-import org.apache.cxf.ws.security.policy.model.Trust10;
-import org.apache.cxf.ws.security.policy.model.Trust13;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.trust.TrustException;
@@ -110,6 +106,11 @@ import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.processor.X509Util;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
@@ -415,8 +416,8 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             while (i.hasNext() && algorithmSuite == null) {
                 List<PolicyComponent> p = CastUtils.cast((List<?>)i.next());
                 for (PolicyComponent p2 : p) {
-                    if (p2 instanceof Binding) {
-                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
+                    if (p2 instanceof AbstractBinding) {
+                        algorithmSuite = ((AbstractBinding)p2).getAlgorithmSuite();
                     }
                 }
             }
@@ -661,8 +662,9 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             if (algorithmSuite == null) {
                 requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
             } else {
+                AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
                 requestorEntropy = WSSecurityUtil
-                    .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                    .generateNonce(algType.getMaximumSymmetricKeyLength() / 8);
             }
             writer.writeCharacters(Base64.encode(requestorEntropy));
 
@@ -922,7 +924,8 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
                     int length = (keySize > 0) ? keySize : 256;
                     if (algorithmSuite != null) {
-                        length = (keySize > 0) ? keySize : algorithmSuite.getMaximumSymmetricKeyLength();
+                        AlgorithmSuiteType algType = algorithmSuite.getAlgorithmSuiteType();
+                        length = (keySize > 0) ? keySize : algType.getMaximumSymmetricKeyLength();
                     }
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);

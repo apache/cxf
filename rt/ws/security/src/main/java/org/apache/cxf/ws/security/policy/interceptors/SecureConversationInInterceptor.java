@@ -211,6 +211,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             } else {
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
+            
+            NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
         }
     }
 
