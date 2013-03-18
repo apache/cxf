@@ -19,15 +19,12 @@
 
 package org.apache.cxf.bus.spring;
 
-import java.util.List;
-
 import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
-import org.apache.cxf.feature.Feature;
 import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -56,14 +53,6 @@ public class SpringBus extends ExtensionManagerBus
     
     public void loadAdditionalFeatures() {
         super.loadAdditionalFeatures();
-        ConfiguredBeanLocator loc = getExtension(ConfiguredBeanLocator.class);
-        if (loc instanceof SpringBeanLocator) {
-            SpringBeanLocator sloc = (SpringBeanLocator)loc;
-            List<Feature> features = sloc.getOSGiServices(Feature.class);
-            for (Feature feature : features) {
-                this.getFeatures().add(feature);
-            }
-        }
     }
     
     /** {@inheritDoc}*/
