@@ -172,13 +172,15 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             };
             
                     
-            StringBuilder buf = new StringBuilder();
-            buf.append("Constructing automatic work queue with:\n");
-            buf.append("max queue size: " + maxQueueSize + "\n");
-            buf.append("initialThreads: " + initialThreads + "\n");
-            buf.append("lowWaterMark: " + lowWaterMark + "\n");
-            buf.append("highWaterMark: " + highWaterMark + "\n");
-            LOG.fine(buf.toString());
+            if (LOG.isLoggable(Level.FINE)) {
+                StringBuilder buf = new StringBuilder();
+                buf.append("Constructing automatic work queue with:\n");
+                buf.append("max queue size: " + maxQueueSize + "\n");
+                buf.append("initialThreads: " + initialThreads + "\n");
+                buf.append("lowWaterMark: " + lowWaterMark + "\n");
+                buf.append("highWaterMark: " + highWaterMark + "\n");
+                LOG.fine(buf.toString());
+            }
     
             if (initialThreads > highWaterMark) {
                 initialThreads = highWaterMark;
