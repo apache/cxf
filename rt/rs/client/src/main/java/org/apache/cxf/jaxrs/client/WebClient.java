@@ -1102,12 +1102,17 @@ public class WebClient extends AbstractClient {
                 requestClass = (Class<?>)requestContext.get(REQUEST_CLASS);
                 requestType = (Type)requestContext.get(REQUEST_TYPE);
             }
+            Annotation[] anns = new Annotation[]{};
+            Annotation[] customAnns = (Annotation[])outMessage.get(Annotation.class.getName());
+            if (customAnns != null) {
+                anns = customAnns;
+            }
             boolean isAssignable = requestClass != null && requestClass.isAssignableFrom(body.getClass());
             try {
                 writeBody(body, outMessage, 
                           requestClass == null || !isAssignable ? body.getClass() : requestClass,
                           requestType == null || !isAssignable ? body.getClass() : requestType, 
-                          new Annotation[]{}, os);
+                          anns, os);
             } catch (Exception ex) {
                 throw new Fault(ex);
             }

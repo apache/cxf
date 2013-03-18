@@ -69,8 +69,8 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public Annotation[] getEntityAnnotations() {
-        // TODO Auto-generated method stub
-        return null;
+        Annotation[] anns = (Annotation[])m.get(Annotation.class.getName());
+        return anns == null ? new Annotation[] {} : anns;
     }
 
     @Override
@@ -102,6 +102,9 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
             MultivaluedMap<String, Object> headers = getHeaders();
             headers.putSingle(HttpHeaders.CONTENT_TYPE, mt);
             m.put(Message.CONTENT_TYPE, mt.toString());
+        }
+        if (anns != null) {
+            m.put(Annotation.class.getName(), anns);
         }
         doSetEntity(entity);
     }
