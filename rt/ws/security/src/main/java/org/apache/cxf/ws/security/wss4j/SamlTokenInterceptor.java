@@ -113,6 +113,20 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                         }
                         assertTokens(message, SP12Constants.SAML_TOKEN, signed);
                         
+                        // Check version against policy
+                        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                        for (AssertionInfo ai : aim.getAssertionInfo(SP12Constants.SAML_TOKEN)) {
+                            SamlToken samlToken = (SamlToken)ai.getAssertion();
+                            for (WSSecurityEngineResult result : samlResults) {
+                                AssertionWrapper assertionWrapper = 
+                                    (AssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+
+                                if (!checkVersion(samlToken, assertionWrapper)) {
+                                    ai.setNotAsserted("Wrong SAML Version");
+                                }
+                            }
+                        }
+                        
                         Principal principal = 
                             (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
                         message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, principal);                   
@@ -339,4 +353,19 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         return crypto;
     }
 
+    /**
+     * Check the policy version against the received assertion
+     */
+    private boolean checkVersion(SamlToken samlToken, AssertionWrapper assertionWrapper) {
+        if ((samlToken.isUseSamlVersion11Profile10()
+            || samlToken.isUseSamlVersion11Profile11())
+            && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
+            return false;
+        } else if (samlToken.isUseSamlVersion20Profile11()
+            && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
+            return false;
+        }
+        return true;
+    }
+    
 }
