@@ -92,40 +92,39 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
 
     private void loadOSGIContext(Bus b) {
-        Object bundleContext = findBundleContext(context);
+        bundleContext = findBundleContext(context, b);
         if (bundleContext == null) {
             osgi = false;
-        } else {
-            if (b != null) {
-                @SuppressWarnings("unchecked")
-                Class<Object> cls = (Class<Object>)bundleContext.getClass();
-                b.setExtension(bundleContext, cls);
-            }
         }
     }
     
-    private Object findBundleContext(ApplicationContext applicationContext) {
+    private Object findBundleContext(ApplicationContext applicationContext, Bus b) {
         Object answer = null;
         ApplicationContext aContext = applicationContext;
         // try to find out the bundleContext by going through the parent context
-        while(aContext != null || answer != null) {
-           answer = getBundleContext(aContext);
-           aContext = aContext.getParent();
+        while (aContext != null && answer != null) {
+            answer = getBundleContext(aContext, b);
+            aContext = aContext.getParent();
         }
         return answer;
     }
     
-    private Object getBundleContext(ApplicationContext applicationContext) {
-        Object bundleContext = null;
+    private Object getBundleContext(ApplicationContext applicationContext, Bus b) {
         try {
             //use a little reflection to allow this to work without the spring-dm jars
             //for the non-osgi cases
             Method m = applicationContext.getClass().getMethod("getBundleContext");
-            bundleContext = m.invoke(applicationContext);
-        } catch(Throwable t) {
+            Object o = m.invoke(applicationContext);
+            if (o != null && b != null) {
+                @SuppressWarnings("unchecked")
+                Class<Object> cls = (Class<Object>)m.getReturnType();
+                b.setExtension(o, cls);
+            }
+            return o;
+        } catch (Throwable t) {
             // do nothing here
         }
-        return bundleContext;
+        return null;
     }
     
     public <T> T getBeanOfType(String name, Class<T> type) {
