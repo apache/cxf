@@ -70,31 +70,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-test-resources</id>
-                        <phase>process-test-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/test-classes/schemaorg_apache_xmlbeans</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/generated/src/test/java/schemaorg_apache_xmlbeans</directory>
-                                    <includes>
-                                        <include>**/*.xsb</include>
-                                        <include>**/*.class</include>
-                                        <include>**/*.wsdl</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>

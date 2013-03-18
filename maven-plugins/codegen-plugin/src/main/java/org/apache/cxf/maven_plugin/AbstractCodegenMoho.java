@@ -50,6 +50,7 @@ import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -259,7 +260,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (project != null && getGeneratedTestRoot() != null) {
             project.addTestCompileSourceRoot(getGeneratedTestRoot().getAbsolutePath());
         }
-
+        checkResources();
+        
         // if this is an m2e configuration build then return immediately without doing any work
         if (project != null && buildContext.isIncremental() && !buildContext.hasDelta(project.getBasedir())) {
             return;
@@ -325,6 +327,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                                 originalProxyUser, originalProxyPassword);
         }
 
+        checkResources();
         // refresh the generated sources
         if (project != null && getGeneratedSourceRoot() != null && getGeneratedSourceRoot().exists()) {
             buildContext.refresh(getGeneratedSourceRoot().getAbsoluteFile());
@@ -333,6 +336,71 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             buildContext.refresh(getGeneratedTestRoot().getAbsoluteFile());
         }
         System.gc();
+    }
+
+    private void checkResources() {
+        File root = project.getBasedir();
+        Resource sourceRoot = null;
+        Resource testRoot = null;
+
+        File genroot = getGeneratedSourceRoot();
+        if (genroot != null) {
+            
+            List<Resource> resources = project.getBuild().getResources();
+            for (Resource r : resources) {
+                File d = new File(root, r.getDirectory());
+                if (d.equals(genroot)) {
+                    sourceRoot = r;
+                } 
+            }
+            Resource r2 = scanForResources(genroot, sourceRoot);
+            if (r2 != sourceRoot) {
+                r2.setDirectory(getGeneratedSourceRoot().getAbsolutePath());
+                r2.setTargetPath(project.getBuild().getOutputDirectory());
+                project.addResource(r2);
+            }
+        }
+        genroot = getGeneratedTestRoot();
+        if (genroot != null) {
+            List<Resource> resources = project.getBuild().getTestResources();
+            for (Resource r : resources) {
+                File d = new File(root, r.getDirectory());
+                if (d.equals(genroot)) {
+                    testRoot = r;
+                } 
+            }
+            Resource r2 = scanForResources(genroot, testRoot);
+            if (r2 != testRoot) {
+                r2.setDirectory(getGeneratedTestRoot().getAbsolutePath());
+                r2.setTargetPath(project.getBuild().getTestOutputDirectory());
+                project.addTestResource(r2);
+            }
+        }
+    }
+
+    private Resource scanForResources(File rootFile, Resource root) {
+        File files[] = rootFile.listFiles();
+        if (files == null) {
+            return root;
+        }
+        for (File f : files) {
+            if (f.isDirectory()) {
+                root = scanForResources(f, root);
+            } else if (!f.getName().endsWith(".java")) {
+                String n = f.getName();
+                int idx = n.lastIndexOf('.');
+                if (idx != -1) {
+                    n = "**/*" + n.substring(idx);
+                }
+                if (root == null) {
+                    root = new Resource();
+                }
+                if (!root.getIncludes().contains(n)) {
+                    root.addInclude(n);
+                }
+            }
+        }
+        return root;
     }
 
     private void restoreProxySetting(String originalProxyHost, String originalProxyPort,
