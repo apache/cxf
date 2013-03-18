@@ -88,25 +88,44 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                 ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
             }
         }
-        
         loadOSGIContext(bus);
     }
 
     private void loadOSGIContext(Bus b) {
+        Object bundleContext = findBundleContext(context);
+        if (bundleContext == null) {
+            osgi = false;
+        } else {
+            if (b != null) {
+                @SuppressWarnings("unchecked")
+                Class<Object> cls = (Class<Object>)bundleContext.getClass();
+                b.setExtension(bundleContext, cls);
+            }
+        }
+    }
+    
+    private Object findBundleContext(ApplicationContext applicationContext) {
+        Object answer = null;
+        ApplicationContext aContext = applicationContext;
+        // try to find out the bundleContext by going through the parent context
+        while(aContext != null || answer != null) {
+           answer = getBundleContext(aContext);
+           aContext = aContext.getParent();
+        }
+        return answer;
+    }
+    
+    private Object getBundleContext(ApplicationContext applicationContext) {
+        Object bundleContext = null;
         try {
             //use a little reflection to allow this to work without the spring-dm jars
             //for the non-osgi cases
-            Method m = context.getClass().getMethod("getBundleContext");
-            bundleContext = m.invoke(context);
-            if (b != null) {
-                @SuppressWarnings("unchecked")
-                Class<Object> cls = (Class<Object>)m.getReturnType();
-                b.setExtension(bundleContext, cls);
-            }
-        } catch (Throwable t) {
-            //ignore
-            osgi = false;
+            Method m = applicationContext.getClass().getMethod("getBundleContext");
+            bundleContext = m.invoke(applicationContext);
+        } catch(Throwable t) {
+            // do nothing here
         }
+        return bundleContext;
     }
     
     public <T> T getBeanOfType(String name, Class<T> type) {
