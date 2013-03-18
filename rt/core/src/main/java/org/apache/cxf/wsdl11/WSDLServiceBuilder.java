@@ -494,7 +494,9 @@ public class WSDLServiceBuilder {
             copyExtensionAttributes(bi, binding);
 
             for (BindingOperation bop : cast(binding.getBindingOperations(), BindingOperation.class)) {
-                LOG.finer("binding operation name is " + bop.getName());
+                if (LOG.isLoggable(Level.FINER)) {
+                    LOG.finer("binding operation name is " + bop.getName());
+                }
                 String inName = null;
                 String outName = null;
                 if (bop.getBindingInput() != null) {

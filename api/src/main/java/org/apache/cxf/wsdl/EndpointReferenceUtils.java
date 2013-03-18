@@ -770,7 +770,9 @@ public final class EndpointReferenceUtils {
                 if (jaxbVal instanceof ServiceNameType) {
                     Port port = null;
                     ServiceNameType snt = (ServiceNameType)jaxbVal;
-                    LOG.log(Level.FINEST, "found service name " + snt.getValue().getLocalPart());
+                    if (LOG.isLoggable(Level.FINEST)) {
+                        LOG.log(Level.FINEST, "found service name " + snt.getValue().getLocalPart());
+                    }
                     Service service = def.getService(snt.getValue());
                     if (service == null) {
                         LOG.log(Level.WARNING, "can't find the service name ["

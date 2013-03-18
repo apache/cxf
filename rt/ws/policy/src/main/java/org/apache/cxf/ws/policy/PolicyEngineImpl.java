@@ -21,6 +21,7 @@ package org.apache.cxf.ws.policy;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -565,6 +566,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
                                        Assertor assertor) {
         PolicyInterceptorProviderRegistry pipr = 
             bus.getExtension(PolicyInterceptorProviderRegistry.class);
+        final boolean doLog = LOG.isLoggable(Level.FINE);
         for (PolicyComponent pc : alternative) {
             if (pc instanceof Assertion) {
                 Assertion a = (Assertion)pc;
@@ -572,7 +574,9 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
                     || !pipr.get(a.getName()).isEmpty() 
                     || (null != assertor && assertor.canAssert(a.getName())))) {
                 
-                    LOG.fine("Alternative " + a.getName() + " is not supported");
+                    if (doLog) {
+                        LOG.fine("Alternative " + a.getName() + " is not supported");
+                    }
                     return false;
                 }
             } else {
