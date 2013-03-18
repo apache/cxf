@@ -1737,7 +1737,7 @@ public abstract class AbstractBindingBuilder {
             }            
         }
         
-        ais = getAllAssertionsByLocalname(SPConstants.WSS10);
+        ais = getAllAssertionsByLocalname(SPConstants.WSS11);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 return (Wss10)ai.getAssertion();
