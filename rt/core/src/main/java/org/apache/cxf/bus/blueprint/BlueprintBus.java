@@ -25,17 +25,13 @@ import java.security.PrivilegedAction;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
-import org.apache.cxf.feature.Feature;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 
 /**
  * 
  */
 public class BlueprintBus extends ExtensionManagerBus {
-
     BundleContext context;
     BlueprintContainer container;
     
@@ -46,18 +42,6 @@ public class BlueprintBus extends ExtensionManagerBus {
     
     public void loadAdditionalFeatures() {
         super.loadAdditionalFeatures();
-        try {
-            ServiceReference refs[] = context.getServiceReferences(Feature.class.getName(), null);
-            if (refs == null) {
-                return;
-            }
-            for (ServiceReference ref : refs) {
-                Feature feature = (Feature)context.getService(ref);
-                this.getFeatures().add(feature);
-            }
-        } catch (InvalidSyntaxException e) {
-            //ignore
-        }
     }
     
     public void setBundleContext(final BundleContext c) {
@@ -85,5 +69,4 @@ public class BlueprintBus extends ExtensionManagerBus {
         }
         return id;
     }
-
 }

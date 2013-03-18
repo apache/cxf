@@ -20,17 +20,20 @@ package org.apache.cxf.bus.osgi;
 
 import java.util.Dictionary;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -46,10 +49,12 @@ public class OSGIBusListener implements BusLifeCycleListener {
     public static final String CONTEXT_NAME_PROPERTY = "cxf.bus.id";
     
     private static final String SERVICE_PROPERTY_PRIVATE = "org.apache.cxf.bus.private.extension";
-    
+    private static final String SERVICE_PROPERTY_RESTRICTED = "org.apache.cxf.bus.restricted.extension";
+    private static final String BUS_EXTENSION_BUNDLES_EXCLUDES = "bus.extension.bundles.excludes";
     Bus bus;
     ServiceRegistration service;
     BundleContext defaultContext;
+    private Pattern extensionBundlesExcludesPattern;
 
     public OSGIBusListener(Bus b) {
         this(b, null);
@@ -60,11 +65,20 @@ public class OSGIBusListener implements BusLifeCycleListener {
             && args[0] instanceof BundleContext) {
             defaultContext = (BundleContext)args[0];
         }
+        String extExcludes = (String)bus.getProperty(BUS_EXTENSION_BUNDLES_EXCLUDES);
+        if (!StringUtils.isEmpty(extExcludes)) {
+            try {
+                extensionBundlesExcludesPattern = Pattern.compile(extExcludes);
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
+        }
         BusLifeCycleManager manager = bus.getExtension(BusLifeCycleManager.class);
         manager.registerLifeCycleListener(this);
         registerConfiguredBeanLocator();
         registerClientLifeCycleListeners();
         registerServerLifecycleListeners();
+        registerBusFeatures();
         sendBusCreatedToBusCreationListeners();
 
     }
@@ -113,7 +127,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     private void sendBusCreatedToBusCreationListeners() {
         ServiceReference refs[] = getServiceReferences(defaultContext, BusCreationListener.class);
         for (ServiceReference ref : refs) {
-            if (!isPrivate(ref)) {
+            if (!isPrivate(ref) && !isExcluded(ref)) {
                 BusCreationListener listener = (BusCreationListener)defaultContext.getService(ref);
                 listener.busCreated(bus);
             }
@@ -124,7 +138,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
         ServiceReference refs[] = getServiceReferences(defaultContext, ServerLifeCycleListener.class);
         ServerLifeCycleManager clcm = bus.getExtension(ServerLifeCycleManager.class);
         for (ServiceReference ref : refs) {
-            if (!isPrivate(ref)) {
+            if (!isPrivate(ref) && !isExcluded(ref)) {
                 ServerLifeCycleListener listener = (ServerLifeCycleListener)defaultContext.getService(ref);
                 clcm.registerListener(listener);
             }
@@ -134,13 +148,23 @@ public class OSGIBusListener implements BusLifeCycleListener {
         ServiceReference refs[] = getServiceReferences(defaultContext, ClientLifeCycleListener.class);
         ClientLifeCycleManager clcm = bus.getExtension(ClientLifeCycleManager.class);
         for (ServiceReference ref : refs) {
-            if (!isPrivate(ref)) {
+            if (!isPrivate(ref) && !isExcluded(ref)) {
                 ClientLifeCycleListener listener = (ClientLifeCycleListener)defaultContext.getService(ref);
                 clcm.registerListener(listener);
             }
         }
     }
     
+    private void registerBusFeatures() {
+        ServiceReference refs[] = getServiceReferences(defaultContext, Feature.class);
+        for (ServiceReference ref : refs) {
+            if (!isPrivate(ref) && !isExcluded(ref)) {
+                Feature feature = (Feature)defaultContext.getService(ref);
+                bus.getFeatures().add(feature);
+            }
+        }
+    }
+
     private boolean isPrivate(ServiceReference ref) {
         Object o = ref.getProperty(SERVICE_PROPERTY_PRIVATE);
         Boolean pvt = Boolean.FALSE;
@@ -152,6 +176,24 @@ public class OSGIBusListener implements BusLifeCycleListener {
             pvt = (Boolean)o;
         }
         return pvt.booleanValue();
+    }
+
+    private boolean isExcluded(ServiceReference ref) {
+        String o = (String)ref.getProperty(SERVICE_PROPERTY_RESTRICTED);
+        if (!StringUtils.isEmpty(o)) {
+            // if the service's restricted-regex is set, the service is excluded when the app not matching that regex
+            BundleContext app = bus.getExtension(BundleContext.class);
+            try {
+                if (app != null && !app.getBundle().getSymbolicName().matches(o)) {
+                    return true;
+                }
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
+        }
+        // if the excludes-regex is set, the service is excluded when matching that regex.
+        return extensionBundlesExcludesPattern != null 
+            && extensionBundlesExcludesPattern.matcher(ref.getBundle().getSymbolicName()).matches();
     }
 
     private Version getBundleVersion(Bundle bundle) {
