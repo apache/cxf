@@ -137,9 +137,13 @@ public class DefaultSubjectProvider implements SubjectProvider {
             }
             cryptoType.setAlias(encryptionName);
             try {
-                X509Certificate certificate = crypto.getX509Certificates(cryptoType)[0];
+                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+                if (certs == null || certs.length <= 0) {
+                    new STSException("Encryption certificate is not found for alias: " + encryptionName,
+                                     STSException.REQUEST_FAILED);
+                }
                 KeyInfoBean keyInfo = 
-                    createKeyInfo(certificate, secret, doc, encryptionProperties, crypto);
+                    createKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
                 subjectBean.setKeyInfo(keyInfo);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
