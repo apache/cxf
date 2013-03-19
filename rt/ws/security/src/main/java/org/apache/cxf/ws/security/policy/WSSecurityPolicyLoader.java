@@ -197,7 +197,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             
             // Layout
             SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST, SP11Constants.STRICT, 
-            SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST, SP11Constants.STRICT,
+            SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST, SP12Constants.STRICT,
             
             // UsernameToken
             SP11Constants.WSS_USERNAME_TOKEN10, SP12Constants.WSS_USERNAME_TOKEN10,  

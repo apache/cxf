@@ -52,7 +52,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
 
     public SecureConversationTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.SECURE_CONVERSATION_TOKEN,
-                            SP12Constants.SECURE_CONVERSATION_TOKEN));
+                            SP12Constants.SECURE_CONVERSATION_TOKEN,
+                            SP12Constants.BOOTSTRAP_POLICY,
+                            SP11Constants.BOOTSTRAP_POLICY));
         this.getOutInterceptors().add(new SecureConversationOutInterceptor());
         this.getOutFaultInterceptors().add(new SecureConversationOutInterceptor());
         this.getInInterceptors().add(new SecureConversationInInterceptor());

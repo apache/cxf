@@ -257,7 +257,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 assertPolicy(aim, SPConstants.HASH_PASSWORD);
             }
             
-            if ((tok.getPasswordType() == UsernameToken.PasswordType.NoPassword)
+            if ((tok.getPasswordType() != UsernameToken.PasswordType.NoPassword)
                 && isNonEndorsingSupportingToken(tok)
                 && (princ == null || princ.getPassword() == null)) {
                 ai.setNotAsserted("Username Token No Password supplied");

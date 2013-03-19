@@ -123,7 +123,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                                 SamlAssertionWrapper assertionWrapper = 
                                     (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
 
-                                if (!checkVersion(samlToken, assertionWrapper)) {
+                                if (!checkVersion(aim, samlToken, assertionWrapper)) {
                                     ai.setNotAsserted("Wrong SAML Version");
                                 }
                             }
@@ -191,6 +191,10 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     }
 
     protected AbstractToken assertTokens(SoapMessage message) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        assertPolicy(aim, "WssSamlV11Token10");
+        assertPolicy(aim, "WssSamlV11Token11");
+        assertPolicy(aim, "WssSamlV20Token11");
         return assertTokens(message, SPConstants.SAML_TOKEN, true);
     }
 
@@ -366,7 +370,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     /**
      * Check the policy version against the received assertion
      */
-    private boolean checkVersion(SamlToken samlToken, SamlAssertionWrapper assertionWrapper) {
+    private boolean checkVersion(
+        AssertionInfoMap aim,
+        SamlToken samlToken, 
+        SamlAssertionWrapper assertionWrapper
+    ) {
         SamlTokenType tokenType = samlToken.getSamlTokenType();
         if ((tokenType == SamlTokenType.WssSamlV11Token10 
             || tokenType == SamlTokenType.WssSamlV11Token11)
@@ -376,6 +384,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }
+        assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), tokenType.name()));
         return true;
     }
     
