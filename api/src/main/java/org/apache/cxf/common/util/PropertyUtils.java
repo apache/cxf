@@ -42,7 +42,8 @@ public final class PropertyUtils {
      * 
      * @param props
      * @param key
-     * @return
+     * @return false if value is either the String "false" or Boolean.FALSE.  Otherwise returns
+     * true.
      */
     public static boolean isFalse(Map<String, Object> props, String key) {
         if (props == null || key == null) {
@@ -54,7 +55,7 @@ public final class PropertyUtils {
     
     /**
      * Returns true if a value is either the String "true" (regardless of case)  or Boolean.TRUE.
-     * @param value
+     * @param property
      * @return true if value is either the String "true" or Boolean.TRUE.  Otherwise returns false.
      */
     public static boolean isTrue(Object property) {
@@ -73,7 +74,7 @@ public final class PropertyUtils {
      * It might seem odd to return 'true' if a property == FALSE, but it is required sometimes.
      * 
      * Returns false if a value is either the String "false" (regardless of case)  or Boolean.FALSE.
-     * @param value
+     * @param property
      * @return false if value is either the String "false" or Boolean.FALSE.  Otherwise returns
      * true.
      */
