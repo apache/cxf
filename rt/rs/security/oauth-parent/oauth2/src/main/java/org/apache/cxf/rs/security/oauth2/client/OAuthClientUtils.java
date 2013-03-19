@@ -284,6 +284,18 @@ public final class OAuthClientUtils {
         }
     }
     
+    /**
+     * Creates OAuth Authorization header with Bearer scheme
+     * @param consumer represents the registered client
+     * @param accessToken the access token  
+     * @return the header value
+     */
+    @Deprecated
+    public static String createAuthorizationHeader(Consumer consumer,
+                                                   ClientAccessToken accessToken)
+        throws OAuthServiceException {
+        return createAuthorizationHeader(accessToken);
+    }
     
     /**
      * Creates OAuth Authorization header with Bearer scheme
