@@ -44,7 +44,7 @@ import org.opensaml.common.SAMLVersion;
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
  */
 public class SamlCallbackHandler implements CallbackHandler {
-    private String confirmationMethod = SAML2Constants.CONF_BEARER;
+    private String confirmationMethod;
     private boolean saml2;
     
     public SamlCallbackHandler() {
@@ -70,12 +70,19 @@ public class SamlCallbackHandler implements CallbackHandler {
                 String subjectName = "uid=sts-client,o=mock-sts.com";
                 String subjectQualifier = "www.mock-sts.com";
                 
+                String subjectConfMethod = confirmationMethod;
+                if (subjectConfMethod == null && !saml2) {
+                    subjectConfMethod = SAML1Constants.CONF_BEARER;
+                } else if (subjectConfMethod == null && saml2) {
+                    subjectConfMethod = SAML2Constants.CONF_BEARER;
+                }
+                
                 SubjectBean subjectBean = 
                     new SubjectBean(
-                        subjectName, subjectQualifier, confirmationMethod
+                        subjectName, subjectQualifier, subjectConfMethod
                     );
-                if (SAML2Constants.CONF_HOLDER_KEY.equals(confirmationMethod)
-                    || SAML1Constants.CONF_HOLDER_KEY.equals(confirmationMethod)) {
+                if (SAML2Constants.CONF_HOLDER_KEY.equals(subjectConfMethod)
+                    || SAML1Constants.CONF_HOLDER_KEY.equals(subjectConfMethod)) {
                     try {
                         KeyInfoBean keyInfo = createKeyInfo();
                         subjectBean.setKeyInfo(keyInfo);
