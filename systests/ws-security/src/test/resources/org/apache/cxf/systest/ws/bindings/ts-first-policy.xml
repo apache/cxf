@@ -29,7 +29,7 @@
                         </sp:RecipientToken>
                         <sp:Layout>
                             <wsp:Policy>
-                                <sp:LaxTimestampFirst />
+                                <sp:LaxTsFirst />
                             </wsp:Policy>
                         </sp:Layout>
                         <sp:IncludeTimestamp />

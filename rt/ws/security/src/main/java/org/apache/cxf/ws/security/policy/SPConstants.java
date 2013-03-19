@@ -43,8 +43,8 @@ public abstract class SPConstants {
     public enum Layout {
         Lax,
         Strict,
-        LaxTimestampFirst,
-        LaxTimestampLast
+        LaxTsFirst,
+        LaxTsLast
     };
 
     
