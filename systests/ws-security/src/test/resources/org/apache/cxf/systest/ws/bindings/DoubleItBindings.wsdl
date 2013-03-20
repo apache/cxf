@@ -110,6 +110,12 @@
         <wsdl:port name="DoubleItTimestampLastPort2" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItTimestampLast2" />
         </wsdl:port>
+        <wsdl:port name="DoubleItTokenProtectionPort" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItTokenProtection" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItTokenProtectionPort2" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItTokenProtection2" />
+        </wsdl:port>
     </wsdl:service>
     
     <wsp:Policy wsu:Id="SignBodyChildPolicy">

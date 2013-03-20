@@ -100,7 +100,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.1.2 (WSS1.0) SAML1.1 Assertion (Sender Vouches) over SSL
-     */
     @org.junit.Test
     public void testTLSSenderVouches() throws Exception {
 
@@ -126,7 +125,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.1.3 (WSS1.0) SAML1.1 Assertion (HK) over SSL
-     */
     @org.junit.Test
     public void testTLSHOKSignedEndorsing() throws Exception {
 
@@ -152,7 +150,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.1.4 (WSS1.0) SAML1.1 Sender Vouches with X.509 Certificates, Sign, Optional Encrypt
-     */
     @org.junit.Test
     public void testAsymmetricSigned() throws Exception {
 
@@ -178,7 +175,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.1.5 (WSS1.0) SAML1.1 Holder of Key, Sign, Optional Encrypt
-     */
     @org.junit.Test
     public void testAsymmetricInitiator() throws Exception {
 
@@ -205,7 +201,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.1 (WSS1.1) SAML 2.0 Bearer
-     */
     @org.junit.Test
     public void testAsymmetricSaml2Bearer() throws Exception {
 
@@ -231,7 +226,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.2 (WSS1.1) SAML2.0 Sender Vouches over SSL
-     */
     @org.junit.Test
     public void testTLSSenderVouchesSaml2() throws Exception {
 
@@ -257,7 +251,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.3 (WSS1.1) SAML2.0 HoK over SSL
-     */
     @org.junit.Test
     public void testTLSHOKSignedEndorsingSaml2() throws Exception {
 
@@ -283,7 +276,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.4 (WSS1.1) SAML1.1/2.0 Sender Vouches with X.509 Certificate, Sign, Encrypt
-     */
     @org.junit.Test
     public void testSymmetricSV() throws Exception {
 
@@ -309,7 +301,6 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
     
     /**
      * 2.3.2.5 (WSS1.1) SAML1.1/2.0 Holder of Key, Sign, Encrypt
-     */
     @org.junit.Test
     public void testSymmetricIssuedToken() throws Exception {
 
@@ -333,6 +324,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
+    */
     
     private static void updateSTSPort(BindingProvider p, String port) {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
