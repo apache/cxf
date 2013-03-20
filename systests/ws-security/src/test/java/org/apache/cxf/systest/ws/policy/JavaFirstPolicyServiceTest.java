@@ -217,10 +217,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         Element messageElement = DOMUtils.getFirstChildWithName(operationElement, WSDL_NAMESPACE, 
                                                               type.name().toLowerCase());
         assertNotNull(messageElement);
-<<<<<<< HEAD
         Element policyReference = DOMUtils.getFirstChildWithName(messageElement, policyNamespace, 
-=======
-        Element policyReference = DOMUtils.getFirstChildWithName(messageElement, policyNamespace,
                                                                  "PolicyReference");
         if (policyReference != null) {
             return policyReference.getAttributeNS(null, "URI");
@@ -229,6 +226,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         }
     }
 
+<<<<<<< HEAD
     private String getOperationPolicyReferenceId(Element operationElement, String policyNamespace) {
         Element policyReference = DOMUtils.getFirstChildWithName(operationElement, policyNamespace,
 >>>>>>> 4c6a8d2... Merged revisions 1458926 via  git cherry-pick from
@@ -240,4 +238,6 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         }
     }
 >>>>>>> ba4d301... Merged revisions 1458929 via  git cherry-pick from
+=======
+>>>>>>> 8e9bd13... Fixing failing build
 }
