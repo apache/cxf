@@ -570,7 +570,7 @@ public class RequestParser {
         String dialectAttr = null;
         RequestClaimCollection requestedClaims = new RequestClaimCollection();
         try {
-            dialectAttr = claimsElement.getAttribute("Dialect");
+            dialectAttr = claimsElement.getAttributeNS(null, "Dialect");
             if (dialectAttr != null && !"".equals(dialectAttr)) {
                 requestedClaims.setDialect(new URI(dialectAttr));
             }

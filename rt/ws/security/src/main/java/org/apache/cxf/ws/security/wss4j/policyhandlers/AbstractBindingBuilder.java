@@ -1051,7 +1051,7 @@ public abstract class AbstractBindingBuilder {
         String id;
         
         //first try to get the Id attr
-        Attr idAttr = elem.getAttributeNode("Id");
+        Attr idAttr = elem.getAttributeNodeNS(null, "Id");
         if (idAttr == null) {
             //then try the wsu:Id value
             idAttr = elem.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
@@ -1398,7 +1398,7 @@ public abstract class AbstractBindingBuilder {
                         } else {
                             //not forcing an ID on this.  Use one if there is one 
                             //there already, but don't force one
-                            Attr idAttr = el.getAttributeNode("Id");
+                            Attr idAttr = el.getAttributeNodeNS(null, "Id");
                             if (idAttr == null) {
                                 //then try the wsu:Id value
                                 idAttr = el.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");

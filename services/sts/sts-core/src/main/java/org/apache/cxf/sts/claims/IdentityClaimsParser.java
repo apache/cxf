@@ -45,8 +45,8 @@ public class IdentityClaimsParser implements ClaimsParser {
         String claimLocalName = claimType.getLocalName();
         String claimNS = claimType.getNamespaceURI();
         if ("ClaimType".equals(claimLocalName)) {
-            String claimTypeUri = claimType.getAttribute("Uri");
-            String claimTypeOptional = claimType.getAttribute("Optional");
+            String claimTypeUri = claimType.getAttributeNS(null, "Uri");
+            String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
             RequestClaim requestClaim = new RequestClaim();
             try {
                 requestClaim.setClaimType(new URI(claimTypeUri));
@@ -60,8 +60,8 @@ public class IdentityClaimsParser implements ClaimsParser {
             requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
             return requestClaim;
         } else if ("ClaimValue".equals(claimLocalName)) {
-            String claimTypeUri = claimType.getAttribute("Uri");
-            String claimTypeOptional = claimType.getAttribute("Optional");
+            String claimTypeUri = claimType.getAttributeNS(null, "Uri");
+            String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
             RequestClaim requestClaim = new RequestClaim();
             try {
                 requestClaim.setClaimType(new URI(claimTypeUri));

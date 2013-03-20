@@ -336,7 +336,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         Element issuedAssertion = 
             this.readDocument("example-sts-issued-saml-assertion.xml").getDocumentElement();
         
-        String assertionId = issuedAssertion.getAttributeNode("AssertionID").getNodeValue();
+        String assertionId = issuedAssertion.getAttributeNodeNS(null, "AssertionID").getNodeValue();
         
         SecurityToken issuedToken = 
             new SecurityToken(assertionId, issuedAssertion, null);

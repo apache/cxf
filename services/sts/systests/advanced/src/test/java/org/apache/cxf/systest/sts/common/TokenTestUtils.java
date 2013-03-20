@@ -58,12 +58,12 @@ public final class TokenTestUtils {
         //mess with the token a bit to force it to fail to validate
         Element e = tok.getToken();
         Element e2 = DOMUtils.getFirstChildWithName(e, e.getNamespaceURI(), "Conditions");
-        String nb = e2.getAttribute("NotBefore");
-        String noa = e2.getAttribute("NotOnOrAfter");
+        String nb = e2.getAttributeNS(null, "NotBefore");
+        String noa = e2.getAttributeNS(null, "NotOnOrAfter");
         nb = "2010" + nb.substring(4);
         noa = "2010" + noa.substring(4);
-        e2.setAttribute("NotBefore", nb);
-        e2.setAttribute("NotOnOrAfter", noa);
+        e2.setAttributeNS(null, "NotBefore", nb);
+        e2.setAttributeNS(null, "NotOnOrAfter", noa);
         try {
             sts.validateSecurityToken(tok);
             fail("Failure expected on an invalid token");
