@@ -314,4 +314,43 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // TODO
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testTokenProtection() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItTokenProtectionPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the property is not enabled
+        portQName = new QName(NAMESPACE, "DoubleItTokenProtectionPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not protecting the token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // String error = "Layout does not match the requirements";
+            // assertTrue(ex.getMessage().contains(error));
+            System.out.println("EX: " + ex.getMessage());
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
 }

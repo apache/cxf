@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,10 +37,16 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.neethi.Assertion;
+
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
@@ -244,6 +252,14 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         assertPolicy(aim, SPConstants.ENCRYPT_SIGNATURE);
         assertPolicy(aim, SPConstants.PROTECT_TOKENS);
         
+        /*
+        // Check ProtectTokens
+        if (binding.isTokenProtection() && !isTokenProtected(results, signedResults)) {
+            ai.setNotAsserted("The token protection property is not valid");
+            return false;
+        }
+        */
+        
         return true;
     }
     
@@ -351,6 +367,99 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Check whether the token protection policy is followed. In other words, check that the
+     * signature token was itself signed.
+     */
+    protected boolean isTokenProtected(
+        List<WSSecurityEngineResult> results,
+        List<WSSecurityEngineResult> signedResults
+    ) {
+        for (int i = 0; i < signedResults.size(); i++) {
+            WSSecurityEngineResult result = signedResults.get(i);
+            
+            // Get the Token result that was used for the signature
+            WSSecurityEngineResult tokenResult = 
+                findCorrespondingToken(result, results);
+            if (tokenResult == null) {
+                return false;
+            }
+            
+            // Now go through what was signed and see if the token itself was signed
+            List<WSDataRef> sl =
+                CastUtils.cast((List<?>)result.get(
+                    WSSecurityEngineResult.TAG_DATA_REF_URIS
+                ));
+            boolean found = false;
+            if (sl != null) {
+                for (WSDataRef dataRef : sl) {
+                    Element referenceElement = dataRef.getProtectedElement();
+                    if (referenceElement != null
+                        && referenceElement.equals(tokenResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT))) {
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                return false;
+            }
+
+        }
+        return true;
+    }
+    
+    /**
+     * Find the token corresponding to either the X509Certificate or PublicKey used to sign
+     * the "signatureResult" argument.
+     */
+    private WSSecurityEngineResult findCorrespondingToken(
+        WSSecurityEngineResult signatureResult,
+        List<WSSecurityEngineResult> results
+    ) {
+        // See what was used to sign this result
+        X509Certificate cert = 
+            (X509Certificate)signatureResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        PublicKey publicKey = 
+            (PublicKey)signatureResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+        
+        for (WSSecurityEngineResult token : results) {
+            Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
+            if (actInt == WSConstants.SIGN) {
+                continue;
+            }
+            
+            BinarySecurity binarySecurity = 
+                (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+            PublicKey foundPublicKey = 
+                (PublicKey)token.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+            if (binarySecurity instanceof X509Security
+                || binarySecurity instanceof PKIPathSecurity) {
+                X509Certificate foundCert = 
+                    (X509Certificate)token.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+                if (foundCert.equals(cert)) {
+                    return token;
+                }
+            } else if (actInt.intValue() == WSConstants.ST_SIGNED
+                || actInt.intValue() == WSConstants.ST_UNSIGNED) {
+                SamlAssertionWrapper assertionWrapper = 
+                    (SamlAssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+                SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
+                if (samlKeyInfo != null) {
+                    X509Certificate[] subjectCerts = samlKeyInfo.getCerts();
+                    PublicKey subjectPublicKey = samlKeyInfo.getPublicKey();
+                    if ((cert != null && subjectCerts != null 
+                        && cert.equals(subjectCerts[0]))
+                        || (subjectPublicKey != null && subjectPublicKey.equals(publicKey))) {
+                        return token;
+                    }
+                }
+            } else if (publicKey != null && publicKey.equals(foundPublicKey)) {
+                return token;
+            } 
+        }
+        return null;
     }
     
     /**
