@@ -321,7 +321,7 @@ public class Headers {
             }
         }
         // make sure we don't add more than one User-Agent header
-        if (connection.getRequestProperty("User-Agent") != null) {
+        if (connection.getRequestProperty("User-Agent") == null) {
             connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
         }
     }
