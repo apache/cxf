@@ -204,6 +204,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
+            String ct = responseContext.getMediaType().toString();
+            ct += ";charset=";
+            responseContext.getHeaders().putSingle("Content-Type", ct);
             responseContext.getHeaders().add("Response", "OK");
         }
         
@@ -295,6 +298,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
         @Override
         public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
             context.getHeaders().add("ServerWriterInterceptor", "serverWrite");
+            String ct = context.getHeaders().getFirst("Content-Type").toString();
+            ct += "us-ascii";
+            context.getHeaders().putSingle("Content-Type", ct);
             context.proceed();
         }
         

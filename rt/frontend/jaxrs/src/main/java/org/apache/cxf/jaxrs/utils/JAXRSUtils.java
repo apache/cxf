@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotAllowedException;
@@ -403,14 +404,15 @@ public final class JAXRSUtils {
                             pathMatched++;
                             boolean mMatched = matchHttpMethod(ori.getHttpMethod(), httpMethod);
                             boolean cMatched = matchConsumeTypes(requestType, ori);
-                            boolean pMatched = matchProduceTypes(acceptType, ori);
-                            if (mMatched && cMatched && pMatched) {
+                            MediaType pMediaType = matchProduceTypes(acceptType, ori);
+                            if (mMatched && cMatched && pMediaType != null) {
                                 subresourcesOnly = false;
+                                map.putSingle(MediaType.class.getName(), pMediaType.toString());
                                 candidateList.put(ori, map);
                                 added = true;
                             } else {
                                 methodMatched = mMatched ? methodMatched + 1 : methodMatched;
-                                produceMatched = pMatched ? produceMatched + 1 : produceMatched;
+                                produceMatched = pMediaType != null ? produceMatched + 1 : produceMatched;
                                 consumeMatched = cMatched ? consumeMatched + 1 : consumeMatched;
                                 logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                             }
@@ -446,6 +448,12 @@ public final class JAXRSUtils {
                 LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED", 
                                BUNDLE, ori.getMethodToInvoke().getName(), 
                                resource.getServiceClass().getName()).toString());
+            }
+            if (!ori.isSubResourceLocator()) {
+                List<String> responseContentType = values.remove(MediaType.class.getName());
+                if (responseContentType != null) {
+                    message.getExchange().put(Message.CONTENT_TYPE, responseContentType.get(0));
+                }
             }
             return ori;
         }
@@ -538,7 +546,7 @@ public final class JAXRSUtils {
     }
     
     public static boolean headMethodPossible(String expectedMethod, String httpMethod) {
-        return "HEAD".equalsIgnoreCase(httpMethod) && "GET".equals(expectedMethod);        
+        return HttpMethod.HEAD.equalsIgnoreCase(httpMethod) && HttpMethod.GET.equals(expectedMethod);        
     }
     
     private static String convertTypesToString(List<MediaType> types) {
@@ -1235,10 +1243,13 @@ public final class JAXRSUtils {
         return intersectMimeTypes(ori.getConsumeTypes(), requestContentType).size() != 0;
     }
     
-    public static boolean matchProduceTypes(MediaType acceptContentType, 
+    public static MediaType matchProduceTypes(MediaType acceptContentType, 
                                             OperationResourceInfo ori) {
         
-        return intersectMimeTypes(ori.getProduceTypes(), acceptContentType).size() != 0;
+        List<MediaType> intersected = intersectMimeTypes(ori.getProduceTypes(), 
+                                                         Collections.singletonList(acceptContentType), 
+                                                         true);
+        return intersected.isEmpty() ? null : intersected.get(0);
     }
     
     public static boolean matchMimeTypes(MediaType requestContentType, 
@@ -1489,7 +1500,7 @@ public final class JAXRSUtils {
     public static void runContainerResponseFilters(ProviderFactory pf,
                                                    Response r,
                                                    Message m, 
-                                                   OperationResourceInfo ori) {
+                                                   OperationResourceInfo ori) throws IOException, Throwable {
         List<ProviderInfo<ContainerResponseFilter>> containerFilters =  
             pf.getContainerResponseFilters(ori == null ? null : ori.getNameBindings());
         if (!containerFilters.isEmpty()) {
@@ -1500,12 +1511,8 @@ public final class JAXRSUtils {
             ContainerResponseContext responseContext = 
                 new ContainerResponseContextImpl(r, m, ori);
             for (ProviderInfo<ContainerResponseFilter> filter : containerFilters) {
-                try {
-                    InjectionUtils.injectContexts(filter.getProvider(), filter, m);
-                    filter.getProvider().filter(requestContext, responseContext);
-                } catch (IOException ex) {
-                    throw new WebApplicationException(ex);
-                }
+                InjectionUtils.injectContexts(filter.getProvider(), filter, m);
+                filter.getProvider().filter(requestContext, responseContext);
             }
         }
     }

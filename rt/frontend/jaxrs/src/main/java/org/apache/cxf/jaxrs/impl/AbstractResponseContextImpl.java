@@ -130,29 +130,20 @@ public abstract class AbstractResponseContextImpl {
             r.getMetadata().putSingle(HttpHeaders.CONTENT_TYPE, mt);
             m.put(Message.CONTENT_TYPE, mt.toString());
         }
-        updateMessageResponse();
     }
     
     protected Annotation[] getResponseEntityAnnotations() {
         return ((ResponseImpl)r).getEntityAnnotations();
     }
     
-    protected Class<?> getResponseEntityClass() {
-        return r.getEntity().getClass();
-    }
-    
+        
     public void setStatus(int status) {
         m.getExchange().put(Message.RESPONSE_CODE, status);
         m.put(Message.RESPONSE_CODE, status);
         ((ResponseImpl)r).setStatus(status);
-        updateMessageResponse();
     }
 
     public void setStatusInfo(StatusType status) {
         setStatus(status.getStatusCode());
-    }
-
-    private void updateMessageResponse() {
-        m.put(Response.class, r);
     }
 }

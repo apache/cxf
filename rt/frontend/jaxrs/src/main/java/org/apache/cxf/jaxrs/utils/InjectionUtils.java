@@ -55,7 +55,9 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -71,6 +73,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -90,9 +93,11 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -1155,5 +1160,44 @@ public final class InjectionUtils {
                 throw new RuntimeException(ex);
             }
         }
+    }
+    
+    public static Class<?> getRawResponseClass(Object targetObject) {
+        if (targetObject != null) {
+            Class<?> targetClass = targetObject.getClass();
+            return ClassHelper.getRealClassFromClass(targetClass);
+        } else {
+            return null;
+        }
+    }
+    
+    public static Type getGenericResponseType(Method invoked, 
+                                        Object targetObject, 
+                                        Class<?> targetType,
+                                        OperationResourceInfo ori,
+                                        Exchange exchange) {
+        if (targetObject == null) {
+            return null;
+        }
+        Type type = null;
+        if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
+            type = ((GenericEntity<?>)targetObject).getType();
+        } else if (invoked == null 
+                   || !invoked.getReturnType().isAssignableFrom(targetType)
+                   || exchange.get(AsyncResponse.class) != null) {
+            // when a method has been invoked it is still possible that either an ExceptionMapper
+            // or a ResponseHandler filter overrides a response entity; if it happens then 
+            // the Type is the class of the response object, unless this new entity is assignable
+            // to invoked.getReturnType(); same applies to the case when a method returns Response
+            type = targetObject.getClass(); 
+        } else {
+            type = invoked.getGenericReturnType();
+            if (type instanceof TypeVariable) {
+                type = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
+                                                           (TypeVariable<?>)type);
+            }
+        }
+        
+        return type;
     }
 }

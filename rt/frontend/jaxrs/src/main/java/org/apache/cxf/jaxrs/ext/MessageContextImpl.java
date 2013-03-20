@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.internet.InternetHeaders;
 import javax.servlet.ServletConfig;
@@ -46,6 +47,7 @@ import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.io.CacheSizeExceededException;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -203,6 +205,11 @@ public class MessageContextImpl implements MessageContext {
             new AttachmentOutputInterceptor(messageContentType, rootHeaders);
         
         outMessage.put(Message.CONTENT_TYPE, rootContentType);
+        Map<String, List<String>> allHeaders = 
+            CastUtils.cast((Map<?, ?>)outMessage.get(Message.PROTOCOL_HEADERS));
+        if (allHeaders != null) {
+            allHeaders.remove(Message.CONTENT_TYPE);
+        }
         attInterceptor.handleMessage(outMessage);
     }
     

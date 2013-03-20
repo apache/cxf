@@ -259,7 +259,7 @@ public class SelectMethodCandidatesTest extends Assert {
         ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, path, values,
                                                                     new MessageImpl());
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
@@ -280,7 +280,7 @@ public class SelectMethodCandidatesTest extends Assert {
         ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/resource1", values,
                                                                     new MessageImpl());
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
@@ -305,7 +305,7 @@ public class SelectMethodCandidatesTest extends Assert {
         ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d", values,
                                                                     new MessageImpl());
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource,
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     Collections.singletonList(MediaType.valueOf(acceptContentTypes)), true);
         assertNotNull(ori);
@@ -317,7 +317,7 @@ public class SelectMethodCandidatesTest extends Assert {
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values,
                                                   new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                        null, 
+                                        createMessage(), 
                                         "GET", values, contentTypes, 
                                         JAXRSUtils.parseMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
@@ -329,7 +329,7 @@ public class SelectMethodCandidatesTest extends Assert {
         acceptContentTypes = "application/xml";
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values, new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                        null, 
+                                        createMessage(), 
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes))
                                         , true);
@@ -342,7 +342,7 @@ public class SelectMethodCandidatesTest extends Assert {
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1/bar/baz/baz", values,
                                                   new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                        null, 
+                                        createMessage(), 
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)),
                                         true);
@@ -354,7 +354,7 @@ public class SelectMethodCandidatesTest extends Assert {
         acceptContentTypes = "application/json";
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1", values, new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                        null, 
+                                        createMessage(), 
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)),
                                         true);
@@ -364,7 +364,7 @@ public class SelectMethodCandidatesTest extends Assert {
         
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/1/2", values, new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                        null, 
+                                        createMessage(), 
                                         "GET", values, contentTypes, 
                                         Collections.singletonList(MediaType.valueOf(acceptContentTypes)),
                                         true);
@@ -388,7 +388,7 @@ public class SelectMethodCandidatesTest extends Assert {
         String contentTypes = "*/*";
         String acceptContentTypes = "application/bar,application/foo";
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
@@ -396,7 +396,7 @@ public class SelectMethodCandidatesTest extends Assert {
         acceptContentTypes = "application/foo,application/bar";
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values, new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
@@ -405,7 +405,7 @@ public class SelectMethodCandidatesTest extends Assert {
         acceptContentTypes = "application/foo;q=0.5,application/bar";
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values, new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
@@ -414,11 +414,36 @@ public class SelectMethodCandidatesTest extends Assert {
         acceptContentTypes = "application/foo,application/bar;q=0.5";
         resource = JAXRSUtils.selectResourceClass(resources, "/1/2/3/d/custom", values, new MessageImpl());
         ori = JAXRSUtils.findTargetMethod(resource, 
-                                    null, 
+                                    createMessage(), 
                                     "GET", values, contentTypes, 
                                     JAXRSUtils.sortMediaTypes(acceptContentTypes), true);
         assertNotNull(ori);
         assertEquals("readFoo", ori.getMethodToInvoke().getName());
         
     }
+    
+    private Message createMessage() {
+        ProviderFactory factory = ProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
+    }
+    
+
 }

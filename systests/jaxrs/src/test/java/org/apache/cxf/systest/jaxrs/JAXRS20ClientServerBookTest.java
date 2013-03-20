@@ -337,6 +337,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("custom", response.getHeaderString("Custom"));
         assertEquals("simple", response.getHeaderString("Simple"));
         assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("application/xml;charset=us-ascii", response.getMediaType().toString());
         assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
     }
     
