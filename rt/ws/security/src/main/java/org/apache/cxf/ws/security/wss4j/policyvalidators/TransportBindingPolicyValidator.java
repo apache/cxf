@@ -87,8 +87,8 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             
             // Check the Layout
             Layout layout = binding.getLayout();
-            boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTimestampFirst;
-            boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTimestampLast;
+            boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTsFirst;
+            boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTsLast;
             if (!validateLayout(timestampFirst, timestampLast, results)) {
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, layout, error);

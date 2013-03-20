@@ -407,9 +407,9 @@ public abstract class AbstractBindingBuilder {
             for (AssertionInfo ai : ais) {
                 Layout layout = (Layout)ai.getAssertion();
                 ai.setAsserted(true);
-                if (SPConstants.Layout.LaxTimestampLast == layout.getValue()) {
+                if (SPConstants.Layout.LaxTsLast == layout.getValue()) {
                     if (timestamp == null) {
-                        ai.setNotAsserted(SPConstants.Layout.LaxTimestampLast + " requires a timestamp");
+                        ai.setNotAsserted(SPConstants.Layout.LaxTsLast + " requires a timestamp");
                     } else {
                         ai.setAsserted(true);
                         Element el = timestamp.getElement();
@@ -418,9 +418,9 @@ public abstract class AbstractBindingBuilder {
                             bottomUpElement = el;
                         }
                     }
-                } else if (SPConstants.Layout.LaxTimestampFirst == layout.getValue()) {
+                } else if (SPConstants.Layout.LaxTsFirst == layout.getValue()) {
                     if (timestamp == null) {
-                        ai.setNotAsserted(SPConstants.Layout.LaxTimestampFirst + " requires a timestamp");
+                        ai.setNotAsserted(SPConstants.Layout.LaxTsFirst + " requires a timestamp");
                     } else {
                         addTopDownElement(timestampEl.getElement());
                     }
