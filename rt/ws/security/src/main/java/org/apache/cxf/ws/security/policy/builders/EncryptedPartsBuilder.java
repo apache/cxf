@@ -70,11 +70,20 @@ public class EncryptedPartsBuilder implements AssertionBuilder<Element> {
     private void processElement(Element element, SignedEncryptedParts parent) {
 
         if ("Header".equals(element.getLocalName())) {
-            String nameAttribute = element.getAttribute(SPConstants.NAME);
+            String nameAttribute = element.getAttributeNS(null, SPConstants.NAME);
             if (nameAttribute == null) {
                 nameAttribute = "";
             }
+<<<<<<< HEAD
             String namespaceAttribute = element.getAttribute(SPConstants.NAMESPACE);
+=======
+            String namespaceAttribute = element.getAttributeNS(null, SPConstants.NAMESPACE);
+            if ("".equals(namespaceAttribute)) {
+                throw new IllegalArgumentException(
+                    "sp:EncryptedParts/sp:Header@Namespace must have a value"
+                );
+            }
+>>>>>>> ba4d301... Merged revisions 1458929 via  git cherry-pick from
             parent.addHeader(new Header(nameAttribute, namespaceAttribute));
 
         } else if ("Body".equals(element.getLocalName())) {

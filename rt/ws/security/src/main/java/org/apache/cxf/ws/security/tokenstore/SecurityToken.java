@@ -479,7 +479,7 @@ public class SecurityToken implements Serializable {
             return DOMUtils.getContent(child);
         } else if (Reference.TOKEN.getLocalPart().equals(child.getLocalName())
             && Reference.TOKEN.getNamespaceURI().equals(child.getNamespaceURI())) {
-            return child.getAttribute("URI").substring(1);
+            return child.getAttributeNS(null, "URI").substring(1);
         }
         return null;
     }

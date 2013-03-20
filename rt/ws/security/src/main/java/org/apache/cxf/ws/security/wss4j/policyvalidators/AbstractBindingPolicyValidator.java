@@ -468,7 +468,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                     for (WSDataRef r : el) {
                         Element protectedElement = r.getProtectedElement();
                         if (protectedElement != null) {
-                            String id = protectedElement.getAttribute("Id");
+                            String id = protectedElement.getAttributeNS(null, "Id");
                             String wsuId = protectedElement.getAttributeNS(WSConstants.WSU_NS, "Id");
                             if (sigId.equals(id) || sigId.equals(wsuId)) {
                                 return true;

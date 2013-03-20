@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.sts.claims;
+package org.apache.cxf.systest.sts.deployment;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,13 +29,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.sts.claims.ClaimsParser;
+import org.apache.cxf.sts.claims.RequestClaim;
 
-public class IdentityClaimsParser implements ClaimsParser {
+/**
+ * A Custom ClaimsParser implementation.
+ */
+public class CustomClaimsParser implements ClaimsParser {
     
-    public static final String IDENTITY_CLAIMS_DIALECT = 
-        "http://schemas.xmlsoap.org/ws/2005/05/identity";
+    public static final String DIALECT = 
+        "http://schemas.mycompany.com/claims";
 
-    private static final Logger LOG = LogUtils.getL7dLogger(IdentityClaimsParser.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(CustomClaimsParser.class);
 
     public RequestClaim parse(Element claim) {
         return parseClaimType(claim);
@@ -100,6 +105,6 @@ public class IdentityClaimsParser implements ClaimsParser {
      * Return the supported dialect of this class
      */
     public String getSupportedDialect() {
-        return IDENTITY_CLAIMS_DIALECT;
+        return DIALECT;
     }
 }
