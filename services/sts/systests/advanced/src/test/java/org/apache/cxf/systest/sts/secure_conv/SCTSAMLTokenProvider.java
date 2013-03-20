@@ -109,9 +109,9 @@ public class SCTSAMLTokenProvider implements TokenProvider {
             String tokenType = tokenRequirements.getTokenType();
             if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) 
                     || WSConstants.SAML2_NS.equals(tokenType)) {
-                response.setTokenId(token.getAttribute("ID"));
+                response.setTokenId(token.getAttributeNS(null, "ID"));
             } else {
-                response.setTokenId(token.getAttribute("AssertionID"));
+                response.setTokenId(token.getAttributeNS(null, "AssertionID"));
             }
             response.setLifetime(conditionsProvider.getLifetime());
             response.setEntropy(entropyBytes);

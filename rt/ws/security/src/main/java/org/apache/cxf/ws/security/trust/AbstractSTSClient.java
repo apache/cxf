@@ -1475,7 +1475,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
             || elName.equals(new QName(WSConstants.WSSE_NS, "KeyIdentifier"))) {
             return DOMUtils.getContent(child);
         } else if (elName.equals(Reference.TOKEN)) {
-            return child.getAttribute("URI");
+            return child.getAttributeNS(null, "URI");
         } else if (elName.equals(new QName(STSUtils.SCT_NS_05_02, "Identifier"))
                    || elName.equals(new QName(STSUtils.SCT_NS_05_12, "Identifier"))) {
             return DOMUtils.getContent(child);

@@ -72,11 +72,11 @@ public class SignedPartsBuilder implements AssertionBuilder<Element> {
 
         if ("Header".equals(element.getLocalName())) {
 
-            String nameAttribute = element.getAttribute(SPConstants.NAME);
+            String nameAttribute = element.getAttributeNS(null, SPConstants.NAME);
             if (nameAttribute == null) {
                 nameAttribute = "";
             }
-            String namespaceAttribute = element.getAttribute(SPConstants.NAMESPACE);
+            String namespaceAttribute = element.getAttributeNS(null, SPConstants.NAMESPACE);
             if ("".equals(namespaceAttribute)) {
                 throw new IllegalArgumentException(
                     "sp:SignedParts/sp:Header@Namespace must have a value"

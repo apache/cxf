@@ -34,12 +34,12 @@ public class CustomClaimParser implements ClaimsParser {
         String claimLocalName = claim.getLocalName();
         String claimNS = claim.getNamespaceURI();
         if (CLAIMS_DIALECT.equals(claimNS) && "MyElement".equals(claimLocalName)) {
-            String claimTypeUri = claim.getAttribute("Uri");
+            String claimTypeUri = claim.getAttributeNS(null, "Uri");
             CustomRequestClaim response = new CustomRequestClaim();
             response.setClaimType(URI.create(claimTypeUri));
-            String claimValue = claim.getAttribute("value");
+            String claimValue = claim.getAttributeNS(null, "value");
             response.setClaimValue(claimValue);
-            String scope = claim.getAttribute("scope");
+            String scope = claim.getAttributeNS(null, "scope");
             response.setScope(scope);
             return response;
         }
