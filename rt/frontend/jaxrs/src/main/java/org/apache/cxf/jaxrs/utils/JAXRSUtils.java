@@ -138,6 +138,7 @@ import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -437,7 +438,7 @@ public final class JAXRSUtils {
                                 MediaType pMediaType = matchProduceTypes(acceptType, ori);
                                 if (mMatched && cMatched && pMediaType != null) {
                                     subresourcesOnly = false;
-                                    map.putSingle(MediaType.class.getName(), pMediaType.toString());
+                                    map.putSingle(Message.CONTENT_TYPE, pMediaType.toString());
                                     candidateList.put(ori, map);
                                     added = true;
                                 } else {
@@ -481,7 +482,7 @@ public final class JAXRSUtils {
                                ori.getClassResourceInfo().getServiceClass().getName()).toString());
             }
             if (!ori.isSubResourceLocator()) {
-                List<String> responseContentType = matchedValues.remove(MediaType.class.getName());
+                List<String> responseContentType = matchedValues.remove(Message.CONTENT_TYPE);
                 if (responseContentType != null) {
                     message.getExchange().put(Message.CONTENT_TYPE, responseContentType.get(0));
                 }
@@ -1461,28 +1462,46 @@ public final class JAXRSUtils {
         return cls == null ? defaultExceptionType : cls;
     }
     
-    public static <T extends Throwable> Response convertFaultToResponse(T ex, Message inMessage) {
-        
+    public static <T extends Throwable> Response convertFaultToResponse(T ex, Message currentMessage) {
+        Message inMessage = currentMessage.getExchange().getInMessage();
+        Response response = null;
         if (ex.getClass() == WebApplicationException.class) {
             WebApplicationException webEx = (WebApplicationException)ex;
             if (webEx.getResponse().hasEntity() 
                 && webEx.getCause() == null
                 && MessageUtils.isTrue(inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION))) {
-                return webEx.getResponse();
+                response = webEx.getResponse();
+                
             }
         }
-        
-        ExceptionMapper<T>  mapper =
-            ServerProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
-        if (mapper != null) {
-            try {
-                return mapper.toResponse(ex);
-            } catch (Exception mapperEx) {
-                mapperEx.printStackTrace();
-                return Response.serverError().build();
+        if (response == null) {
+            ExceptionMapper<T>  mapper =
+                ServerProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
+            if (mapper != null) {
+                try {
+                    response = mapper.toResponse(ex);
+                } catch (Exception mapperEx) {
+                    mapperEx.printStackTrace();
+                    return Response.serverError().build();
+                }
             }
         }
-        return null;
+        setMessageContentType(currentMessage, response);
+        return response;
+    }
+    
+    public static void setMessageContentType(Message message, Response response) {
+        if (response != null) {
+            Object ct = response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+            if (ct != null) {
+                Exchange ex = message.getExchange();
+                if (ex.getInMessage() == message) {
+                    ex.put(Message.CONTENT_TYPE, ct.toString());
+                } else {
+                    message.put(Message.CONTENT_TYPE, ct.toString());
+                }
+            }
+        }
         
     }
     
@@ -1542,7 +1561,9 @@ public final class JAXRSUtils {
                 } catch (IOException ex) {
                     throw new InternalServerErrorException(ex);
                 }
-                if (m.getExchange().get(Response.class) != null) {
+                Response response = m.getExchange().get(Response.class);
+                if (response != null) {
+                    setMessageContentType(m, response);
                     return true;
                 }
             }

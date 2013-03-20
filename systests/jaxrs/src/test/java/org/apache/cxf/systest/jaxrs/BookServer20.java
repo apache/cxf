@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Priority;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NameBinding;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -42,6 +43,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -112,12 +114,20 @@ public class BookServer20 extends AbstractBusTestServerBase {
 
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
+            if ("true".equals(context.getProperty("DynamicPrematchingFilter"))) {
+                throw new RuntimeException();
+            }
             context.setProperty("FirstPrematchingFilter", "true");
             
             UriInfo ui = context.getUriInfo();
             String path = ui.getPath(false);
             if ("wrongpath".equals(path)) {
                 context.setRequestUri(URI.create("/bookstore/bookheaders/simple"));
+            } else if ("throwException".equals(path)) {
+                context.setProperty("filterexception", "prematch");
+                throw new InternalServerErrorException(
+                    Response.status(500).type("text/plain")
+                        .entity("Prematch filter error").build());
             }
         }
         
@@ -176,9 +186,16 @@ public class BookServer20 extends AbstractBusTestServerBase {
     
     @CustomHeaderAdded
     private static class PostMatchContainerRequestFilter implements ContainerRequestFilter {
-
+        @Context
+        private UriInfo ui;
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
+            if (ui.getQueryParameters().getFirst("throwException") != null) {
+                context.setProperty("filterexception", "postmatch");
+                throw new InternalServerErrorException(
+                    Response.status(500).type("text/plain")
+                        .entity("Postmatch filter error").build());
+            }
             String value = context.getHeaders().getFirst("Book");
             if (value != null) {
                 context.getHeaders().addFirst("Book", value + "3");
@@ -205,6 +222,13 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
             String ct = responseContext.getMediaType().toString();
+            if (requestContext.getProperty("filterexception") != null) {
+                if (!"text/plain".equals(ct)) {
+                    throw new RuntimeException();
+                }
+                responseContext.getHeaders().putSingle("FilterException", 
+                                                       requestContext.getProperty("filterexception"));
+            }
             ct += ";charset=";
             responseContext.getHeaders().putSingle("Content-Type", ct);
             responseContext.getHeaders().add("Response", "OK");
@@ -218,8 +242,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
-            if (!responseContext.getHeaders().containsKey("Response")
-                || !responseContext.getHeaders().containsKey("DynamicResponse")) {
+            if (!responseContext.getHeaders().containsKey("Response")) {
+                throw new RuntimeException();
+            }
+            if (!responseContext.getHeaders().containsKey("DynamicResponse")
+                && !"Prematch filter error".equals(responseContext.getEntity())) {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("Response2", "OK2");
@@ -236,8 +263,10 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
             responseContext.getHeaders().add("Custom", "custom");
-            Book book = (Book)responseContext.getEntity();
-            responseContext.setEntity(new Book(book.getName(), 1 + book.getId()), null, null);
+            if (!responseContext.getEntity().equals("Postmatch filter error")) {
+                Book book = (Book)responseContext.getEntity();
+                responseContext.setEntity(new Book(book.getName(), 1 + book.getId()), null, null);
+            }
         }
         
     }

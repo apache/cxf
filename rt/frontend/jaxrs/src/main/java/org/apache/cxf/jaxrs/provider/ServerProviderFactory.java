@@ -168,15 +168,18 @@ public final class ServerProviderFactory extends ProviderFactory {
         for (Map.Entry<NameKey, ProviderInfo<T>> entry : boundFilters.entrySet()) {
             String entryName = entry.getKey().getName();
             if (entryName.equals(DEFAULT_FILTER_NAME_BINDING)) {
-                map.put(entry.getValue(), Collections.<String>emptyList());
+                ProviderInfo<T> provider = entry.getValue(); 
+                map.put(provider, Collections.<String>emptyList());
             } else {
                 map.add(entry.getValue(), entryName);
             }
         }
         List<ProviderInfo<T>> list = new LinkedList<ProviderInfo<T>>();
         for (Map.Entry<ProviderInfo<T>, List<String>> entry : map.entrySet()) {
-            if (names.containsAll(entry.getValue())) {
-                list.add(entry.getKey());
+            List<String> values = entry.getValue();
+            if (names.containsAll(values)) {
+                ProviderInfo<T> provider = entry.getKey();
+                list.add(provider);
             }
         }
         return list;

@@ -93,6 +93,39 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testPreMatchContainerFilterThrowsException() {
+        String address = "http://localhost:" + PORT + "/throwException";
+        WebClient wc = WebClient.create(address);
+        Response response = wc.get();
+        assertEquals(500, response.getStatus());
+        assertEquals("Prematch filter error", response.readEntity(String.class));
+        assertEquals("prematch", response.getHeaderString("FilterException"));
+        assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("OK2", response.getHeaderString("Response2"));
+        assertNull(response.getHeaderString("DynamicResponse"));
+        assertNull(response.getHeaderString("Custom"));
+        assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("text/plain;charset=us-ascii", response.getMediaType().toString());
+    }
+    
+    @Test
+    public void testPostMatchContainerFilterThrowsException() {
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple?throwException";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        Response response = wc.get();
+        assertEquals(500, response.getStatus());
+        assertEquals("Postmatch filter error", response.readEntity(String.class));
+        assertEquals("postmatch", response.getHeaderString("FilterException"));
+        assertEquals("OK", response.getHeaderString("Response"));
+        assertEquals("OK2", response.getHeaderString("Response2"));
+        assertEquals("Dynamic", response.getHeaderString("DynamicResponse"));
+        assertEquals("custom", response.getHeaderString("Custom"));
+        assertEquals("serverWrite", response.getHeaderString("ServerWriterInterceptor"));
+        assertEquals("text/plain;charset=us-ascii", response.getMediaType().toString());
+    }
+    
+    @Test
     public void testGetBookWrongPath() {
         String address = "http://localhost:" + PORT + "/wrongpath";
         doTestGetBook(address);
