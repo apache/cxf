@@ -651,7 +651,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                     h.headerMap().put(header.getName(), s);
                 }
                 s.add(header.getValue());
-                if ("Content-Type".equals(header.getName())) {
+                if ("Content-Type".equalsIgnoreCase(header.getName())) {
                     ct = header.getValue();
                 }
             } 
