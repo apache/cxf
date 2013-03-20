@@ -123,6 +123,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             return handleFault(new Fault((Throwable)asyncObj), 
                                exchange.getInMessage(), null, null);    
         } else {
+            setResponseContentTypeIfNeeded(exchange.getInMessage(), asyncObj);
             return new MessageContentsList(asyncObj);
         }
     }
@@ -255,24 +256,30 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 return this.invoke(exchange, newParams, result);
             } catch (IOException ex) {
-                Response resp = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
+                Response resp = JAXRSUtils.convertFaultToResponse(ex, inMessage);
                 if (resp == null) {
-                    resp = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
+                    resp = JAXRSUtils.convertFaultToResponse(ex, inMessage);
                 }
                 return new MessageContentsList(resp);
             } catch (WebApplicationException ex) {
                 Response excResponse;
                 if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), 
-                        (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
+                        (String)inMessage.get(Message.HTTP_REQUEST_METHOD))) {
                     excResponse = JAXRSUtils.createResponse(subCri, null, null, 200, true);
                 } else {
-                    excResponse = JAXRSUtils.convertFaultToResponse(ex, exchange.getInMessage());
+                    excResponse = JAXRSUtils.convertFaultToResponse(ex, inMessage);
                 }
                 return new MessageContentsList(excResponse);
             }
         }
-
+        setResponseContentTypeIfNeeded(inMessage, result);
         return result;
+    }
+    
+    private void setResponseContentTypeIfNeeded(Message inMessage, Object response) {
+        if (response instanceof Response) {
+            JAXRSUtils.setMessageContentType(inMessage, (Response)response);
+        }
     }
     
     private Object handleFault(Fault ex, Message inMessage, 
