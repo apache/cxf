@@ -96,4 +96,222 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testEncryptSignature() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptSignaturePort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not encrypting the signature is specified
+        portQName = new QName(NAMESPACE, "DoubleItEncryptSignaturePort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not encrypting the signature property");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "The signature is not protected";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testIncludeTimestamp() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItIncludeTimestampPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not sending a Timestamp
+        portQName = new QName(NAMESPACE, "DoubleItIncludeTimestampPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not sending a Timestamp");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Received Timestamp does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testEncryptBeforeSigning() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItEncryptBeforeSigningPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not following the correct steps for this property
+        portQName = new QName(NAMESPACE, "DoubleItEncryptBeforeSigningPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not encrypting before signing");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Not encrypted before signed";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testSignBeforeEncrypting() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItSignBeforeEncryptingPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not following the correct steps for this property
+        portQName = new QName(NAMESPACE, "DoubleItSignBeforeEncryptingPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not signing before encrypting");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Not signed before encrypted";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    // TODO It's not sending the Timestamp "first" correctly
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testTimestampFirst() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItTimestampFirstPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is sending the timestamp last
+        portQName = new QName(NAMESPACE, "DoubleItTimestampFirstPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on on sending the timestamp last");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Layout does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testTimestampLast() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItTimestampLastPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is sending the timestamp first
+        portQName = new QName(NAMESPACE, "DoubleItTimestampLastPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on sending the timestamp first");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Layout does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
 }

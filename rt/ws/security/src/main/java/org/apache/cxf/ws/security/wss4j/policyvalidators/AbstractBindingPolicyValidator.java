@@ -151,7 +151,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
             if (results.isEmpty()) {
                 return false;
             }
-            Integer firstAction = (Integer)results.get(0).get(WSSecurityEngineResult.TAG_ACTION);
+            Integer firstAction = (Integer)results.get(results.size() - 1).get(WSSecurityEngineResult.TAG_ACTION);
             if (firstAction.intValue() != WSConstants.TS) {
                 return false;
             }
@@ -160,7 +160,7 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
                 return false;
             }
             Integer lastAction = 
-                (Integer)results.get(results.size() - 1).get(WSSecurityEngineResult.TAG_ACTION);
+                (Integer)results.get(0).get(WSSecurityEngineResult.TAG_ACTION);
             if (lastAction.intValue() != WSConstants.TS) {
                 return false;
             }
