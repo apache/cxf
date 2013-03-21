@@ -160,6 +160,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         List<QName> others = Arrays.asList(new QName[] {
             SP12Constants.INCLUDE_TIMESTAMP, SP11Constants.INCLUDE_TIMESTAMP,
             SP12Constants.ENCRYPT_SIGNATURE, SP11Constants.ENCRYPT_SIGNATURE,
+            SP12Constants.PROTECT_TOKENS, SP11Constants.PROTECT_TOKENS,
             SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, 
             SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY,
             SP12Constants.WSS_X509_V1_TOKEN_10,
