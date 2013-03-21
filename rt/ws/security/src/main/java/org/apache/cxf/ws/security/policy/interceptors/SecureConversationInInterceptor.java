@@ -71,6 +71,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
     
     public SecureConversationInInterceptor() {
         super(Phase.PRE_PROTOCOL);
+        getBefore().add(WSS4JInInterceptor.class.getName());
     }
     private AbstractBinding getBinding(AssertionInfoMap aim) {
         Collection<AssertionInfo> ais = 

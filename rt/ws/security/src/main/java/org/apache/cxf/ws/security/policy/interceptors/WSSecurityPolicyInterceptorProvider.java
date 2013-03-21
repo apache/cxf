@@ -39,6 +39,11 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP12Constants.LAYOUT);
         ASSERTION_TYPES.add(SP12Constants.INCLUDE_TIMESTAMP);
         ASSERTION_TYPES.add(SP12Constants.ALGORITHM_SUITE);
+        ASSERTION_TYPES.add(SP12Constants.ENCRYPT_SIGNATURE);
+        ASSERTION_TYPES.add(SP12Constants.PROTECT_TOKENS);
+        ASSERTION_TYPES.add(SP12Constants.ENCRYPT_BEFORE_SIGNING);
+        ASSERTION_TYPES.add(SP12Constants.SIGN_BEFORE_ENCRYPTING);
+        ASSERTION_TYPES.add(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         ASSERTION_TYPES.add(SP12Constants.WSS10);
         ASSERTION_TYPES.add(SP12Constants.WSS11);
         ASSERTION_TYPES.add(SP12Constants.TRUST_13);
@@ -72,6 +77,11 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP11Constants.LAYOUT);
         ASSERTION_TYPES.add(SP11Constants.INCLUDE_TIMESTAMP);
         ASSERTION_TYPES.add(SP11Constants.ALGORITHM_SUITE);
+        ASSERTION_TYPES.add(SP11Constants.ENCRYPT_SIGNATURE);
+        ASSERTION_TYPES.add(SP11Constants.PROTECT_TOKENS);
+        ASSERTION_TYPES.add(SP11Constants.ENCRYPT_BEFORE_SIGNING);
+        ASSERTION_TYPES.add(SP11Constants.SIGN_BEFORE_ENCRYPTING);
+        ASSERTION_TYPES.add(SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY);
         ASSERTION_TYPES.add(SP11Constants.WSS10);
         ASSERTION_TYPES.add(SP11Constants.WSS11);
         ASSERTION_TYPES.add(SP11Constants.TRUST_10);

@@ -192,7 +192,6 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP11Constants.REQUIRE_KEY_IDENTIFIER_REFERENCE,
             SP12Constants.PROTECT_TOKENS,
             SP11Constants.PROTECT_TOKENS,
-            SP11Constants.PROTECT_TOKENS,
             SP12Constants.RSA_KEY_VALUE,
             
             // Layout
