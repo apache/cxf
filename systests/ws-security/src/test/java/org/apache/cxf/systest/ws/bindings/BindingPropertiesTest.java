@@ -353,4 +353,41 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    // Not strictly a BindingProperty but a property of WSS11...
+    @org.junit.Test
+    public void testSignatureConfirmation() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // This should work, as SignatureConfirmation is enabled
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfirmationPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as SignatureConfirmation is not enabled
+        portQName = new QName(NAMESPACE, "DoubleItSignatureConfirmationPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not enabling SignatureConfirmation");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Check Signature confirmation";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
 }
