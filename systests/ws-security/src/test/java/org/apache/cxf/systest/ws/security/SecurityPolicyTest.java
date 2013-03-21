@@ -273,10 +273,10 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(5);
         
-        ((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                      POLICY_SIGNENC_PROVIDER_ADDRESS);
-        int x = pt.doubleIt(5);
-        assertEquals(10, x);
+        //((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+        //                                              POLICY_SIGNENC_PROVIDER_ADDRESS);
+        //int x = pt.doubleIt(5);
+        //assertEquals(10, x);
         ((java.io.Closeable)pt).close();
         
         portQName = new QName(NAMESPACE, "DoubleItPortHttps");
