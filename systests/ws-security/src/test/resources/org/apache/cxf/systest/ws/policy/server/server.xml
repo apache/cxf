@@ -138,7 +138,7 @@
 		address="https://localhost:${testutil.ports.Server.2}/DoubleItClientCert"
 		serviceName="s:DoubleItService" endpointName="s:DoubleItClientCertPort"
 		xmlns:s="http://www.example.org/contract/DoubleIt" implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-		wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl">
+		wsdlLocation="org/apache/cxf/systest/ws/policy/DoubleItPolicy.wsdl" depends-on="tls-settings">
 
 		<jaxws:properties>
 			<entry key="ws-security.callback-handler"
