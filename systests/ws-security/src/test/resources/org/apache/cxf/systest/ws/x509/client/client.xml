@@ -319,7 +319,7 @@
         </jaxws:features>
     </jaxws:client>
     
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingPort" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportNegativeEndorsingPort" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 
@@ -339,7 +339,7 @@
         </jaxws:features>
     </jaxws:client>
     
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportEndorsingPort2" 
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportNegativeEndorsingPort2" 
                   createdFromAPI="true">
        <jaxws:properties>
            <entry key="ws-security.encryption.properties" 

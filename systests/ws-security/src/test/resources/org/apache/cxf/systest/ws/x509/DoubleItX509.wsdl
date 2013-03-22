@@ -403,13 +403,13 @@
                    binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="https://localhost:9002/DoubleItX509TransportPKISupportingToken" />
         </wsdl:port>
-        <wsdl:port name="DoubleItTransportEndorsingPort" 
+        <wsdl:port name="DoubleItTransportNegativeEndorsingPort" 
                    binding="tns:DoubleItNoSecurityBinding">
-            <soap:address location="https://localhost:9002/DoubleItX509TransportEndorsing" />
+            <soap:address location="https://localhost:9002/DoubleItX509TransportNegativeEndorsing" />
         </wsdl:port>
-        <wsdl:port name="DoubleItTransportEndorsingPort2" 
+        <wsdl:port name="DoubleItTransportNegativeEndorsingPort2" 
                    binding="tns:DoubleItNoSecurityBinding">
-            <soap:address location="https://localhost:9002/DoubleItX509TransportEndorsing2" />
+            <soap:address location="https://localhost:9002/DoubleItX509TransportNegativeEndorsing2" />
         </wsdl:port>
     </wsdl:service>
 
