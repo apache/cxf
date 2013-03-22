@@ -2244,11 +2244,13 @@ public abstract class AbstractBindingBuilder {
          * signature results in the signatureActions list
          */
         List<WSSecurityEngineResult> signatureActions = new ArrayList<WSSecurityEngineResult>();
+        final List<Integer> signedActions = new ArrayList<Integer>(2);
+        signedActions.add(WSConstants.SIGN);
+        signedActions.add(WSConstants.UT_SIGN);
         for (WSHandlerResult wshResult : results) {
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.SIGN, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.UT_SIGN, signatureActions);
+            signatureActions.addAll(
+                WSSecurityUtil.fetchAllActionResults(wshResult.getResults(), signedActions)
+            );
         }
         
         sigConfList = new ArrayList<WSEncryptionPart>();

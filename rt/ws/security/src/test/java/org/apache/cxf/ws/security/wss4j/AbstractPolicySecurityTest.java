@@ -445,15 +445,14 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
 
-        List<WSSecurityEngineResult> protectionResults = 
+        final List<WSSecurityEngineResult> protectionResults = 
             WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(), WSConstants.ENCR);
         assertNotNull(protectionResults);
         
         //
         // This result should contain a reference to the decrypted element
         //
-        final Map<String, Object> result = protectionResults
-                .get(0);
+        final Map<String, Object> result = protectionResults.get(0);
         final List<WSDataRef> protectedElements = 
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         assertNotNull(protectedElements);
