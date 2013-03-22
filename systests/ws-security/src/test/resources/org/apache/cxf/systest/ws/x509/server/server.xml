@@ -520,10 +520,10 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
-       id="TransportEndorsing"
-       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportEndorsing" 
+       id="TransportEndorsingNegativeTest"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportNegativeEndorsing" 
        serviceName="s:DoubleItService"
-       endpointName="s:DoubleItTransportEndorsingPort"
+       endpointName="s:DoubleItTransportNegativeEndorsingPort"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
        wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
@@ -544,10 +544,10 @@
     </jaxws:endpoint> 
     
     <jaxws:endpoint 
-       id="TransportEndorsing2"
-       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportEndorsing2" 
+       id="TransportEndorsingNegativeTest2"
+       address="https://localhost:${testutil.ports.Server.2}/DoubleItX509TransportNegativeEndorsing2" 
        serviceName="s:DoubleItService"
-       endpointName="s:DoubleItTransportEndorsingPort2"
+       endpointName="s:DoubleItTransportNegativeEndorsingPort2"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
        wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl"
