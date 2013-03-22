@@ -536,9 +536,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         //
         // Pre-fetch various results
         //
-        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
+        final List<Integer> actions = new ArrayList<Integer>(2);
+        actions.add(WSConstants.SIGN);
+        actions.add(WSConstants.UT_SIGN);
+        List<WSSecurityEngineResult> signedResults = 
+            WSS4JUtils.fetchAllActionResults(results, actions);
         for (WSSecurityEngineResult result : signedResults) {
             List<WSDataRef> sl = 
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
@@ -549,8 +551,8 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
         
-        List<WSSecurityEngineResult> encryptResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR, encryptResults);
+        List<WSSecurityEngineResult> encryptResults = 
+            WSS4JUtils.fetchAllActionResults(results, WSConstants.ENCR);
         for (WSSecurityEngineResult result : encryptResults) {
             List<WSDataRef> sl = 
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
@@ -707,13 +709,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         List<WSSecurityEngineResult> encryptedResults,
         boolean utWithCallbacks
     ) {
-        List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
+        final List<Integer> utActions = new ArrayList<Integer>(2);
+        utActions.add(WSConstants.UT);
+        utActions.add(WSConstants.UT_NOPASSWORD);
+        List<WSSecurityEngineResult> utResults = 
+            WSS4JUtils.fetchAllActionResults(results, utActions);
         
-        List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
+        final List<Integer> samlActions = new ArrayList<Integer>(2);
+        samlActions.add(WSConstants.ST_SIGNED);
+        samlActions.add(WSConstants.ST_UNSIGNED);
+        List<WSSecurityEngineResult> samlResults = 
+            WSS4JUtils.fetchAllActionResults(results, samlActions);
         
         // Store the timestamp element
         WSSecurityEngineResult tsResult = WSSecurityUtil.fetchActionResult(results, WSConstants.TS);

@@ -18,11 +18,16 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.cache.ReplayCacheFactory;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.cache.ReplayCache;
 
 /**
@@ -85,5 +90,51 @@ public final class WSS4JUtils {
         return null;
     }
 
+    /**
+     * Fetch the result of a given action from a given result list.
+     * 
+     * @param resultList The result list to fetch an action from
+     * @param action The action to fetch
+     * @return The result fetched from the result list, null if the result
+     *         could not be found
+     */
+    public static List<WSSecurityEngineResult> fetchAllActionResults(
+        List<WSSecurityEngineResult> resultList,
+        int action
+    ) {
+        return fetchAllActionResults(resultList, Collections.singletonList(action));
+    }
+    
+    /**
+     * Fetch the results of a given number of actions action from a given result list.
+     * 
+     * @param resultList The result list to fetch an action from
+     * @param actions The list of actions to fetch
+     * @return The list of matching results fetched from the result list
+     */
+    public static List<WSSecurityEngineResult> fetchAllActionResults(
+        List<WSSecurityEngineResult> resultList,
+        List<Integer> actions
+    ) {
+        List<WSSecurityEngineResult> actionResultList = Collections.emptyList();
+        if (actions == null || actions.isEmpty()) {
+            return actionResultList;
+        }
+        
+        for (WSSecurityEngineResult result : resultList) {
+            //
+            // Check the result of every action whether it matches the given action
+            //
+            int resultAction = 
+                ((java.lang.Integer)result.get(WSSecurityEngineResult.TAG_ACTION)).intValue();
+            if (actions.contains(resultAction)) {
+                if (actionResultList.isEmpty()) {
+                    actionResultList = new ArrayList<WSSecurityEngineResult>();
+                }
+                actionResultList.add(result);
+            }
+        }
+        return actionResultList;
+    }
 
 }

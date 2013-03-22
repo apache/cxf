@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,10 +30,10 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.X509Token;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate an X509 Token policy.
@@ -56,8 +55,8 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
             return true;
         }
         
-        List<WSSecurityEngineResult> bstResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST, bstResults);
+        List<WSSecurityEngineResult> bstResults = 
+            WSS4JUtils.fetchAllActionResults(results, WSConstants.BST);
         
         for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();

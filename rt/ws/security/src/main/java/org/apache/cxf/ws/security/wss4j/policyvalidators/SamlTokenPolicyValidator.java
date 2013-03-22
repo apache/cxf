@@ -33,10 +33,10 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SamlToken;
 import org.apache.cxf.ws.security.wss4j.SAMLUtils;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.common.SAMLVersion;
 
 /**
@@ -62,9 +62,11 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         body = soapBody;
         signed = signedResults;
         
-        List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
+        final List<Integer> actions = new ArrayList<Integer>(2);
+        actions.add(WSConstants.ST_SIGNED);
+        actions.add(WSConstants.ST_UNSIGNED);
+        List<WSSecurityEngineResult> samlResults = 
+            WSS4JUtils.fetchAllActionResults(results, actions);
         
         for (AssertionInfo ai : ais) {
             SamlToken samlToken = (SamlToken)ai.getAssertion();
