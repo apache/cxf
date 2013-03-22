@@ -19,20 +19,20 @@ To remove the code generated from the WSDL file and the .class
 files, run "mvn clean".
 
 
-Alternative: WAR deployment of service in a servlet container (e.g. Tomcat)
+Alternative: WAR deployment of service to Tomcat (either embedded or standalone)
 ---------------------------------------------------------------------------
 1.) Update the endpointAddress value in the client.Client class to the WAR-hosted 
 value, for running this sample on your local machine most likely:
 "http://localhost:8080/java_first_jaxws/services/hello_world".
 
-2.) Manually copy the generated WAR file to the Tomcat webapps folder, or, if you
-have Maven and Tomcat set up to use the Tomcat Maven Plugin 
-(http://mojo.codehaus.org/tomcat-maven-plugin/) you can use the mvn tomcat:redeploy
-command instead.  Important: if you're using this command and deploying on Tomcat 6
-instead of Tomcat 7, update the tomcat-maven-plugin configuration in the pom.xml,
-switching to the the Tomcat 6-specific "url" element.
+2.) Standalone Tomcat: Manually copy the generated WAR file to the Tomcat webapps folder, 
+or, if you have Maven and Tomcat set up to use the Tomcat Maven Plugin 
+(http://tomcat.apache.org/maven-plugin-2.1/tomcat7-maven-plugin/index.html) you can
+use the mvn tomcat7:redeploy command instead.  
 
-Prior to running the client (mvn -Pclient) good to confirm the generated WSDL 
-can be seen from a web browser at: 
+For embedded Tomcat: Just run mvn tomcat7:run-war from the project base folder.
+
+Prior to running the client (mvn -Pclient) it would be good to confirm the 
+generated WSDL can be seen from a web browser at:
 http://localhost:8080/java_first_jaxws/services/hello_world?wsdl
 
