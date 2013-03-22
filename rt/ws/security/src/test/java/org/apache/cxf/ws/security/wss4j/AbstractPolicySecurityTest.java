@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.concurrent.Executor;
 
 import javax.xml.namespace.NamespaceContext;
@@ -75,7 +74,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
     protected PolicyBuilder policyBuilder;
@@ -446,16 +444,14 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
 
-        List<WSSecurityEngineResult> protectionResults = new Vector<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(),
-                WSConstants.ENCR, protectionResults);
+        final List<WSSecurityEngineResult> protectionResults =
+            WSS4JUtils.fetchAllActionResults(handlerResults.get(0).getResults(), WSConstants.ENCR);
         assertNotNull(protectionResults);
         
         //
         // This result should contain a reference to the decrypted element
         //
-        final Map<String, Object> result = protectionResults
-                .get(0);
+        final Map<String, Object> result = protectionResults.get(0);
         final List<WSDataRef> protectedElements = 
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         assertNotNull(protectedElements);
