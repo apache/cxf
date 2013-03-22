@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -71,8 +70,8 @@ public class X509TokenPolicyValidator extends AbstractTokenPolicyValidator imple
         Message message,
         List<WSSecurityEngineResult> results
     ) {
-        List<WSSecurityEngineResult> bstResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST, bstResults);
+        List<WSSecurityEngineResult> bstResults = 
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.BST);
         
         for (AssertionInfo ai : ais) {
             X509Token x509TokenPolicy = (X509Token)ai.getAssertion();

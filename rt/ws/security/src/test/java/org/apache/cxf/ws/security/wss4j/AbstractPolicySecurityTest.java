@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.concurrent.Executor;
 
 import javax.xml.namespace.NamespaceContext;
@@ -446,9 +445,8 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
 
-        List<WSSecurityEngineResult> protectionResults = new Vector<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(),
-                WSConstants.ENCR, protectionResults);
+        List<WSSecurityEngineResult> protectionResults = 
+            WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(), WSConstants.ENCR);
         assertNotNull(protectionResults);
         
         //

@@ -381,9 +381,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         SoapMessage msg, RequestData reqData, List<WSSecurityEngineResult> wsResult
     ) throws WSSecurityException {
         // Extract the signature action result from the action list
-        List<WSSecurityEngineResult> signatureResults = new ArrayList<WSSecurityEngineResult>();
-        signatureResults = 
-            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN, signatureResults);
+        List<WSSecurityEngineResult> signatureResults = 
+            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN);
 
         // Store the last signature result
         if (!signatureResults.isEmpty()) {
@@ -395,9 +394,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         SoapMessage msg, RequestData reqData, List<WSSecurityEngineResult> wsResult
     ) throws WSSecurityException {
         // Extract the timestamp action result from the action list
-        List<WSSecurityEngineResult> timestampResults = new ArrayList<WSSecurityEngineResult>();
-        timestampResults = 
-            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS, timestampResults);
+        List<WSSecurityEngineResult> timestampResults = 
+            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS);
 
         if (!timestampResults.isEmpty()) {
             msg.put(TIMESTAMP_RESULT, timestampResults.get(timestampResults.size() - 1));

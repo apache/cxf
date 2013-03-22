@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -65,8 +64,8 @@ public class WSS11PolicyValidator
         Message message,  
         List<WSSecurityEngineResult> results
     ) {
-        List<WSSecurityEngineResult> scResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC, scResults);
+        List<WSSecurityEngineResult> scResults =
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC);
         
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -64,8 +63,8 @@ public class SecurityContextTokenPolicyValidator
         Message message,
         List<WSSecurityEngineResult> results
     ) {
-        List<WSSecurityEngineResult> sctResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SCT, sctResults);
+        List<WSSecurityEngineResult> sctResults = 
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SCT);
 
         for (AssertionInfo ai : ais) {
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();

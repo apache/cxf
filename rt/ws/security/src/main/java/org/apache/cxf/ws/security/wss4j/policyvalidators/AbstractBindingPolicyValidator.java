@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -85,8 +84,8 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
-        List<WSSecurityEngineResult> timestampResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.TS, timestampResults);
+        List<WSSecurityEngineResult> timestampResults = 
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.TS);
         
         // Check whether we received a timestamp and compare it to the policy
         if (includeTimestamp && timestampResults.size() != 1) {

@@ -75,9 +75,11 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
-        List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
+        final List<Integer> actions = new ArrayList<Integer>(2);
+        actions.add(WSConstants.ST_SIGNED);
+        actions.add(WSConstants.ST_UNSIGNED);
+        List<WSSecurityEngineResult> samlResults = 
+            WSSecurityUtil.fetchAllActionResults(results, actions);
         
         for (AssertionInfo ai : ais) {
             SamlToken samlToken = (SamlToken)ai.getAssertion();

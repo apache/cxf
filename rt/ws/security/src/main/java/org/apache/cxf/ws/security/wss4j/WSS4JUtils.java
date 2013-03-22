@@ -85,5 +85,4 @@ public final class WSS4JUtils {
         return null;
     }
 
-
 }

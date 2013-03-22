@@ -71,9 +71,11 @@ public class UsernameTokenPolicyValidator
         Message message,
         List<WSSecurityEngineResult> results
     ) {
-        List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
+        final List<Integer> actions = new ArrayList<Integer>(2);
+        actions.add(WSConstants.UT);
+        actions.add(WSConstants.UT_NOPASSWORD);
+        List<WSSecurityEngineResult> utResults = 
+            WSSecurityUtil.fetchAllActionResults(results, actions);
         
         for (AssertionInfo ai : ais) {
             org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
