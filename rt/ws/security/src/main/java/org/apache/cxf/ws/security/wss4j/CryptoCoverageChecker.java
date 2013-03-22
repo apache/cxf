@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -51,7 +50,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Utility to enable the checking of WS-Security signature/encryption
@@ -127,15 +125,10 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         
         for (final WSHandlerResult wshr : results) {
             final List<WSSecurityEngineResult> wsSecurityEngineSignResults = 
-                new Vector<WSSecurityEngineResult>();
+                WSS4JUtils.fetchAllActionResults(wshr.getResults(), WSConstants.SIGN);
+            
             final List<WSSecurityEngineResult> wsSecurityEngineEncResults = 
-                new Vector<WSSecurityEngineResult>();
-            
-            WSSecurityUtil.fetchAllActionResults(wshr.getResults(),
-                    WSConstants.SIGN, wsSecurityEngineSignResults);
-            
-            WSSecurityUtil.fetchAllActionResults(wshr.getResults(),
-                    WSConstants.ENCR, wsSecurityEngineEncResults);
+                WSS4JUtils.fetchAllActionResults(wshr.getResults(), WSConstants.ENCR);
             
             for (WSSecurityEngineResult wser : wsSecurityEngineSignResults) {
             
