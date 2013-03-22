@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,9 +29,9 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.SecurityContextToken;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate a SecurityContextToken policy.
@@ -52,8 +51,8 @@ public class SecurityContextTokenPolicyValidator
             return true;
         }
 
-        List<WSSecurityEngineResult> sctResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SCT, sctResults);
+        List<WSSecurityEngineResult> sctResults = 
+            WSS4JUtils.fetchAllActionResults(results, WSConstants.SCT);
 
         for (AssertionInfo ai : ais) {
             SecurityContextToken sctPolicy = (SecurityContextToken)ai.getAssertion();

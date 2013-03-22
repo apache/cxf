@@ -31,10 +31,10 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate a UsernameToken policy.
@@ -54,9 +54,11 @@ public class UsernameTokenPolicyValidator
             return true;
         }
         
-        List<WSSecurityEngineResult> utResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT, utResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_NOPASSWORD, utResults);
+        final List<Integer> actions = new ArrayList<Integer>(2);
+        actions.add(WSConstants.UT);
+        actions.add(WSConstants.UT_NOPASSWORD);
+        List<WSSecurityEngineResult> utResults = 
+            WSS4JUtils.fetchAllActionResults(results, actions);
         
         for (AssertionInfo ai : ais) {
             org.apache.cxf.ws.security.policy.model.UsernameToken usernameTokenPolicy = 

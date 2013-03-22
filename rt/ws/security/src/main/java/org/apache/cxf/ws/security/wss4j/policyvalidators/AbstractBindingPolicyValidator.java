@@ -21,7 +21,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,6 +43,7 @@ import org.apache.cxf.ws.security.policy.model.SymmetricAsymmetricBindingBase;
 import org.apache.cxf.ws.security.policy.model.Token;
 import org.apache.cxf.ws.security.policy.model.TokenWrapper;
 import org.apache.cxf.ws.security.policy.model.X509Token;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
@@ -54,7 +54,6 @@ import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.message.token.X509Security;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Some abstract functionality for validating a security binding.
@@ -78,8 +77,8 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
-        List<WSSecurityEngineResult> timestampResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.TS, timestampResults);
+        List<WSSecurityEngineResult> timestampResults = 
+            WSS4JUtils.fetchAllActionResults(results, WSConstants.TS);
         
         // Check whether we received a timestamp and compare it to the policy
         if (includeTimestamp && timestampResults.size() != 1) {

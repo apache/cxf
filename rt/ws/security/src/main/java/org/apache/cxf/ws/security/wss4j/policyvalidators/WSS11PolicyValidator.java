@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.wss4j.policyvalidators;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,9 +30,9 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.Wss11;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * Validate a WSS11 policy.
@@ -52,8 +51,8 @@ public class WSS11PolicyValidator implements TokenPolicyValidator {
             return true;
         }
         
-        List<WSSecurityEngineResult> scResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SC, scResults);
+        List<WSSecurityEngineResult> scResults =
+            WSS4JUtils.fetchAllActionResults(results, WSConstants.SC);
         
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();
