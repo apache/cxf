@@ -55,6 +55,7 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValidator;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -63,7 +64,6 @@ import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-import org.apache.ws.security.util.WSSecurityUtil;
 
 /**
  * 
@@ -518,10 +518,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             Message message,
             AssertionInfoMap aim
         ) {
-            List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
-            WSSecurityUtil.fetchAllActionResults(
-                rResult.getResults(), WSConstants.SIGN, signedResults
-            );
+            List<WSSecurityEngineResult> signedResults = 
+                WSS4JUtils.fetchAllActionResults(rResult.getResults(), WSConstants.SIGN);
             
             IssuedTokenPolicyValidator issuedValidator = 
                 new IssuedTokenPolicyValidator(signedResults, message);
