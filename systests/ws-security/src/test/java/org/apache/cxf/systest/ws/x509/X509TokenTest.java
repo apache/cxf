@@ -621,7 +621,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    public void testEndorsing() throws Exception {
+    public void testNegativeEndorsing() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = X509TokenTest.class.getResource("client/client.xml");
@@ -634,13 +634,13 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(wsdl, SERVICE_QNAME);
        
         // Successful invocation
-        QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort");
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportNegativeEndorsingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT2);
         port.doubleIt(25);
         
         // This should fail, as the client is not endorsing the token
-        portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort2");
+        portQName = new QName(NAMESPACE, "DoubleItTransportNegativeEndorsingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT2);
         
