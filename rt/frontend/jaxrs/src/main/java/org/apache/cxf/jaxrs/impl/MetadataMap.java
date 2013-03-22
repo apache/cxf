@@ -45,7 +45,11 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
     
     public MetadataMap(Map<K, List<V>> store) {
-        this(store, false, false);
+        this(store, true);
+    }
+    
+    public MetadataMap(Map<K, List<V>> store, boolean copy) {
+        this(store, copy, false, false);
     }
     
     public MetadataMap(boolean readOnly, boolean caseInsensitive) {
@@ -54,18 +58,27 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     
     public MetadataMap(Map<K, List<V>> store, boolean readOnly, boolean caseInsensitive) {
         
-        this.caseInsensitive = caseInsensitive;
+        this(store, true, readOnly, caseInsensitive);
         
-        this.m = new LinkedHashMap<K, List<V>>();
-        if (store != null) {
-            for (Map.Entry<K, List<V>> entry : store.entrySet()) {
-                List<V> values = new ArrayList<V>(entry.getValue());
-                m.put(entry.getKey(), readOnly 
-                      ? Collections.unmodifiableList(values) : values);
+    }
+
+    public MetadataMap(Map<K, List<V>> store, boolean copy, boolean readOnly, boolean caseInsensitive) {
+        
+        this.caseInsensitive = caseInsensitive;
+        if (copy) {
+            this.m = new LinkedHashMap<K, List<V>>();
+            if (store != null) {
+                for (Map.Entry<K, List<V>> entry : store.entrySet()) {
+                    List<V> values = new ArrayList<V>(entry.getValue());
+                    m.put(entry.getKey(), readOnly 
+                          ? Collections.unmodifiableList(values) : values);
+                }
             }
-        }
-        if (readOnly) {
-            this.m = Collections.unmodifiableMap(m);
+            if (readOnly) {
+                this.m = Collections.unmodifiableMap(m);
+            }
+        } else {
+            this.m = store;
         }
         
     }

@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -166,6 +167,17 @@ public class HttpHeadersImplTest extends Assert {
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals(MediaType.valueOf("*/*"), h.getMediaType());
+    }
+    
+    @Test
+    public void testGetContentTypeLowCase() throws Exception {
+        
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, 
+              Collections.singletonMap("content-type", 
+                  Collections.singletonList("text/plain")));
+        HttpHeaders h = new HttpHeadersImpl(m);
+        assertEquals("text/plain", h.getRequestHeaders().getFirst("Content-Type"));
     }
     
     @Test
