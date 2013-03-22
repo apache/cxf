@@ -612,7 +612,7 @@ public class SAMLTokenRenewer implements TokenRenewer {
                 signedActions.add(WSConstants.SIGN);
                 signedActions.add(WSConstants.UT_SIGN);
                 
-                signedResult.addAll(WSSecurityUtil.fetchAllActionResults(results, signedActions));
+                signedResults.addAll(WSSecurityUtil.fetchAllActionResults(results, signedActions));
             }
             
             TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class.getName());
