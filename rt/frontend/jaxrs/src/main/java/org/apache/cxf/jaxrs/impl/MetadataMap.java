@@ -46,7 +46,11 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
     
     public MetadataMap(Map<K, List<V>> store) {
-        this(store, false, false);
+        this(store, true);
+    }
+    
+    public MetadataMap(Map<K, List<V>> store, boolean copy) {
+        this(store, copy, false, false);
     }
     
     public MetadataMap(boolean readOnly, boolean caseInsensitive) {
