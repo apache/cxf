@@ -26,12 +26,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -75,13 +76,13 @@ public class HttpHeadersImpl implements HttpHeaders {
     
     
     private Message message;
-    private MultivaluedMap<String, String> headers;
-    
-    @SuppressWarnings("unchecked")
+    private Map<String, List<String>> headers;
     public HttpHeadersImpl(Message message) {
         this.message = message;
-        this.headers = new MetadataMap<String, String>(
-            (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS), true, true);
+        this.headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        if (headers == null) {
+            headers = Collections.emptyMap();
+        }
     }
     
     public List<MediaType> getAcceptableMediaTypes() {
@@ -126,11 +127,6 @@ public class HttpHeadersImpl implements HttpHeaders {
         }
     }
     
-    private boolean splitIndividualValue() {
-        Object property = message.getContextualProperty(HEADER_SPLIT_PROPERTY);
-        return MessageUtils.isTrue(property);
-    }
-    
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
         return values.size() == 0 ? null : HttpUtils.getLocale(values.get(0).trim());
@@ -142,11 +138,12 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {
-        Map<String, List<String>> newHeaders = new LinkedHashMap<String, List<String>>();
+        Map<String, List<String>> newHeaders = 
+            new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             newHeaders.put(entry.getKey(), getRequestHeader(entry.getKey()));
         }
-        return new MetadataMap<String, String>(newHeaders, true, true);
+        return new MetadataMap<String, String>(Collections.unmodifiableMap(newHeaders), false);
     }
 
     public List<Locale> getAcceptableLanguages() {
@@ -185,20 +182,19 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (values == null || values.isEmpty() || values.get(0) == null) {
             return Collections.emptyList();
         }
-        if (HttpUtils.isDateRelatedHeader(name)) {
+        boolean splitIndividualValue 
+            = MessageUtils.isTrue(message.getContextualProperty(HEADER_SPLIT_PROPERTY));
+        if (!splitIndividualValue
+            || HttpUtils.isDateRelatedHeader(name)) {
             return values;
         }
-        String sep = HttpHeaders.COOKIE.equalsIgnoreCase(name) ? getCookieSeparator() : DEFAULT_SEPARATOR;
         List<String> ls = new LinkedList<String>();
         for (String value : values) {
             if (value == null) {
                 continue;
             }
-            if (splitIndividualValue()) {
-                ls.addAll(getHeaderValues(name, value, sep));
-            } else {
-                ls.add(value);
-            }
+            String sep = HttpHeaders.COOKIE.equalsIgnoreCase(name) ? getCookieSeparator() : DEFAULT_SEPARATOR;
+            ls.addAll(getHeaderValues(name, value, sep));
         }
         return ls;
     }
