@@ -134,7 +134,8 @@
        endpointName="s:DoubleItSaml1SelfSignedTransportPort"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -153,7 +154,8 @@
        endpointName="s:DoubleItSaml1SelfSignedTransportSP11Port"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -172,7 +174,8 @@
        endpointName="s:DoubleItSaml2EndorsingTransportPort"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -191,7 +194,8 @@
        endpointName="s:DoubleItSaml2EndorsingTransportSP11Port"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -296,7 +300,8 @@
        endpointName="s:DoubleItSaml2EndorsingEncryptedTransportPort"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 
@@ -315,7 +320,8 @@
        endpointName="s:DoubleItInlinePolicyPort"
        xmlns:s="http://www.example.org/contract/DoubleIt"
        implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
-       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl">
+       wsdlLocation="org/apache/cxf/systest/ws/saml/DoubleItSaml.wsdl"
+       depends-on="tls-settings">
         
        <jaxws:properties>
            <entry key="ws-security.callback-handler" 

@@ -60,14 +60,15 @@
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/alice.jks"/>
                 </sec:trustManagers> 
 
-                <!--
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_EXPORT_.*</sec:include>
                     <sec:include>.*_EXPORT1024_.*</sec:include>
                     <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
                     <sec:include>.*_WITH_NULL_.*</sec:include>
                     <sec:exclude>.*_DH_anon_.*</sec:exclude>
                 </sec:cipherSuitesFilter>
+                <!--
                 <sec:clientAuthentication want="true" required="true"/>
                 -->
             </httpj:tlsServerParameters>
@@ -96,8 +97,7 @@
        address="http://localhost:${testutil.ports.Server}/UserName" 
        serviceName="interop:PingService"
        endpointName="interop:UserName_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted"
-       depends-on="tls-settings">
+       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         
        <jaxws:properties>
             <entry key="ws-security.username" value="Alice"/>
