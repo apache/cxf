@@ -100,6 +100,7 @@ import org.apache.cxf.ws.security.policy.model.X509Token;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.Assertion;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -2191,11 +2192,13 @@ public abstract class AbstractBindingBuilder {
          * signature results in the signatureActions list
          */
         List<WSSecurityEngineResult> signatureActions = new ArrayList<WSSecurityEngineResult>();
+        final List<Integer> signedActions = new ArrayList<Integer>(2);
+        signedActions.add(WSConstants.SIGN);
+        signedActions.add(WSConstants.UT_SIGN);
         for (WSHandlerResult wshResult : results) {
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.SIGN, signatureActions);
-            WSSecurityUtil.fetchAllActionResults(wshResult.getResults(),
-                    WSConstants.UT_SIGN, signatureActions);
+            signatureActions.addAll(
+                WSS4JUtils.fetchAllActionResults(wshResult.getResults(), signedActions)
+            );
         }
         
         sigConfList = new ArrayList<WSEncryptionPart>();

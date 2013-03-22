@@ -43,7 +43,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.xml.XMLObject;
 
@@ -154,17 +153,21 @@ public final class SAMLUtils {
         Message message,
         Element body
     ) throws WSSecurityException {
-        List<WSSecurityEngineResult> samlResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_SIGNED, samlResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.ST_UNSIGNED, samlResults);
+        final List<Integer> samlActions = new ArrayList<Integer>(2);
+        samlActions.add(WSConstants.ST_SIGNED);
+        samlActions.add(WSConstants.ST_UNSIGNED);
+        List<WSSecurityEngineResult> samlResults = 
+            WSS4JUtils.fetchAllActionResults(results, samlActions);
         
         if (samlResults.isEmpty()) {
             return;
         }
         
-        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
-        WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
+        final List<Integer> signedActions = new ArrayList<Integer>(2);
+        signedActions.add(WSConstants.SIGN);
+        signedActions.add(WSConstants.UT_SIGN);
+        List<WSSecurityEngineResult> signedResults = 
+            WSS4JUtils.fetchAllActionResults(results, signedActions);
         
         for (WSSecurityEngineResult samlResult : samlResults) {
             AssertionWrapper assertionWrapper = 
