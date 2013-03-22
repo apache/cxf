@@ -629,4 +629,90 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testSupportingToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingTokenPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT2);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not sending an X.509 Supporting Token
+        portQName = new QName(NAMESPACE, "DoubleItTransportSupportingTokenPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT2);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not sending an X.509 Supporting Token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        // This should fail, as the client is not sending a PKI Token
+        portQName = new QName(NAMESPACE, "DoubleItTransportPKISupportingTokenPort");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT2);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not sending a PKI token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    @org.junit.Test
+    public void testEndorsing() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT2);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not endorsing the token
+        portQName = new QName(NAMESPACE, "DoubleItTransportEndorsingPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT2);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not endorsing the token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "These policy alternatives can not be satisfied";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
+    
 }
