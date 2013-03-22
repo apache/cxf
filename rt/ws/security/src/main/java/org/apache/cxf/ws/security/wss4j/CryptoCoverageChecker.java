@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -127,15 +126,10 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         
         for (final WSHandlerResult wshr : results) {
             final List<WSSecurityEngineResult> wsSecurityEngineSignResults = 
-                new Vector<WSSecurityEngineResult>();
+                WSSecurityUtil.fetchAllActionResults(wshr.getResults(), WSConstants.SIGN);
+            
             final List<WSSecurityEngineResult> wsSecurityEngineEncResults = 
-                new Vector<WSSecurityEngineResult>();
-            
-            WSSecurityUtil.fetchAllActionResults(wshr.getResults(),
-                    WSConstants.SIGN, wsSecurityEngineSignResults);
-            
-            WSSecurityUtil.fetchAllActionResults(wshr.getResults(),
-                    WSConstants.ENCR, wsSecurityEngineEncResults);
+                WSSecurityUtil.fetchAllActionResults(wshr.getResults(), WSConstants.ENCR);
             
             for (WSSecurityEngineResult wser : wsSecurityEngineSignResults) {
             

@@ -608,9 +608,11 @@ public class SAMLTokenRenewer implements TokenRenewer {
             if (handlerResults != null && handlerResults.size() > 0) {
                 WSHandlerResult handlerResult = handlerResults.get(0);
                 List<WSSecurityEngineResult> results = handlerResult.getResults();
+                final List<Integer> signedActions = new ArrayList<Integer>(2);
+                signedActions.add(WSConstants.SIGN);
+                signedActions.add(WSConstants.UT_SIGN);
                 
-                WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN, signedResults);
-                WSSecurityUtil.fetchAllActionResults(results, WSConstants.UT_SIGN, signedResults);
+                signedResult.addAll(WSSecurityUtil.fetchAllActionResults(results, signedActions));
             }
             
             TLSSessionInfo tlsInfo = (TLSSessionInfo)messageContext.get(TLSSessionInfo.class.getName());

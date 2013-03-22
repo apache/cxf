@@ -523,10 +523,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             Message message,
             AssertionInfoMap aim
         ) {
-            List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
-            WSSecurityUtil.fetchAllActionResults(
-                rResult.getResults(), WSConstants.SIGN, signedResults
-            );
+            List<WSSecurityEngineResult> signedResults = 
+                WSSecurityUtil.fetchAllActionResults(rResult.getResults(), WSConstants.SIGN);
             
             IssuedTokenPolicyValidator issuedValidator = 
                 new IssuedTokenPolicyValidator(signedResults, message);
