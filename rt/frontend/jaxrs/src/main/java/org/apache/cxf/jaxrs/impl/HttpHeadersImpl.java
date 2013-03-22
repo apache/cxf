@@ -87,8 +87,8 @@ public class HttpHeadersImpl implements HttpHeaders {
     
     public List<MediaType> getAcceptableMediaTypes() {
         List<String> lValues = headers.get(HttpHeaders.ACCEPT);
-        if (lValues == null || lValues.isEmpty()) {
-            return Collections.emptyList();
+        if (lValues == null || lValues.isEmpty() || lValues.get(0) == null) {
+            return Collections.singletonList(MediaType.WILDCARD_TYPE);
         }
         List<MediaType> mediaTypes = JAXRSUtils.parseMediaTypes(lValues.get(0));
         sortMediaTypesUsingQualityFactor(mediaTypes); 
@@ -148,6 +148,9 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     public List<Locale> getAcceptableLanguages() {
         List<String> ls = getListValues(HttpHeaders.ACCEPT_LANGUAGE);
+        if (ls.isEmpty()) {
+            return Collections.singletonList(new Locale("*"));
+        }
         
         List<Locale> newLs = new ArrayList<Locale>(); 
         Map<Locale, Float> prefs = new HashMap<Locale, Float>();

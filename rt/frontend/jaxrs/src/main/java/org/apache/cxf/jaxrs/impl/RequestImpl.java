@@ -93,8 +93,11 @@ public class RequestImpl implements Request {
     }
 
     private static boolean isLanguageMatched(List<Locale> locales, Locale l) {
+        
         for (Locale locale : locales) {
-            if (locale.getLanguage().equalsIgnoreCase(l.getLanguage())) {
+            String language = locale.getLanguage();
+            if ("*".equals(language) 
+                || language.equalsIgnoreCase(l.getLanguage())) {
                 return true;
             }
         }

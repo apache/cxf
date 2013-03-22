@@ -255,6 +255,32 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
+    public void testGetNoMediaTypes() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        EasyMock.expectLastCall().andReturn(Collections.emptyMap());
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<MediaType> acceptValues = h.getAcceptableMediaTypes();
+        assertEquals(1, acceptValues.size());
+        assertEquals("*/*", acceptValues.get(0).toString());
+    }
+    
+    @Test
+    public void testGetNoLanguages() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        EasyMock.expectLastCall().andReturn(Collections.emptyMap());
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<Locale> locales = h.getAcceptableLanguages();
+        assertEquals(1, locales.size());
+        assertEquals("*", locales.get(0).toString());
+    }
+    
+    @Test
     public void testGetHeader() throws Exception {
         
         Message m = control.createMock(Message.class);
