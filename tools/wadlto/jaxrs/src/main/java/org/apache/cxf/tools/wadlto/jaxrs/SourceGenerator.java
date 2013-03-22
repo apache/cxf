@@ -95,6 +95,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.tools.common.ToolException;
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class SourceGenerator {
@@ -120,6 +121,7 @@ public class SourceGenerator {
                                                       FormParam.class));
     private static final Map<String, Class<?>> HTTP_METHOD_ANNOTATIONS;
     private static final Map<String, Class<?>> PARAM_ANNOTATIONS;
+    private static final String PLAIN_PARAM_STYLE = "plain";
     private static final Set<String> RESOURCE_LEVEL_PARAMS;
     private static final Map<String, String> AUTOBOXED_PRIMITIVES_MAP;
     private static final Map<String, String> XSD_SPECIFIC_TYPE_MAP;
@@ -919,7 +921,8 @@ public class SourceGenerator {
         for (int i = 0; i < inParamEls.size(); i++) {
     
             Element paramEl = inParamEls.get(i);
-            Class<?> paramAnn = PARAM_ANNOTATIONS.get(paramEl.getAttribute("style"));
+            
+            Class<?> paramAnn = getParamAnnotation(paramEl.getAttribute("style"));
             if (paramAnn == QueryParam.class && form) {
                 paramAnn = FormParam.class; 
             } 
@@ -1000,6 +1003,18 @@ public class SourceGenerator {
             sbCode.append("@").append(Suspended.class.getSimpleName()).append(" ")
                 .append(AsyncResponse.class.getSimpleName()).append(" ").append("async");
         }
+    }
+    
+    private Class<?> getParamAnnotation(String paramStyle) {
+        Class<?> paramAnn = PARAM_ANNOTATIONS.get(paramStyle);
+        if (paramAnn == null) {
+            String error = "Unsupported parameter style: " + paramStyle;
+            if (PLAIN_PARAM_STYLE.equals(paramStyle)) {
+                error += ", plain style parameters have to be wrapped by representations";    
+            }
+            throw new ToolException(error); 
+        }
+        return paramAnn;
     }
     
     private void generateEnumClass(String clsName, List<Element> options, File src, String classPackage) {
