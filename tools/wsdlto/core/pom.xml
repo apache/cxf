@@ -127,11 +127,6 @@
                     <groupId>javax.xml.soap</groupId>
                     <artifactId>saaj-api</artifactId>
                 </dependency>
-                <dependency>
-                    <groupId>${cxf.stax.impl.groupId}</groupId>
-                    <artifactId>${cxf.stax.impl.artifactId}</artifactId>
-                    <scope>runtime</scope>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>
