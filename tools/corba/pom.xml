@@ -69,10 +69,6 @@
             <artifactId>xmlschema-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>${cxf.stax.impl.groupId}</groupId>
-            <artifactId>${cxf.stax.impl.artifactId}</artifactId>
-        </dependency>
-        <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
         </dependency>

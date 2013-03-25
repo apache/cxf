@@ -68,10 +68,6 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${cxf.stax.impl.groupId}</groupId>
-            <artifactId>${cxf.stax.impl.artifactId}</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
