@@ -221,11 +221,6 @@
                     <artifactId>saaj-api</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>${cxf.stax.impl.groupId}</groupId>
-                    <artifactId>${cxf.stax.impl.artifactId}</artifactId>
-                    <scope>runtime</scope>
-                </dependency>
-                <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                 </dependency>
