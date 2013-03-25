@@ -42,10 +42,9 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
                                         int elementCountThreshold,
                                         int innerElementLevelThreshold,
                                         int innerElementCountThreshold) {
-        super(reader);
-        this.props = new DocumentDepthProperties(elementCountThreshold, 
-                                            innerElementLevelThreshold,
-                                            innerElementCountThreshold);
+        this(reader, new DocumentDepthProperties(elementCountThreshold, 
+                                                 innerElementLevelThreshold,
+                                                 innerElementCountThreshold));
     }
     
     public DepthRestrictingStreamReader(XMLStreamReader reader,
