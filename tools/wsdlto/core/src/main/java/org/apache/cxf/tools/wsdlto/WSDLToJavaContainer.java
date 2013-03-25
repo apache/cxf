@@ -354,10 +354,10 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
     
     private void createClientJar(File tmpDirectory, JarOutputStream jarout) {
         try {
-            URI parentFile = new URI((String)context.get(ToolConstants.CFG_CLASSDIR));
+            URI parentFile = new File((String)context.get(ToolConstants.CFG_CLASSDIR)).toURI();
             for (File file : tmpDirectory.listFiles()) {
-                URI relativePath = parentFile.relativize(new URI(file.getPath()));
-                String name = relativePath.toString().replace("\\", "/");
+                URI relativePath = parentFile.relativize(file.toURI());
+                String name = relativePath.toString();
                 if (file.isDirectory()) {
                     if (!StringUtils.isEmpty(name)) {
                         if (!name.endsWith("/")) {
