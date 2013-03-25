@@ -104,7 +104,6 @@
         <dependency>
              <groupId>org.codehaus.woodstox</groupId>
              <artifactId>woodstox-core-asl</artifactId>
-             <scope>runtime</scope>
          </dependency>
 
         <dependency>
