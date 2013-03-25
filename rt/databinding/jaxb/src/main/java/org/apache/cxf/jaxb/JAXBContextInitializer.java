@@ -292,6 +292,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 walkReferences(cls);
             }
             addClass(String.class);
+        } else if (cls.getName().startsWith("java.")
+            || cls.getName().startsWith("javax.")) {
+            return;
         } else {
             cls = JAXBUtils.getValidClass(cls);
             if (null != cls) {
