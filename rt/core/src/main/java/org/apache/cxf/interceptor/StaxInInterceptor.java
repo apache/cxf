@@ -108,18 +108,13 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     reader = factory.createXMLStreamReader(is, encoding);
                 }                
             }
-            xreader = configureRestrictions(xreader, message);
+            reader = configureRestrictions(reader, message);
         } catch (XMLStreamException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("STREAM_CREATE_EXC",
                                                                    LOG,
                                                                    encoding), e);
         }
-<<<<<<< HEAD:rt/core/src/main/java/org/apache/cxf/interceptor/StaxInInterceptor.java
-
         message.setContent(XMLStreamReader.class, reader);
-=======
-        message.setContent(XMLStreamReader.class, xreader);
->>>>>>> bca2740... Merged revisions 1460788 via  git cherry-pick from:api/src/main/java/org/apache/cxf/interceptor/StaxInInterceptor.java
         message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
     }
 
