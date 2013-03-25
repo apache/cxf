@@ -111,9 +111,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-             <groupId>${cxf.stax.impl.groupId}</groupId>
-             <artifactId>${cxf.stax.impl.artifactId}</artifactId>
-             <scope>runtime</scope>
+             <groupId>org.codehaus.woodstox</groupId>
+             <artifactId>woodstox-core-asl</artifactId>
          </dependency>
 
         <dependency>
