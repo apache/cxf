@@ -536,8 +536,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         if (isFromWsdl()) {
             buildServiceFromWSDL(wsdlurl);
-        } else {
+        } else if (getServiceClass() != null) {
             buildServiceFromClass();
+        } else {
+            throw new ServiceConstructionException(new Message("NO_WSDL_NO_SERVICE_CLASS_PROVIDED", LOG, wsdlurl));
         }
 
         if (isValidate()) {
