@@ -27,13 +27,13 @@ import java.util.Locale;
 
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -79,6 +79,81 @@ public class ResponseBuilderImplTest extends Assert {
         m.putSingle("Content-Language", "en");
         checkBuild(Response.ok().language("de").language((Locale)null)
                    .language("en").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testLinkStr() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle("Link", "<http://example.com/page3>;rel=\"next\"");
+        checkBuild(Response.ok().link("http://example.com/page3", "next").build(), 200, null, m);
+    }
+
+    @Test
+    public void testLinkStrMultiple() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Link", "<http://example.com/page1>;rel=\"previous\"");
+        m.add("Link", "<http://example.com/page3>;rel=\"next\"");
+        checkBuild(Response.ok().link("http://example.com/page1", "previous")
+                       .link("http://example.com/page3", "next").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testLinkStrMultipleSameRel() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Link", "<http://example.com/page2.pdf>;rel=\"alternate\"");
+        m.add("Link", "<http://example.com/page2.txt>;rel=\"alternate\"");
+        checkBuild(Response.ok().link("http://example.com/page2.pdf", "alternate")
+                       .link("http://example.com/page2.txt", "alternate").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testLinkURI() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        URI uri = URI.create("http://example.com/page3");
+        m.putSingle("Link", "<http://example.com/page3>;rel=\"next\"");
+        checkBuild(Response.ok().link(uri, "next").build(), 200, null, m);
+    }
+
+    @Test
+    public void testLinks() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Link", "<http://example.com/page1>;rel=\"previous\"");
+        m.add("Link", "<http://example.com/page3>;rel=\"next\"");
+        RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
+        Link.Builder linkBuilder = delegate.createLinkBuilder();
+        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
+        // Reset linkbuilder
+        linkBuilder = delegate.createLinkBuilder();
+        Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").build();
+        checkBuild(Response.ok().links(prevLink, nextLink).build(), 200, null, m);
+    }
+
+    @Test
+    public void testLinksNoReset() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Link", "<http://example.com/page1>;rel=\"previous\"");
+        m.add("Link", "<http://example.com/page3>;rel=\"next\"");
+        RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
+        Link.Builder linkBuilder = delegate.createLinkBuilder();
+        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
+        linkBuilder = delegate.createLinkBuilder();
+        Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").build();
+        checkBuild(Response.ok().links(prevLink).links(nextLink).build(), 200, null, m);
+    }
+
+    @Test
+    public void testLinksWithReset() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Link", "<http://example.com/page3>;rel=\"next\"");
+        RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
+        Link.Builder linkBuilder = delegate.createLinkBuilder();
+        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
+        linkBuilder = delegate.createLinkBuilder();
+        Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").build();
+        // CHECK: Should .links() do a reset? Undocumented feature; so we'll
+        // test with the awkward <code>(Link[])null</code> instead..
+        // Note: .cookie() has same behavior.
+        checkBuild(Response.ok().links(prevLink).links((Link[])null).links(nextLink).build(), 200, null, m);
     }
     
     @Test
