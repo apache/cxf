@@ -154,8 +154,13 @@
         <cxf.woodstox.core.version>4.1.4</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
+<<<<<<< HEAD
         <cxf.wss4j.version>1.6.10-SNAPSHOT</cxf.wss4j.version>
         <cxf.xmlbeans.version>2.5.0</cxf.xmlbeans.version>
+=======
+        <cxf.wss4j.version>1.6.10</cxf.wss4j.version>
+        <cxf.xmlbeans.version>2.6.0</cxf.xmlbeans.version>
+>>>>>>> b2748d1... Merged revisions 1460736 via  git cherry-pick from
         <cxf.xmlschema.version>2.0.3</cxf.xmlschema.version>
         <cxf.xpp3.bundle.version>1.1.4c_6</cxf.xpp3.bundle.version>
        
