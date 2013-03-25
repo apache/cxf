@@ -298,6 +298,9 @@
         <wsdl:port name="DoubleItSaml1TransportPort" binding="tns:DoubleItSaml1TransportBinding">
             <soap:address location="https://localhost:9009/DoubleItSaml1Transport" />
         </wsdl:port>
+        <wsdl:port name="DoubleItSaml1TransportPort2" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9009/DoubleItSaml1Transport2" />
+        </wsdl:port>
         <wsdl:port name="DoubleItSaml2SymmetricPort" binding="tns:DoubleItSaml2SymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItSaml2Symmetric" />
         </wsdl:port>
@@ -307,6 +310,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItSaml2AsymmetricPort" binding="tns:DoubleItSaml2AsymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItSaml2Asymmetric" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSaml2AsymmetricPort2" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="http://localhost:9001/DoubleItSaml2Asymmetric2" />
         </wsdl:port>
         <wsdl:port name="DoubleItSaml1SelfSignedTransportPort" 
                    binding="tns:DoubleItSaml1SelfSignedTransportBinding">
