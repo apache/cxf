@@ -274,9 +274,9 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
 
     @Override
-    public ResponseBuilder entity(Object entity, Annotation[] annotations) {
-        this.annotations = annotations;
-        this.entity = entity;
+    public ResponseBuilder entity(Object ent, Annotation[] anns) {
+        this.annotations = anns;
+        this.entity = ent;
         return this;
     }
 
