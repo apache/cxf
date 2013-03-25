@@ -145,12 +145,6 @@
                       <groupId>org.apache.geronimo.specs</groupId>
                       <artifactId>geronimo-activation_1.1_spec</artifactId>
                   </dependency>
-
-                  <dependency>
-                      <groupId>${cxf.stax.impl.groupId}</groupId>
-                      <artifactId>${cxf.stax.impl.artifactId}</artifactId>
-                  </dependency>
-
              </dependencies>
          </profile>
     </profiles>

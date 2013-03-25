@@ -1565,27 +1565,6 @@
             </properties>
         </profile>
         <profile>
-            <!-- sjsxp is really the precursor to the jaxp-ri jars.   However, getting the jaxp-ri  jar to work on 
-            Java 5 requires endorsing it which is non-trivial in maven  :-(.
-            -->
-            <id>sjsxp</id>
-            <properties>
-                <cxf.stax.impl.groupId>com.sun.xml.stream</cxf.stax.impl.groupId>
-                <cxf.stax.impl.artifactId>sjsxp</cxf.stax.impl.artifactId>
-                <cxf.stax.impl.version>1.0.1</cxf.stax.impl.version>
-            </properties>
-        </profile>
-        <profile>
-            <!-- This really only works with Java 6 as the classes are identically named with the same classes in the Java 5 JDK
-            and the Java 5 versions get picked up instead -->
-            <id>jaxpri</id>
-            <properties>
-                <cxf.stax.impl.groupId>com.sun.xml.parsers</cxf.stax.impl.groupId>
-                <cxf.stax.impl.artifactId>jaxp-ri</cxf.stax.impl.artifactId>
-                <cxf.stax.impl.version>1.4.2</cxf.stax.impl.version>
-            </properties>
-        </profile>
-        <profile>
             <id>axis2-saaj</id>
             <properties>
                 <cxf.saaj.impl.groupId>org.apache.axis2</cxf.saaj.impl.groupId>
