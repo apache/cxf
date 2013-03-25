@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +48,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     private int status = 200;
     private Object entity;
     private MultivaluedMap<String, Object> metadata = new MetadataMap<String, Object>();
+    private Annotation[] annotations;
 
     public ResponseBuilderImpl() {
     }
@@ -58,10 +60,11 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
        
     public Response build() {
-        ResponseImpl r = new ResponseImpl(status, entity);
+        ResponseImpl r = new ResponseImpl(status);
         MetadataMap<String, Object> m = 
             new MetadataMap<String, Object>(metadata, false, true);
         r.addMetadata(m);
+        r.setEntity(entity, annotations);
         reset();
         return r;
     }
@@ -160,7 +163,6 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
         type(variant == null ? null : variant.getMediaType());
         language(variant == null ? null : variant.getLanguage());
         setHeader(HttpHeaders.CONTENT_ENCODING, variant == null ? null : variant.getEncoding());
-        
         return this;
     }
 
@@ -220,6 +222,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     private void reset() {
         metadata.clear();
         entity = null;
+        annotations = null;
         status = 200;
     }
     
@@ -256,27 +259,25 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
 
     @Override
-    public ResponseBuilder allow(String... arg0) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseBuilder allow(String... methods) {
+        return addHeader(HttpHeaders.ALLOW, (Object[])methods);
     }
 
     @Override
-    public ResponseBuilder allow(Set<String> arg0) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseBuilder allow(Set<String> methods) {
+        return allow(methods.toArray(new String[methods.size()]));
     }
 
     @Override
-    public ResponseBuilder encoding(String arg0) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseBuilder encoding(String encoding) {
+        return setHeader(HttpHeaders.CONTENT_ENCODING, encoding);
     }
 
     @Override
-    public ResponseBuilder entity(Object arg0, Annotation[] arg1) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseBuilder entity(Object entity, Annotation[] annotations) {
+        this.annotations = annotations;
+        this.entity = entity;
+        return this;
     }
 
     @Override
@@ -297,14 +298,19 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
 
     @Override
-    public ResponseBuilder replaceAll(MultivaluedMap<String, Object> arg0) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseBuilder replaceAll(MultivaluedMap<String, Object> map) {
+        metadata.clear();
+        if (map != null) {
+            metadata.putAll(map);
+        }
+        return this;
     }
 
     @Override
-    public ResponseBuilder variants(Variant... arg0) {
-        // TODO: Implement
-        throw new UnsupportedOperationException("Not implemented");
+    public ResponseBuilder variants(Variant... variants) {
+        if (variants == null) {
+            return variants((List<Variant>)null);
+        }
+        return variants(Arrays.asList(variants));
     }
 }
