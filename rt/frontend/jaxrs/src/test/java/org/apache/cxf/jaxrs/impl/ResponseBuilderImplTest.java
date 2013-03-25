@@ -19,12 +19,16 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
@@ -39,6 +43,76 @@ import org.junit.Test;
 
 
 public class ResponseBuilderImplTest extends Assert {
+
+    @Test
+    public void testAllow() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Allow", "HEAD");
+        m.add("Allow", "GET");
+        checkBuild(Response.ok().allow("HEAD").allow("GET").build(), 200, null, m);
+    }
+    
+    @Test
+    public void testEncoding() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Content-Encoding", "gzip");
+        checkBuild(Response.ok().encoding("gzip").build(), 200, null, m);
+    }
+
+    @Test
+    public void testEntity() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        checkBuild(Response.ok().entity("Hello").build(), 200, "Hello", m);
+    }
+
+    @Test
+    public void testEntityAnnotations() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        Annotation[] annotations = new Annotation[1];
+        Annotation produces = new Produces() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Produces.class;
+            }
+            @Override
+            public String[] value() {
+                return new String[] {
+                    "text/turtle"
+                };
+            }
+        };
+        annotations[0] = produces;
+        Response response = Response.ok().entity("<> a <#test>", annotations).build();
+        checkBuild(response, 200, "<> a <#test>", m);
+        assertArrayEquals(annotations, ((ResponseImpl)response).getEntityAnnotations());
+    }
+
+    @Test
+    public void testReplaceAll() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Content-Type", "text/plain");
+        checkBuild(Response.ok().type("image/png").tag("removeme").replaceAll(m).build(), 200, null, m);
+
+    }
+
+    @Test
+    public void testAllowReset() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Allow", "POST");
+        checkBuild(Response.ok().allow("HEAD").allow("GET").allow().allow("POST").build(), 200, null, m);
+    }
+
+    @Test
+    public void testAllowSet() throws Exception {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Allow", "HEAD");
+        m.add("Allow", "GET");
+        // LinkedHashSet so we get a predictable order
+        Set<String> methods = new LinkedHashSet<String>();
+        methods.add("HEAD");
+        methods.add("GET");
+        checkBuild(Response.ok().allow(methods).build(), 200, null, m);
+    }
 
     @Test
     public void testValidStatus() {
@@ -260,8 +334,21 @@ public class ResponseBuilderImplTest extends Assert {
     }
     
     @Test
-    public void testVariants() throws Exception {
+    public void testVariantsArray() throws Exception {
         
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Accept", "application/json");
+        m.add("Accept", "application/xml");
+        m.add("Vary", "Accept");
+
+        Variant json = new Variant(MediaType.APPLICATION_JSON_TYPE, (String)null, null);
+        Variant xml = new Variant(MediaType.APPLICATION_XML_TYPE, (String)null, null);
+
+        checkBuild(Response.ok().variants(json, xml).build(), 200, null, m);
+    }
+
+    @Test
+    public void testVariantsList() throws Exception {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.add("Accept", "text/xml");
         m.add("Accept", "application/xml");
@@ -280,6 +367,5 @@ public class ResponseBuilderImplTest extends Assert {
         checkBuild(Response.ok().variants(vts).build(),
                    200, null, m);
     }
-    
     
 }
