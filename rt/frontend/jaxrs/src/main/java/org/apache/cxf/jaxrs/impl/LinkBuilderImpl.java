@@ -44,7 +44,7 @@ public class LinkBuilderImpl implements Builder {
     @Override
     public Link build(Object... values) {
         URI uri = ub.build(values);
-        return new LinkImpl(uri, params);
+        return new LinkImpl(uri, new HashMap<String, String>(params));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class LinkBuilderImpl implements Builder {
         URI resolvedLinkUri = baseUri != null 
             ? HttpUtils.resolve(UriBuilder.fromUri(baseUri), uri) : uri;
         URI relativized = HttpUtils.relativize(requestUri, resolvedLinkUri);
-        return new LinkImpl(relativized, params);
+        return new LinkImpl(relativized, new HashMap<String, String>(params));
     }
 
     @Override
