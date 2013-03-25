@@ -151,7 +151,7 @@
         <cxf.stax.impl.artifactId>woodstox-core-asl</cxf.stax.impl.artifactId>
         <cxf.stax.impl.version>${cxf.woodstox.core.version}</cxf.stax.impl.version>
         <cxf.velocity.version>1.7</cxf.velocity.version>
-        <cxf.woodstox.core.version>4.1.4</cxf.woodstox.core.version>
+        <cxf.woodstox.core.version>4.2.0</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.1</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
         <cxf.wss4j.version>1.6.10</cxf.wss4j.version>
