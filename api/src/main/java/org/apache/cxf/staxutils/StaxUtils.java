@@ -163,14 +163,19 @@ public final class StaxUtils {
             allowInsecureParser = "1".equals(s) || Boolean.parseBoolean(s);
         }
         
-        XMLInputFactory xif = createXMLInputFactory(true);
-        String xifClassName = xif.getClass().getName();
-        if (xifClassName.contains("ctc.wstx") || xifClassName.contains("xml.xlxp")
-                || xifClassName.contains("xml.xlxp2") || xifClassName.contains("bea.core")) {
-            SAFE_INPUT_FACTORY = xif;
-        } else {
-            SAFE_INPUT_FACTORY = null;
+        XMLInputFactory xif = null;
+        try {
+            xif = createXMLInputFactory(true);
+            String xifClassName = xif.getClass().getName();
+            if (!xifClassName.contains("ctc.wstx") && !xifClassName.contains("xml.xlxp")
+                    && !xifClassName.contains("xml.xlxp2") && !xifClassName.contains("bea.core")) {
+                xif = null;
+            }
+        } catch (Throwable t) {
+            //ignore, can always drop down to the pooled factories
+            xif = null;
         }
+        SAFE_INPUT_FACTORY = xif;
         
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         String xofClassName = xof.getClass().getName();
