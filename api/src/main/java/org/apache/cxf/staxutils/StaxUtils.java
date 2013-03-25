@@ -76,6 +76,8 @@ import org.w3c.dom.UserDataHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import com.ctc.wstx.stax.WstxInputFactory;
+
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -89,6 +91,16 @@ public final class StaxUtils {
         "org.apache.cxf.staxutils.innerElementCountThreshold";
     private static final String INNER_ELEMENT_LEVEL_SYSTEM_PROP = 
         "org.apache.cxf.staxutils.innerElementLevelThreshold";
+    private static final String MAX_ATTRIBUTE_COUNT = 
+        "org.apache.cxf.staxutils.maxAttributeCount";
+    private static final String MAX_ATTRIBUTE_SIZE = 
+        "org.apache.cxf.staxutils.maxAttributeSize";
+    private static final String MAX_TEXT_LENGTH = 
+        "org.apache.cxf.staxutils.maxTextLength";
+    private static final String MAX_ELEMENT_COUNT = 
+        "org.apache.cxf.staxutils.maxElementCount";
+    private static final String MAX_XML_CHARACTERS = 
+        "org.apache.cxf.staxutils.maxXMLCharacters";
     
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
     
@@ -104,43 +116,29 @@ public final class StaxUtils {
         "ns7".intern(), "ns8".intern(), "ns9".intern()
     };
     
-    private static int innerElementLevelThreshold = -1;
-    private static int innerElementCountThreshold = -1;
+    private static int innerElementLevelThreshold = 100;
+    private static int innerElementCountThreshold = 50000;
+    private static int maxAttributeCount = 500; 
+    private static int maxAttributeSize = 64 * 1024; //64K per attribute, likely just "list" will hit
+    private static int maxTextLength = 128 * 1024 * 1024;  //128M - more than this should DEFINITLEY use MTOM 
+    private static long maxElementCount = Long.MAX_VALUE;
+    private static long maxXMLCharacters = Long.MAX_VALUE; 
+    
     
     static {
-        int i = 20;
+        int i = getInteger("org.apache.cxf.staxutils.pool-size", 20);
     
-        try {
-            String s = SystemPropertyAction.getProperty("org.apache.cxf.staxutils.pool-size",
-                                          "-1");
-            i = Integer.parseInt(s);
-        } catch (Throwable t) {
-            //ignore 
-            i = 20;
-        }
-        if (i <= 0) {
-            i = 20;
-        }
         NS_AWARE_INPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLInputFactory>(i);
         OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLOutputFactory>(i);
-        try {
-            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_LEVEL_SYSTEM_PROP, "-1");
-            innerElementLevelThreshold = Integer.parseInt(s);
-        } catch (Throwable t) {
-            innerElementLevelThreshold = -1;
-        }
-        if (innerElementLevelThreshold <= 0) {
-            innerElementLevelThreshold = -1;
-        }
-        try {
-            String s =  SystemPropertyAction.getProperty(INNER_ELEMENT_COUNT_SYSTEM_PROP, "-1");
-            innerElementCountThreshold = Integer.parseInt(s);
-        } catch (Throwable t) {
-            innerElementCountThreshold = -1;
-        }
-        if (innerElementCountThreshold <= 0) {
-            innerElementCountThreshold = -1;
-        }
+        
+        innerElementCountThreshold = getInteger(INNER_ELEMENT_LEVEL_SYSTEM_PROP, innerElementCountThreshold);
+        innerElementLevelThreshold = getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, innerElementLevelThreshold);
+        maxAttributeCount = getInteger(MAX_ATTRIBUTE_COUNT, maxAttributeCount); 
+        maxAttributeSize = getInteger(MAX_ATTRIBUTE_SIZE, maxAttributeSize);
+        maxTextLength = getInteger(MAX_TEXT_LENGTH, maxTextLength); 
+        maxElementCount = getLong(MAX_ELEMENT_COUNT, maxElementCount);
+        maxXMLCharacters = getLong(MAX_XML_CHARACTERS, maxXMLCharacters);
+        
         XMLInputFactory xif = createXMLInputFactory(true);
         String xifClassName = xif.getClass().getName();
         if (xifClassName.contains("ctc.wstx") || xifClassName.contains("xml.xlxp")
@@ -162,6 +160,38 @@ public final class StaxUtils {
     }
     
     private StaxUtils() {
+    }
+    private static int getInteger(String prop, int def) {
+        try {
+            String s =  SystemPropertyAction.getProperty(prop);
+            if (StringUtils.isEmpty(s)) {
+                return def;
+            }
+            int i = Integer.parseInt(s);
+            if (i < 0) {
+                i = def;
+            }
+            return i;
+        } catch (Throwable t) {
+            //ignore
+        }
+        return def;
+    }
+    private static long getLong(String prop, long def) {
+        try {
+            String s =  SystemPropertyAction.getProperty(prop);
+            if (StringUtils.isEmpty(s)) {
+                return def;
+            }
+            long i = Long.parseLong(s);
+            if (i < 0) {
+                i = def;
+            }
+            return i;
+        } catch (Throwable t) {
+            //ignore
+        }
+        return def;
     }
     
     public static void setInnerElementLevelThreshold(int i) {
@@ -228,10 +258,16 @@ public final class StaxUtils {
     /**
      * Return a new factory so that the caller can set sticky parameters.
      * @param nsAware
-     * @return
+     * @throws XMLStreamException
      */
     public static XMLInputFactory createXMLInputFactory(boolean nsAware) {
         XMLInputFactory factory = XMLInputFactory.newInstance();
+        if (!setRestrictionProperties(factory)) {
+            factory = new WstxInputFactory();
+            if (!setRestrictionProperties(factory)) {
+                throw new RuntimeException("Cannot create a secure XMLInputFactory");
+            }
+        }
         setProperty(factory, XMLInputFactory.IS_NAMESPACE_AWARE, nsAware);
         setProperty(factory, XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
         setProperty(factory, XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
@@ -243,15 +279,33 @@ public final class StaxUtils {
                 throw new XMLStreamException("Reading external entities is disabled");
             }
         });
+        
         return factory;
     }
     
-    private static void setProperty(XMLInputFactory f, String p, Object o) {
+    private static boolean setRestrictionProperties(XMLInputFactory factory) {
+        //For now, we can only support Woodstox 4.2.x and newer as none of the other
+        //stax parsers support these settings
+        if (setProperty(factory, "com.ctc.wstx.maxAttributesPerElement", maxAttributeCount)
+            && setProperty(factory, "com.ctc.wstx.maxAttributeSize", maxAttributeSize)
+            && setProperty(factory, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold)
+            && setProperty(factory, "com.ctc.wstx.maxElementCount", maxElementCount)
+            && setProperty(factory, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold)
+            && setProperty(factory, "com.ctc.wstx.maxCharacters", maxXMLCharacters)
+            && setProperty(factory, "com.ctc.wstx.maxTextLength", maxTextLength)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean setProperty(XMLInputFactory f, String p, Object o) {
         try {
             f.setProperty(p,  o);
+            return true;
         } catch (Throwable t) {
             //ignore
         }
+        return false;
     }
 
     
