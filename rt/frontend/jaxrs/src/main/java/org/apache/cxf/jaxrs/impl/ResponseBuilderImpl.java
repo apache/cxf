@@ -257,55 +257,54 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
 
     @Override
     public ResponseBuilder allow(String... arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public ResponseBuilder allow(Set<String> arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public ResponseBuilder encoding(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public ResponseBuilder entity(Object arg0, Annotation[] arg1) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public ResponseBuilder link(URI arg0, String arg1) {
-        // TODO Auto-generated method stub
-        return null;
+    public ResponseBuilder link(URI href, String rel) {
+        Link.Builder linkBuilder = new Link.Builder();
+        return links(linkBuilder.uri(href).rel(rel).build());
     }
 
     @Override
-    public ResponseBuilder link(String arg0, String arg1) {
-        // TODO Auto-generated method stub
-        return null;
+    public ResponseBuilder link(String href, String rel) {
+        Link.Builder linkBuilder = new Link.Builder();
+        return links(linkBuilder.uri(href).rel(rel).build());
     }
 
     @Override
-    public ResponseBuilder links(Link... arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public ResponseBuilder links(Link... links) {
+        return addHeader(HttpHeaders.LINK, (Object[])links);
     }
 
     @Override
     public ResponseBuilder replaceAll(MultivaluedMap<String, Object> arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public ResponseBuilder variants(Variant... arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not implemented");
     }
 }
