@@ -120,16 +120,50 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     }
                 }                
             }
+            xreader = configureRestrictions(xreader, message);
         } catch (XMLStreamException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("STREAM_CREATE_EXC",
                                                                    LOG,
                                                                    encoding), e);
         }
-
         message.setContent(XMLStreamReader.class, xreader);
         message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
     }
 
+    private XMLStreamReader configureRestrictions(XMLStreamReader xreader, Message message) throws XMLStreamException {
+        Integer maxChildElements = getInteger(message, StaxUtils.MAX_CHILD_ELEMENTS);
+        Integer maxElementDepth = getInteger(message, StaxUtils.MAX_ELEMENT_DEPTH);
+        Integer maxAttributeCount = getInteger(message, StaxUtils.MAX_ATTRIBUTE_COUNT); 
+        Integer maxAttributeSize = getInteger(message, StaxUtils.MAX_ATTRIBUTE_SIZE);
+        Integer maxTextLength = getInteger(message, StaxUtils.MAX_TEXT_LENGTH); 
+        Long maxElementCount = getLong(message, StaxUtils.MAX_ELEMENT_COUNT);
+        Long maxXMLCharacters = getLong(message, StaxUtils.MAX_XML_CHARACTERS);
+        return StaxUtils.configureReader(xreader, maxChildElements, maxElementDepth,
+                                         maxAttributeCount, maxAttributeSize, maxTextLength,
+                                         maxElementCount, maxXMLCharacters);
+    }
+    private Long getLong(Message message, String key) {
+        Object o = message.getContextualProperty(key);
+        if (o instanceof Long) {
+            return (Long)o;
+        } else if (o instanceof Number) {
+            return ((Number)o).longValue();
+        } else if (o instanceof String) {
+            return Long.valueOf(o.toString());
+        }
+        return null;
+    }
+    private Integer getInteger(Message message, String key) {
+        Object o = message.getContextualProperty(key);
+        if (o instanceof Integer) {
+            return (Integer)o;
+        } else if (o instanceof Number) {
+            return ((Number)o).intValue();
+        } else if (o instanceof String) {
+            return Integer.valueOf((String)o);
+        }
+        return null;
+    }
     public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
         Object o = m.getContextualProperty(XMLInputFactory.class.getName());
         if (o instanceof XMLInputFactory) {

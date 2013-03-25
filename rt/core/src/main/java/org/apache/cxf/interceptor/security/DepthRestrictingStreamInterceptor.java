@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -43,6 +44,7 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
     
     public DepthRestrictingStreamInterceptor() {
         this(Phase.POST_STREAM);
+        addAfter(StaxInInterceptor.class.getName());
     }
     
     public DepthRestrictingStreamInterceptor(String phase) {
@@ -69,16 +71,16 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
             return;
         }
         
-        XMLStreamReader reader = null;
-        InputStream is = message.getContent(InputStream.class);
-        if (is != null) {
-            reader = StaxUtils.createXMLStreamReader(is);
-            message.setContent(InputStream.class, null);
-        } else {
-            reader = message.getContent(XMLStreamReader.class);
-        }
+        XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         if (reader == null) {
-            return;
+            InputStream is = message.getContent(InputStream.class);
+            if (is != null) {
+                reader = StaxUtils.createXMLStreamReader(is);
+                message.setContent(InputStream.class, null);
+            }
+            if (reader == null) {
+                return;
+            }
         }
         DepthRestrictingStreamReader dr = 
             new DepthRestrictingStreamReader(reader,
