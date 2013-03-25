@@ -104,6 +104,23 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         int result = saml1Port.doubleIt(25);
         assertTrue(result == 50);
         
+        // Don't send any Token...failure expected
+        portQName = new QName(NAMESPACE, "DoubleItSaml1TransportPort2");
+        saml1Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml1Port, PORT2);
+        
+        ((BindingProvider)saml1Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler(false)
+        );
+        
+        try {
+            saml1Port.doubleIt(25);
+            fail("Failure expected on no token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
         ((java.io.Closeable)saml1Port).close();
         bus.shutdown(true);
     }
@@ -275,6 +292,23 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         );
         int result = saml2Port.doubleIt(25);
         assertTrue(result == 50);
+        
+        // Don't send any Token...failure expected
+        portQName = new QName(NAMESPACE, "DoubleItSaml2AsymmetricPort2");
+        saml2Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, PORT);
+        
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            "ws-security.saml-callback-handler", new SamlCallbackHandler()
+        );
+        
+        try {
+            saml2Port.doubleIt(25);
+            fail("Failure expected on no token");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "The received token does not match the token inclusion requirement";
+            assertTrue(ex.getMessage().contains(error));
+        }
         
         ((java.io.Closeable)saml2Port).close();
         bus.shutdown(true);
