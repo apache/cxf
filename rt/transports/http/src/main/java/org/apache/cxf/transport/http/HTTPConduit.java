@@ -1128,6 +1128,7 @@ public class HTTPConduit
         connection.setReadTimeout((int)cp.getReceiveTimeout());
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(false);
+        message.put("http.retransmit.url", newURL.toString());
 
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
