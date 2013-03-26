@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -146,7 +147,7 @@ public class HttpHeadersImplTest extends Assert {
         m.get(Message.PROTOCOL_HEADERS);
         EasyMock.expectLastCall().andReturn(createHeaders());
         m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
+        EasyMock.expectLastCall().andReturn("true").anyTimes();
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
         MultivaluedMap<String, String> hs = h.getRequestHeaders();
@@ -173,9 +174,11 @@ public class HttpHeadersImplTest extends Assert {
     public void testGetContentTypeLowCase() throws Exception {
         
         Message m = new MessageImpl();
-        m.put(Message.PROTOCOL_HEADERS, 
-              Collections.singletonMap("content-type", 
-                  Collections.singletonList("text/plain")));
+        // this is what happens at runtime and is tested in the system tests
+        Map<String, List<String>> headers = 
+            new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        headers.put("content-type", Collections.singletonList("text/plain"));
+        m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals("text/plain", h.getRequestHeaders().getFirst("Content-Type"));
     }
@@ -347,7 +350,7 @@ public class HttpHeadersImplTest extends Assert {
         
         Message m = control.createMock(Message.class);
         m.getContextualProperty("org.apache.cxf.http.header.split");
-        EasyMock.expectLastCall().andReturn("true");
+        EasyMock.expectLastCall().andReturn("true").anyTimes();
         m.get(Message.PROTOCOL_HEADERS);
         MetadataMap<String, String> headers = 
             createHeader(HttpHeaders.ACCEPT_LANGUAGE, 
