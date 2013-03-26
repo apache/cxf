@@ -243,6 +243,24 @@ public class BookStore {
     }
     
     @GET
+    @Path("multipleexceptions")
+    public Response getBookWithExceptions(@QueryParam("exception") boolean notReturned) 
+        throws BookNotFoundFault, BookNotReturnedException {
+        if (notReturned) {
+            throw new WebApplicationException(Response.status(404).header("Status", "notReturned").build());
+        } else {
+            throw new WebApplicationException(Response.status(404).header("Status", "notFound").build());
+        }
+    }
+    
+    @GET
+    @Path("multipleexceptions2")
+    public Response getBookWithExceptions2(@QueryParam("exception") boolean notReturned) 
+        throws BookNotReturnedException, BookNotFoundFault {
+        return getBookWithExceptions(notReturned);
+    }
+    
+    @GET
     @Path("propogateExceptionVar/{i}")
     public Book propogateExceptionWithVar() throws BookNotFoundFault {
         return null;
@@ -1024,6 +1042,15 @@ public class BookStore {
         return echoBookNameAndHeader(httpHeaders.getRequestHeader("CustomHeader").get(0), name);
     }
     
+    @POST
+    @Path("/booksecho3")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoBookNameAndHeader3(String name) {
+        return echoBookNameAndHeader(httpHeaders.getRequestHeader("customheader").get(0), name);
+    }
+        
+    
     @GET
     @Path("/cd/{CDId}/")
     public CD getCD() {
@@ -1232,6 +1259,16 @@ public class BookStore {
         return (Book)ProxyHelper.getProxy(this.getClass().getClassLoader(), 
                                     new Class[]{Book.class}, 
                                     handler);
+    }
+    
+    public static class BookNotReturnedException extends RuntimeException {
+
+        private static final long serialVersionUID = 4935423670510083220L;
+
+        public BookNotReturnedException(String errorMessage) {
+            super(errorMessage);
+        }
+        
     }
 }
 
