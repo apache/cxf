@@ -21,7 +21,7 @@ package org.apache.cxf.sts.operation;
 import java.security.Principal;
 
 import org.apache.cxf.sts.IdentityMapper;
-import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 /**
  * A test implementation of IdentityMapper.

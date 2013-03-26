@@ -36,10 +36,10 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.dom.SAMLTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 
 /**

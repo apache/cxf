@@ -44,7 +44,7 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
 

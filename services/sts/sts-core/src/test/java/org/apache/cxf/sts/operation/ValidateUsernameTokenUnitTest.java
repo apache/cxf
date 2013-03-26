@@ -46,7 +46,7 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 
 /**

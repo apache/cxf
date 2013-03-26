@@ -106,10 +106,6 @@
             <artifactId>wss4j-policy</artifactId>
             <version>${cxf.wss4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>

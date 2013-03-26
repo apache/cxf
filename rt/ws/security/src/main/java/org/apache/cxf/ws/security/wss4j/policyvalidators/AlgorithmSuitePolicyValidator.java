@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
