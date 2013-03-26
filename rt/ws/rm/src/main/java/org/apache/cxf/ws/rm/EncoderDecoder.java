@@ -82,6 +82,13 @@ public interface EncoderDecoder {
     Class<?> getTerminateSequenceType();
     
     /**
+     * Get the class used for the TerminateSequenceResponseType.
+     * 
+     * @return class
+     */
+    Class<?> getTerminateSequenceResponseType();
+    
+    /**
      * Builds an element containing WS-RM headers. This adds the appropriate WS-RM and WS-A namespace
      * declarations to the element, and then adds any WS-RM headers set in the supplied properties as child
      * elements.

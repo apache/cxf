@@ -95,6 +95,7 @@ public class Proxy {
         
         TerminateSequenceType ts = new TerminateSequenceType();
         ts.setIdentifier(ss.getIdentifier());
+        ts.setLastMsgNumber(ss.getCurrentMessageNr());
         EncoderDecoder codec = protocol.getCodec();
         invoke(oi, protocol, new Object[] {codec.convertToSend(ts)}, null);
     }
