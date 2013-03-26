@@ -266,11 +266,17 @@ public class ClientProxyImpl extends AbstractClient implements
             if (m.getReturnType() == Response.class && m.getExceptionTypes().length == 0) {
                 return;
             }            
-            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, inMessage);
-            if (mapper != null) {
-                t = mapper.fromResponse(r);
-                if (t != null) {
-                    throw t;
+            Class<?>[] exTypes = m.getExceptionTypes();
+            if (exTypes.length == 0) {
+                exTypes = new Class[]{ServerWebApplicationException.class};
+            }
+            for (Class<?> exType : exTypes) {
+                ResponseExceptionMapper<?> mapper = findExceptionMapper(inMessage, exType);
+                if (mapper != null) {
+                    t = mapper.fromResponse(r);
+                    if (t != null) {
+                        throw t;
+                    }
                 }
             } 
                         
@@ -296,15 +302,9 @@ public class ClientProxyImpl extends AbstractClient implements
         }
     }
     
-    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
+    private static ResponseExceptionMapper<?> findExceptionMapper(Message message, Class<?> exType) {
         ProviderFactory pf = ProviderFactory.getInstance(message);
-        for (Class<?> exType : m.getExceptionTypes()) {
-            ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
-            if (mapper != null) {
-                return mapper;
-            }
-        }
-        return null;
+        return pf.createResponseExceptionMapper(exType);
     }
     
     private MultivaluedMap<String, String> setRequestHeaders(MultivaluedMap<String, String> headers,          

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.ClientWebApplicationException;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.client.ResponseReader;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -64,6 +66,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfo;
 import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
+import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -336,6 +339,51 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book book = store.getBookWithSpace("123");
         assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testBookWithMultipleExceptions() throws Exception {
+        List<Object> providers = new LinkedList<Object>();
+        providers.add(new NotReturnedExceptionMapper());
+        providers.add(new NotFoundExceptionMapper());
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, 
+                                                    BookStore.class,
+                                                    providers);
+        try {
+            store.getBookWithExceptions(true);
+            fail();
+        } catch (BookNotReturnedException ex) {
+            assertEquals("notReturned", ex.getMessage());
+        }
+        try {
+            store.getBookWithExceptions(false);
+            fail();
+        } catch (BookNotFoundFault ex) {
+            assertEquals("notFound", ex.getMessage());
+        }
+        
+    }
+    
+    @Test
+    public void testBookWithMultipleExceptions2() throws Exception {
+        List<Object> providers = new LinkedList<Object>();
+        providers.add(new NotReturnedExceptionMapper());
+        providers.add(new NotFoundExceptionMapper());
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, 
+                                                    BookStore.class,
+                                                    providers);
+        try {
+            store.getBookWithExceptions2(true);
+            fail();
+        } catch (BookNotReturnedException ex) {
+            assertEquals("notReturned", ex.getMessage());
+        }
+        try {
+            store.getBookWithExceptions2(false);
+            fail();
+        } catch (BookNotFoundFault ex) {
+            assertEquals("notFound", ex.getMessage());
+        }
     }
     
     @Test
@@ -1042,6 +1090,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/simplebooks/222");
         Book book = wc.get(Book.class);
         assertEquals(222L, book.getId());
+    }
+    
+    @Test
+    public void testGetBookLowCaseHeader() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/booksecho3");
+        wc.type("text/plain").accept("text/plain").header("CustomHeader", "custom");
+        String name = wc.post("book", String.class);
+        assertEquals("book", name);
+        assertEquals("custom", wc.getResponse().getMetadata().getFirst("CustomHeader").toString());
     }
     
     @Test
@@ -1919,4 +1976,29 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         }
     }
     
+    public static class NotReturnedExceptionMapper implements ResponseExceptionMapper<BookNotReturnedException> {
+
+        public BookNotReturnedException fromResponse(Response r) {
+            String status = r.getMetadata().getFirst("Status").toString();
+            if ("notReturned".equals(status)) { 
+                return new BookNotReturnedException(status);
+            } else {
+                return null;
+            }
+        }
+        
+    }
+    
+    public static class NotFoundExceptionMapper implements ResponseExceptionMapper<BookNotFoundFault> {
+
+        public BookNotFoundFault fromResponse(Response r) {
+            String status = r.getMetadata().getFirst("Status").toString();
+            if ("notFound".equals(status)) { 
+                return new BookNotFoundFault(status);
+            } else {
+                return null;
+            }
+        }
+        
+    }
 }
