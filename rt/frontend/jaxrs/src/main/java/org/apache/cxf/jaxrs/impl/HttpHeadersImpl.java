@@ -138,12 +138,18 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {
-        Map<String, List<String>> newHeaders = 
-            new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-            newHeaders.put(entry.getKey(), getRequestHeader(entry.getKey()));
+        boolean splitIndividualValue 
+            = MessageUtils.isTrue(message.getContextualProperty(HEADER_SPLIT_PROPERTY));
+        if (splitIndividualValue) {
+            Map<String, List<String>> newHeaders = 
+                new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                newHeaders.put(entry.getKey(), getRequestHeader(entry.getKey()));
+            }
+            return new MetadataMap<String, String>(Collections.unmodifiableMap(newHeaders), false);
+        } else {
+            return new MetadataMap<String, String>(Collections.unmodifiableMap(headers), false);
         }
-        return new MetadataMap<String, String>(Collections.unmodifiableMap(newHeaders), false);
     }
 
     public List<Locale> getAcceptableLanguages() {
