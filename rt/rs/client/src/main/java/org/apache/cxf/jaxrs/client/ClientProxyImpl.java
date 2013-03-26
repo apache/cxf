@@ -275,13 +275,19 @@ public class ClientProxyImpl extends AbstractClient implements
         int status = r.getStatus();
         
         if (status >= 300) {
-            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, inMessage);
-            if (mapper != null) {
-                t = mapper.fromResponse(r);
-                if (t != null) {
-                    throw t;
+            Class<?>[] exTypes = m.getExceptionTypes();
+            if (exTypes.length == 0) {
+                exTypes = new Class[]{WebApplicationException.class};
+            }
+            for (Class<?> exType : exTypes) {
+                ResponseExceptionMapper<?> mapper = findExceptionMapper(inMessage, exType);
+                if (mapper != null) {
+                    t = mapper.fromResponse(r);
+                    if (t != null) {
+                        throw t;
+                    }
                 }
-            } 
+            }
                  
             if ((t == null) && (m.getReturnType() == Response.class) && (m.getExceptionTypes().length == 0)) {
                 return;
@@ -306,19 +312,9 @@ public class ClientProxyImpl extends AbstractClient implements
         }
     }
     
-    private static ResponseExceptionMapper<?> findExceptionMapper(Method m, Message message) {
+    private static ResponseExceptionMapper<?> findExceptionMapper(Message message, Class<?> exType) {
         ClientProviderFactory pf = ClientProviderFactory.getInstance(message);
-        Class<?>[] exTypes = m.getExceptionTypes();
-        if (exTypes.length == 0) {
-            exTypes = new Class[]{WebApplicationException.class};
-        }
-        for (Class<?> exType : exTypes) {
-            ResponseExceptionMapper<?> mapper = pf.createResponseExceptionMapper(exType);
-            if (mapper != null) {
-                return mapper;
-            }
-        }
-        return null;
+        return pf.createResponseExceptionMapper(exType);
     }
     
     private MultivaluedMap<String, String> setRequestHeaders(MultivaluedMap<String, String> headers,          
