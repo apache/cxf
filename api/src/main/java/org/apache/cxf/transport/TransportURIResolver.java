@@ -129,9 +129,13 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     InputStream ins = exch.get(InputStream.class);
                     resourceOpened.addElement(ins);
                     InputSource src = new InputSource(ins);
-                    src.setPublicId(base.toString());
-                    src.setSystemId(base.toString());
-                    lastestImportUri = base.toString();
+                    String u = (String)message.get("http.retransmit.url");
+                    if (u == null) {
+                        u = base.toString();
+                    }
+                    src.setPublicId(u);
+                    src.setSystemId(u);
+                    lastestImportUri = u;
                     currentResolver.unresolve();
                     return src;
                 }
