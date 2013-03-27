@@ -62,7 +62,6 @@ public final class TransformTestUtils {
                                                                  appendElements,
                                                                  dropElements,
                                                                  transformAttributes);
-        
         XMLStreamReader teacher = 
             StaxUtils.createXMLStreamReader(
                       TransformTestUtils.class.getResourceAsStream(outname));
@@ -139,15 +138,16 @@ public final class TransformTestUtils {
                 break;
             }
             LOG.fine("Event: " + tevent + " ? " + revent);
-            Assert.assertEquals(tevent, revent);
+            Assert.assertEquals("parsing event", tevent, revent);
 
             switch (revent) {
             case XMLStreamConstants.START_ELEMENT:
                 LOG.fine("Start Element " + teacher.getName() + " ? " + reader.getName());
-                Assert.assertEquals(teacher.getName(), reader.getName());
+                Assert.assertEquals("wrong start element.", teacher.getName(), reader.getName());
                 if (pfx) {
                     // verify if the namespace prefix are preserved
-                    Assert.assertEquals(teacher.getPrefix(), reader.getPrefix());
+                    Assert.assertEquals("wrong start element prefix.", teacher.getPrefix(), reader.getPrefix());
+                    verifyNamespaceDeclarations(teacher, reader);
                 }
                 verifyAttributes(teacher, reader);
                 break;
@@ -155,12 +155,12 @@ public final class TransformTestUtils {
                 LOG.fine("End Element " + teacher.getName() + " ? " + reader.getName());
                 if (eec) {
                     // perform end-element-check
-                    Assert.assertEquals(teacher.getName(), reader.getName());
+                    Assert.assertEquals("wrong end element qname.", teacher.getName(), reader.getName());
                 }
                 break;
             case XMLStreamConstants.CHARACTERS:
                 LOG.fine("Characters " + teacher.getText() + " ? " + reader.getText());
-                Assert.assertEquals(teacher.getText(), reader.getText());
+                Assert.assertEquals("wrong characteres.", teacher.getText(), reader.getText());
                 break;
             default:
             }
@@ -178,10 +178,20 @@ public final class TransformTestUtils {
         // compares each attribute
         for (int i = 0; i < acount; i++) {
             String avalue = attributesMap.remove(teacher.getAttributeName(i));
-            Assert.assertEquals(avalue, teacher.getAttributeValue(i));
+            Assert.assertEquals("attribute " + teacher.getAttributeName(i) + " has wrong value.", 
+                                teacher.getAttributeValue(i), avalue);
         }
         // attributes must be exhausted
-        Assert.assertTrue(attributesMap.isEmpty());
+        Assert.assertTrue("attributes must be exhausted.", attributesMap.isEmpty());
+    }
+
+    private static void verifyNamespaceDeclarations(XMLStreamReader teacher, XMLStreamReader reader) {
+        int dcount = teacher.getNamespaceCount();
+        for (int i = 0; i < dcount; i++) {
+            String p = teacher.getNamespacePrefix(i);
+            Assert.assertEquals("nsdecl prefix " + p + " is incorrectly bound.", 
+                                teacher.getNamespaceURI(i), reader.getNamespaceURI(p));
+        }
     }
 
     /**
