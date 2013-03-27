@@ -491,10 +491,12 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             splitPattern = FIELD_COMMA_PATTERN;
         }
         List<String> results = new ArrayList<String>();
-        for (String value : values) {
-            String[] items = splitPattern.split(value);
-            for (String item : items) {
-                results.add(item.trim());
+        if (values != null) {
+            for (String value : values) {
+                String[] items = splitPattern.split(value);
+                for (String item : items) {
+                    results.add(item.trim());
+                }
             }
         }
         return results;
