@@ -280,7 +280,7 @@ public class WadlGenerator implements RequestHandler {
         }
     }
     
-    private void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars,
+    protected void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars,
                                 SchemaWriter writer, Map<Class<?>, QName> clsMap) {
         if (writer == null) {
             return;
@@ -299,7 +299,7 @@ public class WadlGenerator implements RequestHandler {
     }
 
 
-    private void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes,
+    protected void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                 ElementQNameResolver qnameResolver,
                                 Map<Class<?>, QName> clsMap, ClassResourceInfo cri,
                                 Set<ClassResourceInfo> visitedResources,
@@ -368,7 +368,7 @@ public class WadlGenerator implements RequestHandler {
         sb.append(">");
     }
 
-    private String getPath(String path) {
+    protected String getPath(String path) {
         String thePath = null;
         if (ignoreForwardSlash && path.startsWith("/") && path.length() > 0) {
             thePath = path.substring(1);
@@ -390,7 +390,7 @@ public class WadlGenerator implements RequestHandler {
     }
 
     //CHECKSTYLE:OFF
-    private boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes,
+    protected boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                  ElementQNameResolver qnameResolver,
                                  Map<Class<?>, QName> clsMap,
                                  OperationResourceInfo ori,
@@ -520,13 +520,13 @@ public class WadlGenerator implements RequestHandler {
         sb.append("</resource>");
     }
 
-    private void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params,
+    protected void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params,
             boolean isJson) {
         doHandleClassParams(sb, params, isJson, ParameterType.PATH);
         doHandleClassParams(sb, params, isJson, ParameterType.MATRIX);
     }
     
-    private void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params,
+    protected void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params,
                                      boolean isJson, ParameterType... pType) {
         Set<ParameterType> pTypes = new LinkedHashSet<ParameterType>(Arrays.asList(pType));
         for (Map.Entry<Parameter, Object> entry : params.entrySet()) {
@@ -544,13 +544,13 @@ public class WadlGenerator implements RequestHandler {
         }
     }
     
-    private void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori, boolean isJson) {
+    protected void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori, boolean isJson) {
         handleParams(sb, ori, ParameterType.PATH, isJson);
         handleParams(sb, ori, ParameterType.MATRIX, isJson);
     }
 
 
-    private void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes,
+    protected void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                  ElementQNameResolver qnameResolver,
                                  Map<Class<?>, QName> clsMap, OperationResourceInfo ori, Parameter pm,
                                  boolean isJson) {
@@ -568,7 +568,7 @@ public class WadlGenerator implements RequestHandler {
 
     }
 
-    private void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type, 
+    protected void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type, 
             boolean isJson) {
         for (Parameter pm : ori.getParameters()) {
             if (pm.getType() == type) {
@@ -704,7 +704,7 @@ public class WadlGenerator implements RequestHandler {
     }
     //TODO: Collapse multiple parameters into a holder
     //CHECKSTYLE:OFF
-    private void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
+    protected void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver,
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
                                       Class<?> type, boolean isJson, boolean inbound) {
