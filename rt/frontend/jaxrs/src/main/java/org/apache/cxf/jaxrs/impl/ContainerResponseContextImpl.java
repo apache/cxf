@@ -27,20 +27,19 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 public class ContainerResponseContextImpl extends AbstractResponseContextImpl 
     implements ContainerResponseContext {
 
-    private OperationResourceInfo ori;
+    private Method invoked;
     
     public ContainerResponseContextImpl(Response r, 
                                         Message m,
-                                        OperationResourceInfo ori) {
+                                        Method invoked) {
         super(r, m);
-        this.ori = ori;
+        this.invoked = invoked;
     }
     
     @Override
@@ -55,13 +54,9 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
 
     @Override
     public Type getEntityType() {
-        Method invoked = ori == null ? null : ori.getAnnotatedMethod() != null
-                ? ori.getAnnotatedMethod() : ori.getMethodToInvoke();
-        
         return InjectionUtils.getGenericResponseType(invoked, 
                                               super.r.getEntity(), 
                                               getEntityClass(), 
-                                              ori, 
                                               super.m.getExchange());
     }
     

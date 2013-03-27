@@ -59,6 +59,33 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
     
     @Test
+    public void testGetGenericBook() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
+        doTestGetGenericBook(address, false);
+    }
+    
+    @Test
+    public void testGetGenericBook2() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/genericbooks2/123";
+        doTestGetGenericBook(address, true);
+    }
+    
+    private void doTestGetGenericBook(String address, boolean checkAnnotations) throws Exception {
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
+        wc.accept("application/xml");
+        Book book = wc.get(Book.class);
+        assertEquals(123L, book.getId());
+        MediaType mt = wc.getResponse().getMediaType();
+        assertEquals("application/xml;charset=ISO-8859-1", mt.toString());
+        if (checkAnnotations) {
+            assertEquals("OK", wc.getResponse().getHeaderString("Annotations"));    
+        } else {
+            assertNull(wc.getResponse().getHeaderString("Annotations"));
+        }
+    }
+    
+    @Test
     public void testGetBook() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestGetBook(address);

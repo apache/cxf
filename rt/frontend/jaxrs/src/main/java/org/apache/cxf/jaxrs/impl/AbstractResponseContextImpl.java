@@ -35,6 +35,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 
@@ -60,7 +61,7 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public Object getEntity() {
-        return r.getEntity();
+        return InjectionUtils.getEntity(r.getEntity());
     }
 
        

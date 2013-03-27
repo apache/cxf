@@ -55,7 +55,6 @@ import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
@@ -93,7 +92,6 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -1174,7 +1172,6 @@ public final class InjectionUtils {
     public static Type getGenericResponseType(Method invoked, 
                                         Object targetObject, 
                                         Class<?> targetType,
-                                        OperationResourceInfo ori,
                                         Exchange exchange) {
         if (targetObject == null) {
             return null;
@@ -1183,8 +1180,7 @@ public final class InjectionUtils {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             type = ((GenericEntity<?>)targetObject).getType();
         } else if (invoked == null 
-                   || !invoked.getReturnType().isAssignableFrom(targetType)
-                   || exchange.get(AsyncResponse.class) != null) {
+                   || !invoked.getReturnType().isAssignableFrom(targetType)) {
             // when a method has been invoked it is still possible that either an ExceptionMapper
             // or a ResponseHandler filter overrides a response entity; if it happens then 
             // the Type is the class of the response object, unless this new entity is assignable
@@ -1193,11 +1189,15 @@ public final class InjectionUtils {
         } else {
             type = invoked.getGenericReturnType();
             if (type instanceof TypeVariable) {
-                type = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
-                                                           (TypeVariable<?>)type);
+                type = InjectionUtils.getSuperType(invoked.getDeclaringClass(), 
+                                                   (TypeVariable<?>)type);
             }
         }
         
         return type;
+    }
+    
+    public static Object getEntity(Object o) {
+        return o instanceof GenericEntity ? ((GenericEntity<?>)o).getEntity() : o;
     }
 }

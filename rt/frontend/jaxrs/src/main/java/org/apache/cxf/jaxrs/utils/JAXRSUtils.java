@@ -1574,7 +1574,8 @@ public final class JAXRSUtils {
     public static void runContainerResponseFilters(ServerProviderFactory pf,
                                                    Response r,
                                                    Message m, 
-                                                   OperationResourceInfo ori) throws IOException, Throwable {
+                                                   OperationResourceInfo ori,
+                                                   Method invoked) throws IOException, Throwable {
         List<ProviderInfo<ContainerResponseFilter>> containerFilters =  
             pf.getContainerResponseFilters(ori == null ? null : ori.getNameBindings());
         if (!containerFilters.isEmpty()) {
@@ -1583,7 +1584,7 @@ public final class JAXRSUtils {
                                                false,
                                                true);
             ContainerResponseContext responseContext = 
-                new ContainerResponseContextImpl(r, m, ori);
+                new ContainerResponseContextImpl(r, m, invoked);
             for (ProviderInfo<ContainerResponseFilter> filter : containerFilters) {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, m);
                 filter.getProvider().filter(requestContext, responseContext);
