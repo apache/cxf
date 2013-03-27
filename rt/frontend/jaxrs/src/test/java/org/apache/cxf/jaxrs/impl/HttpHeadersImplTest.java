@@ -55,6 +55,22 @@ public class HttpHeadersImplTest extends Assert {
     }
 
     @Test
+    public void testNoRequestHeader() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = 
+            createHeader("COMPLEX_HEADER",  "b=c; param=c, a=b;param=b");
+        EasyMock.expectLastCall().andReturn(headers);
+        m.getContextualProperty("org.apache.cxf.http.header.split");
+        EasyMock.expectLastCall().andReturn("true");
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("HEADER");
+        assertNull(values);
+    }
+    
+    @Test
     public void testGetHeaderNameValue() throws Exception {
         
         Message m = control.createMock(Message.class);
@@ -201,6 +217,20 @@ public class HttpHeadersImplTest extends Assert {
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         assertEquals("text/plain", h.getRequestHeaders().getFirst("Content-Type"));
+    }
+    
+    @Test
+    public void testGetEmptyHeader() throws Exception {
+        
+        Message m = new MessageImpl();
+        // this is what happens at runtime and is tested in the system tests
+        Map<String, List<String>> headers = 
+            new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+        headers.put("A", Collections.<String>emptyList());
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("A");
+        assertTrue(values.isEmpty());
     }
     
     @Test

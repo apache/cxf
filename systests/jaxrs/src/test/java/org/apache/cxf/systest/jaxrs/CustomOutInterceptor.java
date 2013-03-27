@@ -43,7 +43,7 @@ public class CustomOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         
         HttpHeaders requestHeaders = new HttpHeadersImpl(message.getExchange().getInMessage());
-        if (!requestHeaders.getRequestHeader("PLAIN-MAP").isEmpty()) {
+        if (requestHeaders.getHeaderString("PLAIN-MAP") != null) {
             Map<String, List<String>> headers = (Map<String, List<String>>)
                 message.get(Message.PROTOCOL_HEADERS);
             if (headers == null) {

@@ -162,7 +162,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
             List<String> failHeaders = getContext().getHttpHeaders().getRequestHeader("fail-write");
-            if (failHeaders.size() > 0) {
+            if (failHeaders != null && failHeaders.size() > 0) {
                 os.write("fail".getBytes());
                 throw new IOException();
             } else {
