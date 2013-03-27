@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -57,6 +58,8 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.URIMappingInterceptor;
+import org.apache.cxf.interceptor.security.DefaultSecurityContext;
+import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
@@ -467,7 +470,25 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
         for (WSSecurityEngineResult o : wsResult) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-            if (p != null && isSecurityContextPrincipal(p, wsResult)) {
+            final Subject subject = (Subject)o.get(WSSecurityEngineResult.TAG_SUBJECT);
+            if (subject != null) {
+                String roleClassifier = 
+                    (String)msg.getContextualProperty(SecurityConstants.SUBJECT_ROLE_CLASSIFIER);
+                if (roleClassifier != null && !"".equals(roleClassifier)) {
+                    String roleClassifierType = 
+                        (String)msg.getContextualProperty(SecurityConstants.SUBJECT_ROLE_CLASSIFIER_TYPE);
+                    if (roleClassifierType == null || "".equals(roleClassifierType)) {
+                        roleClassifierType = "prefix";
+                    }
+                    msg.put(
+                        SecurityContext.class, 
+                        new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType)
+                    );
+                } else {
+                    msg.put(SecurityContext.class, new DefaultSecurityContext(subject));
+                }
+                break;
+            } else if (p != null && isSecurityContextPrincipal(p, wsResult)) {
                 msg.put(PRINCIPAL_RESULT, p);
                 if (!utWithCallbacks) {
                     WSS4JTokenConverter.convertToken(msg, p);
@@ -490,6 +511,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 } else {
                     msg.put(SecurityContext.class, createSecurityContext(p));
                 }
+                break;
             }
         }
     }

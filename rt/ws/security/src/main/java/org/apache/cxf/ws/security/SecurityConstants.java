@@ -275,6 +275,23 @@ public final class SecurityConstants {
      */
     public static final String SUBJECT_CERT_CONSTRAINTS = "ws-security.subject.cert.constraints";
     
+    /**
+     * The Subject Role Classifier to use. If one of the WSS4J Validators returns a JAAS Subject
+     * from Validation, then the WSS4JInInterceptor will attempt to create a SecurityContext
+     * based on this Subject. If this value is not specified, then it tries to get roles using
+     * the DefaultSecurityContext in cxf-rt-core. Otherwise it uses this value in combination
+     * with the SUBJECT_ROLE_CLASSIFIER_TYPE to get the roles from the Subject.
+     */
+    public static final String SUBJECT_ROLE_CLASSIFIER = "ws-security.role.classifier";
+    
+    /**
+     * The Subject Role Classifier Type to use. If one of the WSS4J Validators returns a JAAS Subject
+     * from Validation, then the WSS4JInInterceptor will attempt to create a SecurityContext
+     * based on this Subject. Currently accepted values are "prefix" or "classname". Must be
+     * used in conjunction with the SUBJECT_ROLE_CLASSIFIER. The default value is "prefix".
+     */
+    public static final String SUBJECT_ROLE_CLASSIFIER_TYPE = "ws-security.role.classifier.type";
+    
     //
     // Validator implementations for validating received security tokens
     //
@@ -442,7 +459,7 @@ public final class SecurityConstants {
             STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
-            TOKEN, TOKEN_ID
+            TOKEN, TOKEN_ID, SUBJECT_ROLE_CLASSIFIER, SUBJECT_ROLE_CLASSIFIER_TYPE
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
