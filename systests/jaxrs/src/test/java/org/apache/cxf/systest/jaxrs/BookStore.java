@@ -23,6 +23,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -642,6 +643,14 @@ public class BookStore {
     public GenericEntity<GenericHandler<Book>> getGenericBook(@PathParam("bookId") String id) 
         throws BookNotFoundFault {
         return new GenericEntity<GenericHandler<Book>>(new GenericHandler<Book>(doGetBook(id))) { };
+    }
+    
+    @GET
+    @Path("/genericbooks2/{bookId}/")
+    @Produces("application/xml")
+    public Response getGenericBook2(@PathParam("bookId") String id) 
+        throws BookNotFoundFault {
+        return Response.ok().entity(getGenericBook(id), getExtraAnnotations()).build();
     }
     
     @GET
@@ -1392,6 +1401,15 @@ public class BookStore {
             super(errorMessage);
         }
         
+    }
+    
+    private Annotation[] getExtraAnnotations() {
+        try {
+            Method m = BookBean.class.getMethod("setUriInfo", new Class[]{UriInfo.class});
+            return m.getAnnotations();
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
 

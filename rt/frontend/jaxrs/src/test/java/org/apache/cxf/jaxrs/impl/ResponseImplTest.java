@@ -77,7 +77,7 @@ public class ResponseImplTest extends Assert {
         ResponseImpl ri = new ResponseImpl(200);
         MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
         ri.addMetadata(meta);
-        assertNull(ri.getHeader("a"));
+        assertNull(ri.getHeaderString("a"));
         meta.putSingle("a", "aValue");
         assertEquals("aValue", ri.getHeaderString("a"));
         meta.add("a", "aValue2");

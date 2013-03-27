@@ -143,8 +143,7 @@ public final class ResponseImpl extends Response {
         return headers;
     }
 
-    // TODO: Make this method private with the upgrade to the latest API snapshot
-    public String getHeader(String header) {
+    private String getHeader(String header) {
         Object value = metadata.getFirst(header);
         return value == null ? null : value.toString();
     }

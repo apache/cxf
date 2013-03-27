@@ -22,10 +22,12 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer20 extends AbstractBusTestServerBase {
@@ -81,6 +84,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         providers.add(new PostMatchContainerRequestFilter());
         providers.add(new FaultyContainerRequestFilter());
         providers.add(new PreMatchReplaceStreamOrAddress());
+        providers.add(new GenericHandlerWriter());
         sf.setProviders(providers);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
@@ -218,6 +222,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
     @BindingPriority(3)
     public static class PostMatchContainerResponseFilter implements ContainerResponseFilter {
 
+        @Context
+        private ResourceInfo rInfo;
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
@@ -229,7 +235,19 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 responseContext.getHeaders().putSingle("FilterException", 
                                                        requestContext.getProperty("filterexception"));
             }
-            ct += ";charset=";
+            Object entity = responseContext.getEntity();
+            Type entityType = responseContext.getEntityType();
+            if (entity instanceof GenericHandler && InjectionUtils.getActualType(entityType) == Book.class) {
+                ct += ";charset=ISO-8859-1";
+                if ("getGenericBook2".equals(rInfo.getResourceMethod().getName())) {
+                    Annotation[] anns = responseContext.getEntityAnnotations();
+                    if (anns.length == 4 && anns[3].annotationType() == Context.class) {
+                        responseContext.getHeaders().addFirst("Annotations", "OK");
+                    }
+                }
+            } else {
+                ct += ";charset=";
+            }
             responseContext.getHeaders().putSingle("Content-Type", ct);
             responseContext.getHeaders().add("Response", "OK");
         }
@@ -328,7 +346,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
             context.getHeaders().add("ServerWriterInterceptor", "serverWrite");
             String ct = context.getHeaders().getFirst("Content-Type").toString();
-            ct += "us-ascii";
+            if (!ct.endsWith("ISO-8859-1")) {
+                ct += "us-ascii";
+            }
             context.getHeaders().putSingle("Content-Type", ct);
             context.proceed();
         }
