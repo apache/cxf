@@ -64,7 +64,7 @@
                     <sec:include>.*_WITH_NULL_.*</sec:include>
                     <sec:exclude>.*_DH_anon_.*</sec:exclude>
                 </sec:cipherSuitesFilter>
-                <sec:clientAuthentication want="true" required="true"/>
+                <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
@@ -299,6 +299,37 @@
           </p:policies>
         </jaxws:features>
      
+    </jaxws:endpoint> 
+    
+    <bean id="subjectValidator" class="org.apache.cxf.systest.ws.ut.server.CustomUTValidator" />
+    
+    <bean id="authzInterceptor" 
+         class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
+       <property name="methodRolesMap">
+           <map>
+               <entry key="doubleIt" value="manager"/>
+           </map>
+       </property> 
+    </bean>
+    
+    <jaxws:endpoint 
+       id="PlaintextPrincipal"
+       address="https://localhost:${testutil.ports.Server}/DoubleItUTPlaintextPrincipal" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItPlaintextPrincipalPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItPortTypeImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/ut/DoubleItUt.wsdl"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+           <entry key="ws-security.ut.validator" value-ref="subjectValidator"/>
+       </jaxws:properties> 
+       <jaxws:inInterceptors>
+          <ref bean="authzInterceptor"/>
+       </jaxws:inInterceptors>
     </jaxws:endpoint> 
     
 </beans>

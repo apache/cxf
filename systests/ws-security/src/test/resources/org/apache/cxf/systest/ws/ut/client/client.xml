@@ -41,9 +41,6 @@
     
     <http:conduit name="https://localhost:.*">
         <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>
-            </sec:keyManagers>
             <sec:trustManagers>
                 <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
             </sec:trustManagers>
@@ -236,6 +233,14 @@
             </wsp:Policy>
           </p:policies>
         </jaxws:features>
+    </jaxws:client>
+    
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItPlaintextPrincipalPort" 
+                  createdFromAPI="true">
+       <jaxws:properties>
+           <entry key="ws-security.callback-handler" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+       </jaxws:properties>
     </jaxws:client>
     
 </beans>
