@@ -32,7 +32,7 @@
   <soap:Body>
     <TransformTestRequest xmlns="http://cxf.apache.org/transform/test"
       xmlns:ns2="http://cxf.apache.org/transform/header"
-      xmlns:ps1="http://cxf.apache.org/transform/header/element"
+      xmlns:ns3="http://cxf.apache.org/transform/header/element"
       xmlns:ns4="http://cxf.apache.org/transform/fault"/>
   </soap:Body>
 </soap:Envelope>

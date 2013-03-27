@@ -92,6 +92,27 @@ public class DelegatingNamespaceContextTest extends Assert {
         }
     }
 
+    @Test
+    public void testSomeAddsWithDuplicatedPrefixName() throws Exception {
+        DelegatingNamespaceContext dnc = getTestDelegatingNamespaceContext();
+        
+        dnc.down(); // 1
+        dnc.addPrefix("p00", "urn:foo0");
+        dnc.addPrefix("p1", "urn:foo1");
+        dnc.addPrefix("p2", "urn:foo2");
+        assertEquals("urn:foo0", dnc.getNamespaceURI("p0"));
+        assertEquals("urn:foo0", dnc.getNamespaceURI("p00"));
+        assertEquals("urn:foo1", dnc.getNamespaceURI("p1"));
+        assertEquals("urn:foo2", dnc.getNamespaceURI("p2"));
+        assertTrue("p0".equals(dnc.getPrefix("urn:foo0")) || "p00".equals(dnc.getPrefix("urn:foo0")));
+        assertEquals("p1", dnc.getPrefix("urn:foo1"));
+        assertEquals("p2", dnc.getPrefix("urn:foo2"));
+        verifyPrefixes(dnc.getPrefixes("urn:foo1"), new String[] {"p1"});
+        verifyPrefixes(dnc.getPrefixes("urn:foo2"), new String[] {"p2"});
+        verifyPrefixes(dnc.getPrefixes("urn:foo0"), new String[] {"p0", "p00"});
+    }
+
+
     private DelegatingNamespaceContext getTestDelegatingNamespaceContext() {
         return new DelegatingNamespaceContext(
             new NamespaceContext() {

@@ -449,4 +449,15 @@ public class InTransformReaderTest extends Assert {
                                   transformElements, null, null, null, null);
     }
 
+    @Test
+    public void testReadNamespaceWithDuplicatePrefixes() throws Exception {
+        Map<String, String> transformElements = new HashMap<String, String>();
+        transformElements.put("{http://bar.com/foo}*",
+                              "{http://bar.com/foobar}*");
+        TransformTestUtils.transformInStreamAndCompare("../resources/multiNS2In1.xml", 
+                                                     "../resources/multiNS2.xml",
+                                  transformElements, null, null, null, null);
+        
+    }
+
 }

@@ -329,6 +329,17 @@ public class InTransformReader extends DepthXMLStreamReader {
         }
     }
     
+    public String getNamespaceURI(String prefix) {
+        String ns = super.getNamespaceURI(prefix);
+
+        String actualNs = nsMap.get(ns);
+        if (actualNs != null) {
+            return actualNs;
+        } else {
+            return ns != null ? ns : namespaceContext.getNamespaceURI(prefix);
+        }
+    }
+
     public String getNamespaceURI() {
         if (currentEvent != null) {
             return currentEvent.getName().getNamespaceURI();
