@@ -112,7 +112,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 saaj.getSOAPPart().getEnvelope().addHeader();
             }
         } catch (SOAPException e) {
-            throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), 
+            throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE, e.getMessage()), 
                                 e,
                                 message.getVersion().getSender());
         }    
@@ -135,7 +135,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 
                 
             } catch (SOAPException e) {
-                throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, version.getSender());
+                throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE, e.getMessage()), e, version.getSender());
             }
         } else if (!message.containsKey(ORIGINAL_XML_WRITER)) {
             //as the SOAPMessage already has everything in place, we do not need XMLStreamWriter to write
@@ -218,7 +218,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                         throw new SoapFault(e.getCause().getMessage(), e,
                                             message.getVersion().getSender());
                     } else {
-                        throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e,
+                        throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE, e.getMessage()), e,
                                             message.getVersion().getSender());
                     }
                 }
