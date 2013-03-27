@@ -705,7 +705,7 @@ public class WadlGenerator implements RequestHandler {
     }
     //TODO: Collapse multiple parameters into a holder
     //CHECKSTYLE:OFF
-    private void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
+    protected void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
                                       ElementQNameResolver qnameResolver,
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
                                       Class<?> type, boolean isJson, boolean inbound) {
