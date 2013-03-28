@@ -84,6 +84,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxb.JAXBUtils.JCodeModel;
 import org.apache.cxf.jaxb.JAXBUtils.S2JJAXBModel;
@@ -942,7 +943,12 @@ public class SourceGenerator {
                 addImport(imports, List.class.getName());
                 type = "List<" + type + ">";
             }
-            String paramName = name.replaceAll("[\\.\\-]", "_");
+            String paramName;
+            if (JavaUtils.isJavaKeyword(name)) {
+                paramName = name.concat("_arg");
+            } else {
+                paramName = name.replaceAll("[:\\.\\-]", "_");
+            }
             sbCode.append(type).append(" ").append(paramName);
             if (i + 1 < inParamEls.size()) {
                 sbCode.append(", ");
