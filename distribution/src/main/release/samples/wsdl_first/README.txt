@@ -75,26 +75,30 @@ located), the pom.xml file is used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn clean install   (builds the demo and creates a WAR file for optional Tomcat deployment)
-  mvn -Pserver  (from one command line window -- only if using a standalone service, i.e., embedded Jetty)
+  mvn -Pserver  (from one command line window -- only if using embedded Jetty)
   mvn -Pclient  (from a second command line window)
 
+There is no special Maven profile for the Spring client and server but you can
+easily set it up yourself.
 
-If you're using Tomcat for the web service provider:
+If you're using Tomcat (embedded or standalone) for the web service provider:
 ----------------------------------------------------
 1.) Update the soap:address value in the resources/CustomerService.wsdl value, switching the
 soap:address value to the servlet-specific one (presently commented-out).
 
-2.) You can manually copy the generated WAR file to the Tomcat webapps folder, or, if you
-have Maven and Tomcat set up to use the Tomcat Maven Plugin 
-(http://mojo.codehaus.org/tomcat-maven-plugin/) you can use the mvn tomcat:redeploy
-command instead.  Important: if you're using this command, and are using Tomcat 6 
-instead of Tomcat 7, update the tomcat-maven-plugin configuration in the pom.xml, 
-switching to the the Tomcat 6-specific "url" element.
+2.) For standalone Tomcat: You can manually copy the generated WAR file to the Tomcat 
+webapps folder, or, if you have Maven and Tomcat set up to use the Tomcat Maven Plugin 
+(http://tomcat.apache.org/maven-plugin-2.1/tomcat7-maven-plugin/index.html) 
+you can use the mvn tomcat7:redeploy command instead. 
 
-To remove the code generated from the WSDL file and the .class files, run "mvn clean".
+For embedded Tomcat: Just run mvn tomcat7:run-war from the project base folder.
+
+3.) Next activate the client via mvn -Pclient as explained in the previous section.
+
 
 There is no special Maven profile for the spring client and server but you can easily
 set it up yourself.
+
 
 Using Eclipse to run and test the demo
 --------------------------------------
