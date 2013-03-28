@@ -974,10 +974,15 @@ public abstract class AbstractClient implements Client, Retryable {
             }
             
             Object body = objs.get(0);
-            
-            doWriteBody(outMessage, body, os);
+            Annotation[] customAnns = (Annotation[])outMessage.get(Annotation.class.getName());
+            Type t = outMessage.get(Type.class);
+            doWriteBody(outMessage, body, t, customAnns, os);
         }
         
-        protected abstract void doWriteBody(Message outMessage, Object body, OutputStream os) throws Fault;
+        protected abstract void doWriteBody(Message outMessage, 
+                                            Object body,
+                                            Type bodyType,
+                                            Annotation[] customAnns,
+                                            OutputStream os) throws Fault;
     }
 }

@@ -28,12 +28,14 @@ import java.util.Map;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.Configuration;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.AbstractRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 
@@ -58,13 +60,17 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         return null;
     }
     
-    @Override
-    public Object getEntity() {
+    private Object getMessageContent() {
         MessageContentsList objs = MessageContentsList.getContentsList(m);
         if (objs == null || objs.size() == 0) {
             return null;
         }
         return objs.get(0);
+    } 
+    
+    @Override
+    public Object getEntity() {
+        return getMessageContent();
     }
 
     @Override
@@ -76,14 +82,13 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     @Override
     public Class<?> getEntityClass() {
         Object entity = getEntity();
-        return entity == null ? null : entity.getClass();
+        return entity == null ? null : entity.getClass(); 
     }
 
     @Override
     public Type getEntityType() {
-        Object entity = getEntity();
-        //TODO: deal with generic entities
-        return entity == null ? null : entity.getClass();
+        Type t = m.get(Type.class);
+        return t != null ? t : getEntityClass();
     }
     
     @Override
@@ -106,9 +111,26 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         if (anns != null) {
             m.put(Annotation.class.getName(), anns);
         }
-        m.put(List.class, entity == null ? new MessageContentsList() : new MessageContentsList(entity));
+        doSetEntity(entity);
     }
 
+
+    private void doSetEntity(Object entity) {
+        Object actualEntity = InjectionUtils.getEntity(entity);
+        m.setContent(List.class, actualEntity == null ? new MessageContentsList() 
+            : new MessageContentsList(actualEntity));
+        Type type = null;
+        if (entity != null) {
+            if (GenericEntity.class.isAssignableFrom(entity.getClass())) {
+                type = ((GenericEntity<?>)entity).getType();
+            } else {
+                type = entity.getClass();
+            }
+        }
+        if (type != null) {
+            m.put(Type.class, type);
+        }
+    }
     
     @Override
     public URI getUri() {

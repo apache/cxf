@@ -1093,7 +1093,10 @@ public class WebClient extends AbstractClient {
     
     private class BodyWriter extends AbstractBodyWriter {
 
-        protected void doWriteBody(Message outMessage, Object body, 
+        protected void doWriteBody(Message outMessage, 
+                                   Object body,
+                                   Type bodyType,
+                                   Annotation[] customAnns,
                                    OutputStream os) throws Fault {    
             
             Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);
@@ -1103,11 +1106,11 @@ public class WebClient extends AbstractClient {
                 requestClass = (Class<?>)requestContext.get(REQUEST_CLASS);
                 requestType = (Type)requestContext.get(REQUEST_TYPE);
             }
-            Annotation[] anns = new Annotation[]{};
-            Annotation[] customAnns = (Annotation[])outMessage.get(Annotation.class.getName());
-            if (customAnns != null) {
-                anns = customAnns;
+            if (bodyType != null) {
+                requestType = bodyType;
             }
+            
+            Annotation[] anns = customAnns != null ? customAnns : new Annotation[]{};
             boolean isAssignable = requestClass != null && requestClass.isAssignableFrom(body.getClass());
             try {
                 writeBody(body, outMessage, 
