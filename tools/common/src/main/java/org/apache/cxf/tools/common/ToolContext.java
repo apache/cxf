@@ -160,10 +160,11 @@ public class ToolContext {
     }
 
     public boolean isVerbose() {
-        if (get(ToolConstants.CFG_VERBOSE) == null) {
+        Object verboseProperty = get(ToolConstants.CFG_VERBOSE);
+        if (verboseProperty == null) {
             return false;
         } else {
-            return get(ToolConstants.CFG_VERBOSE) == ToolConstants.CFG_VERBOSE;
+            return ToolConstants.CFG_VERBOSE.equals(verboseProperty);
         }
     }
 
