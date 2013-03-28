@@ -27,6 +27,8 @@ public final class WadlToolConstants {
     public static final String CFG_COMPILE = ToolConstants.CFG_COMPILE;
     public static final String CFG_CLASSDIR = ToolConstants.CFG_CLASSDIR;
     public static final String CFG_XJC_ARGS = ToolConstants.CFG_XJC_ARGS;
+    public static final String CFG_VERBOSE = ToolConstants.CFG_VERBOSE;
+    public static final String CFG_ENCODING = ToolConstants.CFG_ENCODING;
     
     /**
      * Default

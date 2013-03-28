@@ -128,7 +128,7 @@ required="true">
        </param>
        <param name="provider.bar" style="query" required="true" type="xs:int"/>
        <param name="a" style="query" repeating="true" type="xs:string"/>
-       <param name="b" style="query" repeating="true" type="xs:long"/> 
+       <param name="b:c" style="query" repeating="true" type="xs:long"/> 
        <representation mediaType="application/xml" element="prefix1:theBook2">
         <doc>InputBook</doc>
        </representation>

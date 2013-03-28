@@ -220,100 +220,7 @@ Examples:
                 </associatedArgument>
                 <switch>async</switch>
             </option>           
-<!-- 
 
-TODO: consider implementing most of the following options
-
-            <option id="reserveClass" maxOccurs="unbounded">
-                <annotation>
-                    Reserve a class name to keep the code generator from generating
-                    a class of the given name.   In name cases, a binding file or 
-                    use of -autoNameResolution flag may be necessary for the 
-                    code generator to completely generate usable code.
-                </annotation>
-                <switch>reserveClass</switch>
-                <associatedArgument placement="afterSpace">
-                    <annotation>class-name</annotation>
-                </associatedArgument>
-            </option>
-            <option id="autoNameResolution" maxOccurs="1">
-                <annotation>
-                    Specifies that the tool will attempt to resolve class naming conflicts 
-                    without requiring the use of binding customizations.
-                </annotation>
-                <switch>autoNameResolution</switch>
-            </option>
-            
-
-            <option id="server" maxOccurs="1">
-                <annotation>
-                    Specifies that server code is generated.
-                </annotation>
-                <switch>server</switch>
-            </option>
-
-            <option id="client" maxOccurs="1">
-                <annotation>
-                    Specifies that client code is generated.
-                </annotation>
-                <switch>client</switch>
-            </option>
-
-            <option id="all" maxOccurs="1">
-                <annotation>
-                    Specifies that interfaces, types , service, server , dummy impl, client
-                    and ant script are generated.
-                </annotation>
-                <switch>all</switch>
-            </option>
-
-            <option id="nexclude" maxOccurs="unbounded">
-                <annotation>
-                    Specifies a WSDL namespace to exclude when generating code. This
-                    option can be specified multiple times. Optionally
-                    specify the Java package name to use for the WSDL namespace.
-                </annotation>
-                <switch>nexclude</switch>
-                <associatedArgument placement="afterSpace">
-                    <annotation>schema-namespace [= java-package-name]</annotation>
-                </associatedArgument>
-            </option>
-            <option id="defaultns" maxOccurs="1">
-                <annotation>
-                    Enables loading the default namespace package name mapping. The default is true.
-                </annotation>
-                <switch>dns</switch>
-                <associatedArgument placement="afterSpace">
-                    <annotation>Default value is true</annotation>
-                    <valueenum>true|false</valueenum>
-                </associatedArgument>
-            </option>
-
-            <option id="defaultex" maxOccurs="1">
-                <annotation>
-                    Enable loading the default excludes namespace mapping. The default is true.</annotation>
-                <switch>dex</switch>
-                <associatedArgument placement="afterSpace">
-                    <annotation>(true, false)</annotation>
-                    <valueenum>true|false</valueenum>
-                </associatedArgument>
-            </option>
-        
-            <option id="validate" maxOccurs="1">
-                <annotation>
-                    Specifies that the WADL is validated before generating the code. Using 
-                    this option is highly recommended.
-                </annotation>
-                <switch>validate</switch>
-            </option>
-            
-            <option id="newonly" maxOccurs="1">
-                <annotation>
-                    Specifies that existing code will not be over written. NOTE: You will have to solve any resulting compilation problems by yourself
-                </annotation>
-                <switch>keep</switch>
-            </option>
--->
             <option id="xjc" maxOccurs="unbounded">
                 <annotation>
                     Specifies a comma separated list of arguments that are passed directly to XJC when the
@@ -329,7 +236,29 @@ TODO: consider implementing most of the following options
                 </associatedArgument>
                 <switch>xjc</switch>
             </option>
+            
+            <option id="encoding" maxOccurs="1">
+                <annotation>
+                    Specifies the charset encoding to use when generating java sources 
+                </annotation>
+                <switch>encoding</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>encoding</annotation>
+                </associatedArgument>
+            </option>
+            
+            <!-- 
 
+            <option id="validate" maxOccurs="1">
+                <annotation>
+                    Specifies that the WADL is validated before generating the code. Using 
+                    this option is highly recommended.
+                </annotation>
+                <switch>validate</switch>
+            </option>
+            
+            -->
+            
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
