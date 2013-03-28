@@ -79,4 +79,42 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testUsernameToken() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+        
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
+        DoubleItPortType port = 
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        // Successful call
+        port.doubleIt(25);
+        
+        // This should fail, as the client is not sending a UsernameToken
+        portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on not sending a UsernameToken element");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "An error was discovered";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
 }

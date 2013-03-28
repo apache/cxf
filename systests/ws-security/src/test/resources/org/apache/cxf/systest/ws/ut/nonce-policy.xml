@@ -18,7 +18,6 @@
                                 <sp:Lax />
                             </wsp:Policy>
                         </sp:Layout>
-                        <sp:IncludeTimestamp />
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
                                 <sp:Basic128 />
