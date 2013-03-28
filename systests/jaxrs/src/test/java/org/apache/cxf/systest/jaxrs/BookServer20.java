@@ -244,6 +244,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
                     if (anns.length == 4 && anns[3].annotationType() == Context.class) {
                         responseContext.getHeaders().addFirst("Annotations", "OK");
                     }
+                } else {
+                    responseContext.setEntity(new Book("book", 124L));
                 }
             } else {
                 ct += ";charset=";
@@ -256,10 +258,15 @@ public class BookServer20 extends AbstractBusTestServerBase {
     
     @Priority(1)
     public static class PostMatchContainerResponseFilter2 implements ContainerResponseFilter {
-
+        @Context
+        private ResourceInfo ri;
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
+            if (ri.getResourceMethod() != null
+                && "addBook2".equals(ri.getResourceMethod().getName())) {
+                return;
+            }
             if (!responseContext.getHeaders().containsKey("Response")) {
                 throw new RuntimeException();
             }

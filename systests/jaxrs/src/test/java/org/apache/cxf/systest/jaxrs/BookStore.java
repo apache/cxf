@@ -995,6 +995,14 @@ public class BookStore {
     }
     
     @POST
+    @Path("/books2")
+    @Produces("text/xml")
+    @Consumes("application/xml")
+    public Book addBook2(Book book) {
+        return new Book("Book echo", book.getId() + 1);
+    }
+    
+    @POST
     @Path("/oneway")
     @Oneway
     public void onewayRequest() {

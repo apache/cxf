@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -61,21 +62,22 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     @Test
     public void testGetGenericBook() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/genericbooks/123";
-        doTestGetGenericBook(address, false);
+        doTestGetGenericBook(address, 124L, false);
     }
     
     @Test
     public void testGetGenericBook2() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/genericbooks2/123";
-        doTestGetGenericBook(address, true);
+        doTestGetGenericBook(address, 123L, true);
     }
     
-    private void doTestGetGenericBook(String address, boolean checkAnnotations) throws Exception {
+    private void doTestGetGenericBook(String address, long bookId, boolean checkAnnotations) 
+        throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("application/xml");
         Book book = wc.get(Book.class);
-        assertEquals(123L, book.getId());
+        assertEquals(bookId, book.getId());
         MediaType mt = wc.getResponse().getMediaType();
         assertEquals("application/xml;charset=ISO-8859-1", mt.toString());
         if (checkAnnotations) {
@@ -203,6 +205,17 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertSame(book, holder.value);
         assertNotSame(collectionEntity.getEntity().get(0), book);
         assertEquals(collectionEntity.getEntity().get(0).getName(), book.getName());
+    }
+    
+    @Test
+    public void testPostReplaceBook() throws Exception {
+        
+        String endpointAddress = "http://localhost:" + PORT + "/bookstore/books2"; 
+        WebClient wc = WebClient.create(endpointAddress,
+                                        Collections.singletonList(new ReplaceBodyFilter()));
+        wc.accept("text/xml").type("application/xml");
+        Book book = wc.post(new Book("book", 555L), Book.class);
+        assertEquals(561L, book.getId());
     }
     
     @Test
@@ -461,6 +474,16 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     public void testPostBookAsyncHandler() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         doTestPostBookAsyncHandler(address);
+    }
+    
+    private static class ReplaceBodyFilter implements ClientRequestFilter {
+
+        @Override
+        public void filter(ClientRequestContext rc) throws IOException {
+            rc.setEntity(new Book("book", ((Book)rc.getEntity()).getId() + 5));
+        }
+
+                
     }
     
     private static class ClientCacheRequestFilter implements ClientRequestFilter {

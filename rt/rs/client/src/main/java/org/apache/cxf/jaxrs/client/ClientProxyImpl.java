@@ -525,6 +525,9 @@ public class ClientProxyImpl extends AbstractClient implements
         setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
         outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
         
+        outMessage.put(Annotation.class.getName(), 
+                       getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex));
+        
         if (body != null) {
             outMessage.put("BODY_INDEX", bodyIndex);
             outMessage.getInterceptorChain().add(new BodyWriter());
@@ -609,10 +612,18 @@ public class ClientProxyImpl extends AbstractClient implements
         throw new ProcessingException(errorMsg.toString());
     }
     
+    protected static Annotation[] getMethodAnnotations(Method aMethod, int bodyIndex) {
+        return aMethod == null || bodyIndex == -1 ? new Annotation[0] 
+            : aMethod.getParameterAnnotations()[bodyIndex];
+    }
+    
     private class BodyWriter extends AbstractBodyWriter {
         
-        protected void doWriteBody(Message outMessage, Object body, 
-                                 OutputStream os) throws Fault {
+        protected void doWriteBody(Message outMessage, 
+                                   Object body,
+                                   Type bodyType,
+                                   Annotation[] customAnns,
+                                   OutputStream os) throws Fault {
             
             
             OperationResourceInfo ori = outMessage.getContent(OperationResourceInfo.class);
@@ -622,17 +633,26 @@ public class ClientProxyImpl extends AbstractClient implements
             
             Method method = ori.getMethodToInvoke();
             int bodyIndex = (Integer)outMessage.get("BODY_INDEX");
-            Method aMethod = ori.getAnnotatedMethod();
-            Annotation[] anns = aMethod == null || bodyIndex == -1 ? new Annotation[0] 
-                                                  : aMethod.getParameterAnnotations()[bodyIndex];
+            
+            Annotation[] anns = customAnns != null ? customAnns
+                : getMethodAnnotations(ori.getAnnotatedMethod(), bodyIndex);
             try {
                 if (bodyIndex != -1) {
+                    Class<?> paramClass = method.getParameterTypes()[bodyIndex];
+                    Class<?> bodyClass = 
+                        paramClass.isAssignableFrom(body.getClass()) ? paramClass : body.getClass();
                     Type paramType = method.getGenericParameterTypes()[bodyIndex];
-                    
-                    writeBody(body, outMessage, body.getClass(), paramType,
+                    if (bodyType != null) {
+                        paramType = bodyType;
+                    }
+                    writeBody(body, outMessage, bodyClass, paramType,
                               anns, os);
                 } else {
-                    writeBody(body, outMessage, body.getClass(), body.getClass(), 
+                    Type paramType = body.getClass();
+                    if (bodyType != null) {
+                        paramType = bodyType;
+                    }
+                    writeBody(body, outMessage, body.getClass(), paramType, 
                               anns, os);
                 }
             } catch (Exception ex) {
