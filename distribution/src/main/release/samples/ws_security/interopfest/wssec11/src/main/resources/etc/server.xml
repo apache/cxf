@@ -38,51 +38,5 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-<<<<<<< HEAD:distribution/src/main/release/samples/ws_security/interopfest/wssec11/src/main/resources/etc/server.xml
 
-=======
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleIt3DESEncryptionPort" 
-                  createdFromAPI="true">
-       <jaxws:outInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Encrypt"/> 
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.action.SecretKeyPasswordCallback"/>
-                        <entry key="encryptSymmetricEncryptionKey" value="false"/>
-                        <entry key="encryptionSymAlgorithm" value="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/> 
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:outInterceptors>
-       <jaxws:inInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="Encrypt"/> 
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.action.SecretKeyPasswordCallback"/>
-                        <entry key="isBSPCompliant" value="false"/>  
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:inInterceptors>
-    </jaxws:client>
-    
-    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItUsernameTokenPort" 
-                  createdFromAPI="true">
-       <jaxws:outInterceptors>
-           <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-               <constructor-arg>
-                   <map>
-                        <entry key="action" value="UsernameToken"/> 
-                        <entry key="passwordCallbackClass" value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
-                        <entry key="user" value="Alice"/>
-                   </map>
-               </constructor-arg>
-           </bean>
-       </jaxws:outInterceptors>
-    </jaxws:client>
-    
->>>>>>> bb22790... Merged revisions 1462037 via  git cherry-pick from:systests/ws-security/src/test/resources/org/apache/cxf/systest/ws/action/client/client.xml
 </beans>
