@@ -21,6 +21,9 @@ package $expClass.PackageName;
 import javax.annotation.Generated;
 #end
 import javax.xml.ws.WebFault;
+#foreach ($import in $expClass.Imports)
+import ${import};
+#end
 
 
 /**

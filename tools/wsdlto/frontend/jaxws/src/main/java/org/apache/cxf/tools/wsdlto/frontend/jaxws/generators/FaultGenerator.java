@@ -132,7 +132,10 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                     exceptionSuperclassString = exceptionSuperclass;
                 }
                 setAttributes("exceptionSuperclass", exceptionSuperclassString);
-
+                if (!exceptionSuperclass.startsWith("java.lang.")
+                    && !exceptionSuperclassString.equals(exceptionSuperclass)) {
+                    expClz.addImport(exceptionSuperclass);
+                }
                 setCommonAttributes();
                 doWrite(FAULT_TEMPLATE, parseOutputName(expClz.getPackageName(),
                         expClz.getName()));
