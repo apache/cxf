@@ -125,10 +125,28 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         ht.setScopes(new ScopesType());
         ht.setMetadataVersion(1);
         
-        QName sn = ServiceModelUtil.getServiceQName(server.getEndpoint().getEndpointInfo());
-        ht.getTypes().add(sn);
+
+        Object o = server.getEndpoint().get("ws-discovery-types");
+        if (o instanceof QName) {
+            ht.getTypes().add((QName)o);
+        } else if (o instanceof List) {
+            for (Object o2: (List<?>)o) {
+                if (o2 instanceof QName) {
+                    ht.getTypes().add((QName)o2);
+                } else if (o2 instanceof String) {
+                    ht.getTypes().add(QName.valueOf((String)o2));
+                }
+            }
+        } else if (o instanceof String) {
+            ht.getTypes().add(QName.valueOf((String)o));
+        } 
+        if (ht.getTypes().isEmpty()) {
+            QName sn = ServiceModelUtil.getServiceQName(server.getEndpoint().getEndpointInfo());
+            ht.getTypes().add(sn);
+        }
+
         
-        Object o = server.getEndpoint().get("ws-discovery-scopes");
+        o = server.getEndpoint().get("ws-discovery-scopes");
         if (o != null) {
             setScopes(ht, o);
         }
