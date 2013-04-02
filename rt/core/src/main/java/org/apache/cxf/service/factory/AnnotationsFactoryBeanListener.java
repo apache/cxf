@@ -281,7 +281,16 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
     private void addFastInfosetSupport(InterceptorProvider provider, FastInfoset annotation) {
         if (annotation != null) {
             FIStaxInInterceptor in = new FIStaxInInterceptor();
+
             FIStaxOutInterceptor out = new FIStaxOutInterceptor(annotation.force());
+            out.setSerializerAttributeValueMapMemoryLimit(annotation.serializerAttributeValueMapMemoryLimit());
+            out.setSerializerMinAttributeValueSize(annotation.serializerMinAttributeValueSize());
+            out.setSerializerMaxAttributeValueSize(annotation.serializerMaxAttributeValueSize());
+            out.setSerializerCharacterContentChunkMapMemoryLimit(
+                    annotation.serializerCharacterContentChunkMapMemoryLimit());
+            out.setSerializerMinCharacterContentChunkSize(annotation.serializerMinCharacterContentChunkSize());
+            out.setSerializerMaxCharacterContentChunkSize(annotation.serializerMaxCharacterContentChunkSize());
+
             provider.getInInterceptors().add(in);
             provider.getInFaultInterceptors().add(in);
             provider.getOutInterceptors().add(out);

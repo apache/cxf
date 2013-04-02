@@ -32,6 +32,51 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface FastInfoset {
+    /**
+     * Set to true in order for FastInfoset to be always used without negotiation
+     */
     boolean force() default false;
+
+    /**
+     * Sets the property <code>attributeValueMapMemoryLimit</code> on FastInfoset StAX Serializers. The property
+     * controls attribute value map size and can be used to control the memory and (indirectly) CPU footprint of
+     * processing.
+     */
+    int serializerAttributeValueMapMemoryLimit() default -1;
+
+    /**
+     * Sets the property <code>minAttributeValueSize</code> on FastInfoset StAX Serializers. The property controls the
+     * <b>minimum</b> size of attribute values to be indexed.
+     */
+    int serializerMinAttributeValueSize() default -1;
+
+    /**
+     * Sets the property <code>maxAttributeValueSize</code> on FastInfoset StAX Serializers. The property controls the
+     * <b>maximum</b> size of attribute values to be indexed. Tests have shown that setting this property to lower
+     * values reduces CPU burden of processing, at the expense of larger sizes of resultant encoded Fast Infoset data.
+     */
+    int serializerMaxAttributeValueSize() default -1;
+
+    /**
+     * Sets the property <code>characterContentChunkMapMemoryLimit</code> on FastInfoset StAX Serializers. The property
+     * controls character content chunk map size and can be used to control the memory and (indirectly) CPU footprint of
+     * processing.
+     */
+    int serializerCharacterContentChunkMapMemoryLimit() default -1;
+
+    /**
+     * Sets the property <code>minCharacterContentChunkSize</code> on FastInfoset StAX Serializers. The property
+     * controls the <b>minimum</b> size of character content chunks to be indexed.
+     */
+    int serializerMinCharacterContentChunkSize() default -1;
+
+    /**
+     * Sets the property <code>maxCharacterContentChunkSize</code> on FastInfoset StAX Serializers. The property
+     * controls the <b>maximum</b> size of character content chunks to be indexed. Tests have shown that setting this
+     * property to lower values reduces CPU burden of processing, at the expense of larger sizes of resultant encoded
+     * Fast Infoset data.
+     */
+    int serializerMaxCharacterContentChunkSize() default -1;
+    
 }
 
