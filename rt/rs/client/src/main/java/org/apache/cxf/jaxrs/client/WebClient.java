@@ -1070,7 +1070,7 @@ public class WebClient extends AbstractClient {
                     entity = currentResponse.getEntity();
                 }
             }
-            rb = Response.fromResponse(currentResponse);
+            rb = JAXRSUtils.fromResponse(currentResponse);
             
             rb.entity(entity instanceof Response 
                       ? ((Response)entity).getEntity() : entity);

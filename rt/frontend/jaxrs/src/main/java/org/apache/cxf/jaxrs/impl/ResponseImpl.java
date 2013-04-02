@@ -85,6 +85,10 @@ public final class ResponseImpl extends Response {
         this.entityAnnotations = anns;
     }
     
+    public void setEntityAnnotations(Annotation[] anns) { 
+        this.entityAnnotations = anns;
+    }
+    
     public Annotation[] getEntityAnnotations() {
         return entityAnnotations;
     }
