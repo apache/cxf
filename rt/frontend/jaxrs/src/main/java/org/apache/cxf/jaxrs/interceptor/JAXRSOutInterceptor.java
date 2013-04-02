@@ -160,6 +160,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                   OperationResourceInfo ori,
                                   boolean firstTry) {
         
+        response = JAXRSUtils.copyResponseIfNeeded(response);
+        
         final Exchange exchange = message.getExchange();
         
         Object entity = response.getEntity();

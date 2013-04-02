@@ -90,6 +90,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
 
+
+    @Test
+    public void testGetCustomBookResponse() {
+        String address = "http://localhost:" + PORT + "/bookstore/customresponse";
+        WebClient wc = WebClient.create(address);
+        Response r = wc.accept("application/xml").get(Response.class);
+        Book book = r.readEntity(Book.class);
+        assertEquals(222L, book.getId());
+        assertEquals("OK", r.getHeaderString("customresponse"));
+    }
     
     @Test
     public void testGetCustomBookText() {

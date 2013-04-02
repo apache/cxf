@@ -323,11 +323,11 @@ public abstract class AbstractClient implements Client, Retryable {
     protected ResponseBuilder setResponseBuilder(Message outMessage, Exchange exchange) throws Exception {
         Response response = exchange.get(Response.class);
         if (response != null) {
-            return Response.fromResponse(response);
+            return JAXRSUtils.fromResponse(JAXRSUtils.copyResponseIfNeeded(response));
         }
         
         Integer status = getResponseCode(exchange);
-        ResponseBuilder currentResponseBuilder = Response.status(status);
+        ResponseBuilder currentResponseBuilder = JAXRSUtils.toResponseBuilder(status);
         
         Message responseMessage = exchange.getInMessage() != null 
             ? exchange.getInMessage() : exchange.getInFaultMessage();

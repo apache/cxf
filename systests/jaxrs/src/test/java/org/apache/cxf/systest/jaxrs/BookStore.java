@@ -1148,6 +1148,14 @@ public class BookStore {
         return this;
     }
     
+    @Path("/customresponse")
+    @GET
+    @Produces("application/xml")
+    public Response getCustomBook() {
+        return new CustomResponse(
+            Response.ok().entity(new Book("Book", 222L)).header("customresponse", "OK").build());
+    }
+    
     @POST
     @Path("/booksecho2")
     @Consumes("text/plain")

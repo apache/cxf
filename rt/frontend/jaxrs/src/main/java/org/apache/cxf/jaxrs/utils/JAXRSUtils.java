@@ -96,6 +96,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
@@ -117,6 +118,8 @@ import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
+import org.apache.cxf.jaxrs.impl.ResponseBuilderImpl;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorContextImpl;
@@ -1536,6 +1539,57 @@ public final class JAXRSUtils {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, m);
                 filter.getProvider().filter(requestContext, responseContext);
             }
+        }
+    }
+    
+    public static Response toResponse(int status) {
+        return toResponseBuilder(status).build();
+    }
+    
+    public static Response toResponse(Response.Status status) {
+        return toResponse(status.getStatusCode());
+    }
+    
+    public static ResponseBuilder toResponseBuilder(int status) {
+        return new ResponseBuilderImpl().status(status);
+    }
+    
+    public static ResponseBuilder toResponseBuilder(Response.Status status) {
+        return toResponseBuilder(status.getStatusCode());
+    }
+    
+    public static ResponseBuilder fromResponse(Response response) {
+        ResponseBuilder rb = toResponseBuilder(response.getStatus());
+        rb.entity(response.getEntity());
+        for (Map.Entry<String, List<Object>> entry : response.getHeaders().entrySet()) {
+            List<Object> values = entry.getValue();
+            for (Object value : values) {
+                rb.header(entry.getKey(), value);
+            }
+        }
+        return rb;
+    }
+
+    public static Response copyResponseIfNeeded(Response response) {
+        if (!(response instanceof ResponseImpl)) {
+            Response r = fromResponse(response).build();
+            Field[] declaredFields = ReflectionUtil.getDeclaredFields(response.getClass());
+            for (Field f : declaredFields) {
+                Class<?> declClass = f.getType();
+                if (declClass == Annotation[].class) {
+                    try {
+                        Annotation[] fieldAnnotations = 
+                            ReflectionUtil.accessDeclaredField(f, response, Annotation[].class);
+                        ((ResponseImpl)r).setEntityAnnotations(fieldAnnotations);
+                    } catch (Throwable ex) {
+                        LOG.warning("Custom annotations if any may can not be copied");
+                    }
+                    break;
+                }
+            }
+            return r;
+        } else {
+            return response;
         }
     }
 }

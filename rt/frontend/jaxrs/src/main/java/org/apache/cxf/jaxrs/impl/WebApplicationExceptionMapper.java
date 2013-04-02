@@ -23,12 +23,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -72,7 +74,8 @@ public class WebApplicationExceptionMapper
         }
         
         if (doAddMessage) {
-            r = Response.fromResponse(r).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();
+            r = JAXRSUtils.copyResponseIfNeeded(r);
+            r = JAXRSUtils.fromResponse(r).entity(errorMessage).type(MediaType.TEXT_PLAIN).build();
         }
         return r;
     }
