@@ -37,6 +37,7 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
@@ -163,7 +164,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             );
         } else if (parameter instanceof Element) {
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper((Element)parameter);
-            SAMLTokenPrincipal principal = new SAMLTokenPrincipal(wrapper);
+            SAMLTokenPrincipal principal = new SAMLTokenPrincipalImpl(wrapper);
             parameterBean.setAttributeValues(Collections.singletonList(principal.getName()));
         }
 

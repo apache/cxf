@@ -21,8 +21,9 @@ package org.apache.cxf.ws.security.wss4j;
 import java.security.Principal;
 
 import org.apache.cxf.common.security.UsernameToken;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.message.Message;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 
 public final class WSS4JTokenConverter {
 
@@ -31,14 +32,18 @@ public final class WSS4JTokenConverter {
     }
     
     public static void convertToken(Message msg, Principal p) {
-        if (p instanceof WSUsernameTokenPrincipal) {
-            WSUsernameTokenPrincipal utp = (WSUsernameTokenPrincipal)p;
+        if (p instanceof UsernameTokenPrincipal) {
+            UsernameTokenPrincipal utp = (UsernameTokenPrincipal)p;
+            String nonce = null;
+            if (utp.getNonce() != null) {
+                nonce = Base64Utility.encode(utp.getNonce());
+            }
             msg.put(org.apache.cxf.common.security.SecurityToken.class, 
                     new UsernameToken(utp.getName(),
                                       utp.getPassword(),
                                       utp.getPasswordType(),
                                       utp.isPasswordDigest(),
-                                      utp.getNonce(),
+                                      nonce,
                                       utp.getCreatedTime()));
             
         }

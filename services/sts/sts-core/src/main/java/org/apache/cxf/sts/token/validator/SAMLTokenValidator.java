@@ -44,6 +44,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -145,7 +146,7 @@ public class SAMLTokenValidator implements TokenValidator {
             Element validateTargetElement = (Element)validateTarget.getToken();
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(validateTargetElement);
             
-            SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipal(assertion);
+            SAMLTokenPrincipal samlPrincipal = new SAMLTokenPrincipalImpl(assertion);
             response.setPrincipal(samlPrincipal);
             
             SecurityToken secToken = null;

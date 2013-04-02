@@ -50,7 +50,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
+import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -58,6 +58,8 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * This class validates a wsse UsernameToken.
@@ -227,6 +229,8 @@ public class UsernameTokenValidator implements TokenValidator {
             validateTarget.setState(STATE.VALID);
         } catch (WSSecurityException ex) {
             LOG.log(Level.WARNING, "", ex);
+        } catch (Base64DecodingException ex) {
+            LOG.log(Level.WARNING, "", ex);
         }
         
         return response;
@@ -234,6 +238,7 @@ public class UsernameTokenValidator implements TokenValidator {
     
     /**
      * Create a principal based on the authenticated UsernameToken.
+     * @throws Base64DecodingException 
      */
     private Principal createPrincipal(
         String username,
@@ -241,13 +246,13 @@ public class UsernameTokenValidator implements TokenValidator {
         String passwordType,
         String nonce,
         String createdTime
-    ) {
+    ) throws Base64DecodingException {
         boolean hashed = false;
         if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
         }
-        WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(username, hashed);
-        principal.setNonce(nonce);
+        WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(username, hashed);
+        principal.setNonce(Base64.decode(nonce));
         principal.setPassword(passwordValue);
         principal.setCreatedTime(createdTime);
         principal.setPasswordType(passwordType);

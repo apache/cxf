@@ -56,7 +56,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.wss4j.common.principal.WSUsernameTokenPrincipal;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -243,9 +243,9 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         
         final Principal p1 = (Principal)protectionResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         final Principal p2 = (Principal)protectionResults.get(1).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-        assertTrue(p1 instanceof WSUsernameTokenPrincipal || p2 instanceof WSUsernameTokenPrincipal);
+        assertTrue(p1 instanceof UsernameTokenPrincipal || p2 instanceof UsernameTokenPrincipal);
         
-        Principal utPrincipal = p1 instanceof WSUsernameTokenPrincipal ? p1 : p2;
+        Principal utPrincipal = p1 instanceof UsernameTokenPrincipal ? p1 : p2;
         
         Principal secContextPrincipal = (Principal)inmsg.get(WSS4JInInterceptor.PRINCIPAL_RESULT);
         assertSame(secContextPrincipal, utPrincipal);
