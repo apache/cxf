@@ -53,6 +53,7 @@ import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
+import org.apache.wss4j.policy.builders.BootstrapPolicyBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedElementsBuilder;
 import org.apache.wss4j.policy.builders.EncryptedPartsBuilder;
@@ -130,6 +131,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new SamlTokenBuilder());
         reg.registerBuilder(new KerberosTokenBuilder());
         reg.registerBuilder(new SecureConversationTokenBuilder());
+        reg.registerBuilder(new BootstrapPolicyBuilder());
         reg.registerBuilder(new SecurityContextTokenBuilder());
         reg.registerBuilder(new SignedElementsBuilder());
         reg.registerBuilder(new SignedPartsBuilder());
@@ -145,16 +147,6 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new WSS10Builder());
         reg.registerBuilder(new WSS11Builder());
         reg.registerBuilder(new X509TokenBuilder());
-
-        //This is for the assertions that would contain nested policies
-        reg.registerBuilder(new XMLPrimitiveAssertionBuilder() {
-            public QName[] getKnownElements() {
-                return new QName[] {
-                    //SecureConversation
-                    SP12Constants.BOOTSTRAP_POLICY, SP11Constants.BOOTSTRAP_POLICY,                                    
-                };
-            }
-        });
         
         //add generic assertions for these known things to prevent warnings
         List<QName> others = Arrays.asList(new QName[] {

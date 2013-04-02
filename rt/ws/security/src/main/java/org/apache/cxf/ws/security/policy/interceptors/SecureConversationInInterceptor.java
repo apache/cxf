@@ -103,7 +103,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 //client side should be checked on the way out
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
-                }      
+                }
+                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
                 
                 Object s = message.getContextualProperty(SecurityConstants.STS_TOKEN_DO_CANCEL);
                 if (s != null && (Boolean.TRUE.equals(s) || "true".equalsIgnoreCase(s.toString()))) {
@@ -130,7 +131,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
                 SecureConversationToken tok = (SecureConversationToken)ais.iterator()
                     .next().getAssertion();
-                Policy pol = tok.getBootstrapPolicy();
+                Policy pol = tok.getBootstrapPolicy().getPolicy();
                 if (s.endsWith("Cancel") || s.endsWith("/Renew")) {
                     //Cancel and Renew just sign with the token
                     Policy p = new Policy();

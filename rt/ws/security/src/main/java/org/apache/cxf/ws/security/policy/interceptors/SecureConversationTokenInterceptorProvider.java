@@ -68,7 +68,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             boolean endorse) {
         client.setTrust(NegotiationUtils.getTrust10(aim));
         client.setTrust(NegotiationUtils.getTrust13(aim));
-        Policy pol = itok.getBootstrapPolicy();
+        Policy pol = itok.getBootstrapPolicy().getPolicy();
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
         p.addPolicyComponent(ea);
