@@ -41,6 +41,8 @@
             org.apache.cxf.*,
         </cxf.osgi.export>
         <cxf.osgi.import>
+            com.ctc.wstx.stax*;resolution:=optional,
+            org.codehaus.stax2*;resolution:=optional,
             com.sun*;resolution:=optional,
             org.slf4j*;resolution:=optional;version="${cxf.osgi.slf4j.version}",
             org.apache.log4j*;resolution:=optional,
