@@ -77,6 +77,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -1201,6 +1202,8 @@ public final class JAXRSUtils {
                                                      is, 
                                                      type,
                                                      m);    
+                } catch (NoContentException e) {
+                    throw new BadRequestException(e);
                 } catch (IOException e) {
                     throw e;
                 } catch (WebApplicationException ex) {

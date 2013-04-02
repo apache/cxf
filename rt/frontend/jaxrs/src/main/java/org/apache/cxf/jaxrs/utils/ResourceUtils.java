@@ -673,6 +673,10 @@ public final class ResourceUtils {
         for (Map.Entry<Class<?>, ResourceProvider> entry : map.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
+        Map<String, Object> appProps = app.getProperties();
+        if (appProps != null) {
+            bean.getProperties(true).putAll(appProps);
+        }
         bean.setApplication(app);
         
         return bean;

@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.NotFoundException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -53,6 +52,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.FactoryBeanListener;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -311,7 +311,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                 new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
                                                        BUNDLE);
             LOG.severe(msg.toString());
-            throw new NotFoundException();
+            throw new ServiceConstructionException(msg);
         }
     }
     

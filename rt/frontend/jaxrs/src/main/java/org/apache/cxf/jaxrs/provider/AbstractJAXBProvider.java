@@ -43,6 +43,7 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -218,10 +219,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         jaxbElementClassMap = map;
     }
     
-    protected void reportEmptyContentLength() {
+    protected void reportEmptyContentLength() throws NoContentException {
         String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
         LOG.warning(message);
-        throw new BadRequestException();
+        throw new NoContentException(message);
     }
     
     protected <X> X getStreamHandlerFromCurrentMessage(Class<X> staxCls) {
