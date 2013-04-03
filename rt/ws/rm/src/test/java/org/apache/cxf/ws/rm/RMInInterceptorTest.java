@@ -342,6 +342,8 @@ public class RMInInterceptorTest extends Assert {
     @Test
     public void testProcessInvalidMessageOnFault() throws SequenceFault, RMException {
         interceptor = new RMInInterceptor();
+        manager = control.createMock(RMManager.class);
+        interceptor.setManager(manager);
         
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
