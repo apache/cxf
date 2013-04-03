@@ -140,7 +140,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private List<URI> externalSchemaLinks;
     private Map<String, List<String>> externalQnamesMap;
     
-    private ConcurrentHashMap<String, String> schemaLocationMap = 
+    private ConcurrentHashMap<String, String> docLocationMap = 
         new ConcurrentHashMap<String, String>();
         
     private ElementQNameResolver resolver;
@@ -180,13 +180,13 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         UriInfo ui = context.getUriInfo();
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
-            if (!schemaLocationMap.isEmpty()) {
+            if (!docLocationMap.isEmpty()) {
                 String path = ui.getPath(false);
                 if (path.startsWith("/") && path.length() > 0) {
                     path = path.substring(1);
                 }
-                if (schemaLocationMap.containsKey(path)) {
-                    context.abortWith(getExistingSchema(m, ui, path));
+                if (docLocationMap.containsKey(path)) {
+                    context.abortWith(getExistingResource(m, ui, path));
                 }
             }
             return;
@@ -887,15 +887,21 @@ public class WadlGenerator implements ContainerRequestFilter {
                                                                                 WadlGenerator.WADL_NS, 
                                                                                 "grammars");
                         if (grammarEls.size() == 1) {
-                            handleSchemaRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), 
+                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), 
                                 WadlGenerator.WADL_NS, "include"), "href", loc, "", m, ui);
                         }
                         
-                        List<Element> resourceEls = DOMUtils.getChildrenWithName(appEl, 
+                        List<Element> resourcesEls = DOMUtils.getChildrenWithName(appEl, 
                                                                                  WadlGenerator.WADL_NS, 
                                                                                  "resources");
-                        if (resourceEls.size() == 1) {
-                            DOMUtils.setAttribute(resourceEls.get(0), "base", getBaseURI(m, ui));
+                        if (resourcesEls.size() == 1) {
+                            DOMUtils.setAttribute(resourcesEls.get(0), "base", getBaseURI(m, ui));
+                            
+                            List<Element> resourceEls = DOMUtils.getChildrenWithName(resourcesEls.get(0), 
+                                                                                     WadlGenerator.WADL_NS, 
+                                                                                     "resource");
+                            handleExistingDocRefs(resourceEls, "type", loc, "", m, ui);
+                            
                             return Response.ok().type(mt).entity(new DOMSource(appEl)).build();
                         }
                         
@@ -909,18 +915,34 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
     
     //TODO: deal with caching later on
-    public Response getExistingSchema(Message m, UriInfo ui, String href) {
-        String loc = schemaLocationMap.get(href);
+    public Response getExistingResource(Message m, UriInfo ui, String href) {
+        String loc = docLocationMap.get(href);
         Endpoint ep = m.getExchange().get(Endpoint.class);
         if (ep != null && loc != null) {
             try {
+                int fragmentIndex = loc.lastIndexOf("#");
+                if (fragmentIndex != -1) {
+                    loc = loc.substring(0, fragmentIndex);
+                }
                 InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
                 if (is != null) {
                     Element docEl = DOMUtils.readXml(is).getDocumentElement();
-                    handleSchemaRefs(DOMUtils.getChildrenWithName(docEl, 
-                        XmlSchemaConstants.XSD_NAMESPACE_URI, "import"), "schemaLocation", loc, href, m, ui);
-                    handleSchemaRefs(DOMUtils.getChildrenWithName(docEl, 
-                        XmlSchemaConstants.XSD_NAMESPACE_URI, "include"), "schemaLocation", loc, href, m, ui);
+                    if (fragmentIndex != -1) {
+                        List<Element> grammarEls = DOMUtils.getChildrenWithName(docEl, 
+                                                                                WadlGenerator.WADL_NS, 
+                                                                                "grammars");
+                        if (grammarEls.size() == 1) {
+                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), 
+                                WadlGenerator.WADL_NS, "include"), "href", loc, href, m, ui);
+                        }
+                    } else {
+                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl, 
+                            XmlSchemaConstants.XSD_NAMESPACE_URI, "import"), "schemaLocation", loc, href, m, ui);
+                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl, 
+                            XmlSchemaConstants.XSD_NAMESPACE_URI, "include"), "schemaLocation", loc, href, m, ui);
+                    }
+                    
+                    
                     return Response.ok().type(MediaType.APPLICATION_XML_TYPE).entity(
                         new DOMSource(docEl)).build();
                 }
@@ -932,7 +954,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         return null;
     }
 
-    private void handleSchemaRefs(List<Element> schemaRefEls, String attrName, 
+    private void handleExistingDocRefs(List<Element> elements, String attrName, 
                                   String parentDocLoc, String parentRef, Message m, UriInfo ui) {
         int index = parentDocLoc.lastIndexOf('/');
         parentDocLoc = index == -1 ? parentDocLoc : parentDocLoc.substring(0, index + 1);
@@ -940,13 +962,25 @@ public class WadlGenerator implements ContainerRequestFilter {
         index = parentRef.lastIndexOf('/');
         parentRef = index == -1 ? "" : parentRef.substring(0, index + 1);    
         
-        for (Element schemaRefEl : schemaRefEls) {
-            String href = schemaRefEl.getAttribute(attrName);
-            if (!StringUtils.isEmpty(href)) {
+        for (Element element : elements) {
+            String href = element.getAttribute(attrName);
+            String originalRef = href;
+            if (!StringUtils.isEmpty(href) && !href.startsWith("#")) {
+                int fragmentIndex = href.lastIndexOf("#");
+                String fragment = null;
+                if (fragmentIndex != -1) {
+                    fragment = href.substring(fragmentIndex + 1);
+                    href = href.substring(0, fragmentIndex);
+                }
+                
                 String actualRef = parentRef + href;
-                schemaLocationMap.put(actualRef, parentDocLoc + href);   
-                URI schemaURI = UriBuilder.fromUri(getBaseURI(m, ui)).path(actualRef).build();
-                DOMUtils.setAttribute(schemaRefEl, attrName, schemaURI.toString());
+                docLocationMap.put(actualRef, parentDocLoc + originalRef);
+                if (fragment != null) {
+                    docLocationMap.put(parentRef + originalRef, parentDocLoc + originalRef);
+                }
+                UriBuilder ub = UriBuilder.fromUri(getBaseURI(m, ui)).path(actualRef).fragment(fragment);
+                URI schemaURI = ub.build();
+                DOMUtils.setAttribute(element, attrName, schemaURI.toString());
             }
         }
     }
@@ -1398,7 +1432,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 if (href.startsWith("classpath:")) {
                     int index = href.lastIndexOf('/');
                     href = index == -1 ? href.substring(9) : href.substring(index + 1);
-                    schemaLocationMap.put(href, s);
+                    docLocationMap.put(href, s);
                 }
                 externalSchemaLinks.add(URI.create(href));
             } catch (Exception ex) {
