@@ -638,7 +638,7 @@ public class DestinationSequenceTest extends Assert {
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
         RMEndpoint rme = control.createMock(RMEndpoint.class);
-        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme);
+        EasyMock.expect(destination.getReliableEndpoint()).andReturn(rme).anyTimes();
         DestinationSequence.SequenceTermination st = seq.new SequenceTermination();
         st.updateInactivityTimeout(30000L);
         long lastAppMessage = System.currentTimeMillis() - 1000L;
