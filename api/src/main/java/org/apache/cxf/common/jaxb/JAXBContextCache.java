@@ -48,12 +48,52 @@ import org.apache.cxf.common.util.StringUtils;
  * 
  */
 public final class JAXBContextCache {
+    /**
+     * Return holder of the context, classes, etc...
+     * Do NOT hold onto these strongly as that can lock the JAXBContext and Set<Class> objects
+     * into memory.  It prefererred to grab the context and classes (if needed) from this object
+     * immediately after the call to getCachedContextAndSchemas and then discard it.  The
+     * main purpose of this class is to hold onto the context/set stongly until the caller 
+     * has a chance to copy those into a place where they can hold onto it strongly as
+     * needed.
+     */
     public static final class CachedContextAndSchemas {
+        private final JAXBContext context;
+        private final Set<Class<?>> classes;
+        private final WeakReference<CachedContextAndSchemasInternal> ccas;
+        private CachedContextAndSchemas(CachedContextAndSchemasInternal i) {
+            classes = i.getClasses();
+            context = i.getContext();
+            ccas = new WeakReference<CachedContextAndSchemasInternal>(i);
+        }
+        public JAXBContext getContext() {
+            return context;
+        }
+        public Set<Class<?>> getClasses() {
+            return classes;
+        }
+        public Collection<DOMSource> getSchemas() {
+            CachedContextAndSchemasInternal i = ccas.get();
+            if (i != null) {
+                return i.getSchemas();
+            }
+            return null;
+        }
+
+        public void setSchemas(Collection<DOMSource> schemas) {
+            CachedContextAndSchemasInternal i = ccas.get();
+            if (i != null) {
+                i.setSchemas(schemas);
+            }
+        }
+        
+    }
+    public static final class CachedContextAndSchemasInternal {
         private WeakReference<JAXBContext> context;
         private WeakReference<Set<Class<?>>> classes;
         private Collection<DOMSource> schemas;
 
-        CachedContextAndSchemas(JAXBContext context, Set<Class<?>> classes) {
+        CachedContextAndSchemasInternal(JAXBContext context, Set<Class<?>> classes) {
             this.context = new WeakReference<JAXBContext>(context);
             this.classes = new WeakReference<Set<Class<?>>>(classes);
         }
@@ -77,8 +117,8 @@ public final class JAXBContextCache {
         }
     } 
     
-    private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE
-        = new CacheMap<Set<Class<?>>, CachedContextAndSchemas>();
+    private static final Map<Set<Class<?>>, CachedContextAndSchemasInternal> JAXBCONTEXT_CACHE
+        = new CacheMap<Set<Class<?>>, CachedContextAndSchemasInternal>();
 
     private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
         = new CacheMap<Package, CachedClass>(); 
@@ -141,14 +181,14 @@ public final class JAXBContextCache {
         if (props != null) {
             map.putAll(props);
         }
-        CachedContextAndSchemas cachedContextAndSchemas = null;
+        CachedContextAndSchemasInternal cachedContextAndSchemas = null;
         JAXBContext context = null;
         if (typeRefs == null || typeRefs.isEmpty()) {
             synchronized (JAXBCONTEXT_CACHE) {
                 if (exact) {
                     cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
                 } else {
-                    for (Map.Entry<Set<Class<?>>, CachedContextAndSchemas> k : JAXBCONTEXT_CACHE.entrySet()) {
+                    for (Map.Entry<Set<Class<?>>, CachedContextAndSchemasInternal> k : JAXBCONTEXT_CACHE.entrySet()) {
                         Set<Class<?>> key = k.getKey();
                         if (key != null && key.containsAll(classes)) {
                             cachedContextAndSchemas = k.getValue();
@@ -162,7 +202,7 @@ public final class JAXBContextCache {
                         JAXBCONTEXT_CACHE.remove(cachedContextAndSchemas.getClasses());
                         cachedContextAndSchemas = null;
                     } else {
-                        return cachedContextAndSchemas;
+                        return new CachedContextAndSchemas(cachedContextAndSchemas);
                     }
                 }
             }
@@ -189,15 +229,18 @@ public final class JAXBContextCache {
                     throw ex;
                 }
             }
-            cachedContextAndSchemas = new CachedContextAndSchemas(context, classes);
-            synchronized (JAXBCONTEXT_CACHE) {
-                if (typeRefs == null || typeRefs.isEmpty()) {
-                    JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
-                }
+            if (context == null) {
+                throw ex;
+            }
+        }
+        cachedContextAndSchemas = new CachedContextAndSchemasInternal(context, classes);
+        synchronized (JAXBCONTEXT_CACHE) {
+            if (typeRefs == null || typeRefs.isEmpty()) {
+                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
             }
         }
 
-        return cachedContextAndSchemas;
+        return new CachedContextAndSchemas(cachedContextAndSchemas);
     }
     
     private static boolean checkObjectFactoryNamespaces(Class<?> clz) {
