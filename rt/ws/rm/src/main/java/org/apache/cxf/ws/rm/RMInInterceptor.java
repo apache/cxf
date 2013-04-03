@@ -48,14 +48,13 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     @Override
     public void handleFault(Message message) {
         message.put(MAPAggregator.class.getName(), true);
-        if (null == RMContextUtils.getProtocolVariation(message)) {
-            return;
-        }
         if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
             // revert the delivering entry from the destination sequence
             try {
                 Destination destination = getManager().getDestination(message);
-                destination.releaseDeliveringStatus(message);
+                if (destination != null) {
+                    destination.releaseDeliveringStatus(message);
+                }
             } catch (RMException e) {
                 LOG.log(Level.WARNING, "Failed to revert the delivering status");
             }
@@ -115,7 +114,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         String addrUri = maps.getNamespaceURI();
 
         ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
-        if (null == protocol) {
+        if (null == protocol && !MessageUtils.isFault(message)) {
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "WSRM_REQUIRED_EXC", LOG, rmUri, addrUri);
             LOG.log(Level.INFO, msg.toString());
