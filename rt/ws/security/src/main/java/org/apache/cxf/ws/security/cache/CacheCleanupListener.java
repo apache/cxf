@@ -29,7 +29,7 @@ import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.wss4j.dom.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCache;
 
 /**
  * 

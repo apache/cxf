@@ -18,12 +18,20 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
+import java.net.URL;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.ws.security.cache.ReplayCacheFactory;
-import org.apache.wss4j.dom.cache.ReplayCache;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCacheFactory;
 
 /**
  * Some common functionality that can be shared between the WSS4JInInterceptor and the
@@ -76,11 +84,39 @@ public final class WSS4JUtils {
                     if (info.getName() != null) {
                         cacheKey += "-" + info.getName().toString().hashCode();
                     }
-                    replayCache = replayCacheFactory.newReplayCache(cacheKey, message);
+                    URL configFile = getConfigFileURL(message);
+                    replayCache = replayCacheFactory.newReplayCache(cacheKey, configFile);
                     info.setProperty(instanceKey, replayCache);
                 }
                 return replayCache;
             }
+        }
+        return null;
+    }
+    
+    private static URL getConfigFileURL(Message message) {
+        Object o = message.getContextualProperty(SecurityConstants.CACHE_CONFIG_FILE);
+        if (o == null) {
+            o = "cxf-ehcache.xml";
+        }
+        
+        if (o instanceof String) {
+            URL url = null;
+            ResourceManager rm = message.getExchange().get(Bus.class).getExtension(ResourceManager.class);
+            url = rm.resolveResource((String)o, URL.class);
+            try {
+                if (url == null) {
+                    url = ClassLoaderUtils.getResource((String)o, ReplayCacheFactory.class);
+                }
+                if (url == null) {
+                    url = new URL((String)o);
+                }
+                return url;
+            } catch (IOException e) {
+                // Do nothing
+            }
+        } else if (o instanceof URL) {
+            return (URL)o;        
         }
         return null;
     }

@@ -37,7 +37,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.ws.security.cache.EHCacheManagerHolder;
+import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 
 /**
  * An in-memory EHCache implementation of the TokenStore interface. The default TTL is 60 minutes
@@ -59,7 +59,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
             b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
 
-        cacheManager = EHCacheManagerHolder.getCacheManager(bus, configFileURL);
+        cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
         // Cannot overflow to disk as SecurityToken Elements can't be serialized
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         cc.overflowToDisk(false); //tokens not writable
