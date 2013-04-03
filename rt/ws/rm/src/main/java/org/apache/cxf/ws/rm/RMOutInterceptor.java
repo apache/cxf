@@ -59,23 +59,27 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
     }
     
     protected void handle(Message msg) throws SequenceFault, RMException {  
-        if (isRuntimeFault(msg)) {
-            LogUtils.log(LOG, Level.WARNING, "RUNTIME_FAULT_MSG");
-            // TODO: in case of a SequenceFault need to set action
-            // to http://schemas.xmlsoap.org/ws/2004/a08/addressing/fault
-            // but: need to defer propagation of received MAPS to outbound chain first           
-            return;
-        }
-       
         AddressingProperties maps = ContextUtils.retrieveMAPs(msg, false, true,  false);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
             return;
         }
-        
-        Source source = getManager().getSource(msg);
         String rmUri = getManager().getRMNamespace(msg);
         String addrUri = getManager().getAddressingNamespace(msg);
+        if (isRuntimeFault(msg)) {
+            LogUtils.log(LOG, Level.WARNING, "RUNTIME_FAULT_MSG");
+            // in case of a SequenceFault or other WS-RM related fault, set action appropriately.
+            // the received inbound maps is available to extract some values in case if needed.
+            Throwable cause = msg.getContent(Exception.class).getCause();
+            if (cause instanceof SequenceFault || cause instanceof RMException) {
+                maps.getAction().setValue(RM11Constants.NAMESPACE_URI.equals(rmUri)
+                                          ? RM11Constants.NAMESPACE_URI + "/fault"
+                                          : addrUri + "/fault");
+            }
+            return;
+        }
+        
+        Source source = getManager().getSource(msg);
 
         ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, addrUri);
         RMContextUtils.setProtocolVariation(msg, protocol);
