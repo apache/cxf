@@ -108,7 +108,6 @@
                         <sp:SecureConversationToken
                             sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                             <wsp:Policy>
-                                <sp:RequireDerivedKeys />
                                 <sp:BootstrapPolicy>
                                     <wsp:Policy>
                                         <sp:TransportBinding>

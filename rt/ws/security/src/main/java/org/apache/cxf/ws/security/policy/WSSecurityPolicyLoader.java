@@ -52,6 +52,7 @@ import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
 import org.apache.wss4j.policy.builders.BootstrapPolicyBuilder;
 import org.apache.wss4j.policy.builders.ContentEncryptedElementsBuilder;
@@ -211,7 +212,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.MUST_NOT_SEND_RENEW,            
             
             // Backwards compatibility thing
-            new QName("http://schemas.microsoft.com/ws/2005/07/securitypolicy", "MustNotSendCancel"),
+            new QName("http://schemas.microsoft.com/ws/2005/07/securitypolicy", SPConstants.MUST_NOT_SEND_CANCEL),
             
             // SCT
             SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE,

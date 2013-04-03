@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -104,7 +106,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
                 }
-                NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+                assertPolicies(aim);
                 
                 Object s = message.getContextualProperty(SecurityConstants.STS_TOKEN_DO_CANCEL);
                 if (s != null && (Boolean.TRUE.equals(s) || "true".equalsIgnoreCase(s.toString()))) {
@@ -214,8 +216,21 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
             }
             
-            NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+            assertPolicies(aim);
         }
+    }
+    
+    private void assertPolicies(AssertionInfoMap aim) {
+        NegotiationUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
+        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_AMEND);
+        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_CANCEL);
+        NegotiationUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_RENEW);
+        QName oldCancelQName = 
+            new QName(
+                "http://schemas.microsoft.com/ws/2005/07/securitypolicy", 
+                SPConstants.MUST_NOT_SEND_CANCEL
+            );
+        NegotiationUtils.assertPolicy(aim, oldCancelQName);
     }
 
     private void unmapSecurityProps(Message message) {
