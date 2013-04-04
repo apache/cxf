@@ -47,13 +47,14 @@ import org.apache.cxf.common.util.StringUtils;
 /**
  * 
  */
-public final class JAXBContextCache {
+public final class JAXBContextCache {  
+    
     /**
      * Return holder of the context, classes, etc...
      * Do NOT hold onto these strongly as that can lock the JAXBContext and Set<Class> objects
-     * into memory.  It prefererred to grab the context and classes (if needed) from this object
+     * into memory.  It preferred to grab the context and classes (if needed) from this object
      * immediately after the call to getCachedContextAndSchemas and then discard it.  The
-     * main purpose of this class is to hold onto the context/set stongly until the caller 
+     * main purpose of this class is to hold onto the context/set strongly until the caller 
      * has a chance to copy those into a place where they can hold onto it strongly as
      * needed.
      */
@@ -88,9 +89,9 @@ public final class JAXBContextCache {
         }
         
     }
-    public static final class CachedContextAndSchemasInternal {
-        private WeakReference<JAXBContext> context;
-        private WeakReference<Set<Class<?>>> classes;
+    private static final class CachedContextAndSchemasInternal {
+        private final WeakReference<JAXBContext> context;
+        private final WeakReference<Set<Class<?>>> classes;
         private Collection<DOMSource> schemas;
 
         CachedContextAndSchemasInternal(JAXBContext context, Set<Class<?>> classes) {
@@ -104,10 +105,7 @@ public final class JAXBContextCache {
         public Set<Class<?>> getClasses() {
             return classes.get();
         }
-        public void setClasses(Set<Class<?>> cls) {
-            classes = new WeakReference<Set<Class<?>>>(cls);
-        }
-        
+
         public Collection<DOMSource> getSchemas() {
             return schemas;
         }
@@ -115,7 +113,7 @@ public final class JAXBContextCache {
         public void setSchemas(Collection<DOMSource> schemas) {
             this.schemas = schemas;
         }
-    } 
+    }   
     
     private static final Map<Set<Class<?>>, CachedContextAndSchemasInternal> JAXBCONTEXT_CACHE
         = new CacheMap<Set<Class<?>>, CachedContextAndSchemasInternal>();
