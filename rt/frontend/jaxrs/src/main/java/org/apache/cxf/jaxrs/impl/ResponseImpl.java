@@ -231,7 +231,7 @@ public final class ResponseImpl extends Response {
 
     public MediaType getMediaType() {
         String header = getHeader(HttpHeaders.CONTENT_TYPE);
-        return header == null ? null : MediaType.valueOf(header);
+        return header == null ? null : JAXRSUtils.toMediaType(header);
     }
     
     public boolean hasLink(String relation) {

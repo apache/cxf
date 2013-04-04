@@ -31,6 +31,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class WriterInterceptorMBW implements WriterInterceptor {
@@ -56,7 +57,7 @@ public class WriterInterceptorMBW implements WriterInterceptor {
         }
         MultivaluedMap<String, Object> headers = c.getHeaders();
         Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
-        MediaType mt = mtObject == null ? c.getMediaType() : MediaType.valueOf(mtObject.toString());
+        MediaType mt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
         m.put(Message.CONTENT_TYPE, mtObject.toString());
         writer.writeTo(c.getEntity(), 
                        c.getType(), 

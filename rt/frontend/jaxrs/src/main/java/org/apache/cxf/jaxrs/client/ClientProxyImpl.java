@@ -64,6 +64,7 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
@@ -329,7 +330,7 @@ public class ClientProxyImpl extends AbstractClient implements
             } else {
                 String cType = ori.getConsumeTypes().isEmpty() 
                     || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
-                    ? MediaType.APPLICATION_XML : ori.getConsumeTypes().get(0).toString();   
+                    ? MediaType.APPLICATION_XML : JAXRSUtils.mediaTypeToString(ori.getConsumeTypes().get(0));   
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, cType);
             }
         }
@@ -349,7 +350,7 @@ public class ClientProxyImpl extends AbstractClient implements
             }
             
             for (MediaType mt : accepts) {
-                headers.add(HttpHeaders.ACCEPT, mt.toString());
+                headers.add(HttpHeaders.ACCEPT, JAXRSUtils.mediaTypeToString(mt));
             }
         }
             
@@ -363,7 +364,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         List<MediaType> types = new ArrayList<MediaType>();
         for (String s : headers) {
-            types.add(MediaType.valueOf(s));
+            types.add(JAXRSUtils.toMediaType(s));
         }
         return types;
     }

@@ -24,12 +24,14 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+
 public class MultipartBody {
     
     public static final String INBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.inbound";
     public static final String OUTBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.outbound";
     
-    private static final MediaType MULTIPART_RELATED_TYPE = MediaType.valueOf("multipart/related"); 
+    private static final MediaType MULTIPART_RELATED_TYPE = JAXRSUtils.toMediaType("multipart/related"); 
     private boolean outbound;
     private List<Attachment> atts;
     private MediaType mt; 

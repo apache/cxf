@@ -272,7 +272,7 @@ public final class ProviderFactory {
                     mt = accepts.get(0);
                 }
             } else {
-                mt = MediaType.valueOf(ctProperty.toString());
+                mt = JAXRSUtils.toMediaType(ctProperty.toString());
             }
         } else {
             mt = requestHeaders.getMediaType();

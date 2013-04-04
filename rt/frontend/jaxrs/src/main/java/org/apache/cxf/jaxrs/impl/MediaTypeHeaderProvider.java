@@ -45,6 +45,11 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     
     public MediaType fromString(String mType) {
         
+        return valueOf(mType);
+    }
+
+    public static MediaType valueOf(String mType) {
+        
         if (mType == null) {
             throw new IllegalArgumentException("Media type value can not be null");
         }
@@ -84,7 +89,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                              subtype.trim().toLowerCase(), 
                              parameters);
     }
-
+    
     private static void addParameter(Map<String, String> parameters, String token) {
         int equalSign = token.indexOf('=');
         if (equalSign == -1) {
@@ -95,6 +100,10 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     }
     
     public String toString(MediaType type) {
+        return typeToString(type);
+    }
+    
+    public static String typeToString(MediaType type) {
         StringBuilder sb = new StringBuilder();
         sb.append(type.getType()).append('/').append(type.getSubtype());
         
@@ -110,7 +119,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         return sb.toString();
     }
 
-    private MediaType handleMediaTypeWithoutSubtype(String mType) {
+    private static MediaType handleMediaTypeWithoutSubtype(String mType) {
         if (mType.startsWith(MediaType.MEDIA_TYPE_WILDCARD)) {
             char next = mType.length() == 1 ? ' ' : mType.charAt(1);
             if (next == ' ' || next == ';') {
@@ -128,7 +137,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             } else {
                 mt = MediaType.WILDCARD_TYPE;
             }
-            LOG.fine("Converting a malformed media type '" + mType + "' to '" + mt.toString() + "'");
+            LOG.fine("Converting a malformed media type '" + mType + "' to '" + typeToString(mt) + "'");
             return mt;
         } else {
             throw new IllegalArgumentException("Media type separator is missing");

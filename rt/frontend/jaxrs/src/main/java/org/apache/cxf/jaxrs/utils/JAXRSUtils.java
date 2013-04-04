@@ -110,6 +110,7 @@ import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
+import org.apache.cxf.jaxrs.impl.MediaTypeHeaderProvider;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -234,7 +235,7 @@ public final class JAXRSUtils {
     public static List<MediaType> getMediaTypes(String[] values) {
         List<MediaType> supportedMimeTypes = new ArrayList<MediaType>(values.length);
         for (int i = 0; i < values.length; i++) {
-            supportedMimeTypes.add(MediaType.valueOf(values[i]));    
+            supportedMimeTypes.add(toMediaType(values[i]));    
         }
         return supportedMimeTypes;
     }
@@ -381,7 +382,7 @@ public final class JAXRSUtils {
         MediaType requestType;
         try {
             requestType = requestContentType == null
-                                ? ALL_TYPES : MediaType.valueOf(requestContentType);
+                                ? ALL_TYPES : toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
             throw new NotSupportedException(ex);
         }
@@ -411,7 +412,7 @@ public final class JAXRSUtils {
                             MediaType pMediaType = matchProduceTypes(acceptType, ori);
                             if (mMatched && cMatched && pMediaType != null) {
                                 subresourcesOnly = false;
-                                map.putSingle(Message.CONTENT_TYPE, pMediaType.toString());
+                                map.putSingle(Message.CONTENT_TYPE, mediaTypeToString(pMediaType));
                                 candidateList.put(ori, map);
                                 added = true;
                             } else {
@@ -483,7 +484,7 @@ public final class JAXRSUtils {
                                                    message.get(Message.REQUEST_URI),
                                                    path,
                                                    httpMethod,
-                                                   requestType.toString(),
+                                                   mediaTypeToString(requestType),
                                                    convertTypesToString(acceptContentTypes));
         if (!"OPTIONS".equalsIgnoreCase(httpMethod) && logNow) {
             LOG.warning(errorMsg.toString());
@@ -556,7 +557,7 @@ public final class JAXRSUtils {
     private static String convertTypesToString(List<MediaType> types) {
         StringBuilder sb = new StringBuilder();
         for (MediaType type : types) {
-            sb.append(type.toString()).append(',');
+            sb.append(mediaTypeToString(type)).append(',');
         }
         return sb.toString();
     }
@@ -699,7 +700,7 @@ public final class JAXRSUtils {
                                        parameterType,
                                        parameterAnns,
                                        is, 
-                                       MediaType.valueOf(contentType),
+                                       toMediaType(contentType),
                                        ori.getConsumeTypes(),
                                        message);
         } else if (parameter.getType() == ParameterType.CONTEXT) {
@@ -1162,7 +1163,7 @@ public final class JAXRSUtils {
                 String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
                                                        BUNDLE,
                                                        targetTypeClass.getSimpleName(),
-                                                       contentType).toString();
+                                                       mediaTypeToString(contentType)).toString();
                 LOG.warning(errorMessage);
                 throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
             }
@@ -1280,7 +1281,7 @@ public final class JAXRSUtils {
                 } else {
                     types = "";
                 }
-                acceptValues.add(MediaType.valueOf(tp));
+                acceptValues.add(toMediaType(tp));
             }
         } else {
             acceptValues.add(ALL_TYPES);
@@ -1540,6 +1541,14 @@ public final class JAXRSUtils {
                 filter.getProvider().filter(requestContext, responseContext);
             }
         }
+    }
+    
+    public static String mediaTypeToString(MediaType mt) {
+        return MediaTypeHeaderProvider.typeToString(mt);
+    }
+    
+    public static MediaType toMediaType(String value) {
+        return MediaTypeHeaderProvider.valueOf(value);
     }
     
     public static Response toResponse(int status) {
