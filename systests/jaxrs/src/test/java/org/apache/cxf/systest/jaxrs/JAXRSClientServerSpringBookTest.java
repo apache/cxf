@@ -138,7 +138,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             checkWadlResourcesInfo(address, address + "/bookstore", "/schemas/book.xsd", 2);
         assertEquals("", resources.get(0).getAttribute("type"));
         String type = resources.get(1).getAttribute("type");
-        String resourceTypeAddress = address + "/bookstoreImportResourceType.xml#bookstoreType";
+        String resourceTypeAddress = address + "/bookstoreImportResourceType.wadl#bookstoreType";
         assertEquals(resourceTypeAddress, type);
         
         checkSchemas(address, "/schemas/book.xsd", "/schemas/chapter.xsd", "include");

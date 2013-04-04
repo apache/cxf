@@ -975,9 +975,6 @@ public class WadlGenerator implements ContainerRequestFilter {
                 
                 String actualRef = parentRef + href;
                 docLocationMap.put(actualRef, parentDocLoc + originalRef);
-                if (fragment != null) {
-                    docLocationMap.put(parentRef + originalRef, parentDocLoc + originalRef);
-                }
                 UriBuilder ub = UriBuilder.fromUri(getBaseURI(m, ui)).path(actualRef).fragment(fragment);
                 URI schemaURI = ub.build();
                 DOMUtils.setAttribute(element, attrName, schemaURI.toString());

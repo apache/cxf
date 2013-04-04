@@ -35,7 +35,7 @@
      </method>
     </resource>
    </resource>
-   <resource path="/bookstore2" type="bookstoreImportResourceType.xml#bookstoreType"/>
+   <resource path="/bookstore2" type="bookstoreImportResourceType.wadl#bookstoreType"/>
    
 </resources>
 
