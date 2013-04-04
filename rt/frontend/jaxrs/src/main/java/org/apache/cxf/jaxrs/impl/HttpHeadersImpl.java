@@ -136,7 +136,7 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     public MediaType getMediaType() {
         List<String> values = getListValues(HttpHeaders.CONTENT_TYPE);
-        return values.size() == 0 ? null : MediaType.valueOf(values.get(0));
+        return values.size() == 0 ? null : JAXRSUtils.toMediaType(values.get(0));
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {

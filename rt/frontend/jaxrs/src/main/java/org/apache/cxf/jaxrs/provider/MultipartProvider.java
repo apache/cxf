@@ -64,6 +64,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -369,7 +370,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                             Class<?> cls, Type genericType,
                                             Annotation[] anns,
                                             String mimeType, int id) {
-        MediaType mt = MediaType.valueOf(mimeType);
+        MediaType mt = JAXRSUtils.toMediaType(mimeType);
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         
         MessageBodyWriter<Object> r = null;

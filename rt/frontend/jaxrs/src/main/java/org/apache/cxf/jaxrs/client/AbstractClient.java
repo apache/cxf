@@ -66,6 +66,7 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -137,7 +138,7 @@ public abstract class AbstractClient implements Client, Retryable {
      */
     public Client accept(MediaType... types) {
         for (MediaType mt : types) {
-            possiblyAddHeader(HttpHeaders.ACCEPT, mt.toString());
+            possiblyAddHeader(HttpHeaders.ACCEPT, JAXRSUtils.mediaTypeToString(mt));
         }
         return this;
     }
@@ -146,7 +147,7 @@ public abstract class AbstractClient implements Client, Retryable {
      * {@inheritDoc}
      */
     public Client type(MediaType ct) {
-        return type(ct.toString());
+        return type(JAXRSUtils.mediaTypeToString(ct));
     }
     
     /**
@@ -322,7 +323,7 @@ public abstract class AbstractClient implements Client, Retryable {
         checkClientException(exchange.getOutMessage(), exchange.getOutMessage().getContent(Exception.class));
         
         int status = (Integer)exchange.get(Message.RESPONSE_CODE);
-        ResponseBuilder currentResponseBuilder = Response.status(status);
+        ResponseBuilder currentResponseBuilder = JAXRSUtils.toResponseBuilder(status);
         
         Message responseMessage = exchange.getInMessage() != null 
             ? exchange.getInMessage() : exchange.getInFaultMessage();
@@ -386,7 +387,7 @@ public abstract class AbstractClient implements Client, Retryable {
             return;
         }
         
-        MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type")); 
+        MediaType contentType = JAXRSUtils.toMediaType(headers.getFirst("Content-Type").toString()); 
         
         MessageBodyWriter mbw = ProviderFactory.getInstance(outMessage).createMessageBodyWriter(
             cls, type, anns, contentType, outMessage);
@@ -591,7 +592,7 @@ public abstract class AbstractClient implements Client, Retryable {
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
                                                    cls,
-                                                   ct.toString());
+                                                   JAXRSUtils.mediaTypeToString(ct));
         LOG.severe(errorMsg.toString());
         throw new ClientWebApplicationException(errorMsg.toString(), cause, response);
     }
@@ -599,7 +600,7 @@ public abstract class AbstractClient implements Client, Retryable {
     private static MediaType getResponseContentType(Response r) {
         MultivaluedMap<String, Object> map = r.getMetadata();
         if (map.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            return MediaType.valueOf(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
+            return JAXRSUtils.toMediaType(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
         }
         return MediaType.WILDCARD_TYPE;
     }

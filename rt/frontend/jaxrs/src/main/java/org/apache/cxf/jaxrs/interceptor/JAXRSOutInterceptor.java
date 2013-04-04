@@ -239,9 +239,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             responseType = checkFinalContentType(responseType);
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Response content type is: " + responseType.toString());
+                LOG.fine("Response content type is: " + JAXRSUtils.mediaTypeToString(responseType));
             }
-            message.put(Message.CONTENT_TYPE, responseType.toString());
+            message.put(Message.CONTENT_TYPE, JAXRSUtils.mediaTypeToString(responseType));
             
             long size = writer.getSize(entity, targetType, genericType, annotations, responseType);
             if (size > 0) {
@@ -438,7 +438,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (mt.isWildcardType() || mt.isWildcardSubtype()) {
             return MediaType.APPLICATION_OCTET_STREAM_TYPE;
         } else if (mt.getParameters().containsKey("q")) {
-            return MediaType.valueOf(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
+            return JAXRSUtils.toMediaType(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
         } else {
             return mt;
         }
