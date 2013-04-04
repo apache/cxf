@@ -63,6 +63,7 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
@@ -362,7 +363,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         List<MediaType> types = new ArrayList<MediaType>();
         for (String s : headers) {
-            types.add(MediaType.valueOf(s));
+            types.add(JAXRSUtils.toMediaType(s));
         }
         return types;
     }

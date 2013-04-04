@@ -45,6 +45,11 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     
     public MediaType fromString(String mType) {
         
+        return valueOf(mType);
+    }
+
+    public static MediaType valueOf(String mType) {
+        
         if (mType == null) {
             throw new IllegalArgumentException("Media type value can not be null");
         }
@@ -84,7 +89,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                              subtype.trim().toLowerCase(), 
                              parameters);
     }
-
+    
     private static void addParameter(Map<String, String> parameters, String token) {
         int equalSign = token.indexOf('=');
         if (equalSign == -1) {
@@ -110,7 +115,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         return sb.toString();
     }
 
-    private MediaType handleMediaTypeWithoutSubtype(String mType) {
+    private static MediaType handleMediaTypeWithoutSubtype(String mType) {
         if (mType.startsWith(MediaType.MEDIA_TYPE_WILDCARD)) {
             char next = mType.length() == 1 ? ' ' : mType.charAt(1);
             if (next == ' ' || next == ';') {

@@ -395,7 +395,7 @@ public abstract class AbstractClient implements Client, Retryable {
         @SuppressWarnings("unchecked")
         Class<T> theClass = (Class<T>)cls;
         
-        MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type").toString()); 
+        MediaType contentType = JAXRSUtils.toMediaType(headers.getFirst("Content-Type").toString()); 
         
         List<WriterInterceptor> writers = ClientProviderFactory.getInstance(outMessage)
             .createMessageBodyWriterInterceptor(theClass, type, anns, contentType, outMessage);
@@ -721,7 +721,7 @@ public abstract class AbstractClient implements Client, Retryable {
     private static MediaType getResponseContentType(Response r) {
         MultivaluedMap<String, Object> map = r.getMetadata();
         if (map.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            return MediaType.valueOf(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
+            return JAXRSUtils.toMediaType(map.getFirst(HttpHeaders.CONTENT_TYPE).toString());
         }
         return MediaType.WILDCARD_TYPE;
     }

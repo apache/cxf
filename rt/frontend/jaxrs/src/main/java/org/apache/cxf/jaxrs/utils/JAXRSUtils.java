@@ -114,6 +114,7 @@ import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
+import org.apache.cxf.jaxrs.impl.MediaTypeHeaderProvider;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -242,7 +243,7 @@ public final class JAXRSUtils {
     public static List<MediaType> getMediaTypes(String[] values) {
         List<MediaType> supportedMimeTypes = new ArrayList<MediaType>(values.length);
         for (int i = 0; i < values.length; i++) {
-            supportedMimeTypes.add(MediaType.valueOf(values[i]));    
+            supportedMimeTypes.add(toMediaType(values[i]));    
         }
         return supportedMimeTypes;
     }
@@ -394,7 +395,7 @@ public final class JAXRSUtils {
         MediaType requestType;
         try {
             requestType = requestContentType == null
-                                ? ALL_TYPES : MediaType.valueOf(requestContentType);
+                                ? ALL_TYPES : toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
             throw new NotSupportedException(ex);
         }
@@ -750,7 +751,7 @@ public final class JAXRSUtils {
                                        parameterType,
                                        parameterAnns,
                                        is, 
-                                       MediaType.valueOf(contentType),
+                                       toMediaType(contentType),
                                        ori.getConsumeTypes(),
                                        message);
         } else if (parameter.getType() == ParameterType.CONTEXT) {
@@ -1333,7 +1334,7 @@ public final class JAXRSUtils {
                 } else {
                     types = "";
                 }
-                acceptValues.add(MediaType.valueOf(tp));
+                acceptValues.add(toMediaType(tp));
             }
         } else {
             acceptValues.add(ALL_TYPES);
@@ -1596,6 +1597,10 @@ public final class JAXRSUtils {
                 filter.getProvider().filter(requestContext, responseContext);
             }
         }
+    }
+    
+    public static MediaType toMediaType(String value) {
+        return MediaTypeHeaderProvider.valueOf(value);
     }
     
     public static Response toResponse(int status) {

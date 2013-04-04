@@ -115,7 +115,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 public class WadlGenerator implements ContainerRequestFilter {
 
     public static final String WADL_QUERY = "_wadl";
-    public static final MediaType WADL_TYPE = MediaType.valueOf("application/vnd.sun.wadl+xml");
+    public static final MediaType WADL_TYPE = JAXRSUtils.toMediaType("application/vnd.sun.wadl+xml");
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
     
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_XML_TYPE; 
@@ -1672,7 +1672,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     public void setDefaultMediaType(String mt) {
-        this.defaultMediaType = MediaType.valueOf(mt);
+        this.defaultMediaType = JAXRSUtils.toMediaType(mt);
     }
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {

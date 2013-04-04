@@ -32,6 +32,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 /**
  * This class represents an attachment; generally a multipart part. 
@@ -112,7 +113,7 @@ public class Attachment {
 
     public MediaType getContentType() {
         String value = handler != null ? handler.getContentType() : headers.getFirst("Content-Type");
-        return value == null ? MediaType.TEXT_PLAIN_TYPE : MediaType.valueOf(value);
+        return value == null ? MediaType.TEXT_PLAIN_TYPE : JAXRSUtils.toMediaType(value);
     }
 
     public DataHandler getDataHandler() {

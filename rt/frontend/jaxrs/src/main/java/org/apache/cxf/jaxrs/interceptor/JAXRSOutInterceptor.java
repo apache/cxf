@@ -226,7 +226,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         responseContentType = (String)responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
         MediaType responseMediaType = responseContentType == null ? MediaType.WILDCARD_TYPE 
-            : MediaType.valueOf(responseContentType);
+            : JAXRSUtils.toMediaType(responseContentType);
         
         Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
         Type genericType = 
@@ -389,7 +389,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (mt.isWildcardType() || mt.isWildcardSubtype() && mt.getType().equals("application")) {
             return MediaType.APPLICATION_OCTET_STREAM_TYPE;
         } else if (mt.getParameters().containsKey("q")) {
-            return MediaType.valueOf(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
+            return JAXRSUtils.toMediaType(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
         } else {
             return mt;
         }
