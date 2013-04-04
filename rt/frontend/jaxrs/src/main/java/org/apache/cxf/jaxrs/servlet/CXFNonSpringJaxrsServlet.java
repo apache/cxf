@@ -33,7 +33,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -54,12 +53,6 @@ import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
-    static { 
-        // Ensure that the correct JAX-RS implementation is loaded 
-        RuntimeDelegate runtimeDelegate = new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl(); 
-        RuntimeDelegate.setInstance(runtimeDelegate);
-    }
-    
     private static final long serialVersionUID = -8916352798780577499L;
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
