@@ -103,10 +103,18 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetWadlFromWadlLocation() throws Exception {
         String address = "http://localhost:" + PORT + "/the/generated";    
-        checkWadlResourcesInfo(address, address + "/bookstore", "/schemas/book.xsd", 1);
-    
+        List<Element> resources = 
+            checkWadlResourcesInfo(address, address + "/bookstore", "/schemas/book.xsd", 2);
+        assertEquals("", resources.get(0).getAttribute("type"));
+        String type = resources.get(1).getAttribute("type");
+        String resourceTypeAddress = address + "/bookstoreImportResourceType.wadl#bookstoreType";
+        assertEquals(resourceTypeAddress, type);
+        
         checkSchemas(address, "/schemas/book.xsd", "/schemas/chapter.xsd", "include");
         checkSchemas(address, "/schemas/chapter.xsd", null, null);
+        
+        // check resource type resource
+        checkWadlResourcesType(address, resourceTypeAddress, "/schemas/book.xsd");
     }
     
     @Test
@@ -138,7 +146,31 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         
     }
     
-    private void checkWadlResourcesInfo(String baseURI, String requestURI, 
+    private void checkWadlResourcesType(String baseURI, String requestTypeURI, String schemaRef) throws Exception {
+        WebClient client = WebClient.create(requestTypeURI);
+        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        
+        Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
+        Element root = doc.getDocumentElement();
+        assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
+        assertEquals("application", root.getLocalName());
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(root, 
+            WadlGenerator.WADL_NS, "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+            WadlGenerator.WADL_NS, "include");
+        assertEquals(1, includeEls.size());
+        String href = includeEls.get(0).getAttribute("href");
+        assertEquals(baseURI + schemaRef, href);
+        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
+            WadlGenerator.WADL_NS, "resources");
+        assertEquals(0, resourcesEls.size());
+        List<Element> resourceTypeEls = 
+            DOMUtils.getChildrenWithName(root, WadlGenerator.WADL_NS, "resource_type");
+        assertEquals(1, resourceTypeEls.size());
+    }
+    
+    private List<Element> checkWadlResourcesInfo(String baseURI, String requestURI, 
                                         String schemaRef, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
         Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
@@ -162,6 +194,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             DOMUtils.getChildrenWithName(resourcesEl, 
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(size, resourceEls.size());
+        return resourceEls;
+        
     }
     
     @Test
@@ -177,7 +211,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon%3B"; 
         WebClient client = WebClient.create(endpointAddress);
-        WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
         Book book = client.get(Book.class);
         assertEquals(333L, book.getId());
         assertEquals(";", book.getName());

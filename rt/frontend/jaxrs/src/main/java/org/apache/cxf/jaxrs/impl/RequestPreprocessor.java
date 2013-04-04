@@ -45,7 +45,8 @@ public class RequestPreprocessor {
     private static final String CTYPE_QUERY = "_ctype";
     private static final String METHOD_QUERY = "_method";
     private static final String METHOD_HEADER = "X-HTTP-Method-Override";
-    
+    private static final String SCHEMA_EXTENSION = ".xsd";
+    private static final String WADL_EXTENSION = ".wadl";     
     
     private static final Map<String, String> SHORTCUTS;
     static {
@@ -203,7 +204,8 @@ public class RequestPreprocessor {
             if (baseAddress.equals(requestURI)) {
                 return handleMetadataRequest(m);
             }
-        } else if (originalRequestURI != null && originalRequestURI.endsWith(".xsd")) {
+        } else if (originalRequestURI != null && (originalRequestURI.endsWith(SCHEMA_EXTENSION)
+            || originalRequestURI.endsWith(WADL_EXTENSION))) {
             // trying WADLGenerator which may be caching schema resources won't
             // interfere with custom schema handlers if any
             return handleMetadataRequest(m);
