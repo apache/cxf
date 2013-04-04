@@ -135,6 +135,30 @@ public class JAXRSContainerTest extends ProcessorTestBase {
         }
     }
     
+    @Test
+    public void testCodeGenWithImportedSchemaWithParentRefs() {
+        try {
+            JAXRSContainer container = new JAXRSContainer(null);
+
+            ToolContext context = new ToolContext();
+            context.put(WadlToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+            context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/sub/bookstoreImport.xml"));
+            context.put(WadlToolConstants.CFG_COMPILE, "true");
+
+            container.setContext(context);
+            container.execute();
+
+            assertNotNull(output.list());
+            
+            verifyFiles("java", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
+            verifyFiles("class", false, false, "superbooks", "org.apache.cxf.jaxrs.model.wadl", 9);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
     @Test    
     public void testCodeGenWithMultipleInlinedSchemas() {
         doTestInlinedSchemasWithImport("/wadl/bookstoreMultipleSchemas.xml");
