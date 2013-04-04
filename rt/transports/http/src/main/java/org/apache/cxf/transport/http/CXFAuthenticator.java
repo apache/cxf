@@ -38,20 +38,27 @@ import org.apache.cxf.transport.Conduit;
  * 
  */
 public class CXFAuthenticator extends Authenticator {
-    static boolean setup;
-    private static final CXFAuthenticator INSTANCE = new CXFAuthenticator();
+    static CXFAuthenticator instance;
     
     
     public CXFAuthenticator() {
     }
-
+    
     public static synchronized void addAuthenticator() { 
-        if (!setup) {
+        if (instance == null) {
+            instance = new CXFAuthenticator();
             Authenticator wrapped = null;
             for (final Field f : Authenticator.class.getDeclaredFields()) {
                 if (f.getType().equals(Authenticator.class)) {
                     ReflectionUtil.setAccessible(f);
                     try {
+                        wrapped = (Authenticator)f.get(null);
+                        if (wrapped != null 
+                            && wrapped.getClass().getName().equals(ReferencingAuthenticator.class.getName())) {
+                            Method m = wrapped.getClass().getMethod("check");
+                            m.setAccessible(true);
+                            m.invoke(wrapped);
+                        }
                         wrapped = (Authenticator)f.get(null);
                     } catch (Exception e) {
                         //ignore
@@ -60,23 +67,25 @@ public class CXFAuthenticator extends Authenticator {
             }
             
             try {
-                InputStream ins = ReferencingAuthenticator.class.getResourceAsStream("ReferencingAuthenticator.class");
-                final byte b[] = IOUtils.readBytesFromStream(ins);
                 ClassLoader loader = new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
                 Method m = ClassLoader.class.getDeclaredMethod("defineClass", String.class, 
                                                                byte[].class, Integer.TYPE, Integer.TYPE);
+                
+                InputStream ins = ReferencingAuthenticator.class
+                        .getResourceAsStream("ReferencingAuthenticator.class");
+                byte b[] = IOUtils.readBytesFromStream(ins);
+                
                 ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
                                                        b, 0, b.length);
                 Class<?> cls = loader.loadClass(ReferencingAuthenticator.class.getName());
                 Authenticator auth = (Authenticator)cls.getConstructor(Authenticator.class, Authenticator.class)
-                    .newInstance(INSTANCE, wrapped);
+                    .newInstance(instance, wrapped);
                 
                 Authenticator.setDefault(auth);
             } catch (Throwable t) {
                 //ignore
                 t.printStackTrace();
             }
-            setup = true;
         }
     }
     
