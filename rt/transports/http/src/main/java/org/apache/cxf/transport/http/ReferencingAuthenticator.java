@@ -18,7 +18,8 @@
  */
 package org.apache.cxf.transport.http;
 
-import java.lang.ref.SoftReference;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -26,14 +27,19 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
 public class ReferencingAuthenticator extends Authenticator {
-    SoftReference<Authenticator> auth;
-    Authenticator wrapped;
+    final Reference<Authenticator> auth;
+    final Authenticator wrapped;
     public ReferencingAuthenticator(Authenticator cxfauth, Authenticator wrapped) {
-        this.auth = new SoftReference<Authenticator>(cxfauth);
+        this.auth = new WeakReference<Authenticator>(cxfauth);
         this.wrapped = wrapped;
     }
+
     @Override
     protected PasswordAuthentication getPasswordAuthentication() {
+        Authenticator cxfauth = auth.get();
+        if (cxfauth == null) {
+            remove();
+        }
         PasswordAuthentication pauth = null;
         if (wrapped != null) {
             try {
@@ -45,14 +51,7 @@ public class ReferencingAuthenticator extends Authenticator {
                 pauth = null;
             }
         }
-        Authenticator cxfauth = auth.get();
-        if (cxfauth == null) {
-            try {
-                Authenticator.setDefault(wrapped);
-            } catch (Throwable t) {
-                //ignore
-            }
-        } else {
+        if (cxfauth != null) {
             try {
                 pauth = tryWith(cxfauth);
             } catch (Exception e1) {
@@ -60,7 +59,63 @@ public class ReferencingAuthenticator extends Authenticator {
             }
         }
         return pauth;
-    }  
+    }
+    
+    public final void check() {
+        Authenticator cxfauth = auth.get();
+        if (cxfauth == null) {
+            remove();
+        }
+        if (wrapped != null && wrapped.getClass().getName().equals(ReferencingAuthenticator.class.getName())) {
+            try {
+                Method m = wrapped.getClass().getMethod("check");
+                m.setAccessible(true);
+                m.invoke(wrapped);
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+    }
+    private void remove() {
+        try {
+            for (final Field f : Authenticator.class.getDeclaredFields()) {
+                if (f.getType().equals(Authenticator.class)) {
+                    try {
+                        f.setAccessible(true);
+                        Authenticator o = (Authenticator)f.get(null);
+                        if (o == this) {
+                            //this is at the root of any chain of authenticators
+                            Authenticator.setDefault(wrapped);
+                        } else {
+                            removeFromChain(o);
+                        }
+                    } catch (Exception e) {
+                        //ignore
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            //ignore
+        }
+    }
+    private void removeFromChain(Authenticator a) {
+        try {
+            if (a.getClass().getName().equals(ReferencingAuthenticator.class.getName())) {
+                //multiple referencing authenticators, we can remove ourself
+                Field f2 = a.getClass().getDeclaredField("wrapped");
+                f2.setAccessible(true);
+                Authenticator a2 = (Authenticator)f2.get(a);
+                if (a2 == this) {
+                    f2.set(a, wrapped);
+                } else {
+                    removeFromChain(a2);
+                }
+            }
+        } catch (Throwable t) {
+            //ignore
+        }
+    }
+    
     PasswordAuthentication tryWith(Authenticator a) throws Exception {
         if (a == null) {
             return null;
