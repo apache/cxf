@@ -402,10 +402,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         
         private void doSetParameters(String name, String[] values) {
             if (saveParamsAsAttributes) {
-                if (values.length == 1) {
-                    super.setAttribute(name, values[0]);
-                }
-                super.setAttribute(name + "Array", values);
+                super.setAttribute(name, values);
             } else {
                 params.put(name, values);
             }
