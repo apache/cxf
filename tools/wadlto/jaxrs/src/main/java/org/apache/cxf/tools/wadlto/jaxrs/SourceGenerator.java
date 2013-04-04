@@ -1342,7 +1342,7 @@ public class SourceGenerator {
             if (schemaURI == null) {
                 if (!URI.create(href).isAbsolute() && app.getWadlPath() != null) {
                     String baseWadlPath = getBaseWadlPath(app.getWadlPath());
-                    if  (!href.startsWith("/")) {
+                    if  (!href.startsWith("/") && !href.contains("..")) {
                         schemaURI = baseWadlPath + href;
                     } else {
                         schemaURI = URI.create(baseWadlPath).resolve(href).toString();
