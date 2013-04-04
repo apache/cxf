@@ -100,6 +100,10 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     }
     
     public String toString(MediaType type) {
+        return typeToString(type);
+    }
+    
+    public static String typeToString(MediaType type) {
         StringBuilder sb = new StringBuilder();
         sb.append(type.getType()).append('/').append(type.getSubtype());
         
@@ -133,7 +137,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             } else {
                 mt = MediaType.WILDCARD_TYPE;
             }
-            LOG.fine("Converting a malformed media type '" + mType + "' to '" + mt.toString() + "'");
+            LOG.fine("Converting a malformed media type '" + mType + "' to '" + typeToString(mt) + "'");
             return mt;
         } else {
             throw new IllegalArgumentException("Media type separator is missing");

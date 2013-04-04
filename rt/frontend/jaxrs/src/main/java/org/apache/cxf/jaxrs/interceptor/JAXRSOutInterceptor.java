@@ -237,7 +237,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             .createMessageBodyWriterInterceptor(targetType, genericType, annotations, responseMediaType, message);
         
         responseMediaType = checkFinalContentType(responseMediaType);
-        responseContentType = responseMediaType.toString();
+        responseContentType = JAXRSUtils.mediaTypeToString(responseMediaType);
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Response content type is: " + responseContentType);
         }

@@ -41,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -83,7 +84,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
 
     public ResponseBuilder type(MediaType type) {
-        return type(type == null ? null : type.toString());
+        return type(type == null ? null : JAXRSUtils.mediaTypeToString(type));
     }
 
     public ResponseBuilder type(String type) {

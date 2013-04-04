@@ -731,7 +731,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         for (MediaType mt : types) {
             
             sb.append("<representation");
-            sb.append(" mediaType=\"").append(mt.toString()).append("\"");
+            sb.append(" mediaType=\"").append(JAXRSUtils.mediaTypeToString(mt)).append("\"");
             if (isJson && !mt.getSubtype().contains("json")) {
                 sb.append("/>");
                 continue;

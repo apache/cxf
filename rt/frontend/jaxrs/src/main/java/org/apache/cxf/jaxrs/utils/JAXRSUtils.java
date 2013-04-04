@@ -443,7 +443,7 @@ public final class JAXRSUtils {
                                 MediaType pMediaType = matchProduceTypes(acceptType, ori);
                                 if (mMatched && cMatched && pMediaType != null) {
                                     subresourcesOnly = false;
-                                    map.putSingle(Message.CONTENT_TYPE, pMediaType.toString());
+                                    map.putSingle(Message.CONTENT_TYPE, mediaTypeToString(pMediaType));
                                     candidateList.put(ori, map);
                                     added = true;
                                 } else {
@@ -521,7 +521,7 @@ public final class JAXRSUtils {
                                                    message.get(Message.REQUEST_URI),
                                                    getCurrentPath(firstCri.getValue()),
                                                    httpMethod,
-                                                   requestType.toString(),
+                                                   mediaTypeToString(requestType),
                                                    convertTypesToString(acceptContentTypes));
         if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
             LOG.warning(errorMsg.toString());
@@ -608,7 +608,7 @@ public final class JAXRSUtils {
     private static String convertTypesToString(List<MediaType> types) {
         StringBuilder sb = new StringBuilder();
         for (MediaType type : types) {
-            sb.append(type.toString()).append(',');
+            sb.append(mediaTypeToString(type)).append(',');
         }
         return sb.toString();
     }
@@ -1216,7 +1216,7 @@ public final class JAXRSUtils {
                 String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
                                                        BUNDLE,
                                                        targetTypeClass.getSimpleName(),
-                                                       contentType).toString();
+                                                       mediaTypeToString(contentType)).toString();
                 LOG.warning(errorMessage);
                 throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
             }
@@ -1597,6 +1597,10 @@ public final class JAXRSUtils {
                 filter.getProvider().filter(requestContext, responseContext);
             }
         }
+    }
+    
+    public static String mediaTypeToString(MediaType mt) {
+        return MediaTypeHeaderProvider.typeToString(mt);
     }
     
     public static MediaType toMediaType(String value) {

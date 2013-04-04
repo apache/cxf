@@ -143,7 +143,7 @@ public abstract class AbstractClient implements Client, Retryable {
      */
     public Client accept(MediaType... types) {
         for (MediaType mt : types) {
-            possiblyAddHeader(HttpHeaders.ACCEPT, mt.toString());
+            possiblyAddHeader(HttpHeaders.ACCEPT, JAXRSUtils.mediaTypeToString(mt));
         }
         return this;
     }
@@ -152,7 +152,7 @@ public abstract class AbstractClient implements Client, Retryable {
      * {@inheritDoc}
      */
     public Client type(MediaType ct) {
-        return type(ct.toString());
+        return type(JAXRSUtils.mediaTypeToString(ct));
     }
     
     /**
@@ -709,7 +709,7 @@ public abstract class AbstractClient implements Client, Retryable {
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
                                                    cls,
-                                                   ct.toString());
+                                                   JAXRSUtils.mediaTypeToString(ct));
         LOG.severe(errorMsg.toString());
         if (response == null) {
             throw new ProcessingException(errorMsg.toString(), cause);
