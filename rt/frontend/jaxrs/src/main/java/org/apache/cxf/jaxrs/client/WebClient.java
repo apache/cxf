@@ -762,7 +762,7 @@ public class WebClient extends AbstractClient {
         }
         if (responseClass != null && responseClass != Response.class 
             && headers.getFirst(HttpHeaders.ACCEPT) == null) {
-            headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
+            headers.putSingle(HttpHeaders.ACCEPT, JAXRSUtils.mediaTypeToString(MediaType.APPLICATION_XML_TYPE));
         }
         resetResponse();
         Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
@@ -863,6 +863,7 @@ public class WebClient extends AbstractClient {
                     entity = currentResponse.getEntity();
                 }
             }
+            rb = JAXRSUtils.fromResponse(currentResponse);
             rb.entity(entity instanceof Response 
                       ? ((Response)entity).getEntity() : entity);
             

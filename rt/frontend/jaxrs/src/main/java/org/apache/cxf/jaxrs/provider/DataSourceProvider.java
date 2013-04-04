@@ -36,6 +36,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
 public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
@@ -82,7 +83,7 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
     private void setContentTypeIfNeeded(MediaType type, 
         MultivaluedMap<String, Object> headers, String ct) {
 
-        if (!StringUtils.isEmpty(ct) && !type.equals(MediaType.valueOf(ct))) { 
+        if (!StringUtils.isEmpty(ct) && !type.equals(JAXRSUtils.toMediaType(ct))) { 
             headers.putSingle("Content-Type", ct);
         }
     }

@@ -174,7 +174,7 @@ public final class AttachmentUtils {
     }
     
     private static void checkMediaTypes(MediaType mt1, String mt2) {
-        if (!mt1.isCompatible(MediaType.valueOf(mt2))) {                                            
+        if (!mt1.isCompatible(JAXRSUtils.toMediaType(mt2))) {                                            
             throw new WebApplicationException(415);
         }
     }

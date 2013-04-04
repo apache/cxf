@@ -46,6 +46,23 @@ public final class ReflectionUtil {
         // intentionally empty
     }
     
+    public static <T> T accessDeclaredField(final Field f, final Object o, final Class<T> responseClass) {
+        return AccessController.doPrivileged(new PrivilegedAction<T>() {
+            public T run() {
+                try {
+                    f.setAccessible(true);
+                    return responseClass.cast(f.get(o));
+                } catch (SecurityException e) {
+                    return null;
+                } catch (IllegalAccessException e) {
+                    return null;
+                } finally {
+                    f.setAccessible(false);
+                }
+            }
+        });
+    }
+    
     public static Field getDeclaredField(final Class<?> cls, final String name) {
         return AccessController.doPrivileged(new PrivilegedAction<Field>() {
             public Field run() {

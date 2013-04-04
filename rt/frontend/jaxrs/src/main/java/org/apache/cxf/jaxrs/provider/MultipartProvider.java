@@ -388,7 +388,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                             Class<T> cls, Type genericType,
                                             Annotation[] anns,
                                             String mimeType, int id) {
-        MediaType mt = MediaType.valueOf(mimeType);
+        MediaType mt = JAXRSUtils.toMediaType(mimeType);
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         
         MessageBodyWriter<T> r = null;
