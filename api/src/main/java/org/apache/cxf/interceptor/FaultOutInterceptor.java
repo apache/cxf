@@ -151,15 +151,19 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @param class1
      */
     public FaultInfo getFaultForClass(BindingOperationInfo op, Class<?> class1) {
+        FaultInfo selectedFaultInfo = null;
+        Class<?> selectedFaultInfoClass = null;
         for (BindingFaultInfo bfi : op.getFaults()) {
 
             FaultInfo faultInfo = bfi.getFaultInfo();
             Class<?> c = (Class<?>)faultInfo.getProperty(Class.class.getName());
-            if (c != null && c.isAssignableFrom(class1)) {
-                return faultInfo;
+            if (c != null && c.isAssignableFrom(class1)
+                && (selectedFaultInfo == null || selectedFaultInfoClass.isAssignableFrom(c))) {
+                selectedFaultInfo = faultInfo;
+                selectedFaultInfoClass = c;
+
             }
         }
-
-        return null;
+        return selectedFaultInfo;
     }
 }
