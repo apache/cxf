@@ -16,23 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.cxf.jaxws.service;
 
-import java.util.List;
+import javax.xml.ws.WebFault;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
 
-@WebService
-public interface HelloInterface {
-    @WebMethod
-    String sayHi(String text);
-    @WebMethod
-    List<String> getGreetings();
-    @WebMethod
-    String[] getStringArray(String[] strs);
-    @WebMethod
-    List<String> getStringList(List<String> list);
-    @WebMethod
-    String addNumbers(int arg0, int arg1) throws AddNumbersSubException, AddNumbersException;
+@WebFault
+public class AddNumbersSubException extends AddNumbersException {
+       
+    private static final long serialVersionUID = 1L;
+    
+    private String subInfo;
+    public AddNumbersSubException(String info) {
+        this.subInfo = info;
+    }
+    
+    public String getSubInfo() {
+        return subInfo;
+    }
 }

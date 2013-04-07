@@ -23,7 +23,7 @@ import javax.xml.ws.WebFault;
 @WebFault
 public class AddNumbersException extends Exception {
     private static final long serialVersionUID = 1L;
-    private String info;
+    protected String info;
 
     public AddNumbersException() {
     }
