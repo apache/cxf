@@ -47,6 +47,7 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.service.AddNumbersException;
+import org.apache.cxf.jaxws.service.AddNumbersSubException;
 import org.apache.cxf.jaxws.service.ArrayService;
 import org.apache.cxf.jaxws.service.ArrayServiceImpl;
 import org.apache.cxf.jaxws.service.Entity;
@@ -246,6 +247,15 @@ public class CodeFirstTest extends AbstractJaxWsTest {
             fail("should throw AddNumbersException");
         } catch (AddNumbersException e) {
             assertEquals(e.getInfo(), "Sum is less than 0.");
+        }
+        
+        try {   
+            proxy.addNumbers(1, 99);
+            fail("should throw AddNumbersSubException");
+        } catch (AddNumbersSubException e) {
+            assertEquals(e.getSubInfo(), "Sum is 100");
+        } catch (AddNumbersException e) {
+            fail("should throw AddNumbersSubException");
         }
 
     }
