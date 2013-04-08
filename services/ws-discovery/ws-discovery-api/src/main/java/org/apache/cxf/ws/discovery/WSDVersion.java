@@ -56,7 +56,6 @@ public abstract class WSDVersion {
     }
     
     static final class WSDVersion10 extends WSDVersion {
-        static final WSDVersion10 INSTANCE = new WSDVersion10();
 
         private WSDVersion10() {
         }
