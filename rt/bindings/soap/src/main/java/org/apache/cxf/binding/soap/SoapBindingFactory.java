@@ -475,14 +475,13 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                 Map<String, String> nsMap = message.getEnvelopeNs();
                 if (nsMap == null) {
                     nsMap = new HashMap<String, String>();
-                    message.put("soap.env.ns.map", nsMap);
+                } else {
+                    nsMap = new HashMap<String, String>(nsMap);
                 }
-                if (!nsMap.containsValue(ns)) {
+                message.put("soap.env.ns.map", nsMap);
+                if (!nsMap.containsValue(ns)
+                    && !nsMap.containsKey("wsa")) {
                     nsMap.put("wsa", ns);
-                }
-                ns = message.getExchange().getBinding().getBindingInfo().getName().getNamespaceURI();
-                if (!nsMap.containsValue(ns)) {
-                    nsMap.put("tns", ns);
                 }
                 message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION, Boolean.TRUE);
             }
