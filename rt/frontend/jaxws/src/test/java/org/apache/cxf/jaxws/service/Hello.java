@@ -70,9 +70,12 @@ public class Hello {
     }
     
     @WebMethod
-    public String addNumbers(int arg0, int arg1) throws AddNumbersException {
+    public String addNumbers(int arg0, int arg1) throws AddNumbersSubException, AddNumbersException {
         if (arg0 + arg1 < 0) {
             throw new AddNumbersException("Sum is less than 0.");
+        }
+        if (arg0 + arg1 == 100) {
+            throw new AddNumbersSubException("Sum is 100");
         }
         return "Result = " + String.valueOf(arg0 + arg1);
     }
