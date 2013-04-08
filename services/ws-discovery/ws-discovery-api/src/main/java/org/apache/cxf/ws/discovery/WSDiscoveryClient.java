@@ -40,7 +40,6 @@ import javax.xml.ws.EndpointReference;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.AddressingFeature;
-import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
@@ -50,6 +49,7 @@ import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
@@ -71,26 +71,35 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  * 
  */
 public class WSDiscoveryClient implements Closeable {
-    public static final QName SERVICE_QNAME 
-        = new QName("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01", "DiscoveryProxy");
+    
+    public static final QName SERVICE_QNAME = new QName(WSDVersion.NS_1_1, "DiscoveryProxy");
+    
+    
     
     String address = "soap.udp://239.255.255.250:3702";
     boolean adHoc = true;
     AtomicInteger msgId = new AtomicInteger(1);
     long instanceId = System.currentTimeMillis();
     JAXBContext jaxbContext;
-    Service service;
+    ServiceImpl service;
     Dispatch<Object> dispatch;
     ObjectFactory factory = new ObjectFactory();
-    Bus bus;
+    final Bus bus;
     int defaultProbeTimeout = 1000;
+    WSDVersion version = WSDVersion.INSTANCE_1_1;
     
     public WSDiscoveryClient() {
+        this((Bus)null);
     }
-    public WSDiscoveryClient(Bus bus) {
-        this.bus = bus;
+    public WSDiscoveryClient(Bus b) {
+        this.bus = b == null ? BusFactory.getThreadDefaultBus() : b;
     }
     public WSDiscoveryClient(String address) {
+        this((Bus)null);
+        resetDispatch(address);
+    }
+    public WSDiscoveryClient(Bus b, String address) {
+        this(b);
         resetDispatch(address);
     }
     
@@ -110,6 +119,11 @@ public class WSDiscoveryClient implements Closeable {
         }
     }
     
+    public void setVersion10() {
+        version =  WSDVersion.INSTANCE_1_0;
+        service = null;
+        dispatch = null;
+    }
     
     private synchronized JAXBContext getJAXBContext() {
         if (jaxbContext == null) {
@@ -121,12 +135,15 @@ public class WSDiscoveryClient implements Closeable {
         }
         return jaxbContext;
     }
-    private synchronized Service getService() {
+    private synchronized ServiceImpl getService() {
         if (service == null) {
             Bus b = BusFactory.getAndSetThreadDefaultBus(bus);
             try {
-                service = Service.create(SERVICE_QNAME);
-                service.addPort(SERVICE_QNAME, SOAPBinding.SOAP12HTTP_BINDING, address);
+                service = new ServiceImpl(bus, null,
+                                          version.getServiceName(),
+                                          Service.class);
+                service.addPort(version.getServiceName(), 
+                                version.getSoapVersion(), address);
             } finally {
                 BusFactory.setThreadDefaultBus(b);
             }
@@ -154,27 +171,31 @@ public class WSDiscoveryClient implements Closeable {
         }
     }
     
-    private synchronized Dispatch<Object> getDispatchInternal(boolean addSeq) {
+    private synchronized Dispatch<Object> getDispatchInternal(boolean addSeq, String action) {
         if (dispatch == null) {
             AddressingFeature f = new AddressingFeature(true, true);
-            dispatch = getService().createDispatch(SERVICE_QNAME, getJAXBContext(), Service.Mode.PAYLOAD, f);
+            dispatch = getService().createDispatch(version.getServiceName(), getJAXBContext(), Service.Mode.PAYLOAD, f);
             dispatch.getRequestContext().put("thread.local.request.context", Boolean.TRUE);
+            version.addVersionTransformer(dispatch);
         }
-        addAddressing(dispatch, false);
+        addAddressing(dispatch, false, action);
         return dispatch;
     }
-    private void addAddressing(BindingProvider p, boolean addSeq) {
+    private void addAddressing(BindingProvider p, boolean addSeq, String action) {
+        AddressingProperties addrProperties = new AddressingPropertiesImpl();
+        if (action != null) {
+            AttributedURIType act = new AttributedURIType();
+            act.setValue(action);
+            addrProperties.setAction(act);
+        }
         if (adHoc) {
             EndpointReferenceType to = new EndpointReferenceType();
-            AddressingProperties addrProperties = new AddressingPropertiesImpl();
+            addrProperties.exposeAs(version.getAddressingNamespace());
             AttributedURIType epr = new AttributedURIType();
-            epr.setValue("urn:docs-oasis-open-org:ws-dd:ns:discovery:2009:01");
+            epr.setValue(version.getToAddress());
             to.setAddress(epr);
             addrProperties.setTo(to);
         
-            p.getRequestContext()
-                .put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProperties);
-            
             if (addSeq) {
                 AppSequenceType s = new AppSequenceType();
                 s.setInstanceId(instanceId);
@@ -188,7 +209,10 @@ public class WSDiscoveryClient implements Closeable {
                 p.getRequestContext()
                     .put(Header.HEADER_LIST, headers);
             }
+        } else {
+            addrProperties.exposeAs(version.getAddressingNamespace());
         }
+        p.getRequestContext().put(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES, addrProperties);
     }
     
     public synchronized void close() throws IOException {
@@ -211,7 +235,7 @@ public class WSDiscoveryClient implements Closeable {
         if (hello.getEndpointReference() == null) {
             hello.setEndpointReference(generateW3CEndpointReference());
         }
-        getDispatchInternal(true).invokeOneWay(factory.createHello(hello));
+        getDispatchInternal(true, version.getHelloAction()).invokeOneWay(factory.createHello(hello));
         return hello;
     }
     
@@ -235,7 +259,7 @@ public class WSDiscoveryClient implements Closeable {
     
     
     public void unregister(ByeType bye) {
-        getDispatchInternal(true).invokeOneWay(factory.createBye(bye));
+        getDispatchInternal(true, version.getByeAction()).invokeOneWay(factory.createBye(bye));
     }
     public void unregister(HelloType hello) {
         ByeType bt = new ByeType();
@@ -273,7 +297,7 @@ public class WSDiscoveryClient implements Closeable {
         return probe(params, defaultProbeTimeout);
     }    
     public ProbeMatchesType probe(ProbeType params, int timeout) {
-        Dispatch<Object> disp = this.getDispatchInternal(false);
+        Dispatch<Object> disp = this.getDispatchInternal(false, version.getProbeAction());
         if (adHoc) {
             disp.getRequestContext().put("udp.multi.response.timeout", timeout);
             final ProbeMatchesType response = new ProbeMatchesType();
@@ -288,8 +312,9 @@ public class WSDiscoveryClient implements Closeable {
                             response.getProbeMatch().addAll(((ProbeMatchesType)o).getProbeMatch());
                         } else if (o instanceof HelloType) {
                             HelloType h = (HelloType)o;
-                            if (h.getTypes().contains(SERVICE_QNAME)
-                                || h.getTypes().contains(new QName("", SERVICE_QNAME.getLocalPart()))) {
+                            QName sn = version.getServiceName();
+                            if (h.getTypes().contains(sn)
+                                || h.getTypes().contains(new QName("", sn.getLocalPart()))) {
                                 // A DiscoveryProxy wants us to flip to managed mode
                                 resetDispatch(h.getXAddrs().get(0));
                             }

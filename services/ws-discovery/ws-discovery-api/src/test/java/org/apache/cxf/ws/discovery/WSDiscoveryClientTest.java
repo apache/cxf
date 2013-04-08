@@ -23,6 +23,9 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
@@ -42,13 +45,18 @@ public final class WSDiscoveryClientTest {
     
     public static void main(String[] arg) throws Exception {
         try {
+            Bus bus = BusFactory.getDefaultBus();
             Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
-            WSDiscoveryServiceImpl service = new WSDiscoveryServiceImpl(null);
+            WSDiscoveryServiceImpl service = new WSDiscoveryServiceImpl(bus);
             service.startup();
-            
-            
-            WSDiscoveryClient c = new WSDiscoveryClient();
             HelloType h = service.register(ep.getEndpointReference());
+
+            
+            
+            bus  = BusFactory.newInstance().createBus();
+            new LoggingFeature().initialize(bus);
+            WSDiscoveryClient c = new WSDiscoveryClient(bus);
+            //c.setVersion10();
             
             
             System.out.println("1");
