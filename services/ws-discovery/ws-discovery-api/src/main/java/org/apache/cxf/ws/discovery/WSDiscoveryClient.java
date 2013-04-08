@@ -87,7 +87,7 @@ public class WSDiscoveryClient implements Closeable {
     final Bus bus;
     int defaultProbeTimeout = 1000;
     WSDVersion version = WSDVersion.INSTANCE_1_1;
-    
+
     public WSDiscoveryClient() {
         this((Bus)null);
     }
