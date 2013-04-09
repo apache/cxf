@@ -31,6 +31,7 @@ import org.apache.cxf.ws.discovery.wsdl.HelloType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchesType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeType;
+import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 
 
 /**
@@ -56,11 +57,14 @@ public final class WSDiscoveryClientTest {
             bus  = BusFactory.newInstance().createBus();
             new LoggingFeature().initialize(bus);
             WSDiscoveryClient c = new WSDiscoveryClient(bus);
-            //c.setVersion10();
+            c.setVersion10();
             
             
             System.out.println("1");
-            ProbeMatchesType pmts = c.probe(new ProbeType());
+            ProbeType pt = new ProbeType();
+            ScopesType scopes = new ScopesType();
+            pt.setScopes(scopes);
+            ProbeMatchesType pmts = c.probe(pt);
             System.out.println("2");
             if  (pmts != null) {
                 for (ProbeMatchType pmt : pmts.getProbeMatch()) {
@@ -69,7 +73,7 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
-            pmts = c.probe(new ProbeType());
+            pmts = c.probe(pt);
             System.out.println("3");
             
             if  (pmts != null) {
