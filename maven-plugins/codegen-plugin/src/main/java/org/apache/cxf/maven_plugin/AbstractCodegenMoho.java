@@ -734,9 +734,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (wsdlA == null) {
                 continue;
             }
-            Artifact wsdlArtifact = artifactFactory.createBuildArtifact(wsdlA.getGroupId(),
+            Artifact wsdlArtifact = artifactFactory.createArtifactWithClassifier(wsdlA.getGroupId(),
                                                                         wsdlA.getArtifactId(),
-                                                                        wsdlA.getVersion(), wsdlA.getType());
+                                                                        wsdlA.getVersion(), 
+                                                                        wsdlA.getType(),
+                                                                        wsdlA.getClassifier());
             wsdlArtifact = resolveRemoteWsdlArtifact(wsdlArtifact);
             if (wsdlArtifact != null) {
                 File supposedFile = wsdlArtifact.getFile();
