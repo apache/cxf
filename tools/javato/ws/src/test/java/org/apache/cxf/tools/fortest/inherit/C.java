@@ -21,4 +21,5 @@ package org.apache.cxf.tools.fortest.inherit;
 public interface C {
     String hello(String hello);
     String bye(String bye);
+    String hello();
 }
