@@ -37,6 +37,7 @@ import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.EndpointReference;
+import javax.xml.ws.Holder;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.AddressingFeature;
@@ -64,6 +65,9 @@ import org.apache.cxf.ws.discovery.wsdl.ObjectFactory;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeMatchesType;
 import org.apache.cxf.ws.discovery.wsdl.ProbeType;
+import org.apache.cxf.ws.discovery.wsdl.ResolveMatchType;
+import org.apache.cxf.ws.discovery.wsdl.ResolveMatchesType;
+import org.apache.cxf.ws.discovery.wsdl.ResolveType;
 import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
@@ -334,6 +338,51 @@ public class WSDiscoveryClient implements Closeable {
             o = ((JAXBElement)o).getValue();
         }
         return (ProbeMatchesType)o;
+    }
+    
+    public ResolveMatchType resolve(W3CEndpointReference ref) {
+        return resolve(ref, defaultProbeTimeout);
+    }
+    public ResolveMatchType resolve(W3CEndpointReference ref, int timeout) {
+        Dispatch<Object> disp = this.getDispatchInternal(false, version.getResolveAction());
+        ResolveType rt = new ResolveType();
+        rt.setEndpointReference(ref);
+        if (adHoc) {
+            disp.getRequestContext().put("udp.multi.response.timeout", timeout);
+            final Holder<ResolveMatchesType> response = new Holder<ResolveMatchesType>();
+            AsyncHandler<Object> handler = new AsyncHandler<Object>() {
+                public void handleResponse(Response<Object> res) {
+                    try {
+                        Object o = res.get();
+                        while (o instanceof JAXBElement) {
+                            o = ((JAXBElement)o).getValue();
+                        }
+                        if (o instanceof ResolveMatchesType) {
+                            response.value = (ResolveMatchesType)o;
+                        } else if (o instanceof HelloType) {
+                            HelloType h = (HelloType)o;
+                            QName sn = version.getServiceName();
+                            if (h.getTypes().contains(sn)
+                                || h.getTypes().contains(new QName("", sn.getLocalPart()))) {
+                                // A DiscoveryProxy wants us to flip to managed mode
+                                resetDispatch(h.getXAddrs().get(0));
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        // ?
+                    } catch (ExecutionException e) {
+                        // ?
+                    }
+                }
+            };
+            disp.invokeAsync(new ObjectFactory().createResolve(rt), handler);
+            return response.value == null ? null : response.value.getResolveMatch();
+        }
+        Object o = disp.invoke(new ObjectFactory().createResolve(rt));
+        while (o instanceof JAXBElement) {
+            o = ((JAXBElement)o).getValue();
+        }
+        return o == null ? null : ((ResolveMatchesType)o).getResolveMatch();
     }
     
     

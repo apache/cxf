@@ -38,9 +38,10 @@ public abstract class WSDVersion {
     public static final WSDVersion INSTANCE_1_0 = new WSDVersion10();
     public static final WSDVersion INSTANCE_1_1 = new WSDVersion11();
     
-    abstract String getNamespace();
+    public abstract String getNamespace();
+    public abstract String getAddressingNamespace();
+
     abstract String getToAddress();
-    abstract String getAddressingNamespace();
     abstract void addVersionTransformer(Dispatch<Object> dispatch);
     abstract QName getServiceName();
     abstract String getSoapVersion();
@@ -53,6 +54,9 @@ public abstract class WSDVersion {
     }
     public String getProbeAction() {
         return getNamespace() + "/Probe";
+    }
+    public String getResolveAction() {
+        return getNamespace() + "/Resolve";
     }
     
     static final class WSDVersion10 extends WSDVersion {
