@@ -92,6 +92,12 @@ public class Java2WSMojo extends AbstractMojo {
      * @parameter
      */
     private String address;
+    
+    
+    /**
+     * @parameter
+     */
+    private String classifier;
 
     /**
      * @parameter  expression="${project.compileClasspathElements}"
@@ -427,7 +433,12 @@ public class Java2WSMojo extends AbstractMojo {
         if (attachWsdl && outputFile != null) {
             File wsdlFile = new File(outputFile);
             if (wsdlFile.exists()) {
-                projectHelper.attachArtifact(project, "wsdl", wsdlFile);
+                if (classifier != null) {
+                    projectHelper.attachArtifact(project, "wsdl", classifier, wsdlFile);
+                } else {
+                    projectHelper.attachArtifact(project, "wsdl", wsdlFile);
+                }
+                
             }
         }
     }
