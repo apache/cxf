@@ -63,6 +63,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.impl.AddressingPropertiesImpl;
+import org.apache.cxf.ws.discovery.WSDVersion;
 import org.apache.cxf.ws.discovery.WSDiscoveryClient;
 import org.apache.cxf.ws.discovery.WSDiscoveryService;
 import org.apache.cxf.ws.discovery.wsdl.ByeType;
@@ -320,12 +321,18 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             mb = "http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/rfc3986";
         }
         
+        if (mb.startsWith(WSDVersion.NS_1_0)) {
+            mb = mb.substring(WSDVersion.NS_1_0.length());
+        } else if (mb.startsWith(WSDVersion.NS_1_1)) {
+            mb = mb.substring(WSDVersion.NS_1_1.length());
+        }
+        
         ListIterator<HelloType> cit = consider.listIterator();
         while (cit.hasNext()) {
             HelloType ht = cit.next();
             boolean matches = false;
             
-            if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/rfc3986".equals(mb)) {
+            if ("/rfc3986".equals(mb)) {
                 matches = true;
                 if (!pt.getScopes().getValue().isEmpty()) {
                     for (String ps : pt.getScopes().getValue()) {
@@ -340,7 +347,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                         matches &= foundOne;
                     }
                 }
-            } else if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/uuid".equals(mb)) {
+            } else if ("/uuid".equals(mb)) {
                 matches = true;
                 if (!pt.getScopes().getValue().isEmpty()) {
                     for (String ps : pt.getScopes().getValue()) {
@@ -355,12 +362,12 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                         matches &= foundOne;
                     }
                 }
-            } else if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/ldap".equals(mb)) {
+            } else if ("/ldap".equals(mb)) {
                 //LDAP not supported
                 if (!pt.getScopes().getValue().isEmpty()) {
                     matches = false;
                 }
-            } else if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/strcmp0".equals(mb)) {
+            } else if ("/strcmp0".equals(mb)) {
                 matches = true;
                 if (!pt.getScopes().getValue().isEmpty()) {
                     for (String s : pt.getScopes().getValue()) {
@@ -369,7 +376,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                         }
                     }
                 }
-            } else if ("http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/none".equals(mb)
+            } else if ("/none".equals(mb)
                 && (ht.getScopes() == null || ht.getScopes().getValue().isEmpty())) {
                 matches = true;
             }
