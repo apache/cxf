@@ -318,7 +318,7 @@ public class JAXRSUtilsTest extends Assert {
         //method is declared with a most specific ProduceMime type is selected.
         OperationResourceInfo ori = findTargetResourceClass(resources, createMessage2(), 
              "/bookstore/1/books/123/", "GET", new MetadataMap<String, String>(), contentTypes, 
-             getTypes("application/json,application/xml"));       
+             getTypes("application/json,application/xml;q=0.9"));       
         assertNotNull(ori);
         assertEquals("getBookJSON", ori.getMethodToInvoke().getName());
         
@@ -1491,12 +1491,12 @@ public class JAXRSUtilsTest extends Assert {
         
         ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
-                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain,text/xml")));
+                                          JAXRSUtils.sortMediaTypes(getTypes("*/*;q=0.1,text/plain,text/xml;q=0.8")));
                      
         assertSame(ori, ori2);
         ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
-                                          JAXRSUtils.sortMediaTypes(getTypes("*,text/plain, text/xml,x/y")));
+                                          JAXRSUtils.sortMediaTypes(getTypes("*;q=0.1,text/plain,text/xml;q=0.9,x/y")));
                      
         assertSame(ori, ori2);
     }

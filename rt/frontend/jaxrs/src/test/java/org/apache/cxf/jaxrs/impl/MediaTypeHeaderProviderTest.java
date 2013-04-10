@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -54,21 +55,21 @@ public class MediaTypeHeaderProviderTest extends Assert {
     public void testShortWildcardWithParameters() {
         MediaType m = MediaType.valueOf("*;q=0.2");
         assertEquals("Media type was not parsed correctly", 
-                     m, new MediaType("*", "*"));
+                     m, new MediaType("*", "*", Collections.singletonMap("q", "0.2")));
     }
     
     @Test
     public void testShortWildcardWithParameters2() {
         MediaType m = MediaType.valueOf("* ;q=0.2");
         assertEquals("Media type was not parsed correctly", 
-                     m, new MediaType("*", "*"));
+                     m, new MediaType("*", "*", Collections.singletonMap("q", "0.2")));
     }
     
     @Test
     public void testShortWildcardWithParameters3() {
         MediaType m = MediaType.valueOf("*; q=.2");
         assertEquals("Media type was not parsed correctly", 
-                     m, new MediaType("*", "*"));
+                     m, new MediaType("*", "*", Collections.singletonMap("q", ".2")));
     }
     
     @Test
