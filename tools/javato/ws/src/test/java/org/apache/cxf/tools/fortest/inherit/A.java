@@ -46,4 +46,10 @@ public class A implements B {
     public String bye(String bye) {
         return bye;
     }
+
+    @Override
+    public String hello() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
