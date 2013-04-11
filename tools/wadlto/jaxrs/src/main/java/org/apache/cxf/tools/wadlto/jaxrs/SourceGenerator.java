@@ -1367,7 +1367,11 @@ public class SourceGenerator {
                     if  (!href.startsWith("/") && !href.contains("..")) {
                         schemaURI = baseWadlPath + href;
                     } else {
-                        schemaURI = URI.create(baseWadlPath).resolve(href).toString();
+                        try {
+                            schemaURI = new URL(new URL(baseWadlPath), href).toString();
+                        } catch (Exception ex) {
+                            schemaURI = URI.create(baseWadlPath).resolve(href).toString();
+                        }
                     }
                 } else {
                     schemaURI = href;
