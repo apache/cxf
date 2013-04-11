@@ -86,6 +86,9 @@ public class SelectMethodCandidatesTest extends Assert {
         doTestGenericSuperType(GenericEntityImpl3.class, "POST");
     }
     
+    private static List<MediaType> sortMediaTypes(String mediaTypes) {
+        return JAXRSUtils.sortMediaTypes(mediaTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
+    }
     @Test
     public void testFindFromAbstractGenericImpl4() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
@@ -119,7 +122,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             "/books",
                                                             "POST",
                                                             values, contentTypes, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "postEntity",
                      ori.getMethodToInvoke().getName());
@@ -169,7 +172,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             "/books",
                                                             "PUT",
                                                             values, contentTypes, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "putEntity",
                      ori.getMethodToInvoke().getName());
@@ -239,7 +242,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             "POST",
                                                             values, 
                                                             contentType, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals(expectedMethodName,  ori.getMethodToInvoke().getName());
     }
@@ -361,7 +364,7 @@ public class SelectMethodCandidatesTest extends Assert {
      
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, m, "GET", 
                                                 values, contentType, 
-                                                JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals(expectedMethodName,  ori.getMethodToInvoke().getName());
         assertEquals(expectedResponseType, m.getExchange().get(Message.CONTENT_TYPE));
@@ -398,7 +401,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             path,
                                                             "PUT",
                                                             values, contentTypes, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", methodName,
                      ori.getMethodToInvoke().getName());
@@ -460,7 +463,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             "/books",
                                                             methodName,
                                                             values, contentTypes, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", methodName.toLowerCase() + "Entity",
                      ori.getMethodToInvoke().getName());
@@ -508,7 +511,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             path,
                                                             "GET",
                                                             values, contentTypes, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", method,
                      ori.getMethodToInvoke().getName());
@@ -528,7 +531,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                                             "/1/2/3/d/resource1",
                                                             "GET",
                                                             values, contentTypes, 
-                                                            JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                                            sortMediaTypes(acceptContentTypes));
         
         assertNotNull(ori);
         assertEquals("jsonResource needs to be selected", "jsonResource",
@@ -630,7 +633,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                       "/1/2/3/d/custom",
                                       "GET",
                                       values, contentTypes, 
-                                      JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                      sortMediaTypes(acceptContentTypes));
         
         assertNotNull(ori);
         assertEquals("readBar", ori.getMethodToInvoke().getName());
@@ -639,7 +642,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                       "/1/2/3/d/custom",
                                       "GET",
                                       values, contentTypes, 
-                                      JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                      sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("readFoo", ori.getMethodToInvoke().getName());
         
@@ -648,7 +651,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                       "/1/2/3/d/custom",
                                       "GET",
                                       values, contentTypes, 
-                                      JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                      sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("readBar", ori.getMethodToInvoke().getName());
         
@@ -657,7 +660,7 @@ public class SelectMethodCandidatesTest extends Assert {
                                       "/1/2/3/d/custom",
                                       "GET",
                                       values, contentTypes, 
-                                      JAXRSUtils.sortMediaTypes(acceptContentTypes));
+                                      sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("readFoo", ori.getMethodToInvoke().getName());
         

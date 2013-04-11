@@ -689,10 +689,6 @@ public final class JAXRSUtils {
         return actualMts;
     }
     
-    public static int compareSortedMediaTypes(List<MediaType> mts1, List<MediaType> mts2) {
-        return compareSortedMediaTypes(mts1, mts2, MEDIA_TYPE_Q_PARAM);
-    }
-    
     public static int compareSortedMediaTypes(List<MediaType> mts1, List<MediaType> mts2, String qs) {
         int size1 = mts1.size();
         int size2 = mts2.size();
@@ -1533,15 +1529,8 @@ public final class JAXRSUtils {
                                   false);
     }
     
-    public static List<MediaType> sortMediaTypes(String mediaTypes) {
-        return sortMediaTypes(JAXRSUtils.parseMediaTypes(mediaTypes));
-    }
-    
     public static List<MediaType> sortMediaTypes(String mediaTypes, String qs) {
         return sortMediaTypes(JAXRSUtils.parseMediaTypes(mediaTypes), qs);
-    }
-    public static List<MediaType> sortMediaTypes(List<MediaType> types) {
-        return sortMediaTypes(types, MEDIA_TYPE_Q_PARAM);
     }
     public static List<MediaType> sortMediaTypes(List<MediaType> types, final String qs) {
         if (types.size() > 1) {

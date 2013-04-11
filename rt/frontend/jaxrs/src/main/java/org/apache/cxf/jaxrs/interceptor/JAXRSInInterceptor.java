@@ -138,7 +138,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         List<MediaType> acceptContentTypes = null;
         try {
-            acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes);
+            acceptContentTypes = JAXRSUtils.sortMediaTypes(acceptTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
         } catch (IllegalArgumentException ex) {
             throw new NotAcceptableException();
         }
