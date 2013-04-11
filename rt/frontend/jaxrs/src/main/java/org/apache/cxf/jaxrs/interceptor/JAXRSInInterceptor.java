@@ -123,7 +123,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {
-            requestContentType = "*/*";
+            requestContentType = MediaType.WILDCARD;
         }
         
         String rawPath = HttpUtils.getPathToMatch(message, true);

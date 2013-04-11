@@ -396,17 +396,19 @@ public final class JAXRSUtils {
         boolean throwException) {
         
         final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
-                
+        final boolean getMethod = HttpMethod.GET.equals(httpMethod);
+        
         MediaType requestType;
         try {
-            requestType = toMediaType(requestContentType);
+            requestType = getMethod ? MediaType.WILDCARD_TYPE : toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
             throw new NotSupportedException(ex);
         }
         
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
-                new OperationResourceInfoComparator(message, httpMethod, requestType, acceptContentTypes));
+                new OperationResourceInfoComparator(message, httpMethod, 
+                                                    getMethod, requestType, acceptContentTypes));
 
         int pathMatched = 0;
         int methodMatched = 0;
@@ -442,22 +444,10 @@ public final class JAXRSUtils {
                             if (matchHttpMethod(ori.getHttpMethod(), httpMethod)) {
                                 methodMatched++;
                                 //CHECKSTYLE:OFF
-                                if (matchConsumeTypes(requestType, ori)) {
+                                if (getMethod || matchConsumeTypes(requestType, ori)) {
                                     consumeMatched++;
                                     for (MediaType acceptType : acceptContentTypes) {
-                                        MediaType pMediaType = matchProduceTypes(acceptType, ori);
-                                        if (pMediaType != null) {
-                                            if (acceptContentTypes.size() > 1 
-                                                || ori.getProduceTypes().size() > 1) {
-                                                pMediaType = intersectSortMediaTypes(acceptContentTypes,
-                                                                                     ori.getProduceTypes(),
-                                                                                     false).get(0);
-                                            }
-                                            map.putSingle(Message.CONTENT_TYPE, 
-                                                          mediaTypeToString(pMediaType, 
-                                                                            MEDIA_TYPE_Q_PARAM, 
-                                                                            MEDIA_TYPE_QS_PARAM));
-                                            
+                                        if (matchProduceTypes(acceptType, ori)) {
                                             candidateList.put(ori, map);
                                             added = true;
                                             break;
@@ -498,10 +488,12 @@ public final class JAXRSUtils {
                                ori.getClassResourceInfo().getServiceClass().getName()).toString());
             }
             if (!ori.isSubResourceLocator()) {
-                List<String> responseContentType = matchedValues.remove(Message.CONTENT_TYPE);
-                if (responseContentType != null) {
-                    message.getExchange().put(Message.CONTENT_TYPE, responseContentType.get(0));
-                }
+                MediaType responseMediaType = intersectSortMediaTypes(acceptContentTypes,
+                                                                      ori.getProduceTypes(),
+                                                                      false).get(0);
+                message.getExchange().put(Message.CONTENT_TYPE, mediaTypeToString(responseMediaType, 
+                                                                                  MEDIA_TYPE_Q_PARAM, 
+                                                                                  MEDIA_TYPE_QS_PARAM));
             }
             return ori;
         }
@@ -1389,13 +1381,10 @@ public final class JAXRSUtils {
         return !intersectMimeTypes(ori.getConsumeTypes(), requestContentType).isEmpty();
     }
     
-    public static MediaType matchProduceTypes(MediaType acceptContentType, 
+    public static boolean matchProduceTypes(MediaType acceptContentType, 
                                               OperationResourceInfo ori) {
         
-        List<MediaType> types = intersectMimeTypes(ori.getProduceTypes(), 
-                                                   Collections.singletonList(acceptContentType),
-                                                   true);
-        return types.isEmpty() ? null : types.get(0);
+        return !intersectMimeTypes(ori.getProduceTypes(), acceptContentType).isEmpty();
     }
     
     public static boolean matchMimeTypes(MediaType requestContentType, 

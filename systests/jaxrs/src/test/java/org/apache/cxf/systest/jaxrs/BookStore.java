@@ -887,7 +887,7 @@ public class BookStore {
     
     @GET
     @Path("/books/{bookId}/")
-    @Produces("application/json;q=0.9")
+    @Produces("application/json;qs=0.9")
     public Book getBookAsJSON() throws BookNotFoundFault {
         return doGetBook(currentBookId);
     }
