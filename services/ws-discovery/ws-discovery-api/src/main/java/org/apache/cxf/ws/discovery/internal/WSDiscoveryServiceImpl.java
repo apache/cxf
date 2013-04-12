@@ -132,14 +132,26 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         registered.add(ht);
     }
     
+    private Object getProperty(Server server, String s) {
+        Object o = server.getEndpoint().get(s);
+        if (o == null) {
+            o = server.getEndpoint().getEndpointInfo().getProperty(s);
+        }
+        return o;
+    }
+    
     public void serverStarted(Server server) {
+        Object o = getProperty(server, "ws-discovery-disable");
+        if (o == Boolean.TRUE || Boolean.valueOf((String)o)) {
+            return;
+        }
         startup();
         HelloType ht = new HelloType();
         ht.setScopes(new ScopesType());
         ht.setMetadataVersion(1);
         
 
-        Object o = server.getEndpoint().get("ws-discovery-types");
+        o = getProperty(server, "ws-discovery-types");
         if (o instanceof QName) {
             ht.getTypes().add((QName)o);
         } else if (o instanceof List) {
@@ -159,12 +171,12 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         }
 
         
-        o = server.getEndpoint().get("ws-discovery-scopes");
+        o = getProperty(server, "ws-discovery-scopes");
         if (o != null) {
             setScopes(ht, o);
         }
         setXAddrs(ht, server);
-        String uuid = (String)server.getEndpoint().get("ws-discovery-uuid");
+        String uuid = (String)getProperty(server, "ws-discovery-uuid");
         if (uuid != null) {
             //persistent uuid
             W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
@@ -177,15 +189,9 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     }
 
     private void setXAddrs(HelloType ht, Server server) {
-        String s = (String)server.getEndpoint().get("ws-discovery-published-url");
+        String s = (String)getProperty(server, "ws-discovery-published-url");
         if (s == null) {
-            s = (String)server.getEndpoint().getEndpointInfo().getProperty("ws-discovery-published-url");
-        } 
-        if (s == null) {
-            s = (String)server.getEndpoint().get("publishedEndpointUrl");
-        }
-        if (s == null) {
-            s = (String)server.getEndpoint().getEndpointInfo().getProperty("publishedEndpointUrl");
+            s = (String)getProperty(server, "publishedEndpointUrl");
         }
         if (s == null) {
             s = server.getEndpoint().getEndpointInfo().getAddress();
