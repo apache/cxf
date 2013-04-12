@@ -50,6 +50,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
         
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         inProperties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
@@ -71,6 +72,22 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        // Negative test for wrong password type
+        service.getInInterceptors().remove(inhandler);
+        
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected on the wrong password type");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     @Test
@@ -79,6 +96,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         Service service = createService();
         
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         inProperties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
@@ -100,6 +118,22 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        // Negative test for wrong password type
+        service.getInInterceptors().remove(inhandler);
+        
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected on the wrong password type");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     @Test
