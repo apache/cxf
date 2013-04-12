@@ -283,30 +283,32 @@ public class HTTPTransportFactory
         if (endpointInfo == null) {
             throw new IllegalArgumentException("EndpointInfo cannot be null");
         }
-        AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
-        if (d == null) {
-            HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
-            String addr = endpointInfo.getAddress();
-            if (jettyFactory == null && addr != null && addr.startsWith("http")) {
-                String m = 
-                    new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND"
-                                                           , LOG).toString();
-                LOG.log(Level.SEVERE, m);
-                throw new IOException(m);
+        synchronized (registry) {
+            AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
+            if (d == null) {
+                HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
+                String addr = endpointInfo.getAddress();
+                if (jettyFactory == null && addr != null && addr.startsWith("http")) {
+                    String m = 
+                        new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND"
+                                                               , LOG).toString();
+                    LOG.log(Level.SEVERE, m);
+                    throw new IOException(m);
+                }
+                HttpDestinationFactory factory = null;
+                if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
+                    factory = jettyFactory;
+                } else {
+                    factory = new ServletDestinationFactory();
+                }
+                
+                d = factory.createDestination(endpointInfo, getBus(), registry);
+                registry.addDestination(d);
+                configure(d);
+                d.finalizeConfig();
             }
-            HttpDestinationFactory factory = null;
-            if (jettyFactory != null && (addr == null || addr.startsWith("http"))) {
-                factory = jettyFactory;
-            } else {
-                factory = new ServletDestinationFactory();
-            }
-            
-            d = factory.createDestination(endpointInfo, getBus(), registry);
-            registry.addDestination(d);
-            configure(d);
-            d.finalizeConfig();
+            return d;
         }
-        return d;
     }
 
 }
