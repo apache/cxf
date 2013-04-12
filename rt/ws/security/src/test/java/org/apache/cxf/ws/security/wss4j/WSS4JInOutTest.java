@@ -262,7 +262,6 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         Map<String, String> inProperties = new HashMap<String, String>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "false");
         inProperties.put(
             WSHandlerConstants.PW_CALLBACK_CLASS, 
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
@@ -272,16 +271,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         xpaths.add("//wsse:Security");
 
         //
-        // This should pass, as even though passwordType is set to digest, we are 
-        // overriding the default handler behaviour of requiring a strict password
-        // type
-        //
-        makeInvocation(outProperties, xpaths, inProperties);
-        
-        //
         // This should fail, as we are requiring a digest password type
         //
-        inProperties.put(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
         try {
             makeInvocation(outProperties, xpaths, inProperties);
             fail("Failure expected on the wrong password type");

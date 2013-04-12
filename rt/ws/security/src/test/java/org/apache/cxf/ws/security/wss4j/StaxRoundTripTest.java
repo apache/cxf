@@ -355,6 +355,60 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         assertEquals("test", echo.echo("test"));
     }
     
+    @Test
+    public void testSignatureConfirmation() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        Properties cryptoProperties = 
+            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
+        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        WSSSecurityProperties outProperties = new WSSSecurityProperties();
+        outProperties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION});
+        outProperties.setSignatureUser("myalias");
+        
+        Properties outCryptoProperties = 
+            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
+        outProperties.setSignatureCryptoProperties(outCryptoProperties);
+        outProperties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxOutInterceptor staxOhandler = new WSS4JStaxOutInterceptor(outProperties);
+        service.getOutInterceptors().add(staxOhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE});
+        properties.setSignatureUser("myalias");
+        
+        Properties clientOutCryptoProperties = 
+            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
+        properties.setSignatureCryptoProperties(clientOutCryptoProperties);
+        properties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+        
+        WSSSecurityProperties staxInProperties = new WSSSecurityProperties();
+        staxInProperties.setCallbackHandler(new TestPwdCallback());
+        Properties staxInCryptoProperties = 
+            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
+        staxInProperties.setSignatureVerificationCryptoProperties(staxInCryptoProperties);
+        staxInProperties.setEnableSignatureConfirmationVerification(true);
+        WSS4JStaxInInterceptor inhandler2 = new WSS4JStaxInInterceptor(staxInProperties);
+        client.getInInterceptors().add(inhandler2);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
    /*
     * TODO
     @Test

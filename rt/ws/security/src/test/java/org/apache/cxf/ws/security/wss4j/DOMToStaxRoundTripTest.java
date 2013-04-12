@@ -36,6 +36,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.junit.Test;
 
 
@@ -368,6 +369,58 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testSignatureConfirmation() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        Properties cryptoProperties = 
+            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
+        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        WSSSecurityProperties outProperties = new WSSSecurityProperties();
+        outProperties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION});
+        outProperties.setSignatureUser("myalias");
+        
+        Properties outCryptoProperties = 
+            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
+        outProperties.setSignatureCryptoProperties(outCryptoProperties);
+        outProperties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxOutInterceptor staxOhandler = new WSS4JStaxOutInterceptor(outProperties);
+        service.getOutInterceptors().add(staxOhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
+        properties.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        properties.put(WSHandlerConstants.USER, "myalias");
+        
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+        
+        Map<String, Object> domInProperties = new HashMap<String, Object>();
+        domInProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        domInProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        domInProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        domInProperties.put(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(domInProperties);
+        client.getInInterceptors().add(inInterceptor);
 
         assertEquals("test", echo.echo("test"));
     }

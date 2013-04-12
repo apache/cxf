@@ -241,11 +241,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             reqData.setCallbackHandler(getCallback(reqData, doAction, utWithCallbacks));
             
-            String passwordTypeStrict = (String)getOption(WSHandlerConstants.PASSWORD_TYPE_STRICT);
-            if (passwordTypeStrict == null) {
-                setProperty(WSHandlerConstants.PASSWORD_TYPE_STRICT, "true");
-            }
-            
             // Configure replay caching
             ReplayCache nonceCache = 
                 getReplayCache(
