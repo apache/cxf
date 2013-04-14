@@ -55,8 +55,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
-
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SelectMethodCandidatesTest extends Assert {
@@ -328,6 +328,49 @@ public class SelectMethodCandidatesTest extends Assert {
                                "application/xml", "m2");
     }
     
+    @Test
+    public void testProducesResource5() throws Exception {
+        doTestProducesResource(ProducesResource2.class, "/", 
+                               "application/xml;q=0.3,application/json;q=0.5", 
+                               "application/json", "m1");
+    }
+
+    @Test
+    public void testProducesResource6() throws Exception {
+        doTestProducesResource(ProducesResource3.class, "/", 
+                               "application/xml,application/json", 
+                               "application/xml", "m2");
+    }
+
+    @Test
+    public void testProducesResource7() throws Exception {
+        doTestProducesResource(ProducesResource4.class, "/", 
+                               "application/xml,", 
+                               "application/xml", "m1");
+    }
+
+    @Test
+    @Ignore
+    public void testProducesResource8() throws Exception {
+        doTestProducesResource(ProducesResource5.class, "/", 
+                               "application/*,text/html", 
+                               "text/html", "m1");
+    }
+
+    @Test
+    public void testProducesResource9() throws Exception {
+        doTestProducesResource(ProducesResource5.class, "/", 
+                               "application/*,text/html;q=0.3", 
+                               "application/*", "m2");
+    }
+
+    @Test
+    public void testProducesResource10() throws Exception {
+        doTestProducesResource(ProducesResource6.class, "/", 
+                               "application/*,text/html", 
+                               "application/*", "m2");
+    }
+
     private void doTestProducesResource(Class<?> resourceClass, 
                                         String path,
                                         String acceptContentTypes,
@@ -845,6 +888,58 @@ public class SelectMethodCandidatesTest extends Assert {
         }
         @GET
         @Produces({"application/xml;qs=0.9" })
+        public Response m2() {
+            return null;
+        }
+    }
+
+    public static class ProducesResource3 {
+        @GET
+        @Produces({"application/json;qs=0.2" })
+        public Response m1() {
+            return null;
+        }
+        @GET
+        @Produces({"application/xml;qs=0.9" })
+        public Response m2() {
+            return null;
+        }
+    }
+
+    public static class ProducesResource4 {
+        @GET
+        @Produces({"application/*" })
+        public Response m1() {
+            return null;
+        }
+        @GET
+        @Produces({"application/xml;qs=0.9" })
+        public Response m2() {
+            return null;
+        }
+    }
+
+    public static class ProducesResource5 {
+        @GET
+        @Produces({"text/*" })
+        public Response m1() {
+            return null;
+        }
+        @GET
+        @Produces({"application/*" })
+        public Response m2() {
+            return null;
+        }
+    }
+
+    public static class ProducesResource6 {
+        @GET
+        @Produces({"text/*;qs=0.9" })
+        public Response m1() {
+            return null;
+        }
+        @GET
+        @Produces({"application/*" })
         public Response m2() {
             return null;
         }
