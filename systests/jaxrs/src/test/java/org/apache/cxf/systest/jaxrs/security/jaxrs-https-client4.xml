@@ -52,6 +52,16 @@ under the License.
 
     <jaxrs:client id="bookService" 
        address="https://localhost:${testutil.ports.jaxrs-https}"
-serviceClass="org.apache.cxf.systest.jaxrs.BookStore"/>
+serviceClass="org.apache.cxf.systest.jaxrs.BookStore">
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+                <property name="inTransformElements">
+                 <map>
+                   <entry key="Book" value="TheBook"/>
+                 </map>
+                </property>
+            </bean>
+        </jaxrs:providers>
+    </jaxrs:client>
 
 </beans>
