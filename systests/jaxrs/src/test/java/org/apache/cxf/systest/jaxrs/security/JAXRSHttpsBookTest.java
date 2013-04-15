@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -78,7 +79,24 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testGetBook123ProxyFromSpringWildcard() throws Exception {
-        doTestGetBook123ProxyFromSpring(CLIENT_CONFIG_FILE4);
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE4});
+        Object bean = ctx.getBean("bookService.proxyFactory");
+        assertNotNull(bean);
+        JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
+        
+        BookStore bs = cfb.create(BookStore.class);
+        assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
+        
+        WebClient wc = WebClient.fromClient(WebClient.client(bs));
+        assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
+        wc.accept("application/xml");
+        wc.path("bookstore/securebooks/123");
+        TheBook b = wc.get(TheBook.class);
+        
+        assertEquals(b.getId(), 123);
+        b = wc.get(TheBook.class);
+        assertEquals(b.getId(), 123);
     }
     
     private void doTestGetBook123ProxyFromSpring(String cfgFile) throws Exception {
@@ -147,4 +165,21 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         assertEquals(123, b.getId());
     }     
     
+    @XmlRootElement(name = "TheBook")
+    public static class TheBook {
+        private String name;
+        private long id;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public long getId() {
+            return id;
+        }
+        public void setId(long id) {
+            this.id = id;
+        }
+    }
 }
