@@ -56,7 +56,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SelectMethodCandidatesTest extends Assert {
@@ -350,7 +349,6 @@ public class SelectMethodCandidatesTest extends Assert {
     }
 
     @Test
-    @Ignore
     public void testProducesResource8() throws Exception {
         doTestProducesResource(ProducesResource5.class, "/", 
                                "application/*,text/html", 
@@ -361,14 +359,14 @@ public class SelectMethodCandidatesTest extends Assert {
     public void testProducesResource9() throws Exception {
         doTestProducesResource(ProducesResource5.class, "/", 
                                "application/*,text/html;q=0.3", 
-                               "application/*", "m2");
+                               "text/html", "m1");
     }
 
     @Test
     public void testProducesResource10() throws Exception {
         doTestProducesResource(ProducesResource6.class, "/", 
                                "application/*,text/html", 
-                               "application/*", "m2");
+                               "text/html", "m1");
     }
 
     private void doTestProducesResource(Class<?> resourceClass, 

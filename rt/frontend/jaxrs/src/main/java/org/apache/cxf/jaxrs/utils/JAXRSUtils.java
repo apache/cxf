@@ -544,7 +544,11 @@ public final class JAXRSUtils {
             Collections.sort(all, new Comparator<MediaType>() {
 
                 public int compare(MediaType mt1, MediaType mt2) {
-                    return compareQualityAndDistance(mt1, mt2, checkDistance);
+                    int result = compareMediaTypes(mt1, mt2, null);
+                    if (result == 0) {
+                        result = compareQualityAndDistance(mt1, mt2, checkDistance);
+                    }
+                    return result;
                 }
                 
             });    
@@ -666,7 +670,10 @@ public final class JAXRSUtils {
         int size1 = mts1.size();
         int size2 = mts2.size();
         for (int i = 0; i < size1 && i < size2; i++) {
-            int result = compareQualityAndDistance(actualMts1.get(i), actualMts2.get(i), true);
+            int result = compareMediaTypes(actualMts1.get(i), actualMts2.get(i), null);
+            if (result == 0) {
+                result = compareQualityAndDistance(actualMts1.get(i), actualMts2.get(i), true);
+            }
             if (result != 0) {
                 return result;
             }
