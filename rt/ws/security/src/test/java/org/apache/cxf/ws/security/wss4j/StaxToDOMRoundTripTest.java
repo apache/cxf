@@ -173,6 +173,49 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
+    public void testEncryptionAlgorithms() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
+        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
+        WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
+        service.getInInterceptors().add(inInterceptor);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.ENCRYPT});
+        properties.setEncryptionUser("myalias");
+        
+        Properties cryptoProperties = 
+            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
+        properties.setEncryptionCryptoProperties(cryptoProperties);
+        properties.setCallbackHandler(new TestPwdCallback());
+        properties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
+        properties.setEncryptionSymAlgorithm("http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected as RSA v1.5 is not allowed by default");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+        
+        inProperties.put(WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
     public void testEncryptUsernameToken() throws Exception {
         // Create + configure service
         Service service = createService();

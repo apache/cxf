@@ -170,6 +170,51 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
+    public void testEncryptionAlgorithms() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        Properties cryptoProperties = 
+            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
+        inProperties.setDecryptionCryptoProperties(cryptoProperties);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
+        properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
+        properties.put(WSHandlerConstants.USER, "myalias");
+        properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, WSConstants.KEYTRANSPORT_RSA15);
+        properties.put(WSHandlerConstants.ENC_SYM_ALGO, WSConstants.TRIPLE_DES);
+        
+        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected as RSA v1.5 is not allowed by default");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+        
+        inProperties.setAllowRSA15KeyTransportAlgorithm(true);
+        service.getInInterceptors().remove(inhandler);
+        inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
     public void testEncryptUsernameToken() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -236,7 +281,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testTimestamp() throws Exception {
         // Create + configure service

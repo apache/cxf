@@ -235,6 +235,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
                 TestPwdCallback.class.getName());
         inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
+        inHandler.setProperty(WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
         
         return inHandler;
     }
