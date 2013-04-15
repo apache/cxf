@@ -158,6 +158,8 @@ public final class JAXRSUtils {
     public static final String IGNORE_MESSAGE_WRITERS = "ignore.message.writers";
     public static final String ROOT_INSTANCE = "service.root.instance";
     public static final String ROOT_PROVIDER = "service.root.provider";
+    public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
+        "partial.hierarchical.media.subtype.check"; 
     public static final String DOC_LOCATION = "wadl.location";
     public static final String DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES = "defaultProviders.for.simpleTypes";
     public static final String MEDIA_TYPE_Q_PARAM = "q";
@@ -1492,16 +1494,54 @@ public final class JAXRSUtils {
     
     private static boolean isMediaTypeCompatible(MediaType requiredType, MediaType userType) {
         boolean isCompatible = requiredType.isCompatible(userType);
-        if (!isCompatible && requiredType.getType().equalsIgnoreCase(userType.getType())) {
-            // check if we have composite subtypes
-            String subType1 = requiredType.getSubtype();
-            String subType2 = userType.getSubtype();
-            
-            String subTypeAfterPlus1 = splitMediaSubType(subType1, true); 
-            String subTypeAfterPlus2 = splitMediaSubType(subType2, true);
-            
+        if (!requiredType.isCompatible(userType) && requiredType.getType().equalsIgnoreCase(userType.getType())) {
+            isCompatible = compareCompositeSubtypes(requiredType, userType,
+                                                    PhaseInterceptorChain.getCurrentMessage());
+        }
+        return isCompatible;
+    }
+    
+    static boolean compareCompositeSubtypes(String requiredType, String userType,
+                                            Message message) {
+        return compareCompositeSubtypes(toMediaType(requiredType), toMediaType(userType), message);
+    }
+    
+    private static boolean compareCompositeSubtypes(MediaType requiredType, MediaType userType,
+                                            Message message) {
+        boolean isCompatible = false;
+        // check if we have composite subtypes
+        String subType1 = requiredType.getSubtype();
+        String subType2 = userType.getSubtype();
+        
+        String subTypeAfterPlus1 = splitMediaSubType(subType1, true); 
+        String subTypeAfterPlus2 = splitMediaSubType(subType2, true);
+        if (message != null && MessageUtils.isTrue(
+            message.getContextualProperty(PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK))) {     
+            if (subTypeAfterPlus1 != null || subTypeAfterPlus2 != null) {
+                boolean nullPossible = subTypeAfterPlus1 == null || subTypeAfterPlus2 == null;
+                isCompatible = subTypeAfterPlus1 == null && subTypeAfterPlus2.equals(subType1)
+                    || subTypeAfterPlus2 == null && subTypeAfterPlus1.equals(subType2);
+                if (!isCompatible && !nullPossible) {
+                    isCompatible = subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
+                        && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*');
+                }
+                
+                if (!isCompatible) {
+                    String subTypeBeforePlus1 = splitMediaSubType(subType1, false);
+                    String subTypeBeforePlus2 = splitMediaSubType(subType2, false);
+                    nullPossible = subTypeBeforePlus1 == null || subTypeBeforePlus2 == null;
+                    isCompatible = subTypeBeforePlus1 == null && subTypeBeforePlus2.equals(subType1)
+                        || subTypeBeforePlus2 == null && subTypeBeforePlus1.equals(subType2);
+                    if (!isCompatible && !nullPossible) {
+                        isCompatible = subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
+                            && (subType1.charAt(subType1.length() - 1) == '*' 
+                                || subType2.charAt(subType2.length() - 1) == '*');
+                    }
+                }
+            }
+        } else {
             if (subTypeAfterPlus1 != null && subTypeAfterPlus2 != null) {
-            
+                
                 isCompatible = subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
                     && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*');
                 
