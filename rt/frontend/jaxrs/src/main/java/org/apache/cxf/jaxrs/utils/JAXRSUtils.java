@@ -155,6 +155,7 @@ public final class JAXRSUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
+    private static final String PATH_SEGMENT_SEP = "/";
     private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
     private static final String  SUPPORT_WAE_SPEC_OPTIMIZATION = "support.wae.spec.optimization";
@@ -390,48 +391,49 @@ public final class JAXRSUtils {
         int pathMatched = 0;
         int methodMatched = 0;
         int consumeMatched = 0;
-        int produceMatched = 0;
         
         boolean subresourcesOnly = true;
         for (MediaType acceptType : acceptContentTypes) {
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
+                boolean added = false;
+                
                 URITemplate uriTemplate = ori.getURITemplate();
                 MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
-                    boolean added = false;
                     if (ori.isSubResourceLocator()) {
                         candidateList.put(ori, map);
                         added = true;
                     } else {
                         String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
-                        if (finalGroup == null || StringUtils.isEmpty(finalGroup)
-                            || finalGroup.equals("/")) {
+                        //CHECKSTYLE:OFF
+                        if (StringUtils.isEmpty(finalGroup) || PATH_SEGMENT_SEP.equals(finalGroup)) {
                             pathMatched++;
-                            boolean mMatched = matchHttpMethod(ori.getHttpMethod(), httpMethod);
-                            boolean cMatched = matchConsumeTypes(requestType, ori);
-                            MediaType pMediaType = matchProduceTypes(acceptType, ori);
-                            if (mMatched && cMatched && pMediaType != null) {
-                                subresourcesOnly = false;
-                                map.putSingle(Message.CONTENT_TYPE, mediaTypeToString(pMediaType));
-                                candidateList.put(ori, map);
-                                added = true;
-                            } else {
-                                methodMatched = mMatched ? methodMatched + 1 : methodMatched;
-                                produceMatched = pMediaType != null ? produceMatched + 1 : produceMatched;
-                                consumeMatched = cMatched ? consumeMatched + 1 : consumeMatched;
-                                logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
+                            if (matchHttpMethod(ori.getHttpMethod(), httpMethod)) {
+                                methodMatched++;
+                                if (matchConsumeTypes(requestType, ori)) {
+                                    consumeMatched++;
+                                    MediaType pMediaType = matchProduceTypes(acceptType, ori);
+                                    if (pMediaType != null) {
+                                        map.putSingle(Message.CONTENT_TYPE, mediaTypeToString(pMediaType));
+                        
+                                        subresourcesOnly = false;
+                                        candidateList.put(ori, map);
+                                        added = true;
+                                    }
+                                }
                             }
-                        } else {
-                            logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                         }
+                        //CHECKSTYLE:ON
                     }
-                    if (added && isFineLevelLoggable) {
+                } 
+                if (isFineLevelLoggable) {
+                    if (added) {
                         LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY", 
                                   BUNDLE, 
                                   ori.getMethodToInvoke().getName()).toString());
+                    } else {
+                        logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                     }
-                } else {
-                    logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                 }
             }
             if (!candidateList.isEmpty() && !subresourcesOnly) {
@@ -471,9 +473,10 @@ public final class JAXRSUtils {
             status = 404;
         } else if (methodMatched == 0) {
             status = 405;
-        } else if (consumeMatched <= produceMatched) {
+        } else if (consumeMatched == 0) {
             status = 415;
         } else {
+            // Not a single Produces match
             status = 406;
         }
         
@@ -502,9 +505,6 @@ public final class JAXRSUtils {
     
     private static void logNoMatchMessage(OperationResourceInfo ori, 
         String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes) {
-        if (!LOG.isLoggable(Level.FINE)) {
-            return;
-        }
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH", 
                                                    BUNDLE,
@@ -1245,16 +1245,16 @@ public final class JAXRSUtils {
     public static boolean matchConsumeTypes(MediaType requestContentType, 
                                             OperationResourceInfo ori) {
         
-        return intersectMimeTypes(ori.getConsumeTypes(), requestContentType).size() != 0;
+        return !intersectMimeTypes(ori.getConsumeTypes(), requestContentType).isEmpty();
     }
     
     public static MediaType matchProduceTypes(MediaType acceptContentType, 
-                                            OperationResourceInfo ori) {
+                                              OperationResourceInfo ori) {
         
-        List<MediaType> intersected = intersectMimeTypes(ori.getProduceTypes(), 
-                                                         Collections.singletonList(acceptContentType), 
-                                                         true);
-        return intersected.isEmpty() ? null : intersected.get(0);
+        List<MediaType> types = intersectMimeTypes(ori.getProduceTypes(), 
+                                                   Collections.singletonList(acceptContentType),
+                                                   true);
+        return types.isEmpty() ? null : types.get(0);
     }
     
     public static boolean matchMimeTypes(MediaType requestContentType, 
