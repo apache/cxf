@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -102,8 +104,12 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     public String toString(MediaType type) {
         return typeToString(type);
     }
-    
     public static String typeToString(MediaType type) {
+        return typeToString(type, null);
+    }
+    // Max number of parameters that may be ignored is 3, at least as known 
+    // to the implementation
+    public static String typeToString(MediaType type, List<String> ignoreParams) {
         StringBuilder sb = new StringBuilder();
         sb.append(type.getType()).append('/').append(type.getSubtype());
         
@@ -112,6 +118,9 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             for (Iterator<Map.Entry<String, String>> iter = params.entrySet().iterator();
                 iter.hasNext();) {
                 Map.Entry<String, String> entry = iter.next();
+                if (ignoreParams != null && ignoreParams.contains(entry.getKey())) {
+                    continue;
+                }
                 sb.append(';').append(entry.getKey()).append('=').append(entry.getValue());
             }
         }
@@ -121,9 +130,22 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
 
     private static MediaType handleMediaTypeWithoutSubtype(String mType) {
         if (mType.startsWith(MediaType.MEDIA_TYPE_WILDCARD)) {
-            char next = mType.length() == 1 ? ' ' : mType.charAt(1);
-            if (next == ' ' || next == ';') {
-                return MediaType.WILDCARD_TYPE;
+            String mTypeNext = mType.length() == 1 ? "" : mType.substring(1).trim();
+            boolean mTypeNextEmpty = StringUtils.isEmpty(mTypeNext);
+            if (mTypeNextEmpty || mTypeNext.startsWith(";")) {
+                if (!mTypeNextEmpty) {
+                    Map<String, String> parameters = new LinkedHashMap<String, String>();
+                    StringTokenizer st = new StringTokenizer(mType.substring(2).trim(), ";");
+                    while (st.hasMoreTokens()) {
+                        addParameter(parameters, st.nextToken());
+                    }
+                    return new MediaType(MediaType.MEDIA_TYPE_WILDCARD,
+                                         MediaType.MEDIA_TYPE_WILDCARD,
+                                         parameters);
+                } else { 
+                    return MediaType.WILDCARD_TYPE;
+                }
+                
             }
         }
         Message message = PhaseInterceptorChain.getCurrentMessage();

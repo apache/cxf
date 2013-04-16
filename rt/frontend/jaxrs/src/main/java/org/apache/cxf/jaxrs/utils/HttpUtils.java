@@ -444,7 +444,7 @@ public final class HttpUtils {
                                  BUNDLE, enc, defaultEncoding).toString();
             LOG.warning(message);
             headers.putSingle(HttpHeaders.CONTENT_TYPE, 
-                JAXRSUtils.removeMediaTypeParameter(mt, CHARSET_PARAMETER) 
+                JAXRSUtils.mediaTypeToString(mt, CHARSET_PARAMETER) 
                 + ';' + CHARSET_PARAMETER + "=" 
                 + (defaultEncoding == null ? "UTF-8" : defaultEncoding));
         }

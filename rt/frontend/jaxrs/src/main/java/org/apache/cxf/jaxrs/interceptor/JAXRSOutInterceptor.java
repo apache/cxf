@@ -400,8 +400,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private MediaType checkFinalContentType(MediaType mt) {
         if (mt.isWildcardType() || mt.isWildcardSubtype() && mt.getType().equals("application")) {
             return MediaType.APPLICATION_OCTET_STREAM_TYPE;
-        } else if (mt.getParameters().containsKey("q")) {
-            return JAXRSUtils.toMediaType(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
         } else {
             return mt;
         }

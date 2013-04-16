@@ -1356,7 +1356,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/123",
                                "resources/expected_get_book123json.txt",
-                               "application/json, application/xml", 
+                               "application/json, application/xml;q=0.9", 
                                "application/json", 200);
         
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/123",

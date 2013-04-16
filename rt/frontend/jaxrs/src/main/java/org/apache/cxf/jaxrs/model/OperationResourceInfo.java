@@ -193,14 +193,16 @@ public class OperationResourceInfo {
             }
         }
         if (produceMediaTypes != null) {
-            produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes);
+            produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes, JAXRSUtils.MEDIA_TYPE_QS_PARAM);
         } else {
             Produces pm = 
                 AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
             if (pm != null) {
-                produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()));
+                produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()),
+                                                         JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             } else if (classResourceInfo != null) {
-                produceMimes = JAXRSUtils.sortMediaTypes(classResourceInfo.getProduceMime());
+                produceMimes = JAXRSUtils.sortMediaTypes(classResourceInfo.getProduceMime(),
+                                                         JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             }
         }
     }
