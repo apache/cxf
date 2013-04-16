@@ -26,7 +26,9 @@ import java.util.logging.Logger;
 
 import javax.xml.datatype.Duration;
 
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.message.Exchange;
@@ -75,8 +77,22 @@ public class Servant implements Invoker {
             || RM11Constants.INSTANCE.getCreateSequenceOnewayOperationName().equals(oi.getName())) {
             try {
                 return Collections.singletonList(createSequence(exchange.getInMessage()));
-            } catch (Exception ex) {
-                throw new Fault(ex);
+            } catch (RuntimeException ex) {
+                LOG.log(Level.WARNING, "Sequence creation rejected", ex);
+                SequenceFault sf = 
+                    new SequenceFaultFactory(protocol.getConstants()).createCreateSequenceRefusedFault();
+                Endpoint e = exchange.get(Endpoint.class);
+                Binding b = null == e ? null : e.getBinding();
+                if (null != b) {
+                    RMManager m = reliableEndpoint.getManager();
+                    LOG.fine("Manager: " + m);
+                    BindingFaultFactory bff = m.getBindingFaultFactory(b);
+                    Fault f = bff.createFault(sf, exchange.getInMessage());
+                    // log with warning instead sever, as this may happen for some delayed messages
+                    LogUtils.log(LOG, Level.WARNING, "SEQ_FAULT_MSG", bff.toString(f));
+                    throw f;
+                }
+                throw new Fault(sf);
             }
         } else if (RM10Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())
             || RM11Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())) {
@@ -114,6 +130,10 @@ public class Servant implements Invoker {
         createResponse.setIdentifier(destination.generateSequenceIdentifier());
         
         DestinationPolicyType dp = reliableEndpoint.getManager().getDestinationPolicy();
+        if (dp.getMaxSequences() > 0 
+            && destination.getProcessingSequenceCount() >= dp.getMaxSequences()) {
+            throw new RuntimeException("Sequence creation refused");
+        }
         Duration supportedDuration = dp.getSequenceExpiration();
         if (null == supportedDuration) {
             supportedDuration = DatatypeFactory.PT0S;
