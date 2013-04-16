@@ -514,6 +514,48 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testIntersectMimeTypesCompositeSubtype6() throws Exception {
+        Message m = new MessageImpl();
+        m.put(JAXRSUtils.PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK, true);
+        assertTrue(JAXRSUtils.compareCompositeSubtypes("application/bar+xml", "application/xml", m));  
+    }
+    
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype7() throws Exception {
+        Message m = new MessageImpl();
+        m.put(JAXRSUtils.PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK, true);
+        assertTrue(JAXRSUtils.compareCompositeSubtypes("application/xml", "application/bar+xml", m));
+    }
+    
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype8() throws Exception {
+        Message m = new MessageImpl();
+        m.put(JAXRSUtils.PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK, true);
+        assertTrue(JAXRSUtils.compareCompositeSubtypes("application/xml+bar", "application/xml", m));  
+    }
+    
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype9() throws Exception {
+        Message m = new MessageImpl();
+        m.put(JAXRSUtils.PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK, true);
+        assertTrue(JAXRSUtils.compareCompositeSubtypes("application/xml", "application/xml+bar", m));  
+    }
+    
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype10() throws Exception {
+        Message m = new MessageImpl();
+        m.put(JAXRSUtils.PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK, true);
+        assertFalse(JAXRSUtils.compareCompositeSubtypes("application/v1+xml", "application/v2+xml", m));  
+    }
+
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype11() throws Exception {
+        Message m = new MessageImpl();
+        m.put(JAXRSUtils.PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK, true);
+        assertFalse(JAXRSUtils.compareCompositeSubtypes("application/v1+xml", "application/json", m));  
+    }
+    
+    @Test
     public void testIntersectMimeTypes() throws Exception {
         //test basic
         List<MediaType> methodMimeTypes = new ArrayList<MediaType>(
