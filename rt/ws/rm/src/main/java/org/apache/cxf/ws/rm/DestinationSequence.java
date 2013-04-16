@@ -401,7 +401,7 @@ public class DestinationSequence extends AbstractSequence {
     void scheduleAcknowledgement(long acknowledgementInterval) {  
         AcksPolicyType ap = destination.getManager().getDestinationPolicy().getAcksPolicy();
  
-        if (acknowledgementInterval > 0 && getMonitor().getMPM() >= ap.getIntraMessageThreshold()) {
+        if (acknowledgementInterval > 0 && getMonitor().getMPM() >= (ap == null ? 10 : ap.getIntraMessageThreshold())) {
             LOG.fine("Schedule deferred acknowledgment");
             scheduleDeferredAcknowledgement(acknowledgementInterval);
         } else {
@@ -409,7 +409,7 @@ public class DestinationSequence extends AbstractSequence {
             scheduleImmediateAcknowledgement();
             
             destination.getManager().getTimer().schedule(
-                new ImmediateFallbackAcknowledgment(), ap.getImmediaAcksTimeout());
+                new ImmediateFallbackAcknowledgment(), ap == null ? 1000L : ap.getImmediaAcksTimeout());
            
         }
     }
