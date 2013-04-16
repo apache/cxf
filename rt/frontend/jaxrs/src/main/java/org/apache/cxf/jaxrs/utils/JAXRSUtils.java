@@ -509,7 +509,11 @@ public final class JAXRSUtils {
             Collections.sort(all, new Comparator<MediaType>() {
 
                 public int compare(MediaType mt1, MediaType mt2) {
-                    return compareQualityAndDistance(mt1, mt2, checkDistance);
+                    int result = compareMediaTypes(mt1, mt2, null);
+                    if (result == 0) {
+                        result = compareQualityAndDistance(mt1, mt2, checkDistance);
+                    }
+                    return result;
                 }
                 
             });    
@@ -617,7 +621,10 @@ public final class JAXRSUtils {
         int size1 = mts1.size();
         int size2 = mts2.size();
         for (int i = 0; i < size1 && i < size2; i++) {
-            int result = compareQualityAndDistance(actualMts1.get(i), actualMts2.get(i), true);
+            int result = compareMediaTypes(actualMts1.get(i), actualMts2.get(i), null);
+            if (result == 0) {
+                result = compareQualityAndDistance(actualMts1.get(i), actualMts2.get(i), true);
+            }
             if (result != 0) {
                 return result;
             }
@@ -638,10 +645,6 @@ public final class JAXRSUtils {
             }
         }
         return actualMts;
-    }
-    
-    public static int compareSortedMediaTypes(List<MediaType> mts1, List<MediaType> mts2) {
-        return compareSortedMediaTypes(mts1, mts2, MEDIA_TYPE_Q_PARAM);
     }
     
     public static int compareSortedMediaTypes(List<MediaType> mts1, List<MediaType> mts2, String qs) {
@@ -1482,15 +1485,8 @@ public final class JAXRSUtils {
                                   false);
     }
     
-    public static List<MediaType> sortMediaTypes(String mediaTypes) {
-        return sortMediaTypes(JAXRSUtils.parseMediaTypes(mediaTypes));
-    }
-    
     public static List<MediaType> sortMediaTypes(String mediaTypes, String qs) {
         return sortMediaTypes(JAXRSUtils.parseMediaTypes(mediaTypes), qs);
-    }
-    public static List<MediaType> sortMediaTypes(List<MediaType> types) {
-        return sortMediaTypes(types, MEDIA_TYPE_Q_PARAM);
     }
     public static List<MediaType> sortMediaTypes(List<MediaType> types, final String qs) {
         if (types.size() > 1) {

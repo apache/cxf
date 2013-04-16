@@ -626,10 +626,22 @@ public class JAXRSUtilsTest extends Assert {
         
     }
     
+    private static List<MediaType> sortMediaTypes(String mediaTypes) {
+        return JAXRSUtils.sortMediaTypes(mediaTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
+    }
+    
+    private static List<MediaType> sortMediaTypes(List<MediaType> mediaTypes) {
+        return JAXRSUtils.sortMediaTypes(mediaTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
+    }
+    
+    private static int compareSortedMediaTypes(List<MediaType> mt1, List<MediaType> mt2) {
+        return JAXRSUtils.compareSortedMediaTypes(mt1, mt2, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
+    }
+    
     @Test
     public void testSortMediaTypes() throws Exception {
         List<MediaType> types = 
-            JAXRSUtils.sortMediaTypes("text/*,text/plain;q=.2,text/xml,TEXT/BAR");
+            sortMediaTypes("text/*,text/plain;q=.2,text/xml,TEXT/BAR");
         assertTrue(types.size() == 4
                    && "text/xml".equals(types.get(0).toString())
                    && "text/bar".equals(types.get(1).toString())
@@ -679,14 +691,14 @@ public class JAXRSUtilsTest extends Assert {
         MediaType m1 = MediaType.valueOf("text/xml");
         MediaType m2 = MediaType.valueOf("text/*");
         assertTrue("text/xml is more specific than text/*", 
-                   JAXRSUtils.compareSortedMediaTypes(Collections.singletonList(m1), 
+                   compareSortedMediaTypes(Collections.singletonList(m1), 
                                                       Collections.singletonList(m2)) < 0);
         assertTrue("text/* is less specific than text/xml", 
-                   JAXRSUtils.compareSortedMediaTypes(Collections.singletonList(m2), 
+                   compareSortedMediaTypes(Collections.singletonList(m2), 
                                                       Collections.singletonList(m1)) > 0);
         
         assertTrue("text/xml is the same as text/xml", 
-                   JAXRSUtils.compareSortedMediaTypes(Collections.singletonList(m1), 
+                   compareSortedMediaTypes(Collections.singletonList(m1), 
                                                       Collections.singletonList(m1)) == 0);
         
         List<MediaType> sortedList1 = new ArrayList<MediaType>();
@@ -698,14 +710,14 @@ public class JAXRSUtilsTest extends Assert {
         sortedList2.add(m2);
         
         assertTrue("lists should be equal", 
-                   JAXRSUtils.compareSortedMediaTypes(sortedList1, sortedList2) == 0);
+                   compareSortedMediaTypes(sortedList1, sortedList2) == 0);
         
         sortedList1.add(MediaType.WILDCARD_TYPE);
         assertTrue("first list should be less specific", 
-                   JAXRSUtils.compareSortedMediaTypes(sortedList1, sortedList2) > 0);
+                   compareSortedMediaTypes(sortedList1, sortedList2) > 0);
         sortedList1.add(MediaType.WILDCARD_TYPE);
         assertTrue("second list should be more specific", 
-                   JAXRSUtils.compareSortedMediaTypes(sortedList2, sortedList1) < 0);
+                   compareSortedMediaTypes(sortedList2, sortedList1) < 0);
     }
     
     @Test
@@ -1500,13 +1512,15 @@ public class JAXRSUtilsTest extends Assert {
         
         ori = JAXRSUtils.findTargetMethod(cri, createMessage2(), "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
-                                          JAXRSUtils.sortMediaTypes(getTypes("*/*;q=0.1,text/plain,text/xml;q=0.8")),
+                                          JAXRSUtils.sortMediaTypes(
+                getTypes("*/*;q=0.1,text/plain,text/xml;q=0.8"), "q"),
             true);
                      
         assertSame(ori, ori2);
         ori = JAXRSUtils.findTargetMethod(cri, createMessage2(), "GET", new MetadataMap<String, String>(), 
                                           "*/*", 
-                                          JAXRSUtils.sortMediaTypes(getTypes("*;q=0.1,text/plain,text/xml;q=0.9,x/y")), 
+                                          JAXRSUtils.sortMediaTypes(
+                getTypes("*;q=0.1,text/plain,text/xml;q=0.9,x/y"), "q"), 
             true);
                      
         assertSame(ori, ori2);

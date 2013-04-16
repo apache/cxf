@@ -1062,11 +1062,11 @@ public final class ProviderFactory {
             MessageBodyReader<?> e1 = p1.getProvider();
             MessageBodyReader<?> e2 = p2.getProvider();
             List<MediaType> types1 = JAXRSUtils.getProviderConsumeTypes(e1);
-            types1 = JAXRSUtils.sortMediaTypes(types1);
+            types1 = JAXRSUtils.sortMediaTypes(types1, null);
             List<MediaType> types2 = JAXRSUtils.getProviderConsumeTypes(e2);
-            types2 = JAXRSUtils.sortMediaTypes(types2);
+            types2 = JAXRSUtils.sortMediaTypes(types2, null);
     
-            return JAXRSUtils.compareSortedMediaTypes(types1, types2);
+            return JAXRSUtils.compareSortedMediaTypes(types1, types2, null);
         }
     }
     
@@ -1079,11 +1079,11 @@ public final class ProviderFactory {
             MessageBodyWriter<?> e2 = p2.getProvider();
             
             List<MediaType> types1 =
-                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e1));
+                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e1), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             List<MediaType> types2 =
-                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e2));
+                JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e2), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
     
-            return JAXRSUtils.compareSortedMediaTypes(types1, types2);
+            return JAXRSUtils.compareSortedMediaTypes(types1, types2, JAXRSUtils.MEDIA_TYPE_QS_PARAM);
         }
     }
     
@@ -1097,12 +1097,12 @@ public final class ProviderFactory {
             
             List<MediaType> types1 =
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProduceTypes(
-                                               e1.getClass().getAnnotation(Produces.class)));
+                     e1.getClass().getAnnotation(Produces.class)), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             List<MediaType> types2 =
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProduceTypes(
-                                               e2.getClass().getAnnotation(Produces.class)));
+                     e2.getClass().getAnnotation(Produces.class)), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
     
-            return JAXRSUtils.compareSortedMediaTypes(types1, types2);
+            return JAXRSUtils.compareSortedMediaTypes(types1, types2, JAXRSUtils.MEDIA_TYPE_QS_PARAM);
         }
     }
     
