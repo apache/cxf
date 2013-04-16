@@ -491,7 +491,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
         QName qname = getQName(actualClass, genericType, actualObject);
-        if (ignoreNamespaces && (isCollection  || dropRootElement)) {        
+        if (qname != null && ignoreNamespaces && (isCollection  || dropRootElement)) {        
             qname = new QName(qname.getLocalPart());
         }
         if (BADGER_FISH_CONVENTION.equals(convention)) {
