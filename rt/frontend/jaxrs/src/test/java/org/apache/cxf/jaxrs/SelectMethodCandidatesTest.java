@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.endpoint.Endpoint;
@@ -177,6 +179,67 @@ public class SelectMethodCandidatesTest extends Assert {
         assertEquals(2L, c.getId());
         assertEquals("The Book", c.getTitle());
     }
+    
+    @Test
+    public void testConsumesResource1() throws Exception {
+        doTestConsumesResource(ConsumesResource1.class, "text/xml", "m2");
+    }
+    @Test
+    public void testConsumesResource2() throws Exception {
+        doTestConsumesResource(ConsumesResource2.class, "m1");
+    }
+    @Test
+    public void testConsumesResource3() throws Exception {
+        doTestConsumesResource(ConsumesResource3.class, "m1");
+    }
+    @Test
+    public void testConsumesResource4() throws Exception {
+        doTestConsumesResource(ConsumesResource4.class, "application/xml+bar", "m2");
+    }
+    
+    private void doTestConsumesResource(Class<?> resourceClass, String expectedMethodName) throws Exception {
+        doTestConsumesResource(resourceClass, null, expectedMethodName);
+    }
+    private void doTestConsumesResource(Class<?> resourceClass, String ct, 
+                                        String expectedMethodName) throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(resourceClass);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        String contentType = ct == null ? "application/xml" : ct;
+        String acceptContentTypes = "*/*";
+        
+        Message m = new MessageImpl();
+        m.put(Message.CONTENT_TYPE, contentType);
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        m.setExchange(ex);
+        Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        e.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        e.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        e.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
+        e.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.replay(e);
+        ex.put(Endpoint.class, e);
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/", values,
+                                                                    m);
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                                                m, 
+                                    "POST", values, contentType, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes),
+                                    true);
+        assertNotNull(ori);
+        assertEquals(expectedMethodName,  ori.getMethodToInvoke().getName());
+    }
+    
     
     private void doTestGenericSuperType(Class<?> serviceClass, String methodName) throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
@@ -446,4 +509,54 @@ public class SelectMethodCandidatesTest extends Assert {
     }
     
 
+    
+    public static class ConsumesResource1 {
+        @POST
+        @Consumes({"application/xml", "text/*" })
+        public void m1() {
+            
+        }
+        @POST
+        @Consumes({"application/xml", "text/xml" })
+        public void m2() {
+            
+        }
+    }
+    public static class ConsumesResource2 {
+        @POST
+        @Consumes({"application/*", "text/xml" })
+        public void m2() {
+            
+        }
+        @POST
+        @Consumes({"text/*", "application/xml" })
+        public void m1() {
+            
+        }
+    }
+    public static class ConsumesResource3 {
+        @POST
+        @Consumes({"application/*" })
+        public void m2() {
+            
+        }
+        @POST
+        @Consumes({"application/xml" })
+        public void m1() {
+            
+        }
+    }
+    public static class ConsumesResource4 {
+        @POST
+        @Consumes({"application/xml", "application/xml+*" })
+        public void m1() {
+            
+        }
+        @POST
+        @Consumes({"application/*", "application/xml+bar" })
+        public void m2() {
+            
+        }
+    }
+    
 }

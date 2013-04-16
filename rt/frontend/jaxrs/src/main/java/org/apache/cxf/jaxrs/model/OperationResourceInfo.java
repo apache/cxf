@@ -182,14 +182,14 @@ public class OperationResourceInfo {
     private void checkMediaTypes(String consumeMediaTypes,
                                  String produceMediaTypes) {
         if (consumeMediaTypes != null) {
-            consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes);
+            consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes, null);
         } else {
             Consumes cm = 
                 AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
             if (cm != null) {
-                consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()));
+                consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()), null);
             } else if (classResourceInfo != null) {
-                consumeMimes = JAXRSUtils.sortMediaTypes(classResourceInfo.getConsumeMime());
+                consumeMimes = JAXRSUtils.sortMediaTypes(classResourceInfo.getConsumeMime(), null);
             }
         }
         if (produceMediaTypes != null) {
