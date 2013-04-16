@@ -142,7 +142,7 @@ public class DOM4JProviderTest extends Assert {
     }
     
     private Message createMessageWithJSONProvider() {
-        ProviderFactory factory = ServerProviderFactory.getInstance();
+        ProviderFactory factory = ProviderFactory.getInstance();
         JSONProvider<Object> provider = new JSONProvider<Object>();
         provider.setDropRootElement(true);
         provider.setIgnoreNamespaces(true);
@@ -161,7 +161,7 @@ public class DOM4JProviderTest extends Assert {
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         endpoint.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
+        endpoint.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
