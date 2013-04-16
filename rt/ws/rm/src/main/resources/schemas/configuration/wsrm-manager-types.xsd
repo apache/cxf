@@ -78,6 +78,14 @@
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute>
+        <xs:attribute name="maxSequences" type="xs:int" use="optional" default="0">
+            <xs:annotation>
+                <xs:documentation>
+                    The maximum number of sequences that can be held active. A value of
+                    0 indicates there is no limit.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="DestinationPolicyType">
@@ -110,6 +118,14 @@
             </xs:annotation>      
         </xs:attribute>
         
+        <xs:attribute name="maxSequences" type="xs:int" use="optional" default="0">
+            <xs:annotation>
+                <xs:documentation>
+                    The maximum number of sequences that can be held active. A value of
+                    0 indicates there is no limit.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="SequenceTerminationPolicyType">    
