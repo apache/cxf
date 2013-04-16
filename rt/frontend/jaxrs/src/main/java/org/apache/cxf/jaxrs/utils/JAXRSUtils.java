@@ -153,7 +153,7 @@ public final class JAXRSUtils {
     public static final String ROOT_INSTANCE = "service.root.instance";
     public static final String ROOT_PROVIDER = "service.root.provider";
     public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
-        "partial.hierarchical.media.subtype.check"; 
+        "media.subtype.partial.check"; 
     public static final String DOC_LOCATION = "wadl.location";
     public static final String DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES = "defaultProviders.for.simpleTypes";
     public static final String MEDIA_TYPE_Q_PARAM = "q";
