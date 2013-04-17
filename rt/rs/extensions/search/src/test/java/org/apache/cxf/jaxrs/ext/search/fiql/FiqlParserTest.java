@@ -128,13 +128,27 @@ public class FiqlParserTest extends Assert {
 
     @Test
     public void testParseName() throws SearchParseException {
-        SearchCondition<Condition> filter = parser.parse("name==king");
+        doTestParseName("name==king");
+    }
+    
+    @Test
+    public void testParseTheName() throws SearchParseException {
+        doTestParseName("thename==king");
+    }
+    
+    @Test
+    public void testParseTheName2() throws SearchParseException {
+        doTestParseName("theName==king");
+    }
+
+    private void doTestParseName(String exp) throws SearchParseException {
+        SearchCondition<Condition> filter = parser.parse(exp);
         assertTrue(filter.isMet(new Condition("king", 10, new Date())));
         assertTrue(filter.isMet(new Condition("king", 0, null)));
         assertFalse(filter.isMet(new Condition("diamond", 10, new Date())));
         assertFalse(filter.isMet(new Condition("diamond", 0, null)));
     }
-
+    
     @Test
     public void testParseLevel() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("level=gt=10");
@@ -319,8 +333,12 @@ public class FiqlParserTest extends Assert {
             this.time = time;
         }
 
-        public void setException(Exception ex) {
-            // do nothing
+        public void setTheName(String thename) {
+            setName(thename);
+        }
+        
+        public String getTheName() {
+            return getName();
         }
 
     }
