@@ -211,7 +211,7 @@ public final class JAXRSUtils {
                                                 message,
                                                 values,
                                                 ori);
-            InjectionUtils.injectThroughMethod(requestObject, m, o);
+            InjectionUtils.injectThroughMethod(requestObject, m, o, message);
         }
         // Param fields
         for (Field f : cri.getParameterFields()) {
@@ -226,7 +226,6 @@ public final class JAXRSUtils {
                                                 ori);
             InjectionUtils.injectFieldValue(f, requestObject, o);
         }
-        
     }
     
     public static ClassResourceInfo selectResourceClass(List<ClassResourceInfo> resources,

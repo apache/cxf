@@ -75,23 +75,24 @@ public class JAXRSInvoker extends AbstractInvoker {
     }
 
     public Object invoke(Exchange exchange, Object request) {
-        Response response = exchange.get(Response.class);
-        if (response != null) {
-            // this means a blocking request filter provided a Response
-            // or earlier exception has been converted to Response
-
-            //TODO: should we remove response from exchange ?
-            //      or should we rather ignore content list and have
-            //      Response set here for all cases and extract it
-            //      in the out interceptor instead of dealing with the contents list ?
-            return new MessageContentsList(response);
+        MessageContentsList responseList = checkExchangeForResponse(exchange);
+        if (responseList != null) {
+            return responseList; 
         }
+
         ResourceProvider provider = getResourceProvider(exchange);
-        Object rootInstance = getServiceObject(exchange);
-        Object serviceObject = getActualServiceObject(exchange, rootInstance);
-        
+        Object rootInstance = null;
         try {
+            rootInstance = getServiceObject(exchange);
+            Object serviceObject = getActualServiceObject(exchange, rootInstance);
+            
             return invoke(exchange, request, serviceObject);
+        } catch (WebApplicationException ex) {
+            responseList = checkExchangeForResponse(exchange);
+            if (responseList != null) {
+                return responseList; 
+            }
+            return handleFault(ex, exchange.getInMessage());
         } finally {
             boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
             if (!suspended) {
@@ -261,6 +262,45 @@ public class JAXRSInvoker extends AbstractInvoker {
         }
 
         return result;
+    }
+    
+    private MessageContentsList checkExchangeForResponse(Exchange exchange) {
+        Response r = exchange.get(Response.class);
+        if (r != null) {
+            return new MessageContentsList(r);
+        } else {
+            return null;
+        }
+    }
+    
+    private Object handleFault(Throwable ex, Message inMessage) {
+        return handleFault(new Fault(ex), inMessage, null, null);
+    }
+    private Object handleFault(Fault ex, Message inMessage, 
+                               ClassResourceInfo cri, Method methodToInvoke) {
+        String errorMessage = ex.getMessage();
+        if (errorMessage != null && cri != null 
+            && errorMessage.contains(PROXY_INVOCATION_ERROR_FRAGMENT)) {
+            org.apache.cxf.common.i18n.Message errorM =
+                new org.apache.cxf.common.i18n.Message("PROXY_INVOCATION_FAILURE",
+                                                       BUNDLE,
+                                                       methodToInvoke,
+                                                       cri.getServiceClass().getName());
+            LOG.severe(errorM.toString());
+        }
+        Response excResponse = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
+        if (excResponse == null) {
+            ProviderFactory.getInstance(inMessage).clearThreadLocalProxies();
+            ClassResourceInfo criRoot =
+                (ClassResourceInfo)inMessage.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+            if (criRoot != null) {
+                criRoot.clearThreadLocalProxies();
+            }
+            inMessage.getExchange().put(Message.PROPOGATE_EXCEPTION, 
+                                        JAXRSUtils.propogateException(inMessage));
+            throw ex;
+        }
+        return new MessageContentsList(excResponse);
     }
 
     @SuppressWarnings("unchecked")
