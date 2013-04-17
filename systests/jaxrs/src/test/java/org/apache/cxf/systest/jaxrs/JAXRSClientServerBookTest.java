@@ -1442,6 +1442,50 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookByHeaderPerRequestInjected() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore2/bookheaders/injected";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        wc.header("BOOK", "1", "2", "3");
+        Book b = wc.get(Book.class);
+        assertEquals(123L, b.getId());
+    }
+    
+    @Test
+    public void testGetBookByHeaderPerRequestInjectedFault() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore2/bookheaders/injected";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        wc.header("BOOK", "2", "3");
+        Response r = wc.get();
+        assertEquals(400, r.getStatus());
+        assertEquals("Param setter: 3 header values are required", r.readEntity(String.class));
+    }
+    
+    @Test
+    public void testGetBookByHeaderPerRequestConstructorFault() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore2/bookheaders";
+        WebClient wc = WebClient.create(address);
+        wc.accept("application/xml");
+        wc.header("BOOK", "1", "2", "4");
+        Response r = wc.get();
+        assertEquals(400, r.getStatus());
+        assertEquals("Constructor: Header value 3 is required", r.readEntity(String.class));
+    }
+    
+    @Test
+    public void testGetBookByHeaderPerRequestContextFault() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore2/bookheaders";
+        WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        wc.accept("application/xml");
+        wc.header("BOOK", "1", "3", "4");
+        Response r = wc.get();
+        assertEquals(400, r.getStatus());
+        assertEquals("Context setter: unexpected header value", r.readEntity(String.class));
+    }
+    
+    @Test
     public void testGetBookByHeaderDefault() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/bookheaders2",
                                "resources/expected_get_book123.txt",

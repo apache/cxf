@@ -259,12 +259,26 @@ public final class InjectionUtils {
     }
     
     public static void injectThroughMethod(Object requestObject,
-                                           Method method,
-                                           Object parameterValue) {
+                                               Method method,
+                                               Object parameterValue) {
+        injectThroughMethod(requestObject, method, parameterValue, null);
+    }
+    
+    public static void injectThroughMethod(Object requestObject,
+                                               Method method,
+                                               Object parameterValue,
+                                               Message inMessage) {
         try {
             Method methodToInvoke = checkProxy(method, requestObject);
             methodToInvoke.invoke(requestObject, new Object[]{parameterValue});
         } catch (IllegalAccessException ex) {
+            reportServerError("METHOD_ACCESS_FAILURE", method.getName());
+        } catch (InvocationTargetException ex) {
+            Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), inMessage);
+            if (r != null) {
+                inMessage.getExchange().put(Response.class, r);
+                throw new InternalServerErrorException();
+            }
             reportServerError("METHOD_ACCESS_FAILURE", method.getName());
         } catch (Exception ex) {
             reportServerError("METHOD_INJECTION_FAILURE", method.getName());
@@ -968,7 +982,7 @@ public final class InjectionUtils {
             
             if (o != null) {
                 if (!cri.isSingleton()) {
-                    InjectionUtils.injectThroughMethod(requestObject, method, o);
+                    InjectionUtils.injectThroughMethod(requestObject, method, o, message);
                 } else {
                     ThreadLocalProxy<Object> proxy 
                         = (ThreadLocalProxy<Object>)cri.getContextSetterProxy(method);

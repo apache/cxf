@@ -283,7 +283,7 @@ public final class JAXRSUtils {
                                                 values,
                                                 ori);
             }
-            InjectionUtils.injectThroughMethod(requestObject, m, o);
+            InjectionUtils.injectThroughMethod(requestObject, m, o, message);
         }
         // Param fields
         for (Field f : bri.getParameterFields()) {
@@ -304,7 +304,6 @@ public final class JAXRSUtils {
             }
             InjectionUtils.injectFieldValue(f, requestObject, o);
         }
-        
     }
     
     public static ClassResourceInfo selectResourceClass(List<ClassResourceInfo> resources,
@@ -1560,6 +1559,9 @@ public final class JAXRSUtils {
     }
     
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message currentMessage) {
+        if (ex == null || currentMessage == null) {
+            return null;
+        }
         Message inMessage = currentMessage.getExchange().getInMessage();
         Response response = null;
         if (ex.getClass() == WebApplicationException.class) {
