@@ -1311,6 +1311,15 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testDropJSONRootDynamically() {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/dropjsonroot");
+        wc.accept("application/json");
+        String response = wc.get(String.class);
+        // with root: {"Book":{"id":123,"name":"CXF in Action"}}
+        assertEquals("{\"id\":123,\"name\":\"CXF in Action\"}", response);
+    }
+    
+    @Test
     public void testFormattedJSON() {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
         wc.accept("application/json");
