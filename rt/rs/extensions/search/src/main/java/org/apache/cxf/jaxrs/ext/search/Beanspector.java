@@ -95,7 +95,7 @@ public class Beanspector<T> {
     }
 
     public TypeInfo getAccessorTypeInfo(String getterOrSetterName) throws Exception {
-        Method m = getters.get(getterOrSetterName);
+        Method m = getters.get(getterOrSetterName.toLowerCase());
         if (m == null) {
             m = setters.get(getterOrSetterName);
         }
@@ -122,7 +122,7 @@ public class Beanspector<T> {
     }
 
     public Beanspector<T> setValue(String setterName, Object value) throws Throwable {
-        Method m = setters.get(setterName);
+        Method m = setters.get(setterName.toLowerCase());
         if (m == null) {
             String msg = String.format("Setter '%s' not found, " + "known setters are: %s", setterName,
                                        setters.keySet());
