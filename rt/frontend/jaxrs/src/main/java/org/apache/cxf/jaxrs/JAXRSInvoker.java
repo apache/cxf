@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
@@ -78,28 +79,31 @@ public class JAXRSInvoker extends AbstractInvoker {
     }
 
     public Object invoke(Exchange exchange, Object request) {
-        Response response = exchange.get(Response.class);
-        if (response == null) {
-            AsyncResponse asyncResp = exchange.get(AsyncResponse.class);
-            if (asyncResp != null) {
-                AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
-                asyncImpl.prepareContinuation();
-                asyncImpl.handleTimeout();
-                return handleAsyncResponse(exchange, asyncImpl);
-            }
+        MessageContentsList responseList = checkExchangeForResponse(exchange);
+        if (responseList != null) {
+            return responseList; 
         }
-        if (response != null) {
-            return new MessageContentsList(response);
+        AsyncResponse asyncResp = exchange.get(AsyncResponse.class);
+        if (asyncResp != null) {
+            AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
+            asyncImpl.prepareContinuation();
+            asyncImpl.handleTimeout();
+            return handleAsyncResponse(exchange, asyncImpl);
         }
-        
-        
         
         ResourceProvider provider = getResourceProvider(exchange);
-        Object rootInstance = getServiceObject(exchange);
-        Object serviceObject = getActualServiceObject(exchange, rootInstance);
-        
+        Object rootInstance = null;
         try {
+            rootInstance = getServiceObject(exchange);
+            Object serviceObject = getActualServiceObject(exchange, rootInstance);
+            
             return invoke(exchange, request, serviceObject);
+        } catch (InternalServerErrorException ex) {
+            responseList = checkExchangeForResponse(exchange);
+            if (responseList != null) {
+                return responseList; 
+            }
+            return handleFault(ex, exchange.getInMessage());
         } finally {
             boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
             if (!suspended) {
@@ -281,15 +285,27 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
     
+    private MessageContentsList checkExchangeForResponse(Exchange exchange) {
+        Response r = exchange.get(Response.class);
+        if (r != null) {
+            JAXRSUtils.setMessageContentType(exchange.getInMessage(), r);
+            return new MessageContentsList(r);
+        } else {
+            return null;
+        }
+    }
+    
     private void setResponseContentTypeIfNeeded(Message inMessage, Object response) {
         if (response instanceof Response) {
             JAXRSUtils.setMessageContentType(inMessage, (Response)response);
         }
     }
-    
+    private Object handleFault(Throwable ex, Message inMessage) {
+        return handleFault(new Fault(ex), inMessage, null, null);
+    }
     private Object handleFault(Fault ex, Message inMessage, 
                                ClassResourceInfo cri, Method methodToInvoke) {
-        String errorMessage = ex.getCause().getMessage();
+        String errorMessage = ex.getMessage();
         if (errorMessage != null && cri != null 
             && errorMessage.contains(PROXY_INVOCATION_ERROR_FRAGMENT)) {
             org.apache.cxf.common.i18n.Message errorM =

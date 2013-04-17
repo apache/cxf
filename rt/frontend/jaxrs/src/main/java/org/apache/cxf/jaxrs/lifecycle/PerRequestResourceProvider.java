@@ -27,6 +27,7 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
@@ -78,6 +79,11 @@ public class PerRequestResourceProvider implements ResourceProvider {
                 + " due to IllegalAccessException";
             throw new InternalServerErrorException(Response.serverError().entity(msg).build());
         } catch (InvocationTargetException ex) {
+            Response r = JAXRSUtils.convertFaultToResponse(ex.getCause(), m);
+            if (r != null) {
+                m.getExchange().put(Response.class, r);
+                throw new InternalServerErrorException();
+            }
             String msg = "Resource class "
                 + c.getDeclaringClass().getName() + " can not be instantiated"
                 + " due to InvocationTargetException";
