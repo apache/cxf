@@ -41,16 +41,18 @@ import org.apache.xml.security.utils.Base64;
 public class KerberosClient implements Configurable {
     private static final Logger LOG = LogUtils.getL7dLogger(KerberosClient.class);
     
-    Bus bus;
     String name = "default.kerberos-client";
     
     private String serviceName;
     private CallbackHandler callbackHandler;
     private String contextName;
     private WSSConfig wssConfig = WSSConfig.getNewInstance();
-    
+
+    @Deprecated
     public KerberosClient(Bus b) {
-        bus = b;
+    }
+    
+    public KerberosClient() {
     }
 
     public String getBeanName() {
