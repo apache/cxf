@@ -85,7 +85,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     
     private static final String MAPPED_CONVENTION = "mapped";
     private static final String BADGER_FISH_CONVENTION = "badgerfish";
-    
+    private static final String DROP_ROOT_CONTEXT_PROPERTY = "drop.json.root.element";
     static {
         new SimpleConverter();
     }
@@ -490,12 +490,15 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         
-        QName qname = actualClass == Document.class ? null : getQName(actualClass, genericType, actualObject);
-        if (qname != null && ignoreNamespaces && (isCollection  || dropRootElement)) {        
-            qname = new QName(qname.getLocalPart());
-        }
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishWriter(os);
+        }
+        
+        boolean dropRootNeeded = isDropRootNeeded();
+        
+        QName qname = actualClass == Document.class ? null : getQName(actualClass, genericType, actualObject);
+        if (qname != null && ignoreNamespaces && (isCollection  || dropRootNeeded)) {        
+            qname = new QName(qname.getLocalPart());
         }
         
         Configuration config = 
@@ -506,10 +509,22 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,
-             isCollection || dropRootElement);
+             isCollection || dropRootNeeded);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
         return createTransformWriterIfNeeded(writer, os);
+    }
+    
+    protected boolean isDropRootNeeded() {
+        MessageContext mc = getContext();
+        if (mc != null) {
+            Object prop = mc.get(DROP_ROOT_CONTEXT_PROPERTY);
+            if (prop != null) {
+                // means the property has been set explicitly
+                return MessageUtils.isTrue(prop);
+            }
+        }
+        return dropRootElement;
     }
     
     protected void marshal(Object actualObject, Class<?> actualClass, 
