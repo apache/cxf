@@ -142,6 +142,14 @@ public class BookStore {
     }
     
     @GET
+    @Path("/dropjsonroot")
+    @Produces("application/json")
+    public Book getBookDropJsonRoot(@Context MessageContext mc) throws BookNotFoundFault {
+        mc.put("drop.json.root.element", "true");
+        return doGetBook("123");
+    }
+    
+    @GET
     @Path("/booknames/123")
     @Produces("application/bar")
     public byte[] getBookName123() {
