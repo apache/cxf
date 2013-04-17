@@ -102,7 +102,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         Object answer = null;
         ApplicationContext aContext = applicationContext;
         // try to find out the bundleContext by going through the parent context
-        while (aContext != null && answer != null) {
+        while (aContext != null && answer == null) {
             answer = getBundleContext(aContext, b);
             aContext = aContext.getParent();
         }
