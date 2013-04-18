@@ -236,13 +236,13 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Converts proxy to Client
-     * @param proxy the proxy
-     * @return proxy as a Client 
+     * Converts object to Client
+     * @param object the object
+     * @return Client object converted to Client 
      */
-    public static Client client(Object proxy) {
-        if (proxy instanceof Client) {
-            return (Client)proxy;
+    public static Client client(Object object) {
+        if (object instanceof Client) {
+            return (Client)object;
         }
         return null;
     }
