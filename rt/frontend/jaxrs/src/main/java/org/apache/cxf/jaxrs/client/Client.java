@@ -156,4 +156,9 @@ public interface Client {
      * @return JAXRS Response response
      */
     Response getResponse();
+
+    /**
+     * Releases the internal state and configuration associated with this client 
+     */
+    void close(); 
 }
