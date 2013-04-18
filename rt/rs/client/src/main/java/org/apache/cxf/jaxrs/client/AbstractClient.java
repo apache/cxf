@@ -93,7 +93,7 @@ import org.apache.cxf.transport.MessageObserver;
  * Common proxy and http-centric client implementation
  *
  */
-public abstract class AbstractClient implements Client, Retryable {
+public abstract class AbstractClient implements Client {
     protected static final String REQUEST_CONTEXT = "RequestContext";
     protected static final String RESPONSE_CONTEXT = "ResponseContext";
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
@@ -590,8 +590,8 @@ public abstract class AbstractClient implements Client, Retryable {
     }
     
     @SuppressWarnings("unchecked")
-    public Object[] invoke(BindingOperationInfo oi, Object[] params, Map<String, Object> context,
-                           Exchange exchange) throws Exception {
+    protected Object[] retryInvoke(BindingOperationInfo oi, Object[] params, Map<String, Object> context,
+                              Exchange exchange) throws Exception {
         
         try {
             Object body = params.length == 0 ? null : params[0];
@@ -886,7 +886,7 @@ public abstract class AbstractClient implements Client, Retryable {
         exchange = createExchange(m, exchange);
         exchange.put(Message.REST_MESSAGE, Boolean.TRUE);
         exchange.setOneWay("true".equals(headers.getFirst(Message.ONE_WAY_REQUEST)));
-        exchange.put(Retryable.class, this);
+        exchange.put(Retryable.class, new RetryableImpl());
         
         // context
         setContexts(m, exchange, invocationContext, proxy);
@@ -993,5 +993,14 @@ public abstract class AbstractClient implements Client, Retryable {
                                             Type bodyType,
                                             Annotation[] customAnns,
                                             OutputStream os) throws Fault;
+    }
+    
+    private class RetryableImpl implements Retryable {
+
+        public Object[] invoke(BindingOperationInfo oi, Object[] params, Map<String, Object> context,
+                               Exchange exchange) throws Exception {
+            return AbstractClient.this.retryInvoke(oi, params, context, exchange);
+        }
+        
     }
 }
