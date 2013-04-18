@@ -28,6 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.UpfrontConduitSelector;
@@ -209,6 +210,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                 : new WebClient(actualState);
             initClient(client, ep, actualState == null);
     
+            notifyLifecycleManager(client); 
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, client, ep);
             
             return client;
@@ -219,6 +221,12 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     
+    private void notifyLifecycleManager(Object client) {
+        ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);
+        if (null != mgr) {
+            mgr.clientCreated(new FrontendClientAdapter(WebClient.getConfig(client)));
+        }
+    }  
     
     private ClientState getActualState() {
         if (threadSafe) {
@@ -311,6 +319,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                                                                 InvocationHandlerAware.class}, 
                                      proxyImpl);
             }
+
+            notifyLifecycleManager(actualClient);
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, actualClient, ep);
             return actualClient;
         } catch (IllegalArgumentException ex) {
