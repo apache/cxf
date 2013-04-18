@@ -256,7 +256,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
      * @return the client
      */
     public Client create() { 
-        return createWithValues();
+        if (serviceClass == WebClient.class) {
+            return createWebClient();
+        } else {
+            return createWithValues();
+        }
     }
     
     /**

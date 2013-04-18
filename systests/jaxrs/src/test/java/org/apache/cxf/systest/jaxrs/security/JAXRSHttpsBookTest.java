@@ -45,7 +45,9 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     private static final String CLIENT_CONFIG_FILE3 =
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client3.xml";
     private static final String CLIENT_CONFIG_FILE4 =
-        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client4.xml";    
+        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client4.xml";
+    private static final String CLIENT_CONFIG_FILE5 =
+        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-client5.xml";
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -90,6 +92,26 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         
         WebClient wc = WebClient.fromClient(WebClient.client(bs));
         assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
+        wc.accept("application/xml");
+        wc.path("bookstore/securebooks/123");
+        TheBook b = wc.get(TheBook.class);
+        
+        assertEquals(b.getId(), 123);
+        b = wc.get(TheBook.class);
+        assertEquals(b.getId(), 123);
+    }
+    
+    @Test
+    public void testGetBook123WebClientFromSpringWildcard() throws Exception {
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {CLIENT_CONFIG_FILE5});
+        Object bean = ctx.getBean("bookService.proxyFactory");
+        assertNotNull(bean);
+        JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
+        
+        WebClient wc = (WebClient)cfb.create();
+        assertEquals("https://localhost:" + PORT, wc.getBaseURI().toString());
+        
         wc.accept("application/xml");
         wc.path("bookstore/securebooks/123");
         TheBook b = wc.get(TheBook.class);
