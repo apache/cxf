@@ -190,6 +190,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (certConstraints != null) {
             msg.setContextualProperty(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
         }
+        
+        // Now set SAML SenderVouches + Holder Of Key requirements
+        boolean validateSAMLSubjectConf = 
+            MessageUtils.getContextualBoolean(
+                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
+            );
+        msg.setContextualProperty(
+            WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
+            Boolean.toString(validateSAMLSubjectConf)
+        );
     }
 
     @Override

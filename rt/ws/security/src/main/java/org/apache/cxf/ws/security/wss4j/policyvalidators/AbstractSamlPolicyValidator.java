@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.ws.security.wss4j.SAMLUtils;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractToken;
 
@@ -77,7 +77,7 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
-        return SAMLUtils.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts);
+        return DOMSAMLUtil.checkHolderOfKey(assertionWrapper, signedResults, tlsCerts);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class AbstractSamlPolicyValidator extends AbstractTokenPolicyVal
         List<WSSecurityEngineResult> signedResults,
         Certificate[] tlsCerts
     ) {
-        return SAMLUtils.compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
+        return DOMSAMLUtil.compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
     }
     
 }

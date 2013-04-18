@@ -32,10 +32,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.security.wss4j.SAMLUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.SamlToken;
@@ -118,7 +118,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator implem
                     ai.setNotAsserted("Assertion fails holder-of-key requirements");
                     continue;
                 }
-                if (!SAMLUtils.checkSenderVouches(assertionWrapper, tlsCerts, body, signed)) {
+                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, body, signed)) {
                     ai.setNotAsserted("Assertion fails sender-vouches requirements");
                     continue;
                 }

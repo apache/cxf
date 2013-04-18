@@ -20,6 +20,7 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -252,6 +254,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
                 );
             reqData.setTimestampReplayCache(timestampCache);
+            
+            TLSSessionInfo tlsInfo = msg.get(TLSSessionInfo.class);
+            if (tlsInfo != null) {
+                Certificate[] tlsCerts = tlsInfo.getPeerCertificates();
+                reqData.setTlsCerts(tlsCerts);
+            }
 
             /*
              * Get and check the Signature specific parameters first because
@@ -362,15 +370,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 + "use WS-SecurityPolicy, or else use the CryptoCoverageChecker or "
                 + "SignatureCoverageChecker";
             LOG.warning(warning);
-        }
-        
-        // Now check SAML SenderVouches + Holder Of Key requirements
-        boolean validateSAMLSubjectConf = 
-            MessageUtils.getContextualBoolean(
-                msg, SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
-            );
-        if (validateSAMLSubjectConf) {
-            SAMLUtils.validateSAMLResults(wsResult, msg, body);
         }
         
     }
