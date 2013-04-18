@@ -114,6 +114,49 @@ public class SamlTokenTest extends AbstractSecurityTest {
         assert !receivedAssertion.isSigned();
     }
     
+    @Test
+    public void testSaml1TokenSignedSenderVouches() throws Exception {
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
+        outProperties.put(
+            WSHandlerConstants.SAML_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.saml.SAML1CallbackHandler"
+        );
+        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put("password", "password");
+        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(
+            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
+        );
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/saml1:Assertion");
+
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+        SamlAssertionWrapper receivedAssertion = 
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null && receivedAssertion.getSaml1() != null);
+        assert !receivedAssertion.isSigned();
+    }
+    
     /**
      * This test creates a SAML2 Assertion and sends it in the security header to the provider.
      */
@@ -128,6 +171,51 @@ public class SamlTokenTest extends AbstractSecurityTest {
         
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
+        final Map<QName, Object> customMap = new HashMap<QName, Object>();
+        CustomSamlValidator validator = new CustomSamlValidator();
+        validator.setRequireSAML1Assertion(false);
+        customMap.put(WSSecurityEngine.SAML_TOKEN, validator);
+        customMap.put(WSSecurityEngine.SAML2_TOKEN, validator);
+        inProperties.put(WSS4JInInterceptor.VALIDATOR_MAP, customMap);
+        
+        List<String> xpaths = new ArrayList<String>();
+        xpaths.add("//wsse:Security");
+        xpaths.add("//wsse:Security/saml2:Assertion");
+
+        Map<String, String> inMessageProperties = new HashMap<String, String>();
+        inMessageProperties.put(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, "false");
+        Message message = makeInvocation(outProperties, xpaths, inProperties, inMessageProperties);
+        
+        final List<WSHandlerResult> handlerResults = 
+            CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
+        
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(handlerResults.get(0).getResults(), WSConstants.ST_UNSIGNED);
+        SamlAssertionWrapper receivedAssertion = 
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null && receivedAssertion.getSaml2() != null);
+        assert !receivedAssertion.isSigned();
+    }
+    
+    @Test
+    public void testSaml2TokenSignedSenderVouches() throws Exception {
+        Map<String, Object> outProperties = new HashMap<String, Object>();
+        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
+        outProperties.put(
+            WSHandlerConstants.SAML_CALLBACK_CLASS, 
+            "org.apache.cxf.ws.security.wss4j.saml.SAML2CallbackHandler"
+        );
+        outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        outProperties.put(WSHandlerConstants.USER, "alice");
+        outProperties.put("password", "password");
+        outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(
+            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE
+        );
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         final Map<QName, Object> customMap = new HashMap<QName, Object>();
         CustomSamlValidator validator = new CustomSamlValidator();
         validator.setRequireSAML1Assertion(false);
@@ -169,6 +257,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
+        callbackHandler.setSignAssertion(true);
         outProperties.put(
             WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
         );
@@ -227,6 +316,7 @@ public class SamlTokenTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        callbackHandler.setSignAssertion(true);
         outProperties.put(
             WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler
         );

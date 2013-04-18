@@ -40,6 +40,8 @@ import org.opensaml.common.SAMLVersion;
  */
 public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
     
+    private boolean signAssertion;
+    
     public SAML1CallbackHandler() throws Exception {
         if (certs == null) {
             Crypto crypto = CryptoFactory.getInstance("alice.properties");
@@ -79,6 +81,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                     callback.setIssuerCrypto(crypto);
                     callback.setIssuerKeyName("myalias");
                     callback.setIssuerKeyPassword("myAliasPassword");
+                    callback.setSignAssertion(signAssertion);
                 } catch (WSSecurityException e) {
                     throw new IOException(e);
                 }
@@ -87,6 +90,14 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
+    }
+
+    public boolean isSignAssertion() {
+        return signAssertion;
+    }
+
+    public void setSignAssertion(boolean signAssertion) {
+        this.signAssertion = signAssertion;
     }
     
 }
