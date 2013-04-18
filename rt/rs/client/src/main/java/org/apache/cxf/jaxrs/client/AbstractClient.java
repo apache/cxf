@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.client;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -58,6 +60,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Retryable;
@@ -274,6 +277,29 @@ public abstract class AbstractClient implements Client {
         return this;
     }
 
+    public void close() {
+        if (cfg.getBus() == null) {
+            return;
+        }
+        ClientLifeCycleManager mgr = cfg.getBus().getExtension(ClientLifeCycleManager.class);
+        if (null != mgr) {
+            mgr.clientDestroyed(new FrontendClientAdapter(getConfiguration()));
+        }
+
+        if (cfg.getConduitSelector() instanceof Closeable) {
+            try {
+                ((Closeable)cfg.getConduitSelector()).close();
+            } catch (IOException e) {
+                //ignore, we're destroying anyway
+            }
+        } else {
+            cfg.getConduit().close();
+        }
+        state.reset();
+        state = null;
+        cfg = null;
+    }
+    
     private void possiblyAddHeader(String name, String value) {
         if (!isDuplicate(name, value)) {
             state.getRequestHeaders().add(name, value);
