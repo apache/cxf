@@ -663,8 +663,11 @@ public final class ResourceUtils {
         if (!ignoreAppPath) {
             ApplicationPath appPath = app.getClass().getAnnotation(ApplicationPath.class);
             if (appPath != null) {
-                address = appPath.value().length() == 0 ? "/" : appPath.value();
+                address = appPath.value();
             }
+        }
+        if (!address.startsWith("/")) {
+            address = "/" + address;
         }
         bean.setAddress(address);
         bean.setStaticSubresourceResolution(staticSubresourceResolution);
