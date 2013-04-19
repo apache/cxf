@@ -266,8 +266,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         );
         properties.setCallbackHandler(new PasswordCallbackHandler());
         
-        // outProperties.put("password", "password");
-        
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
         
@@ -325,8 +323,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
         );
-        
-        // outProperties.put("password", "password");
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);

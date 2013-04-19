@@ -246,7 +246,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             saml2Port.doubleIt(25);
             fail("Expected failure on an invocation with an unsigned SAML SV Assertion");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("Assertion fails sender-vouches requirements"));
+            assertTrue(ex.getMessage().contains("An error was discovered processing"));
         }
         
         ((java.io.Closeable)saml2Port).close();
