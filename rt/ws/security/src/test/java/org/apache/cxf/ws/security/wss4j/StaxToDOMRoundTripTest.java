@@ -358,7 +358,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
             new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.TIMESTAMP}
         );
         properties.addSignaturePart(
-            new SecurePart(new QName(WSSConstants.NS_WSSE10, "Timestamp"), SecurePart.Modifier.Element)
+            new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
         );
         properties.addSignaturePart(
             new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
@@ -373,6 +373,57 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+    }
+    
+    // TODO
+    @Test
+    @org.junit.Ignore
+    public void testSignatureTimestampWrongNamespace() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inProperties = new HashMap<String, Object>();
+        inProperties.put(
+            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
+        );
+        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
+        service.getInInterceptors().add(inInterceptor);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(
+            new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.TIMESTAMP}
+        );
+        properties.addSignaturePart(
+            new SecurePart(new QName(WSSConstants.NS_WSSE10, "Timestamp"), SecurePart.Modifier.Element)
+        );
+        properties.addSignaturePart(
+            new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
+        );
+        properties.setSignatureUser("myalias");
+        
+        Properties cryptoProperties = 
+            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
+        properties.setSignatureCryptoProperties(cryptoProperties);
+        properties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected on a wrong namespace");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            ex.printStackTrace();
+        }
     }
     
     @Test
