@@ -668,8 +668,8 @@ public final class JAXRSUtils {
                                                     List<MediaType> acceptTypes) {
         List<MediaType> actualMts1 = intersectSortMediaTypes(mts1, acceptTypes, true);
         List<MediaType> actualMts2 = intersectSortMediaTypes(mts2, acceptTypes, true);
-        int size1 = mts1.size();
-        int size2 = mts2.size();
+        int size1 = actualMts1.size();
+        int size2 = actualMts2.size();
         for (int i = 0; i < size1 && i < size2; i++) {
             int result = compareMediaTypes(actualMts1.get(i), actualMts2.get(i), null);
             if (result == 0) {
