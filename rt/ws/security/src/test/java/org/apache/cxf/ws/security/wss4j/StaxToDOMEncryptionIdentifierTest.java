@@ -191,9 +191,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         assertEquals("test", echo.echo("test"));
     }
     
-    // TODO
     @Test
-    @org.junit.Ignore
     public void testEncryptEncryptedKeySHA1() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -216,7 +214,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.ENCRYPT});
         properties.setEncryptionUser("myalias");
         properties.setEncryptionKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_EncryptedKey
+            WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier
         );
         
         Properties cryptoProperties = 

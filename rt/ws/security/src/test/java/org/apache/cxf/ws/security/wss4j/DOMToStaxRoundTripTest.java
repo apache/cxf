@@ -477,8 +477,9 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         service.getInInterceptors().add(inhandler);
         
         WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        outProperties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION});
+        outProperties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE});
         outProperties.setSignatureUser("myalias");
+        outProperties.setEnableSignatureConfirmation(true);
         
         Properties outCryptoProperties = 
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
