@@ -38,6 +38,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
@@ -46,6 +47,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxInInterceptor.class);
     
     private final InboundWSSec inboundWSSec;
+    private List<XMLSecurityConstants.Action> inActions;
     
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) throws WSSecurityException {
         super();
@@ -86,6 +88,10 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         soapMessage.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         soapMessage.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         soapMessage.getInterceptorChain().add(new StaxSecurityContextInInterceptor());
+        
+        if (inActions != null && !inActions.isEmpty()) {
+            soapMessage.getInterceptorChain().add(new StaxActionInInterceptor(inActions));
+        }
         
         try {
             @SuppressWarnings("unchecked")
@@ -131,5 +137,13 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             }
         }
         return fault;
+    }
+
+    public List<XMLSecurityConstants.Action> getInActions() {
+        return inActions;
+    }
+
+    public void setInActions(List<XMLSecurityConstants.Action> inActions) {
+        this.inActions = inActions;
     }
 }
