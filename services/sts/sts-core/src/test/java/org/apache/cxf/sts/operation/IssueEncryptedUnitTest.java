@@ -157,22 +157,19 @@ public class IssueEncryptedUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
         
-        // Issue a token - this will fail as the STSProperties has no encryption name specified
-        try {
-            issueOperation.issue(request, webServiceContext);
-            fail("Failure expected on no encryption name");
-        } catch (STSException ex) {
-            // expected
-        }
-        
-        encryptionProperties.setEncryptionName("myservicekey");
-        service.setEncryptionProperties(encryptionProperties);
-        
-        // Issue a token - this should work as the Service is configured with an EncryptionName
+        // Issue a token - as no encryption name has been specified the token will not be encrypted
         RequestSecurityTokenResponseCollectionType response = 
             issueOperation.issue(request, webServiceContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = 
             response.getRequestSecurityTokenResponse();
+        assertTrue(!securityTokenResponse.isEmpty());
+        
+        encryptionProperties.setEncryptionName("myservicekey");
+        service.setEncryptionProperties(encryptionProperties);
+        
+        // Issue a (encrypted) token
+        response = issueOperation.issue(request, webServiceContext);
+        securityTokenResponse = response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
     

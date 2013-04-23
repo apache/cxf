@@ -304,7 +304,8 @@ public abstract class AbstractOperation {
             name = stsProperties.getEncryptionUsername();
         }
         if (name == null) {
-            throw new STSException("No encryption alias is configured", STSException.REQUEST_FAILED);
+            LOG.fine("No encryption alias is configured");
+            return element;
         }
         
         // Get the encryption algorithm to use
