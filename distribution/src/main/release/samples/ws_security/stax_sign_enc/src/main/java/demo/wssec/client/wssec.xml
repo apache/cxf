@@ -34,7 +34,7 @@
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
-            <!--<wsa:addressing/>-->
+            <wsa:addressing/>
         </cxf:features>
     </cxf:bus>
     
