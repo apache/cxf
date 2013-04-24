@@ -106,19 +106,19 @@ public final class ResponseImpl extends Response {
     }
 
     public StatusType getStatusInfo() {
-        final Response.Status responseStatus = Response.Status.fromStatusCode(status);
         return new Response.StatusType() {
 
             public Family getFamily() {
-                return responseStatus.getFamily();
+                return Response.Status.Family.familyOf(ResponseImpl.this.status);
             }
 
             public String getReasonPhrase() {
-                return responseStatus.getReasonPhrase();
+                Response.Status statusEnum = Response.Status.fromStatusCode(ResponseImpl.this.status); 
+                return statusEnum != null ? statusEnum.getReasonPhrase() : "";
             }
 
             public int getStatusCode() {
-                return responseStatus.getStatusCode();
+                return ResponseImpl.this.status;
             } 
             
         };
