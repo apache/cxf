@@ -47,6 +47,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     private int status = 200;
+    private boolean statusSet;
     private Object entity;
     private MultivaluedMap<String, Object> metadata = new MetadataMap<String, Object>();
     private Annotation[] annotations;
@@ -61,6 +62,9 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
        
     public Response build() {
+        if (entity == null && !statusSet) {
+            status = 204;
+        }
         ResponseImpl r = new ResponseImpl(status);
         MetadataMap<String, Object> m = 
             new MetadataMap<String, Object>(metadata, false, true);
@@ -75,6 +79,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
             throw new IllegalArgumentException("Illegal status value : " + s);
         }
         status = s;
+        statusSet = true;
         return this;
     }
 

@@ -45,6 +45,22 @@ import org.junit.Test;
 public class ResponseBuilderImplTest extends Assert {
 
     @Test
+    public void testStatusSet() throws Exception {
+        assertEquals(200, Response.ok().build().getStatus());
+        assertEquals(200, new ResponseBuilderImpl().status(200).build().getStatus());
+    }
+    
+    @Test
+    public void testStatusNotSetNoEntity() throws Exception {
+        assertEquals(204, new ResponseBuilderImpl().build().getStatus());
+    }
+    
+    @Test
+    public void testStatusNotSetEntitySet() throws Exception {
+        assertEquals(200, new ResponseBuilderImpl().entity("").build().getStatus());
+    }
+    
+    @Test
     public void testAllow() throws Exception {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.add("Allow", "HEAD");
