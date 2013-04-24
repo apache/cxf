@@ -57,6 +57,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
 
     private ResponseBuilderImpl(ResponseBuilderImpl copy) {
         status = copy.status;
+        statusSet = copy.statusSet;
         metadata.putAll(copy.metadata);
         entity = copy.entity;
     }
