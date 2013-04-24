@@ -355,7 +355,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.setOutAction(
-            new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.TIMESTAMP}
+            new XMLSecurityConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE}
         );
         properties.addSignaturePart(
             new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
