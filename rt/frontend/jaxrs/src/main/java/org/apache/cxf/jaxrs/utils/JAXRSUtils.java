@@ -401,7 +401,7 @@ public final class JAXRSUtils {
         
         MediaType requestType;
         try {
-            requestType = getMethod ? MediaType.APPLICATION_OCTET_STREAM_TYPE : toMediaType(requestContentType);
+            requestType = toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
             throw new NotSupportedException(ex);
         }
@@ -823,11 +823,7 @@ public final class JAXRSUtils {
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
             if (contentType == null) {
-                org.apache.cxf.common.i18n.Message errorMsg = 
-                    new org.apache.cxf.common.i18n.Message("NO_CONTENT_TYPE_SPECIFIED", 
-                                                           BUNDLE, 
-                                                           ori.getHttpMethod());
-                LOG.fine(errorMsg.toString());
+                // for tests only
                 contentType = MediaType.WILDCARD;
             }
 
