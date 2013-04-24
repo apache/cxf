@@ -28,6 +28,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -109,16 +110,13 @@ public class Server {
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         bus.getInInterceptors().add(inhandler);
 
-        /*
-         * TODO
         // Check to make sure that the SOAP Body and Timestamp were signed,
         // and that the SOAP Body was encrypted
-        DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
+        StaxCryptoCoverageChecker coverageChecker = new StaxCryptoCoverageChecker();
         coverageChecker.setSignBody(true);
         coverageChecker.setSignTimestamp(true);
         coverageChecker.setEncryptBody(true);
         bus.getInInterceptors().add(coverageChecker);
-        */
 
         BusFactory.setDefaultBus(bus);
 

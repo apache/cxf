@@ -31,6 +31,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
+import org.apache.cxf.ws.security.wss4j.StaxCryptoCoverageChecker;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -99,12 +100,9 @@ public final class Client {
             properties.addSignaturePart(
                 new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
             );
-            /*
-             * TODO
             properties.addSignaturePart(
                 new SecurePart(new QName("http://www.w3.org/2005/08/addressing", "ReplyTo"), SecurePart.Modifier.Element)
             );
-            */
             properties.setCallbackHandler(new UTPasswordCallback());
             
             WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
@@ -118,16 +116,13 @@ public final class Client {
             WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
             bus.getInInterceptors().add(inhandler);
 
-            /*
-             * TODO
             // Check to make sure that the SOAP Body and Timestamp were signed,
             // and that the SOAP Body was encrypted
-            DefaultCryptoCoverageChecker coverageChecker = new DefaultCryptoCoverageChecker();
+            StaxCryptoCoverageChecker coverageChecker = new StaxCryptoCoverageChecker();
             coverageChecker.setSignBody(true);
             coverageChecker.setSignTimestamp(true);
             coverageChecker.setEncryptBody(true);
             bus.getInInterceptors().add(coverageChecker);
-            */
 
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();

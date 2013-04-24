@@ -34,80 +34,18 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.junit.Test;
 
 
 /**
+ * A test for streaming WS-Security with the Crypto Coverage Checker installed
  */
-public class StaxRoundTripTest extends AbstractSecurityTest {
+public class StaxCryptoCoverageCheckerTest extends AbstractSecurityTest {
     
     @Test
-    public void testUsernameTokenText() throws Exception {
-        // Create + configure service
-        Service service = createService();
-        
-        WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        inProperties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
-        principalInterceptor.setPrincipalName("username");
-        service.getInInterceptors().add(inhandler);
-        service.getInInterceptors().add(principalInterceptor);
-
-        // Create + configure client
-        Echo echo = createClientProxy();
-        
-        Client client = ClientProxy.getClient(echo);
-        client.getInInterceptors().add(new LoggingInInterceptor());
-        client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
-        WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
-        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
-        properties.setTokenUser("username");
-        properties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
-        client.getOutInterceptors().add(ohandler);
-
-        assertEquals("test", echo.echo("test"));
-    }
-    
-    @Test
-    public void testUsernameTokenDigest() throws Exception {
-        // Create + configure service
-        Service service = createService();
-        
-        WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        inProperties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
-        principalInterceptor.setPrincipalName("username");
-        service.getInInterceptors().add(inhandler);
-        service.getInInterceptors().add(principalInterceptor);
-        
-        // Create + configure client
-        Echo echo = createClientProxy();
-        
-        Client client = ClientProxy.getClient(echo);
-        client.getInInterceptors().add(new LoggingInInterceptor());
-        client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
-        WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
-        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
-        properties.setTokenUser("username");
-        properties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
-        client.getOutInterceptors().add(ohandler);
-
-        assertEquals("test", echo.echo("test"));
-    }
-    
-    @Test
-    public void testEncrypt() throws Exception {
+    public void testEncryptedBody() throws Exception {
         // Create + configure service
         Service service = createService();
         
@@ -118,6 +56,9 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        service.getInInterceptors().add(checker);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -137,6 +78,58 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
+        try {
+            echo.echo("test");
+            fail("Failure expected as SOAP Body isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+        
+        checker.setSignBody(false);
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testUsernameToken() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        principalInterceptor.setPrincipalName("username");
+        service.getInInterceptors().add(inhandler);
+        service.getInInterceptors().add(principalInterceptor);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        checker.setSignBody(false);
+        checker.setEncryptUsernameToken(true);
+        service.getInInterceptors().add(checker);
+
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
+        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        properties.setTokenUser("username");
+        properties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected as UsernameToken isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+
+        checker.setEncryptUsernameToken(false);
         assertEquals("test", echo.echo("test"));
     }
     
@@ -152,6 +145,11 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        checker.setSignBody(false);
+        checker.setEncryptUsernameToken(true);
+        service.getInInterceptors().add(checker);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -178,6 +176,71 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        checker.setSignUsernameToken(true);
+        try {
+            echo.echo("test");
+            fail("Failure expected as UsernameToken isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+    }
+    
+    @Test
+    public void testSignedUsernameToken() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        Properties cryptoProperties = 
+            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
+        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        checker.setSignBody(false);
+        checker.setSignUsernameToken(true);
+        service.getInInterceptors().add(checker);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[] {
+            WSSConstants.USERNAMETOKEN, WSSConstants.SIGNATURE
+        });
+        properties.setSignatureUser("myalias");
+        
+        properties.addSignaturePart(
+            new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
+        );
+        properties.addSignaturePart(
+            new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
+        );
+        
+        Properties outCryptoProperties = 
+            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
+        properties.setSignatureCryptoProperties(outCryptoProperties);
+        properties.setTokenUser("username");
+        properties.setCallbackHandler(new TestPwdCallback());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+        
+        checker.setEncryptUsernameToken(true);
+        try {
+            echo.echo("test");
+            fail("Failure expected as UsernameToken isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
     }
     
     @Test
@@ -195,6 +258,9 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         principalInterceptor.setPrincipalName("CN=myAlias");
         service.getInInterceptors().add(inhandler);
         service.getInInterceptors().add(principalInterceptor);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        service.getInInterceptors().add(checker);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -215,53 +281,14 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
-    }
-    
-    @Test
-    public void testSignedUsernameToken() throws Exception {
-        // Create + configure service
-        Service service = createService();
         
-        WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
-            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
-        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
-        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
-        principalInterceptor.setPrincipalName("username");
-        service.getInInterceptors().add(inhandler);
-        service.getInInterceptors().add(principalInterceptor);
-        
-        // Create + configure client
-        Echo echo = createClientProxy();
-        
-        Client client = ClientProxy.getClient(echo);
-        client.getInInterceptors().add(new LoggingInInterceptor());
-        client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
-        WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[] {
-            WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN
-        });
-        properties.setSignatureUser("myalias");
-        
-        properties.addSignaturePart(
-            new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
-        );
-        properties.addSignaturePart(
-            new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
-        );
-        
-        Properties outCryptoProperties = 
-            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
-        properties.setSignatureCryptoProperties(outCryptoProperties);
-        properties.setTokenUser("username");
-        properties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
-        client.getOutInterceptors().add(ohandler);
-
-        assertEquals("test", echo.echo("test"));
+        checker.setEncryptBody(true);
+        try {
+            echo.echo("test");
+            fail("Failure expected as SOAP Body isn't encrypted");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
     }
     
     @Test
@@ -272,6 +299,10 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        checker.setSignBody(false);
+        service.getInInterceptors().add(checker);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -285,7 +316,15 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected as Timestamp isn't signed");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
 
+        checker.setSignTimestamp(false);
         assertEquals("test", echo.echo("test"));
     }
     
@@ -301,6 +340,9 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        service.getInInterceptors().add(checker);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -332,50 +374,6 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
-    public void testSignaturePKI() throws Exception {
-        // Create + configure service
-        Service service = createService();
-        
-        WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
-            CryptoFactory.getProperties("cxfca.properties", this.getClass().getClassLoader());
-        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
-        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
-        principalInterceptor.setPrincipalName("CN=alice,OU=eng,O=apache.org");
-        service.getInInterceptors().add(inhandler);
-        service.getInInterceptors().add(principalInterceptor);
-        
-        // Create + configure client
-        Echo echo = createClientProxy();
-        
-        Client client = ClientProxy.getClient(echo);
-        client.getInInterceptors().add(new LoggingInInterceptor());
-        client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
-        WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(
-            new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE}
-        );
-        properties.setSignatureUser("alice");
-        
-        Properties outCryptoProperties = 
-            CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
-        properties.setSignatureCryptoProperties(outCryptoProperties);
-        properties.setCallbackHandler(new KeystorePasswordCallback());
-        properties.setUseSingleCert(true);
-        properties.setSignatureKeyIdentifier(
-            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
-        );
-        
-        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
-        client.getOutInterceptors().add(ohandler);
-
-        assertEquals("test", echo.echo("test"));
-    }
-    
-    @Test
     public void testEncryptSignature() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -388,6 +386,9 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
+        
+        StaxCryptoCoverageChecker checker = new StaxCryptoCoverageChecker();
+        service.getInInterceptors().add(checker);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -410,61 +411,6 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
-
-        assertEquals("test", echo.echo("test"));
-    }
-    
-    @Test
-    public void testSignatureConfirmation() throws Exception {
-        // Create + configure service
-        Service service = createService();
-        
-        WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
-            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
-        inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
-        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-        service.getInInterceptors().add(inhandler);
-        
-        WSSSecurityProperties outProperties = new WSSSecurityProperties();
-        outProperties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE});
-        outProperties.setSignatureUser("myalias");
-        outProperties.setEnableSignatureConfirmation(true);
-        
-        Properties outCryptoProperties = 
-            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
-        outProperties.setSignatureCryptoProperties(outCryptoProperties);
-        outProperties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxOutInterceptor staxOhandler = new WSS4JStaxOutInterceptor(outProperties);
-        service.getOutInterceptors().add(staxOhandler);
-        
-        // Create + configure client
-        Echo echo = createClientProxy();
-        
-        Client client = ClientProxy.getClient(echo);
-        client.getInInterceptors().add(new LoggingInInterceptor());
-        client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
-        WSSSecurityProperties properties = new WSSSecurityProperties();
-        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.SIGNATURE});
-        properties.setSignatureUser("myalias");
-        
-        Properties clientOutCryptoProperties = 
-            CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
-        properties.setSignatureCryptoProperties(clientOutCryptoProperties);
-        properties.setCallbackHandler(new TestPwdCallback());
-        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
-        client.getOutInterceptors().add(ohandler);
-        
-        WSSSecurityProperties staxInProperties = new WSSSecurityProperties();
-        staxInProperties.setCallbackHandler(new TestPwdCallback());
-        Properties staxInCryptoProperties = 
-            CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
-        staxInProperties.setSignatureVerificationCryptoProperties(staxInCryptoProperties);
-        staxInProperties.setEnableSignatureConfirmationVerification(true);
-        WSS4JStaxInInterceptor inhandler2 = new WSS4JStaxInInterceptor(staxInProperties);
-        client.getInInterceptors().add(inhandler2);
 
         assertEquals("test", echo.echo("test"));
     }
