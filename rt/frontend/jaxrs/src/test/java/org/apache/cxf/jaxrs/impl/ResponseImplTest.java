@@ -28,6 +28,8 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.StatusType;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
@@ -55,6 +57,33 @@ public class ResponseImplTest extends Assert {
     public void testHasEntity() {
         assertTrue(new ResponseImpl(200, "").hasEntity());
         assertFalse(new ResponseImpl(200).hasEntity());
+    }
+    
+    @Test
+    public void testStatuInfoForOKStatus() {
+        StatusType si = new ResponseImpl(200, "").getStatusInfo();
+        assertNotNull(si);
+        assertEquals(200, si.getStatusCode());
+        assertEquals(Status.Family.SUCCESSFUL, si.getFamily());
+        assertEquals("OK", si.getReasonPhrase());
+    }
+    
+    @Test
+    public void testStatuInfoForClientErrorStatus() {
+        StatusType si = new ResponseImpl(400, "").getStatusInfo();
+        assertNotNull(si);
+        assertEquals(400, si.getStatusCode());
+        assertEquals(Status.Family.CLIENT_ERROR, si.getFamily());
+        assertEquals("Bad Request", si.getReasonPhrase());
+    }
+    
+    @Test
+    public void testStatuInfoForClientErrorStatus2() {
+        StatusType si = new ResponseImpl(499, "").getStatusInfo();
+        assertNotNull(si);
+        assertEquals(499, si.getStatusCode());
+        assertEquals(Status.Family.CLIENT_ERROR, si.getFamily());
+        assertEquals("", si.getReasonPhrase());
     }
     
     @Test
