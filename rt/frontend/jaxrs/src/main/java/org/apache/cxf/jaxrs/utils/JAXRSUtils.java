@@ -401,7 +401,7 @@ public final class JAXRSUtils {
         
         MediaType requestType;
         try {
-            requestType = getMethod ? MediaType.WILDCARD_TYPE : toMediaType(requestContentType);
+            requestType = getMethod ? MediaType.APPLICATION_OCTET_STREAM_TYPE : toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
             throw new NotSupportedException(ex);
         }
