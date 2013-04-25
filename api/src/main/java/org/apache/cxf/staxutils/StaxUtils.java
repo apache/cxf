@@ -143,8 +143,8 @@ public final class StaxUtils {
         OUTPUT_FACTORY_POOL = new ArrayBlockingQueue<XMLOutputFactory>(i);
         
         //old names
-        innerElementCountThreshold = getInteger(INNER_ELEMENT_LEVEL_SYSTEM_PROP, innerElementCountThreshold);
-        innerElementLevelThreshold = getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, innerElementLevelThreshold);
+        innerElementCountThreshold = getInteger(INNER_ELEMENT_COUNT_SYSTEM_PROP, innerElementCountThreshold);
+        innerElementLevelThreshold = getInteger(INNER_ELEMENT_LEVEL_SYSTEM_PROP, innerElementLevelThreshold);
         //new names
         innerElementCountThreshold = getInteger(MAX_CHILD_ELEMENTS, innerElementCountThreshold);
         innerElementLevelThreshold = getInteger(MAX_ELEMENT_DEPTH, innerElementLevelThreshold);
