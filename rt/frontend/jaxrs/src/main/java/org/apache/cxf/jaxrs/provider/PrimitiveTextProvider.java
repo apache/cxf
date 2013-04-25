@@ -29,6 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
@@ -47,9 +48,13 @@ public class PrimitiveTextProvider<T>
 
     public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt, 
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
-        
+        String string = IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8"));
+        if (type == Character.class) {
+            char character = StringUtils.isEmpty(string) ? ' ' : string.charAt(0);
+            return type.cast(Character.valueOf(character));
+        }
         return InjectionUtils.handleParameter(
-                    IOUtils.toString(is, HttpUtils.getEncoding(mt, "UTF-8")), 
+                    string, 
                     false,
                     type,
                     anns,

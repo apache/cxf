@@ -185,10 +185,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (firstTry && userHeaders != null) {
             responseHeaders.putAll(userHeaders);
         }
-
-        String responseContentType = (String)message.get(Message.CONTENT_TYPE);
-        if (responseContentType != null && !responseHeaders.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, responseContentType);
+        
+        String initialResponseContentType = (String)message.get(Message.CONTENT_TYPE);
+        if (initialResponseContentType != null && !responseHeaders.containsKey(HttpHeaders.CONTENT_TYPE)) {
+            responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, initialResponseContentType);
         }
         
         message.put(Message.PROTOCOL_HEADERS, responseHeaders);
@@ -224,9 +224,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         
-        responseContentType = (String)responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
-        MediaType responseMediaType = responseContentType == null ? MediaType.WILDCARD_TYPE 
-            : JAXRSUtils.toMediaType(responseContentType);
+        Object mediaTypeHeader = responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
+        MediaType responseMediaType;
+        if (mediaTypeHeader instanceof MediaType) {
+            responseMediaType = (MediaType)mediaTypeHeader;
+        } else {
+            responseMediaType = mediaTypeHeader == null ? MediaType.WILDCARD_TYPE
+                : JAXRSUtils.toMediaType(mediaTypeHeader.toString());
+        }
         
         Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
         Type genericType = 
@@ -237,12 +242,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             .createMessageBodyWriterInterceptor(targetType, genericType, annotations, responseMediaType, message);
         
         responseMediaType = checkFinalContentType(responseMediaType);
-        responseContentType = JAXRSUtils.mediaTypeToString(responseMediaType);
+        String finalResponseContentType = JAXRSUtils.mediaTypeToString(responseMediaType);
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Response content type is: " + responseContentType);
+            LOG.fine("Response content type is: " + finalResponseContentType);
         }
-        responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, responseContentType);
-        message.put(Message.CONTENT_TYPE, responseContentType);
+        responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, finalResponseContentType);
+        message.put(Message.CONTENT_TYPE, finalResponseContentType);
         
         OutputStream outOriginal = message.getContent(OutputStream.class);
         if (writers == null) {
