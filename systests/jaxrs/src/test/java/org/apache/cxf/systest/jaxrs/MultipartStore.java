@@ -88,7 +88,8 @@ public class MultipartStore {
     @Path("/books/image")
     @Consumes("multipart/mixed")
     @Produces("multipart/mixed")
-    public byte[] addBookImage(byte[] image) throws Exception {
+    @Multipart(type = "application/stream")
+    public byte[] addBookImage(@Multipart byte[] image) throws Exception {
         return image;
     }
     
@@ -96,7 +97,8 @@ public class MultipartStore {
     @Path("/xop")
     @Consumes("multipart/related")
     @Produces("multipart/related;type=text/xml")
-    public XopType addBookXop(XopType type) throws Exception {
+    @Multipart("xop")
+    public XopType addBookXop(@Multipart XopType type) throws Exception {
         if (!"xopName".equals(type.getName())) {
             throw new RuntimeException("Wrong name property");
         }
@@ -251,7 +253,7 @@ public class MultipartStore {
     @POST
     @Path("/books/stream")
     @Produces("text/xml")
-    public Response addBookFromStream(StreamSource source) throws Exception {
+    public Response addBookFromStream(@Multipart StreamSource source) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         Book b = (Book)u.unmarshal(source);
@@ -336,7 +338,7 @@ public class MultipartStore {
     @POST
     @Path("/books/dsource")
     @Produces("text/xml")
-    public Response addBookFromDataSource(DataSource ds) throws Exception {
+    public Response addBookFromDataSource(@Multipart DataSource ds) throws Exception {
         return readBookFromInputStream(ds.getInputStream());
     }
     
@@ -445,7 +447,7 @@ public class MultipartStore {
     @Path("/books/jsonform")
     @Produces("text/xml")
     @Consumes("multipart/form-data")
-    public Response addBookJsonFromForm(Book b1) 
+    public Response addBookJsonFromForm(@Multipart Book b1) 
         throws Exception {
         b1.setId(124);
         return Response.ok(b1).build();
@@ -524,7 +526,7 @@ public class MultipartStore {
     @Path("/books/jaxbform")
     @Produces("text/xml")
     @Consumes("multipart/form-data")
-    public Response addBookJaxbFromForm(Book b1) 
+    public Response addBookJaxbFromForm(@Multipart Book b1) 
         throws Exception {
         b1.setId(124);
         return Response.ok(b1).build();
@@ -622,14 +624,14 @@ public class MultipartStore {
     @POST
     @Path("/books/dhandler")
     @Produces("text/xml")
-    public Response addBookFromDataHandler(DataHandler dh) throws Exception {
+    public Response addBookFromDataHandler(@Multipart DataHandler dh) throws Exception {
         return readBookFromInputStream(dh.getInputStream());
     }
     
     @POST
     @Path("/books/attachment")
     @Produces("text/xml")
-    public Response addBookFromAttachment(Attachment a) throws Exception {
+    public Response addBookFromAttachment(@Multipart Attachment a) throws Exception {
         return readBookFromInputStream(a.getDataHandler().getInputStream());
     }
     
@@ -662,7 +664,7 @@ public class MultipartStore {
     @POST
     @Path("/books/jaxb")
     @Produces("text/xml")
-    public Response addBook(Book b) throws Exception {
+    public Response addBook(@Multipart Book b) throws Exception {
         b.setId(124);
         return Response.ok(b).build();
     }
@@ -671,7 +673,7 @@ public class MultipartStore {
     @Path("/books/mismatch1")
     @Consumes("multipart/related;type=\"bar/foo\"")
     @Produces("text/xml")
-    public Response addBookMismatched(Book b) {
+    public Response addBookMismatched(@Multipart Book b) {
         throw new WebApplicationException();
     }
     

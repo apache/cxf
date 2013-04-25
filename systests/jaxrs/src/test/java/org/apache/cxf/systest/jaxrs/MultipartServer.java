@@ -26,7 +26,6 @@ import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 
@@ -40,7 +39,6 @@ public class MultipartServer extends AbstractBusTestServerBase {
         
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, String.valueOf(1024 * 10));
-        props.put(JAXRSUtils.DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES, "true");
         sf.setProperties(props);
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(MultipartStore.class,
@@ -65,4 +63,5 @@ public class MultipartServer extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
+    
 }

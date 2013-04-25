@@ -381,6 +381,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testGetBookXsiType() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
         WebClient wc = WebClient.create(address);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
         wc.accept("application/xml");
         Book book = wc.get(Book.class);
         assertEquals("SuperBook", book.getName());

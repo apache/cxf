@@ -99,7 +99,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address);
         wc.type("multipart/mixed;type=text/xml");
         wc.accept("text/xml");
-        
+        WebClient.getConfig(wc).getRequestContext().put("support.type.as.multipart", 
+            "true");
         Book book = wc.post(new Book("CXF in Action - 2", 12345L), Book.class);
         assertEquals(432L, book.getId());
     }
@@ -346,6 +347,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/add_book.txt");
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxb";
         WebClient client = WebClient.create(address);
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart", 
+            "true");
         client.type("multipart/related;type=text/xml").accept("text/xml");
         Book book = client.post(is1, Book.class);
         assertEquals("CXF in Action - 2", book.getName());
@@ -387,10 +390,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         bean.setProperties(Collections.singletonMap(org.apache.cxf.message.Message.MTOM_ENABLED, 
                                                     (Object)"true"));
         WebClient client = bean.createWebClient();
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
-        
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart", 
+            "true");
         client.type("multipart/related").accept("multipart/related");
         
         XopType xop = new XopType();
@@ -612,10 +613,9 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
         String address = "http://localhost:" + PORT + "/bookstore/books/image";
         WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
         client.type("multipart/mixed").accept("multipart/mixed");
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart", 
+            "true");
         InputStream is2 = client.post(is1, InputStream.class);
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
@@ -663,11 +663,9 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
                                .toURI().getPath());
         String address = "http://localhost:" + PORT + "/bookstore/books/formimage2";
         WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
         client.type("multipart/form-data").accept("multipart/form-data");
-        
+        WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart", 
+                                                            "true");
         MultipartBody body2 = client.post(file, MultipartBody.class);
         InputStream is2 = body2.getRootAttachment().getDataHandler().getInputStream();
         byte[] image1 = IOUtils.readBytesFromStream(
