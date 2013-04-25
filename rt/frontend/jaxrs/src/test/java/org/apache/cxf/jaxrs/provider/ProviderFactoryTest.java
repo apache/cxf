@@ -175,17 +175,6 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
-    public void testNoDataSourceWriter() {
-        ProviderFactory pf = ServerProviderFactory.getInstance();
-        pf.registerUserProvider(new DataSourceProvider<Object>());
-        MessageBodyWriter<DataSource> writer = pf.createMessageBodyWriter(
-              DataSource.class, null, null, 
-              MediaType.valueOf("multipart/form-data"), new MessageImpl());
-        assertFalse(writer instanceof DataSourceProvider);
-    }
-    
-    
-    @Test
     public void testSchemaLocations() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         MessageBodyReader<Book> jaxbReader = pf.createMessageBodyReader(Book.class, null, null, 

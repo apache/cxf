@@ -574,13 +574,15 @@ public abstract class ProviderFactory {
                     return (MessageBodyReader<T>) ep.getProvider();
                 }
                 handleMapper(candidates, ep, type, m, MessageBodyReader.class, false);
+                if (!candidates.isEmpty()) {
+                    break;
+                }
             }
         }     
         
-        if (candidates.size() == 0) {
+        if (candidates.isEmpty()) {
             return null;
         }
-        Collections.sort(candidates, new ClassComparator());
         return (MessageBodyReader<T>) candidates.get(0);
         
     }
@@ -636,12 +638,14 @@ public abstract class ProviderFactory {
                     return (MessageBodyWriter<T>) ep.getProvider();
                 }
                 handleMapper(candidates, ep, type, m, MessageBodyWriter.class, false);
+                if (!candidates.isEmpty()) {
+                    break;
+                }
             }
         }     
-        if (candidates.size() == 0) {
+        if (candidates.isEmpty()) {
             return null;
         }
-        Collections.sort(candidates, new ClassComparator());
         return (MessageBodyWriter<T>) candidates.get(0);
     }
     
@@ -704,6 +708,12 @@ public abstract class ProviderFactory {
                            ProviderInfo<MessageBodyReader<?>> p2) {
             MessageBodyReader<?> e1 = p1.getProvider();
             MessageBodyReader<?> e2 = p2.getProvider();
+            
+            int result = compareClasses(e1, e2);
+            if (result != 0) {
+                return result;
+            }
+            
             List<MediaType> types1 = JAXRSUtils.getProviderConsumeTypes(e1);
             types1 = JAXRSUtils.sortMediaTypes(types1, null);
             List<MediaType> types2 = JAXRSUtils.getProviderConsumeTypes(e2);
@@ -721,6 +731,10 @@ public abstract class ProviderFactory {
             MessageBodyWriter<?> e1 = p1.getProvider();
             MessageBodyWriter<?> e2 = p2.getProvider();
             
+            int result = compareClasses(e1, e2);
+            if (result != 0) {
+                return result;
+            }
             List<MediaType> types1 =
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e1), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
             List<MediaType> types2 =

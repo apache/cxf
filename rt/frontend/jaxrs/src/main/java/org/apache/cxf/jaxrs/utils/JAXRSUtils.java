@@ -161,7 +161,6 @@ public final class JAXRSUtils {
     public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
         "media.subtype.partial.check"; 
     public static final String DOC_LOCATION = "wadl.location";
-    public static final String DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES = "defaultProviders.for.simpleTypes";
     public static final String MEDIA_TYPE_Q_PARAM = "q";
     public static final String MEDIA_TYPE_QS_PARAM = "qs";
     private static final String MEDIA_TYPE_DISTANCE_PARAM = "d";

@@ -29,11 +29,13 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
@@ -45,7 +47,6 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -78,9 +79,23 @@ public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     private static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
+    private static final String SUPPORT_TYPE_AS_MULTIPART = "support.type.as.multipart";
     private static final Logger LOG = LogUtils.getL7dLogger(MultipartProvider.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(MultipartProvider.class);
-
+    private static final Set<Class<?>> WELL_KNOWN_MULTIPART_CLASSES;
+    private static final Set<String> MULTIPART_SUBTYPES;
+    static {
+        WELL_KNOWN_MULTIPART_CLASSES = new HashSet<Class<?>>();
+        WELL_KNOWN_MULTIPART_CLASSES.add(MultipartBody.class);
+        WELL_KNOWN_MULTIPART_CLASSES.add(Attachment.class);
+        
+        MULTIPART_SUBTYPES = new HashSet<String>();
+        MULTIPART_SUBTYPES.add("form-data");
+        MULTIPART_SUBTYPES.add("mixed");
+        MULTIPART_SUBTYPES.add("related");
+        MULTIPART_SUBTYPES.add("alternative");
+    }
+    
     @Context
     private MessageContext mc;
     private String attachmentDir;
@@ -105,33 +120,23 @@ public class MultipartProvider extends AbstractConfigurableProvider
 
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
                               MediaType mt) {
-        return isSupported(type, genericType, annotations, mt);
+        return isSupported(type, genericType, annotations, mt); 
+            
     }
     
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] anns, 
                                 MediaType mt) {
-        if (DataHandler.class.isAssignableFrom(type) || DataSource.class.isAssignableFrom(type)
-            || Attachment.class.isAssignableFrom(type) || MultipartBody.class.isAssignableFrom(type)
-            || mediaTypeSupported(mt)
-            || isSupportedFormDataType(type, mt)) {
-            
-            if (type == InputStream.class 
-                && AnnotationUtils.getAnnotation(anns, Multipart.class) == null
-                && MessageUtils.isTrue(mc.getContextualProperty(JAXRSUtils.DEFAULT_PROVIDERS_FOR_SIMPLE_TYPES))) {
-                return false;
-            }
-            
-            
+        if (mediaTypeSupported(mt) 
+            && (WELL_KNOWN_MULTIPART_CLASSES.contains(type)
+                || Collection.class.isAssignableFrom(type)
+                || Map.class.isAssignableFrom(type) && type != MultivaluedMap.class
+                || AnnotationUtils.getAnnotation(anns, Multipart.class) != null
+                || MessageUtils.isTrue(mc.getContextualProperty(SUPPORT_TYPE_AS_MULTIPART)))) {
             return true;
         }
         return false;
     }
 
-    private boolean isSupportedFormDataType(Class<?> type, MediaType mt) {
-        return mt.getType().equals("multipart") && mt.getSubtype().equals("form-data") 
-            && !MultivaluedMap.class.isAssignableFrom(type) && !Form.class.isAssignableFrom(type);
-    }
-    
     protected void checkContentLength() {
         if (mc != null && isPayloadEmpty(mc.getHttpHeaders())) {
             String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
@@ -250,8 +255,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     }
     
     private boolean mediaTypeSupported(MediaType mt) {
-        return mt.getType().equals("multipart") && (mt.getSubtype().equals("related") 
-            || mt.getSubtype().equals("mixed") || mt.getSubtype().equals("alternative"));
+        return mt.getType().equals("multipart") && MULTIPART_SUBTYPES.contains(mt.getSubtype());
     }
 
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, 

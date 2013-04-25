@@ -142,6 +142,9 @@ public final class AttachmentUtils {
     }
     
     private static boolean matchAttachmentId(Attachment at, Multipart mid, MediaType multipartType) {
+        if (mid.value().isEmpty()) {
+            return true;
+        }
         if (at.getContentId().equals(mid.value())) {
             return true;
         }
