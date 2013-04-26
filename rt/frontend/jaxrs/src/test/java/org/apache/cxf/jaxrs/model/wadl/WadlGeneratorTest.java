@@ -437,7 +437,7 @@ public class WadlGeneratorTest extends Assert {
                                     String booksEl) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
-        checkDocs(resource, "book store resource", "super resource", "en-us");
+        checkDocs(resource, "book store \"resource\"", "super resource", "en-us");
         
         List<Element> resourceEls = getElements(resource, "resource", 8);
         
@@ -445,7 +445,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
         assertEquals("/chapter2", resourceEls.get(3).getAttribute("path"));
-        assertEquals("/books/{bookid}", resourceEls.get(4).getAttribute("path"));
+        assertEquals("/books/\"{bookid}\"", resourceEls.get(4).getAttribute("path"));
         assertEquals("/booksubresource", resourceEls.get(5).getAttribute("path"));
         assertEquals("/form", resourceEls.get(6).getAttribute("path"));
         assertEquals("/itself", resourceEls.get(7).getAttribute("path"));
@@ -486,7 +486,7 @@ public class WadlGeneratorTest extends Assert {
         // verify POST
         assertEquals("POST", methodEls.get(2).getAttribute("name"));
         Element formRep = verifyRepresentation(methodEls.get(2), "request", "multipart/form-data", "");
-        checkDocs(formRep, "", "Attachments", "");
+        checkDocs(formRep, "", "Attachments, max < 10", "");
         
         // verify PUT
         assertEquals("PUT", methodEls.get(3).getAttribute("name"));
@@ -502,7 +502,7 @@ public class WadlGeneratorTest extends Assert {
         verifyParameters(resourceEls.get(1), 3, 
                          new Param("id", "template", "xs:int", "book id"),
                          new Param("bookid", "template", "xs:int"),
-                         new Param("mid", "matrix", "xs:int"));
+                         new Param("mid", "matrix", "xs:string", false, null, "mid > 5"));
         
         // and 2 methods
         methodEls = getElements(resourceEls.get(1), "method", 2);
@@ -702,6 +702,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(p.getType(), paramEl.getAttribute("style"));
         assertEquals(p.getSchemaType(), paramEl.getAttribute("type"));
         assertEquals(p.isRepeating(), Boolean.valueOf(paramEl.getAttribute("repeating")));
+        assertEquals(p.getDefaultValue(), paramEl.getAttribute("default"));
         Set<String> options = p.getOptions();
         if (options != null) {
             Set<String> actualOptions = new HashSet<String>();
@@ -769,6 +770,7 @@ public class WadlGeneratorTest extends Assert {
         private String type;
         private String schemaType;
         private String docs;
+        private String defaultValue = "";
         private boolean repeating;
         private Set<String> options;
         public Param(String name, String type, String schemaType) {
@@ -799,6 +801,12 @@ public class WadlGeneratorTest extends Assert {
             this.repeating = repeating;
         }
         
+        public Param(String name, String type, String schemaType, boolean repeating, String docs,
+                     String defaultValue) {
+            this(name, type, schemaType, repeating, docs);
+            this.defaultValue = defaultValue;
+        }
+        
         public Set<String> getOptions() {
             return options;
         }
@@ -821,6 +829,10 @@ public class WadlGeneratorTest extends Assert {
         
         public boolean isRepeating() {
             return repeating;
+        }
+        
+        public String getDefaultValue() {
+            return defaultValue;
         }
     }
     

@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,9 @@ import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,6 +82,17 @@ public final class XMLUtils {
     private static final Map<ClassLoader, TransformerFactory> TRANSFORMER_FACTORIES
         = Collections.synchronizedMap(new WeakHashMap<ClassLoader, TransformerFactory>());
 
+    private static final Pattern XML_ESCAPE_CHARS = Pattern.compile("[\"'&<>]");
+    private static final Map<String, String> XML_ENCODING_TABLE;
+    static {
+        XML_ENCODING_TABLE = new HashMap<String, String>();
+        XML_ENCODING_TABLE.put("\"", "&quot;");
+        XML_ENCODING_TABLE.put("'", "&apos;");
+        XML_ENCODING_TABLE.put("<", "&lt;");
+        XML_ENCODING_TABLE.put(">", "&gt;");
+        XML_ENCODING_TABLE.put("&", "&amp;");
+    }
+    
     private XMLUtils() {
     }
 
@@ -488,4 +503,22 @@ public final class XMLUtils {
         return dropElements;
     }
     
+    public static String xmlEncode(String value) {
+        Matcher m = XML_ESCAPE_CHARS.matcher(value);
+        boolean match = m.find();
+        if (match) {
+            int i = 0;
+            StringBuilder sb = new StringBuilder();
+            do {
+                String replacement = XML_ENCODING_TABLE.get(m.group());
+                sb.append(value.substring(i, m.start()));
+                sb.append(replacement);
+                i = m.end();
+            } while (m.find());
+            sb.append(value.substring(i, value.length()));
+            return sb.toString();
+        } else {
+            return value;
+        }
+    }
 }
