@@ -61,7 +61,7 @@ public final class Version {
             buildNumber = p.getProperty("build.number", "<unknown>");
             if (version.contains("SNAPSHOT") 
                 || version.contains("<unknown>")) {
-                fullVersion = name + " " + version + " (" + buildNumber + ")";
+                fullVersion = name + " " + version + "-" + buildNumber;
             } else {
                 fullVersion = name + " " + version;
             }
