@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
@@ -81,6 +82,8 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      */
     protected Map<String, String> prefixMap = new HashMap<String, String>();
     
+    private boolean checkFaults = true;
+    
     /**
      * Creates a new instance.  See {@link #setPrefixes()} and {@link #setXpaths()}
      * for providing configuration options.
@@ -118,6 +121,22 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      *             covered by the required cryptographic operation
      */
     public void handleMessage(SoapMessage message) throws Fault {
+        if (this.xPaths == null || this.xPaths.isEmpty()) {
+            // return
+        }
+        
+        Element documentElement = null;
+        try {
+            SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
+            SOAPEnvelope envelope = saajDoc.getSOAPPart().getEnvelope();
+            if (!checkFaults && envelope.getBody().hasFault()) {
+                return;
+            }
+            documentElement = envelope;
+        } catch (SOAPException e) {
+            throw new SoapFault("Error obtaining SOAP document", Fault.FAULT_CODE_CLIENT);
+        }
+        
         final Collection<WSDataRef> signed = new HashSet<WSDataRef>();
         final Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
         
@@ -161,55 +180,43 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         }
         
         CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
-        
-        if (this.xPaths != null && !this.xPaths.isEmpty()) {
-            // XPathFactory and XPath are not thread-safe so we must recreate them
-            // each request.
-            final XPathFactory factory = XPathFactory.newInstance();
-            final XPath xpath = factory.newXPath();
-            
-            if (this.prefixMap != null) {
-                xpath.setNamespaceContext(new MapNamespaceContext(this.prefixMap));
+
+        // XPathFactory and XPath are not thread-safe so we must recreate them
+        // each request.
+        final XPathFactory factory = XPathFactory.newInstance();
+        final XPath xpath = factory.newXPath();
+
+        if (this.prefixMap != null) {
+            xpath.setNamespaceContext(new MapNamespaceContext(this.prefixMap));
+        }
+
+        for (XPathExpression xPathExpression : this.xPaths) {
+            Collection<WSDataRef> refsToCheck = null;
+
+            switch (xPathExpression.getType()) {
+            case SIGNED:
+                refsToCheck = signed;
+                break;
+            case ENCRYPTED:
+                refsToCheck = encrypted;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected crypto type: " 
+                    + xPathExpression.getType());
             }
-            
-            for (XPathExpression xPathExpression : this.xPaths) {
-                Collection<WSDataRef> refsToCheck = null;
-                
-                switch (xPathExpression.getType()) {
-                case SIGNED:
-                    refsToCheck = signed;
-                    break;
-                case ENCRYPTED:
-                    refsToCheck = encrypted;
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected crypto type: " 
-                            + xPathExpression.getType());
-                }
-                        
-                try {
-                    SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
-                    Element documentElement = null;
-                    if (saajDoc != null && saajDoc.getSOAPPart() != null) {
-                        documentElement = saajDoc.getSOAPPart().getEnvelope();
-                    }
-                    
-                    CryptoCoverageUtil.checkCoverage(
-                            documentElement,
-                            refsToCheck,
-                            xpath, 
-                            Arrays.asList(xPathExpression.getXPath()),
-                            xPathExpression.getType(),
-                            xPathExpression.getScope());
-                } catch (WSSecurityException e) {
-                    throw new SoapFault("No " + xPathExpression.getType()
-                            + " element found matching XPath "
-                            + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
-                } catch (SOAPException e) {
-                    throw new SoapFault("No " + xPathExpression.getType()
-                            + " element found matching XPath "
-                            + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
-                }
+
+            try {
+                CryptoCoverageUtil.checkCoverage(
+                                                 documentElement,
+                                                 refsToCheck,
+                                                 xpath, 
+                                                 Arrays.asList(xPathExpression.getXPath()),
+                                                 xPathExpression.getType(),
+                                                 xPathExpression.getScope());
+            } catch (WSSecurityException e) {
+                throw new SoapFault("No " + xPathExpression.getType()
+                                    + " element found matching XPath "
+                                    + xPathExpression.getXPath(), Fault.FAULT_CODE_CLIENT);
             }
         }
     }
@@ -262,6 +269,14 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         if (prefixes != null) {
             this.prefixMap.putAll(prefixes);
         }
+    }
+
+    public boolean isCheckFaults() {
+        return checkFaults;
+    }
+
+    public void setCheckFaults(boolean checkFaults) {
+        this.checkFaults = checkFaults;
     }
 
     /**

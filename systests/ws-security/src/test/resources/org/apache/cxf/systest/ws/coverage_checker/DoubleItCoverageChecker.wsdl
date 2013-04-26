@@ -77,6 +77,9 @@
         <wsdl:port name="DoubleItWSAPort" binding="tns:DoubleItSoapBinding">
             <soap:address location="http://localhost:9001/DoubleItWSA" />
         </wsdl:port>
+        <wsdl:port name="DoubleItClientCheckerPort" binding="tns:DoubleItSoapBinding">
+            <soap:address location="http://localhost:9001/DoubleItClientChecker" />
+        </wsdl:port>
     </wsdl:service>
     
 </wsdl:definitions>
