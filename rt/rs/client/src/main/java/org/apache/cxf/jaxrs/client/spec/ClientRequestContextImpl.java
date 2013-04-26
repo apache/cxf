@@ -160,7 +160,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     public MultivaluedMap<String, Object> getHeaders() {
         h = null;
         return new MetadataMap<String, Object>(
-            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, true, true);    
+            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);    
 
     }
 

@@ -47,7 +47,7 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     public MultivaluedMap<String, String> getHeaders() {
         Object headers = m.get(Message.PROTOCOL_HEADERS);
         if (headers != null) {
-            return new MetadataMap<String, String>((Map<String, List<String>>)headers, false, true, true);
+            return new MetadataMap<String, String>((Map<String, List<String>>)headers, false, false, true);
         }
         return (MultivaluedMap<String, String>)(MultivaluedMap<?, ?>)r.getHeaders();
     }
