@@ -117,14 +117,14 @@ public class WadlGenerator implements ContainerRequestFilter {
     public static final String WADL_QUERY = "_wadl";
     public static final MediaType WADL_TYPE = JAXRSUtils.toMediaType("application/vnd.sun.wadl+xml");
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
-    
-    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_XML_TYPE; 
+
+    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_XML_TYPE;
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     private static final String CLASSPATH_PREFIX = "classpath:";
     private static final String DEFAULT_NS_PREFIX = "prefix";
-
+    
     private String wadlNamespace;
     private boolean ignoreMessageWriters = true;
     private boolean singleResourceMultipleMethods = true;
@@ -135,20 +135,19 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean linkJsonToXmlSchema;
     private boolean useJaxbContextForQnames = true;
     private boolean supportCollections = true;
-    
+
     private List<String> externalSchemasCache;
     private List<URI> externalSchemaLinks;
     private Map<String, List<String>> externalQnamesMap;
-    
-    private ConcurrentHashMap<String, String> docLocationMap = 
-        new ConcurrentHashMap<String, String>();
-        
+
+    private ConcurrentHashMap<String, String> docLocationMap = new ConcurrentHashMap<String, String>();
+
     private ElementQNameResolver resolver;
     private List<String> privateAddresses;
     private String applicationTitle;
     private String nsPrefix = DEFAULT_NS_PREFIX;
     private MediaType defaultMediaType = DEFAULT_MEDIA_TYPE;
-    
+
     public WadlGenerator() {
 
     }
@@ -168,11 +167,11 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     public void filter(ContainerRequestContext context) {
-    
+
         Message m = JAXRSUtils.getCurrentMessage();
         doFilter(context, m);
     }
-    
+
     protected void doFilter(ContainerRequestContext context, Message m) {
         if (!"GET".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
             return;
@@ -199,23 +198,22 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         HttpHeaders headers = new HttpHeadersImpl(m);
         List<MediaType> accepts = headers.getAcceptableMediaTypes();
-        MediaType type = accepts.contains(WADL_TYPE)
-            ? WADL_TYPE : accepts.contains(MediaType.APPLICATION_JSON_TYPE) 
-                ? MediaType.APPLICATION_JSON_TYPE : defaultMediaType;
-        
+        MediaType type = accepts.contains(WADL_TYPE) ? WADL_TYPE : accepts
+            .contains(MediaType.APPLICATION_JSON_TYPE) ? MediaType.APPLICATION_JSON_TYPE : defaultMediaType;
+
         Response response = getExistingWadl(m, ui, type);
         if (response != null) {
             context.abortWith(response);
             return;
         }
-        
-        boolean isJson = type == MediaType.APPLICATION_JSON_TYPE; 
-                
+
+        boolean isJson = type == MediaType.APPLICATION_JSON_TYPE;
+
         StringBuilder sbMain = new StringBuilder();
         sbMain.append("<application");
         if (!isJson) {
-            sbMain.append(" xmlns=\"").append(getNamespace())
-                  .append("\" xmlns:xs=\"").append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\"");
+            sbMain.append(" xmlns=\"").append(getNamespace()).append("\" xmlns:xs=\"")
+                .append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\"");
         }
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
@@ -225,16 +223,15 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         List<ClassResourceInfo> cris = getResourcesList(m, ui);
 
-        ResourceTypes resourceTypes =
-            ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames);
+        ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames);
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
-        
-        JAXBContext jaxbContext = useJaxbContextForQnames 
-            ? ResourceUtils.createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
-        
+
+        JAXBContext jaxbContext = useJaxbContextForQnames ? ResourceUtils
+            .createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
+
         SchemaWriter schemaWriter = createSchemaWriter(resourceTypes, jaxbContext, ui);
-        ElementQNameResolver qnameResolver =
-            schemaWriter == null ? null : createElementQNameResolver(jaxbContext);
+        ElementQNameResolver qnameResolver = schemaWriter == null
+            ? null : createElementQNameResolver(jaxbContext);
 
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
         Set<ClassResourceInfo> visitedResources = new LinkedHashSet<ClassResourceInfo>();
@@ -242,10 +239,11 @@ public class WadlGenerator implements ContainerRequestFilter {
             startResourceTag(sbResources, cri.getServiceClass(), cri.getURITemplate().getValue());
             Annotation[] anns = cri.getServiceClass().getAnnotations();
             if (anns.length == 0) {
-                Annotation ann = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), 
-                                                                    Description.class);
+                Annotation ann = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Description.class);
                 if (ann != null) {
-                    anns = new Annotation[] {ann};
+                    anns = new Annotation[] {
+                        ann
+                    };
                 }
             }
             handleDocs(anns, sbResources, DocTarget.RESOURCE, true, isJson);
@@ -253,7 +251,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             sbResources.append("</resource>");
         }
         sbResources.append("</resources>");
-        
+
         handleGrammars(sbMain, sbGrammars, schemaWriter, clsMap);
 
         sbGrammars.append("</grammars>");
@@ -264,22 +262,21 @@ public class WadlGenerator implements ContainerRequestFilter {
         sbMain.append("</application>");
 
         m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, ignoreMessageWriters);
-        Response r = Response.ok().type(type).entity(
-                createResponseEntity(sbMain.toString(), isJson)).build();
+        Response r = Response.ok().type(type).entity(createResponseEntity(sbMain.toString(), isJson)).build();
         context.abortWith(r);
     }
-    
+
     private Object createResponseEntity(String entity, boolean isJson) {
         if (!isJson) {
             return entity;
         }
         try {
             return DOMUtils.readXml(new StringReader(entity));
-        }  catch (Exception ex) {
+        } catch (Exception ex) {
             throw new InternalServerErrorException(ex);
         }
     }
-    
+
     private String getBaseURI(Message m, UriInfo ui) {
         EndpointInfo ei = m.getExchange().get(Endpoint.class).getEndpointInfo();
         String publishedEndpointUrl = (String)ei.getProperty("publishedEndpointUrl");
@@ -289,9 +286,9 @@ public class WadlGenerator implements ContainerRequestFilter {
             return publishedEndpointUrl;
         }
     }
-    
-    protected void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars,
-                                SchemaWriter writer, Map<Class<?>, QName> clsMap) {
+
+    protected void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars, SchemaWriter writer,
+                                  Map<Class<?>, QName> clsMap) {
         if (writer == null) {
             return;
         }
@@ -301,24 +298,22 @@ public class WadlGenerator implements ContainerRequestFilter {
             map.put(qname.getPrefix(), qname.getNamespaceURI());
         }
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            sbApp.append(" xmlns:").append(entry.getKey()).append("=\"")
-                 .append(entry.getValue()).append("\"");
+            sbApp.append(" xmlns:").append(entry.getKey()).append("=\"").append(entry.getValue())
+                .append("\"");
         }
 
         writer.write(sbGrammars);
     }
 
-
     protected void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes,
-                                ElementQNameResolver qnameResolver,
-                                Map<Class<?>, QName> clsMap, ClassResourceInfo cri,
-                                Set<ClassResourceInfo> visitedResources,
-                                boolean isJson) {
+                                  ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
+                                  ClassResourceInfo cri, Set<ClassResourceInfo> visitedResources,
+                                  boolean isJson) {
         visitedResources.add(cri);
         Map<Parameter, Object> classParams = getClassParameters(cri);
-        
-        List<OperationResourceInfo> sortedOps = sortOperationsByPath(
-            cri.getMethodDispatcher().getOperationResourceInfos());
+
+        List<OperationResourceInfo> sortedOps = sortOperationsByPath(cri.getMethodDispatcher()
+            .getOperationResourceInfos());
 
         boolean resourceTagOpened = false;
         for (int i = 0; i < sortedOps.size(); i++) {
@@ -329,11 +324,10 @@ public class WadlGenerator implements ContainerRequestFilter {
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
                 if (subcri != null && !visitedResources.contains(subcri)) {
                     startResourceTag(sb, subcri.getServiceClass(), ori.getURITemplate().getValue());
-                    handleDocs(subcri.getServiceClass().getAnnotations(), sb, DocTarget.RESOURCE, true, 
-                            isJson);
+                    handleDocs(subcri.getServiceClass().getAnnotations(), sb, DocTarget.RESOURCE, true,
+                               isJson);
                     handlePathAndMatrixParams(sb, ori, isJson);
-                    handleResource(sb, jaxbTypes, qnameResolver, clsMap, subcri,
-                                   visitedResources, isJson);
+                    handleResource(sb, jaxbTypes, qnameResolver, clsMap, subcri, visitedResources, isJson);
                     sb.append("</resource>");
                 } else {
                     handleDynamicSubresource(sb, jaxbTypes, qnameResolver, clsMap, ori, subcri, isJson);
@@ -341,8 +335,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 continue;
             }
             OperationResourceInfo nextOp = i + 1 < sortedOps.size() ? sortedOps.get(i + 1) : null;
-            resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, 
-                                                classParams, nextOp, resourceTagOpened, isJson, i);
+            resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, classParams,
+                                                nextOp, resourceTagOpened, isJson, i);
         }
     }
 
@@ -350,17 +344,15 @@ public class WadlGenerator implements ContainerRequestFilter {
         Map<Parameter, Object> classParams = new LinkedHashMap<Parameter, Object>();
         List<Method> paramMethods = cri.getParameterMethods();
         for (Method m : paramMethods) {
-            classParams.put(ResourceUtils.getParameter(0, m.getAnnotations(),
-                                                       m.getParameterTypes()[0]), m);
+            classParams.put(ResourceUtils.getParameter(0, m.getAnnotations(), m.getParameterTypes()[0]), m);
         }
         List<Field> fieldParams = cri.getParameterFields();
         for (Field f : fieldParams) {
-            classParams.put(ResourceUtils.getParameter(0, f.getAnnotations(),
-                                                       f.getType()), f);
+            classParams.put(ResourceUtils.getParameter(0, f.getAnnotations(), f.getType()), f);
         }
         return classParams;
     }
-    
+
     private void startResourceTag(StringBuilder sb, Class<?> serviceClass, String path) {
         sb.append("<resource path=\"").append(getPath(path)).append("\"");
         if (addResourceAndMethodIds) {
@@ -368,10 +360,9 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (useJaxbContextForQnames) {
                 jaxbQname = getJaxbQName(null, serviceClass, new HashMap<Class<?>, QName>(0));
             }
-            String pName = jaxbQname == null ? PackageUtils.getPackageName(serviceClass)
-                : jaxbQname.getNamespaceURI();
-            String localName = jaxbQname == null ? serviceClass.getSimpleName()
-                : jaxbQname.getLocalPart();
+            String pName = jaxbQname == null ? PackageUtils.getPackageName(serviceClass) : jaxbQname
+                .getNamespaceURI();
+            String localName = jaxbQname == null ? serviceClass.getSimpleName() : jaxbQname.getLocalPart();
             String finalName = jaxbQname == null ? pName + "." : "{" + pName + "}";
             sb.append(" id=\"").append(finalName + localName).append("\"");
         }
@@ -385,10 +376,12 @@ public class WadlGenerator implements ContainerRequestFilter {
         } else {
             thePath = path;
         }
-        if (thePath.contains("&")) {
-            thePath = thePath.replace("&", "&amp;");
-        }
-        return thePath;
+        
+        return xmlEncodeIfNeeded(thePath);
+    }
+
+    private String xmlEncodeIfNeeded(String value) {
+        return XMLUtils.xmlEncode(value);
     }
     
     private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
@@ -399,18 +392,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         sb.append(">");
     }
 
-    //CHECKSTYLE:OFF
+    // CHECKSTYLE:OFF
     protected boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes,
-                                 ElementQNameResolver qnameResolver,
-                                 Map<Class<?>, QName> clsMap,
-                                 OperationResourceInfo ori,
-                                 Map<Parameter, Object> classParams,
-                                 OperationResourceInfo nextOp,
-                                 boolean resourceTagOpened,
-                                 boolean isJson,
-                                 int index) {
+                                      ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
+                                      OperationResourceInfo ori, Map<Parameter, Object> classParams,
+                                      OperationResourceInfo nextOp, boolean resourceTagOpened,
+                                      boolean isJson, int index) {
         Annotation[] anns = getMethod(ori).getAnnotations();
-    //CHECKSTYLE:ON
+        // CHECKSTYLE:ON
         boolean samePathOperationFollows = singleResourceMultipleMethods && compareOperations(ori, nextOp);
 
         String path = ori.getURITemplate().getValue();
@@ -437,9 +426,9 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (getMethod(ori).getParameterTypes().length != 0 || classParams.size() != 0) {
             sb.append("<request>");
             handleDocs(anns, sb, DocTarget.REQUEST, false, isJson);
-            
+
             boolean isForm = isFormRequest(ori);
-            
+
             doHandleClassParams(sb, classParams, isJson, ParameterType.QUERY, ParameterType.HEADER);
             for (Parameter p : ori.getParameters()) {
                 if (isForm && p.getType() == ParameterType.REQUEST_BODY) {
@@ -448,8 +437,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p, isJson);
             }
             if (isForm) {
-                handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori), 
-                        isJson);
+                handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori), isJson);
             }
             sb.append("</request>");
         }
@@ -463,8 +451,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         sb.append(">");
         handleDocs(anns, sb, DocTarget.RESPONSE, false, isJson);
         if (!isVoid) {
-            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori,
-                                 returnType, isJson, false);
+            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, returnType, isJson, false);
         }
         sb.append("</response>");
 
@@ -480,8 +467,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     protected boolean compareOperations(OperationResourceInfo ori1, OperationResourceInfo ori2) {
         if (ori1 == null || ori2 == null
             || !ori1.getURITemplate().getValue().equals(ori2.getURITemplate().getValue())
-            || ori1.getHttpMethod() != null && ori2.getHttpMethod() == null 
-            || ori2.getHttpMethod() != null && ori1.getHttpMethod() == null) {
+            || ori1.getHttpMethod() != null && ori2.getHttpMethod() == null || ori2.getHttpMethod() != null
+            && ori1.getHttpMethod() == null) {
             return false;
         }
         int ori1PathParams = 0;
@@ -515,8 +502,9 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     protected void handleDynamicSubresource(StringBuilder sb, Set<Class<?>> jaxbTypes,
-                 ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
-                 ClassResourceInfo subcri, boolean isJson) {
+                                            ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
+                                            OperationResourceInfo ori, ClassResourceInfo subcri,
+                                            boolean isJson) {
         if (!isJson) {
             if (subcri != null) {
                 sb.append("<!-- Recursive subresource -->");
@@ -524,46 +512,44 @@ public class WadlGenerator implements ContainerRequestFilter {
                 sb.append("<!-- Dynamic subresource -->");
             }
         }
-        startResourceTag(sb, subcri != null ? subcri.getServiceClass() : Object.class,
-            ori.getURITemplate().getValue());
+        startResourceTag(sb, subcri != null ? subcri.getServiceClass() : Object.class, ori.getURITemplate()
+            .getValue());
         handlePathAndMatrixParams(sb, ori, isJson);
         sb.append("</resource>");
     }
 
     protected void handlePathAndMatrixClassParams(StringBuilder sb, Map<Parameter, Object> params,
-            boolean isJson) {
+                                                  boolean isJson) {
         doHandleClassParams(sb, params, isJson, ParameterType.PATH);
         doHandleClassParams(sb, params, isJson, ParameterType.MATRIX);
     }
-    
-    protected void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params,
-                                     boolean isJson, ParameterType... pType) {
+
+    protected void doHandleClassParams(StringBuilder sb, Map<Parameter, Object> params, boolean isJson,
+                                       ParameterType... pType) {
         Set<ParameterType> pTypes = new LinkedHashSet<ParameterType>(Arrays.asList(pType));
         for (Map.Entry<Parameter, Object> entry : params.entrySet()) {
             Parameter pm = entry.getKey();
             Object obj = entry.getValue();
             if (pTypes.contains(pm.getType())) {
-                Class<?> cls = obj instanceof Method 
-                    ? ((Method)obj).getParameterTypes()[0] : ((Field)obj).getType();
-                Type type = obj instanceof Method 
-                    ? ((Method)obj).getGenericParameterTypes()[0] : ((Field)obj).getGenericType();    
-                Annotation[] ann = obj instanceof Method 
+                Class<?> cls = obj instanceof Method ? ((Method)obj).getParameterTypes()[0] : ((Field)obj)
+                    .getType();
+                Type type = obj instanceof Method
+                    ? ((Method)obj).getGenericParameterTypes()[0] : ((Field)obj).getGenericType();
+                Annotation[] ann = obj instanceof Method
                     ? ((Method)obj).getParameterAnnotations()[0] : ((Field)obj).getAnnotations();
-                doWriteParam(sb, pm, cls, type, pm.getName(), ann, isJson);        
+                doWriteParam(sb, pm, cls, type, pm.getName(), ann, isJson);
             }
         }
     }
-    
+
     protected void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori, boolean isJson) {
         handleParams(sb, ori, ParameterType.PATH, isJson);
         handleParams(sb, ori, ParameterType.MATRIX, isJson);
     }
 
-
     protected void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes,
-                                 ElementQNameResolver qnameResolver,
-                                 Map<Class<?>, QName> clsMap, OperationResourceInfo ori, Parameter pm,
-                                 boolean isJson) {
+                                   ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
+                                   OperationResourceInfo ori, Parameter pm, boolean isJson) {
         Class<?> cls = getMethod(ori).getParameterTypes()[pm.getIndex()];
         if (pm.getType() == ParameterType.REQUEST_BODY) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, cls, isJson, true);
@@ -578,8 +564,8 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     }
 
-    protected void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type, 
-            boolean isJson) {
+    protected void handleParams(StringBuilder sb, OperationResourceInfo ori, ParameterType type,
+                                boolean isJson) {
         for (Parameter pm : ori.getParameters()) {
             if (pm.getType() == type) {
                 writeParam(sb, pm, ori, isJson);
@@ -595,7 +581,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                     return opMethod.getParameterAnnotations()[pm.getIndex()];
                 }
             }
-            return new Annotation[]{};
+            return new Annotation[] {};
         } else {
             return opMethod.getDeclaredAnnotations();
         }
@@ -605,9 +591,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         Method method = getMethod(ori);
         Class<?> type = method.getParameterTypes()[pm.getIndex()];
         if (!"".equals(pm.getName())) {
-            doWriteParam(sb, pm, type, method.getGenericParameterTypes()[pm.getIndex()],
-                         pm.getName(), method.getParameterAnnotations()[pm.getIndex()],
-                         isJson);
+            doWriteParam(sb, pm, type, method.getGenericParameterTypes()[pm.getIndex()], pm.getName(),
+                         method.getParameterAnnotations()[pm.getIndex()], isJson);
         } else {
             List<Class<?>> parentBeanClasses = new LinkedList<Class<?>>();
             parentBeanClasses.add(type);
@@ -615,12 +600,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
-    private void doWriteBeanParam(StringBuilder sb, 
-                                  Class<?> type, 
-                                  Parameter pm, 
-                                  String parentName,
-                                  List<Class<?>> parentBeanClasses,
-                                  boolean isJson) {
+    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName,
+                                  List<Class<?>> parentBeanClasses, boolean isJson) {
         Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType(), true);
         for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
             String name = entry.getKey().getName();
@@ -630,7 +611,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             Class<?> paramCls = entry.getValue();
             boolean isPrimitive = InjectionUtils.isPrimitive(paramCls) || paramCls.isEnum();
             if (isPrimitive || InjectionUtils.isSupportedCollectionOrArray(paramCls)) {
-                doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[]{}, isJson);
+                doWriteParam(sb, entry.getKey(), paramCls, paramCls, name, new Annotation[] {}, isJson);
             } else if (!parentBeanClasses.contains(paramCls)) {
                 parentBeanClasses.add(paramCls);
                 doWriteBeanParam(sb, paramCls, entry.getKey(), name, parentBeanClasses, isJson);
@@ -638,8 +619,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
-    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, 
-                                Type genericType, String paramName, Annotation[] anns, boolean isJson) {
+    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, Type genericType,
+                                String paramName, Annotation[] anns, boolean isJson) {
         ParameterType pType = pm.getType();
         boolean isForm = isFormParameter(pm, type, anns);
         if (paramName == null && isForm) {
@@ -649,19 +630,18 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
         }
         sb.append("<param name=\"").append(paramName).append("\" ");
-        String style = ParameterType.PATH == pType ? "template"
-                       : isForm ? "query"
-                       : ParameterType.REQUEST_BODY == pType ? "plain"    
-                       : pType.toString().toLowerCase();
+        String style = ParameterType.PATH == pType ? "template" : isForm
+            ? "query" : ParameterType.REQUEST_BODY == pType ? "plain" : pType.toString().toLowerCase();
         sb.append("style=\"").append(style).append("\"");
         if (pm.getDefaultValue() != null) {
-            sb.append(" default=\"").append(pm.getDefaultValue()).append("\"");
+            sb.append(" default=\"").append(xmlEncodeIfNeeded(pm.getDefaultValue()))
+                .append("\"");
         }
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             type = InjectionUtils.getActualType(genericType);
             sb.append(" repeating=\"true\"");
         }
-        
+
         String value = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
         if (value == null && type.isEnum()) {
             value = "xs:string";
@@ -684,19 +664,19 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     private void setEnumOptions(StringBuilder sb, Class<?> enumClass) {
         try {
-            Method m = enumClass.getMethod("values", new Class[]{});
-            Object[] values = (Object[])m.invoke(null, new Object[]{});
-            m = enumClass.getMethod("toString", new Class[]{});
+            Method m = enumClass.getMethod("values", new Class[] {});
+            Object[] values = (Object[])m.invoke(null, new Object[] {});
+            m = enumClass.getMethod("toString", new Class[] {});
             for (Object o : values) {
-                String str = (String)m.invoke(o, new Object[]{});
+                String str = (String)m.invoke(o, new Object[] {});
                 sb.append("<option value=\"" + str + "\"/>");
             }
-            
+
         } catch (Throwable ex) {
             // ignore
         }
     }
-    
+
     private void addDocsAndCloseElement(StringBuilder sb, Annotation[] anns, String elementName,
                                         String category, boolean allowDefault, boolean isJson) {
         if (isDocAvailable(anns)) {
@@ -707,37 +687,37 @@ public class WadlGenerator implements ContainerRequestFilter {
             sb.append("/>");
         }
     }
-    
+
     private boolean isDocAvailable(Annotation[] anns) {
         return AnnotationUtils.getAnnotation(anns, Description.class) != null
-                   || AnnotationUtils.getAnnotation(anns, Descriptions.class) != null;
+               || AnnotationUtils.getAnnotation(anns, Descriptions.class) != null;
     }
-    //TODO: Collapse multiple parameters into a holder
-    //CHECKSTYLE:OFF
+
+    // TODO: Collapse multiple parameters into a holder
+    // CHECKSTYLE:OFF
     protected void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
-                                      ElementQNameResolver qnameResolver,
-                                      Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
-                                      Class<?> type, boolean isJson, boolean inbound) {
-    //CHECKSTYLE:ON
+                                        ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
+                                        OperationResourceInfo ori, Class<?> type, boolean isJson,
+                                        boolean inbound) {
+        // CHECKSTYLE:ON
         List<MediaType> types = inbound ? ori.getConsumeTypes() : ori.getProduceTypes();
         if (MultivaluedMap.class.isAssignableFrom(type)) {
             types = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
         } else if (isWildcard(types)) {
             types = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
-        } 
-        
+        }
+
         Method opMethod = getMethod(ori);
         boolean isPrimitive = InjectionUtils.isPrimitive(type);
         for (MediaType mt : types) {
-            
+
             sb.append("<representation");
             sb.append(" mediaType=\"").append(JAXRSUtils.mediaTypeToString(mt)).append("\"");
             if (isJson && !mt.getSubtype().contains("json")) {
                 sb.append("/>");
                 continue;
             }
-            
-            
+
             boolean allowDefault = true;
             String docCategory;
             Annotation[] anns;
@@ -754,34 +734,34 @@ public class WadlGenerator implements ContainerRequestFilter {
                 allowDefault = false;
             }
             if (isPrimitive) {
-                sb.append(">");    
-                Parameter p = inbound ? getRequestBodyParam(ori) 
-                    : new Parameter(ParameterType.REQUEST_BODY, 0, "result"); 
+                sb.append(">");
+                Parameter p = inbound ? getRequestBodyParam(ori) : new Parameter(ParameterType.REQUEST_BODY,
+                                                                                 0, "result");
                 doWriteParam(sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns, isJson);
                 sb.append("</representation>");
-            } else  { 
+            } else {
                 boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
                 if (isCollection) {
-                    type = InjectionUtils.getActualType(!inbound ? opMethod.getGenericReturnType() 
-                        : opMethod.getGenericParameterTypes()[getRequestBodyParam(ori).getIndex()]);
+                    type = InjectionUtils.getActualType(!inbound ? opMethod.getGenericReturnType() : opMethod
+                        .getGenericParameterTypes()[getRequestBodyParam(ori).getIndex()]);
                 } else {
                     type = ResourceUtils.getActualJaxbType(type, opMethod, inbound);
                 }
                 if (isJson) {
                     sb.append(" element=\"").append(type.getSimpleName()).append("\"");
-                } else if (qnameResolver != null 
-                        && (mt.getSubtype().contains("xml")
-                                || linkJsonToXmlSchema && mt.getSubtype().contains("json"))
-                        && jaxbTypes.contains(type)) {
+                } else if (qnameResolver != null
+                           && (mt.getSubtype().contains("xml") || linkJsonToXmlSchema
+                                                                  && mt.getSubtype().contains("json"))
+                           && jaxbTypes.contains(type)) {
                     generateQName(sb, qnameResolver, clsMap, type, isCollection,
                                   getBodyAnnotations(ori, inbound));
                 }
                 addDocsAndCloseElement(sb, anns, "representation", docCategory, allowDefault, isJson);
             }
         }
-        
+
     }
-    
+
     private Parameter getRequestBodyParam(OperationResourceInfo ori) {
         for (Parameter p : ori.getParameters()) {
             if (p.getType() == ParameterType.REQUEST_BODY) {
@@ -790,22 +770,20 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         throw new IllegalStateException();
     }
-    
+
     private boolean isWildcard(List<MediaType> types) {
         return types.size() == 1 && types.get(0).equals(MediaType.WILDCARD_TYPE);
     }
-    
+
     private void handleFormRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
-                                      ElementQNameResolver qnameResolver,
-                                      Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
-                                      Class<?> type,
-                                      boolean isJson) {
+                                          ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap,
+                                          OperationResourceInfo ori, Class<?> type, boolean isJson) {
         if (type != null) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, type, false, true);
         } else {
             List<MediaType> types = ori.getConsumeTypes();
-            MediaType formType = isWildcard(types) ? MediaType.APPLICATION_FORM_URLENCODED_TYPE 
-                : types.get(0); 
+            MediaType formType = isWildcard(types) ? MediaType.APPLICATION_FORM_URLENCODED_TYPE : types
+                .get(0);
             sb.append("<representation");
             sb.append(" mediaType=\"").append(formType).append("\"");
             if (isJson) {
@@ -814,9 +792,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 sb.append(">");
                 List<Parameter> params = ori.getParameters();
                 for (int i = 0; i < params.size(); i++) {
-                    if (isFormParameter(params.get(i), 
-                                        getMethod(ori).getParameterTypes()[i],
-                                        getMethod(ori).getParameterAnnotations()[i])) {
+                    if (isFormParameter(params.get(i), getMethod(ori).getParameterTypes()[i], getMethod(ori)
+                        .getParameterAnnotations()[i])) {
                         writeParam(sb, params.get(i), ori, false);
                     }
                 }
@@ -871,8 +848,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         return cris;
     }
-    
-    //TODO: deal with caching later on
+
+    // TODO: deal with caching later on
     public Response getExistingWadl(Message m, UriInfo ui, MediaType mt) {
         Endpoint ep = m.getExchange().get(Endpoint.class);
         if (ep != null) {
@@ -882,29 +859,30 @@ public class WadlGenerator implements ContainerRequestFilter {
                     InputStream is = ResourceUtils.getResourceStream(loc, (Bus)ep.get(Bus.class.getName()));
                     if (is != null) {
                         Element appEl = DOMUtils.readXml(is).getDocumentElement();
-                        
-                        List<Element> grammarEls = DOMUtils.getChildrenWithName(appEl, 
-                                                                                WadlGenerator.WADL_NS, 
+
+                        List<Element> grammarEls = DOMUtils.getChildrenWithName(appEl, WadlGenerator.WADL_NS,
                                                                                 "grammars");
                         if (grammarEls.size() == 1) {
-                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), 
-                                WadlGenerator.WADL_NS, "include"), "href", loc, "", m, ui);
+                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0),
+                                                                               WadlGenerator.WADL_NS,
+                                                                               "include"), "href", loc, "",
+                                                  m, ui);
                         }
-                        
-                        List<Element> resourcesEls = DOMUtils.getChildrenWithName(appEl, 
-                                                                                 WadlGenerator.WADL_NS, 
-                                                                                 "resources");
+
+                        List<Element> resourcesEls = DOMUtils.getChildrenWithName(appEl,
+                                                                                  WadlGenerator.WADL_NS,
+                                                                                  "resources");
                         if (resourcesEls.size() == 1) {
                             DOMUtils.setAttribute(resourcesEls.get(0), "base", getBaseURI(m, ui));
-                            
-                            List<Element> resourceEls = DOMUtils.getChildrenWithName(resourcesEls.get(0), 
-                                                                                     WadlGenerator.WADL_NS, 
+
+                            List<Element> resourceEls = DOMUtils.getChildrenWithName(resourcesEls.get(0),
+                                                                                     WadlGenerator.WADL_NS,
                                                                                      "resource");
                             handleExistingDocRefs(resourceEls, "type", loc, "", m, ui);
-                            
+
                             return Response.ok().type(mt).entity(new DOMSource(appEl)).build();
                         }
-                        
+
                     }
                 } catch (Exception ex) {
                     throw new InternalServerErrorException(ex);
@@ -913,8 +891,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         return null;
     }
-    
-    //TODO: deal with caching later on
+
+    // TODO: deal with caching later on
     public Response getExistingResource(Message m, UriInfo ui, String href) {
         String loc = docLocationMap.get(href);
         Endpoint ep = m.getExchange().get(Endpoint.class);
@@ -928,40 +906,44 @@ public class WadlGenerator implements ContainerRequestFilter {
                 if (is != null) {
                     Element docEl = DOMUtils.readXml(is).getDocumentElement();
                     if (fragmentIndex != -1) {
-                        List<Element> grammarEls = DOMUtils.getChildrenWithName(docEl, 
-                                                                                WadlGenerator.WADL_NS, 
+                        List<Element> grammarEls = DOMUtils.getChildrenWithName(docEl, WadlGenerator.WADL_NS,
                                                                                 "grammars");
                         if (grammarEls.size() == 1) {
-                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0), 
-                                WadlGenerator.WADL_NS, "include"), "href", loc, href, m, ui);
+                            handleExistingDocRefs(DOMUtils.getChildrenWithName(grammarEls.get(0),
+                                                                               WadlGenerator.WADL_NS,
+                                                                               "include"), "href", loc, href,
+                                                  m, ui);
                         }
                     } else {
-                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl, 
-                            XmlSchemaConstants.XSD_NAMESPACE_URI, "import"), "schemaLocation", loc, href, m, ui);
-                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl, 
-                            XmlSchemaConstants.XSD_NAMESPACE_URI, "include"), "schemaLocation", loc, href, m, ui);
+                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
+                                                                           XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                           "import"), "schemaLocation", loc,
+                                              href, m, ui);
+                        handleExistingDocRefs(DOMUtils.getChildrenWithName(docEl,
+                                                                           XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                           "include"), "schemaLocation", loc,
+                                              href, m, ui);
                     }
-                    
-                    
-                    return Response.ok().type(MediaType.APPLICATION_XML_TYPE).entity(
-                        new DOMSource(docEl)).build();
+
+                    return Response.ok().type(MediaType.APPLICATION_XML_TYPE).entity(new DOMSource(docEl))
+                        .build();
                 }
             } catch (Exception ex) {
                 throw new BadRequestException();
             }
-            
+
         }
         return null;
     }
 
-    private void handleExistingDocRefs(List<Element> elements, String attrName, 
-                                  String parentDocLoc, String parentRef, Message m, UriInfo ui) {
+    private void handleExistingDocRefs(List<Element> elements, String attrName, String parentDocLoc,
+                                       String parentRef, Message m, UriInfo ui) {
         int index = parentDocLoc.lastIndexOf('/');
         parentDocLoc = index == -1 ? parentDocLoc : parentDocLoc.substring(0, index + 1);
-        
+
         index = parentRef.lastIndexOf('/');
-        parentRef = index == -1 ? "" : parentRef.substring(0, index + 1);    
-        
+        parentRef = index == -1 ? "" : parentRef.substring(0, index + 1);
+
         for (Element element : elements) {
             String href = element.getAttribute(attrName);
             String originalRef = href;
@@ -972,7 +954,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                     fragment = href.substring(fragmentIndex + 1);
                     href = href.substring(0, fragmentIndex);
                 }
-                
+
                 String actualRef = parentRef + href;
                 docLocationMap.put(actualRef, parentDocLoc + originalRef);
                 UriBuilder ub = UriBuilder.fromUri(getBaseURI(m, ui)).path(actualRef).fragment(fragment);
@@ -982,11 +964,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
-    private void generateQName(StringBuilder sb,
-                               ElementQNameResolver qnameResolver,
-                               Map<Class<?>, QName> clsMap,
-                               Class<?> type,
-                               boolean isCollection,
+    private void generateQName(StringBuilder sb, ElementQNameResolver qnameResolver,
+                               Map<Class<?>, QName> clsMap, Class<?> type, boolean isCollection,
                                Annotation[] annotations) {
         if (!isCollection) {
             QName typeQName = clsMap.get(type);
@@ -996,8 +975,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
         }
 
-        QName qname = qnameResolver.resolve(type, annotations,
-                                            Collections.unmodifiableMap(clsMap));
+        QName qname = qnameResolver.resolve(type, annotations, Collections.unmodifiableMap(clsMap));
 
         if (qname != null) {
             if (!isCollection) {
@@ -1008,8 +986,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 QName collectionName = null;
                 if (name != null) {
                     QName tempQName = JAXRSUtils.convertStringToQName(name.value());
-                    collectionName = new QName(qname.getNamespaceURI(), 
-                                               tempQName.getLocalPart(),
+                    collectionName = new QName(qname.getNamespaceURI(), tempQName.getLocalPart(),
                                                qname.getPrefix());
                     writeQName(sb, collectionName);
                 }
@@ -1018,8 +995,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     private void writeQName(StringBuilder sb, QName qname) {
-        sb.append(" element=\"").append(qname.getPrefix()).append(':')
-            .append(qname.getLocalPart()).append("\"");
+        sb.append(" element=\"").append(qname.getPrefix()).append(':').append(qname.getLocalPart())
+            .append("\"");
     }
 
     private SchemaCollection getSchemaCollection(ResourceTypes resourceTypes, JAXBContext context) {
@@ -1030,33 +1007,34 @@ public class WadlGenerator implements ContainerRequestFilter {
         Collection<DOMSource> schemas = new HashSet<DOMSource>();
         List<String> targetNamespaces = new ArrayList<String>();
         try {
-            for (DOMResult r : JAXBUtils.generateJaxbSchemas(context,
-                                    CastUtils.cast(Collections.emptyMap(), String.class, DOMResult.class))) {
+            for (DOMResult r : JAXBUtils.generateJaxbSchemas(context, CastUtils.cast(Collections.emptyMap(),
+                                                                                     String.class,
+                                                                                     DOMResult.class))) {
                 Document doc = (Document)r.getNode();
                 if (supportCollections && !resourceTypes.getCollectionMap().isEmpty()) {
                     ElementQNameResolver theResolver = createElementQNameResolver(context);
                     String tns = doc.getDocumentElement().getAttribute("targetNamespace");
                     for (Map.Entry<Class<?>, QName> entry : resourceTypes.getCollectionMap().entrySet()) {
                         if (tns.equals(entry.getValue().getNamespaceURI())) {
-                            QName typeName = theResolver.resolve(entry.getKey(), new Annotation[]{}, 
-                                                           Collections.<Class<?>, QName>emptyMap());
+                            QName typeName = theResolver.resolve(entry.getKey(), new Annotation[] {},
+                                                                 Collections.<Class<?>, QName> emptyMap());
                             if (typeName != null) {
-                                Element newElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
-                                                                         "xs:element");
+                                Element newElement = doc
+                                    .createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, "xs:element");
                                 newElement.setAttribute("name", entry.getValue().getLocalPart());
-                                Element ctElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
-                                    "xs:complexType");
+                                Element ctElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                        "xs:complexType");
                                 newElement.appendChild(ctElement);
-                                Element seqElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
-                                    "xs:sequence");
+                                Element seqElement = doc
+                                    .createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, "xs:sequence");
                                 ctElement.appendChild(seqElement);
-                                Element xsElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI, 
-                                    "xs:element");
+                                Element xsElement = doc.createElementNS(XmlSchemaConstants.XSD_NAMESPACE_URI,
+                                                                        "xs:element");
                                 seqElement.appendChild(xsElement);
                                 xsElement.setAttribute("ref", "tns:" + typeName.getLocalPart());
                                 xsElement.setAttribute("minOccurs", "0");
                                 xsElement.setAttribute("maxOccurs", "unbounded");
-                                
+
                                 doc.getDocumentElement().appendChild(newElement);
                             }
                         }
@@ -1064,8 +1042,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 }
                 DOMSource source = new DOMSource(doc, r.getSystemId());
                 schemas.add(source);
-                String tns = 
-                    ((Document)source.getNode()).getDocumentElement().getAttribute("targetNamespace");
+                String tns = ((Document)source.getNode()).getDocumentElement()
+                    .getAttribute("targetNamespace");
                 if (!StringUtils.isEmpty(tns)) {
                     targetNamespaces.add(tns);
                 }
@@ -1077,13 +1055,9 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         boolean hackAroundEmptyNamespaceIssue = false;
         for (DOMSource r : schemas) {
-            hackAroundEmptyNamespaceIssue =
-                              addSchemaDocument(
-                                  xmlSchemaCollection,
-                                  targetNamespaces,
-                                  (Document)r.getNode(),
-                                  r.getSystemId(),
-                                  hackAroundEmptyNamespaceIssue);
+            hackAroundEmptyNamespaceIssue = addSchemaDocument(xmlSchemaCollection, targetNamespaces,
+                                                              (Document)r.getNode(), r.getSystemId(),
+                                                              hackAroundEmptyNamespaceIssue);
         }
         return xmlSchemaCollection;
     }
@@ -1111,9 +1085,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
             Object instance = type.newInstance();
             return getQNameFromParts(jaxbInfo.getElementLocalName(instance),
-                                     jaxbInfo.getElementNamespaceURI(instance),
-                                     type,
-                                     clsMap);
+                                     jaxbInfo.getElementNamespaceURI(instance), type, clsMap);
         } catch (Exception ex) {
             // ignore
         }
@@ -1138,39 +1110,34 @@ public class WadlGenerator implements ContainerRequestFilter {
     private boolean isFormRequest(OperationResourceInfo ori) {
         for (Parameter p : ori.getParameters()) {
             if (p.getType() == ParameterType.FORM
-                || p.getType() == ParameterType.REQUEST_BODY 
-                && (getMethod(ori).getParameterTypes()[p.getIndex()] == MultivaluedMap.class 
-                    || AnnotationUtils.getAnnotation(getMethod(ori).getParameterAnnotations()[p.getIndex()],
-                                                     Multipart.class) != null)) {
+                || p.getType() == ParameterType.REQUEST_BODY
+                && (getMethod(ori).getParameterTypes()[p.getIndex()] == MultivaluedMap.class || AnnotationUtils
+                    .getAnnotation(getMethod(ori).getParameterAnnotations()[p.getIndex()], Multipart.class) != null)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     private Class<?> getFormClass(OperationResourceInfo ori) {
         List<Parameter> params = ori.getParameters();
         for (int i = 0; i < params.size(); i++) {
-            if (isFormParameter(params.get(i), 
-                                getMethod(ori).getParameterTypes()[i],
-                                getMethod(ori).getParameterAnnotations()[i])) {
+            if (isFormParameter(params.get(i), getMethod(ori).getParameterTypes()[i], getMethod(ori)
+                .getParameterAnnotations()[i])) {
                 return null;
             }
-        } 
+        }
         return MultivaluedMap.class;
     }
 
     private boolean isFormParameter(Parameter pm, Class<?> type, Annotation[] anns) {
         return ParameterType.FORM == pm.getType() || ParameterType.REQUEST_BODY == pm.getType()
-            && AnnotationUtils.getAnnotation(anns, Multipart.class) != null 
-            && InjectionUtils.isPrimitive(type);
+               && AnnotationUtils.getAnnotation(anns, Multipart.class) != null
+               && InjectionUtils.isPrimitive(type);
     }
-    
+
     // TODO : can we reuse this block with JAXBBinding somehow ?
-    public boolean addSchemaDocument(SchemaCollection col,
-                                     List<String> tnsList,
-                                     Document d,
-                                     String systemId,
+    public boolean addSchemaDocument(SchemaCollection col, List<String> tnsList, Document d, String systemId,
                                      boolean hackAroundEmptyNamespaceIssue) {
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
 
@@ -1179,8 +1146,8 @@ public class WadlGenerator implements ContainerRequestFilter {
                 hackAroundEmptyNamespaceIssue = true;
                 return hackAroundEmptyNamespaceIssue;
             }
-            //create a copy of the dom so we
-            //can modify it.
+            // create a copy of the dom so we
+            // can modify it.
             d = copy(d);
             ns = tnsList.isEmpty() ? "" : tnsList.get(0);
             d.getDocumentElement().setAttribute("targetNamespace", ns);
@@ -1211,16 +1178,15 @@ public class WadlGenerator implements ContainerRequestFilter {
         boolean hasStuffToRemove = false;
         Element el = DOMUtils.getFirstElement(d.getDocumentElement());
         while (el != null) {
-            if ("import".equals(el.getLocalName())
-                && StringUtils.isEmpty(el.getAttribute("targetNamespace"))) {
+            if ("import".equals(el.getLocalName()) && StringUtils.isEmpty(el.getAttribute("targetNamespace"))) {
                 hasStuffToRemove = true;
                 break;
             }
             el = DOMUtils.getNextElement(el);
         }
         if (hasStuffToRemove) {
-            //create a copy of the dom so we
-            //can modify it.
+            // create a copy of the dom so we
+            // can modify it.
             d = copy(d);
             el = DOMUtils.getFirstElement(d.getDocumentElement());
             while (el != null) {
@@ -1241,18 +1207,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         try {
             return StaxUtils.copy(doc);
         } catch (XMLStreamException e) {
-            //ignore
+            // ignore
         } catch (ParserConfigurationException e) {
-            //ignore
+            // ignore
         }
         return doc;
     }
 
-
-    private QName getQNameFromParts(String name, 
-                                    String namespace,
-                                    Class<?> type,
-                                    Map<Class<?>, QName> clsMap) {
+    private QName getQNameFromParts(String name, String namespace, Class<?> type, Map<Class<?>, QName> clsMap) {
         if (namespace == null || JAXB_DEFAULT_NAMESPACE.equals(namespace) || namespace.length() == 0) {
             return null;
         }
@@ -1262,7 +1224,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (JAXB_DEFAULT_NAME.equals(name)) {
             name = type.getSimpleName();
             StringBuilder sb = new StringBuilder();
-            sb.append(Character.toLowerCase(name.charAt(0))); 
+            sb.append(Character.toLowerCase(name.charAt(0)));
             if (name.length() > 1) {
                 sb.append(name.substring(1));
             }
@@ -1278,12 +1240,12 @@ public class WadlGenerator implements ContainerRequestFilter {
 
     private void handleApplicationDocs(StringBuilder sbApp) {
         if (applicationTitle != null) {
-            sbApp.append("<doc title=\"" + applicationTitle + "\"/>");
+            sbApp.append("<doc title=\"" + xmlEncodeIfNeeded(applicationTitle) + "\"/>");
         }
     }
-    
-    private void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault,
-            boolean isJson) {
+
+    protected void handleDocs(Annotation[] anns, StringBuilder sb, String category, boolean allowDefault,
+                            boolean isJson) {
         for (Annotation a : anns) {
             if (a.annotationType() == Descriptions.class) {
                 Descriptions ds = (Descriptions)a;
@@ -1292,27 +1254,27 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
             if (a.annotationType() == Description.class) {
                 Description d = (Description)a;
-                if (d.target().length() == 0 && !allowDefault 
-                    || d.target().length() > 0 && !d.target().equals(category)) {
+                if (d.target().length() == 0 && !allowDefault || d.target().length() > 0
+                    && !d.target().equals(category)) {
                     continue;
                 }
-                
+
                 sb.append("<doc");
                 if (!isJson && d.lang().length() > 0) {
                     sb.append(" xml:lang=\"" + d.lang() + "\"");
                 }
                 if (d.title().length() > 0) {
-                    sb.append(" title=\"" + d.title() + "\"");
+                    sb.append(" title=\"" + xmlEncodeIfNeeded(d.title()) + "\"");
                 }
                 sb.append(">");
                 if (d.value().length() > 0) {
-                    sb.append(d.value());
+                    sb.append(xmlEncodeIfNeeded(d.value()));
                 } else if (d.docuri().length() > 0) {
                     InputStream is = null;
                     if (d.docuri().startsWith(CLASSPATH_PREFIX)) {
                         String path = d.docuri().substring(CLASSPATH_PREFIX.length());
                         is = ResourceUtils.getClasspathResourceStream(path, SchemaHandler.class,
-                            BusFactory.getDefaultBus());
+                                                                      BusFactory.getDefaultBus());
                         if (is != null) {
                             try {
                                 sb.append(IOUtils.toString(is));
@@ -1346,6 +1308,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public void setLinkJsonToXmlSchema(boolean link) {
         linkJsonToXmlSchema = link;
     }
+
     public void setSchemaLocations(List<String> locations) {
 
         externalQnamesMap = new HashMap<String, List<String>>();
@@ -1373,14 +1336,13 @@ public class WadlGenerator implements ContainerRequestFilter {
         source.setBuffering();
         String targetNs = source.getValue("/*/@targetNamespace");
 
-        Map<String, String> nsMap =
-            Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+        Map<String, String> nsMap = Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
         String[] elementNames = source.getValues("/*/xs:element/@name", nsMap);
         externalQnamesMap.put(targetNs, Arrays.asList(elementNames));
         String schemaValue = source.getNode("/xs:schema", nsMap, String.class);
         externalSchemasCache.add(schemaValue);
     }
-    
+
     public void setUseJaxbContextForQnames(boolean checkJaxbOnly) {
         this.useJaxbContextForQnames = checkJaxbOnly;
     }
@@ -1391,8 +1353,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         if (useJaxbContextForQnames) {
             if (context != null) {
-                JAXBContextProxy proxy =
-                    ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
+                JAXBContextProxy proxy = ReflectionInvokationHandler
+                    .createProxyWrapper(context, JAXBContextProxy.class);
                 return new JaxbContextQNameResolver(proxy);
             } else {
                 return null;
@@ -1404,8 +1366,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
     }
 
-    protected SchemaWriter createSchemaWriter(ResourceTypes resourceTypes, JAXBContext context, 
-                                              UriInfo ui) {
+    protected SchemaWriter createSchemaWriter(ResourceTypes resourceTypes, JAXBContext context, UriInfo ui) {
         // if neither externalSchemaLinks nor externalSchemasCache is set
         // then JAXBContext will be used to generate the schema
         if (externalSchemaLinks != null && externalSchemasCache == null) {
@@ -1462,10 +1423,9 @@ public class WadlGenerator implements ContainerRequestFilter {
             }
         }
 
-        private Map<String, String> getLocationsMap(XMLSource source, String elementName,
-                                                    List<URI> links, UriInfo ui) {
-            Map<String, String> nsMap =
-                Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+        private Map<String, String> getLocationsMap(XMLSource source, String elementName, List<URI> links,
+                                                    UriInfo ui) {
+            Map<String, String> nsMap = Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
             String[] locations = source.getValues("/*/xs:" + elementName + "/@schemaLocation", nsMap);
             if (locations == null) {
                 return Collections.emptyMap();
@@ -1482,16 +1442,15 @@ public class WadlGenerator implements ContainerRequestFilter {
                                     if (overwriteURI.isAbsolute()) {
                                         locs.put(loc, overwriteURI.toString());
                                     } else {
-                                        locs.put(loc, ui.getBaseUriBuilder().path(
-                                            overwriteURI.toString()).build().toString());
+                                        locs.put(loc, ui.getBaseUriBuilder().path(overwriteURI.toString())
+                                            .build().toString());
                                     }
                                     break;
                                 }
                             }
                         }
                         if (!locs.containsKey(loc)) {
-                            locs.put(loc, ui.getBaseUriBuilder().path(
-                                 loc).build().toString());
+                            locs.put(loc, ui.getBaseUriBuilder().path(loc).build().toString());
                         }
                     }
                 } catch (Exception ex) {
@@ -1532,8 +1491,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         public void write(StringBuilder sb) {
             for (XmlSchema xs : coll.getXmlSchemas()) {
-                if (xs.getItems().isEmpty()
-                    || WSDLConstants.NS_SCHEMA_XSD.equals(xs.getTargetNamespace())) {
+                if (xs.getItems().isEmpty() || WSDLConstants.NS_SCHEMA_XSD.equals(xs.getTargetNamespace())) {
                     continue;
                 }
                 StringWriter writer = new StringWriter();
@@ -1556,8 +1514,8 @@ public class WadlGenerator implements ContainerRequestFilter {
         public void write(StringBuilder sb) {
             for (URI link : links) {
                 try {
-                    URI value = link.isAbsolute() ? link
-                        : uriInfo.getBaseUriBuilder().path(link.toString()).build();
+                    URI value = link.isAbsolute() ? link : uriInfo.getBaseUriBuilder().path(link.toString())
+                        .build();
                     sb.append("<include href=\"").append(value.toString()).append("\"/>");
                 } catch (Exception ex) {
                     LOG.warning("WADL grammar section will be incomplete, this link is not a valid URI : "
@@ -1593,10 +1551,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 if (qname.getPrefix().length() > 0) {
                     return qname;
                 } else {
-                    return getQNameFromParts(qname.getLocalPart(),
-                                             qname.getNamespaceURI(),
-                                             type,
-                                             clsMap);
+                    return getQNameFromParts(qname.getLocalPart(), qname.getNamespaceURI(), type, clsMap);
                 }
             }
             return null;
@@ -1650,7 +1605,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         Method annMethod = ori.getAnnotatedMethod();
         return annMethod != null ? annMethod : ori.getMethodToInvoke();
     }
-    
+
     public void setApplicationTitle(String applicationTitle) {
         this.applicationTitle = applicationTitle;
     }
@@ -1666,7 +1621,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     public void setIgnoreRequests(boolean ignoreRequests) {
         this.ignoreRequests = ignoreRequests;
     }
-    
+
     public void setSupportCollections(boolean support) {
         this.supportCollections = support;
     }
@@ -1678,6 +1633,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private Map<String, String> locsMap;
+
         public SchemaConverter(XMLStreamWriter writer, Map<String, String> locsMap) {
             super(writer);
             this.locsMap = locsMap;
