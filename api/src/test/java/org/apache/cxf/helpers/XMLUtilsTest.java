@@ -27,13 +27,42 @@ import javax.xml.transform.stream.StreamSource;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class XMLUtilsTest {
+public class XMLUtilsTest extends Assert {
 
     @Test
     public void testToString() throws Exception {
         InputStream is = getClass().getResourceAsStream("resources/test.xml");
         Source source = new StreamSource(is);
         
-        Assert.assertEquals("<test><ok/></test>", XMLUtils.toString(source));
+        assertEquals("<test><ok/></test>", XMLUtils.toString(source));
+    }
+    
+    @Test
+    public void testXmlEncodeNoEscape() {
+        assertEquals("12345", XMLUtils.xmlEncode("12345"));
+    }
+    
+    @Test
+    public void testXmlEncodeEscapeAtStart() {
+        assertEquals("&quot;2345", XMLUtils.xmlEncode("\"2345"));
+    }
+    @Test
+    public void testXmlEncodeEscapeAtEnd() {
+        assertEquals("1234&apos;", XMLUtils.xmlEncode("1234'"));
+    }
+    
+    @Test
+    public void testXmlEncodeEscapeInMiddle() {
+        assertEquals("12&amp;45", XMLUtils.xmlEncode("12&45"));
+    }
+    
+    @Test
+    public void testXmlEncodeEscapeMany() {
+        assertEquals("&lt;2&amp;4&gt;", XMLUtils.xmlEncode("<2&4>"));
+    }
+    
+    @Test
+    public void testXmlEncodeEscapeAll() {
+        assertEquals("&lt;&quot;&amp;&apos;&gt;", XMLUtils.xmlEncode("<\"&'>"));
     }
 }

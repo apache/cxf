@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
@@ -46,11 +47,11 @@ import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })
 @Produces({"application/xml", "application/json" })
-@Description(lang = "en-us", title = "book store resource", value = "super resource")
+@Description(lang = "en-us", title = "book store \"resource\"", value = "super resource")
 public class BookStore {
 
     @Descriptions({ 
-        @Description(value = "Attachments", target = DocTarget.PARAM)
+        @Description(value = "Attachments, max < 10", target = DocTarget.PARAM)
     })
     @POST 
     @Consumes("multipart/form-data")
@@ -79,7 +80,7 @@ public class BookStore {
     public void setName(@PathParam("id") Long id, String name) {
     }
     
-    @Path("books/{bookid}")
+    @Path("books/\"{bookid}\"")
     public Object addBook(@PathParam("id") int id,
                         @PathParam("bookid") int bookId,
                         @MatrixParam("mid") int matrixId) {
@@ -101,7 +102,7 @@ public class BookStore {
     public Book addBook(@Description("book id")
                         @PathParam("id") int id,
                         @PathParam("bookid") int bookId,
-                        @MatrixParam("mid") int matrixId,
+                        @MatrixParam("mid") @DefaultValue("mid > 5") String matrixId,
                         @Description("header param")
                         @HeaderParam("hid") int headerId,
                         @CookieParam("cid") int cookieId,
