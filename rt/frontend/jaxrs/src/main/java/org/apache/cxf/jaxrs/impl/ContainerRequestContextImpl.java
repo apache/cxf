@@ -79,7 +79,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     public MultivaluedMap<String, String> getHeaders() {
         h = null;
         return new MetadataMap<String, String>(
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, true, true);
+            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);
     }
 
 

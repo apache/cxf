@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Priority;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NameBinding;
 import javax.ws.rs.WebApplicationException;
@@ -140,11 +141,14 @@ public class BookServer20 extends AbstractBusTestServerBase {
     @PreMatching
     @Priority(3)
     private static class PreMatchContainerRequestFilter2 implements ContainerRequestFilter {
-
+        @Context
+        private HttpServletRequest servletRequest;
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
             if (!"true".equals(context.getProperty("FirstPrematchingFilter"))
-                || !"true".equals(context.getProperty("DynamicPrematchingFilter"))) {
+                || !"true".equals(context.getProperty("DynamicPrematchingFilter"))
+                || !"true".equals(servletRequest.getAttribute("FirstPrematchingFilter"))
+                || !"true".equals(servletRequest.getAttribute("DynamicPrematchingFilter"))) {
                 throw new RuntimeException();
             }
             context.getHeaders().add("BOOK", "12");

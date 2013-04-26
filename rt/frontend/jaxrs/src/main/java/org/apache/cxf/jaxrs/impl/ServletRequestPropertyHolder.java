@@ -19,32 +19,52 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.jaxrs.impl.PropertyHolderFactory.PropertyHolder;
 import org.apache.cxf.message.Message;
 
-public abstract class AbstractPropertiesImpl {
-    protected Message m;
-    private PropertyHolder holder;
-    public AbstractPropertiesImpl(Message message) {
-        holder = PropertyHolderFactory.getPropertyHolder(message);
-        this.m = message;
+public class ServletRequestPropertyHolder implements PropertyHolder {
+    private static final String ENDPOINT_ADDRESS_PROPERTY = "org.apache.cxf.transport.endpoint.address";
+    private HttpServletRequest request;
+    public ServletRequestPropertyHolder(Message m) {
+        request = (HttpServletRequest)m.get("HTTP.REQUEST");
     }
     
+    @Override
     public Object getProperty(String name) {
-        return holder.getProperty(name);
+        return request.getAttribute(name);
     }
 
+    @Override
     public void removeProperty(String name) {
-        holder.removeProperty(name);
+        request.removeAttribute(name);
     }
 
-
+    @Override
     public void setProperty(String name, Object value) {
-        holder.setProperty(name, value);
+        if (value == null) {
+            removeProperty(name);
+        } else {
+            request.setAttribute(name, value);
+        }
     }
 
+    @Override
     public Collection<String> getPropertyNames() {
-        return holder.getPropertyNames();
+        List<String> list = new LinkedList<String>(); 
+        Enumeration<String> attrNames = request.getAttributeNames();
+        while (attrNames.hasMoreElements()) {
+            String name = attrNames.nextElement();
+            if (!ENDPOINT_ADDRESS_PROPERTY.equals(name)) {
+                list.add(name);
+            }
+        }
+        return list;
     }
+
 }

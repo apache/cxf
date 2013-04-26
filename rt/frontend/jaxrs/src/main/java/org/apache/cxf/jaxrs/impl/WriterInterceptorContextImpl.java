@@ -64,7 +64,7 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
     @Override
     public MultivaluedMap<String, Object> getHeaders() {
         return new MetadataMap<String, Object>(
-            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, true, true);
+            (Map<String, List<Object>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);
     }
 
     @Override

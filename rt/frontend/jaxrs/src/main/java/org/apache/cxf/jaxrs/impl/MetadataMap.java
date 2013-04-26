@@ -35,6 +35,7 @@ import javax.ws.rs.core.MultivaluedMap;
 public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
 
     private boolean caseInsensitive;
+    private boolean readOnly;
     private Map<K, List<V>> m;
     
     public MetadataMap() {
@@ -62,8 +63,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         this (store, true, readOnly, caseInsensitive);
         
     }
-    // TODO: Review the use of this constructor,
-    //       refactor the code, copyStore and readOnly are duplicates
+    
     public MetadataMap(Map<K, List<V>> store, boolean copyStore, 
                        boolean readOnly, boolean caseInsensitive) {
         
@@ -72,17 +72,17 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
             if (store != null) {
                 for (Map.Entry<K, List<V>> entry : store.entrySet()) {
                     List<V> values = new ArrayList<V>(entry.getValue());
-                    m.put(entry.getKey(), readOnly 
-                          ? Collections.unmodifiableList(values) : values);
+                    m.put(entry.getKey(), values);
                 }
-            }
-            if (readOnly) {
-                this.m = Collections.unmodifiableMap(m);
             }
         } else {
             this.m = store;
         }
+        if (readOnly) {
+            this.m = Collections.unmodifiableMap(m);
+        }
         this.caseInsensitive = caseInsensitive;
+        this.readOnly = readOnly;
         
     }
     
@@ -105,7 +105,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
             data = new ArrayList<V>();    
             m.put(key, data);
         }
-        return data;
+        return readOnly ? Collections.unmodifiableList(data) : data;
     }
     
     public V getFirst(K key) {

@@ -21,7 +21,12 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -210,11 +215,57 @@ public class MetadataMapTest extends Assert {
     }
     
     @Test(expected = UnsupportedOperationException.class)
-    public void testReadOnly() {
+    public void testReadOnlyRemove() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.add("baz", "bar");
         MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
         m2.remove("baz");
+    }
+    
+    @Test(expected = UnsupportedOperationException.class)
+    public void testReadOnlyAdd() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("baz", "bar");
+        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
+        m2.add("bar", "foo");
+    }
+    
+    @Test(expected = UnsupportedOperationException.class)
+    public void testReadOnlyAddFirst() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("baz", "bar");
+        MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, false);
+        m2.addFirst("baz", "bar2");
+    }
+    
+    @Test(expected = UnsupportedOperationException.class)
+    public void testReadOnlyAdd2() {
+        Map<String, List<String>> values = new HashMap<String, List<String>>();
+        List<String> list = new LinkedList<String>();
+        list.add("bar");
+        values.put("baz", list);
+        MultivaluedMap<String, String> map = 
+            new MetadataMap<String, String>(values, false, true, true);
+        map.add("baz", "baz");
+    }
+    
+    @Test(expected = UnsupportedOperationException.class)
+    public void testReadOnlyAddFirst2() {
+        Map<String, List<String>> values = new HashMap<String, List<String>>();
+        List<String> list = new LinkedList<String>();
+        list.add("bar");
+        values.put("baz", list);
+        MultivaluedMap<String, String> map = 
+            new MetadataMap<String, String>(values, false, true, true);
+        map.addFirst("baz", "bar2");
+    }
+    
+    @Test(expected = UnsupportedOperationException.class)
+    public void testReadOnlyPutSingle() {
+        Map<String, List<String>> values = new HashMap<String, List<String>>();
+        MultivaluedMap<String, String> map = 
+            new MetadataMap<String, String>(values, false, true, true);
+        map.putSingle("baz", "baz");
     }
     
     @Test
