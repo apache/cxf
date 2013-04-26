@@ -58,4 +58,23 @@
          </jaxws:features>
     </jaxws:client>
     
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItClientCheckerPort" 
+                  createdFromAPI="true">
+        <jaxws:inInterceptors>
+        <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+           <constructor-arg>
+            <map>
+               <entry key="action" value="Signature"/>
+               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+               <entry key="passwordCallbackClass" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+            </map>
+           </constructor-arg>
+        </bean>
+        <bean class="org.apache.cxf.ws.security.wss4j.DefaultCryptoCoverageChecker">
+             <property name="checkFaults" value="false"/>
+        </bean>
+       </jaxws:inInterceptors>
+    </jaxws:client>
+    
 </beans>

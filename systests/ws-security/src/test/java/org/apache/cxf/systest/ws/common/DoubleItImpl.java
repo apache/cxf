@@ -31,6 +31,9 @@ import org.example.contract.doubleit.DoubleItPortType;
 public class DoubleItImpl implements DoubleItPortType {
     
     public int doubleIt(int numberToDouble) throws DoubleItFault {
+        if (numberToDouble == 0) {
+            throw new DoubleItFault("0 can't be doubled!");
+        }
         return numberToDouble * 2;
     }
     

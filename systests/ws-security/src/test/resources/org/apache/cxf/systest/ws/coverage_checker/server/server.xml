@@ -149,5 +149,28 @@
            <wsa:addressing xmlns:wsa="http://cxf.apache.org/ws/addressing"/>
        </jaxws:features>
     </jaxws:endpoint> 
+    
+    <jaxws:endpoint 
+       id="ClientChecker"
+       address="http://localhost:${testutil.ports.Server}/DoubleItClientChecker" 
+       serviceName="s:DoubleItService"
+       endpointName="s:DoubleItClientCheckerPort"
+       xmlns:s="http://www.example.org/contract/DoubleIt"
+       implementor="org.apache.cxf.systest.ws.common.DoubleItImpl"
+       wsdlLocation="org/apache/cxf/systest/ws/coverage_checker/DoubleItCoverageChecker.wsdl">
+       <jaxws:outInterceptors>
+         <bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+           <constructor-arg>
+            <map>
+               <entry key="action" value="Signature"/>
+               <entry key="signaturePropFile" value="org/apache/cxf/systest/ws/wssec10/client/alice.properties"/>
+               <entry key="passwordCallbackClass" 
+                  value="org.apache.cxf.systest.ws.wssec10.client.KeystorePasswordCallback"/>
+               <entry key="user" value="alice"/>
+            </map>
+           </constructor-arg>
+        </bean>
+       </jaxws:outInterceptors>
+    </jaxws:endpoint> 
    
 </beans>
