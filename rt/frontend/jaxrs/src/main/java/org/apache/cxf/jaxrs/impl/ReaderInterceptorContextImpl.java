@@ -53,7 +53,7 @@ public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
     @Override
     public MultivaluedMap<String, String> getHeaders() {
         return new MetadataMap<String, String>(
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, true, true);
+            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS), false, false, true);
     }
 
     @Override
