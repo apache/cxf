@@ -314,7 +314,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.setOutAction(new XMLSecurityConstants.Action[] {
-            WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN
+            WSSConstants.USERNAMETOKEN, WSSConstants.SIGNATURE
         });
         properties.setSignatureUser("myalias");
         
@@ -421,9 +421,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         assertEquals("test", echo.echo("test"));
     }
     
-    // TODO
     @Test
-    @org.junit.Ignore
     public void testSignatureTimestampWrongNamespace() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -468,7 +466,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
             echo.echo("test");
             fail("Failure expected on a wrong namespace");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            ex.printStackTrace();
+            // expected
         }
     }
     

@@ -228,10 +228,10 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
-        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
-        principalInterceptor.setPrincipalName("username");
+        //WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        //principalInterceptor.setPrincipalName("username");
         service.getInInterceptors().add(inhandler);
-        service.getInInterceptors().add(principalInterceptor);
+        //service.getInInterceptors().add(principalInterceptor);
         
         // Create + configure client
         Echo echo = createClientProxy();
@@ -242,7 +242,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.setOutAction(new XMLSecurityConstants.Action[] {
-            WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN
+            WSSConstants.USERNAMETOKEN, WSSConstants.SIGNATURE
         });
         properties.setSignatureUser("myalias");
         
