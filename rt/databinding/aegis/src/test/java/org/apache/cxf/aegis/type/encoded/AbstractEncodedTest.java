@@ -21,7 +21,6 @@ package org.apache.cxf.aegis.type.encoded;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -89,7 +88,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
 
         // write value to element
         Element element = writeRef(value);
-
+        
         // reread value from element
         value = typeClass.cast(readRef(element));
 
@@ -143,9 +142,10 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
         // create the document
         Element element = createElement("urn:Bean", "root", "b");
         MapNamespaceContext namespaces = new MapNamespaceContext();
-        for (Map.Entry<String, String> entry : getNamespaces().entrySet()) {
+        // we should not add the out namespace here, as it is not a part of root element 
+        /*for (Map.Entry<String, String> entry : getNamespaces().entrySet()) {
             namespaces.addNamespace(entry.getKey(), entry.getValue());
-        }
+        }*/
         ElementWriter rootWriter = getElementWriter(element, namespaces);
         Context context = getContext();
 
