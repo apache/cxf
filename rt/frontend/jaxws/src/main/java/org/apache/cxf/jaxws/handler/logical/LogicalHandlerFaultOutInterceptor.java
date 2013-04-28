@@ -73,7 +73,12 @@ public class LogicalHandlerFaultOutInterceptor
             Document doc = XMLUtils.newDocument();
             message.setContent(Node.class, doc);
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc);
-        
+            // set up the namespace context
+            try {
+                writer.setNamespaceContext(origWriter.getNamespaceContext());
+            } catch (XMLStreamException ex) {
+                // don't set the namespaceContext
+            }
             // Replace stax writer with DomStreamWriter
             message.setContent(XMLStreamWriter.class, writer);
             message.put(ORIGINAL_WRITER, origWriter);
@@ -81,7 +86,7 @@ public class LogicalHandlerFaultOutInterceptor
             message.getInterceptorChain().add(ending);
         } catch (ParserConfigurationException e) {
             throw new Fault(e);
-        }
+        } 
     }
     
     
