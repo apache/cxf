@@ -32,12 +32,18 @@ import org.w3c.dom.Node;
 
 public class W3CNamespaceContext implements NamespaceContext {
     private Element currentNode;
+    private NamespaceContext outNamespaceContext;
     
     public W3CNamespaceContext() {
     }
     public W3CNamespaceContext(Element el) {
         currentNode = el;
     }
+    
+    public void setOutNamespaceContext(NamespaceContext context) {
+        outNamespaceContext = context;
+    }
+    
     public String getNamespaceURI(String prefix) {
         String name = prefix;
         if (name.length() == 0) {
@@ -53,7 +59,14 @@ public class W3CNamespaceContext implements NamespaceContext {
         if (e == null) {
             return null;
         }
-
+        // check the outside namespace URI
+        if (outNamespaceContext != null) {
+            String result = outNamespaceContext.getNamespaceURI(name);
+            if (result != null) {
+                return result;
+            }
+        }
+        
         Attr attr = e.getAttributeNode(name);
         if (attr == null) {
             Node n = e.getParentNode();
@@ -75,6 +88,14 @@ public class W3CNamespaceContext implements NamespaceContext {
         if (e == null) {
             return null;
         }
+        // check the outside namespace URI
+        if (outNamespaceContext != null) {
+            String result = outNamespaceContext.getPrefix(uri);
+            if (result != null) {
+                return result;
+            }
+        }
+        
         NamedNodeMap attributes = e.getAttributes();
         if (attributes != null) {
             for (int i = 0; i < attributes.getLength(); i++) {

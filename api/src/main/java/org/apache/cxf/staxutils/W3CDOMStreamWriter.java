@@ -120,7 +120,10 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
             }
         }
         if (!(context instanceof W3CNamespaceContext)) {
-            context = new W3CNamespaceContext();
+            // set the outside namespace context
+            W3CNamespaceContext childContext = new W3CNamespaceContext();
+            childContext.setOutNamespaceContext(context);
+            context = childContext;
         }
         ((W3CNamespaceContext)context).setElement(element);
         currentNode = element;
