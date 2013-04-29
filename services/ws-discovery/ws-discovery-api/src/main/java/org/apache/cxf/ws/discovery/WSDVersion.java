@@ -23,7 +23,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Dispatch;
-import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.feature.StaxTransformFeature;
 import org.apache.cxf.jaxws.DispatchImpl;
@@ -44,7 +43,6 @@ public abstract class WSDVersion {
     abstract String getToAddress();
     abstract void addVersionTransformer(Dispatch<Object> dispatch);
     abstract QName getServiceName();
-    abstract String getSoapVersion();
     
     public String getHelloAction() {
         return getNamespace() + "/Hello";
@@ -102,9 +100,6 @@ public abstract class WSDVersion {
         public QName getServiceName() {
             return new QName(NS_1_0, "DiscoveryProxy");
         }
-        public String getSoapVersion() {
-            return SOAPBinding.SOAP11HTTP_BINDING;
-        }
     }
     static final class WSDVersion11 extends WSDVersion {
         private WSDVersion11() {
@@ -130,9 +125,6 @@ public abstract class WSDVersion {
         }
         public QName getServiceName() {
             return new QName(NS_1_1, "DiscoveryProxy");
-        }
-        public String getSoapVersion() {
-            return SOAPBinding.SOAP12HTTP_BINDING;
         }
     }
     
