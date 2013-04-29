@@ -158,6 +158,7 @@ public final class JAXRSUtils {
     public static final String IGNORE_MESSAGE_WRITERS = "ignore.message.writers";
     public static final String ROOT_INSTANCE = "service.root.instance";
     public static final String ROOT_PROVIDER = "service.root.provider";
+    public static final String EXCEPTION_FROM_MAPPER = "exception.from.mapper";
     public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
         "media.subtype.partial.check"; 
     public static final String DOC_LOCATION = "wadl.location";
@@ -1625,6 +1626,7 @@ public final class JAXRSUtils {
                 try {
                     response = mapper.toResponse(ex);
                 } catch (Exception mapperEx) {
+                    inMessage.getExchange().put(JAXRSUtils.EXCEPTION_FROM_MAPPER, "true");
                     mapperEx.printStackTrace();
                     return Response.serverError().build();
                 }
