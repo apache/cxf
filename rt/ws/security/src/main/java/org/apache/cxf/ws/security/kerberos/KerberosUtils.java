@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.kerberos;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.SecurityConstants;
 
@@ -41,7 +40,7 @@ public final class KerberosUtils {
         KerberosClient client = (KerberosClient)message
             .getContextualProperty(SecurityConstants.KERBEROS_CLIENT);
         if (client == null) {
-            client = new KerberosClient(message.getExchange().get(Bus.class));
+            client = new KerberosClient();
         }
         return client;
     }
