@@ -37,8 +37,7 @@ public abstract class TokenStoreFactory {
     
     static {
         try {
-            Class<?> cacheManagerClass = 
-                ClassLoaderUtils.loadClass("net.sf.ehcache.CacheManager", TokenStoreFactory.class);
+            Class<?> cacheManagerClass = Class.forName("net.sf.ehcache.CacheManager");
             if (cacheManagerClass != null) {
                 ehCacheInstalled = true;
             }
