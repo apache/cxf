@@ -47,14 +47,13 @@ import org.apache.cxf.common.util.StringUtils;
 /**
  * 
  */
-public final class JAXBContextCache {  
-    
+public final class JAXBContextCache {
     /**
      * Return holder of the context, classes, etc...
      * Do NOT hold onto these strongly as that can lock the JAXBContext and Set<Class> objects
-     * into memory.  It preferred to grab the context and classes (if needed) from this object
+     * into memory.  It prefererred to grab the context and classes (if needed) from this object
      * immediately after the call to getCachedContextAndSchemas and then discard it.  The
-     * main purpose of this class is to hold onto the context/set strongly until the caller 
+     * main purpose of this class is to hold onto the context/set stongly until the caller 
      * has a chance to copy those into a place where they can hold onto it strongly as
      * needed.
      */
