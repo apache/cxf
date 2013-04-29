@@ -275,8 +275,7 @@
                                                     <sp:RequireInternalReference />
                                                   </wsp:Policy>
                                                   <sp:Issuer>
-                                                    <wsaw:Address>http://localhost:8080/SecurityTokenService/UT
-                                                    </wsaw:Address>
+                                                    <wsaw:Address>http://localhost:8080/SecurityTokenService/UT</wsaw:Address>
                                                   </sp:Issuer>
                                                 </sp:IssuedToken>
                                               </wsp:Policy>
