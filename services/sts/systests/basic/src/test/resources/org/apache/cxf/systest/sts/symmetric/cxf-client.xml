@@ -99,7 +99,7 @@ http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/confi
    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItSymmetricSAML2SecureConversationPort" 
                   createdFromAPI="true">
        <jaxws:properties>
-           <entry key="ws-security.sts.client" value-ref="stsClient"/>
+           <entry key="ws-security.sts.client.sct" value-ref="stsClient"/>
        </jaxws:properties>
    </jaxws:client>
    
