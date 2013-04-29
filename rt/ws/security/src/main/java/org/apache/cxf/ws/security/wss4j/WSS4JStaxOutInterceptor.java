@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,6 +36,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -53,7 +56,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
     public static final String OUTPUT_STREAM_HOLDER = 
         WSS4JStaxOutInterceptor.class.getName() + ".outputstream";
-    private final OutboundWSSec outboundWSSec;
     private WSS4JStaxOutInterceptorInternal ending;
     
     private boolean mtomEnabled;
@@ -64,15 +66,16 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         getBefore().add(StaxOutInterceptor.class.getName());
         
         ending = createEndingInterceptor();
-        outboundWSSec = WSSec.getOutboundWSSec(securityProperties);
+        setSecurityProperties(securityProperties);
     }
 
-    /*
-    public WSS4JStaxOutInterceptor(Map<String, Object> props) {
-        this();
-        setProperties(props);
+    public WSS4JStaxOutInterceptor(Map<String, Object> props) throws WSSecurityException {
+        super(props);
+        setPhase(Phase.PRE_STREAM);
+        getBefore().add(StaxOutInterceptor.class.getName());
+        
+        ending = createEndingInterceptor();
     }
-    */
     
     public boolean isAllowMTOM() {
         return mtomEnabled;
@@ -117,6 +120,17 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             @SuppressWarnings("unchecked")
             final List<SecurityEvent> requestSecurityEvents = 
                 (List<SecurityEvent>) mc.getExchange().get(SecurityEvent.class.getName() + ".in");
+            
+            translateProperties(mc);
+            configureProperties(mc);
+            
+            OutboundWSSec outboundWSSec = null;
+            if (getSecurityProperties() != null) {
+                outboundWSSec = WSSec.getOutboundWSSec(getSecurityProperties());
+            } else {
+                outboundWSSec = WSSec.getOutboundWSSec(getProperties());
+            }
+            
             newXMLStreamWriter = 
                 outboundWSSec.processOutMessage(os, encoding, requestSecurityEvents, securityEventListener);
             mc.setContent(XMLStreamWriter.class, newXMLStreamWriter);
@@ -142,15 +156,34 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         
     }
     
-    /*
-    private OutboundWSSec createOutSecurityContext(Message message) {
-        WSSSecurityProperties properties = new WSSSecurityProperties();
+    private void configureProperties(SoapMessage msg) throws WSSecurityException {
+        Map<String, Object> config = getProperties();
         
-        OutboundWSSec wssec = new OutboundWSSec(properties);
-        
-        return wssec;
+        // Crypto loading only applies for Map
+        if (config != null) {
+            Crypto sigCrypto = 
+                loadCrypto(
+                    msg,
+                    ConfigurationConstants.SIG_PROP_FILE,
+                    ConfigurationConstants.SIG_PROP_REF_ID
+                );
+            if (sigCrypto != null) {
+                config.put(ConfigurationConstants.SIG_PROP_REF_ID, "RefId-" + sigCrypto.hashCode());
+                config.put("RefId-" + sigCrypto.hashCode(), sigCrypto);
+            }
+            
+            Crypto encCrypto = 
+                loadCrypto(
+                    msg,
+                    ConfigurationConstants.ENC_PROP_FILE,
+                    ConfigurationConstants.ENC_PROP_REF_ID
+                );
+            if (encCrypto != null) {
+                config.put(ConfigurationConstants.ENC_PROP_REF_ID, "RefId-" + encCrypto.hashCode());
+                config.put("RefId-" + encCrypto.hashCode(), encCrypto);
+            }
+        }
     }
-    */
     
     public final WSS4JStaxOutInterceptorInternal createEndingInterceptor() {
         return new WSS4JStaxOutInterceptorInternal();

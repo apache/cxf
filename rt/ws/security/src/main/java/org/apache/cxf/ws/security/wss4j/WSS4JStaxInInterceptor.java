@@ -20,20 +20,28 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.URIMappingInterceptor;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
@@ -46,15 +54,19 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxInInterceptor.class);
     
-    private final InboundWSSec inboundWSSec;
     private List<XMLSecurityConstants.Action> inActions;
     
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) throws WSSecurityException {
         super();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
-        
-        inboundWSSec = WSSec.getInboundWSSec(securityProperties);
+        setSecurityProperties(securityProperties);
+    }
+    
+    public WSS4JStaxInInterceptor(Map<String, Object> props) throws WSSecurityException {
+        super(props);
+        setPhase(Phase.POST_STREAM);
+        getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public final boolean isGET(SoapMessage message) {
@@ -97,6 +109,18 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             @SuppressWarnings("unchecked")
             final List<SecurityEvent> requestSecurityEvents = 
                 (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
+            
+            translateProperties(soapMessage);
+            configureProperties(soapMessage);
+            configureCallbackHandler(soapMessage);
+            
+            InboundWSSec inboundWSSec = null;
+            if (getSecurityProperties() != null) {
+                inboundWSSec = WSSec.getInboundWSSec(getSecurityProperties());
+            } else {
+                inboundWSSec = WSSec.getInboundWSSec(getProperties());
+            }
+            
             newXmlStreamReader = 
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
@@ -111,6 +135,86 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             throw createSoapFault(soapMessage.getVersion(), e);
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, soapMessage.getVersion().getSender());
+        }
+    }
+    
+    private void configureProperties(SoapMessage msg) throws WSSecurityException {
+        WSSSecurityProperties securityProperties = getSecurityProperties();
+        Map<String, Object> config = getProperties();
+        
+        // Configure replay caching
+        ReplayCache nonceCache = 
+            WSS4JUtils.getReplayCache(
+                msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
+            );
+        if (securityProperties != null) {
+            securityProperties.setNonceReplayCache(nonceCache);
+        } else {
+            config.put(ConfigurationConstants.NONCE_CACHE_INSTANCE, nonceCache);
+        }
+        
+        ReplayCache timestampCache = 
+            WSS4JUtils.getReplayCache(
+                msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
+            );
+        if (securityProperties != null) {
+            securityProperties.setTimestampReplayCache(timestampCache);
+        } else {
+            config.put(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE, timestampCache);
+        }
+        
+        boolean enableRevocation = 
+            MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_REVOCATION));
+        if (securityProperties != null) {
+            securityProperties.setEnableRevocation(enableRevocation);
+        } else {
+            config.put(ConfigurationConstants.ENABLE_REVOCATION, Boolean.toString(enableRevocation));
+        }
+        
+        // Crypto loading only applies for Map
+        if (config != null) {
+            Crypto sigVerCrypto = 
+                loadCrypto(
+                    msg,
+                    ConfigurationConstants.SIG_VER_PROP_FILE,
+                    ConfigurationConstants.SIG_VER_PROP_REF_ID
+                );
+            if (sigVerCrypto != null) {
+                config.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, "RefId-" + sigVerCrypto.hashCode());
+                config.put("RefId-" + sigVerCrypto.hashCode(), sigVerCrypto);
+            }
+            
+            Crypto decCrypto = 
+                loadCrypto(
+                    msg,
+                    ConfigurationConstants.DEC_PROP_FILE,
+                    ConfigurationConstants.DEC_PROP_REF_ID
+                );
+            if (decCrypto != null) {
+                config.put(ConfigurationConstants.DEC_PROP_REF_ID, "RefId-" + decCrypto.hashCode());
+                config.put("RefId-" + decCrypto.hashCode(), decCrypto);
+            }
+        }
+    }
+    
+    private void configureCallbackHandler(SoapMessage soapMessage) throws WSSecurityException {
+        Object o = soapMessage.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
+        if (o instanceof String) {
+            try {
+                o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+        }            
+        if (o instanceof CallbackHandler) {
+            WSSSecurityProperties securityProperties = getSecurityProperties();
+            Map<String, Object> config = getProperties();
+            
+            if (securityProperties != null) {
+                securityProperties.setCallbackHandler((CallbackHandler)o);
+            } else {
+                config.put(ConfigurationConstants.PW_CALLBACK_REF, (CallbackHandler)o);
+            }
         }
     }
 
