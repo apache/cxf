@@ -35,6 +35,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
@@ -274,8 +275,15 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             byte[] secret = writeProofToken(prefix, namespace, writer, clientEntropy, keySize);
             
             token.setSecret(secret);
+            
+            SecurityContext sc = exchange.getInMessage().get(SecurityContext.class);
+            if (sc != null) {
+                token.setSecurityContext(sc);
+            }
+            
             ((TokenStore)exchange.get(Endpoint.class).getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
+            
             
             writer.writeEndElement();
             if (STSUtils.WST_NS_05_12.equals(namespace)) {

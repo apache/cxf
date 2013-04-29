@@ -159,7 +159,6 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
     }
     
     @org.junit.Test
-    @org.junit.Ignore
     public void testUsernameTokenSAML2SecureConversation() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
