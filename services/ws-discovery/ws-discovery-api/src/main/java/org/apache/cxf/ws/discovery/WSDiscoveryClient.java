@@ -41,6 +41,7 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
@@ -91,6 +92,7 @@ public class WSDiscoveryClient implements Closeable {
     final Bus bus;
     int defaultProbeTimeout = 1000;
     WSDVersion version = WSDVersion.INSTANCE_1_1;
+    String soapVersion = SOAPBinding.SOAP12HTTP_BINDING;
 
     public WSDiscoveryClient() {
         this((Bus)null);
@@ -119,14 +121,56 @@ public class WSDiscoveryClient implements Closeable {
     }
     public void setAddress(String a) {
         if (!address.equals(a)) {
+            uncache();
             resetDispatch(a);
         }
     }
     
+    
+    /**
+     * By default, CXF's WS-Discovery implementation is based on WS-Discovery 1.1.  Some devices will
+     * not respond to 1.1 probes.  This allows CXF to use the WS-Discovery 1.0 namespaces and actions
+     * which will allow older devices to be discovered.   
+     */
     public void setVersion10() {
-        version =  WSDVersion.INSTANCE_1_0;
-        service = null;
+        setVersion(true);
+    }
+    
+    public void setVersion(boolean version10) {
+        WSDVersion newv =  version10 ? WSDVersion.INSTANCE_1_0 : WSDVersion.INSTANCE_1_1;
+        if (newv != version) {
+            version = newv;
+            uncache();
+        }
+    }
+
+    
+    /**
+     * WS-Discovery will use SOAP 1.2 by default.  This allows forcing the use of SOAP 1.1. 
+     * @param do11
+     */
+    public void setSoapVersion11() {
+        setSoapVersion(true);
+    }
+    
+    
+    public void setSoapVersion(boolean do11) {
+        String newVer = do11 ? SOAPBinding.SOAP11HTTP_BINDING : SOAPBinding.SOAP12HTTP_BINDING;
+        if (!soapVersion.equals(newVer)) {
+            soapVersion = newVer;
+            uncache();
+        }
+    }
+    private void uncache() {
+        if (dispatch instanceof Closeable) {
+            try {
+                ((Closeable)dispatch).close();
+            } catch (IOException e) {
+                //ignorable
+            }
+        }
         dispatch = null;
+        service = null;
     }
     
     private synchronized JAXBContext getJAXBContext() {
@@ -147,7 +191,7 @@ public class WSDiscoveryClient implements Closeable {
                                           version.getServiceName(),
                                           Service.class);
                 service.addPort(version.getServiceName(), 
-                                version.getSoapVersion(), address);
+                                soapVersion, address);
             } finally {
                 BusFactory.setThreadDefaultBus(b);
             }
@@ -156,8 +200,8 @@ public class WSDiscoveryClient implements Closeable {
     }
     private synchronized void resetDispatch(String newad) {
         address = newad;
-        service = null;
         dispatch = null;
+        service = null;
         adHoc = false;
         try {
             URI uri = new URI(address);
@@ -224,6 +268,7 @@ public class WSDiscoveryClient implements Closeable {
             ((Closeable)dispatch).close();
             dispatch = null;
         }
+        service = null;
     }
     protected void finalize() throws Throwable {
         super.finalize();
@@ -320,6 +365,7 @@ public class WSDiscoveryClient implements Closeable {
                             if (h.getTypes().contains(sn)
                                 || h.getTypes().contains(new QName("", sn.getLocalPart()))) {
                                 // A DiscoveryProxy wants us to flip to managed mode
+                                uncache();
                                 resetDispatch(h.getXAddrs().get(0));
                             }
                         }
@@ -365,6 +411,7 @@ public class WSDiscoveryClient implements Closeable {
                             if (h.getTypes().contains(sn)
                                 || h.getTypes().contains(new QName("", sn.getLocalPart()))) {
                                 // A DiscoveryProxy wants us to flip to managed mode
+                                uncache();
                                 resetDispatch(h.getXAddrs().get(0));
                             }
                         }
