@@ -46,8 +46,7 @@ public class LocalClientState implements ClientState {
     
     public LocalClientState(URI baseURI) {
         this.baseURI = baseURI;
-        String scheme = baseURI.getScheme();
-        if (!StringUtils.isEmpty(scheme) && scheme.startsWith(HTTP_SCHEME)) {
+        if (isHttpScheme(baseURI)) {
             this.currentBuilder = UriBuilder.fromUri(baseURI);
         } else {
             this.currentBuilder = UriBuilder.fromUri("/");
@@ -127,7 +126,7 @@ public class LocalClientState implements ClientState {
                                 MultivaluedMap<String, String> headers,
                                 MultivaluedMap<String, String> templatesMap) {
         ClientState state = null;
-        if (!StringUtils.isEmpty(currentURI.getScheme()) && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
+        if (isHttpScheme(currentURI)) {
             state = new LocalClientState(currentURI);
         } else {
             state = new LocalClientState(baseURI, currentURI);
@@ -144,5 +143,9 @@ public class LocalClientState implements ClientState {
         }
         state.setTemplates(newTemplateParams);
         return state;
+    }
+    
+    private static boolean isHttpScheme(URI uri) {
+        return !StringUtils.isEmpty(uri.getScheme()) && uri.getScheme().startsWith(HTTP_SCHEME);
     }
 }
