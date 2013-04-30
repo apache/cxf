@@ -70,7 +70,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
         assertTrue("server did not launch correctly",
-                   launchServer(JMSServer.class, true));
+                   launchServer(JMSServer.class));
         serversStarted = true;
     }
     
