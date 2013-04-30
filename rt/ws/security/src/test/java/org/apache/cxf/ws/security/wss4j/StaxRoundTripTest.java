@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.Client;
@@ -35,6 +39,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -54,6 +59,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
         principalInterceptor.setPrincipalName("username");
@@ -76,6 +82,21 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        // Negative test for wrong password type
+        service.getInInterceptors().remove(inhandler);
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected on the wrong password type");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     @Test
@@ -85,6 +106,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         Map<String, Object> inConfig = new HashMap<String, Object>();
         inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordText");
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
         WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
         principalInterceptor.setPrincipalName("username");
@@ -108,6 +130,93 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        // Negative test for wrong password type
+        service.getInInterceptors().remove(inhandler);
+        inConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordDigest");
+        inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected on the wrong password type");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+    }
+    
+    @Test
+    public void testUsernameTokenTextUnknownUser() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
+        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        properties.setTokenUser("Alice");
+        properties.setCallbackHandler(new UnknownUserPasswordCallbackHandler());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected on an unknown user");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+    }
+    
+    @Test
+    public void testUsernameTokenTextUnknownPassword() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
+        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        properties.setTokenUser("username");
+        properties.setCallbackHandler(new UnknownUserPasswordCallbackHandler());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected on an unknown password");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     @Test
@@ -117,6 +226,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
         principalInterceptor.setPrincipalName("username");
@@ -139,6 +249,21 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        // Negative test for wrong password type
+        service.getInInterceptors().remove(inhandler);
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
+        inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected on the wrong password type");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     @Test
@@ -148,6 +273,7 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         
         Map<String, Object> inConfig = new HashMap<String, Object>();
         inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordDigest");
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
         WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
         principalInterceptor.setPrincipalName("username");
@@ -171,6 +297,93 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
+        
+        // Negative test for wrong password type
+        service.getInInterceptors().remove(inhandler);
+        inConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordText");
+        inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        try {
+            echo.echo("test");
+            fail("Failure expected on the wrong password type");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+    }
+    
+    @Test
+    public void testUsernameTokenDigestUnknownUser() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
+        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        properties.setTokenUser("Alice");
+        properties.setCallbackHandler(new UnknownUserPasswordCallbackHandler());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected on an unknown user");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
+    }
+    
+    @Test
+    public void testUsernameTokenDigestUnknownPassword() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        WSSSecurityProperties inProperties = new WSSSecurityProperties();
+        inProperties.setCallbackHandler(new TestPwdCallback());
+        inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
+        service.getInInterceptors().add(inhandler);
+
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.USERNAMETOKEN});
+        properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
+        properties.setTokenUser("username");
+        properties.setCallbackHandler(new UnknownUserPasswordCallbackHandler());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        try {
+            echo.echo("test");
+            fail("Failure expected on an unknown password");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+            String error = "The security token could not be authenticated or authorized";
+            assertTrue(ex.getMessage().contains(error));
+        }
     }
     
     @Test
@@ -887,5 +1100,26 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
         
         return (Echo)proxyFac.create();
+    }
+    
+    private static class UnknownUserPasswordCallbackHandler implements CallbackHandler {
+
+        private static Map<String, String> passwords = new HashMap<String, String>();
+
+        static {
+            passwords.put("Alice", "AlicePassword");
+            passwords.put("username", "unknownPassword");
+        }
+
+        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (int i = 0; i < callbacks.length; i++) {
+                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
+
+                String pass = passwords.get(pc.getIdentifier());
+                if (pass != null) {
+                    pc.setPassword(pass);
+                }
+            }
+        }
     }
 }
