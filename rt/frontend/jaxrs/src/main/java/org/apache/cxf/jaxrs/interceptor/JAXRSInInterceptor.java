@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.NotFoundException;
@@ -127,6 +128,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null)) {
             return;
         }
+        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, 
+                                                        HttpMethod.POST, true);
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {
@@ -171,7 +174,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
 
-        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
         OperationResourceInfo ori = null;     
         
         boolean operChecked = false;
