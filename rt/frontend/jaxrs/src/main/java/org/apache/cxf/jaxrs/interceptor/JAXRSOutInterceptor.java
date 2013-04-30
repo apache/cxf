@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -123,6 +124,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         Response response = null;
         if (responseObj instanceof Response) {
             response = (Response)responseObj;
+            if (response.getStatus() == 500 
+                && message.getExchange().get(JAXRSUtils.EXCEPTION_FROM_MAPPER) != null) {
+                message.put(Message.RESPONSE_CODE, 500);
+                return;
+            }
         } else {
             int status = getStatus(message, responseObj != null ? 200 : 204);
             response = Response.status(status).entity(responseObj).build();
@@ -254,7 +260,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         List<WriterInterceptor> writers = providerFactory
             .createMessageBodyWriterInterceptor(targetType, genericType, annotations, responseMediaType, message);
         
-        responseMediaType = checkFinalContentType(responseMediaType);
+        OutputStream outOriginal = message.getContent(OutputStream.class);
+        if (writers == null || writers.isEmpty()) {
+            message.put(Message.CONTENT_TYPE, "text/plain");
+            message.put(Message.RESPONSE_CODE, 500);
+            writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType.getSimpleName());
+            return;
+        }
+        responseMediaType = checkFinalContentType(responseMediaType, writers);
         String finalResponseContentType = JAXRSUtils.mediaTypeToString(responseMediaType);
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Response content type is: " + finalResponseContentType);
@@ -262,15 +275,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, finalResponseContentType);
         message.put(Message.CONTENT_TYPE, finalResponseContentType);
         
-        OutputStream outOriginal = message.getContent(OutputStream.class);
-        if (writers == null) {
-            message.put(Message.CONTENT_TYPE, "text/plain");
-            message.put(Message.RESPONSE_CODE, 500);
-            writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType.getSimpleName());
-            return;
-        }
         boolean enabled = checkBufferingMode(message, writers, firstTry);
-        
         try {
             
             try {
@@ -402,13 +407,23 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     
-    private MediaType checkFinalContentType(MediaType mt) {
-        if (mt.isWildcardType() || mt.isWildcardSubtype() && mt.getType().equals("application")) {
-            return MediaType.APPLICATION_OCTET_STREAM_TYPE;
-        } else {
-            return mt;
+    private MediaType checkFinalContentType(MediaType mt, List<WriterInterceptor> writers) {
+        if (mt.isWildcardType() || mt.isWildcardSubtype()) {
+            int mbwIndex = writers.size() == 1 ? 0 : writers.size() - 1;
+            MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(mbwIndex)).getMBW();
+            Produces pm = writer.getClass().getAnnotation(Produces.class);
+            if (pm != null) {
+                List<MediaType> sorted = 
+                    JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()), JAXRSUtils.MEDIA_TYPE_QS_PARAM);
+                mt = JAXRSUtils.intersectMimeTypes(sorted, mt).get(0);
+                if (mt.isWildcardType() || mt.isWildcardSubtype()) {
+                    return MediaType.APPLICATION_OCTET_STREAM_TYPE;    
+                }
+            } else {
+                return MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            }
         }
-        
+        return mt;
     }
     
     private void setResponseDate(MultivaluedMap<String, Object> headers, boolean firstTry) {

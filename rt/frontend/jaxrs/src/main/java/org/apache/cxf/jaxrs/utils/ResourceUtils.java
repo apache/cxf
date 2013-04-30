@@ -97,6 +97,22 @@ public final class ResourceUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ResourceUtils.class);
     private static final String CLASSPATH_PREFIX = "classpath:";
+    private static final Set<String> SERVER_PROVIDER_CLASS_NAMES;
+    static {
+        SERVER_PROVIDER_CLASS_NAMES = new HashSet<String>();
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.MessageBodyWriter");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.MessageBodyReader");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ExceptionMapper");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ContextResolver");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ReaderInterceptor");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.WriterInterceptor");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.ext.ParamConverterProvider");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerRequestFilter");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerResponseFilter");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.DynamicFeature");
+        SERVER_PROVIDER_CLASS_NAMES.add("org.apache.cxf.jaxrs.ext.ContextResolver");
+        
+    }
     
     private ResourceUtils() {
         
@@ -634,7 +650,7 @@ public final class ResourceUtils {
         // or singleton provider classes
         for (Class<?> c : app.getClasses()) {
             if (isValidApplicationClass(c, singletons)) {
-                if (c.getAnnotation(Provider.class) != null) {
+                if (isValidProvider(c)) {
                     try {
                         providers.add(c.newInstance());
                     } catch (Throwable ex) {
@@ -679,6 +695,21 @@ public final class ResourceUtils {
         bean.setApplication(app);
         
         return bean;
+    }
+    
+    private static boolean isValidProvider(Class<?> c) {
+        if (c == null || c == Object.class) {
+            return false;
+        }
+        if (c.getAnnotation(Provider.class) != null) {
+            return true;
+        }
+        for (Class<?> itf : c.getInterfaces()) {    
+            if (SERVER_PROVIDER_CLASS_NAMES.contains(itf.getName())) {
+                return true;
+            }
+        }
+        return isValidProvider(c.getSuperclass());
     }
     
     private static void verifySingletons(Set<Object> singletons) {
