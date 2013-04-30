@@ -75,9 +75,130 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong Request Uri", "http://localhost:8080/app/root/a/b/c", 
                      u.getRequestUri().toString());
         URI relativized = u.relativize(URI.create("http://localhost:8080/app/root/a/d/e"));
-        assertEquals("../../d/e", relativized.toString());
+        assertEquals("../d/e", relativized.toString());
     }
     
+    @Test
+    public void testRelativizeAlreadyRelative() throws Exception {
+        Message mockMessage = mockMessage("http://localhost:8080/app/root/",
+                "/soup/");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        assertEquals("http://localhost:8080/app/root/soup/", u.getRequestUri()
+                .toString());
+        URI x = URI.create("x/");
+        assertEquals("http://localhost:8080/app/root/x/", u.resolve(x)
+                .toString());
+        assertEquals("../x/", u.relativize(x).toString());
+    }
+
+    @Test
+    public void testRelativizeNoCommonPrefix() throws Exception {
+        Message mockMessage = mockMessage("http://localhost:8080/app/root/",
+                "/soup");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        assertEquals("http://localhost:8080/app/root/soup", u.getRequestUri()
+                .toString());
+        URI otherHost = URI.create("http://localhost:8081/app/root/x");
+        assertEquals(otherHost, u.resolve(otherHost));
+
+        // port/host is different!
+        assertEquals(otherHost, u.relativize(otherHost));
+    }
+
+    @Test
+    public void testRelativizeChild() throws Exception {
+        /** From UriInfo.relativize() javadoc (2013-04-21):
+*
+* <br/><b>Request URI:</b> <tt>http://host:port/app/root/a/b/c</tt>
+* <br/><b>Supplied URI:</b> <tt>a/b/c/d/e</tt>
+* <br/><b>Returned URI:</b> <tt>d/e</tt>
+*
+* NOTE: Although the above is correct JAX-RS API-wise (as of 2013-04-21),
+* it is WRONG URI-wise (but correct API wise)
+* as the request URI is missing the trailing / -- if the request returned HTML at
+* that location, then resolving "d/e" would end up instead at /app/root/a/b/d/e
+* -- see URI.create("/app/root/a/b/c").resolve("d/e"). Therefore the below tests
+* use the slightly modified request URI http://example.com/app/root/a/b/c/ with a trailing /
+*
+* See the test testRelativizeSibling for a non-slash-ending request URI
+*/
+        Message mockMessage = mockMessage("http://example.com/app/root/",
+                "/a/b/c/");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
+                .toString());
+        URI absolute = URI.create("http://example.com/app/root/a/b/c/d/e");
+        assertEquals("d/e", u.relativize(absolute).toString());
+
+        URI relativeToBase = URI.create("a/b/c/d/e");
+        assertEquals("d/e", u.relativize(relativeToBase).toString());
+    }
+    
+    @Test
+    public void testRelativizeSibling() throws Exception {
+        Message mockMessage = mockMessage("http://example.com/app/root/",
+                "/a/b/c.html");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        // NOTE: No slash in the end!
+        assertEquals("http://example.com/app/root/a/b/c.html", u
+                .getRequestUri().toString());
+        URI absolute = URI.create("http://example.com/app/root/a/b/c.pdf");
+        assertEquals("c.pdf", u.relativize(absolute).toString());
+
+        URI relativeToBase = URI.create("a/b/c.pdf");
+        assertEquals("c.pdf", u.relativize(relativeToBase).toString());
+    }
+    
+    @Test
+    public void testRelativizeGrandParent() throws Exception {
+        Message mockMessage = mockMessage("http://example.com/app/root/",
+                "/a/b/c/");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        // NOTE: All end with slashes (imagine they are folders)
+        assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
+                .toString());
+        URI absolute = URI.create("http://example.com/app/root/a/");
+        // Need to go two levels up from /a/b/c/ to /a/
+        assertEquals("../../", u.relativize(absolute).toString());
+
+        URI relativeToBase = URI.create("a/");
+        assertEquals("../../", u.relativize(relativeToBase).toString());
+    }
+
+    @Test
+    public void testRelativizeCousin() throws Exception {
+        Message mockMessage = mockMessage("http://example.com/app/root/",
+                "/a/b/c/");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        // NOTE: All end with slashes (imagine they are folders)
+        assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
+                .toString());
+        URI absolute = URI.create("http://example.com/app/root/a/b2/c2/");
+        // Need to go two levels up from /a/b/c/ to /a/
+        assertEquals("../../b2/c2/", u.relativize(absolute).toString());
+
+        URI relativeToBase = URI.create("a/b2/c2/");
+        assertEquals("../../b2/c2/", u.relativize(relativeToBase).toString());
+    }
+
+    @Test
+    public void testRelativizeOutsideBase() throws Exception {
+        Message mockMessage = mockMessage("http://example.com/app/root/",
+                "/a/b/c/");
+        UriInfoImpl u = new UriInfoImpl(mockMessage, null);
+        // NOTE: All end with slashes (imagine they are folders)
+        assertEquals("http://example.com/app/root/a/b/c/", u.getRequestUri()
+                .toString());
+        URI absolute = URI.create("http://example.com/otherapp/fred.txt");
+
+        assertEquals("../../../../../otherapp/fred.txt", u.relativize(absolute)
+                .toString());
+
+        URI relativeToBase = URI.create("../../otherapp/fred.txt");
+        assertEquals("../../../../../otherapp/fred.txt",
+                u.relativize(relativeToBase).toString());
+    }
+
     @Test
     public void testResolveNormalizeComplex() throws Exception {
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/1/2/3/", null), null);

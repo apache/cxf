@@ -495,44 +495,51 @@ public final class HttpUtils {
         return uri;
     }
     
-    public static URI relativize(URI requestURI, URI resolved) {
-        if (!getUriPrefix(resolved).equals(getUriPrefix(requestURI))) {
-            return resolved;
+    public static URI relativize(URI base, URI uri) {
+        // quick bail-out
+        if (!(base.isAbsolute()) || !(uri.isAbsolute())) {
+            return uri;
         }
-        List<PathSegment> resolvedSegments = JAXRSUtils.getPathSegments(resolved.getRawPath(), false);
-        List<PathSegment> requestSegments = JAXRSUtils.getPathSegments(requestURI.getRawPath(), false);
+        if (base.isOpaque() || uri.isOpaque()) {
+            // Unlikely case of an URN which can't deal with
+            // relative path, such as urn:isbn:0451450523
+            return uri;
+        }
+        // Check for common root
+        URI root = base.resolve("/");
+        if (!(root.equals(uri.resolve("/")))) {
+            // Different protocol/auth/host/port, return as is
+            return uri;
+        }
         
-        int count = 0;
-        for (int i = resolvedSegments.size() - 1; i >= 0; i--) {
-            if (i <= requestSegments.size() - 1) {
-                String resolvedPath = resolvedSegments.get(i).getPath();
-                String requestPath = requestSegments.get(i).getPath();
-                if (!resolvedPath.equals(requestPath)) {
-                    count++;
-                }
-            }
-        }
-        StringBuilder sb = new StringBuilder();
+        // Ignore hostname bits for the following , but add "/" in the beginning
+        // so that in worst case we'll still return "/fred" rather than
+        // "http://example.com/fred".
+        URI baseRel = URI.create("/").resolve(root.relativize(base));
+        URI uriRel = URI.create("/").resolve(root.relativize(uri));
         
-        for (int i = 0; i < count; i++) {
-            if (i != 0) {
-                sb.append("/");
-            }
-            sb.append(PARENT_PATH_SEGMENT);
+        // Is it same path?
+        if (baseRel.getPath().equals(uriRel.getPath())) {
+            return baseRel.relativize(uriRel);
         }
-        for (int i = count + 1; i < resolvedSegments.size(); i++) {
-            if (i != 0) {
-                sb.append("/");
-            }
-            sb.append(resolvedSegments.get(i).getPath());
-        }
-        return URI.create(sb.toString());
-    }
-    
-    private static String getUriPrefix(URI uri) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(uri.getScheme()).append(uri.getHost()).append(uri.getPort());
         
-        return sb.toString();
+        // Direct siblings? (ie. in same folder)
+        URI commonBase = baseRel.resolve("./");
+        if (commonBase.equals(uriRel.resolve("./"))) {
+            return commonBase.relativize(uriRel);
+        }
+        
+        // No, then just keep climbing up until we find a common base.
+        URI relative = URI.create("");
+        while (!(uriRel.getPath().startsWith(commonBase.getPath())) && !(commonBase.getPath().equals("/"))) {
+            commonBase = commonBase.resolve("../");
+            relative = relative.resolve("../");
+        }
+
+        // Now we can use URI.relativize
+        URI relToCommon = commonBase.relativize(uriRel);
+        // and prepend the needed ../
+        return relative.resolve(relToCommon);
+        
     }
 }

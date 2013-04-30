@@ -45,6 +45,17 @@ public class HttpUtilsTest extends Assert {
     }
     
     @Test
+    public void testRelativize() throws Exception {
+        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6226081
+        URI a = new URI("file:/c:/abc/def/myDocument/doc.xml");
+        URI b = new URI("file:/c:/abc/def/images/subdir/image.png");
+        
+        URI c = HttpUtils.relativize(a, b);
+        
+        assertEquals("../images/subdir/image.png", c.toString());
+    }
+    
+    @Test
     public void testIsDateHeader() {
         assertFalse(HttpUtils.isDateRelatedHeader(HttpHeaders.ETAG));
         assertTrue(HttpUtils.isDateRelatedHeader(HttpHeaders.EXPIRES));
