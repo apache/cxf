@@ -24,19 +24,15 @@ import javax.xml.ws.handler.MessageContext;
 
 public class FaultThrowingHandler implements LogicalHandler<LogicalMessageContext> {
 
-    @Override
     public boolean handleMessage(LogicalMessageContext context) {
         throw new CustomSoapFault();
     }
 
-    @Override
     public boolean handleFault(LogicalMessageContext context) {
         return false;
     }
 
-    @Override
     public void close(MessageContext context) {
 
     }
-
 }
