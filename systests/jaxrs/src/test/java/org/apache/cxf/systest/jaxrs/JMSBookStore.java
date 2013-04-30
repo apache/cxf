@@ -84,6 +84,11 @@ public class JMSBookStore {
         return doGetBook(id);
     }
     
+    @Path("/booksubresource/{bookId}/")
+    public Book getBookSubResource(@PathParam("bookId") String id) throws BookNotFoundFault {
+        return doGetBook(id);
+    }
+    
     private Book doGetBook(String id) throws BookNotFoundFault {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {

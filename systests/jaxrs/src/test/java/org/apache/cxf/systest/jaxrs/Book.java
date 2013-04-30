@@ -68,6 +68,7 @@ public class Book {
     }
     
     @GET
+    @Produces("application/xml")
     public Book retrieveState() {
         return this;
     }
