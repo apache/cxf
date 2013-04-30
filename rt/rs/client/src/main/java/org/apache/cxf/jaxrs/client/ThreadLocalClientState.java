@@ -103,7 +103,7 @@ public class ThreadLocalClientState implements ClientState {
     public ClientState newState(URI currentURI, 
                                 MultivaluedMap<String, String> headers,
                                 MultivaluedMap<String, String> templates) {
-        LocalClientState ls = (LocalClientState)initialState.newState(currentURI, headers, templates);
+        LocalClientState ls = (LocalClientState)getState().newState(currentURI, headers, templates);
         return new ThreadLocalClientState(ls, timeToKeepState);
     }
     
