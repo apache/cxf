@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
@@ -31,6 +33,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -76,6 +79,38 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
+    public void testUsernameTokenTextConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        principalInterceptor.setPrincipalName("username");
+        service.getInInterceptors().add(inhandler);
+        service.getInInterceptors().add(principalInterceptor);
+
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        outConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordText");
+        outConfig.put(ConfigurationConstants.USER, "username");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
     public void testUsernameTokenDigest() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -101,6 +136,38 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setTokenUser("username");
         properties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testUsernameTokenDigestConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        principalInterceptor.setPrincipalName("username");
+        service.getInInterceptors().add(inhandler);
+        service.getInInterceptors().add(principalInterceptor);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
+        outConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordDigest");
+        outConfig.put(ConfigurationConstants.USER, "username");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
@@ -135,6 +202,36 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setEncryptionCryptoProperties(outCryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testEncryptConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
@@ -181,6 +278,44 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
+    public void testEncryptUsernameTokenConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(
+            ConfigurationConstants.ACTION, 
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
+        );
+        outConfig.put(
+            ConfigurationConstants.ENCRYPTION_PARTS, 
+            "{Element}{" + WSSConstants.NS_WSSE10 + "}UsernameToken"
+        );
+        outConfig.put(ConfigurationConstants.USER, "username");
+        outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
     public void testSignature() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -212,6 +347,40 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setSignatureCryptoProperties(outCryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testSignatureConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        
+        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        principalInterceptor.setPrincipalName("CN=myAlias");
+        service.getInInterceptors().add(inhandler);
+        service.getInInterceptors().add(principalInterceptor);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
@@ -265,6 +434,48 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
+    public void testSignedUsernameTokenConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        //WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        //principalInterceptor.setPrincipalName("username");
+        service.getInInterceptors().add(inhandler);
+        //service.getInInterceptors().add(principalInterceptor);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(
+            ConfigurationConstants.ACTION, 
+            ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.SIGNATURE
+        );
+        outConfig.put(
+            ConfigurationConstants.SIGNATURE_PARTS, 
+            "{Element}{" + WSSConstants.NS_WSSE10 + "}UsernameToken;"
+            + "{Element}{" + WSSConstants.NS_SOAP11 + "}Body"
+        );
+        outConfig.put(ConfigurationConstants.USER, "username");
+        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
     public void testTimestamp() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -284,6 +495,31 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setOutAction(new XMLSecurityConstants.Action[]{WSSConstants.TIMESTAMP});
         
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testTimestampConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
@@ -326,6 +562,44 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         properties.setSignatureCryptoProperties(outCryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testSignatureTimestampConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(
+            ConfigurationConstants.ACTION, 
+            ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.SIGNATURE
+        );
+        outConfig.put(
+            ConfigurationConstants.SIGNATURE_PARTS, 
+            "{Element}{" + WSSConstants.NS_WSU10 + "}Timestamp;"
+            + "{Element}{" + WSSConstants.NS_SOAP11 + "}Body"
+        );
+        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
@@ -376,6 +650,41 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
     }
     
     @Test
+    public void testSignaturePKIConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "cxfca.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        WSS4JPrincipalInterceptor principalInterceptor = new WSS4JPrincipalInterceptor();
+        principalInterceptor.setPrincipalName("CN=alice,OU=eng,O=apache.org");
+        service.getInInterceptors().add(inhandler);
+        service.getInInterceptors().add(principalInterceptor);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
+        outConfig.put(ConfigurationConstants.USE_SINGLE_CERTIFICATE, "true");
+        outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+
+        client.getOutInterceptors().add(ohandler);
+
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
     public void testEncryptSignature() throws Exception {
         // Create + configure service
         Service service = createService();
@@ -411,6 +720,42 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testEncryptSignatureConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        inConfig.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(
+            ConfigurationConstants.ACTION, 
+            ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE
+        );
+        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
+        outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
+        client.getOutInterceptors().add(ohandler);
+        
         assertEquals("test", echo.echo("test"));
     }
     
@@ -466,6 +811,57 @@ public class StaxRoundTripTest extends AbstractSecurityTest {
         WSS4JStaxInInterceptor inhandler2 = new WSS4JStaxInInterceptor(staxInProperties);
         client.getInInterceptors().add(inhandler2);
 
+        assertEquals("test", echo.echo("test"));
+    }
+    
+    @Test
+    public void testSignatureConfirmationConfig() throws Exception {
+        // Create + configure service
+        Service service = createService();
+        
+        Map<String, Object> inConfig = new HashMap<String, Object>();
+        inConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        inConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inConfig);
+        service.getInInterceptors().add(inhandler);
+        
+        Map<String, Object> outConfig = new HashMap<String, Object>();
+        outConfig.put(
+            ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE
+        );
+        outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
+        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        outConfig.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
+        
+        service.getOutInterceptors().add(ohandler);
+        
+        // Create + configure client
+        Echo echo = createClientProxy();
+        
+        Client client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
+        
+        Map<String, Object> clientOutConfig = new HashMap<String, Object>();
+        clientOutConfig.put(
+            ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE
+        );
+        clientOutConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
+        clientOutConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        clientOutConfig.put(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        WSS4JStaxOutInterceptor clientOhandler = new WSS4JStaxOutInterceptor(clientOutConfig);
+        
+        client.getOutInterceptors().add(clientOhandler);
+        
+        Map<String, Object> clientInConfig = new HashMap<String, Object>();
+        clientInConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+        clientInConfig.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
+        clientInConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+        WSS4JStaxInInterceptor clientInHandler = new WSS4JStaxInInterceptor(clientInConfig);
+        client.getInInterceptors().add(clientInHandler);
+        
         assertEquals("test", echo.echo("test"));
     }
     

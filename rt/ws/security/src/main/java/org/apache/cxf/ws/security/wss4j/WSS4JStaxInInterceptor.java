@@ -147,20 +147,24 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             WSS4JUtils.getReplayCache(
                 msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
             );
-        if (securityProperties != null) {
-            securityProperties.setNonceReplayCache(nonceCache);
-        } else {
-            config.put(ConfigurationConstants.NONCE_CACHE_INSTANCE, nonceCache);
+        if (nonceCache != null) {
+            if (securityProperties != null) {
+                securityProperties.setNonceReplayCache(nonceCache);
+            } else {
+                config.put(ConfigurationConstants.NONCE_CACHE_INSTANCE, nonceCache);
+            }
         }
         
         ReplayCache timestampCache = 
             WSS4JUtils.getReplayCache(
                 msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
             );
-        if (securityProperties != null) {
-            securityProperties.setTimestampReplayCache(timestampCache);
-        } else {
-            config.put(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE, timestampCache);
+        if (timestampCache != null) {
+            if (securityProperties != null) {
+                securityProperties.setTimestampReplayCache(timestampCache);
+            } else {
+                config.put(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE, timestampCache);
+            }
         }
         
         boolean enableRevocation = 
