@@ -28,13 +28,15 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.StringUtils;
+
 /**
  * Keeps the client state such as the baseURI, currentURI, requestHeaders, current response
  * in a thread local storage
  *
  */
 public class ThreadLocalClientState implements ClientState {
-    
+    private static final String HTTP_SCHEME = "http";
     private Map<Thread, LocalClientState> state = 
         Collections.synchronizedMap(new WeakHashMap<Thread, LocalClientState>());
     
@@ -101,10 +103,15 @@ public class ThreadLocalClientState implements ClientState {
         removeThreadLocalState(Thread.currentThread());
     }
     
-    public ClientState newState(URI baseURI, 
+    public ClientState newState(URI currentURI, 
                                 MultivaluedMap<String, String> headers,
                                 MultivaluedMap<String, String> templates) {
-        LocalClientState ls = new LocalClientState(baseURI);
+        LocalClientState ls = null;
+        if (!StringUtils.isEmpty(currentURI.getScheme()) && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
+            ls = new LocalClientState(currentURI);
+        } else {
+            ls = new LocalClientState(initialState.getBaseURI(), currentURI);
+        }
         ls.setRequestHeaders(headers);
         ls.setTemplates(templates);
         return new ThreadLocalClientState(ls, timeToKeepState);

@@ -123,7 +123,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null, false)) {
             return;
         }
-        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
+        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, 
+                                                        HttpMethod.POST, true);
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {

@@ -54,6 +54,11 @@ public class LocalClientState implements ClientState {
         }
     }
     
+    public LocalClientState(URI baseURI, URI currentURI) {
+        this.baseURI = baseURI;
+        this.currentBuilder = UriBuilder.fromUri(currentURI);
+    }
+    
     public LocalClientState(LocalClientState cs) {
         this.requestHeaders = new MetadataMap<String, String>(cs.requestHeaders);
         this.templates = cs.templates == null ? null : new MetadataMap<String, String>(cs.templates);
@@ -118,10 +123,15 @@ public class LocalClientState implements ClientState {
         templates = null;
     }
     
-    public ClientState newState(URI newBaseURI, 
+    public ClientState newState(URI currentURI, 
                                 MultivaluedMap<String, String> headers,
                                 MultivaluedMap<String, String> templatesMap) {
-        ClientState state = new LocalClientState(newBaseURI);
+        ClientState state = null;
+        if (!StringUtils.isEmpty(currentURI.getScheme()) && currentURI.getScheme().startsWith(HTTP_SCHEME)) {
+            state = new LocalClientState(currentURI);
+        } else {
+            state = new LocalClientState(baseURI, currentURI);
+        }
         if (headers != null) {
             state.setRequestHeaders(headers);
         }
