@@ -57,6 +57,21 @@
         <wsdl:port name="DoubleItUsernameTokenPort2" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItUsernameToken2" />
         </wsdl:port>
+        <wsdl:port name="DoubleItUsernameTokenTextPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItUsernameTokenText" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItUsernameTokenDigestPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItUsernameTokenDigest" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItEncryptPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItEncrypt" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSignaturePort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignature" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItSignedTimestampPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignedTimestamp" />
+        </wsdl:port>
     </wsdl:service>
 
 </wsdl:definitions>
