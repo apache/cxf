@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -168,5 +169,22 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         Book b = client.get(Book.class);
         assertEquals(123, b.getId());
     }     
-    
+ 
+    @XmlRootElement(name = "TheBook")
+    public static class TheBook {
+        private String name;
+        private long id;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public long getId() {
+            return id;
+        }
+        public void setId(long id) {
+            this.id = id;
+        }
+    }   
 }

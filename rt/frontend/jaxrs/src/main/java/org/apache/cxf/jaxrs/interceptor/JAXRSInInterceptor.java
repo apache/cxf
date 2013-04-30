@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -117,6 +118,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         
+        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, 
+                                                        HttpMethod.POST, true);
+        
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {
             requestContentType = "*/*";
@@ -160,7 +164,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
 
-        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
         OperationResourceInfo ori = null;     
         
         boolean operChecked = false;

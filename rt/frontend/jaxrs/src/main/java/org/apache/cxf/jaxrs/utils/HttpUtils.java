@@ -253,9 +253,16 @@ public final class HttpUtils {
     }
     
     public static String getProtocolHeader(Message m, String name, String defaultValue) {
+        return getProtocolHeader(m, name, defaultValue, false);
+    }
+    
+    public static String getProtocolHeader(Message m, String name, String defaultValue, boolean setOnMessage) {
         String value = (String)m.get(name);
         if (value == null) {
             value = new HttpHeadersImpl(m).getRequestHeaders().getFirst(name);
+            if (value != null && setOnMessage) {
+                m.put(name, value);
+            }
         }
         return value == null ? defaultValue : value;
     }
