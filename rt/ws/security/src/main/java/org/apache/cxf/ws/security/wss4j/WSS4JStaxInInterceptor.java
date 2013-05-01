@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
@@ -54,7 +54,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxInInterceptor.class);
     
-    private List<XMLSecurityConstants.Action> inActions;
+    private List<String> actions;
     
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) throws WSSecurityException {
         super();
@@ -67,6 +67,13 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         super(props);
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
+        if (props != null && props.containsKey(ConfigurationConstants.ACTION)) {
+            Object actionObject = props.get(ConfigurationConstants.ACTION);
+            if (actionObject instanceof String) {
+                String[] actionArray = ((String)actionObject).split(" ");
+                this.actions = Arrays.asList(actionArray);
+            }
+        }
     }
 
     public final boolean isGET(SoapMessage message) {
@@ -101,8 +108,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         soapMessage.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         soapMessage.getInterceptorChain().add(new StaxSecurityContextInInterceptor());
         
-        if (inActions != null && !inActions.isEmpty()) {
-            soapMessage.getInterceptorChain().add(new StaxActionInInterceptor(inActions));
+        if (actions != null && !actions.isEmpty()) {
+            soapMessage.getInterceptorChain().add(new StaxActionInInterceptor(actions));
         }
         
         try {
@@ -247,11 +254,11 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         return fault;
     }
 
-    public List<XMLSecurityConstants.Action> getInActions() {
-        return inActions;
+    public List<String> getActions() {
+        return actions;
     }
 
-    public void setInActions(List<XMLSecurityConstants.Action> inActions) {
-        this.inActions = inActions;
+    public void setActions(List<String> actions) {
+        this.actions = actions;
     }
 }
