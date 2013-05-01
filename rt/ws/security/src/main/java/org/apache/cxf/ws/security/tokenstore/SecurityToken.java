@@ -30,6 +30,7 @@ import java.util.Properties;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -134,6 +135,10 @@ public class SecurityToken implements Serializable {
      * The principal of this SecurityToken
      */
     private transient Principal principal;
+    /**
+     * The SecurityContext originally associated with this token
+     */
+    private transient SecurityContext securityContext;
     
     public SecurityToken() {
         
@@ -487,6 +492,22 @@ public class SecurityToken implements Serializable {
      */
     public Principal getPrincipal() {
         return principal;
+    }
+    
+    /**
+     * Set the SecurityContext associated with this SecurityToken
+     * @param securityContext the SecurityContext associated with this SecurityToken
+     */
+    public void setSecurityContext(SecurityContext securityContext) {
+        this.securityContext = securityContext;
+    }
+    
+    /**
+     * Get the SecurityContext associated with this SecurityToken
+     * @return the SecurityContext associated with this SecurityToken
+     */
+    public SecurityContext getSecurityContext() {
+        return securityContext;
     }
     
 } 

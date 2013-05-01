@@ -36,6 +36,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -266,13 +267,20 @@ final class NegotiationUtils {
                         (SecurityContextToken)wser.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
                     
-                    byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
-                    if (secret != null) {
-                        SecurityToken token = new SecurityToken(tok.getIdentifier());
-                        token.setToken(tok.getElement());
-                        token.setSecret(secret);
-                        token.setTokenType(tok.getTokenType());
-                        getTokenStore(message).add(token);
+                    SecurityToken token = getTokenStore(message).getToken(tok.getIdentifier());
+                    if (token == null) {
+                        byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
+                        if (secret != null) {
+                            token = new SecurityToken(tok.getIdentifier());
+                            token.setToken(tok.getElement());
+                            token.setSecret(secret);
+                            token.setTokenType(tok.getTokenType());
+                            getTokenStore(message).add(token);
+                        }
+                    }
+                    final SecurityContext sc = token.getSecurityContext();
+                    if (sc != null) {
+                        message.put(SecurityContext.class, sc);
                     }
                     return true;
                 }
