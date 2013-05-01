@@ -19,14 +19,23 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.util.Map;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 
 public class ProviderInfo<T> extends AbstractResourceInfo {
 
     private T provider;
     
     public ProviderInfo(T provider, Bus bus) {
-        super(provider.getClass(), provider.getClass(), true, bus);
+        this(provider, null, bus);
+    }
+    
+    public ProviderInfo(T provider, 
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+                        Bus bus) {
+        super(provider.getClass(), provider.getClass(), true, true, constructorProxies, bus);
         this.provider = provider;
     }
     

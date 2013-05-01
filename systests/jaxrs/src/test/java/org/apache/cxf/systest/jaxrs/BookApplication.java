@@ -18,14 +18,19 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 @ApplicationPath("/thebooks")
 public class BookApplication extends Application {
@@ -49,6 +54,7 @@ public class BookApplication extends Application {
         classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
         classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
         classes.add(org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper.class);
+        classes.add(BookRequestFilter.class);
         return classes;
     }
 
@@ -75,5 +81,22 @@ public class BookApplication extends Application {
             sb.append(id);
         }
         defaultId = Long.valueOf(sb.toString());
+    }
+    
+    public static class BookRequestFilter implements ContainerRequestFilter {
+        private UriInfo ui;
+        
+        public BookRequestFilter(@Context UriInfo ui) {
+            this.ui = ui;
+        }
+        
+        @Override
+        public void filter(ContainerRequestContext context) throws IOException {
+            if (ui.getRequestUri().toString().endsWith("/application11/thebooks/bookstore2/bookheaders")) {
+                context.getHeaders().put("BOOK", Arrays.asList("1", "2", "3"));    
+            }
+            
+        }
+        
     }
 }

@@ -66,7 +66,7 @@ public class PerRequestResourceProvider implements ResourceProvider {
     
     protected Object createInstance(Message m) {
         
-        Object[] values = ResourceUtils.createConstructorArguments(c, m);
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, true);
         try {
             Object instance = values.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);

@@ -71,7 +71,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public Object getInstance(Message m) {
-        Object[] values = ResourceUtils.createConstructorArguments(c, m);
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton());
         Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
         if (!isSingleton || m == null) {
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);

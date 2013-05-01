@@ -963,6 +963,7 @@ public final class InjectionUtils {
         if (resource.contextsAvailable()) {
             injectContextMethods(requestObject, resource, message);
             injectContextFields(requestObject, resource, message);
+            injectConstructorProxies(requestObject, resource, message);
         }
     }
     
@@ -1005,6 +1006,20 @@ public final class InjectionUtils {
             }
             Object value = JAXRSUtils.createContextValue(m, f.getGenericType(), f.getType());
             InjectionUtils.injectContextField(cri, f, o, value);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void injectConstructorProxies(Object o,
+                                                AbstractResourceInfo cri,
+                                                Message m) {
+        
+        Map<Class<?>, ThreadLocalProxy<?>> proxies = cri.getConstructorProxies();
+        if (proxies != null) {
+            for (Map.Entry<Class<?>, ThreadLocalProxy<?>> entry : proxies.entrySet()) {
+                Object value = JAXRSUtils.createContextValue(m, entry.getKey(), entry.getKey());
+                ((ThreadLocalProxy<Object>)entry.getValue()).set(value);
+            }
         }
     }
     

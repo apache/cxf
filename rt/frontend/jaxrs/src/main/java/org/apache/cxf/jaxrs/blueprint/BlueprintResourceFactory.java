@@ -70,7 +70,7 @@ public class BlueprintResourceFactory implements ResourceProvider {
 
     public Object getInstance(Message m) {
         //TODO -- This is not the BP way.
-        Object[] values = ResourceUtils.createConstructorArguments(c, m);
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton());
         //TODO Very springish...
         Object instance = values.length > 0 ? blueprintContainer.getComponentInstance(beanId) 
             : blueprintContainer.getComponentInstance(beanId);
