@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -28,9 +29,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -56,11 +59,13 @@ import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.ReaderInterceptorMBR;
 import org.apache.cxf.jaxrs.impl.WriterInterceptorMBW;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
@@ -457,42 +462,56 @@ public abstract class ProviderFactory {
     }
     
     //CHECKSTYLE:OFF       
+    @SuppressWarnings("unchecked")
     protected void setProviders(Object... providers) {
         
         for (Object o : providers) {
             if (o == null) {
                 continue;
             }
-            Class<?> oClass = ClassHelper.getRealClass(o);
             
-            if (MessageBodyReader.class.isAssignableFrom(oClass)) {
-                messageReaders.add(new ProviderInfo<MessageBodyReader<?>>((MessageBodyReader<?>)o, bus)); 
+            ProviderInfo<? extends Object> provider = null;
+            Class<?> providerCls = null;
+            Object realObject = null;            
+            if (o instanceof ProviderInfo) {
+                provider = (ProviderInfo<? extends Object>)o;
+                providerCls = provider.getProvider().getClass();
+                realObject = provider;
+            } else {
+                providerCls = ClassHelper.getRealClass(o);
+                provider = new ProviderInfo<Object>(o, getBus());
+                realObject = o;
             }
             
-            if (MessageBodyWriter.class.isAssignableFrom(oClass)) {
-                messageWriters.add(new ProviderInfo<MessageBodyWriter<?>>((MessageBodyWriter<?>)o, bus)); 
+            
+            if (MessageBodyReader.class.isAssignableFrom(providerCls)) {
+                messageReaders.add((ProviderInfo<MessageBodyReader<?>>)provider); 
             }
             
-            if (ContextResolver.class.isAssignableFrom(oClass)) {
-                contextResolvers.add(new ProviderInfo<ContextResolver<?>>((ContextResolver<?>)o, bus)); 
+            if (MessageBodyWriter.class.isAssignableFrom(providerCls)) {
+                messageWriters.add((ProviderInfo<MessageBodyWriter<?>>)provider); 
             }
             
-            if (ContextProvider.class.isAssignableFrom(oClass)) {
-                contextProviders.add(new ProviderInfo<ContextProvider<?>>((ContextProvider<?>)o, bus)); 
+            if (ContextResolver.class.isAssignableFrom(providerCls)) {
+                contextResolvers.add((ProviderInfo<ContextResolver<?>>)provider); 
             }
             
-            if (ReaderInterceptor.class.isAssignableFrom(oClass)) {
-                readerInterceptors.add(
-                   new ProviderInfo<ReaderInterceptor>((ReaderInterceptor)o, bus));
+            if (ContextProvider.class.isAssignableFrom(providerCls)) {
+                contextProviders.add((ProviderInfo<ContextProvider<?>>)provider); 
             }
             
-            if (WriterInterceptor.class.isAssignableFrom(oClass)) {
-                writerInterceptors.add(
-                   new ProviderInfo<WriterInterceptor>((WriterInterceptor)o, bus));
+            if (ReaderInterceptor.class.isAssignableFrom(providerCls)) {
+                readerInterceptors.add((ProviderInfo<ReaderInterceptor>)provider);
             }
             
-            if (ParamConverterProvider.class.isAssignableFrom(oClass)) {
-                newParamConverter = (ParamConverterProvider)o;
+            if (WriterInterceptor.class.isAssignableFrom(providerCls)) {
+                writerInterceptors.add((ProviderInfo<WriterInterceptor>)provider);
+            }
+            
+            if (ParamConverterProvider.class.isAssignableFrom(providerCls)) {
+                //TODO: review the possibility of ParamConverterProvider needing to have Contexts injected
+                Object converter = realObject == provider ? provider.getProvider() : realObject;
+                newParamConverter = (ParamConverterProvider)converter;
             }
         }
         sortReaders();
@@ -948,5 +967,26 @@ public abstract class ProviderFactory {
         }
     }
     
-    
+    protected ProviderInfo<Object> createProviderFromConstructor(Constructor<?> c, 
+                                                                 Map<Class<?>, Object> values) {
+        Object[] cArgs = ResourceUtils.createConstructorArguments(c, null, false, values);
+        Object instance = null;
+        try {
+            instance = c.newInstance(cArgs);
+        } catch (Throwable ex) {
+            throw new RuntimeException("Resource or provider class " + c.getDeclaringClass().getName()
+                                       + " can not be instantiated"); 
+        }
+        Map<Class<?>, ThreadLocalProxy<?>> proxies = 
+            new HashMap<Class<?>, ThreadLocalProxy<?>>();
+        Class<?>[] paramTypes = c.getParameterTypes();
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (cArgs[i] instanceof ThreadLocalProxy) {
+                @SuppressWarnings("unchecked")
+                ThreadLocalProxy<Object> proxy = (ThreadLocalProxy<Object>)cArgs[i];
+                proxies.put(paramTypes[i], proxy);
+            }
+        }
+        return new ProviderInfo<Object>(instance, proxies, getBus()); 
+    }
 }

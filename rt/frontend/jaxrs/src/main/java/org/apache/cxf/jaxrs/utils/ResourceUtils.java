@@ -614,7 +614,16 @@ public final class ResourceUtils {
         return op;
     }
     
-    public static Object[] createConstructorArguments(Constructor<?> c, Message m, boolean perRequest) {
+    public static Object[] createConstructorArguments(Constructor<?> c, 
+                                                      Message m, 
+                                                      boolean perRequest) {
+        return createConstructorArguments(c, m, perRequest, null);
+    }
+    
+    public static Object[] createConstructorArguments(Constructor<?> c, 
+                                                      Message m, 
+                                                      boolean perRequest,
+                                                      Map<Class<?>, Object> contextValues) {
         Class<?>[] params = c.getParameterTypes();
         Annotation[][] anns = c.getParameterAnnotations();
         Type[] genericTypes = c.getGenericParameterTypes();
@@ -624,10 +633,15 @@ public final class ResourceUtils {
         Object[] values = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             if (AnnotationUtils.getAnnotation(anns[i], Context.class) != null) {
-                if (perRequest) {
-                    values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
+                Object contextValue = contextValues != null ? contextValues.get(params[i]) : null;
+                if (contextValue == null) {
+                    if (perRequest) {
+                        values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
+                    } else {
+                        values[i] = InjectionUtils.createThreadLocalProxy(params[i]);
+                    }
                 } else {
-                    values[i] = InjectionUtils.createThreadLocalProxy(params[i]);
+                    values[i] = contextValue;
                 }
             } else {
                 // this branch won't execute for singletons given that the found constructor

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.provider;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,6 +50,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.ResourceInfoImpl;
@@ -219,9 +221,9 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
     
   //CHECKSTYLE:OFF 
+    @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(Object... providers) {
-        super.setProviders(providers);
         List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters = 
             new LinkedList<ProviderInfo<ContainerRequestFilter>>();
         List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters = 
@@ -231,25 +233,40 @@ public final class ServerProviderFactory extends ProviderFactory {
             if (o == null) {
                 continue;
             }
-            Class<?> oClass = ClassHelper.getRealClass(o);
+            ProviderInfo<? extends Object> provider = null;
+            Class<?> providerCls = null;
+            Object realObject = null;
+            if (o instanceof Constructor) {
+                Map<Class<?>, Object> values = CastUtils.cast((application == null ? null 
+                    : Collections.singletonMap(Application.class, application.getProvider())));
+                provider = createProviderFromConstructor((Constructor<?>)o, values);
+                providerCls = provider.getProvider().getClass();
+                realObject = provider;
+            } else {
+                providerCls = ClassHelper.getRealClass(o);
+                provider = new ProviderInfo<Object>(o, getBus());
+                realObject = o;
+            }
+            super.setProviders(realObject);
                         
-            if (ContainerRequestFilter.class.isAssignableFrom(oClass)) {
-                addContainerRequestFilter(postMatchRequestFilters,
-                    new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)o, getBus()));
+            if (ContainerRequestFilter.class.isAssignableFrom(providerCls)) {
+                addContainerRequestFilter(postMatchRequestFilters, 
+                                          (ProviderInfo<ContainerRequestFilter>)provider);
             }
             
-            if (ContainerResponseFilter.class.isAssignableFrom(oClass)) {
-                postMatchResponseFilters.add(
-                   new ProviderInfo<ContainerResponseFilter>((ContainerResponseFilter)o, getBus())); 
+            if (ContainerResponseFilter.class.isAssignableFrom(providerCls)) {
+                postMatchResponseFilters.add((ProviderInfo<ContainerResponseFilter>)provider); 
             }
             
-            if (DynamicFeature.class.isAssignableFrom(oClass)) {
-                dynamicFeatures.add((DynamicFeature)o);
+            if (DynamicFeature.class.isAssignableFrom(providerCls)) {
+                //TODO: review the possibility of DynamicFeatures needing to have Contexts injected
+                Object feature = realObject == provider ? provider.getProvider() : realObject;
+                dynamicFeatures.add((DynamicFeature)feature);
             }
             
             
-            if (ExceptionMapper.class.isAssignableFrom(oClass)) {
-                exceptionMappers.add(new ProviderInfo<ExceptionMapper<?>>((ExceptionMapper<?>)o, getBus())); 
+            if (ExceptionMapper.class.isAssignableFrom(providerCls)) {
+                exceptionMappers.add((ProviderInfo<ExceptionMapper<?>>)provider); 
             }
             
         }

@@ -85,13 +85,18 @@ public class BookApplication extends Application {
     
     public static class BookRequestFilter implements ContainerRequestFilter {
         private UriInfo ui;
+        private Application ap;
         
-        public BookRequestFilter(@Context UriInfo ui) {
+        public BookRequestFilter(@Context UriInfo ui, @Context Application ap) {
             this.ui = ui;
+            this.ap = ap;
         }
         
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
+            if (ap == null) {
+                throw new RuntimeException();
+            }
             if (ui.getRequestUri().toString().endsWith("/application11/thebooks/bookstore2/bookheaders")) {
                 context.getHeaders().put("BOOK", Arrays.asList("1", "2", "3"));    
             }

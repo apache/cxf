@@ -171,7 +171,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             
             ServerProviderFactory factory = setupFactory(ep);
             ep.put(Application.class.getName(), appProvider);
-            factory.setApplicationProvider(appProvider);
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
             ep.put(Bus.class.getName(), getBus());
@@ -216,6 +215,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     protected ServerProviderFactory setupFactory(Endpoint ep) { 
         ServerProviderFactory factory = ServerProviderFactory.createInstance(getBus()); 
         setBeanInfo(factory);
+        factory.setApplicationProvider(appProvider);
         super.setupFactory(factory, ep);
         return factory;
     }
