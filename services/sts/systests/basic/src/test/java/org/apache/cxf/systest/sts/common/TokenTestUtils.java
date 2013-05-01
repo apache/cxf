@@ -83,6 +83,15 @@ public final class TokenTestUtils {
                 stsClient.setWsdlLocation(location.replace("8443", port));
             }
         }
+        stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT + ".sct");
+        if (stsClient != null) {
+            String location = stsClient.getWsdlLocation();
+            if (location.contains("8080")) {
+                stsClient.setWsdlLocation(location.replace("8080", port));
+            } else if (location.contains("8443")) {
+                stsClient.setWsdlLocation(location.replace("8443", port));
+            }
+        }
     }
 
 }
