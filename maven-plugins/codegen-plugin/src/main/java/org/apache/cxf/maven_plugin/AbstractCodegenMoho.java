@@ -603,7 +603,13 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             jar.createArchive();
 
             cmd.createArg().setValue("-jar");
-            cmd.createArg().setValue(file.getAbsolutePath());
+            
+            String tmpFilePath = file.getAbsolutePath();
+            if (tmpFilePath.contains(" ")) {
+                //ensure the path is in double quotation marks if the path contain space
+                tmpFilePath = "\"" + tmpFilePath + "\"";
+            }
+            cmd.createArg().setValue(tmpFilePath);
 
         } catch (Exception e1) {
             throw new MojoExecutionException("Could not create runtime jar", e1);
