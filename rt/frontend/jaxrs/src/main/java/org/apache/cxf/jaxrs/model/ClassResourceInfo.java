@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
@@ -38,6 +39,7 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Message;
 
 public class ClassResourceInfo extends BeanResourceInfo {
     
@@ -130,18 +132,19 @@ public class ClassResourceInfo extends BeanResourceInfo {
     
     public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass) {
         instanceClass = enableStatic ? typedClass : instanceClass;
-        return getSubResource(typedClass, instanceClass, null, enableStatic);
+        return getSubResource(typedClass, instanceClass, null, enableStatic, null);
     }
     
     public ClassResourceInfo getSubResource(Class<?> typedClass, Class<?> instanceClass, Object instance) {
         instanceClass = enableStatic ? typedClass : instanceClass;
-        return getSubResource(typedClass, instanceClass, instance, enableStatic);
+        return getSubResource(typedClass, instanceClass, instance, enableStatic, null);
     }
     
     public ClassResourceInfo getSubResource(Class<?> typedClass, 
                                             Class<?> instanceClass,
                                             Object instance,
-                                            boolean resolveContexts) {
+                                            boolean resolveContexts,
+                                            Message message) {
         
         SubresourceKey key = new SubresourceKey(typedClass, instanceClass);
         ClassResourceInfo cri = subResources.get(key);
@@ -159,7 +162,15 @@ public class ClassResourceInfo extends BeanResourceInfo {
         if (resolveContexts && cri != null && cri.isSingleton() && instance != null && cri.contextsAvailable()) {
             synchronized (this) {
                 if (!injectedSubInstances.contains(instance.toString())) {
-                    InjectionUtils.injectContextProxies(cri, instance);
+                    Application app = null;
+                    if (message != null) {
+                        ProviderInfo<?> appProvider = 
+                            (ProviderInfo<?>)message.getExchange().getEndpoint().get(Application.class.getName());
+                        if (appProvider != null) {
+                            app = (Application)appProvider.getProvider();
+                        }
+                    }
+                    InjectionUtils.injectContextProxiesAndApplication(cri, instance, app);
                     injectedSubInstances.add(instance.toString());
                 }
             }

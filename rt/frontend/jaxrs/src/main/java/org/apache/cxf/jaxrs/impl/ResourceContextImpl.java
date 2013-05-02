@@ -18,30 +18,27 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.container.ResourceContext;
 
+import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.message.Message;
 
 public class ResourceContextImpl implements ResourceContext {
 
     private ClassResourceInfo cri;
     private Class<?> subClass;
-    
-    public ResourceContextImpl(OperationResourceInfo ori) {
+    private Message m;
+    public ResourceContextImpl(Message m, OperationResourceInfo ori) {
+        this.m = m;
         this.cri = ori.getClassResourceInfo();
         this.subClass = ori.getMethodToInvoke().getReturnType();
     }
     
     @Override
     public <T> T getResource(Class<T> cls) {
-        T resource = null;
-        try {
-            resource = cls.newInstance();
-        } catch (Throwable ex) {
-            throw new InternalServerErrorException(ex);
-        }
+        T resource = cls.cast(new PerRequestResourceProvider(cls).getInstance(m));
         return doInitResource(cls, resource);
     }
     
@@ -50,7 +47,7 @@ public class ResourceContextImpl implements ResourceContext {
     }
 
     private <T> T doInitResource(Class<?> cls, T resource) {
-        cri.getSubResource(subClass, cls, resource, true);
+        cri.getSubResource(subClass, cls, resource, true, m);
         return resource;
     }
 }
