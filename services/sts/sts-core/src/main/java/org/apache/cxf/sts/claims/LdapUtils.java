@@ -1,0 +1,89 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.cxf.sts.claims;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchControls;
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.cxf.helpers.CastUtils;
+
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.filter.AndFilter;
+import org.springframework.ldap.filter.EqualsFilter;
+
+public final class LdapUtils {
+    
+    private LdapUtils() {
+    }
+    
+    public static boolean isDN(String user) {
+        try {
+            new X500Principal(user);
+            return true;
+            //Principal contains a DN -> ldap.lookup
+        } catch (Exception ex) {
+            //Principal does not contain a DN -> ldap.search
+            return false;
+        }
+    }
+    
+    public static Map<String, Attribute> getAttributesOfEntry(LdapTemplate ldapTemplate, String baseDN, 
+        String objectClass, String filterAttributeName, String filterAttributeValue,
+        String[] searchAttributes) {
+        
+        Map<String, Attribute> ldapAttributes = null;
+        
+        AttributesMapper mapper = 
+            new AttributesMapper() {
+                public Object mapFromAttributes(Attributes attrs) throws NamingException {
+                    Map<String, Attribute> map = new HashMap<String, Attribute>();
+                    NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
+                    while (attrEnum.hasMore()) {
+                        Attribute att = attrEnum.next();
+                        map.put(att.getID(), att);
+                    }
+                    return map;
+                }
+            };
+        
+        List<?> result = null;
+        AndFilter filter = new AndFilter();
+        filter.and(
+                new EqualsFilter("objectclass", objectClass)).and(
+                        new EqualsFilter(filterAttributeName, filterAttributeValue));
+        
+        result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+            SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
+        if (result != null && result.size() > 0) {
+            //not only the first one....
+            ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
+        }
+        
+        return ldapAttributes;
+    }
+}
