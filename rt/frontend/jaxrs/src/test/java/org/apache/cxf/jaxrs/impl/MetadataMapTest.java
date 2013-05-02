@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -54,6 +55,21 @@ public class MetadataMapTest extends Assert {
     public void testAddFirst() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.addFirst("baz", "foo");
+        List<Object> values = m.get("baz");
+        assertEquals(1, values.size());
+        assertEquals("foo", values.get(0));
+        
+        m.addFirst("baz", "clazz");
+        values = m.get("baz");
+        assertEquals(2, values.size());
+        assertEquals("clazz", values.get(0));
+        assertEquals("foo", values.get(1));
+    }
+    
+    @Test
+    public void testAddFirstUnmodifiableListFirst() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.put("baz", Arrays.<Object>asList("foo"));
         List<Object> values = m.get("baz");
         assertEquals(1, values.size());
         assertEquals("foo", values.get(0));
