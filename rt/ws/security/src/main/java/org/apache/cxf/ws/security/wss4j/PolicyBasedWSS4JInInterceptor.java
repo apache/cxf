@@ -51,6 +51,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -111,6 +112,13 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
      */
     public PolicyBasedWSS4JInInterceptor() {
         super(true);
+    }
+    
+    public void handleMessage(SoapMessage msg) throws Fault {
+        AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
+        if (aim != null) {
+            super.handleMessage(msg);
+        }
     }
     
     private static Properties getProps(Object o, URL propsURL, SoapMessage message) {
