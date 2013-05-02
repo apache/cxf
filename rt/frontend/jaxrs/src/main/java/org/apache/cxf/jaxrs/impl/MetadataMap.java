@@ -92,10 +92,21 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     
     private void addValue(K key, V value, boolean last) {
         List<V> data = getList(key);
-        if (last) {
-            data.add(value);
-        } else {
-            data.add(0, value);
+        try {
+            if (last) {
+                data.add(value);
+            } else {
+                data.add(0, value);
+            }
+        } catch (UnsupportedOperationException ex) {
+            // this may happen if an unmodifiable List was set via put or putAll
+            if (!readOnly) {
+                List<V> newList = new ArrayList<V>(data);
+                put(key, newList);
+                addValue(key, value, last);
+            } else {
+                throw ex;
+            }
         }
     }
 
