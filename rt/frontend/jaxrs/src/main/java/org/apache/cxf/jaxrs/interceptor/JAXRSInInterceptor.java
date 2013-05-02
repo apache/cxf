@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.interceptor;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -38,7 +37,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -128,15 +126,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
         if (requestContentType == null) {
-            boolean getMethod = HttpMethod.GET.equals(httpMethod);
-            requestContentType = getMethod ? MediaType.WILDCARD : MediaType.APPLICATION_OCTET_STREAM;
-            message.put(Message.CONTENT_TYPE, requestContentType);
-            if (!getMethod) {
-                Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-                if (headers != null) {
-                    headers.put(Message.CONTENT_TYPE, Collections.singletonList(requestContentType));    
-                }
-            }
+            requestContentType = MediaType.WILDCARD;
         }
         
         String rawPath = HttpUtils.getPathToMatch(message, true);

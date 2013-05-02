@@ -823,8 +823,7 @@ public final class JAXRSUtils {
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
             if (contentType == null) {
-                // for tests only
-                contentType = MediaType.WILDCARD;
+                contentType = MediaType.APPLICATION_OCTET_STREAM;
             }
 
             return readFromMessageBody(parameterClass,
