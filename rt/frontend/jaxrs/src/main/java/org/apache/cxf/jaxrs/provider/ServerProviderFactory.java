@@ -61,6 +61,7 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 public final class ServerProviderFactory extends ProviderFactory {
@@ -237,8 +238,8 @@ public final class ServerProviderFactory extends ProviderFactory {
             Class<?> providerCls = null;
             Object realObject = null;
             if (o instanceof Constructor) {
-                Map<Class<?>, Object> values = CastUtils.cast((application == null ? null 
-                    : Collections.singletonMap(Application.class, application.getProvider())));
+                Map<Class<?>, Object> values = CastUtils.cast(application == null ? null 
+                    : Collections.singletonMap(Application.class, application.getProvider()));
                 provider = createProviderFromConstructor((Constructor<?>)o, values);
                 providerCls = provider.getProvider().getClass();
                 realObject = provider;
@@ -283,6 +284,21 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
 //CHECKSTYLE:ON
     
+    @Override
+    protected void injectContextProxiesIntoProvider(ProviderInfo<?> pi) {
+        injectContextProxiesIntoProvider(pi, application == null ? null : application.getProvider());
+    }
+    
+    @Override
+    protected void injectContextValues(ProviderInfo<?> pi, Message m) {
+        if (m != null) {
+            InjectionUtils.injectContexts(pi.getProvider(), pi, m);
+            if (application != null && application.contextsAvailable()) {
+                InjectionUtils.injectContexts(application.getProvider(), application, m);
+            }
+        }
+    }
+    
     private void addContainerRequestFilter(
         List<ProviderInfo<ContainerRequestFilter>> postMatchFilters,
         ProviderInfo<ContainerRequestFilter> p) {
@@ -305,6 +321,10 @@ public final class ServerProviderFactory extends ProviderFactory {
     
     public void setApplicationProvider(ProviderInfo<Application> app) {
         application = app;
+    }
+    
+    public ProviderInfo<Application> getApplicationProvider() {
+        return application;
     }
     
     public void setRequestPreprocessor(RequestPreprocessor rp) {

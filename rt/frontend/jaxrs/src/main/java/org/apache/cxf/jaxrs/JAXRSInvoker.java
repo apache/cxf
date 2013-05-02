@@ -169,8 +169,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 }
             }
             if (cri.isRoot()) {
-                ProviderInfo<?> appProvider = 
-                    (ProviderInfo<?>)exchange.getEndpoint().get(Application.class.getName());
+                ProviderInfo<Application> appProvider = providerFactory.getApplicationProvider();
                 if (appProvider != null) {
                     InjectionUtils.injectContexts(appProvider.getProvider(),
                                                   appProvider,

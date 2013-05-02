@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Priority;
 import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -55,6 +56,7 @@ public class BookApplication extends Application {
         classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
         classes.add(org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper.class);
         classes.add(BookRequestFilter.class);
+        classes.add(BookRequestFilter2.class);
         return classes;
     }
 
@@ -83,6 +85,7 @@ public class BookApplication extends Application {
         defaultId = Long.valueOf(sb.toString());
     }
     
+    @Priority(1)
     public static class BookRequestFilter implements ContainerRequestFilter {
         private UriInfo ui;
         private Application ap;
@@ -98,7 +101,31 @@ public class BookApplication extends Application {
                 throw new RuntimeException();
             }
             if (ui.getRequestUri().toString().endsWith("/application11/thebooks/bookstore2/bookheaders")) {
-                context.getHeaders().put("BOOK", Arrays.asList("1", "2", "3"));    
+                context.getHeaders().put("BOOK", Arrays.asList("1", "2"));    
+            }
+            
+        }
+        
+    }
+    
+    @Priority(2)
+    public static class BookRequestFilter2 implements ContainerRequestFilter {
+        private UriInfo ui;
+        @Context
+        private Application ap;
+        
+        @Context
+        public void setUriInfo(UriInfo context) {
+            this.ui = context;
+        }
+        
+        @Override
+        public void filter(ContainerRequestContext context) throws IOException {
+            if (ap == null) {
+                throw new RuntimeException();
+            }
+            if (ui.getRequestUri().toString().endsWith("/application11/thebooks/bookstore2/bookheaders")) {
+                context.getHeaders().add("BOOK", "3");    
             }
             
         }

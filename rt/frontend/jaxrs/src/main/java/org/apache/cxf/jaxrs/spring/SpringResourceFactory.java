@@ -21,9 +21,15 @@ package org.apache.cxf.jaxrs.spring;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.Map;
+
+import javax.ws.rs.core.Application;
 
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
@@ -71,9 +77,13 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public Object getInstance(Message m) {
-        Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton());
+        ProviderInfo<?> application = m == null ? null
+            : (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
+        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null 
+            : Collections.singletonMap(Application.class, application.getProvider()));
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
         Object instance = values.length > 0 ? ac.getBean(beanId, values) : ac.getBean(beanId);
-        if (!isSingleton || m == null) {
+        if (!isSingleton() || m == null) {
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
         }
         return instance;
@@ -90,7 +100,7 @@ public class SpringResourceFactory implements ResourceProvider, ApplicationConte
      * {@inheritDoc}
      */
     public void releaseInstance(Message m, Object o) {
-        if (!isSingleton) {
+        if (!isSingleton()) {
             InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
         }
     }

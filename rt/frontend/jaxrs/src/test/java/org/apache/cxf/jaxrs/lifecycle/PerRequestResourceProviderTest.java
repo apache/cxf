@@ -18,9 +18,17 @@
  */
 package org.apache.cxf.jaxrs.lifecycle;
 
+import javax.ws.rs.core.Application;
+
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +38,7 @@ public class PerRequestResourceProviderTest extends Assert {
     @Test
     public void testGetInstance() {
         PerRequestResourceProvider rp = new PerRequestResourceProvider(Customer.class);
-        Message message = new MessageImpl();
+        Message message = createMessage();
         message.put(Message.QUERY_STRING, "a=aValue");
         Customer c = (Customer)rp.getInstance(message);
         assertNotNull(c.getUriInfo());
@@ -38,6 +46,29 @@ public class PerRequestResourceProviderTest extends Assert {
         assertTrue(c.isPostConstuctCalled());
         rp.releaseInstance(message, c);
         assertTrue(c.isPreDestroyCalled());
+    }
+    
+    private Message createMessage() {
+        ProviderFactory factory = ServerProviderFactory.getInstance();
+        Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.get(Application.class.getName());
+        EasyMock.expectLastCall().andReturn(null);
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
+        endpoint.isEmpty();
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        endpoint.get(ServerProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
     }
 }
 

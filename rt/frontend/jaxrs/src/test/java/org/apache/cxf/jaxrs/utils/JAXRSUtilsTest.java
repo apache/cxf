@@ -240,7 +240,7 @@ public class JAXRSUtilsTest extends Assert {
         ClassResourceInfo cri = sf.getServiceFactory().getClassResourceInfo().get(0);
         
         Customer customer = (Customer)cri.getResourceProvider().getInstance(
-             new MessageImpl());
+             createMessage());
         
         assertNull(customer.getApplication1());
         assertNull(customer.getApplication2());

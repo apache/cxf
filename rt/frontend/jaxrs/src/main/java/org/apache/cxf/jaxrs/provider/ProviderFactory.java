@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -255,7 +256,7 @@ public abstract class ProviderFactory {
         
     }
     
-    protected static <T> void handleMapper(List<T> candidates, 
+    protected <T> void handleMapper(List<T> candidates, 
                                      ProviderInfo<T> em, 
                                      Class<?> expectedType, 
                                      Message m, 
@@ -526,7 +527,7 @@ public abstract class ProviderFactory {
     }
     //CHECKSTYLE:ON
     
-    static void injectContextValues(ProviderInfo<?> pi, Message m) {
+    protected void injectContextValues(ProviderInfo<?> pi, Message m) {
         if (m != null) {
             InjectionUtils.injectContexts(pi.getProvider(), pi, m);
         }
@@ -541,9 +542,13 @@ public abstract class ProviderFactory {
         }
     }
     
-    void injectContextProxiesIntoProvider(ProviderInfo<?> pi) {
+    protected void injectContextProxiesIntoProvider(ProviderInfo<?> pi) {
+        injectContextProxiesIntoProvider(pi, null);
+    }
+    
+    void injectContextProxiesIntoProvider(ProviderInfo<?> pi, Application app) {
         if (pi.contextsAvailable()) {
-            InjectionUtils.injectContextProxies(pi, pi.getProvider());
+            InjectionUtils.injectContextProxiesAndApplication(pi, pi.getProvider(), app);
             injectedProviders.add(pi);
         }
     }

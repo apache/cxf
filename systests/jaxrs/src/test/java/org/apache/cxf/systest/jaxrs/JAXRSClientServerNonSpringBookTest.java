@@ -156,6 +156,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     @Test
     public void testGetBook123Application11PerRequest() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/application11/thebooks/bookstore2/bookheaders");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("application/xml");
         Book book = wc.get(Book.class);
         assertEquals("CXF in Action", book.getName());

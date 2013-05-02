@@ -22,10 +22,15 @@ package org.apache.cxf.jaxrs.lifecycle;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -65,8 +70,11 @@ public class PerRequestResourceProvider implements ResourceProvider {
     }
     
     protected Object createInstance(Message m) {
-        
-        Object[] values = ResourceUtils.createConstructorArguments(c, m, true);
+        ProviderInfo<?> application = 
+            (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
+        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null 
+            : Collections.singletonMap(Application.class, application.getProvider()));
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, true, mapValues);
         try {
             Object instance = values.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
