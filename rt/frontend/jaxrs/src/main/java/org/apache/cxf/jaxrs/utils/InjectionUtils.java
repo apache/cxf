@@ -1129,6 +1129,7 @@ public final class InjectionUtils {
         return type.isPrimitive() 
             || Number.class.isAssignableFrom(type)
             || Boolean.class.isAssignableFrom(type)
+            || Character.class.isAssignableFrom(type)
             || String.class == type;
     }
     
