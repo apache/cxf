@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.sts.claims;
 
 import java.net.URI;
@@ -34,7 +33,6 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.x500.X500Principal;
 
@@ -42,8 +40,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.filter.AndFilter;
-import org.springframework.ldap.filter.EqualsFilter;
 
 public class LdapClaimsHandler implements ClaimsHandler {
 
@@ -130,10 +126,10 @@ public class LdapClaimsHandler implements ClaimsHandler {
     
     public ClaimCollection retrieveClaimValues(
             RequestClaimCollection claims, ClaimsParameters parameters) {
-      
-        Principal principal = parameters.getPrincipal();
-        
         String user = null;
+        boolean useLdapLookup = false;
+        
+        Principal principal = parameters.getPrincipal();
         if (principal instanceof KerberosPrincipal) {
             KerberosPrincipal kp = (KerberosPrincipal)principal;
             StringTokenizer st = new StringTokenizer(kp.getName(), "@");
@@ -144,62 +140,69 @@ public class LdapClaimsHandler implements ClaimsHandler {
             return new ClaimCollection();
         } else if (principal != null) {
             user = principal.getName();
+            if (user == null) {
+                LOG.warning("User must not be null");
+                return new ClaimCollection();
+            }
+            useLdapLookup = LdapUtils.isDN(user);
+            
         } else {
-            //[TODO] if onbehalfof -> principal == null
-            LOG.info("Principal is null");
+            LOG.warning("Principal is null");
             return new ClaimCollection();
         }
-        
-        if (user == null) {
-            LOG.warning("User must not be null");
-            return new ClaimCollection();
-        } else {
-            if (LOG.isLoggable(Level.FINEST)) {
-                LOG.finest("Retrieve claims for user " + user);
-            }
+       
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.finest("Retrieve claims for user " + user);
         }
         
-        AndFilter filter = new AndFilter();
-        filter.and(
-                new EqualsFilter("objectclass", this.getObjectClass())).and(
-                        new EqualsFilter(this.getUserNameAttribute(), user));
-
-        List<String> searchAttributeList = new ArrayList<String>();
-        for (RequestClaim claim : claims) {
-            if (getClaimsLdapAttributeMapping().keySet().contains(claim.getClaimType().toString())) {
-                searchAttributeList.add(
-                    getClaimsLdapAttributeMapping().get(claim.getClaimType().toString())
-                );
-            } else {
-                if (LOG.isLoggable(Level.FINER)) {
-                    LOG.finer("Unsupported claim: " + claim.getClaimType());
-                }
-            }
-        }
-
-        String[] searchAttributes = null;
-        searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
-
-        AttributesMapper mapper = 
-            new AttributesMapper() {
-                public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                    Map<String, Attribute> map = new HashMap<String, Attribute>();
-                    NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
-                    while (attrEnum.hasMore()) {
-                        Attribute att = attrEnum.next();
-                        map.put(att.getID(), att);
-                    }
-                    return map;
-                }
-            };
         
+
+
         
-        List<?> result = ldap.search((this.userBaseDn == null) ? "" : this.userBaseDn, filter.toString(),
-                SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
-      
         Map<String, Attribute> ldapAttributes = null;
-        if (result != null && result.size() > 0) {
-            ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
+        if (useLdapLookup) {
+            AttributesMapper mapper = 
+                new AttributesMapper() {
+                    public Object mapFromAttributes(Attributes attrs) throws NamingException {
+                        Map<String, Attribute> map = new HashMap<String, Attribute>();
+                        NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
+                        while (attrEnum.hasMore()) {
+                            Attribute att = attrEnum.next();
+                            map.put(att.getID(), att);
+                        }
+                        return map;
+                    }
+                };
+                
+            Object result = ldap.lookup(user, mapper);
+            ldapAttributes = CastUtils.cast((Map<?, ?>)result);
+        } else {
+            List<String> searchAttributeList = new ArrayList<String>();
+            for (RequestClaim claim : claims) {
+                if (getClaimsLdapAttributeMapping().keySet().contains(claim.getClaimType().toString())) {
+                    searchAttributeList.add(
+                        getClaimsLdapAttributeMapping().get(claim.getClaimType().toString())
+                    );
+                } else {
+                    if (LOG.isLoggable(Level.FINER)) {
+                        LOG.finer("Unsupported claim: " + claim.getClaimType());
+                    }
+                }
+            }
+
+            String[] searchAttributes = null;
+            searchAttributes = searchAttributeList.toArray(new String[searchAttributeList.size()]);
+            
+            ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, this.userBaseDn, this.getObjectClass(),
+                                                            this.getUserNameAttribute(), user, searchAttributes);
+        }
+        
+        if (ldapAttributes == null || ldapAttributes.size() == 0) {
+            //No result
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.finest("User '" + user + "' not found");
+            }
+            return new ClaimCollection();
         }
         
         ClaimCollection claimsColl = new ClaimCollection();
@@ -258,5 +261,8 @@ public class LdapClaimsHandler implements ClaimsHandler {
         return claimsColl;
     }
 
+    
+
 }
+
 
