@@ -181,6 +181,7 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     protected boolean sendKeyType = true;
     protected Message message;
     protected String context;
+    protected X509Certificate useKeyCertificate;
 
     protected Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -721,8 +722,13 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         if (keyTypeTemplate != null && keyTypeTemplate.endsWith("SymmetricKey")) {
             requestorEntropy = writeElementsForRSTSymmetricKey(writer, wroteKeySize);
         } else if (keyTypeTemplate != null && keyTypeTemplate.endsWith("PublicKey")) {
-            crypto = createCrypto(false);
-            cert = getCert(crypto);
+            // Use the given cert, or else get it from a Crypto instance
+            if (useKeyCertificate != null) {
+                cert = useKeyCertificate;
+            } else {
+                crypto = createCrypto(false);
+                cert = getCert(crypto);
+            }
             writeElementsForRSTPublicKey(writer, cert);
         } else if (isSpnego) {
             addKeySize(keySize, writer);
@@ -1612,5 +1618,13 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
     public void setWspNamespace(String wspNamespace) {
         this.wspNamespace = wspNamespace;
+    }
+
+    public X509Certificate getUseKeyCertificate() {
+        return useKeyCertificate;
+    }
+
+    public void setUseKeyCertificate(X509Certificate useKeyCertificate) {
+        this.useKeyCertificate = useKeyCertificate;
     }
 }
