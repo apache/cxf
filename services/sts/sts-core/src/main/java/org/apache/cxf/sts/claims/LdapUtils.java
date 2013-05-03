@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.Name;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -32,7 +33,10 @@ import javax.security.auth.x500.X500Principal;
 import org.apache.cxf.helpers.CastUtils;
 
 import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.AbstractContextMapper;
 import org.springframework.ldap.filter.AndFilter;
 import org.springframework.ldap.filter.EqualsFilter;
 
@@ -80,10 +84,70 @@ public final class LdapUtils {
         result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
         if (result != null && result.size() > 0) {
-            //not only the first one....
             ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
         }
         
         return ldapAttributes;
     }
+    
+    public static List<String> getAttributeOfEntries(
+        LdapTemplate ldapTemplate, String baseDN, 
+        String objectClass, String filterAttributeName, String filterAttributeValue,
+        String searchAttribute) {
+
+        List<String> ldapAttributes = null;
+
+        AttributesMapper mapper = 
+            new AttributesMapper() {
+                public Object mapFromAttributes(Attributes attrs) throws NamingException {
+                    NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
+                    while (attrEnum.hasMore()) {
+                        return (String) attrEnum.next().get();
+                    }
+                    return null;
+                }
+            };
+        
+        String[] searchAttributes = new String[] {searchAttribute};  
+        
+        List<?> result = null;
+        AndFilter filter = new AndFilter();
+        filter.and(
+            new EqualsFilter("objectclass", objectClass)).and(
+                new EqualsFilter(filterAttributeName, filterAttributeValue));
+
+        result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+            SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
+        if (result != null && result.size() > 0) {
+            ldapAttributes = CastUtils.cast((List<?>)result);
+        }
+
+        return ldapAttributes;
+    }
+    
+    public static Name getDnOfEntry(LdapTemplate ldapTemplate, String baseDN, 
+        String objectClass, String filterAttributeName, String filterAttributeValue) {
+
+        ContextMapper mapper = 
+            new AbstractContextMapper() {
+                public Object doMapFromContext(DirContextOperations ctx) {
+                    return ctx.getDn();
+                }
+            };
+        
+        AndFilter filter = new AndFilter();
+        filter.and(
+            new EqualsFilter("objectclass", objectClass)).and(
+                new EqualsFilter(filterAttributeName, filterAttributeValue));
+
+        List<?> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+            SearchControls.SUBTREE_SCOPE, mapper);
+        
+        if (result != null && result.size() > 0) {
+            //not only the first one....
+            return (Name)result.get(0);
+        }
+        return null;
+    }
+    
 }
