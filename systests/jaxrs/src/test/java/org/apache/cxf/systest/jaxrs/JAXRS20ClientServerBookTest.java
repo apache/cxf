@@ -377,7 +377,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Book book = future.get();
         assertSame(book, holder.value);
         assertEquals(124L, book.getId());
-        validatePostResponse(wc);   
+        validatePostResponse(wc, true);   
     }
     
     private void doTestGetBookAsyncResponse(String address, boolean asyncInvoker) 
@@ -413,10 +413,11 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("http://localhost/redirect", response.getHeaderString(HttpHeaders.LOCATION));
     }
     
-    private void validatePostResponse(WebClient wc) {
+    private void validatePostResponse(WebClient wc, boolean async) {
         validateResponse(wc);
         Response response = wc.getResponse();
-        assertEquals("serverRead", response.getHeaderString("ServerReaderInterceptor"));
+        assertEquals(!async ? "serverRead" : "serverReadAsync", 
+            response.getHeaderString("ServerReaderInterceptor"));
         assertEquals("clientWrite", response.getHeaderString("ClientWriterInterceptor"));
         assertEquals("clientRead", response.getHeaderString("ClientReaderInterceptor"));
     }
@@ -442,7 +443,7 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         WebClient wc = createWebClientPost(address);
         Book book = wc.post(new Book("Book", 126L), Book.class);
         assertEquals(124L, book.getId());
-        validatePostResponse(wc);
+        validatePostResponse(wc, false);
     }
     
     @Test
@@ -463,16 +464,16 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     
     @Test
     public void testPostBookAsync() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple/async";
         WebClient wc = createWebClientPost(address);
         Future<Book> future = wc.async().post(Entity.xml(new Book("Book", 126L)), Book.class);
         assertEquals(124L, future.get().getId());
-        validatePostResponse(wc);
+        validatePostResponse(wc, true);
     }
     
     @Test
     public void testPostBookAsyncHandler() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
+        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple/async";
         doTestPostBookAsyncHandler(address);
     }
     

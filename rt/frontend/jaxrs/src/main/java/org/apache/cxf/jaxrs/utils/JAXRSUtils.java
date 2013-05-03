@@ -831,7 +831,7 @@ public final class JAXRSUtils {
                                        parameterAnns,
                                        is, 
                                        toMediaType(contentType),
-                                       ori.getConsumeTypes(),
+                                       ori,
                                        message);
         } else if (parameter.getType() == ParameterType.CONTEXT) {
             return createContextValue(message, parameterType, parameterClass);
@@ -1260,10 +1260,10 @@ public final class JAXRSUtils {
                                                   Annotation[] parameterAnnotations,
                                                   InputStream is, 
                                                   MediaType contentType, 
-                                                  List<MediaType> consumeTypes,
+                                                  OperationResourceInfo ori,
                                                   Message m) throws IOException, WebApplicationException {
         
-        List<MediaType> types = JAXRSUtils.intersectMimeTypes(consumeTypes, contentType);
+        List<MediaType> types = JAXRSUtils.intersectMimeTypes(ori.getConsumeTypes(), contentType);
         
         final ProviderFactory pf = ServerProviderFactory.getInstance(m);
         for (MediaType type : types) { 
@@ -1272,7 +1272,8 @@ public final class JAXRSUtils {
                                          parameterType,
                                          parameterAnnotations,
                                          type,
-                                         m);
+                                         m,
+                                         ori.getNameBindings());
             if (readers != null) {
                 try {
                     return readFromMessageBodyReader(readers, 

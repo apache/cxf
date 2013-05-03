@@ -424,7 +424,7 @@ public abstract class AbstractClient implements Client {
         MediaType contentType = JAXRSUtils.toMediaType(headers.getFirst("Content-Type").toString()); 
         
         List<WriterInterceptor> writers = ClientProviderFactory.getInstance(outMessage)
-            .createMessageBodyWriterInterceptor(theClass, type, anns, contentType, outMessage);
+            .createMessageBodyWriterInterceptor(theClass, type, anns, contentType, outMessage, null);
         if (writers != null) {
             try {
                 JAXRSUtils.writeMessageBody(writers, 
@@ -495,7 +495,7 @@ public abstract class AbstractClient implements Client {
         
         List<ReaderInterceptor> readers 
             = ClientProviderFactory.getInstance(outMessage).createMessageBodyReaderInterceptor(
-                cls, type, anns, contentType, outMessage);
+                cls, type, anns, contentType, outMessage, null);
         if (readers != null) {
             try {
                 responseMessage.put(Message.PROTOCOL_HEADERS, r.getMetadata());

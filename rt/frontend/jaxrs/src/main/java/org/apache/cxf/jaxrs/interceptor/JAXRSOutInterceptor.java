@@ -245,7 +245,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         annotations = ((ResponseImpl)response).getEntityAnnotations();        
         
         List<WriterInterceptor> writers = providerFactory
-            .createMessageBodyWriterInterceptor(targetType, genericType, annotations, responseMediaType, message);
+            .createMessageBodyWriterInterceptor(targetType, genericType, annotations, responseMediaType, message,
+                                                ori == null ? null : ori.getNameBindings());
         
         OutputStream outOriginal = message.getContent(OutputStream.class);
         if (writers == null || writers.isEmpty()) {

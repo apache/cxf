@@ -1488,7 +1488,8 @@ public class JAXRSUtilsTest extends Assert {
                 }
             });
         
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, 
+                                                               new ClassResourceInfo(Customer.class)), 
                                                            new MetadataMap<String, String>(), messageImpl);
         assertEquals("3 params should've been identified", 3, params.size());
         

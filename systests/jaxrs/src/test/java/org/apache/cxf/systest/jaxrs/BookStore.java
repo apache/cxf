@@ -89,6 +89,7 @@ import org.apache.cxf.jaxrs.ext.xml.XSISchemaLocation;
 import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAdded;
+import org.apache.cxf.systest.jaxrs.BookServer20.CustomHeaderAddedAsync;
 import org.apache.cxf.systest.jaxrs.BookServer20.PostMatchMode;
 
 @Path("/bookstore")
@@ -554,6 +555,21 @@ public class BookStore {
             builder.header("ClientWriterInterceptor", clientInterceptorHeader);
         }
         return builder.build();
+    }
+    
+    @POST
+    @Path("/bookheaders/simple/async")
+    @PostMatchMode
+    @CustomHeaderAdded
+    @CustomHeaderAddedAsync
+    public Response echoBookByHeaderSimpleAsync(Book book,
+                                       @HeaderParam("BOOK") String headerBook,
+                                       @HeaderParam("Simple") String headerSimple,
+                                       @HeaderParam("ServerReaderInterceptor") String serverInterceptorHeader,
+                                       @HeaderParam("ClientWriterInterceptor") String clientInterceptorHeader) 
+        throws Exception {
+        
+        return echoBookByHeaderSimple(book, headerBook, headerSimple, serverInterceptorHeader, clientInterceptorHeader);
     }
     
     private ResponseBuilder getBookByHeaderSimpleBuilder(@HeaderParam("BOOK") String headerBook,

@@ -315,7 +315,8 @@ public final class ResponseImpl extends Response {
             
             List<ReaderInterceptor> readers = ProviderFactory.getInstance(responseMessage)
                 .createMessageBodyReaderInterceptor(cls, t, anns, mediaType, 
-                                                    responseMessage.getExchange().getOutMessage());
+                                                    responseMessage.getExchange().getOutMessage(), 
+                                                    null);
             if (readers != null) {
                 try {
                     responseMessage.put(Message.PROTOCOL_HEADERS, this.getMetadata());

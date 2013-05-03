@@ -80,38 +80,31 @@ public final class ClientProviderFactory extends ProviderFactory {
     }
     
     
-    //CHECKSTYLE:OFF 
+    @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(Object... providers) {
-        super.setProviders(providers);
-        for (Object o : providers) {
-            if (o == null) {
-                continue;
-            }
-            Class<?> oClass = ClassHelper.getRealClass(o);
-            if (ClientRequestFilter.class.isAssignableFrom(oClass)) {
-                clientRequestFilters.add(
-                   new ProviderInfo<ClientRequestFilter>((ClientRequestFilter)o, getBus()));
+        List<ProviderInfo<? extends Object>> theProviders = 
+            prepareProviders((Object[])providers, null);
+        super.setCommonProviders(theProviders);
+        for (ProviderInfo<? extends Object> provider : theProviders) {
+            Class<?> providerCls = ClassHelper.getRealClass(provider.getProvider());
+            if (ClientRequestFilter.class.isAssignableFrom(providerCls)) {
+                clientRequestFilters.add((ProviderInfo<ClientRequestFilter>)provider);
             }
             
-            if (ClientResponseFilter.class.isAssignableFrom(oClass)) {
-                clientResponseFilters.add(
-                   new ProviderInfo<ClientResponseFilter>((ClientResponseFilter)o, getBus()));
+            if (ClientResponseFilter.class.isAssignableFrom(providerCls)) {
+                clientResponseFilters.add((ProviderInfo<ClientResponseFilter>)provider);
             }
             
-            if (ResponseExceptionMapper.class.isAssignableFrom(oClass)) {
-                responseExceptionMappers.add(
-                    new ProviderInfo<ResponseExceptionMapper<?>>((ResponseExceptionMapper<?>)o, getBus())); 
+            if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
+                responseExceptionMappers.add((ProviderInfo<ResponseExceptionMapper<?>>)provider); 
             }
-        
-            
         }
         Collections.sort(clientRequestFilters, new BindingPriorityComparator(true));
         Collections.sort(clientResponseFilters, new BindingPriorityComparator(false));
         
         injectContextProxies(responseExceptionMappers, clientRequestFilters, clientResponseFilters);
     }
-//CHECKSTYLE:ON
     
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
