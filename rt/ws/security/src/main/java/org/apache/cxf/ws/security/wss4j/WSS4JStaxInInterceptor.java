@@ -56,14 +56,14 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
     
     private List<String> actions;
     
-    public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) throws WSSecurityException {
+    public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) {
         super();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
         setSecurityProperties(securityProperties);
     }
     
-    public WSS4JStaxInInterceptor(Map<String, Object> props) throws WSSecurityException {
+    public WSS4JStaxInInterceptor(Map<String, Object> props) {
         super(props);
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
@@ -97,15 +97,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
         XMLStreamReader newXmlStreamReader;
 
-        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
-        SecurityEventListener securityEventListener = new SecurityEventListener() {
-            @Override
-            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                incomingSecurityEventList.add(securityEvent);
-            }
-        };
-        soapMessage.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
-        soapMessage.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         soapMessage.getInterceptorChain().add(new StaxSecurityContextInInterceptor());
         
         if (actions != null && !actions.isEmpty()) {
@@ -128,6 +119,9 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 inboundWSSec = WSSec.getInboundWSSec(getProperties());
             }
             
+            SecurityEventListener securityEventListener = 
+                configureSecurityEventListener(soapMessage, inboundWSSec);
+            
             newXmlStreamReader = 
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
@@ -145,7 +139,21 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
     }
     
-    private void configureProperties(SoapMessage msg) throws WSSecurityException {
+    protected SecurityEventListener configureSecurityEventListener(SoapMessage msg, InboundWSSec inboundWSSec) {
+        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
+        SecurityEventListener securityEventListener = new SecurityEventListener() {
+            @Override
+            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+                incomingSecurityEventList.add(securityEvent);
+            }
+        };
+        msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
+        msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
+        
+        return securityEventListener;
+    }
+    
+    protected void configureProperties(SoapMessage msg) throws WSSecurityException {
         WSSSecurityProperties securityProperties = getSecurityProperties();
         Map<String, Object> config = getProperties();
         

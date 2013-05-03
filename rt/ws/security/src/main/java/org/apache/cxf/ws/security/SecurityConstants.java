@@ -182,6 +182,13 @@ public final class SecurityConstants {
     public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
         "ws-security.validate.saml.subject.conf";
     
+    /**
+     * Whether to enable streaming WS-Security. If set to false (the default), the old DOM
+     * implementation is used. If set to true, the new streaming (StAX) implementation is used.
+     */
+    public static final String ENABLE_STREAMING_SECURITY = 
+        "ws-security.enable.streaming";
+    
     //
     // Non-boolean WS-Security Configuration parameters
     //

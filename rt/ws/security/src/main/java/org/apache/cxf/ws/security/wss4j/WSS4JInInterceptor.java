@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +63,6 @@ import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
 import org.apache.cxf.interceptor.security.SAMLSecurityContext;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -148,16 +146,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             secEngineOverride = createSecurityEngine(validatorMap);
         }
     }
-
-    @Override
-    public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>>
-    getAdditionalInterceptors() {
-        List<PhaseInterceptor<? extends org.apache.cxf.message.Message>> extras 
-            = new ArrayList<PhaseInterceptor<? extends org.apache.cxf.message.Message>>(1);
-        extras.add(SAAJInInterceptor.SAAJPreInInterceptor.INSTANCE);
-        return extras;
-    }
-
     
     public void setIgnoreActions(boolean i) {
         ignoreActions = i;
