@@ -193,6 +193,25 @@ public final class JAXRSClientFactory {
     }
     
     /**
+     * Creates a proxy which will do basic authentication
+     * @param baseAddress baseAddress
+     * @param cls proxy class, if not interface then a CGLIB proxy will be created
+     * @param providers list of providers
+     * @param username username
+     * @param password password
+     * @param configLocation classpath location of the configuration resource
+     * @return typed proxy
+     */
+    public static <T> T create(String baseAddress, Class<T> cls, List<?> providers,
+                               String username, String password, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, cls, configLocation);
+        bean.setUsername(username);
+        bean.setPassword(password);
+        bean.setProviders(providers);
+        return bean.create(cls);
+    }
+    
+    /**
      * Creates a proxy using user resource model
      * @param baseAddress baseAddress
      * @param cls proxy class, if not interface then a CGLIB proxy will be created

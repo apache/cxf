@@ -205,6 +205,25 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Creates WebClient which will do basic authentication
+     * @param baseAddress baseAddress
+     * @param providers list of providers
+     * @param username username
+     * @param password password
+     * @param configLocation classpath location of the configuration resource, can be null  
+     * @return WebClient instance
+     */
+    public static WebClient create(String baseAddress, List<?> providers, 
+                                   String username, String password, String configLocation) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
+        
+        bean.setUsername(username);
+        bean.setPassword(password);
+        bean.setProviders(providers);
+        return bean.createWebClient();
+    }
+    
+    /**
      * Creates WebClient, baseURI will be set to Client currentURI
      * @param client existing client
      */
