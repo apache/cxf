@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.sts.asymmetric;
 
 import java.net.URL;
+import java.security.cert.X509Certificate;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -31,6 +32,11 @@ import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.CryptoType;
 
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -151,6 +157,16 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         if (standalone) {
             TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1EncryptedPort, STSPORT2);
         }
+        
+        // Set the X509Certificate manually on the STSClient (just to test that we can)
+        BindingProvider bindingProvider = (BindingProvider)asymmetricSaml1EncryptedPort;
+        STSClient stsClient = 
+            (STSClient)bindingProvider.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("myclientkey");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        stsClient.setUseKeyCertificate(certs[0]);
         
         doubleIt(asymmetricSaml1EncryptedPort, 40);
         
