@@ -1759,7 +1759,7 @@ public final class JAXRSUtils {
     public static ResponseBuilder fromResponse(Response response) {
         ResponseBuilder rb = toResponseBuilder(response.getStatus());
         rb.entity(response.getEntity());
-        for (Map.Entry<String, List<Object>> entry : response.getHeaders().entrySet()) {
+        for (Map.Entry<String, List<Object>> entry : response.getMetadata().entrySet()) {
             List<Object> values = entry.getValue();
             for (Object value : values) {
                 rb.header(entry.getKey(), value);
@@ -1780,7 +1780,7 @@ public final class JAXRSUtils {
                             ReflectionUtil.accessDeclaredField(f, response, Annotation[].class);
                         ((ResponseImpl)r).setEntityAnnotations(fieldAnnotations);
                     } catch (Throwable ex) {
-                        LOG.warning("Custom annotations if any may can not be copied");
+                        LOG.warning("Custom annotations if any can not be copied");
                     }
                     break;
                 }
