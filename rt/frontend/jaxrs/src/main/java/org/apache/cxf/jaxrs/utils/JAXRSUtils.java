@@ -103,6 +103,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -1290,7 +1291,7 @@ public final class JAXRSUtils {
                 } catch (WebApplicationException ex) {
                     throw ex;
                 } catch (Exception ex) {
-                    throw new WebApplicationException(ex);
+                    throw new Fault(ex);
                 }
             } else {
                 String errorMessage = new org.apache.cxf.common.i18n.Message("NO_MSG_READER",
