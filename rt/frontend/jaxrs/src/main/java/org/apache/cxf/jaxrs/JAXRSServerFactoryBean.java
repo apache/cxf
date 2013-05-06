@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,8 +96,11 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      */
     public void setApplication(Application app) {
         appProvider = new ProviderInfo<Application>(app, getBus());
+        List<String> appNameBindings = AnnotationUtils.getNameBindings(app.getClass().getAnnotations());
         for (ClassResourceInfo cri : getServiceFactory().getClassResourceInfo()) {
-            cri.setNameBindings(AnnotationUtils.getNameBindings(app.getClass().getAnnotations()));
+            List<String> clsNameBindings = new LinkedList<String>(appNameBindings);
+            clsNameBindings.addAll(AnnotationUtils.getNameBindings(cri.getServiceClass().getAnnotations()));
+            cri.setNameBindings(clsNameBindings);
         }
     }
     
