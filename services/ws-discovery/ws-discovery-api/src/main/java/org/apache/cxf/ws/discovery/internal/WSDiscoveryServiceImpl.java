@@ -572,7 +572,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             QName snr = EndpointReferenceUtils.getServiceName(ref, bus);
             QName snc = EndpointReferenceUtils.getServiceName(cref, bus);
             String addr = EndpointReferenceUtils.getAddress(ref);
-            String addc = EndpointReferenceUtils.getAddress(ref);
+            String addc = EndpointReferenceUtils.getAddress(cref);
             
             if (addr == null) {
                 return false;
