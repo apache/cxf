@@ -22,6 +22,11 @@ package org.apache.cxf.systest.jaxrs.security;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientLifeCycleListener;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -33,7 +38,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 
 public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookHttpsServer.PORT;
@@ -128,8 +132,14 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         Object bean = ctx.getBean("bookService.proxyFactory");
         assertNotNull(bean);
         JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
-        
+        Bus bus = cfb.getBus();
+        ClientLifeCycleManager manager = bus.getExtension(ClientLifeCycleManager.class);
+        TestClientLifeCycleListener listener = new TestClientLifeCycleListener();
+        manager.registerListener(listener);
         BookStore bs = cfb.create(BookStore.class);
+        assertNotNull(listener.getEp());
+        assertEquals("{http://service.rs}BookService", 
+                     listener.getEp().getEndpointInfo().getName().toString());
         assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
         Book b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
@@ -203,5 +213,26 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         public void setId(long id) {
             this.id = id;
         }
+    }
+    
+    public static class TestClientLifeCycleListener implements ClientLifeCycleListener {
+
+        private Endpoint ep;
+        
+        @Override
+        public void clientCreated(Client client) {
+            this.ep = client.getEndpoint();
+        }
+
+        @Override
+        public void clientDestroyed(Client client) {
+            ep = null;
+            
+        }
+
+        public Endpoint getEp() {
+            return ep;
+        }
+        
     }
 }

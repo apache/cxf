@@ -88,11 +88,36 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
     
     @Override
     public Endpoint getEndpoint() {
-        throw new UnsupportedOperationException();
+        return config.getEndpoint();
     }
     
     @Override
     public void destroy() {
+        //complete, the actual JAX-RS Client will be closed via a different path 
+    }
+    
+    @Override
+    public Map<String, Object> getRequestContext() {
+        return config.getRequestContext();
+    }
+
+    @Override
+    public Map<String, Object> getResponseContext() {
+        return config.getResponseContext();
+    }
+    
+    @Override
+    public void setThreadLocalRequestContext(boolean b) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isThreadLocalRequestContext() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setExecutor(Executor executor) {
         throw new UnsupportedOperationException();
     }
     
@@ -184,28 +209,4 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Map<String, Object> getRequestContext() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Map<String, Object> getResponseContext() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setThreadLocalRequestContext(boolean b) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isThreadLocalRequestContext() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setExecutor(Executor executor) {
-        throw new UnsupportedOperationException();
-    }
 }
