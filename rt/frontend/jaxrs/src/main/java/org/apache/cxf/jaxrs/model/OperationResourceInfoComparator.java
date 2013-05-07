@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -36,14 +37,10 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
     private boolean getMethod;
     private Message message;
     private ResourceComparator rc;  
-    private MediaType contentType;
-    private List<MediaType> acceptTypes;
+    private MediaType contentType = MediaType.WILDCARD_TYPE;
+    private List<MediaType> acceptTypes = Collections.singletonList(MediaType.WILDCARD_TYPE);
 
-    public OperationResourceInfoComparator(Message m, 
-                                           String httpMethod,
-                                           boolean getMethod,
-                                           MediaType contentType,
-                                           List<MediaType> acceptTypes) {
+    public OperationResourceInfoComparator(Message m, String method) {
         this.message = m;
         if (message != null) {
             Object o = m.getExchange().get(Endpoint.class).get("org.apache.cxf.jaxrs.comparator");
@@ -51,9 +48,17 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                 rc = (ResourceComparator)o;
             }
         }
+        this.httpMethod = method;
+    }
+    
+    public OperationResourceInfoComparator(Message m, 
+                                           String httpMethod,
+                                           boolean getMethod,
+                                           MediaType contentType,
+                                           List<MediaType> acceptTypes) {
+        this(m, httpMethod);
         this.contentType = contentType;
         this.acceptTypes = acceptTypes;
-        this.httpMethod = httpMethod;
         this.getMethod = getMethod;
     }
     
@@ -85,7 +90,6 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         }
         
         if (result == 0 && !getMethod) {
-        
             result = JAXRSUtils.compareSortedConsumesMediaTypes(
                           e1.getConsumeTypes(), 
                           e2.getConsumeTypes(),

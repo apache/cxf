@@ -19,11 +19,19 @@
 
 package org.apache.cxf.jaxrs.model;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.easymock.EasyMock;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -85,4 +93,60 @@ public class OperationResourceInfoTest extends Assert {
                      "text/xml", ctypes.get(0).toString());
     }
 
+    @Test
+    public void testComparator1() throws Exception {
+        OperationResourceInfo ori1 = new OperationResourceInfo(
+                                                               TestClass.class.getMethod("doIt", new Class[]{}), 
+                                                               new ClassResourceInfo(TestClass.class));
+        ori1.setURITemplate(new URITemplate("/"));
+        
+        OperationResourceInfo ori2 = new OperationResourceInfo(
+                                                               TestClass.class.getMethod("doThat", new Class[]{}), 
+                                                               new ClassResourceInfo(TestClass.class));
+        
+        ori2.setURITemplate(new URITemplate("/"));
+        
+        OperationResourceInfoComparator cmp = new OperationResourceInfoComparator(null, null);
+        
+        
+        int result = cmp.compare(ori1,  ori2);
+        assertEquals(0, result);
+    }
+    
+    @Test
+    public void testComparator2() throws Exception {
+        Message m = createMessage();
+        
+        OperationResourceInfo ori1 = new OperationResourceInfo(
+                                                               TestClass.class.getMethod("doIt", new Class[]{}), 
+                                                               new ClassResourceInfo(TestClass.class));
+        ori1.setURITemplate(new URITemplate("/"));
+        
+        OperationResourceInfo ori2 = new OperationResourceInfo(
+                                                               TestClass.class.getMethod("doThat", new Class[]{}), 
+                                                               new ClassResourceInfo(TestClass.class));
+        
+        ori2.setURITemplate(new URITemplate("/"));
+        
+        OperationResourceInfoComparator cmp = new OperationResourceInfoComparator(m, "POST", false,
+            MediaType.WILDCARD_TYPE, Collections.singletonList(MediaType.WILDCARD_TYPE));
+        
+        
+        int result = cmp.compare(ori1,  ori2);
+        assertEquals(0, result);
+    }
+    
+    
+    private Message createMessage() {
+        Message m = new MessageImpl();
+        Exchange e = new ExchangeImpl();
+        m.setExchange(e);
+        e.setInMessage(m);
+        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.replay(endpoint);
+        e.put(Endpoint.class, endpoint);
+        return m;
+    }
 }
