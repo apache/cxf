@@ -232,4 +232,8 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     public Map<String, Object> getRequestContext() {
         return requestContext;
     }
+    
+    public Endpoint getEndpoint() {
+        return conduitSelector == null ? null : conduitSelector.getEndpoint();
+    }
 }
