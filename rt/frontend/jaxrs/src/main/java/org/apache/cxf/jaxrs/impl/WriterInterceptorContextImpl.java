@@ -25,11 +25,13 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl 
@@ -43,12 +45,11 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
                                         Class<?> cls,
                                         Type type,
                                         Annotation[] anns,
-                                        MediaType mt,
                                         OutputStream os,
                                         Message message,
                                         List<WriterInterceptor> writers) {
     //CHECKSTYLE:ON    
-        super(cls, type, anns, mt, message);
+        super(cls, type, anns, message);
         this.entity = entity;
         this.os = os;
         this.writers = writers;
@@ -92,6 +93,19 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
         this.os = stream;
         m.put(OutputStream.class, stream);
 
+    }
+
+
+    @Override
+    public MediaType getMediaType() {
+        Object value = getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+        return value instanceof MediaType ? (MediaType)value : JAXRSUtils.toMediaType((String)value);
+    }
+
+
+    @Override
+    public void setMediaType(MediaType mt) {
+        getHeaders().putSingle(HttpHeaders.CONTENT_TYPE, mt);
     }
 
 }

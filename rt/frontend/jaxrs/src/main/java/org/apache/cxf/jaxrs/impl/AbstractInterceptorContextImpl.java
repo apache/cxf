@@ -21,8 +21,6 @@ package org.apache.cxf.jaxrs.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.cxf.message.Message;
 
 public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
@@ -30,16 +28,13 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
     private Class<?> cls;
     private Type type;
     private Annotation[] anns;
-    private MediaType mt;
     public AbstractInterceptorContextImpl(Class<?> cls,
                                         Type type,
                                         Annotation[] anns,
-                                        MediaType mt,
                                         Message message) {
         super(message);
         this.cls = cls;
         this.type = type;
-        this.mt = mt;
         this.anns = anns;
     }
     
@@ -55,10 +50,6 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
         return type;
     }
 
-    public MediaType getMediaType() {
-        return mt;
-    }
-
     public void setAnnotations(Annotation[] annotations) {
         anns = annotations;
 
@@ -66,10 +57,6 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
 
     public void setGenericType(Type genType) {
         type = genType;
-    }
-
-    public void setMediaType(MediaType mtype) {
-        mt = mtype;
     }
 
     public void setType(Class<?> ctype) {

@@ -1321,7 +1321,6 @@ public final class JAXRSUtils {
             ReaderInterceptorContext context = new ReaderInterceptorContextImpl(targetTypeClass, 
                                                                             parameterType, 
                                                                             parameterAnnotations, 
-                                                                            mediaType,
                                                                             is,
                                                                             m,
                                                                             readers);
@@ -1354,8 +1353,7 @@ public final class JAXRSUtils {
             WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,
                                                                                 type, 
                                                                             genericType, 
-                                                                            annotations, 
-                                                                            mediaType,
+                                                                            annotations,
                                                                             entityStream,
                                                                             message,
                                                                             writers);
