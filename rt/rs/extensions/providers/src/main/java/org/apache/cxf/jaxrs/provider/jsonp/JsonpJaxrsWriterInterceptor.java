@@ -29,7 +29,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-
+import org.apache.cxf.phase.PhaseInterceptorChain;
 /**
  * Appends the jsonp callback to json responses when the '_jsonp' parameter has been set in the querystring.
  */
@@ -43,7 +43,7 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
   
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-        String callback = getCallbackValue(JAXRSUtils.getCurrentMessage());
+        String callback = getCallbackValue(PhaseInterceptorChain.getCurrentMessage());
         if (!StringUtils.isEmpty(callback)) {
             context.getHeaders().putSingle(Message.CONTENT_TYPE, 
                                            JAXRSUtils.toMediaType(getMediaType()));
