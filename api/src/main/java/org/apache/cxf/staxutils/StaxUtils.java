@@ -740,6 +740,9 @@ public final class StaxUtils {
             if (nsPrefix == null) {
                 nsPrefix = "";
             }
+            if (nsURI == null) {
+                nsURI = "";
+            }
             if (nsPrefix.length() == 0) {
                 writer.writeDefaultNamespace(nsURI);
                 writer.setDefaultNamespace(nsURI);
