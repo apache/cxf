@@ -468,7 +468,13 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
         results.add(0, rResult);
 
-        for (WSSecurityEngineResult o : wsResult) {
+        for (int i = wsResult.size() - 1; i >= 0; i--) {
+            WSSecurityEngineResult o = wsResult.get(i);
+            Integer action = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
+            if (action == WSConstants.ENCR) {
+                // Don't try to parse a Principal for the Decryption case
+                continue;
+            }
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             final Subject subject = (Subject)o.get(WSSecurityEngineResult.TAG_SUBJECT);
             if (subject != null) {
