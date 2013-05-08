@@ -44,6 +44,7 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -116,7 +117,9 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             if (getSecurityProperties() != null) {
                 inboundWSSec = WSSec.getInboundWSSec(getSecurityProperties());
             } else {
-                inboundWSSec = WSSec.getInboundWSSec(getProperties());
+                WSSSecurityProperties convertedProperties = 
+                    ConfigurationConverter.convert(getProperties());
+                inboundWSSec = WSSec.getInboundWSSec(convertedProperties);
             }
             
             SecurityEventListener securityEventListener = 

@@ -39,6 +39,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -128,7 +129,9 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             if (getSecurityProperties() != null) {
                 outboundWSSec = WSSec.getOutboundWSSec(getSecurityProperties());
             } else {
-                outboundWSSec = WSSec.getOutboundWSSec(getProperties());
+                WSSSecurityProperties convertedProperties = 
+                    ConfigurationConverter.convert(getProperties());
+                outboundWSSec = WSSec.getOutboundWSSec(convertedProperties);
             }
             
             newXMLStreamWriter = 
