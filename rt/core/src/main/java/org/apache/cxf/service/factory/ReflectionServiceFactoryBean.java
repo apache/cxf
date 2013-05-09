@@ -147,6 +147,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     public static final String METHOD_ANNOTATIONS = "method.return.annotations";
     public static final String PARAM_ANNOTATION = "parameter.annotations";
     private static final Logger LOG = LogUtils.getL7dLogger(ReflectionServiceFactoryBean.class);
+    private static Class<? extends DataBinding> defaultDatabindingClass;
 
     protected String wsdlURL;
 
@@ -193,7 +194,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
 
     protected DataBinding createDefaultDataBinding() {
-
         Object obj = null;
         Class<? extends DataBinding> cls = null;
 
@@ -216,10 +216,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (cls == null && getBus() != null) {
             obj = getBus().getProperty(DataBinding.class.getName());
         }
-        if (obj == null) {
-            obj = "org.apache.cxf.jaxb.JAXBDataBinding";
-        }
         try {
+            if (obj == null && cls == null) {
+                cls = getJAXBClass();            
+            }
             if (obj instanceof String) {
                 cls = ClassLoaderUtils.loadClass(obj.toString(), getClass(), DataBinding.class);
             } else if (obj instanceof Class) {
@@ -236,6 +236,17 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             throw new ServiceConstructionException(e);
         }
     }
+    private static synchronized Class<? extends DataBinding> getJAXBClass() throws ClassNotFoundException {
+        if (defaultDatabindingClass == null) {
+            defaultDatabindingClass = ClassLoaderUtils.loadClass("org.apache.cxf.jaxb.JAXBDataBinding",
+                                                                 ReflectionServiceFactoryBean.class,
+                                                                 DataBinding.class); 
+        }
+        return defaultDatabindingClass;
+    }
+
+
+
     public void reset() {
         if (!dataBindingSet) {
             setDataBinding(null);
@@ -266,8 +277,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             getService().setDataBinding(getDataBinding());
         }
 
-        MethodDispatcher m = getMethodDispatcher();
-        getService().put(MethodDispatcher.class.getName(), m);
+        getService().put(MethodDispatcher.class.getName(), getMethodDispatcher());
         createEndpoints();
 
         fillInSchemaCrossreferences();
@@ -426,8 +436,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         initializeWSDLOperations();
 
         Set<Class<?>> cls = getExtraClass();
-        for (ServiceInfo si : getService().getServiceInfos()) {
-            if (cls != null && !cls.isEmpty()) {
+        if (cls != null && !cls.isEmpty()) {
+            for (ServiceInfo si : getService().getServiceInfos()) {
                 si.setProperty(EXTRA_CLASS, cls);
             }
         }
@@ -532,14 +542,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     protected void initializeServiceModel() {
-        String wsdlurl = getWsdlURL();
-
         if (isFromWsdl()) {
-            buildServiceFromWSDL(wsdlurl);
+            buildServiceFromWSDL(getWsdlURL());
         } else if (getServiceClass() != null) {
             buildServiceFromClass();
         } else {
-            throw new ServiceConstructionException(new Message("NO_WSDL_NO_SERVICE_CLASS_PROVIDED", LOG, wsdlurl));
+            throw new ServiceConstructionException(new Message("NO_WSDL_NO_SERVICE_CLASS_PROVIDED", LOG, getWsdlURL()));
         }
 
         if (isValidate()) {
@@ -613,19 +621,15 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     private void validateSchemas(XmlSchemaValidationManager xsdValidator,
                                  SchemaCollection xmlSchemaCollection) {
-        final boolean[] anyErrors = new boolean[1];
         final StringBuilder errorBuilder = new StringBuilder();
-        anyErrors[0] = false;
         xsdValidator.validateSchemas(xmlSchemaCollection.getXmlSchemaCollection(), new DOMErrorHandler() {
-
             public boolean handleError(DOMError error) {
-                anyErrors[0] = true;
                 errorBuilder.append(error.getMessage());
                 LOG.warning(error.getMessage());
                 return true;
             }
         });
-        if (anyErrors[0]) {
+        if (errorBuilder.length() > 0) {
             throw new ServiceConstructionException(new Message("XSD_VALIDATION_ERROR", LOG,
                                                                errorBuilder.toString()));
         }
@@ -785,11 +789,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
         sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, origOp, method, origOp.getInput());
         // Initialize return type
-        Class<?> paramType = method.getReturnType();
-        Type genericType = method.getGenericReturnType();
-
         if (o.hasOutput()
-            && !initializeParameter(o, method, -1, paramType, genericType)) {
+            && !initializeParameter(o, method, -1, method.getReturnType(), method.getGenericReturnType())) {
             return false;
         }
         if (origOp.hasOutput()) {
