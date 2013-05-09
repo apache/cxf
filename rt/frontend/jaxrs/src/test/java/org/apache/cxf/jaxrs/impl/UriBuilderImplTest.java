@@ -158,11 +158,87 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testResolveTemplateFromEncodedMap() {
+        String expected = 
+            "path-rootless%2Ftest2/x%25yz/%2Fpath-absolute%2F%2525test1/fred@example.com/x%25yz";
+            
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("v", new StringBuilder("path-rootless%2Ftest2"));
+        map.put("w", new StringBuilder("x%yz"));
+        map.put("x", new Object() {
+            public String toString() {
+                return "%2Fpath-absolute%2F%2525test1";
+            }
+        });
+        map.put("y", "fred@example.com");
+        UriBuilder builder = UriBuilder.fromPath("").path("{v}/{w}/{x}/{y}/{w}");
+        builder = builder.resolveTemplatesFromEncoded(map);
+        URI uri = builder.build();
+        assertEquals(expected, uri.getRawPath());        
+    }
+    
+    @Test
     public void testResolveTemplateFromMap() {
         URI uri;
         uri = UriBuilder.fromPath("/{a}/{b}").resolveTemplate("a", "1")
             .buildFromMap(Collections.singletonMap("b", "2"));
         assertEquals("/1/2", uri.toString());        
+    }
+    
+    @Test
+    public void testResolveTemplateFromMap2() {
+        String expected = 
+            "path-rootless%2Ftest2/x%25yz/%2Fpath-absolute%2F%2525test1/fred@example.com/x%25yz";
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("x", new StringBuilder("x%yz"));
+        map.put("y", new StringBuffer("/path-absolute/%25test1"));
+        map.put("z", new Object() {
+            public String toString() {
+                return "fred@example.com";
+            }
+        });
+        map.put("w", "path-rootless/test2");
+        UriBuilder builder = UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}");
+        URI uri = builder.resolveTemplates(map).build();
+        
+        assertEquals(expected, uri.getRawPath());        
+    }
+    
+    @Test
+    public void testResolveTemplatesMapBooleanSlashEncoded() throws Exception {
+        String expected = 
+            "path-rootless%2Ftest2/x%25yz/%2Fpath-absolute%2F%2525test1/fred@example.com/x%25yz";
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("x", new StringBuilder("x%yz"));
+        map.put("y", new StringBuffer("/path-absolute/%25test1"));
+        map.put("z", new Object() {
+            public String toString() {
+                return "fred@example.com";
+            }
+        });
+        map.put("w", "path-rootless/test2");
+        UriBuilder builder = UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}");
+        URI uri = builder.resolveTemplates(map, true).build();
+        assertEquals(expected, uri.getRawPath());
+    }
+
+    @Test
+    public void testResolveTemplatesMapBooleanSlashNotEncoded() throws Exception {
+        String expected = 
+            "path-rootless/test2/x%25yz//path-absolute/test1/fred@example.com/x%25yz";
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("x", new StringBuilder("x%yz"));
+        map.put("y", new StringBuffer("/path-absolute/test1"));
+        map.put("z", new Object() {
+            public String toString() {
+                return "fred@example.com";
+            }
+        });
+        map.put("w", "path-rootless/test2");
+        UriBuilder builder = UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}");
+        URI uri = builder.resolveTemplates(map, false).build();
+        assertEquals(expected, uri.getRawPath());
     }
     
     @Test
@@ -384,6 +460,37 @@ public class UriBuilderImplTest extends Assert {
         URI uri = new URI("http://bar/foo");
         URI newUri = new UriBuilderImpl(uri).matrixParam("q").build();   
         assertEquals("URI is not built correctly", "http://bar/foo;q", newUri.toString());
+    }
+    
+    @Test
+    public void replaceMatrixParamWithEmptyPathTest() throws Exception {
+        String name = "name";
+        String expected = "http://localhost:8080;name=x;name=y;name=y%20x;name=x%25y;name=%20";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080;name=x=;name=y?;name=x y;name=&")
+            .replaceMatrixParam(name, "x", "y", "y x", "x%y", "%20")
+            .build();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void replaceMatrixWithEmptyPathTest() throws Exception {
+        String expected = "http://localhost:8080;name=x;name=y;name=y%20x;name=x%25y;name=%20";
+        String value = "name=x;name=y;name=y x;name=x%y;name= ";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080;name=x=;name=y?;name=x y;name=&")
+                                .replaceMatrix(value).build();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testAddMatrixToEmptyPath() throws Exception {
+        String name = "name";
+        String expected = "http://localhost:8080;name=x;name=y";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080").matrixParam(name, "x", "y")
+            .build();
+        assertEquals(expected, uri.toString());
     }
     
     @Test
@@ -1126,6 +1233,18 @@ public class UriBuilderImplTest extends Assert {
         URI uri = UriBuilder.fromPath(path1).path(path2).build(new Object[]{"x/y"}, false);
         assertEquals(uri.toString(), expected);        
     }
+
+    @Test
+    public void testInvalidUriReplacement() throws Exception {
+        UriBuilder builder = UriBuilder.fromUri(new URI("news:comp.lang.java"));
+        try {
+            builder.uri("").build();
+            fail("IAE exception is expected");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
     
     @Test
     public void testNullSegment() {

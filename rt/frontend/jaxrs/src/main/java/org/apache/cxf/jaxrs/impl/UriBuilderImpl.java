@@ -51,6 +51,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private int port = -1;
     private String host;
     private List<PathSegment> paths = new ArrayList<PathSegment>();
+    private boolean originalPathEmpty;
     private boolean leadingSlash;
     private String fragment;
     private String schemeSpecificPart; 
@@ -159,7 +160,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             return buildURIFromEncoded(thePath, theQuery, theFragment);
         } else if (!isSchemeOpaque()) {
             if ((scheme != null || host != null || userInfo != null)
-                && thePath.length() != 0 && !thePath.startsWith("/")) {
+                && thePath.length() != 0 && !(thePath.startsWith("/") || thePath.startsWith(";"))) {
                 thePath = "/" + thePath;
             }
             try {
@@ -205,7 +206,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 b.append(':').append(port);    
             }
             if (thePath != null && thePath.length() > 0) {
-                b.append(thePath.startsWith("/") || b.length() == 0 ? thePath : '/' + thePath);
+                b.append(thePath.startsWith("/") || b.length() == 0 || originalPathEmpty 
+                    ? thePath : '/' + thePath);
             }
             if (theQuery != null && theQuery.length() != 0) {
                 b.append('?').append(theQuery);
@@ -289,24 +291,27 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             ? Collections.<String>emptySet() : new HashSet<String>();
         for (String var : uniqueVars) {
             
-            boolean isPathEncVar = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
+            boolean resolvedPathVarHasToBeEncoded = !isQuery && alreadyResolvedTsPathEnc.containsKey(var);
+            boolean varValueHasToBeEncoded = resolvedPathVarHasToBeEncoded || alreadyResolvedTs.containsKey(var);
             
-            boolean isVarEncoded = isPathEncVar || alreadyResolvedTs.containsKey(var) ? false : true;
-            Map<String, Object> resolved = isVarEncoded ? alreadyResolvedTsEnc 
-                : isPathEncVar ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
+            Map<String, Object> resolved = !varValueHasToBeEncoded ? alreadyResolvedTsEnc 
+                : resolvedPathVarHasToBeEncoded ? alreadyResolvedTsPathEnc : alreadyResolvedTs;
             Object oval = resolved.isEmpty() ? null : resolved.remove(var);
+            boolean valueFromEncodedMap = false;
             if (oval == null) {
                 if (allowUnresolved) {
                     continue;
                 }
                 oval = values[idx++];
-            } 
+            } else {
+                valueFromEncodedMap = resolved == alreadyResolvedTsEnc;
+            }
             
             if (oval == null) {
                 throw new IllegalArgumentException("No object for " + var);
             }
             String value = oval.toString();
-            if (fromEncoded) {
+            if (fromEncoded || valueFromEncodedMap) {
                 value = HttpUtils.encodePartiallyEncoded(value, isQuery);
             } else {
                 value = isQuery ? HttpUtils.queryEncode(value) : HttpUtils.pathEncode(value);
@@ -314,7 +319,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             
             varValueMap.put(var, value);
             
-            if (!isQuery && (isPathEncVar || encodePathSlash)) {
+            if (!isQuery && (resolvedPathVarHasToBeEncoded 
+                || encodePathSlash && !varValueHasToBeEncoded)) {
                 pathEncodeVars.add(var);
             }
             
@@ -418,6 +424,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         builder.matrix = new MetadataMap<String, String>(matrix);
         builder.schemeSpecificPart = schemeSpecificPart;
         builder.leadingSlash = leadingSlash;
+        builder.originalPathEmpty = originalPathEmpty;
         return builder;
     }
 
@@ -504,7 +511,30 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             throw new IllegalArgumentException("path is null");
         }
         if (isAbsoluteUriPath(path)) {
-            uri(URI.create(path));
+            try {
+                URI uri = URI.create(path);
+                this.originalPathEmpty = StringUtils.isEmpty(uri.getPath());
+                uri(uri);
+            } catch (IllegalArgumentException ex) {
+                String pathEncoded = HttpUtils.pathEncode(path);
+                // Bad hack to bypass the TCK usage of bogus URI with empty paths containing matrix parameters, 
+                // which even URI class chokes upon; cheaper to do the following than try to challenge,
+                // given that URI RFC mentions the possibility of empty paths, though no word on the possibility of
+                // such empty paths having matrix parameters... 
+                int schemeIndex = pathEncoded.indexOf("//");
+                if (schemeIndex != -1) {
+                    int pathComponentStart = pathEncoded.indexOf("/", schemeIndex + 2);
+                    if (pathComponentStart == -1) {
+                        this.originalPathEmpty = true;
+                        pathComponentStart = pathEncoded.indexOf(";");
+                        if (pathComponentStart != -1) {
+                            pathEncoded = pathEncoded.substring(0, pathComponentStart)
+                                + "/" + pathEncoded.substring(pathComponentStart);
+                        }
+                    }
+                }
+                setUriParts(URI.create(pathEncoded));
+            } 
             return this;
         }
         
@@ -589,7 +619,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             port = uri.getPort();
             host = uri.getHost();
             if (rawPath != null) {
-                setPathAndMatrix(uri.getRawPath());
+                setPathAndMatrix(rawPath);
             }
             String rawQuery = uri.getRawQuery();
             if (rawQuery != null) {
@@ -607,7 +637,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     }
 
     private void setPathAndMatrix(String path) {
-        leadingSlash = path.startsWith("/");
+        leadingSlash = !originalPathEmpty && path.startsWith("/");
         paths = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty()) {
             matrix = paths.get(paths.size() - 1).getMatrixParameters();
@@ -673,7 +703,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     @Override
     public UriBuilder replaceMatrix(String matrixValues) throws IllegalArgumentException {
-        this.matrix = JAXRSUtils.getStructuredParams(matrixValues, ";", true, false);
+        String encodedMatrixValues = matrixValues != null ? HttpUtils.pathEncode(matrixValues) : null;
+        this.matrix = JAXRSUtils.getStructuredParams(encodedMatrixValues, ";", true, false);
         return this;
     }
 
@@ -837,6 +868,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
 
     public UriBuilder uri(String uriTemplate) throws IllegalArgumentException {
+        if (StringUtils.isEmpty(uriTemplate)) {
+            throw new IllegalArgumentException();
+        }
         try {
             return uri(URI.create(uriTemplate));
         } catch (Exception ex) {
