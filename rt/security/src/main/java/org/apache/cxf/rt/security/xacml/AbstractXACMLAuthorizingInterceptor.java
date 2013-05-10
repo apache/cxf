@@ -26,7 +26,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.AccessDeniedException;
 import org.apache.cxf.message.Message;
@@ -35,6 +39,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
+import org.apache.ws.security.util.DOM2Writer;
 import org.opensaml.xacml.ctx.DecisionType;
 import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResponseType;
@@ -85,6 +90,12 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
                 LOG.log(Level.FINE, "Unauthorized: " + e.getMessage(), e);
                 throw new AccessDeniedException("Unauthorized");
             }
+        } else {
+            LOG.log(
+                Level.FINE,
+                "The SecurityContext was not an instance of LoginSecurityContext. No authorization "
+                + "is possible as a result"
+            );
         }
         
         throw new AccessDeniedException("Unauthorized");
@@ -105,6 +116,11 @@ public abstract class AbstractXACMLAuthorizingInterceptor extends AbstractPhaseI
         Principal principal, List<String> roles, Message message
     ) throws Exception {
         RequestType request = requestBuilder.createRequest(principal, roles, message);
+        if (LOG.isLoggable(Level.FINE)) {
+            Document doc = DOMUtils.createDocument();
+            Element requestElement = OpenSAMLUtil.toDom(request, doc);
+            LOG.log(Level.FINE, DOM2Writer.nodeToString(requestElement));
+        }
         
         ResponseType response = performRequest(request, message);
         
