@@ -39,11 +39,13 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
@@ -106,7 +108,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         
         try {
             @SuppressWarnings("unchecked")
-            final List<SecurityEvent> requestSecurityEvents = 
+            List<SecurityEvent> requestSecurityEvents = 
                 (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
             
             translateProperties(soapMessage);
@@ -114,16 +116,22 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             configureCallbackHandler(soapMessage);
             
             InboundWSSec inboundWSSec = null;
+            WSSSecurityProperties secProps = null;
             if (getSecurityProperties() != null) {
-                inboundWSSec = WSSec.getInboundWSSec(getSecurityProperties());
+                secProps = getSecurityProperties();
             } else {
-                WSSSecurityProperties convertedProperties = 
-                    ConfigurationConverter.convert(getProperties());
-                inboundWSSec = WSSec.getInboundWSSec(convertedProperties);
+                secProps = ConfigurationConverter.convert(getProperties());
             }
             
             SecurityEventListener securityEventListener = 
-                configureSecurityEventListener(soapMessage, inboundWSSec);
+                configureSecurityEventListener(soapMessage, secProps);
+            
+            TLSSessionInfo tlsInfo = soapMessage.get(TLSSessionInfo.class);
+            if (tlsInfo != null) {
+                // TODO HttpsSecurityTokenEvent
+            }
+            
+            inboundWSSec = WSSec.getInboundWSSec(secProps);
             
             newXmlStreamReader = 
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListener);
@@ -137,12 +145,16 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             // processing in the WS-Stack.
         } catch (WSSecurityException e) {
             throw createSoapFault(soapMessage.getVersion(), e);
+        } catch (WSSPolicyException e) {
+            throw new SoapFault(e.getMessage(), e, soapMessage.getVersion().getSender());
         } catch (XMLStreamException e) {
             throw new SoapFault(new Message("STAX_EX", LOG), e, soapMessage.getVersion().getSender());
         }
     }
     
-    protected SecurityEventListener configureSecurityEventListener(SoapMessage msg, InboundWSSec inboundWSSec) {
+    protected SecurityEventListener configureSecurityEventListener(
+        SoapMessage msg, WSSSecurityProperties securityProperties
+    ) throws WSSPolicyException {
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
