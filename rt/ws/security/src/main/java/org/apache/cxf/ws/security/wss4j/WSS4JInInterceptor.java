@@ -594,7 +594,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     || WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(pc.getType())) {
                     for (String tokenId : store.getTokenIdentifiers()) {
                         SecurityToken token = store.getToken(tokenId);
-                        if (id.equals(token.getSHA1())) {
+                        if (token != null && id.equals(token.getSHA1())) {
                             pc.setKey(token.getSecret());
                             return;
                         }
