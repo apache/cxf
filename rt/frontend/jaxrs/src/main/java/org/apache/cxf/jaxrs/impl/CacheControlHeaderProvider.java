@@ -115,6 +115,9 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
     }
 
     private String[] getTokens(String c) {
+        if (c == null) {
+            throw new IllegalArgumentException();
+        }
         if (c.contains("\"")) {
             List<String> values = new ArrayList<String>(4);
             Matcher m = COMPLEX_HEADER_PATTERN.matcher(c);

@@ -93,7 +93,9 @@ public class LinkBuilderImpl implements Builder {
 
     @Override
     public Builder rel(String rel) {
-        return param(Link.REL, rel);
+        String exisingRel = params.get(Link.REL);
+        String newRel = exisingRel == null ? rel : exisingRel + " " + rel; 
+        return param(Link.REL, newRel);
     }
 
     @Override

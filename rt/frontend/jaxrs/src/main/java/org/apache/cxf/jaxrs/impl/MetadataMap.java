@@ -121,7 +121,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     
     public V getFirst(K key) {
         List<V> data = this.get(key);
-        return data == null ? null : data.get(0);
+        return data == null || data.isEmpty() ? null : data.get(0);
     }
 
     public void putSingle(K key, V value) {
@@ -150,7 +150,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public List<V> get(Object key) {
-        if (!caseInsensitive) {
+        if (!caseInsensitive || key == null) {
             return m.get(key);
         }
         K realKey = getMatchingKey(key);
@@ -159,7 +159,8 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     
     private K getMatchingKey(Object key) {
         for (K entry : m.keySet()) {
-            if (entry.toString().equalsIgnoreCase(key.toString())) {
+            if (entry != null && entry.toString().equalsIgnoreCase(key.toString())
+                || entry == null && key == null) {
                 return entry;
             }
         }
@@ -181,7 +182,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     public List<V> put(K key, List<V> value) {
-        K realKey = !caseInsensitive ? key : getMatchingKey(key);
+        K realKey = !caseInsensitive || key == null ? key : getMatchingKey(key);
         return m.put(realKey == null ? key : realKey, value);
     }
 

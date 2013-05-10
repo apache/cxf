@@ -22,6 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,9 +36,11 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -128,6 +131,12 @@ public class ResponseBuilderImplTest extends Assert {
         methods.add("HEAD");
         methods.add("GET");
         checkBuild(Response.ok().allow(methods).build(), 200, null, m);
+    }
+    
+    @Test
+    public void testAllowReSet() throws Exception {
+        Response r = Response.ok().allow("GET").allow((Set<String>)null).build();
+        assertNull(r.getMetadata().getFirst("Allow"));
     }
 
     @Test
@@ -327,6 +336,28 @@ public class ResponseBuilderImplTest extends Assert {
                    200, null, m);
     }
     
+    @Test
+    public void testVariant2() throws Exception {
+        List<String> encoding = Arrays.asList("gzip", "compress");
+        MediaType mt = MediaType.APPLICATION_JSON_TYPE;
+        ResponseBuilder rb = Response.ok();
+        rb = rb.variants(getVariantList(encoding, mt).toArray(new Variant[0]));
+        Response response = rb.build();
+        List<Object> enc = response.getHeaders().get(HttpHeaders.CONTENT_ENCODING);
+        assertTrue(encoding.containsAll(enc));
+        List<Object> ct = response.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+        assertTrue(ct.contains(mt.toString()));
+    }
+    
+    protected static List<Variant> getVariantList(List<String> encoding,
+                                                  MediaType... mt) {
+        return Variant.VariantListBuilder.newInstance()
+            .mediaTypes(mt)
+            .languages(new Locale("en", "US"), new Locale("en", "GB"), new Locale("zh", "CN"))
+            .encodings(encoding.toArray(new String[]{}))
+            .add()
+            .build();
+    }
 
     @Test
     public void testCreatedNoEntity() throws Exception {
@@ -353,12 +384,14 @@ public class ResponseBuilderImplTest extends Assert {
     public void testVariantsArray() throws Exception {
         
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
-        m.add("Accept", "application/json");
-        m.add("Accept", "application/xml");
+        m.add("Content-Type", "application/json");
+        m.add("Content-Language", "en_uk");
+        m.add("Content-Language", "en_gb");
         m.add("Vary", "Accept");
-
-        Variant json = new Variant(MediaType.APPLICATION_JSON_TYPE, (String)null, null);
-        Variant xml = new Variant(MediaType.APPLICATION_XML_TYPE, (String)null, null);
+        m.add("Vary", "Accept-Language");
+        
+        Variant json = new Variant(MediaType.APPLICATION_JSON_TYPE, "en_uk", null);
+        Variant xml = new Variant(MediaType.APPLICATION_JSON_TYPE, "en_gb", null);
 
         checkBuild(Response.ok().variants(json, xml).build(), 200, null, m);
     }
@@ -366,17 +399,17 @@ public class ResponseBuilderImplTest extends Assert {
     @Test
     public void testVariantsList() throws Exception {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
-        m.add("Accept", "text/xml");
-        m.add("Accept", "application/xml");
-        m.add("Accept-Language", "en_UK");
-        m.add("Accept-Language", "en_GB");
-        m.add("Accept-Encoding", "compress");
-        m.add("Accept-Encoding", "gzip");
+        m.add("Content-Type", "text/xml");
+        m.add("Content-Language", "en_UK");
+        m.add("Content-Language", "en_GB");
+        m.add("Content-Encoding", "compress");
+        m.add("Content-Encoding", "gzip");
         m.add("Vary", "Accept");
         m.add("Vary", "Accept-Language");
         m.add("Vary", "Accept-Encoding");
+        
         List<Variant> vts = Variant.VariantListBuilder.newInstance()
-            .mediaTypes(MediaType.TEXT_XML_TYPE, MediaType.APPLICATION_XML_TYPE).
+            .mediaTypes(MediaType.TEXT_XML_TYPE).
             languages(new Locale("en", "UK"), new Locale("en", "GB")).encodings("compress", "gzip").
                       add().build();
 

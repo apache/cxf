@@ -125,11 +125,12 @@ public final class ResponseImpl extends Response {
     }
     
     public Object getEntity() {
+        checkEntityIsClosed();
         return entity;
     }
 
     public boolean hasEntity() {
-        return entity != null;
+        return getEntity() != null;
     }
     
     public MultivaluedMap<String, Object> getMetadata() {
@@ -250,7 +251,8 @@ public final class ResponseImpl extends Response {
     }
 
     public Link.Builder getLinkBuilder(String relation) {
-        return Link.fromLink(getLink(relation));
+        Link link = getLink(relation);
+        return link == null ? null : Link.fromLink(link);
     }
 
     public Set<Link> getLinks() {

@@ -469,22 +469,14 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         if (method == null) {
             throw new IllegalArgumentException("method is null");
         }
-        Path foundAnn = null;
         for (Method meth : resource.getMethods()) {
             if (meth.getName().equals(method)) {
                 Path ann = meth.getAnnotation(Path.class);
-                if (foundAnn != null && ann != null) {
-                    throw new IllegalArgumentException("Multiple Path annotations for '" + method
-                                                       + "' overloaded method");
-                }
-                foundAnn = ann;
+                String path = ann == null ? "" : ann.value();
+                return path(resource).path(path);
             }
         }
-        if (foundAnn == null) {
-            throw new IllegalArgumentException("No Path annotation for '" + method + "' method");
-        }
-        // path(String) decomposes multi-segment path when necessary
-        return path(foundAnn.value());
+        throw new IllegalArgumentException("No Path annotation for '" + method + "' method");
     }
 
     @Override
@@ -516,6 +508,9 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 this.originalPathEmpty = StringUtils.isEmpty(uri.getPath());
                 uri(uri);
             } catch (IllegalArgumentException ex) {
+                if (!new URITemplate(path).getVariables().isEmpty()) {
+                    return uriAsTemplate(path);
+                }
                 String pathEncoded = HttpUtils.pathEncode(path);
                 // Bad hack to bypass the TCK usage of bogus URI with empty paths containing matrix parameters, 
                 // which even URI class chokes upon; cheaper to do the following than try to challenge,
@@ -874,10 +869,40 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         try {
             return uri(URI.create(uriTemplate));
         } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
+            if (new URITemplate(uriTemplate).getVariables().isEmpty()) {
+                throw new IllegalArgumentException(ex);    
+            } else {
+                return uriAsTemplate(uriTemplate);
+            }
+            
         }
     }
 
+    private UriBuilder uriAsTemplate(String uri) {
+        // This can be a start of replacing URI class Parser completely
+        // but it can be too complicated, the following code is needed for now 
+        // to deal with URIs containing template variables. 
+        int index = uri.indexOf(":");
+        if (index != -1) {
+            this.scheme = uri.substring(0, index);
+            uri = uri.substring(index + 1);
+            if (uri.indexOf("//") == 0) {
+                uri = uri.substring(2);
+                index = uri.indexOf("/");
+                if (index != -1) {
+                    String[] schemePair = uri.substring(0, index).split(":");
+                    this.host = schemePair[0];
+                    this.port = schemePair.length == 2 ? Integer.valueOf(schemePair[1]) : -1;
+                    
+                }
+                uri = uri.substring(index);
+            }
+            
+        }
+        setPathAndMatrix(uri);
+        return this;
+    }
+    
     //the clarified rules for encoding values of uri templates are:
     //  - encode each value contextually based on the URI component containing the template
     //  - in path templates, by default, encode also slashes (i.e. treat all path templates as 

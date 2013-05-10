@@ -52,6 +52,39 @@ public class MetadataMapTest extends Assert {
     }
     
     @Test
+    public void testPutSingleNullKey() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putSingle(null, "null");
+        m.putSingle(null, "null2");
+        assertEquals(1, m.get(null).size());
+        assertEquals("null2", m.getFirst(null));
+    }
+    
+    @Test
+    public void testPutSingleNullKeyCaseSensitive() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>(false, true);
+        m.putSingle(null, "null");
+        m.putSingle(null, "null2");
+        assertEquals(1, m.get(null).size());
+        assertEquals("null2", m.getFirst(null));
+    }
+    
+    @Test
+    public void testPutSingleNullKeyCaseSensitive2() {
+        MetadataMap<String, Object> map = new MetadataMap<String, Object>(false, true);
+        Object obj1 = new Object();
+        Object obj2 = new Object();
+        map.putSingle("key", obj1);
+        map.putSingle("key", obj2);
+        map.putSingle(null, obj2);
+        map.putSingle(null, obj1);
+        assertEquals(2, map.size());
+        assertEquals(1, map.get(null).size());
+        assertSame(map.getFirst("key"), obj2);
+        assertSame(map.getFirst(null), obj1);
+    }
+    
+    @Test
     public void testAddFirst() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.addFirst("baz", "foo");
@@ -296,6 +329,15 @@ public class MetadataMapTest extends Assert {
         List<Object> values = m2.get("baz");
         assertEquals(1, values.size());
         assertEquals("bar", values.get(0).toString());
+    }
+    
+    @Test
+    public void testGetFirstEmptyMap() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        assertNull(m.getFirst("key"));
+        m.add("key", "1");
+        m.get("key").clear();
+        assertNull(m.getFirst("key"));
     }
     
     @Test

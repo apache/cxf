@@ -20,20 +20,32 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
+import javax.ws.rs.core.Link.Builder;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Variant;
+import javax.ws.rs.core.Variant.VariantListBuilder;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -54,9 +66,32 @@ public class ResponseImplTest extends Assert {
     }
     
     @Test
+    @Ignore
+    public void testGetHeaderStringUsingHeaderDelegate() throws Exception {
+        StringBean bean = new StringBean("s3");
+        RuntimeDelegate original = RuntimeDelegate.getInstance();
+        RuntimeDelegate.setInstance(new StringBeanRuntimeDelegate(original));
+        try {
+            Response response = Response.ok().header(bean.get(), bean).build();
+            String header = response.getHeaderString(bean.get());
+            assertTrue(header.contains(bean.get()));
+        } finally {
+            RuntimeDelegate.setInstance(original);
+            StringBeanRuntimeDelegate.assertNotStringBeanRuntimeDelegate();
+        }
+    }
+    
+    @Test
     public void testHasEntity() {
         assertTrue(new ResponseImpl(200, "").hasEntity());
         assertFalse(new ResponseImpl(200).hasEntity());
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testGetEntityAfterClose() {
+        Response response = Response.ok("entity").build();
+        response.close();
+        response.getEntity();
     }
     
     @Test
@@ -86,12 +121,12 @@ public class ResponseImplTest extends Assert {
         assertEquals("", si.getReasonPhrase());
     }
     
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testHasEntityAfterClose() {
         Response r = new ResponseImpl(200, new ByteArrayInputStream("data".getBytes())); 
         assertTrue(r.hasEntity());
         r.close();
-        assertFalse(r.hasEntity());
+        r.hasEntity();
     }
     
     
@@ -204,6 +239,23 @@ public class ResponseImplTest extends Assert {
     }
     
     @Test
+    public void testGetNoLinkBuilder() throws Exception {
+        Response response = Response.ok().build();
+        Builder builder = response.getLinkBuilder("anyrelation");
+        assertNull(builder);
+    }
+    
+    protected static List<Variant> getVariantList(List<String> encoding,
+                                                  MediaType... mt) {
+        return Variant.VariantListBuilder.newInstance()
+            .mediaTypes(mt)
+            .languages(new Locale("en", "US"), new Locale("en", "GB"), new Locale("zh", "CN"))
+            .encodings(encoding.toArray(new String[]{}))
+            .add()
+            .build();
+    }
+    
+    @Test
     public void testGetLinks() {
         ResponseImpl ri = new ResponseImpl(200);
         MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
@@ -231,5 +283,107 @@ public class ResponseImplTest extends Assert {
         assertEquals("next", next.getRel());
         assertEquals("http://prev", prev.getUri().toString());
         assertEquals("prev", prev.getRel());
+    }
+    
+    public static class StringBean {
+        private String header;
+
+        public StringBean(String header) {
+            super();
+            this.header = header;
+        }
+        
+        public String get() {
+            return header;
+        }
+
+        public void set(String h) {
+            this.header = h;
+        }
+        
+        @Override
+        public String toString() {
+            return "StringBean. To get a value, use rather #get() method.";
+        }
+    }
+    
+    public static class StringBeanRuntimeDelegate extends RuntimeDelegate {
+        private RuntimeDelegate original;
+        public StringBeanRuntimeDelegate(RuntimeDelegate orig) {
+            super();
+            this.original = orig;
+            assertNotStringBeanRuntimeDelegate(orig);
+        }
+
+        @Override
+        public <T> T createEndpoint(Application arg0, Class<T> arg1)
+            throws IllegalArgumentException, UnsupportedOperationException {
+            return original.createEndpoint(arg0, arg1);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> arg0)
+            throws IllegalArgumentException {
+            if (arg0 == StringBean.class) {
+                return (HeaderDelegate<T>) new StringBeanHeaderDelegate();
+            } else {
+                return original.createHeaderDelegate(arg0);
+            }
+        }
+
+        @Override
+        public ResponseBuilder createResponseBuilder() {
+            return original.createResponseBuilder();
+        }
+
+        @Override
+        public UriBuilder createUriBuilder() {
+            return original.createUriBuilder();
+        }
+
+        @Override
+        public VariantListBuilder createVariantListBuilder() {
+            return original.createVariantListBuilder();
+        }
+
+        public RuntimeDelegate getOriginal() {
+            return original;
+        }
+
+        public static final void assertNotStringBeanRuntimeDelegate() {
+            RuntimeDelegate delegate = RuntimeDelegate.getInstance();
+            assertNotStringBeanRuntimeDelegate(delegate);
+        }
+
+        public static final void assertNotStringBeanRuntimeDelegate(RuntimeDelegate delegate) {
+            if (delegate instanceof StringBeanRuntimeDelegate) {
+                StringBeanRuntimeDelegate sbrd = (StringBeanRuntimeDelegate) delegate;
+                if (sbrd.getOriginal() != null) {
+                    RuntimeDelegate.setInstance(sbrd.getOriginal());
+                    throw new RuntimeException(
+                        "RuntimeDelegate.getInstance() is StringBeanRuntimeDelegate");
+                }
+            }
+        }
+
+        @Override
+        public Builder createLinkBuilder() {
+            return original.createLinkBuilder();
+        }
+    }
+    
+    public static class StringBeanHeaderDelegate implements HeaderDelegate<StringBean> {
+
+        @Override
+        public StringBean fromString(String string) throws IllegalArgumentException {
+            return new StringBean(string);
+        }
+
+        @Override
+        public String toString(StringBean bean) throws IllegalArgumentException {
+            return bean.get();
+        }
+
     }
 }

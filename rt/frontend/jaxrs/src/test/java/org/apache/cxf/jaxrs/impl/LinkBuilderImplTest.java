@@ -18,26 +18,55 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public class LinkBuilderImplTest {
+public class LinkBuilderImplTest extends Assert {
     
 
     @Test
-    public void build() throws Exception {
+    public void testBuild() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
         assertEquals("<http://example.com/page1>;rel=\"previous\"", prevLink.toString());
     }
+    
+    @Test
+    public void testbBuildObjects() throws Exception {
+        StringBuilder path1 = new StringBuilder().append("p1");
+        ByteArrayInputStream path2 = new ByteArrayInputStream("p2".getBytes()) {
+            @Override
+            public String toString() {
+                return "p2";
+            }
+        };
+        URI path3 = new URI("p3");
+        
+        String expected = "<" + "http://host.com:888/" + "p1/p2/p3" + ">";
+        Link.Builder builder = Link.fromUri("http://host.com:888/" + "{x1}/{x2}/{x3}");
+        Link link = builder.build(path1, path2, path3);
+        assertNotNull(link);
+        assertEquals(link.toString(), expected);
+    }
+    
+    @Test
+    public void testBuildManyRels() throws Exception {
+        Link.Builder linkBuilder = new LinkBuilderImpl();
+        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("1").rel("2").build();
+        assertEquals("<http://example.com/page1>;rel=\"1 2\"", prevLink.toString());
+    }
 
     @Test
-    public void relativeBuild() throws Exception {
+    public void testRelativeBuild() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
         URI base = URI.create("http://example.com/page2");
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").buildRelativized(base);
@@ -45,32 +74,27 @@ public class LinkBuilderImplTest {
     }
 
     @Test
-    public void severalAttributes() throws Exception {
+    public void testSeveralAttributes() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").title("A title").build();
         assertEquals("<http://example.com/page1>;rel=\"previous\";title=\"A title\"", prevLink.toString());
     }
-
+    
     @Test
-    public void copyOnBuild() throws Exception {
-        Link.Builder linkBuilder = new LinkBuilderImpl();
-        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
-        Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").build();
-
-        // Previously built link should not be affected by reuse of link builder
-        assertEquals("<http://example.com/page1>;rel=\"previous\"", prevLink.toString());
-        assertEquals("<http://example.com/page3>;rel=\"next\"", nextLink.toString());
+    public void testCreateFromMethod() throws Exception {
+        Link.Builder linkBuilder = Link.fromMethod(TestResource.class, "consumesAppJson");
+        Link link = linkBuilder.build();
+        String resource = link.toString();
+        assertTrue(resource.contains("<resource/consumesappjson>"));
     }
-
-    @Test
-    public void copyOnRelativeBuild() throws Exception {
-        Link.Builder linkBuilder = new LinkBuilderImpl();
-        URI base = URI.create("http://example.com/page2");
-        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").buildRelativized(base);
-        Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").buildRelativized(base);
-
-        // Previously built link should not be affected by reuse of link builder
-        assertEquals("<page1>;rel=\"previous\"", prevLink.toString());
-        assertEquals("<page3>;rel=\"next\"", nextLink.toString());
+    
+    @Path("resource")
+    public static class TestResource {
+        @POST
+        @Consumes(MediaType.APPLICATION_JSON)
+        @Path("consumesappjson")
+        public String consumesAppJson() {
+            return MediaType.APPLICATION_JSON;
+        }
     }
 }

@@ -187,17 +187,17 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
             MediaType mt = v.getMediaType();
             if (mt != null) {
                 acceptVary = HttpHeaders.ACCEPT;
-                addHeader(HttpHeaders.ACCEPT, mt);
+                addHeader(HttpHeaders.CONTENT_TYPE, mt);
             }
             Locale l = v.getLanguage();
             if (l != null) {
                 acceptLangVary = HttpHeaders.ACCEPT_LANGUAGE;
-                addHeader(HttpHeaders.ACCEPT_LANGUAGE, l);
+                addHeader(HttpHeaders.CONTENT_LANGUAGE, l);
             }
             String enc = v.getEncoding();
             if (enc != null) {
                 acceptEncVary = HttpHeaders.ACCEPT_ENCODING;
-                addHeader(HttpHeaders.ACCEPT_ENCODING, enc);
+                addHeader(HttpHeaders.CONTENT_ENCODING, enc);
             }
         }
         handleVaryValue(acceptVary, acceptLangVary, acceptEncVary);
@@ -272,7 +272,11 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
 
     @Override
     public ResponseBuilder allow(Set<String> methods) {
-        return allow(methods.toArray(new String[methods.size()]));
+        if (methods == null) {
+            return allow();
+        } else {
+            return allow(methods.toArray(new String[methods.size()]));
+        }
     }
 
     @Override

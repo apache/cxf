@@ -40,6 +40,20 @@ import org.junit.Test;
 public class UriBuilderImplTest extends Assert {
 
     @Test
+    public void testUriTemplate() throws Exception {
+        UriBuilder builder = UriBuilder.fromUri("http://localhost:8080/{a}/{b}");
+        URI uri = builder.build("1", "2");
+        assertEquals("http://localhost:8080/1/2", uri.toString());
+    }
+    
+    @Test
+    public void testUriTemplate2() throws Exception {
+        UriBuilder builder = UriBuilder.fromUri("http://localhost/{a}/{b}");
+        URI uri = builder.build("1", "2");
+        assertEquals("http://localhost/1/2", uri.toString());
+    }
+    
+    @Test
     public void testBuildWithNonEncodedSubstitutionValue() {
         URI uri;
         uri = UriBuilder.fromPath("/{a}").build("{}");
@@ -765,7 +779,7 @@ public class UriBuilderImplTest extends Assert {
     public void testAddPathClassMethod() throws Exception {
         URI uri = new URI("http://foo/");
         URI newUri = new UriBuilderImpl().uri(uri).path(BookStore.class, "updateBook").path("bar").build();
-        assertEquals("URI is not built correctly", new URI("http://foo/books/bar"), newUri);
+        assertEquals("URI is not built correctly", new URI("http://foo/bookstore/books/bar"), newUri);
     }
 
     @Test(expected = IllegalArgumentException.class)
