@@ -32,18 +32,16 @@ import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 
 public abstract class AbstractResponseContextImpl {
 
     protected Message m;
-    protected Response r;
-    public AbstractResponseContextImpl(Response r, Message m) {
+    protected ResponseImpl r;
+    public AbstractResponseContextImpl(ResponseImpl r, Message m) {
         this.m = m;
         this.r = r;
     }
@@ -61,7 +59,7 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public Object getEntity() {
-        return InjectionUtils.getEntity(r.getEntity());
+        return r.getEntity();
     }
 
        

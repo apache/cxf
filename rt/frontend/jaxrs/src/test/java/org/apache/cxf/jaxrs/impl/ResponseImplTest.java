@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Link.Builder;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
+import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
@@ -85,6 +87,23 @@ public class ResponseImplTest extends Assert {
     public void testHasEntity() {
         assertTrue(new ResponseImpl(200, "").hasEntity());
         assertFalse(new ResponseImpl(200).hasEntity());
+    }
+    
+    @Test
+    public void testGetEntityUnwrapped() {
+        final Book book = new Book();
+        Response r = Response.ok().entity(
+            new GenericEntity<Book>(book) {
+            }
+        ).build();
+        assertSame(book, r.getEntity());
+    }
+    
+    @Test
+    public void testGetEntity() {
+        final Book book = new Book();
+        Response r = Response.ok().entity(book).build();
+        assertSame(book, r.getEntity());
     }
     
     @Test(expected = IllegalStateException.class)

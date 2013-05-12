@@ -24,16 +24,16 @@ import java.util.Map;
 
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.impl.AbstractResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.message.Message;
 
 public class ClientResponseContextImpl extends AbstractResponseContextImpl 
     implements ClientResponseContext {
 
-    public ClientResponseContextImpl(Response r, 
+    public ClientResponseContextImpl(ResponseImpl r, 
                                      Message m) {
         super(r, m);
     }

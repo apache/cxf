@@ -33,8 +33,10 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.client.ClientProviderFactory;
+import org.apache.cxf.jaxrs.impl.ResponseImpl;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
@@ -55,8 +57,9 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
             ClientRequestContext reqContext = new ClientRequestContextImpl(inMessage.getExchange().getInMessage(),
                                                                         true);
             
-            ClientResponseContext respContext = new ClientResponseContextImpl(getResponse(inMessage), 
-                                                                              inMessage);
+            ClientResponseContext respContext = 
+                new ClientResponseContextImpl((ResponseImpl)getResponse(inMessage), 
+                                              inMessage);
             for (ProviderInfo<ClientResponseFilter> filter : filters) {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, inMessage);
                 try {
@@ -71,9 +74,9 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
     protected Response getResponse(Message inMessage) {
         Response resp = inMessage.getExchange().get(Response.class);
         if (resp != null) {
-            return resp;
+            return JAXRSUtils.copyResponseIfNeeded(resp);
         }
-        ResponseBuilder rb = Response.status((Integer)inMessage.get(Message.RESPONSE_CODE));
+        ResponseBuilder rb = JAXRSUtils.toResponseBuilder((Integer)inMessage.get(Message.RESPONSE_CODE));
         rb.entity(inMessage.get(InputStream.class));
         
         @SuppressWarnings("unchecked")

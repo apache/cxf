@@ -149,15 +149,15 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     @SuppressWarnings("unchecked")
     private void serializeMessage(ServerProviderFactory providerFactory,
                                   Message message, 
-                                  Response response, 
+                                  Response theResponse, 
                                   OperationResourceInfo ori,
                                   boolean firstTry) {
         
-        response = JAXRSUtils.copyResponseIfNeeded(response);
+        ResponseImpl response = (ResponseImpl)JAXRSUtils.copyResponseIfNeeded(theResponse);
         
         final Exchange exchange = message.getExchange();
         
-        Object entity = response.getEntity();
+        Object entity = response.getActualEntity();
         if (response.getStatus() == 200 && entity != null && firstTry 
             && ori != null && JAXRSUtils.headMethodPossible(ori.getHttpMethod(), 
                 (String)exchange.getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
@@ -171,7 +171,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         Annotation[] annotations = null;
         Annotation[] staticAnns = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
-        Annotation[] responseAnns = ((ResponseImpl)response).getEntityAnnotations();
+        Annotation[] responseAnns = response.getEntityAnnotations();
         if (responseAnns != null) {
             annotations = new Annotation[staticAnns.length + responseAnns.length];
             System.arraycopy(staticAnns, 0, annotations, 0, staticAnns.length);
@@ -180,9 +180,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             annotations = staticAnns;
         }
         
-        ((ResponseImpl)response).setStatus(
-            getActualStatus(response.getStatus(), entity));
-        ((ResponseImpl)response).setEntity(entity, annotations);
+        response.setStatus(getActualStatus(response.getStatus(), entity));
+        response.setEntity(entity, annotations);
         
         // Prepare the headers
         MultivaluedMap<String, Object> responseHeaders = response.getMetadata();
@@ -213,7 +212,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
    
         // Write the entity
-        entity = InjectionUtils.getEntity(response.getEntity());
+        entity = InjectionUtils.getEntity(response.getActualEntity());
         setResponseStatus(message, getActualStatus(response.getStatus(), entity));
         if (entity == null) {
             responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, "0");
@@ -241,8 +240,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         Class<?> targetType = InjectionUtils.getRawResponseClass(entity);
         Type genericType = 
-            InjectionUtils.getGenericResponseType(invoked, response.getEntity(), targetType, exchange);
-        annotations = ((ResponseImpl)response).getEntityAnnotations();        
+            InjectionUtils.getGenericResponseType(invoked, response.getActualEntity(), targetType, exchange);
+        annotations = response.getEntityAnnotations();        
         
         List<WriterInterceptor> writers = providerFactory
             .createMessageBodyWriterInterceptor(targetType, genericType, annotations, responseMediaType, message,

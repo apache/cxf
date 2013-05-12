@@ -50,6 +50,7 @@ import javax.ws.rs.ext.ReaderInterceptor;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -124,13 +125,17 @@ public final class ResponseImpl extends Response {
         };
     }
     
-    public Object getEntity() {
+    public Object getActualEntity() {
         checkEntityIsClosed();
         return entity;
     }
+    
+    public Object getEntity() {
+        return InjectionUtils.getEntity(getActualEntity());
+    }
 
     public boolean hasEntity() {
-        return getEntity() != null;
+        return getActualEntity() != null;
     }
     
     public MultivaluedMap<String, Object> getMetadata() {

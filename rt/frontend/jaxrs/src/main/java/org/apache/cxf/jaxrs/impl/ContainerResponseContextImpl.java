@@ -25,7 +25,6 @@ import java.lang.reflect.Type;
 
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
@@ -35,7 +34,7 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
 
     private Method invoked;
     
-    public ContainerResponseContextImpl(Response r, 
+    public ContainerResponseContextImpl(ResponseImpl r, 
                                         Message m,
                                         Method invoked) {
         super(r, m);
@@ -49,13 +48,13 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
 
     @Override
     public Class<?> getEntityClass() {
-        return InjectionUtils.getRawResponseClass(super.r.getEntity());
+        return InjectionUtils.getRawResponseClass(super.r.getActualEntity());
     }
 
     @Override
     public Type getEntityType() {
         return InjectionUtils.getGenericResponseType(invoked, 
-                                              super.r.getEntity(), 
+                                              super.r.getActualEntity(), 
                                               getEntityClass(), 
                                               super.m.getExchange());
     }

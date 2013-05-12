@@ -1704,7 +1704,7 @@ public final class JAXRSUtils {
     }
     
     public static void runContainerResponseFilters(ServerProviderFactory pf,
-                                                   Response r,
+                                                   ResponseImpl r,
                                                    Message m, 
                                                    OperationResourceInfo ori,
                                                    Method invoked) throws IOException, Throwable {
