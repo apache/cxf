@@ -504,6 +504,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookWithExceptionsNoMapper() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, 
+                                                    BookStore.class);
+        try {
+            store.getBookWithExceptions(true);
+            fail();
+        } catch (WebApplicationException ex) {
+            assertEquals("notReturned", ex.getResponse().getHeaderString("Status"));
+        }
+    }
+    
+    @Test
     public void testBookWithMultipleExceptions2() throws Exception {
         List<Object> providers = new LinkedList<Object>();
         providers.add(new NotReturnedExceptionMapper());
