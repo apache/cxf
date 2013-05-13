@@ -97,7 +97,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
                 return true;
             } catch (Exception e) {
                 // ignore and continue
-                LOG.warning(e.toString());
+                LOG.fine(e.toString());
             }
         }
         return false;
