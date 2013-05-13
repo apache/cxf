@@ -87,8 +87,12 @@ public class JAXRSInvoker extends AbstractInvoker {
         if (asyncResp != null) {
             AsyncResponseImpl asyncImpl = (AsyncResponseImpl)asyncResp;
             asyncImpl.prepareContinuation();
-            asyncImpl.handleTimeout();
-            return handleAsyncResponse(exchange, asyncImpl);
+            try {
+                asyncImpl.handleTimeout();
+                return handleAsyncResponse(exchange, asyncImpl);
+            } catch (Throwable t) {
+                return handleAsyncFault(exchange, asyncImpl, t);
+            }
         }
         
         ResourceProvider provider = getResourceProvider(exchange);
@@ -125,16 +129,19 @@ public class JAXRSInvoker extends AbstractInvoker {
     private Object handleAsyncResponse(Exchange exchange, AsyncResponseImpl ar) {
         Object asyncObj = ar.getResponseObject();
         if (asyncObj instanceof Throwable) {
-            try {
-                return handleFault(new Fault((Throwable)asyncObj), 
-                                   exchange.getInMessage(), null, null);
-            } catch (Fault ex) {
-                ar.setUnmappedThrowable(ex.getCause());
-                return new MessageContentsList(Response.serverError().build());
-            }
+            return handleAsyncFault(exchange, ar, (Throwable)asyncObj);
         } else {
             setResponseContentTypeIfNeeded(exchange.getInMessage(), asyncObj);
             return new MessageContentsList(asyncObj);
+        }
+    }
+    
+    private Object handleAsyncFault(Exchange exchange, AsyncResponseImpl ar, Throwable t) {
+        try {
+            return handleFault(new Fault(t), exchange.getInMessage(), null, null);
+        } catch (Fault ex) {
+            ar.setUnmappedThrowable(ex.getCause());
+            return new MessageContentsList(Response.serverError().build());
         }
     }
     
@@ -191,12 +198,12 @@ public class JAXRSInvoker extends AbstractInvoker {
 
         Object result = null;
         ClassLoaderHolder contextLoader = null;
+        AsyncResponseImpl asyncResponse = null;
         try {
             if (setServiceLoaderAsContextLoader(inMessage)) {
                 contextLoader = ClassLoaderUtils
                     .setThreadContextClassloader(resourceObject.getClass().getClassLoader());
             }
-            AsyncResponseImpl asyncResponse = null;
             if (!ori.isSubResourceLocator()) {
                 asyncResponse = (AsyncResponseImpl)inMessage.get(AsyncResponse.class);
             }
@@ -205,7 +212,13 @@ public class JAXRSInvoker extends AbstractInvoker {
                 result = handleAsyncResponse(exchange, asyncResponse);
             }
         } catch (Fault ex) {
-            return handleFault(ex, inMessage, cri, methodToInvoke);
+            Object faultResponse;
+            if (asyncResponse != null && !asyncResponse.suspendContinuationIfNeeded()) {
+                faultResponse = handleAsyncFault(exchange, asyncResponse, ex.getCause());    
+            } else {
+                faultResponse = handleFault(ex, inMessage, cri, methodToInvoke);
+            }
+            return faultResponse;
         } finally {
             exchange.put(LAST_SERVICE_OBJECT, resourceObject);
             if (contextLoader != null) {

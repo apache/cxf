@@ -275,7 +275,7 @@ public class WadlGeneratorTest extends Assert {
     private void checkResponse(Response r) throws Exception {
         assertNotNull(r);
         assertEquals(MediaType.APPLICATION_XML,
-                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
+                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE).toString());
 //        File f = new File("test.xml");
 //        f.delete();
 //        f.createNewFile();
@@ -300,7 +300,7 @@ public class WadlGeneratorTest extends Assert {
         Message m = mockMessage("http://localhost:8080/baz", "", WadlGenerator.WADL_QUERY, cris);
         Response r = handleRequest(wg, m);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
-                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
+                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE).toString());
         String wadl = r.getEntity().toString();
         Document doc = DOMUtils.readXml(new StringReader(wadl));
         checkGrammars(doc.getDocumentElement(), "thebook", "books", "thebook2", "thechapter");

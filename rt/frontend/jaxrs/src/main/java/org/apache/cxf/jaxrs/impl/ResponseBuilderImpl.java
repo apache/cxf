@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.lang.annotation.Annotation;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -40,12 +39,11 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
-import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
+    
     private int status = 200;
     private boolean statusSet;
     private Object entity;
@@ -90,7 +88,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
 
     public ResponseBuilder type(MediaType type) {
-        return type(type == null ? null : JAXRSUtils.mediaTypeToString(type));
+        return setHeader(HttpHeaders.CONTENT_TYPE, type);
     }
 
     public ResponseBuilder type(String type) {
@@ -99,7 +97,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
 
     @Override
     public ResponseBuilder language(Locale locale) {
-        return language(locale == null ? null : locale.toString());
+        return setHeader(HttpHeaders.CONTENT_LANGUAGE, locale);
     }
     
     public ResponseBuilder language(String language) {
@@ -126,17 +124,19 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
 
     public ResponseBuilder tag(EntityTag tag) {
-        return setHeader(HttpHeaders.ETAG, tag == null ? null : tag.toString());
+        return setHeader(HttpHeaders.ETAG, tag);
     }
 
     public ResponseBuilder tag(String tag) {
-        // String tag value needs to be parsed as it may 
-        // contain parameters indicating it's a weak tag, etc
-        return tag(tag == null ? null : EntityTag.valueOf(tag));
+        final String doubleQuote = "\"";
+        if (tag != null && !tag.startsWith(doubleQuote)) {
+            tag = doubleQuote + tag + doubleQuote;
+        }
+        return setHeader(HttpHeaders.ETAG, tag);
     }
 
     public ResponseBuilder lastModified(Date date) {
-        return setHeader(HttpHeaders.LAST_MODIFIED, date == null ? null : toHttpDate(date));
+        return setHeader(HttpHeaders.LAST_MODIFIED, date);
     }
 
     public ResponseBuilder cacheControl(CacheControl cacheControl) {
@@ -145,7 +145,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
 
     @Override
     public ResponseBuilder expires(Date date) {
-        return setHeader(HttpHeaders.EXPIRES, date == null ? null : toHttpDate(date));
+        return setHeader(HttpHeaders.EXPIRES, date);
     }
 
     @Override
@@ -154,14 +154,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     }
     
     public ResponseBuilder header(String name, Object value) {
-        if (HttpUtils.isDateRelatedHeader(name)) {
-            Object theValue = value instanceof Date ? toHttpDate((Date)value) : value;  
-            return setHeader(name, theValue);
-        } else if (HttpHeaders.LOCATION.equals(name)) {
-            return location(URI.create(value.toString()));
-        } else {
-            return addHeader(name, value);
-        }
+        return addHeader(name, value);
     }
 
     
@@ -233,16 +226,11 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
         status = 200;
     }
     
-    private String toHttpDate(Date date) {
-        SimpleDateFormat format = HttpUtils.getHttpDateFormat();
-        return format.format(date);
-    }
-    
     private ResponseBuilder setHeader(String name, Object value) {
         if (value == null) {
             metadata.remove(name);
         } else {
-            metadata.putSingle(name, value.toString());
+            metadata.putSingle(name, value);
         }
         return this;
     }
@@ -251,7 +239,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
         if (values != null && values.length >= 1 && values[0] != null) {
             for (Object value : values) {
                 if (!valueExists(name, value)) {
-                    metadata.add(name, value.toString());
+                    metadata.add(name, value);
                 }
             }
         } else {
@@ -262,7 +250,7 @@ public final class ResponseBuilderImpl extends ResponseBuilder implements Clonea
     
     private boolean valueExists(String key, Object value) {
         List<Object> values = metadata.get(key);
-        return values == null ? false : values.contains(value.toString());
+        return values == null ? false : values.contains(value);
     }
 
     @Override

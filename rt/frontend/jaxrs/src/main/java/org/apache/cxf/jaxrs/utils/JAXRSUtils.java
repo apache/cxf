@@ -1368,7 +1368,8 @@ public final class JAXRSUtils {
                 }
             }
             writer.writeTo(entity, type, genericType, annotations, mediaType,
-                           httpHeaders, entityStream);
+                           httpHeaders, 
+                           entityStream);
         }
     }
     //CHECKSTYLE:ON

@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +33,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -40,6 +43,8 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
@@ -50,6 +55,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
     private static final String HTTP_RANGE_PROPERTY = "http.range.support";
+    private static final Logger LOG = LogUtils.getL7dLogger(BinaryDataProvider.class);
     
     private static final int BUFFER_SIZE = 4096;
     private boolean reportByteArraySize;
@@ -57,7 +63,8 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return byte[].class.isAssignableFrom(type)
                || InputStream.class.isAssignableFrom(type)
-               || Reader.class.isAssignableFrom(type);
+               || Reader.class.isAssignableFrom(type)
+               || File.class.isAssignableFrom(type);
     }
 
     public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
@@ -71,6 +78,19 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         }
         if (byte[].class.isAssignableFrom(clazz)) {
             return clazz.cast(IOUtils.readBytesFromStream(is));
+        }
+        if (File.class.isAssignableFrom(clazz)) {
+            LOG.warning("Reading data into File objects with the help of pre-packaged" 
+                + " providers is not recommended - use InputStream or custom File reader");
+            // create a temp file, delete on exit
+            File f = FileUtils.createTempFile("File" + UUID.randomUUID().toString(), 
+                                              "jaxrs",
+                                              null,
+                                              true);
+            FileOutputStream fos = new FileOutputStream(f);
+            IOUtils.copy(is, fos);
+            fos.close();
+            return clazz.cast(f);
         }
         throw new IOException("Unrecognized class");
     }

@@ -54,7 +54,7 @@ public class BinaryDataProviderTest extends Assert {
         MessageBodyReader<Object> p = new BinaryDataProvider<Object>();
         assertTrue(p.isReadable(byte[].class, null, null, null)
                    && p.isReadable(InputStream.class, null, null, null)
-                   && !p.isReadable(File.class, null, null, null)
+                   && p.isReadable(File.class, null, null, null)
                    && !p.isReadable(int[].class, null, null, null));
     }
     

@@ -21,16 +21,19 @@ package org.apache.cxf.transport.http;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -416,7 +419,11 @@ public class Headers {
             } else {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < headerList.size(); i++) {
-                    sb.append(headerList.get(i));
+                    Object headerValue = headerList.get(i);
+                    if (headerValue instanceof Date) {
+                        headerValue = toHttpDate((Date)headerValue);
+                    }
+                    sb.append(headerValue.toString());
                     if (i + 1 < headerList.size()) {
                         sb.append(',');
                     }
@@ -443,4 +450,16 @@ public class Headers {
         }
     }
 
+    public static SimpleDateFormat getHttpDateFormat() {
+        SimpleDateFormat dateFormat = 
+            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        TimeZone tZone = TimeZone.getTimeZone("GMT");
+        dateFormat.setTimeZone(tZone);
+        return dateFormat;
+    }
+    
+    public static String toHttpDate(Date date) {
+        SimpleDateFormat format = getHttpDateFormat();
+        return format.format(date);
+    }
 }

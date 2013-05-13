@@ -46,6 +46,8 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -149,29 +151,30 @@ public final class ResponseImpl extends Response {
     public MultivaluedMap<String, String> getStringHeaders() {
         MetadataMap<String, String> headers = new MetadataMap<String, String>(metadata.size());
         for (Map.Entry<String, List<Object>> entry : metadata.entrySet()) {
-            headers.put(entry.getKey(), toListOfStrings(entry.getValue()));
+            String headerName = entry.getKey();
+            headers.put(headerName, toListOfStrings(headerName, entry.getValue()));
         }
         return headers;
     }
 
-    private String getHeader(String header) {
-        Object value = metadata.getFirst(header);
-        return value == null ? null : value.toString();
-    }
-    
     public String getHeaderString(String header) {
         List<Object> methodValues = metadata.get(header);
-        return HttpUtils.getHeaderString(toListOfStrings(methodValues));
+        return HttpUtils.getHeaderString(toListOfStrings(header, methodValues));
     }
     
     // This conversion is needed as some values may not be Strings
-    private List<String> toListOfStrings(List<Object> values) {
+    private List<String> toListOfStrings(String headerName, List<Object> values) {
         if (values == null) {
             return null; 
         } else {
             List<String> stringValues = new ArrayList<String>(values.size());
+            RuntimeDelegate rd = RuntimeDelegate.getInstance();
+            @SuppressWarnings("unchecked")
+            HeaderDelegate<Object> hd = rd == null || values.isEmpty() 
+                ? null : (HeaderDelegate<Object>)rd.createHeaderDelegate(values.get(0).getClass());
             for (Object value : values) {
-                stringValues.add(value.toString());
+                String actualValue = hd == null ? value.toString() : hd.toString(value); 
+                stringValues.add(actualValue);
             }
             return stringValues;
         }
@@ -211,16 +214,21 @@ public final class ResponseImpl extends Response {
     }
 
     private Date doGetDate(String dateHeader) {
-        return HttpUtils.getHttpDate(getHeader(dateHeader));
+        Object value = metadata.getFirst(dateHeader);
+        return value == null || value instanceof Date ? (Date)value
+            : HttpUtils.getHttpDate(value.toString());
     }
     
     public EntityTag getEntityTag() {
-        String header = getHeader(HttpHeaders.ETAG);
-        return header == null ? null : EntityTag.valueOf(header);
+        Object header = metadata.getFirst(HttpHeaders.ETAG);
+        return header == null || header instanceof EntityTag ? (EntityTag)header
+            : EntityTag.valueOf(header.toString());
     }
 
     public Locale getLanguage() {
-        return HttpUtils.getLocale(getHeader(HttpHeaders.CONTENT_LANGUAGE));
+        Object header = metadata.getFirst(HttpHeaders.CONTENT_LANGUAGE);
+        return header == null || header instanceof Locale ? (Locale)header
+            : HttpUtils.getLocale(header.toString());
     }
 
     public Date getLastModified() {
@@ -228,17 +236,20 @@ public final class ResponseImpl extends Response {
     }
 
     public int getLength() {
-        return HttpUtils.getContentLength(getHeader(HttpHeaders.CONTENT_LENGTH));
+        Object header = metadata.getFirst(HttpHeaders.CONTENT_LENGTH);
+        return HttpUtils.getContentLength(header == null ? null : header.toString());
     }
 
     public URI getLocation() {
-        String header = getHeader(HttpHeaders.LOCATION);
-        return header == null ? null : URI.create(header);
+        Object header = metadata.getFirst(HttpHeaders.LOCATION);
+        return header == null || header instanceof URI ? (URI)header
+            : URI.create(header.toString());
     }
 
     public MediaType getMediaType() {
-        String header = getHeader(HttpHeaders.CONTENT_TYPE);
-        return header == null ? null : JAXRSUtils.toMediaType(header);
+        Object header = metadata.getFirst(HttpHeaders.CONTENT_TYPE);
+        return header == null || header instanceof MediaType ? (MediaType)header 
+            : (MediaType)JAXRSUtils.toMediaType(header.toString());
     }
     
     public boolean hasLink(String relation) {

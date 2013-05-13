@@ -161,7 +161,7 @@ public class RequestImplTest extends Assert {
         Response r = rb.build();
         assertEquals("If-Match precondition was not met", 412, r.getStatus());
         assertEquals("Response should include ETag", 
-                     "\"123\"", r.getMetadata().getFirst("ETag"));
+                     "\"123\"", r.getMetadata().getFirst("ETag").toString());
     }
     
     @Test

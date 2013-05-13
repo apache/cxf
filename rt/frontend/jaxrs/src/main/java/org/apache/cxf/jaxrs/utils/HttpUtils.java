@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +54,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.servlet.BaseUrlHelper;
 
 public final class HttpUtils {
@@ -187,11 +187,11 @@ public final class HttpUtils {
     }
     
     public static SimpleDateFormat getHttpDateFormat() {
-        SimpleDateFormat dateFormat = 
-            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
-        TimeZone tZone = TimeZone.getTimeZone("GMT");
-        dateFormat.setTimeZone(tZone);
-        return dateFormat;
+        return Headers.getHttpDateFormat();
+    }
+    
+    public static String toHttpDate(Date date) {
+        return Headers.toHttpDate(date);
     }
     
     public static Date getHttpDate(String value) {
@@ -199,7 +199,7 @@ public final class HttpUtils {
             return null;
         }
         try {
-            return HttpUtils.getHttpDateFormat().parse(value);
+            return Headers.getHttpDateFormat().parse(value);
         } catch (ParseException ex) {
             return null;
         }

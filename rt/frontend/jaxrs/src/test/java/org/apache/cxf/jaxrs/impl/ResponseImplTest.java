@@ -47,7 +47,6 @@ import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -68,7 +67,6 @@ public class ResponseImplTest extends Assert {
     }
     
     @Test
-    @Ignore
     public void testGetHeaderStringUsingHeaderDelegate() throws Exception {
         StringBean bean = new StringBean("s3");
         RuntimeDelegate original = RuntimeDelegate.getInstance();
