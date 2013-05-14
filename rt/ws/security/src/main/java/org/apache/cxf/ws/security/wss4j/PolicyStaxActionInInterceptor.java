@@ -27,6 +27,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.policy.SP11Constants;
@@ -61,25 +62,39 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         }
         
         verifyTokens(aim, incomingSecurityEventList);
-        verifyPartsAndElements(aim, incomingSecurityEventList);
+        verifyPartsAndElements(aim, incomingSecurityEventList, soapMessage);
         verifyBindings(aim);
     }
     
     private void verifyPartsAndElements(
-        AssertionInfoMap aim, List<SecurityEvent> incomingSecurityEventList
+        AssertionInfoMap aim, List<SecurityEvent> incomingSecurityEventList,
+        SoapMessage soapMessage
     ) {
+        TLSSessionInfo tlsInfo = soapMessage.get(TLSSessionInfo.class);
+        if (tlsInfo != null) {
+            assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+            assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+            assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+            assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+            assertAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+        } else {
+            for (SecurityEvent event : incomingSecurityEventList) {
+                if (WSSecurityEventConstants.SignedPart == event.getSecurityEventType()) {
+                    assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+                } else if (WSSecurityEventConstants.SignedElement == event.getSecurityEventType()) {
+                    assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+                } else if (WSSecurityEventConstants.EncryptedPart == event.getSecurityEventType()) {
+                    assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+                } else if (WSSecurityEventConstants.EncryptedElement == event.getSecurityEventType()) {
+                    assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+                } else if (WSSecurityEventConstants.ContentEncrypted == event.getSecurityEventType()) {
+                    assertAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+                }
+            }
+        }
+        
         for (SecurityEvent event : incomingSecurityEventList) {
-            if (WSSecurityEventConstants.SignedPart == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
-            } else if (WSSecurityEventConstants.SignedElement == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
-            } else if (WSSecurityEventConstants.EncryptedPart == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
-            } else if (WSSecurityEventConstants.EncryptedElement == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
-            } else if (WSSecurityEventConstants.ContentEncrypted == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-            } else if (WSSecurityEventConstants.RequiredPart == event.getSecurityEventType()) {
+            if (WSSecurityEventConstants.RequiredPart == event.getSecurityEventType()) {
                 assertAllAssertionsByLocalname(aim, SPConstants.REQUIRED_PARTS);
             } else if (WSSecurityEventConstants.RequiredElement == event.getSecurityEventType()) {
                 assertAllAssertionsByLocalname(aim, SPConstants.REQUIRED_ELEMENTS);
@@ -179,6 +194,12 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
 
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_THUMBPRINT);
         assertAllAssertionsByLocalname(aim, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY);
+        
+        assertAllAssertionsByLocalname(aim, SPConstants.KEY_VALUE_TOKEN);
+        assertAllAssertionsByLocalname(aim, SPConstants.RSA_KEY_VALUE);
+        
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS10);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS11);
     }
     
     private void assertAllAssertionsByLocalname(AssertionInfoMap aim, String localname) {

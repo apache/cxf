@@ -39,7 +39,6 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.URIMappingInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -125,11 +124,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             
             SecurityEventListener securityEventListener = 
                 configureSecurityEventListener(soapMessage, secProps);
-            
-            TLSSessionInfo tlsInfo = soapMessage.get(TLSSessionInfo.class);
-            if (tlsInfo != null) {
-                // TODO HttpsSecurityTokenEvent
-            }
             
             inboundWSSec = WSSec.getInboundWSSec(secProps);
             

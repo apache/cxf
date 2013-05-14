@@ -410,6 +410,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                 incomingSecurityEventList.add(securityEvent);
+                super.registerSecurityEvent(securityEvent);
             }
         };
         
