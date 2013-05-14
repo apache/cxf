@@ -523,4 +523,22 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
             throw new WSSPolicyException(new Message("INVALID_ALGORITHM", LOG, algoSuite));
         }
     }
+
+
+
+    public void setSymmetricSignature(String symmetricSignature) {
+        this.symmetricSignature = symmetricSignature;
+    }
+
+
+
+    public void setAsymmetricSignature(String asymmetricSignature) {
+        this.asymmetricSignature = asymmetricSignature;
+    }
+
+
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
 }
