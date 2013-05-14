@@ -203,6 +203,11 @@ public class SelectMethodCandidatesTest extends Assert {
         doTestConsumesResource(ConsumesResource4.class, "application/xml+bar", "m2");
     }
     
+    @Test
+    public void testConsumesResource5() throws Exception {
+        doTestConsumesResource(ConsumesResource5.class, "text/xml", "m2");
+    }
+
     private void doTestConsumesResource(Class<?> resourceClass, String expectedMethodName) throws Exception {
         doTestConsumesResource(resourceClass, null, expectedMethodName);
     }
@@ -836,6 +841,17 @@ public class SelectMethodCandidatesTest extends Assert {
         @Consumes({"application/*", "application/xml+bar" })
         public void m2() {
             
+        }
+    }
+    public static class ConsumesResource5 {
+        @POST
+        @Consumes("text/*")
+        public void m1() {
+        }       
+        
+        @POST
+        @Consumes("text/xml;qs=0.7")
+        public void m2() {
         }
     }
     
