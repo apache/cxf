@@ -1613,12 +1613,14 @@ public final class JAXRSUtils {
         if (ex.getClass() == WebApplicationException.class) {
             WebApplicationException webEx = (WebApplicationException)ex;
             if (webEx.getResponse().hasEntity() 
-                && webEx.getCause() == null
-                && MessageUtils.isTrue(inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION))) {
-                response = webEx.getResponse();
-                
+                && webEx.getCause() == null) {
+                Object prop = inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION);
+                if (prop == null || MessageUtils.isTrue(prop)) {
+                    response = webEx.getResponse();
+                }
             }
         }
+        
         if (response == null) {
             ExceptionMapper<T>  mapper =
                 ServerProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);

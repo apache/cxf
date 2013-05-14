@@ -28,6 +28,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl {
@@ -78,7 +79,7 @@ public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl 
     }
 
     public String getMethod() {
-        return (String)getProperty(Message.HTTP_REQUEST_METHOD);
+        return HttpUtils.getProtocolHeader(m, Message.HTTP_REQUEST_METHOD, null);
     }
 
     public void setMethod(String method) throws IllegalStateException {

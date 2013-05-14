@@ -23,6 +23,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
@@ -45,7 +46,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public InputStream getEntityStream() {
-        return m.get(InputStream.class);
+        return m.getContent(InputStream.class);
     }
 
 
@@ -56,7 +57,8 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public SecurityContext getSecurityContext() {
-        return new SecurityContextImpl(m);
+        SecurityContext sc = m.get(SecurityContext.class);
+        return sc == null ? new SecurityContextImpl(m) : sc;
     }
 
     @Override
@@ -66,7 +68,8 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
-        return getEntityStream() != null;
+        InputStream is = getEntityStream();
+        return is != null && !HttpMethod.GET.equals(getMethod());
     }
 
     @Override
@@ -87,7 +90,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     public void setRequestUri(URI requestUri) throws IllegalStateException {
         if (requestUri.isAbsolute()) {
             String baseUriString = new UriInfoImpl(m).getBaseUri().toString();
-            String requestUriString = new UriInfoImpl(m).getBaseUri().toString();
+            String requestUriString = requestUri.toString();
             if (!requestUriString.startsWith(baseUriString)) {
                 setRequestUri(requestUri, URI.create("/"));
                 return;
@@ -104,9 +107,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     }
     
     public void doSetRequestUri(URI requestUri) throws IllegalStateException {
-        if (!preMatch) {
-            throw new IllegalStateException();
-        }
+        checkNotPreMatch();
         HttpUtils.resetRequestURI(m, requestUri.toString());
     }
 
@@ -122,7 +123,19 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public void setSecurityContext(SecurityContext sc) {
+        checkContext();
         m.put(SecurityContext.class, sc);
     }
 
+    private void checkNotPreMatch() {
+        if (!preMatch) {
+            throw new IllegalStateException();
+        }
+    }
+    
+    @Override 
+    public void setMethod(String method) throws IllegalStateException {
+        checkNotPreMatch();
+        super.setMethod(method);
+    }
 }
