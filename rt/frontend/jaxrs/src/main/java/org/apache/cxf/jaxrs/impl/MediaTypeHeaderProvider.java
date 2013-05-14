@@ -110,6 +110,9 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     // Max number of parameters that may be ignored is 3, at least as known 
     // to the implementation
     public static String typeToString(MediaType type, List<String> ignoreParams) {
+        if (type == null) {
+            throw new IllegalArgumentException("MediaType parameter is null");
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(type.getType()).append('/').append(type.getSubtype());
         
