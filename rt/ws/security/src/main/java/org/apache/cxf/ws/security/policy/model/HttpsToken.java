@@ -25,9 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-/**
- * @author Ruchith Fernando (ruchith.fernando@gmail.com)
- */
 public class HttpsToken extends Token {
 
     private boolean requireClientCertificate;

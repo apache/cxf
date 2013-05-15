@@ -44,8 +44,6 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 
 /**
  * An ArrayType.
- *
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class ArrayType extends AegisType {
     private static final Logger LOG = LogUtils.getL7dLogger(ArrayType.class);

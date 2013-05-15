@@ -23,8 +23,6 @@ import javax.jws.WebService;
 /**
  * Service that echoes the username and password back to the user in an xml
  * document
- * 
- * @author Brian Bonner
  */
 @WebService(endpointInterface = "org.apache.cxf.ws.security.wss4j.Echo")
 public class EchoImpl implements Echo {

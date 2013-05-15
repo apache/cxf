@@ -32,8 +32,6 @@ import org.junit.Test;
  * This test ensures that we're handling inheritance of interfaces correctly.
  * Since we can't do multiple parent inheritance in XML schema, which interfaces
  * require, we just don't allow interface inheritance period.
- *
- * @author Dan Diephouse
  */
 public class InterfaceInheritanceTest extends AbstractAegisTest {
 

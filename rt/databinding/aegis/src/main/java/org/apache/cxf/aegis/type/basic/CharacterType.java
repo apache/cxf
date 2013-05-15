@@ -23,9 +23,6 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
-/**
- * @author <a href="mailto:struman@nuparadigm.com">Sean Truman</a>
- */
 public class CharacterType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {

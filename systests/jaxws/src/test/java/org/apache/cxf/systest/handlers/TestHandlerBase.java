@@ -33,12 +33,6 @@ import org.apache.handler_test.PingException;
 
 /**
  * Describe class TestHandlerBase here.
- *
- *
- * Created: Fri Oct 21 14:02:50 2005
- *
- * @author <a href="mailto:codea@iona.com">codea</a>
- * @version 1.0
  */
 public abstract class TestHandlerBase {
    

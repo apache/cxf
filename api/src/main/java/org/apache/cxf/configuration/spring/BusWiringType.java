@@ -22,8 +22,6 @@ package org.apache.cxf.configuration.spring;
 /**
  * Enumeration for the ways in which the CXF bus can be wired into a Spring
  * bean.
- * 
- * @author Ian Roberts
  */
 public enum BusWiringType {
     /**

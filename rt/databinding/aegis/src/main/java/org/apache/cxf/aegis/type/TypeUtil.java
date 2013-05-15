@@ -36,8 +36,6 @@ import org.apache.ws.commons.schema.XmlSchema;
 
 /**
  * Static methods/constants for Aegis.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public final class TypeUtil {
     public static final Logger LOG = LogUtils.getL7dLogger(TypeUtil.class);

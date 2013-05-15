@@ -25,8 +25,6 @@ import org.junit.Test;
 
 /**
  * A {@code PatternBuilderTest} is ...
- *
- * @author Guillaume Sauthier
  */
 public class PatternBuilderTest extends Assert {
 

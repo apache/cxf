@@ -21,9 +21,6 @@ package org.apache.cxf.management.persistence;
 /**
  * This interface can be implemented to indicate to PersistOutInterceptor
  * if an ExchangeData should be persisted.
- * 
- * @author remi
- *
  */
 public interface ExchangeDataFilter {
 

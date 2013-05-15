@@ -30,10 +30,6 @@ import org.apache.cxf.frontend.ClientProxy;
 
 import org.junit.Test;
 
-/**
- *
- * @author jtalbut
- */
 public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverrideTest {
     private static final String FAILOVER_CONFIG =
         "org/apache/cxf/systest/clustering/load_distributor_address_override.xml";

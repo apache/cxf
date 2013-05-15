@@ -42,8 +42,6 @@ import org.jdom.Text;
 
 /**
  * Facade for DOMStreamReader using JDOM implmentation.
- * 
- * @author <a href="mailto:tsztelak@gmail.com">Tomasz Sztelak</a>
  */
 public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> {
 

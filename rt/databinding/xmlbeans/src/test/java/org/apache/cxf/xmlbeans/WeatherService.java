@@ -27,9 +27,6 @@ import net.webservicex.GetWeatherByZipCodeDocument;
 import net.webservicex.GetWeatherByZipCodeResponseDocument;
 import net.webservicex.WeatherForecasts;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 @WebService(targetNamespace = "http://www.webservicex.net")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public class WeatherService {

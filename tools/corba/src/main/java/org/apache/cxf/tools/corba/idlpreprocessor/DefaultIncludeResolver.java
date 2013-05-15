@@ -33,7 +33,6 @@ import org.apache.cxf.common.logging.LogUtils;
 
 
 /**
- * @author lk
  * 
  */
 public class DefaultIncludeResolver implements IncludeResolver {

@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class RootBean {
     private String id;
     private BeanA child;
