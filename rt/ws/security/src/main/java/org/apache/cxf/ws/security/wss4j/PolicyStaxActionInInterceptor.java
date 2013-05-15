@@ -32,6 +32,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -114,8 +115,18 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
                 assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN11);
                 assertAllAssertionsByLocalname(aim, SPConstants.HASH_PASSWORD);
                 assertAllAssertionsByLocalname(aim, SPConstants.NO_PASSWORD);
-                assertAllAssertionsByLocalname(aim, SPConstants.NONCE);
-                assertAllAssertionsByLocalname(aim, SPConstants.CREATED);
+                Collection<AssertionInfo> sp13Ais = aim.get(SP13Constants.NONCE);
+                if (sp13Ais != null) {
+                    for (AssertionInfo ai : sp13Ais) {
+                        ai.setAsserted(true);
+                    }
+                }
+                sp13Ais = aim.get(SP13Constants.CREATED);
+                if (sp13Ais != null) {
+                    for (AssertionInfo ai : sp13Ais) {
+                        ai.setAsserted(true);
+                    }
+                }
             } else if (WSSecurityEventConstants.X509Token == event.getSecurityEventType()) {
                 assertAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
                 assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKCS7_TOKEN10);
