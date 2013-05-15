@@ -272,11 +272,16 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);                
                 if (tlsInfo != null) {
                     if (token.getAuthenticationType() 
-                        == HttpsToken.AuthenticationType.RequireClientCertificate
-                        && (tlsInfo.getPeerCertificates() == null 
-                            || tlsInfo.getPeerCertificates().length == 0)) {
-                        asserted = false;
-                    } else {
+                        == HttpsToken.AuthenticationType.RequireClientCertificate) {
+                        if (tlsInfo.getPeerCertificates() == null 
+                            || tlsInfo.getPeerCertificates().length == 0) {
+                            asserted = false;
+                        } else {
+                            NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                        }
+                    }
+                    
+                    if (tlsInfo.getPeerCertificates() != null && tlsInfo.getPeerCertificates().length > 0) {
                         httpsTokenSecurityEvent.setAuthenticationType(
                             HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication
                         );
@@ -284,7 +289,13 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                             new HttpsSecurityTokenImpl((X509Certificate)tlsInfo.getPeerCertificates()[0]);
                         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
                         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
-                        NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                    } else {
+                        httpsTokenSecurityEvent.setAuthenticationType(
+                            HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
+                        );
+                        HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
+                        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
                     }
                 } else {
                     asserted = false;

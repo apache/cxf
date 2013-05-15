@@ -73,6 +73,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         super(Phase.PRE_PROTOCOL);
         addAfter(PolicyBasedWSS4JOutInterceptor.class.getName());
         addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
+        addAfter(PolicyBasedWSS4JStaxInInterceptor.class.getName());
     }
     
     public Set<QName> getUnderstoodHeaders() {
@@ -81,6 +82,12 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
 
     public void handleMessage(SoapMessage message) throws Fault {
 
+        boolean enableStax = 
+            MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+        if (enableStax) {
+            return;
+        }
+        
         boolean isReq = MessageUtils.isRequestor(message);
         boolean isOut = MessageUtils.isOutbound(message);
         
