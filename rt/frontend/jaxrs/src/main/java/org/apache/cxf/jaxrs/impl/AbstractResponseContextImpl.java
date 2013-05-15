@@ -100,6 +100,7 @@ public abstract class AbstractResponseContextImpl {
     }
 
     public MediaType getMediaType() {
+        //return r.getEntity() != null ? r.getMediaType() : null;
         return r.getMediaType();
     }
 

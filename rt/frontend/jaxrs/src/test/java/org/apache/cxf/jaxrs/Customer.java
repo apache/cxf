@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -148,6 +149,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @Context private UriInfo uriInfo2;
     private String queryParam;
     
+    @DefaultValue("bQuery")
     @QueryParam("b")
     private String b;
     private String name;
@@ -439,7 +441,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     public void testCookieParam(@CookieParam("c1") String c1,
-                                @CookieParam("c2") @DefaultValue("c2Value") String c2) {
+                                @CookieParam("c1") Set<Cookie> c11,
+                                @CookieParam("c2") @DefaultValue("c2Value") String c2,
+                                @CookieParam("c2") @DefaultValue("c2Value") Set<String> c22) {
         // complete
     }
     

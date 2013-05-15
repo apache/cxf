@@ -1033,9 +1033,17 @@ public final class JAXRSUtils {
         if (pClass.isAssignableFrom(Cookie.class)) {
             return c;
         }
-        
-        return InjectionUtils.handleParameter(c.getValue(), false, pClass, paramAnns, 
-                                              ParameterType.COOKIE, m);
+        String value = InjectionUtils.isSupportedCollectionOrArray(pClass) 
+            && InjectionUtils.getActualType(genericType) == Cookie.class
+            ? c.toString() : c.getValue();
+        return InjectionUtils.createParameterObject(Collections.singletonList(value), 
+                                                    pClass, 
+                                                    genericType,
+                                                    paramAnns,
+                                                    null,
+                                                    false,
+                                                    ParameterType.COOKIE,
+                                                    m);
     }
     
     public static Object createBeanParamValue(Message m, Class<?> clazz, OperationResourceInfo ori) {

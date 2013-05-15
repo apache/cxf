@@ -273,6 +273,21 @@ public class ResponseImplTest extends Assert {
     }
     
     @Test
+    public void testGetLinksSameRel() {
+        ResponseImpl ri = new ResponseImpl(200);
+        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+        ri.addMetadata(meta);
+        
+        meta.add(HttpHeaders.LINK, "<http://link1>");
+        meta.add(HttpHeaders.LINK, "<http://link2>");
+        
+        Set<Link> links = ri.getLinks();
+        assertEquals(2, links.size());
+        assertTrue(links.contains(Link.valueOf("<http://link1>")));
+        assertTrue(links.contains(Link.valueOf("<http://link2>")));
+    }
+    
+    @Test
     public void testGetLinks() {
         ResponseImpl ri = new ResponseImpl(200);
         MetadataMap<String, Object> meta = new MetadataMap<String, Object>();

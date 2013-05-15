@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -272,7 +273,15 @@ public final class ResponseImpl extends Response {
     }
 
     public Set<Link> getLinks() {
-        return new HashSet<Link>(getAllLinks().values());
+        List<Object> linkValues = metadata.get(HttpHeaders.LINK);
+        Set<Link> links = new HashSet<Link>();
+        if (linkValues != null) {
+            for (Object o : linkValues) {
+                Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
+                links.add(link);
+            }
+        }
+        return links;
     }
 
     private Map<String, Link> getAllLinks() {
@@ -280,9 +289,9 @@ public final class ResponseImpl extends Response {
         if (linkValues == null) {
             return Collections.emptyMap();
         } else {
-            Map<String, Link> links = new HashMap<String, Link>();
+            Map<String, Link> links = new LinkedHashMap<String, Link>();
             for (Object o : linkValues) {
-                Link link = Link.valueOf(o.toString());
+                Link link = o instanceof Link ? (Link)o : Link.valueOf(o.toString());
                 links.put(link.getRel(), link);
             }
             return links;

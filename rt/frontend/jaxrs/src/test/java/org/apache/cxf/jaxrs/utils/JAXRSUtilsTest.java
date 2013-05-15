@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.ServletConfig;
@@ -856,7 +857,7 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testCookieParameters() throws Exception {
-        Class<?>[] argType = {String.class, String.class};
+        Class<?>[] argType = {String.class, Set.class, String.class, Set.class};
         Method m = Customer.class.getMethod("testCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
@@ -865,10 +866,15 @@ public class JAXRSUtilsTest extends Assert {
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
                                                            messageImpl);
-        assertEquals(params.size(), 2);
+        assertEquals(params.size(), 4);
         assertEquals("c1Value", params.get(0));
-        assertEquals("c2Value", params.get(1));
-        
+        Set<Cookie> set1 = CastUtils.cast((Set<?>)params.get(1));
+        assertEquals(1, set1.size());
+        assertTrue(set1.contains(Cookie.valueOf("c1=c1Value")));
+        assertEquals("c2Value", params.get(2));
+        Set<Cookie> set2 = CastUtils.cast((Set<?>)params.get(3));
+        assertTrue(set2.contains("c2Value"));
+        assertEquals(1, set2.size());
         
     }
     
@@ -1806,6 +1812,20 @@ public class JAXRSUtilsTest extends Assert {
         JAXRSUtils.injectParameters(ori, c, m);
         assertEquals("bValue", c.getB());
         assertEquals("theAHeader", c.getAHeader());
+    }
+    
+    @Test
+    public void testDefaultValueOnField() throws Exception {
+
+        ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
+        Customer c = new Customer();
+        OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
+                                                              cri);
+        Message m = createMessage();
+        
+        m.put(Message.QUERY_STRING, "");
+        JAXRSUtils.injectParameters(ori, c, m);
+        assertEquals("bQuery", c.getB());
     }
     
     @Test

@@ -190,10 +190,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (firstTry && userHeaders != null) {
             responseHeaders.putAll(userHeaders);
         }
-        
-        String initialResponseContentType = (String)message.get(Message.CONTENT_TYPE);
-        if (initialResponseContentType != null && !responseHeaders.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, initialResponseContentType);
+        if (entity != null) {
+            String initialResponseContentType = (String)message.get(Message.CONTENT_TYPE);
+            if (initialResponseContentType != null && !responseHeaders.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                responseHeaders.putSingle(HttpHeaders.CONTENT_TYPE, initialResponseContentType);
+            }
+        } else {
+            message.remove(Message.CONTENT_TYPE);
         }
         
         message.put(Message.PROTOCOL_HEADERS, responseHeaders);
@@ -415,7 +418,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     private void setResponseDate(MultivaluedMap<String, Object> headers, boolean firstTry) {
-        if (!firstTry) {
+        if (!firstTry || headers.containsKey(HttpHeaders.DATE)) {
             return;
         }
         SimpleDateFormat format = HttpUtils.getHttpDateFormat();

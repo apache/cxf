@@ -226,6 +226,23 @@ public class ResponseBuilderImplTest extends Assert {
         Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").build();
         checkBuild(Response.ok().links(prevLink, nextLink).build(), 200, null, m);
     }
+    
+    @Test
+    public void testLinks2() {
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.add("Link", Link.valueOf("<http://example.com/page1>;rel=\"previous\""));
+        m.add("Link", Link.valueOf("<http://example.com/page3>;rel=\"next\""));
+        RuntimeDelegateImpl delegate = new RuntimeDelegateImpl();
+        Link.Builder linkBuilder = delegate.createLinkBuilder();
+        Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
+        // Reset linkbuilder
+        linkBuilder = delegate.createLinkBuilder();
+        Link nextLink = linkBuilder.uri("http://example.com/page3").rel("next").build();
+        Link[] links = new Link[2];
+        links[0] = prevLink;
+        links[1] = nextLink;
+        checkBuild(Response.ok().links(links).build(), 200, null, m);
+    }
 
     @Test
     public void testLinksNoReset() {

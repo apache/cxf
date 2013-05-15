@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
@@ -102,7 +101,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             Object serviceObject = getActualServiceObject(exchange, rootInstance);
             
             return invoke(exchange, request, serviceObject);
-        } catch (InternalServerErrorException ex) {
+        } catch (WebApplicationException ex) {
             responseList = checkExchangeForResponse(exchange);
             if (responseList != null) {
                 return responseList; 

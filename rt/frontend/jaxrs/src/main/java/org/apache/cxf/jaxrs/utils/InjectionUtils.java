@@ -360,12 +360,13 @@ public final class InjectionUtils {
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (Exception ex) {
+            Throwable t = getOrThrowActualException(ex);
             result = createFromParameterHandler(value, cls, message);
             if (result == null) {
                 LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                    BUNDLE, 
                                                                    pClass.getName()).toString());
-                throw new ClientErrorException(HttpUtils.getParameterFailureStatus(pType), ex);
+                throw new ClientErrorException(HttpUtils.getParameterFailureStatus(pType), t);
             }
         }
         if (result == null) {
@@ -451,14 +452,21 @@ public final class InjectionUtils {
         } catch (NoSuchMethodException ex) {
             // no luck
         } catch (Exception ex) {
-            Throwable t = ex instanceof InvocationTargetException 
-                ? ((InvocationTargetException)ex).getTargetException() : ex; 
+            Throwable t = getOrThrowActualException(ex);
             LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
                                                                BUNDLE, 
                                                                pClass.getName()).toString());
             throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
         }
         return null;
+    }
+    
+    private static Throwable getOrThrowActualException(Throwable ex) {
+        Throwable t = ex instanceof InvocationTargetException ? ((InvocationTargetException)ex).getCause() : ex; 
+        if (t instanceof WebApplicationException) {    
+            throw (WebApplicationException)t;
+        }
+        return t;
     }
     
     public static Object handleBean(Class<?> paramType, Annotation[] paramAnns, 
