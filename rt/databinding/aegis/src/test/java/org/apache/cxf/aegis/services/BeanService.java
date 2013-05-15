@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.aegis.services;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class BeanService {
     public SimpleBean getSimpleBean() {
         SimpleBean bean = new SimpleBean();

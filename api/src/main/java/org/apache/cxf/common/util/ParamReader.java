@@ -41,9 +41,6 @@ import java.util.Map;
  * <p>
  * don't get tricky, it's the bare minimum. Instances of this class are not
  * threadsafe -- don't share them.
- * <p>
- * 
- * @author Edwin Smith, Macromedia
  */
 public class ParamReader extends ClassReader {
     private String methodName;

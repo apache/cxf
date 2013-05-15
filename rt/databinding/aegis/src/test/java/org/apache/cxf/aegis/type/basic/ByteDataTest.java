@@ -26,10 +26,6 @@ import org.apache.cxf.aegis.services.DataService;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Feb 21, 2004
- */
 public class ByteDataTest extends AbstractAegisTest {
     public void setUp() throws Exception {
         super.setUp();

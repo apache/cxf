@@ -32,8 +32,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 /**
  * AegisType for the Date class which serializes as an xsd:date (no time
  * information).
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class DateType extends AegisType {
     private static XsDateFormat format = new XsDateFormat();

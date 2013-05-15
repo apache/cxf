@@ -24,8 +24,6 @@ import org.apache.cxf.common.util.SOAPConstants;
 
 /**
  * Basic type conversion functionality for writing messages.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public abstract class AbstractMessageWriter implements MessageWriter {
     

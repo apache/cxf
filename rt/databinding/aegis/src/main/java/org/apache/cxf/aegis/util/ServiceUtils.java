@@ -24,8 +24,6 @@ import javax.xml.namespace.QName;
 
 /**
  * Helps when constructing, or using services.
- * 
- * @author Arjen Poutsma
  */
 public final class ServiceUtils {
     private ServiceUtils() {

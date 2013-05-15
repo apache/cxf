@@ -20,11 +20,6 @@ package org.apache.cxf.aegis.inheritance.ws1;
 
 import java.util.Arrays;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class ResultBean {
     private BeanA[] result1;
     private RootBean[] result2;

@@ -23,9 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class SoapVersionFactory {
     private static SoapVersionFactory factory = new SoapVersionFactory();
 

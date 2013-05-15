@@ -21,8 +21,6 @@ package org.apache.cxf.transport;
 
 /**
  * A Session which can be bound to HTTP, WS-Adddressing, etc.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public interface Session {
     /**

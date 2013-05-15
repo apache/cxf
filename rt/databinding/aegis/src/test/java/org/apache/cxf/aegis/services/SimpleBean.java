@@ -20,8 +20,6 @@ package org.apache.cxf.aegis.services;
 
 /**
  * SomeBean
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class SimpleBean {
     private String bleh;

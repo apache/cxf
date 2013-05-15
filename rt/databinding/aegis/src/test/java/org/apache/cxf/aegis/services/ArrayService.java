@@ -24,8 +24,6 @@ import javax.jws.WebService;
 /**
  * An array service for testing.
  * There are some JAX-WS annotations for tests with JAX-WS.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 @WebService(targetNamespace = "urn:org.apache.cxf.aegis",
             serviceName = "arrayService")

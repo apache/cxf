@@ -29,9 +29,6 @@ import org.apache.cxf.message.Attachment;
 /**
  * Holds information about the message request and response. Applications should not need to 
  * work with this class.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Feb 13, 2004
  */
 public class Context {
     private AegisContext globalContext;

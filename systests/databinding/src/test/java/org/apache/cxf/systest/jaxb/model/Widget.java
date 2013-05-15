@@ -29,9 +29,6 @@ import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/**
- * @author shade
- */
 @XmlType(name = "widget", namespace = "http://cxf.org.apache/model")
 @XmlRootElement(name = "widget", namespace = "http://cxf.org.apache/model")
 @XmlAccessorType(XmlAccessType.FIELD)

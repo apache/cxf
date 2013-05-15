@@ -41,8 +41,6 @@ import org.junit.Assert;
 
 /**
  * XPath test assertions.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public final class XPathAssert {
     private XPathAssert() {

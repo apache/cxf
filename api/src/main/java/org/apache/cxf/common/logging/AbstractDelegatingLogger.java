@@ -34,8 +34,6 @@ import java.util.logging.Logger;
  *   addHandler / getHandlers
  *   setParent / getParent
  *   setUseParentHandlers / getUseParentHandlers
- *
- * @author gnodet
  */
 public abstract class AbstractDelegatingLogger extends Logger {
 

@@ -50,8 +50,6 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
  * <li>If the file doesn't exist, check the classpath</li>
  * <li>If the classpath doesn't exist, try to create URL from the URI.</li>
  * </ul>
- * 
- * @author Dan Diephouse
  */
 public class URIResolver {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);

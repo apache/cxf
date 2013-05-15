@@ -28,8 +28,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 /**
  * AegisType for the java.sql.Date class which serializes as an xsd:date (no time
  * information).
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class SqlDateType extends DateType {
     @Override

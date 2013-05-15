@@ -22,9 +22,6 @@ package org.apache.cxf.common.util;
 /**
  * Base64Utility - this static class provides useful base64 
  *                 encoding utilities.
- * <p>
- * @author Darach Ennis
- * @author Craig Ryan
  */
 
 // Java imports

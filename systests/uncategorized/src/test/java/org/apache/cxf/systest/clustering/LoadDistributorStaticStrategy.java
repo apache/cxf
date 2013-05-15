@@ -26,7 +26,6 @@ import org.apache.cxf.message.Exchange;
 
 /**
  *
- * @author jtalbut
  */
 public class LoadDistributorStaticStrategy extends SequentialStrategy {
 

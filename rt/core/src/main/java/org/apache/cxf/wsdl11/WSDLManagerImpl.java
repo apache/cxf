@@ -67,8 +67,6 @@ import org.apache.cxf.wsdl.WSDLManager;
 
 /**
  * WSDLManagerImpl
- * 
- * @author dkulp
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class WSDLManagerImpl implements WSDLManager {

@@ -37,7 +37,6 @@ import org.apache.cxf.service.invoker.Invoker;
 /**
  * Invokes a Binding's invoker with the <code>INVOCATION_INPUT</code> from
  * the Exchange.
- * @author Dan Diephouse
  */
 public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message> {
     

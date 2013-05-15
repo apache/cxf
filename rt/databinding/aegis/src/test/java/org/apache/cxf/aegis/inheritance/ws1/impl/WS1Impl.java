@@ -30,11 +30,6 @@ import org.apache.cxf.aegis.inheritance.ws1.WS1Exception;
 import org.apache.cxf.aegis.inheritance.ws1.WS1ExtendedException;
 import org.apache.cxf.aegis.services.SimpleBean;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class WS1Impl implements WS1 {
     public BeanA getBeanA() {
         BeanA a = new BeanA();

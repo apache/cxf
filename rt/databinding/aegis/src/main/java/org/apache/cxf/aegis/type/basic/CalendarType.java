@@ -29,8 +29,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * AegisType for the Calendar class.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class CalendarType extends AegisType {
     private static XsDateTimeFormat format = new XsDateTimeFormat();

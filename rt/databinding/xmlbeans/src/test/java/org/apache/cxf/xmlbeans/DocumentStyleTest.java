@@ -29,9 +29,6 @@ import org.apache.cxf.endpoint.Server;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class DocumentStyleTest extends AbstractXmlBeansTest {
     String ns = "urn:TestService";
     Server server;

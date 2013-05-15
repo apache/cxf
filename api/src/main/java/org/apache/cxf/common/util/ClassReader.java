@@ -44,8 +44,6 @@ import java.util.Map;
  * don't get tricky, it's the bare minimum. Instances of this class are not
  * threadsafe -- don't share them.
  * <p>
- * 
- * @author Edwin Smith, Macromedia
  */
 public class ClassReader extends ByteArrayInputStream {
     // constants values that appear in java class files,

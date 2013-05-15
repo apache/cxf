@@ -26,9 +26,6 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class PrimitiveTypesTest extends AbstractXmlBeansTest {
 
     @Before

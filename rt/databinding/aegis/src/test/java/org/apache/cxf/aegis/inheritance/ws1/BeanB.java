@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class BeanB extends BeanA {
     private static final long serialVersionUID = 8140920723297559985L;
     private String propB;

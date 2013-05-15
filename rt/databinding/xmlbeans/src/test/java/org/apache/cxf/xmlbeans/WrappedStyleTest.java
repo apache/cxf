@@ -31,9 +31,6 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class WrappedStyleTest extends AbstractXmlBeansTest {
     private Server endpoint;
 

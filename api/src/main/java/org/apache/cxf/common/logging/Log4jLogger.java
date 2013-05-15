@@ -40,8 +40,6 @@ import org.apache.log4j.spi.LoggingEvent;
  *   addHandler / getHandlers
  *   setParent / getParent
  *   setUseParentHandlers / getUseParentHandlers
- *
- * @author gnodet
  */
 public class Log4jLogger extends AbstractDelegatingLogger {
     private static final Map<Level, org.apache.log4j.Level> TO_LOG4J = 

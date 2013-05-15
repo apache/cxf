@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws2.common.pack1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class ContentBean1 {
     private String data1;
 

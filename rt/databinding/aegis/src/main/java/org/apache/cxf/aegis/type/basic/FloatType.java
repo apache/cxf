@@ -23,9 +23,6 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class FloatType extends AegisType {
 
     @Override

@@ -44,7 +44,6 @@ import org.apache.cxf.staxutils.StaxUtils;
  * <p>
  * The XML stream is converted DOMSource and sent off.
  * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  * @see javanet.staxutils.StAXSource
  * @see javax.xml.stream.XMLInputFactory
  * @see org.apache.cxf.aegis.util.STAXUtils

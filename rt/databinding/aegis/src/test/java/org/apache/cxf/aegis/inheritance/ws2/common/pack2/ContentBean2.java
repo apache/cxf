@@ -20,11 +20,6 @@ package org.apache.cxf.aegis.inheritance.ws2.common.pack2;
 
 import org.apache.cxf.aegis.inheritance.ws2.common.pack1.ContentBean1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class ContentBean2 extends ContentBean1 {
     private String content2;
 

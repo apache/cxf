@@ -23,9 +23,7 @@ import javax.jws.WebService;
 
 import org.apache.cxf.systest.jaxb.model.ExtendedWidget;
 import org.apache.cxf.systest.jaxb.model.Widget;
-/**
- * @author shade
- */
+
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxb.service.TestService")
 public class TestServiceImpl implements TestService {
 

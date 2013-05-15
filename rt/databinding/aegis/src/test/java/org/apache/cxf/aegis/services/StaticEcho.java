@@ -20,8 +20,6 @@ package org.apache.cxf.aegis.services;
 
 /**
  * Has a static method which shouldn't be registered with the service.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class StaticEcho {
 

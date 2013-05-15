@@ -28,8 +28,6 @@ import org.apache.cxf.transport.Destination;
 
 /**
  * A base class to build your own message implementations on.
- * 
- * @author Dan
  */
 public abstract class AbstractWrappedMessage implements Message {
     

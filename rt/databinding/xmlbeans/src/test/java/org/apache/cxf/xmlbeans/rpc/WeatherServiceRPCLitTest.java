@@ -34,9 +34,6 @@ import org.apache.cxf.xmlbeans.AbstractXmlBeansTest;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class WeatherServiceRPCLitTest extends AbstractXmlBeansTest {
 
     @Before

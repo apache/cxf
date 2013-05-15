@@ -25,8 +25,6 @@ import org.apache.cxf.message.Exchange;
  * Invokers control how a particular service is invoked. It may maintain
  * state or it may create new service objects for every request. It is
  * up to the invoker.
- * 
- * @author Dan Diephouse
  */
 public interface Invoker {
 

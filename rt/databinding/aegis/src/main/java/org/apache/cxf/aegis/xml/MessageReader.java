@@ -24,8 +24,6 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * A MessageReader. You must call getNextChildReader() until
  * hasMoreChildReaders() returns false.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public interface MessageReader {
     

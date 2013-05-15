@@ -65,9 +65,6 @@ import javax.net.ssl.SSLSocket;
  * Inspired by Sebastian Hauer's original StrictSSLProtocolSocketFactory in the
  * HttpClient "contrib" repository.
  *
- * @author Julius Davies
- * @author <a href="mailto:hauer@psicode.com">Sebastian Hauer</a>
- * @since 8-Dec-2006
  */
 
 public interface CertificateHostnameVerifier extends javax.net.ssl.HostnameVerifier {
