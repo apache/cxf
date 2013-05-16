@@ -48,7 +48,9 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
+import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
@@ -121,6 +123,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             } else {
                 secProps = ConfigurationConverter.convert(getProperties());
             }
+            
+            setTokenValidators(secProps, soapMessage);
             
             SecurityEventListener securityEventListener = 
                 configureSecurityEventListener(soapMessage, secProps);
@@ -269,6 +273,61 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             }
         }
         return fault;
+    }
+    
+    private void setTokenValidators(
+        WSSSecurityProperties properties, SoapMessage message
+    ) throws WSSecurityException {
+        Validator validator = loadValidator(SecurityConstants.SAML1_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+        }
+        validator = loadValidator(SecurityConstants.SAML2_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+        }
+        validator = loadValidator(SecurityConstants.USERNAME_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_wsse_UsernameToken, validator);
+        }
+        validator = loadValidator(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_dsig_Signature, validator);
+        }
+        validator = loadValidator(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_wsu_Timestamp, validator);
+        }
+        validator = loadValidator(SecurityConstants.BST_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_wsse_BinarySecurityToken, validator);
+        }
+        validator = loadValidator(SecurityConstants.SCT_TOKEN_VALIDATOR, message);
+        if (validator != null) {
+            properties.addValidator(WSSConstants.TAG_wsc0502_SecurityContextToken, validator);
+            properties.addValidator(WSSConstants.TAG_wsc0512_SecurityContextToken, validator);
+        }
+    }
+    
+    private Validator loadValidator(String validatorKey, SoapMessage message) throws WSSecurityException {
+        Object o = message.getContextualProperty(validatorKey);
+        try {
+            if (o instanceof Validator) {
+                return (Validator)o;
+            } else if (o instanceof Class) {
+                return (Validator)((Class<?>)o).newInstance();
+            } else if (o instanceof String) {
+                return (Validator)ClassLoaderUtils.loadClass(o.toString(),
+                                                             WSS4JInInterceptor.class)
+                                                             .newInstance();
+            }
+        } catch (RuntimeException t) {
+            throw t;
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
+        
+        return null;
     }
 
     public List<String> getActions() {
