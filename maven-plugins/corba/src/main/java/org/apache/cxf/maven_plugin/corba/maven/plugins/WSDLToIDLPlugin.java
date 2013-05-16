@@ -165,7 +165,9 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                 bus.shutdown(true);
             }
             Thread.currentThread().setContextClassLoader(origContext);
-            System.setProperty("java.class.path", cp);
+            if (cp != null) {
+                System.setProperty("java.class.path", cp);
+            }
             
             Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
             for (Object o : newProps.keySet()) {
