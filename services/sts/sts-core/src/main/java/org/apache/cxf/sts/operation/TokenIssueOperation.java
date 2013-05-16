@@ -29,6 +29,8 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.event.STSIssueFailureEvent;
+import org.apache.cxf.sts.event.STSIssueSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -54,6 +56,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.ws.security.WSSecurityException;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * An implementation of the IssueOperation interface.
@@ -91,90 +94,103 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             RequestSecurityTokenType request,
             WebServiceContext context
     ) {
-        RequestParser requestParser = parseRequest(request, context);
-
-        TokenProviderParameters providerParameters = createTokenProviderParameters(requestParser, context);
-
-        // Check if the requested claims can be handled by the configured claim handlers
-        RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
-        checkClaimsSupport(requestedClaims);
-        requestedClaims = providerParameters.getRequestedSecondaryClaims();
-        checkClaimsSupport(requestedClaims);
-        providerParameters.setClaimsManager(claimsManager);
-        
-        String realm = providerParameters.getRealm();
-
-        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
-        String tokenType = tokenRequirements.getTokenType();
-
-
-        // Validate OnBehalfOf token if present
-        if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
-            ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
-            TokenValidatorResponse tokenResponse = validateReceivedToken(
-                    context, realm, tokenRequirements, validateTarget);
-
-            if (tokenResponse == null) {
-                LOG.fine("No Token Validator has been found that can handle this token");
-            } else if (validateTarget.getState().equals(STATE.INVALID)) {
-                throw new STSException("Incoming token is invalid", STSException.REQUEST_FAILED);
-            } else if (validateTarget.getState().equals(STATE.VALID)) {
-                processValidToken(providerParameters, validateTarget, tokenResponse); 
-            } else {
-                //[TODO] Add plugin for validation out-of-band
-                // Example:
-                // If the requestor is in the possession of a certificate (mutual ssl handshake)
-                // the STS trusts the token sent in OnBehalfOf element
-            }
-            if (tokenResponse != null) {
-                Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
-                if (additionalProperties != null) {
-                    providerParameters.setAdditionalProperties(additionalProperties);
-                }
-            }
-        }
-
-        // create token
-        TokenProviderResponse tokenResponse = null;
-        for (TokenProvider tokenProvider : tokenProviders) {
-            boolean canHandle = false;
-            if (realm == null) {
-                canHandle = tokenProvider.canHandleToken(tokenType);
-            } else {
-                canHandle = tokenProvider.canHandleToken(tokenType, realm);
-            }
-            if (canHandle) {
-                try {
-                    tokenResponse = tokenProvider.createToken(providerParameters);
-                } catch (STSException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw ex;
-                } catch (RuntimeException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw new STSException("Error in providing a token", ex, STSException.REQUEST_FAILED);
-                }
-                break;
-            }
-        }
-        if (tokenResponse == null || tokenResponse.getToken() == null) {
-            LOG.log(Level.WARNING, "No token provider found for requested token type: " + tokenType);
-            throw new STSException(
-                    "No token provider found for requested token type: " + tokenType, 
-                    STSException.REQUEST_FAILED
-            );
-        }
-        // prepare response
+        long start = System.currentTimeMillis();
+        TokenProviderParameters providerParameters = new TokenProviderParameters();
         try {
-            KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-            EncryptionProperties encryptionProperties = providerParameters.getEncryptionProperties();
-            RequestSecurityTokenResponseType response = 
-                createResponse(
-                        encryptionProperties, tokenResponse, tokenRequirements, keyRequirements, context
+            RequestParser requestParser = parseRequest(request, context);
+    
+            providerParameters = createTokenProviderParameters(requestParser, context);
+    
+            // Check if the requested claims can be handled by the configured claim handlers
+            RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
+            checkClaimsSupport(requestedClaims);
+            requestedClaims = providerParameters.getRequestedSecondaryClaims();
+            checkClaimsSupport(requestedClaims);
+            providerParameters.setClaimsManager(claimsManager);
+            
+            String realm = providerParameters.getRealm();
+    
+            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            String tokenType = tokenRequirements.getTokenType();
+    
+    
+            // Validate OnBehalfOf token if present
+            if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
+                ReceivedToken validateTarget = providerParameters.getTokenRequirements().getOnBehalfOf();
+                TokenValidatorResponse tokenResponse = validateReceivedToken(
+                        context, realm, tokenRequirements, validateTarget);
+    
+                if (tokenResponse == null) {
+                    LOG.fine("No Token Validator has been found that can handle this token");
+                } else if (validateTarget.getState().equals(STATE.INVALID)) {
+                    throw new STSException("Incoming token is invalid", STSException.REQUEST_FAILED);
+                } else if (validateTarget.getState().equals(STATE.VALID)) {
+                    processValidToken(providerParameters, validateTarget, tokenResponse); 
+                } else {
+                    //[TODO] Add plugin for validation out-of-band
+                    // Example:
+                    // If the requestor is in the possession of a certificate (mutual ssl handshake)
+                    // the STS trusts the token sent in OnBehalfOf element
+                }
+                if (tokenResponse != null) {
+                    Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
+                    if (additionalProperties != null) {
+                        providerParameters.setAdditionalProperties(additionalProperties);
+                    }
+                }
+            }
+    
+            // create token
+            TokenProviderResponse tokenResponse = null;
+            for (TokenProvider tokenProvider : tokenProviders) {
+                boolean canHandle = false;
+                if (realm == null) {
+                    canHandle = tokenProvider.canHandleToken(tokenType);
+                } else {
+                    canHandle = tokenProvider.canHandleToken(tokenType, realm);
+                }
+                if (canHandle) {
+                    try {
+                        tokenResponse = tokenProvider.createToken(providerParameters);
+                    } catch (STSException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+                        throw ex;
+                    } catch (RuntimeException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+                        throw new STSException("Error in providing a token", ex, STSException.REQUEST_FAILED);
+                    }
+                    break;
+                }
+            }
+            if (tokenResponse == null || tokenResponse.getToken() == null) {
+                LOG.log(Level.WARNING, "No token provider found for requested token type: " + tokenType);
+                throw new STSException(
+                        "No token provider found for requested token type: " + tokenType, 
+                        STSException.REQUEST_FAILED
                 );
-            return response;
-        } catch (Throwable ex) {
-            LOG.log(Level.WARNING, "", ex);
-            throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
+            }
+            // prepare response
+            try {
+                KeyRequirements keyRequirements = requestParser.getKeyRequirements();
+                EncryptionProperties encryptionProperties = providerParameters.getEncryptionProperties();
+                RequestSecurityTokenResponseType response = 
+                    createResponse(
+                            encryptionProperties, tokenResponse, tokenRequirements, keyRequirements, context
+                    );
+                ApplicationEvent event = new STSIssueSuccessEvent(providerParameters,
+                        System.currentTimeMillis() - start);
+                publishEvent(event);
+                return response;
+            } catch (Throwable ex) {
+                LOG.log(Level.WARNING, "", ex);
+                throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
+            }
+        
+        } catch (RuntimeException ex) {
+            ApplicationEvent event = new STSIssueFailureEvent(providerParameters,
+                                                              System.currentTimeMillis() - start, ex);
+            publishEvent(event);
+            throw ex;
         }
     }
 

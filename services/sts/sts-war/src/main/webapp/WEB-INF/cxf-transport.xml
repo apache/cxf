@@ -38,6 +38,8 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
+    
+    <bean id="loggerListener" class="org.apache.cxf.sts.event.LoggerListener" />
 
 	<bean id="transportSTSProviderBean"
 	    class="org.apache.cxf.sts.provider.DefaultSecurityTokenServiceProvider">
