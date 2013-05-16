@@ -59,7 +59,7 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
                 return;
             }
         } catch (XMLStreamException e) {
-            throw new SoapFault(new Message("XML_STREAM_EXC", LOG), e, 
+            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
                                 message.getVersion().getSender());
         }
         if (message.getVersion().getFault().equals(xmlReader.getName()) && isRequestor(message)) {
