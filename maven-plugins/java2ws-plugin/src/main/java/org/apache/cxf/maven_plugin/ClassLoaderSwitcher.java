@@ -112,7 +112,9 @@ public class ClassLoaderSwitcher {
      */
     public void restoreClassLoader() {
         Thread.currentThread().setContextClassLoader(origContextClassloader);
-        System.setProperty("java.class.path", origClassPath);
+        if (origClassPath != null) {
+            System.setProperty("java.class.path", origClassPath);
+        }
 
         Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
         for (Object o : newProps.keySet()) {
