@@ -62,7 +62,8 @@ public class StartBodyInterceptor extends AbstractSoapInterceptor {
                 i = xmlReader.next();
             }
         } catch (XMLStreamException e) {
-            throw new SoapFault(new Message("XML_STREAM_EXC", LOG), e, message.getVersion().getSender());
+            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
+                                message.getVersion().getSender());
         }
 
     }
