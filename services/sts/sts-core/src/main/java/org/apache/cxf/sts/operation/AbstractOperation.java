@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -83,12 +84,14 @@ import org.apache.ws.security.message.WSSecEncrypt;
 import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 
-
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 
 /**
  * This abstract class contains some common functionality for different operations.
  */
-public abstract class AbstractOperation {
+public abstract class AbstractOperation implements ApplicationEventPublisherAware {
 
     public static final QName TOKEN_TYPE = 
         new QName(WSConstants.WSSE11_NS, WSConstants.TOKEN_TYPE, WSConstants.WSSE11_PREFIX);
@@ -103,6 +106,7 @@ public abstract class AbstractOperation {
     protected boolean returnReferences = true;
     protected TokenStore tokenStore;
     protected ClaimsManager claimsManager = new ClaimsManager();
+    protected ApplicationEventPublisher eventPublisher;
     
     public boolean isReturnReferences() {
         return returnReferences;
@@ -642,4 +646,15 @@ public abstract class AbstractOperation {
         }
     }
     
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.eventPublisher = applicationEventPublisher;
+    }
+    
+    
+    protected void publishEvent(ApplicationEvent event) {
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(event);
+        }
+    }
 }

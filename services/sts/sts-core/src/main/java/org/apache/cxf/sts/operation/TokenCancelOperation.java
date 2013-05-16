@@ -30,6 +30,8 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.STSConstants;
+import org.apache.cxf.sts.event.STSCancelFailureEvent;
+import org.apache.cxf.sts.event.STSCancelSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -44,6 +46,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedTokenCancelledType;
 import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
 import org.apache.ws.security.WSSecurityException;
+import org.springframework.context.ApplicationEvent;
 
 /**
  *  An implementation for Cancel operation interface.
@@ -65,69 +68,84 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
     public RequestSecurityTokenResponseType cancel(
         RequestSecurityTokenType request, WebServiceContext context
     ) {
-        RequestParser requestParser = parseRequest(request, context);
-        
-        KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
-        
-        ReceivedToken cancelTarget = tokenRequirements.getCancelTarget();
-        if (cancelTarget == null || cancelTarget.getToken() == null) {
-            throw new STSException("No element presented for cancellation", STSException.INVALID_REQUEST);
-        }
-        if (tokenRequirements.getTokenType() == null) {
-            tokenRequirements.setTokenType(STSConstants.STATUS);
-            LOG.fine(
-                "Received TokenType is null, falling back to default token type: " + STSConstants.STATUS
-            );
-        }
-        
+        long start = System.currentTimeMillis();
         TokenCancellerParameters cancellerParameters = new TokenCancellerParameters();
-        cancellerParameters.setStsProperties(stsProperties);
-        cancellerParameters.setPrincipal(context.getUserPrincipal());
-        cancellerParameters.setWebServiceContext(context);
-        cancellerParameters.setTokenStore(getTokenStore());
         
-        cancellerParameters.setKeyRequirements(keyRequirements);
-        cancellerParameters.setTokenRequirements(tokenRequirements);   
-        cancellerParameters.setToken(cancelTarget);
-        
-        //
-        // Cancel token
-        //
-        TokenCancellerResponse tokenResponse = null;
-        for (TokenCanceller tokenCanceller : tokencancellers) {
-            if (tokenCanceller.canHandleToken(cancelTarget)) {
-                try {
-                    tokenResponse = tokenCanceller.cancelToken(cancellerParameters);
-                } catch (RuntimeException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw new STSException(
-                        "Error while cancelling a token", ex, STSException.REQUEST_FAILED
-                    );
-                }
-                break;
-            }
-        }
-        if (tokenResponse == null || tokenResponse.getToken() == null) {
-            LOG.fine("No Token Canceller has been found that can handle this token");
-            throw new STSException(
-                "No token canceller found for requested token type: " 
-                + tokenRequirements.getTokenType(), 
-                STSException.REQUEST_FAILED
-            );
-        }
-        
-        if (tokenResponse.getToken().getState() != STATE.CANCELLED) {
-            LOG.log(Level.WARNING, "Token cancellation failed.");
-            throw new STSException("Token cancellation failed.");
-        }
-        
-        // prepare response
         try {
-            return createResponse(tokenRequirements);
-        } catch (Throwable ex) {
-            LOG.log(Level.WARNING, "", ex);
-            throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
+            RequestParser requestParser = parseRequest(request, context);
+            
+            KeyRequirements keyRequirements = requestParser.getKeyRequirements();
+            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            
+            cancellerParameters.setStsProperties(stsProperties);
+            cancellerParameters.setPrincipal(context.getUserPrincipal());
+            cancellerParameters.setWebServiceContext(context);
+            cancellerParameters.setTokenStore(getTokenStore());
+            
+            cancellerParameters.setKeyRequirements(keyRequirements);
+            cancellerParameters.setTokenRequirements(tokenRequirements);  
+            
+            ReceivedToken cancelTarget = tokenRequirements.getCancelTarget();
+            if (cancelTarget == null || cancelTarget.getToken() == null) {
+                throw new STSException("No element presented for cancellation", STSException.INVALID_REQUEST);
+            }
+            cancellerParameters.setToken(cancelTarget);
+            
+            if (tokenRequirements.getTokenType() == null) {
+                tokenRequirements.setTokenType(STSConstants.STATUS);
+                LOG.fine(
+                    "Received TokenType is null, falling back to default token type: " + STSConstants.STATUS
+                );
+            }
+            
+            //
+            // Cancel token
+            //
+            TokenCancellerResponse tokenResponse = null;
+            for (TokenCanceller tokenCanceller : tokencancellers) {
+                if (tokenCanceller.canHandleToken(cancelTarget)) {
+                    try {
+                        tokenResponse = tokenCanceller.cancelToken(cancellerParameters);
+                    } catch (RuntimeException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+                        throw new STSException(
+                            "Error while cancelling a token", ex, STSException.REQUEST_FAILED
+                        );
+                    }
+                    break;
+                }
+            }
+            if (tokenResponse == null || tokenResponse.getToken() == null) {
+                LOG.fine("No Token Canceller has been found that can handle this token");
+                throw new STSException(
+                    "No token canceller found for requested token type: " 
+                    + tokenRequirements.getTokenType(), 
+                    STSException.REQUEST_FAILED
+                );
+            }
+            
+            if (tokenResponse.getToken().getState() != STATE.CANCELLED) {
+                LOG.log(Level.WARNING, "Token cancellation failed.");
+                throw new STSException("Token cancellation failed.");
+            }
+            
+            // prepare response
+            try {
+                RequestSecurityTokenResponseType response = createResponse(tokenRequirements);
+                ApplicationEvent event = new STSCancelSuccessEvent(cancellerParameters,
+                        System.currentTimeMillis() - start);
+                publishEvent(event);
+                return response;
+            } catch (Throwable ex) {
+                LOG.log(Level.WARNING, "", ex);
+                throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
+            }
+        
+        } catch (RuntimeException ex) {
+            ApplicationEvent event = new STSCancelFailureEvent(cancellerParameters,
+                                                              System.currentTimeMillis() - start, ex);
+            publishEvent(event);
+            throw ex;
         }
     }
 
