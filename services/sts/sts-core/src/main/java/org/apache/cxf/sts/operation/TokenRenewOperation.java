@@ -31,6 +31,8 @@ import javax.xml.ws.WebServiceContext;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
+import org.apache.cxf.sts.event.STSRenewFailureEvent;
+import org.apache.cxf.sts.event.STSRenewSuccessEvent;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
@@ -51,6 +53,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * An implementation of the IssueOperation interface to renew tokens.
@@ -72,105 +75,129 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
     public RequestSecurityTokenResponseType renew(
         RequestSecurityTokenType request, WebServiceContext context
     ) {
-        RequestParser requestParser = parseRequest(request, context);
-
-        KeyRequirements keyRequirements = requestParser.getKeyRequirements();
-        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+        long start = System.currentTimeMillis();
+        TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         
-        ReceivedToken renewTarget = tokenRequirements.getRenewTarget();
-        if (renewTarget == null || renewTarget.getToken() == null) {
-            throw new STSException("No element presented for renewal", STSException.INVALID_REQUEST);
-        }
-        if (tokenRequirements.getTokenType() == null) {
-            LOG.fine("Received TokenType is null");
-        }
-        
-        // Get the realm of the request
-        String realm = null;
-        if (stsProperties.getRealmParser() != null) {
-            RealmParser realmParser = stsProperties.getRealmParser();
-            realm = realmParser.parseRealm(context);
-        }
-        
-        // Validate the request
-        TokenValidatorResponse tokenResponse = validateReceivedToken(
-                context, realm, tokenRequirements, renewTarget);
-        
-        if (tokenResponse == null) {
-            LOG.fine("No Token Validator has been found that can handle this token");
-            renewTarget.setState(STATE.INVALID);
-            throw new STSException(
-                "No Token Validator has been found that can handle this token" 
-                + tokenRequirements.getTokenType(), 
-                STSException.REQUEST_FAILED
-            );
-        }
-        
-        // Reject an invalid token
-        if (tokenResponse.getToken().getState() != STATE.EXPIRED
-            && tokenResponse.getToken().getState() != STATE.VALID) {
-            LOG.fine("The token is not valid or expired, and so it cannot be renewed");
-            throw new STSException(
-                "No Token Validator has been found that can handle this token" 
-                + tokenRequirements.getTokenType(), 
-                STSException.REQUEST_FAILED
-            );
-        }
-        
-        //
-        // Renew the token
-        //
-        TokenRenewerResponse tokenRenewerResponse = null;
-        TokenRenewerParameters renewerParameters = createTokenRenewerParameters(requestParser, context);
-        Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
-        if (additionalProperties != null) {
-            renewerParameters.setAdditionalProperties(additionalProperties);
-        }
-        renewerParameters.setRealm(tokenResponse.getTokenRealm());
-        renewerParameters.setToken(tokenResponse.getToken());
-
-        realm = tokenResponse.getTokenRealm();
-        for (TokenRenewer tokenRenewer : tokenRenewers) {
-            boolean canHandle = false;
-            if (realm == null) {
-                canHandle = tokenRenewer.canHandleToken(tokenResponse.getToken());
-            } else {
-                canHandle = tokenRenewer.canHandleToken(tokenResponse.getToken(), realm);
-            }
-            if (canHandle) {
-                try {
-                    tokenRenewerResponse = tokenRenewer.renewToken(renewerParameters);
-                } catch (STSException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw ex;
-                } catch (RuntimeException ex) {
-                    LOG.log(Level.WARNING, "", ex);
-                    throw new STSException(
-                        "Error in providing a token", ex, STSException.REQUEST_FAILED
-                    );
-                }
-                break;
-            }
-        }
-        if (tokenRenewerResponse == null || tokenRenewerResponse.getToken() == null) {
-            LOG.fine("No Token Renewer has been found that can handle this token");
-            throw new STSException(
-                "No token renewer found for requested token type", STSException.REQUEST_FAILED
-            );
-        }
-
-        // prepare response
         try {
-            EncryptionProperties encryptionProperties = renewerParameters.getEncryptionProperties();
-            RequestSecurityTokenResponseType response = 
-                createResponse(
-                    encryptionProperties, tokenRenewerResponse, tokenRequirements, keyRequirements, context
+            RequestParser requestParser = parseRequest(request, context);
+    
+            KeyRequirements keyRequirements = requestParser.getKeyRequirements();
+            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
+            
+            renewerParameters.setStsProperties(stsProperties);
+            renewerParameters.setPrincipal(context.getUserPrincipal());
+            renewerParameters.setWebServiceContext(context);
+            renewerParameters.setTokenStore(getTokenStore());
+            
+            renewerParameters.setKeyRequirements(keyRequirements);
+            renewerParameters.setTokenRequirements(tokenRequirements);  
+            
+            ReceivedToken renewTarget = tokenRequirements.getRenewTarget();
+            if (renewTarget == null || renewTarget.getToken() == null) {
+                throw new STSException("No element presented for renewal", STSException.INVALID_REQUEST);
+            }
+            renewerParameters.setToken(renewTarget);
+            
+            if (tokenRequirements.getTokenType() == null) {
+                LOG.fine("Received TokenType is null");
+            }
+            
+            // Get the realm of the request
+            String realm = null;
+            if (stsProperties.getRealmParser() != null) {
+                RealmParser realmParser = stsProperties.getRealmParser();
+                realm = realmParser.parseRealm(context);
+            }
+            renewerParameters.setRealm(realm);
+            
+            // Validate the request
+            TokenValidatorResponse tokenResponse = validateReceivedToken(
+                    context, realm, tokenRequirements, renewTarget);
+            
+            if (tokenResponse == null) {
+                LOG.fine("No Token Validator has been found that can handle this token");
+                renewTarget.setState(STATE.INVALID);
+                throw new STSException(
+                    "No Token Validator has been found that can handle this token" 
+                    + tokenRequirements.getTokenType(), 
+                    STSException.REQUEST_FAILED
                 );
-            return response;
-        } catch (Throwable ex) {
-            LOG.log(Level.WARNING, "", ex);
-            throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
-        }
+            }
+            
+            // Reject an invalid token
+            if (tokenResponse.getToken().getState() != STATE.EXPIRED
+                && tokenResponse.getToken().getState() != STATE.VALID) {
+                LOG.fine("The token is not valid or expired, and so it cannot be renewed");
+                throw new STSException(
+                    "No Token Validator has been found that can handle this token" 
+                    + tokenRequirements.getTokenType(), 
+                    STSException.REQUEST_FAILED
+                );
+            }
+            
+            //
+            // Renew the token
+            //
+            TokenRenewerResponse tokenRenewerResponse = null;
+            renewerParameters = createTokenRenewerParameters(requestParser, context);
+            Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
+            if (additionalProperties != null) {
+                renewerParameters.setAdditionalProperties(additionalProperties);
+            }
+            renewerParameters.setRealm(tokenResponse.getTokenRealm());
+            renewerParameters.setToken(tokenResponse.getToken());
+    
+            realm = tokenResponse.getTokenRealm();
+            for (TokenRenewer tokenRenewer : tokenRenewers) {
+                boolean canHandle = false;
+                if (realm == null) {
+                    canHandle = tokenRenewer.canHandleToken(tokenResponse.getToken());
+                } else {
+                    canHandle = tokenRenewer.canHandleToken(tokenResponse.getToken(), realm);
+                }
+                if (canHandle) {
+                    try {
+                        tokenRenewerResponse = tokenRenewer.renewToken(renewerParameters);
+                    } catch (STSException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+                        throw ex;
+                    } catch (RuntimeException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+                        throw new STSException(
+                            "Error in providing a token", ex, STSException.REQUEST_FAILED
+                        );
+                    }
+                    break;
+                }
+            }
+            if (tokenRenewerResponse == null || tokenRenewerResponse.getToken() == null) {
+                LOG.fine("No Token Renewer has been found that can handle this token");
+                throw new STSException(
+                    "No token renewer found for requested token type", STSException.REQUEST_FAILED
+                );
+            }
+    
+            // prepare response
+            try {
+                EncryptionProperties encryptionProperties = renewerParameters.getEncryptionProperties();
+                RequestSecurityTokenResponseType response = 
+                    createResponse(
+                        encryptionProperties, tokenRenewerResponse, tokenRequirements, keyRequirements, context
+                    );
+                ApplicationEvent event = new STSRenewSuccessEvent(renewerParameters,
+                        System.currentTimeMillis() - start);
+                publishEvent(event);
+                return response;
+            } catch (Throwable ex) {
+                LOG.log(Level.WARNING, "", ex);
+                throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
+            }
+        } catch (RuntimeException ex) {
+            ApplicationEvent event = new STSRenewFailureEvent(renewerParameters,
+                                                              System.currentTimeMillis() - start, ex);
+            publishEvent(event);
+            throw ex;
+        }            
     }
    
     private RequestSecurityTokenResponseType createResponse(

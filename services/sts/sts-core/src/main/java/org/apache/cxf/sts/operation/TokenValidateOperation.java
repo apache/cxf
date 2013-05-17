@@ -31,6 +31,8 @@ import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.sts.RealmParser;
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.claims.RequestClaimCollection;
+import org.apache.cxf.sts.event.STSValidateFailureEvent;
+import org.apache.cxf.sts.event.STSValidateSuccessEvent;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.request.RequestParser;
@@ -39,6 +41,7 @@ import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.provider.TokenReference;
+import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.LifetimeType;
@@ -49,6 +52,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * An implementation of the ValidateOperation interface.
@@ -61,101 +65,128 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         RequestSecurityTokenType request, 
         WebServiceContext context
     ) {
-        RequestParser requestParser = parseRequest(request, context);
+        long start = System.currentTimeMillis();
+        TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         
-        TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
-        
-        ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
-        if (validateTarget == null || validateTarget.getToken() == null) {
-            throw new STSException("No element presented for validation", STSException.INVALID_REQUEST);
-        }
-        if (tokenRequirements.getTokenType() == null) {
-            tokenRequirements.setTokenType(STSConstants.STATUS);
-            LOG.fine(
-                "Received TokenType is null, falling back to default token type: " 
-                + STSConstants.STATUS
-            );
-        }
-        
-        // Get the realm of the request
-        String realm = null;
-        if (stsProperties.getRealmParser() != null) {
-            RealmParser realmParser = stsProperties.getRealmParser();
-            realm = realmParser.parseRealm(context);
-        }
-        
-        TokenValidatorResponse tokenResponse = validateReceivedToken(
-                context, realm, tokenRequirements, validateTarget);
-        
-        if (tokenResponse == null) {
-            LOG.fine("No Token Validator has been found that can handle this token");
-            tokenResponse = new TokenValidatorResponse();
-            validateTarget.setState(STATE.INVALID);
-            tokenResponse.setToken(validateTarget);
-        }
-        
-        //
-        // Create a new token (if requested)
-        //
-        TokenProviderResponse tokenProviderResponse = null;
-        String tokenType = tokenRequirements.getTokenType();
-        if (tokenResponse.getToken().getState() == STATE.VALID 
-            && !STSConstants.STATUS.equals(tokenType)) {
-            TokenProviderParameters providerParameters = 
-                 createTokenProviderParameters(requestParser, context);
+        try {
+            RequestParser requestParser = parseRequest(request, context);
             
-            processValidToken(providerParameters, validateTarget, tokenResponse);
+            TokenRequirements tokenRequirements = requestParser.getTokenRequirements();
             
-            // Check if the requested claims can be handled by the configured claim handlers
-            RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
-            checkClaimsSupport(requestedClaims);
-            requestedClaims = providerParameters.getRequestedSecondaryClaims();
-            checkClaimsSupport(requestedClaims);
-            providerParameters.setClaimsManager(claimsManager);
+            validatorParameters.setStsProperties(stsProperties);
+            validatorParameters.setPrincipal(context.getUserPrincipal());
+            validatorParameters.setWebServiceContext(context);
+            validatorParameters.setTokenStore(getTokenStore());
             
-            Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
-            if (additionalProperties != null) {
-                providerParameters.setAdditionalProperties(additionalProperties);
+            //validatorParameters.setKeyRequirements(keyRequirements);
+            validatorParameters.setTokenRequirements(tokenRequirements);
+            
+            ReceivedToken validateTarget = tokenRequirements.getValidateTarget();
+            if (validateTarget == null || validateTarget.getToken() == null) {
+                throw new STSException("No element presented for validation", STSException.INVALID_REQUEST);
             }
-            realm = providerParameters.getRealm();
-            for (TokenProvider tokenProvider : tokenProviders) {
-                boolean canHandle = false;
-                if (realm == null) {
-                    canHandle = tokenProvider.canHandleToken(tokenType);
-                } else {
-                    canHandle = tokenProvider.canHandleToken(tokenType, realm);
-                }
-                if (canHandle) {
-                    try {
-                        tokenProviderResponse = tokenProvider.createToken(providerParameters);
-                    } catch (STSException ex) {
-                        LOG.log(Level.WARNING, "", ex);
-                        throw ex;
-                    } catch (RuntimeException ex) {
-                        LOG.log(Level.WARNING, "", ex);
-                        throw new STSException(
-                            "Error in providing a token", ex, STSException.REQUEST_FAILED
-                        );
-                    }
-                    break;
-                }
-            }
-            if (tokenProviderResponse == null || tokenProviderResponse.getToken() == null) {
-                LOG.fine("No Token Provider has been found that can handle this token");
-                throw new STSException(
-                    "No token provider found for requested token type: " + tokenType, 
-                    STSException.REQUEST_FAILED
+            validatorParameters.setToken(validateTarget);
+            
+            if (tokenRequirements.getTokenType() == null) {
+                tokenRequirements.setTokenType(STSConstants.STATUS);
+                LOG.fine(
+                    "Received TokenType is null, falling back to default token type: " 
+                    + STSConstants.STATUS
                 );
             }
-        }
-        
-        // prepare response
-        try {
-            return createResponse(tokenResponse, tokenProviderResponse, tokenRequirements);
-        } catch (Throwable ex) {
-            LOG.log(Level.WARNING, "", ex);
-            throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
-        }
+            
+            // Get the realm of the request
+            String realm = null;
+            if (stsProperties.getRealmParser() != null) {
+                RealmParser realmParser = stsProperties.getRealmParser();
+                realm = realmParser.parseRealm(context);
+            }
+            validatorParameters.setRealm(realm);
+            
+            TokenValidatorResponse tokenResponse = validateReceivedToken(
+                    context, realm, tokenRequirements, validateTarget);
+            
+            if (tokenResponse == null) {
+                LOG.fine("No Token Validator has been found that can handle this token");
+                tokenResponse = new TokenValidatorResponse();
+                validateTarget.setState(STATE.INVALID);
+                tokenResponse.setToken(validateTarget);
+            }
+            
+            //
+            // Create a new token (if requested)
+            //
+            TokenProviderResponse tokenProviderResponse = null;
+            String tokenType = tokenRequirements.getTokenType();
+            if (tokenResponse.getToken().getState() == STATE.VALID 
+                && !STSConstants.STATUS.equals(tokenType)) {
+                TokenProviderParameters providerParameters = 
+                     createTokenProviderParameters(requestParser, context);
+                
+                processValidToken(providerParameters, validateTarget, tokenResponse);
+                
+                // Check if the requested claims can be handled by the configured claim handlers
+                RequestClaimCollection requestedClaims = providerParameters.getRequestedPrimaryClaims();
+                checkClaimsSupport(requestedClaims);
+                requestedClaims = providerParameters.getRequestedSecondaryClaims();
+                checkClaimsSupport(requestedClaims);
+                providerParameters.setClaimsManager(claimsManager);
+                
+                Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
+                if (additionalProperties != null) {
+                    providerParameters.setAdditionalProperties(additionalProperties);
+                }
+                realm = providerParameters.getRealm();
+                for (TokenProvider tokenProvider : tokenProviders) {
+                    boolean canHandle = false;
+                    if (realm == null) {
+                        canHandle = tokenProvider.canHandleToken(tokenType);
+                    } else {
+                        canHandle = tokenProvider.canHandleToken(tokenType, realm);
+                    }
+                    if (canHandle) {
+                        try {
+                            tokenProviderResponse = tokenProvider.createToken(providerParameters);
+                        } catch (STSException ex) {
+                            LOG.log(Level.WARNING, "", ex);
+                            throw ex;
+                        } catch (RuntimeException ex) {
+                            LOG.log(Level.WARNING, "", ex);
+                            throw new STSException(
+                                "Error in providing a token", ex, STSException.REQUEST_FAILED
+                            );
+                        }
+                        break;
+                    }
+                }
+                if (tokenProviderResponse == null || tokenProviderResponse.getToken() == null) {
+                    LOG.fine("No Token Provider has been found that can handle this token");
+                    throw new STSException(
+                        "No token provider found for requested token type: " + tokenType, 
+                        STSException.REQUEST_FAILED
+                    );
+                }
+            }
+            
+            // prepare response
+            try {
+                RequestSecurityTokenResponseType response =
+                    createResponse(tokenResponse, tokenProviderResponse, tokenRequirements);
+                ApplicationEvent event = new STSValidateSuccessEvent(validatorParameters,
+                        System.currentTimeMillis() - start);
+                publishEvent(event);
+                return response;
+            } catch (Throwable ex) {
+                LOG.log(Level.WARNING, "", ex);
+                throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
+            }
+            
+        } catch (RuntimeException ex) {
+            ApplicationEvent event = new STSValidateFailureEvent(validatorParameters,
+                                                              System.currentTimeMillis() - start, ex);
+            publishEvent(event);
+            throw ex;
+        }            
     }
     
     private RequestSecurityTokenResponseType createResponse(
