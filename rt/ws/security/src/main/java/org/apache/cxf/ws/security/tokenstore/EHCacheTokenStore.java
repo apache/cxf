@@ -66,6 +66,9 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         
         Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
+        
+        // Set the TimeToLive value from the CacheConfiguration
+        ttl = cc.getTimeToLiveSeconds();
     }
     
     /**
