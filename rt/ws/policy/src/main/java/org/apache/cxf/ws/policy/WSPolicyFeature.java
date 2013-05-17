@@ -216,7 +216,8 @@ public class WSPolicyFeature extends AbstractFeature {
     Policy resolveReference(PolicyReference ref, PolicyBuilder builder, Bus bus, DescriptionInfo i) {
         Policy p = null;
         if (!ref.getURI().startsWith("#")) {
-            p = resolveExternal(ref, i.getBaseURI(), bus);
+            String base = i == null ? null : i.getBaseURI();
+            p = resolveExternal(ref, base, bus);
         } else {
             p = resolveLocal(ref, bus, i);
         }
