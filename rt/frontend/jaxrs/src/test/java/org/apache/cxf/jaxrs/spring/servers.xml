@@ -80,7 +80,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
   
   <jaxrs:server id="moduleServer"
     modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
-    address="http://localhost:9090/simpleWithAddress"
+    address="http://localhost:9090/simpleWithAddress2"
     bus="cxf"/>
   
 </beans>
