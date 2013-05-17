@@ -22,14 +22,11 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -37,45 +34,39 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.model.SoapBindingInfo;
-import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
-import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.security.SecurityConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
-import org.apache.wss4j.policy.WSSPolicyException;
-import org.apache.wss4j.policy.stax.OperationPolicy;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
-import org.apache.wss4j.policy.stax.PolicyInputProcessor;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
+import org.apache.wss4j.policy.model.AbstractBinding;
+import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
 
 /**
  * 
  */
-public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
-    public static final PolicyBasedWSS4JStaxInInterceptor INSTANCE 
-        = new PolicyBasedWSS4JStaxInInterceptor();
-    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JStaxInInterceptor.class);
+public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor {
+    public static final PolicyBasedWSS4JStaxOutInterceptor INSTANCE 
+        = new PolicyBasedWSS4JStaxOutInterceptor();
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JStaxOutInterceptor.class);
 
-    public PolicyBasedWSS4JStaxInInterceptor() {
+    public PolicyBasedWSS4JStaxOutInterceptor() {
         super(new HashMap<String, Object>());
     }
     
@@ -84,8 +75,8 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         boolean enableStax = 
             MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
         if (aim != null && enableStax) {
+            getProperties().clear();
             super.handleMessage(msg);
-            msg.getInterceptorChain().add(new PolicyStaxActionInInterceptor());
         }
     }
     
@@ -177,15 +168,15 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
             message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
     }
@@ -217,15 +208,15 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         }
         
         if (signCrypto != null) {
-            message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), signCrypto);
         }
         
         if (encrCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + encrCrypto.hashCode());
             message.put("RefId-" + encrCrypto.hashCode(), (Crypto)encrCrypto);
         } else if (signCrypto != null) {
-            message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
+            message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
     }
@@ -262,7 +253,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
             
@@ -271,7 +262,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
         } else {
@@ -280,7 +271,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = encrCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.SIG_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
             
@@ -289,7 +280,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 crypto = signCrypto;
             }
             if (crypto != null) {
-                message.put(WSHandlerConstants.DEC_PROP_REF_ID, "RefId-" + crypto.hashCode());
+                message.put(WSHandlerConstants.ENC_PROP_REF_ID, "RefId-" + crypto.hashCode());
                 message.put("RefId-" + crypto.hashCode(), crypto);
             }
         }
@@ -341,6 +332,13 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         return signCrypto;
     }
     
+    private void configureActions(
+        AssertionInfoMap aim, SoapMessage message
+    ) throws WSSecurityException {
+        configureUsernameToken(aim, message);
+        configureTimestamp(aim, message);
+    }
+    
     @Override
     protected void configureProperties(SoapMessage msg) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
@@ -348,80 +346,110 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         checkSymmetricBinding(aim, msg);
         checkTransportBinding(aim, msg);
         
+        configureActions(aim, msg);
+        
         super.configureProperties(msg);
     }
     
-    @Override
-    protected SecurityEventListener configureSecurityEventListener(
-        SoapMessage msg, WSSSecurityProperties securityProperties
-    ) throws WSSPolicyException {
-        Endpoint endoint = msg.getExchange().get(Endpoint.class);
-        
-        PolicyEnforcer policyEnforcer = createPolicyEnforcer(endoint.getEndpointInfo(), msg);
-        securityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, securityProperties));
+    private void configureUsernameToken(
+        AssertionInfoMap aim, SoapMessage message
+    ) throws WSSecurityException {
+        Map<String, Object> config = getProperties();
+                                  
+        Collection<AssertionInfo> ais = 
+            getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        if (ais != null && ais.size() > 0) {
+            UsernameToken usernameToken = (UsernameToken)ais.iterator().next().getAssertion();
+            IncludeTokenType includeToken = usernameToken.getIncludeTokenType();
+            if (!isTokenRequired(includeToken, message)) {
+                return;
+            }
+            
+            // Action
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, 
+                           action + " " + ConfigurationConstants.USERNAME_TOKEN);
+            } else {
+                config.put(ConfigurationConstants.ACTION, 
+                           ConfigurationConstants.USERNAME_TOKEN);
+            }
 
-        return policyEnforcer;
+            // Password Type
+            PasswordType passwordType = usernameToken.getPasswordType();
+            if (passwordType == PasswordType.HashPassword) {
+                config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
+            } else if (passwordType == PasswordType.NoPassword) {
+                config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
+            } else {
+                config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+            }
+            
+            // Nonce + Created
+            if (usernameToken.isNonce()) {
+                config.put(ConfigurationConstants.ADD_USERNAMETOKEN_NONCE, "true");
+            }
+            if (usernameToken.isCreated()) {
+                config.put(ConfigurationConstants.ADD_USERNAMETOKEN_CREATED, "true");
+            }
+        }
     }
     
-    private PolicyEnforcer createPolicyEnforcer(
-        EndpointInfo endpointInfo, SoapMessage msg
-    ) throws WSSPolicyException {
-
-        List<OperationPolicy> operationPolicies = new ArrayList<OperationPolicy>();
-        Collection<BindingOperationInfo> bindingOperationInfos = endpointInfo.getBinding().getOperations();
-        for (Iterator<BindingOperationInfo> bindingOperationInfoIterator =
-                     bindingOperationInfos.iterator(); bindingOperationInfoIterator.hasNext();) {
-            BindingOperationInfo bindingOperationInfo = bindingOperationInfoIterator.next();
-            QName operationName = bindingOperationInfo.getName();
-            
-            // todo: I'm not sure what the effectivePolicy exactly contains,
-            // a) only the operation policy,
-            // or b) all policies for the service,
-            // or c) all policies which applies for the current operation.
-            // c) is that what we need for stax.
-            EffectivePolicy policy = 
-                (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-serve-request");
-            //PolicyEngineImpl.POLICY_INFO_REQUEST_SERVER);
-            if (MessageUtils.isRequestor(msg)) {
-                policy = 
-                    (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-client-response");
-            }
-            SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
-
-            String soapNS;
-            BindingInfo bindingInfo = bindingOperationInfo.getBinding();
-            if (bindingInfo instanceof SoapBindingInfo) {
-                soapNS = ((SoapBindingInfo)bindingInfo).getSoapVersion().getNamespace();
+    private void configureTimestamp(
+        AssertionInfoMap aim, SoapMessage message
+    ) throws WSSecurityException {
+        Map<String, Object> config = getProperties();
+        
+        AbstractBinding binding = getBinding(aim);
+        if (binding != null && binding.isIncludeTimestamp()) {
+            // Action
+            if (config.containsKey(ConfigurationConstants.ACTION)) {
+                String action = (String)config.get(ConfigurationConstants.ACTION);
+                config.put(ConfigurationConstants.ACTION, 
+                           action + " " + ConfigurationConstants.TIMESTAMP);
             } else {
-                //no idea what todo here...
-                //most probably throw an exception:
-                throw new IllegalArgumentException("BindingInfo is not an instance of SoapBindingInfo");
+                config.put(ConfigurationConstants.ACTION, 
+                           ConfigurationConstants.TIMESTAMP);
             }
+        }
+    }
 
-            //todo: I think its a bug that we handover only the localPart of the operation. 
-            // Needs to be fixed in ws-security-policy-stax
-            OperationPolicy operationPolicy = new OperationPolicy(operationName.getLocalPart());
-            operationPolicy.setPolicy(policy.getPolicy());
-            operationPolicy.setOperationAction(soapOperationInfo.getAction());
-            operationPolicy.setSoapMessageVersionNamespace(soapNS);
-            
-            operationPolicies.add(operationPolicy);
+    private AbstractBinding getBinding(
+        AssertionInfoMap aim
+    ) throws WSSecurityException {
+        Collection<AssertionInfo> ais = 
+            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (ais != null && ais.size() > 0) {
+            return (AbstractBinding)ais.iterator().next().getAssertion();
         }
         
-        final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
-        // TODO Soap Action
-        PolicyEnforcer securityEventListener = new PolicyEnforcer(operationPolicies, "") {
-            @Override
-            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                incomingSecurityEventList.add(securityEvent);
-                super.registerSecurityEvent(securityEvent);
-            }
-        };
+        ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
+        if (ais != null && ais.size() > 0) {
+            return (AbstractBinding)ais.iterator().next().getAssertion();
+        }
         
-        msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
-        msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
+        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
+        if (ais != null && ais.size() > 0) {
+            return (AbstractBinding)ais.iterator().next().getAssertion();
+        }
         
-        return securityEventListener;
+        return null;
     }
     
+    private boolean isTokenRequired(IncludeTokenType includeToken, SoapMessage soapMessage) {
+        if (includeToken == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
+            return false;
+        } else if (includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
+            return true;
+        } else {
+            boolean initiator = MessageUtils.isRequestor(soapMessage);
+            if (initiator && (includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
+                || includeToken == IncludeTokenType.INCLUDE_TOKEN_ONCE)) {
+                return true;
+            } else if (!initiator && includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
+                return true;
+            }
+            return false;
+        }
+    }
 }

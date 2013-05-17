@@ -19,7 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +36,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -61,7 +63,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
     
     private boolean mtomEnabled;
     
-    public WSS4JStaxOutInterceptor(WSSSecurityProperties securityProperties) throws WSSecurityException {
+    public WSS4JStaxOutInterceptor(WSSSecurityProperties securityProperties) {
         super();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
@@ -70,7 +72,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         setSecurityProperties(securityProperties);
     }
 
-    public WSS4JStaxOutInterceptor(Map<String, Object> props) throws WSSecurityException {
+    public WSS4JStaxOutInterceptor(Map<String, Object> props) {
         super(props);
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
@@ -107,15 +109,6 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         OutputStream os = mc.getContent(OutputStream.class);
         String encoding = getEncoding(mc);
 
-        final List<SecurityEvent> outgoingSecurityEventList = new ArrayList<SecurityEvent>();
-        SecurityEventListener securityEventListener = new SecurityEventListener() {
-            @Override
-            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                outgoingSecurityEventList.add(securityEvent);
-            }
-        };
-        mc.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
-
         XMLStreamWriter newXMLStreamWriter;
         try {
             @SuppressWarnings("unchecked")
@@ -124,20 +117,27 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             
             translateProperties(mc);
             configureProperties(mc);
+            configureCallbackHandler(mc);
             
             OutboundWSSec outboundWSSec = null;
+            WSSSecurityProperties secProps = null;
             if (getSecurityProperties() != null) {
-                outboundWSSec = WSSec.getOutboundWSSec(getSecurityProperties());
+                secProps = getSecurityProperties();
             } else {
-                WSSSecurityProperties convertedProperties = 
-                    ConfigurationConverter.convert(getProperties());
-                outboundWSSec = WSSec.getOutboundWSSec(convertedProperties);
+                secProps = ConfigurationConverter.convert(getProperties());
             }
+            
+            SecurityEventListener securityEventListener = 
+                configureSecurityEventListener(mc, secProps);
+            
+            outboundWSSec = WSSec.getOutboundWSSec(secProps);
             
             newXMLStreamWriter = 
                 outboundWSSec.processOutMessage(os, encoding, requestSecurityEvents, securityEventListener);
             mc.setContent(XMLStreamWriter.class, newXMLStreamWriter);
         } catch (WSSecurityException e) {
+            throw new Fault(e);
+        } catch (WSSPolicyException e) {
             throw new Fault(e);
         }
 
@@ -159,11 +159,40 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         
     }
     
-    private void configureProperties(SoapMessage msg) throws WSSecurityException {
+    protected SecurityEventListener configureSecurityEventListener(
+        SoapMessage msg, WSSSecurityProperties securityProperties
+    ) throws WSSPolicyException {
+        final List<SecurityEvent> outgoingSecurityEventList = new LinkedList<SecurityEvent>();
+        SecurityEventListener securityEventListener = new SecurityEventListener() {
+            @Override
+            public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
+                outgoingSecurityEventList.add(securityEvent);
+            }
+        };
+        msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
+        msg.put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
+
+        return securityEventListener;
+    }
+    
+    protected void configureProperties(SoapMessage msg) throws WSSecurityException {
         Map<String, Object> config = getProperties();
         
         // Crypto loading only applies for Map
         if (config != null) {
+            String user = (String)msg.getContextualProperty(SecurityConstants.USERNAME);
+            if (user != null) {
+                config.put(ConfigurationConstants.USER, user);
+            }
+            String sigUser = (String)msg.getContextualProperty(SecurityConstants.SIGNATURE_USERNAME);
+            if (sigUser != null) {
+                config.put(ConfigurationConstants.SIGNATURE_USER, sigUser);
+            }
+            String encUser = (String)msg.getContextualProperty(SecurityConstants.ENCRYPT_USERNAME);
+            if (encUser != null) {
+                config.put(ConfigurationConstants.ENCRYPTION_USER, encUser);
+            }
+            
             Crypto sigCrypto = 
                 loadCrypto(
                     msg,

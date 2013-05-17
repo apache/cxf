@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -77,11 +78,15 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
 
     public void handleMessage(SoapMessage mc) throws Fault {
-        if (mc.getContent(SOAPMessage.class) == null) {
-            saajOut.handleMessage(mc);
+        boolean enableStax = 
+            MessageUtils.isTrue(mc.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+        if (!enableStax) {
+            if (mc.getContent(SOAPMessage.class) == null) {
+                saajOut.handleMessage(mc);
+            }
+            mc.put(SECURITY_PROCESSED, Boolean.TRUE);
+            mc.getInterceptorChain().add(ending);
         }
-        mc.put(SECURITY_PROCESSED, Boolean.TRUE);
-        mc.getInterceptorChain().add(ending);
     }    
     public void handleFault(SoapMessage message) {
         saajOut.handleFault(message);

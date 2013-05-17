@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.CallbackHandler;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -229,27 +228,6 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
     }
     
-    private void configureCallbackHandler(SoapMessage soapMessage) throws WSSecurityException {
-        Object o = soapMessage.getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-        if (o instanceof String) {
-            try {
-                o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
-        }            
-        if (o instanceof CallbackHandler) {
-            WSSSecurityProperties securityProperties = getSecurityProperties();
-            Map<String, Object> config = getProperties();
-            
-            if (securityProperties != null) {
-                securityProperties.setCallbackHandler((CallbackHandler)o);
-            } else {
-                config.put(ConfigurationConstants.PW_CALLBACK_REF, (CallbackHandler)o);
-            }
-        }
-    }
-
     /**
      * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
      * 1.1 specification, chapter 12 "Error Handling".
