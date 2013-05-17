@@ -20,6 +20,9 @@
 package org.apache.cxf.systest.jaxrs.failover;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.systest.jaxrs.BookStore;
@@ -35,17 +38,26 @@ public class Server extends AbstractBusTestServerBase {
     public static final String ADDRESS3 = "http://localhost:" + PORT3 + "/work/rest";
     
 
+    List<org.apache.cxf.endpoint.Server> servers = new ArrayList<org.apache.cxf.endpoint.Server>();
+    
     protected void run()  {
         createEndpoint(ADDRESS2);
         createEndpoint(ADDRESS3);
     }
-    
+    public void tearDown() throws Exception {
+        for (org.apache.cxf.endpoint.Server s : servers) {
+            s.stop();
+            s.destroy();
+        }
+        servers.clear();
+    }
+        
     private void createEndpoint(String address) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
         sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore(), false));
         sf.setAddress(address);
-        sf.create();
+        servers.add(sf.create());
     }
 
     public static void main(String[] args) {
