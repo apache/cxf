@@ -20,6 +20,8 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -30,6 +32,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
@@ -67,7 +70,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                                            XMLStreamReader reader) {
         String exMessage = null;
         QName faultCode = null;
-        QName subCode = null;
+        List<QName> subCodes = null;
         String role = null;
         String node = null;
         Element detail = null;
@@ -103,11 +106,16 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
                 faultCode = XMLUtils.getQName(el.getTextContent(), el);
             }
             
-            el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode/s:Value", 
+            el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode", 
                                       fault, 
                                       XPathConstants.NODE);
             if (el != null) {
-                subCode = XMLUtils.getQName(el.getTextContent(), el);
+                subCodes = new LinkedList<QName>();
+                NodeList vlist = el.getElementsByTagNameNS(Soap12.SOAP_NAMESPACE, "Value");
+                for (int i = 0; i < vlist.getLength(); i++) {
+                    Node v = vlist.item(i);
+                    subCodes.add(XMLUtils.getQName(v.getTextContent(), v));
+                }
             }
             
             exMessage = (String) xu.getValue("//s:Fault/s:Reason/s:Text/text()", 
@@ -140,7 +148,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         }
         
         SoapFault fault = new SoapFault(exMessage, faultCode);
-        fault.setSubCode(subCode);
+        fault.setSubCodes(subCodes);
         fault.setDetail(detail);
         fault.setRole(role);
         fault.setNode(node);
