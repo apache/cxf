@@ -20,11 +20,6 @@ package org.apache.cxf.aegis.inheritance.ws2.common;
 
 import org.apache.cxf.aegis.inheritance.ws2.common.pack1.ContentBean1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class ParentBean {
     private String id;
 

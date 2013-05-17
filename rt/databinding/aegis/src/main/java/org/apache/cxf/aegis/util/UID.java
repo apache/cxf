@@ -20,9 +20,6 @@ package org.apache.cxf.aegis.util;
 
 import java.util.Random;
 
-/**
- * @author Hani Suleiman Date: Jun 10, 2005 Time: 3:20:28 PM
- */
 public final class UID {
     private static int counter;
     private static Random random = new Random(System.currentTimeMillis());

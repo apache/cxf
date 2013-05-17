@@ -23,9 +23,6 @@ import java.util.Iterator;
 
 import javax.activation.DataHandler;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public interface Attachment {
     DataHandler getDataHandler();
 

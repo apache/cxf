@@ -24,10 +24,6 @@ import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 
-/**
- *
- * @author jtalbut
- */
 public class LoadDistributorSequentialStrategy extends SequentialStrategy {
 
     @Override

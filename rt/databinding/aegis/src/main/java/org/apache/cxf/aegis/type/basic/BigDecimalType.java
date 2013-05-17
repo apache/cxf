@@ -27,8 +27,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * <code>AegisType</code> for a <code>BigDecimal</code>
- * 
- * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
 public class BigDecimalType extends AegisType {
     public BigDecimalType() {

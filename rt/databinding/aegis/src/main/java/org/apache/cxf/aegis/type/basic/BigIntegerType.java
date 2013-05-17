@@ -27,8 +27,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * <code>AegisType</code> for a <code>BigInteger</code>
- * 
- * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
 public class BigIntegerType extends AegisType {
     public BigIntegerType() {

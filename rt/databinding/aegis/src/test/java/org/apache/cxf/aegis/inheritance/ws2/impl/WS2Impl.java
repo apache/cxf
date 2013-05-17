@@ -28,11 +28,6 @@ import org.apache.cxf.aegis.inheritance.ws2.common.exception.NotFoundException;
 import org.apache.cxf.aegis.inheritance.ws2.common.pack1.ContentBean1;
 import org.apache.cxf.aegis.inheritance.ws2.common.pack2.ContentBean2;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class WS2Impl implements WS2 {
     private Map<String, ParentBean> map = new HashMap<String, ParentBean>();
 

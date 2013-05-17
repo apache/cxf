@@ -20,9 +20,6 @@ package org.apache.cxf.management.persistence;
 
 /**
  * This filter will only persist exchange data with a specific status.
- * 
- * @author remi
- *
  */
 public class StatusExchangeDataFilter implements ExchangeDataFilter {
 

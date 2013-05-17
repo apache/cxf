@@ -20,9 +20,6 @@ package org.apache.cxf.common.util;
 
 /**
  * SOAP constants from the specifications.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Feb 18, 2004
  */
 public final class SOAPConstants {
     

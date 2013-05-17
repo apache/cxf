@@ -32,8 +32,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * Reads and writes <code>org.w3c.dom.Document</code> types.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class XMLStreamReaderType extends AegisType {
     public XMLStreamReaderType() {

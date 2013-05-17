@@ -26,8 +26,6 @@ import org.apache.cxf.common.util.SOAPConstants;
 
 /**
  * Basic type conversions for reading messages.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public abstract class AbstractMessageReader implements MessageReader {
     private static final QName XSI_NIL = new QName(SOAPConstants.XSI_NS, "nil", SOAPConstants.XSI_PREFIX);

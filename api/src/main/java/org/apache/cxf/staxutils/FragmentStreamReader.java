@@ -24,8 +24,6 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Wraps a XMLStreamReader and provides optional START_DOCUMENT and END_DOCUMENT events.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class FragmentStreamReader extends DepthXMLStreamReader {
     private boolean startElement;

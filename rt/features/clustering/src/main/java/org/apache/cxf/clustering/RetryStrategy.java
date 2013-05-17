@@ -26,9 +26,6 @@ import org.apache.cxf.message.Exchange;
 
 /**
  * This strategy simply retries the invocation using the same Endpoint (CXF-2036).
- * 
- * @author Dennis Kieselhorst
- *
  */
 public class RetryStrategy extends SequentialStrategy {
 

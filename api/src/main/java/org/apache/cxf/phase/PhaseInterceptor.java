@@ -34,7 +34,6 @@ import org.apache.cxf.message.Message;
  * interceptors that must be placed before and after the interceptor.
  *
  * @see org.apache.cxf.phase.PhaseInterceptorChain
- * @author Dan Diephouse
  */
 public interface PhaseInterceptor<T extends Message> extends Interceptor<T> {
 

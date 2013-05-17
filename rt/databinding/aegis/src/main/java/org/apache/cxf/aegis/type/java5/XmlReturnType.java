@@ -28,8 +28,6 @@ import org.apache.cxf.aegis.type.AegisType;
 /**
  * Annotates a service's return type to provide information about how it is to
  * be serialized.
- * 
- * @author Dan Diephouse
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

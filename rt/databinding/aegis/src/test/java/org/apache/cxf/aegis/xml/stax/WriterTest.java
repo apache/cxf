@@ -31,10 +31,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Nov 4, 2004
- */
 public class WriterTest extends AbstractCXFTest {
     File output;
 

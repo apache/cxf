@@ -68,7 +68,6 @@ import org.junit.Test;
 
 /**
  * JAXBEncoderDecoderTest
- * @author apaibir
  */
 public class JAXBEncoderDecoderTest extends Assert {
     public static final QName  SOAP_ENV = 

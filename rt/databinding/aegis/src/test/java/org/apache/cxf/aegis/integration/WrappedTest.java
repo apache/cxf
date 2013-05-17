@@ -31,10 +31,6 @@ import org.apache.cxf.aegis.services.BeanService;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @since Feb 21, 2004
- */
 public class WrappedTest extends AbstractAegisTest {
     
     private ArrayService arrayService;

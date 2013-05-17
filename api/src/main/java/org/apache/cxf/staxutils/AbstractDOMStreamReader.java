@@ -31,10 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Abstract logic for creating XMLStreamReader from DOM documents. Its works
- * using adapters for Element, Node and Attribute (
- * 
- * @see ElementAdapter }
- * @author <a href="mailto:tsztelak@gmail.com">Tomasz Sztelak</a>
+ * using adapters for Element, Node and Attribute.
  */
 public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
     protected int currentEvent = XMLStreamConstants.START_DOCUMENT;

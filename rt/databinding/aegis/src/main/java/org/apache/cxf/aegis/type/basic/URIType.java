@@ -27,8 +27,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * <code>AegisType</code> for a <code>URI</code>
- * 
- * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
 public class URIType extends AegisType {
     @Override

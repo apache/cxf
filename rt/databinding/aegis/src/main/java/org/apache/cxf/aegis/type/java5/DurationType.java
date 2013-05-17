@@ -28,9 +28,6 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
-/**
- * @author Dan Diephouse
- */
 public class DurationType extends AegisType {
     private DatatypeFactory dtFactory;
 

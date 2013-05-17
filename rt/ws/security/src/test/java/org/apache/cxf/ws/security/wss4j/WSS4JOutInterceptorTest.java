@@ -40,10 +40,6 @@ import org.apache.ws.security.handler.WSHandler;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.Test;
 
-
-/**
- * @author <a href="mailto:tsztelak@gmail.com">Tomasz Sztelak</a>
- */
 public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
     
     @Test

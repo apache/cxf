@@ -35,8 +35,6 @@ import org.jdom.Element;
 
 /**
  * Reads and writes <code>org.w3c.dom.Document</code> types.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class JDOMElementType extends AegisType {
     // private static final StaxBuilder builder = new StaxBuilder();

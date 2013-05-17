@@ -25,8 +25,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * SimpleSerializer
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class IntType extends AegisType {
     @Override

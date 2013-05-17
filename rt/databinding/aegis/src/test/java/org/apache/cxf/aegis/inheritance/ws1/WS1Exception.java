@@ -18,11 +18,6 @@
  */
 package org.apache.cxf.aegis.inheritance.ws1;
 
-/**
- * <br/>
- * 
- * @author xfournet
- */
 public class WS1Exception extends Exception {
     private static final long serialVersionUID = -6302805071638456660L;
     private int errorCode;

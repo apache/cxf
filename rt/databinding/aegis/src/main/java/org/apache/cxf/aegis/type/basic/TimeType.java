@@ -31,8 +31,6 @@ import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * AegisType for the Time class which serializes to an xs:time.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class TimeType extends AegisType {
     private static XsTimeFormat format = new XsTimeFormat();
