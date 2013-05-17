@@ -29,7 +29,7 @@
 
   <xsd:import namespace="http://www.osgi.org/xmlns/blueprint/v1.0.0" schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd"/>
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
-  <xsd:include schemaLocation="http://cxf.apache.org/schemas/jaxrs-common.xsd"/>
+  <xsd:include schemaLocation="jaxrs-common.xsd"/>
   
   <xsd:element name="server">
     <xsd:complexType>
@@ -49,11 +49,11 @@
             <xsd:element name="properties" type="beans:Tmap" minOccurs="0"/>
             <xsd:element name="serviceBeans" type="xsd:anyType" minOccurs="0"/>            
             <xsd:element name="modelBeans" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="model" type="model" minOccurs="0"/>
+            <xsd:element name="model" type="tns:model" minOccurs="0"/>
             <xsd:element name="providers" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="extensionMappings" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="languageMappings" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
+            <xsd:element name="schemaLocations" type="tns:schemasType" minOccurs="0"/>
             <xsd:element name="resourceComparator" type="xsd:anyType" minOccurs="0"/> 
           </xsd:all>
           <!-- xsd:attributeGroup ref="cxf-beans:beanAttributes"/-->
