@@ -20,6 +20,8 @@
 package org.apache.cxf.binding.soap;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -46,7 +48,7 @@ public class SoapFault extends Fault {
      * FaultHandler) be mapped to "Sender" instead.
      */ 
 
-    private QName subCode;
+    private List<QName> subCodes;
     private String role;
     private String node;
     private Map<String, String> namespaces = new HashMap<String, String>();
@@ -82,7 +84,7 @@ public class SoapFault extends Fault {
     }
     
     public String getSubCodeString(String prefix, String defaultPrefix) {
-        return getFaultCodeString(prefix, defaultPrefix, subCode);
+        return getFaultCodeString(prefix, defaultPrefix, getRootSubCode());
     }
     
     private String getFaultCodeString(String prefix, String defaultPrefix, QName fCode) {
@@ -97,6 +99,19 @@ public class SoapFault extends Fault {
         }
         
         return codePrefix + ":" + fCode.getLocalPart();        
+    }
+    
+    private QName getRootSubCode() {
+        return subCodes != null && subCodes.size() > 0 ? subCodes.get(0) : null;
+    }
+
+    private void setRootSubCode(QName subCode) {
+        if (subCodes == null) {
+            subCodes = new LinkedList<QName>();
+        } else {
+            subCodes.clear();
+        }
+        subCodes.add(subCode);
     }
 
     public String getReason() {
@@ -130,21 +145,53 @@ public class SoapFault extends Fault {
     }    
 
     /**
-     * Returns the SubCode for the Fault Code.
+     * Returns the SubCode for the Fault Code. If there are more than one Subcode entries 
+     * in this fault, the first Subcode is returned.
      * 
      * @return The SubCode element as detailed by the SOAP 1.2 spec.
      */
     public QName getSubCode() {
-        return subCode;
+        return getRootSubCode();
     }
 
     /**
-     * Sets the SubCode for the Fault Code.
+     * Returns the SubCode list for the Fault Code.
+     * 
+     * @return The SubCode element list as detailed by the SOAP 1.2 spec.
+     */
+    public List<QName> getSubCodes() {
+        return subCodes;
+    }
+
+    /**
+     * Sets the SubCode for the Fault Code. If there are more than one Subcode entries 
+     * in this fault, the first Subcode is set while the other entries are removed.
      * 
      * @param subCode The SubCode element as detailed by the SOAP 1.2 spec.
      */
     public void setSubCode(QName subCode) {
-        this.subCode = subCode;
+        setRootSubCode(subCode);
+    }
+
+    /**
+     * Sets the SubCode list for the Fault Code.
+     * 
+     * @param subCode The SubCode element list as detailed by the SOAP 1.2 spec.
+     */
+    public void setSubCodes(List<QName> subCodes) {
+        this.subCodes = subCodes;
+    }
+
+    /**
+     * Appends the SubCode to the SubCode list.
+     * 
+     * @param subCode The SubCode element as detailed by the SOAP 1.2 spec. 
+     */
+    public void appendSubCode(QName subCode) {
+        if (subCodes == null) {
+            subCodes = new LinkedList<QName>();
+        }
+        subCodes.add(subCode);
     }
 
     public Map<String, String> getNamespaces() {

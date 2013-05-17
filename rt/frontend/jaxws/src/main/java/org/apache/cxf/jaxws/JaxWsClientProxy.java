@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
@@ -219,10 +220,12 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             if (role != null) {
                 soapFault.setFaultActor(role);
             }
-            if (((SoapFault)ex).getSubCode() != null 
+            if (((SoapFault)ex).getSubCodes() != null 
                 && !SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE.equals(soapFault.getNamespaceURI())) {
                 // set the subcode only if it is supported (e.g, 1.2)
-                soapFault.appendFaultSubcode(((SoapFault)ex).getSubCode());
+                for (QName fsc : ((SoapFault)ex).getSubCodes()) {
+                    soapFault.appendFaultSubcode(fsc);    
+                }
             }
 
             if (((SoapFault)ex).hasDetails()) {
