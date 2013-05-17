@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs;
 
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -26,12 +28,17 @@ import org.apache.cxf.binding.AbstractBaseBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.transport.Destination;
 
 /**
  * The CXF BindingFactory implementation which is used to register 
@@ -39,9 +46,11 @@ import org.apache.cxf.service.model.BindingInfo;
  */
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class JAXRSBindingFactory extends AbstractBaseBindingFactory {
-
     public static final String JAXRS_BINDING_ID = "http://apache.org/cxf/binding/jaxrs";
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSBindingFactory.class);
 
+    
     public JAXRSBindingFactory() {
     }
     public JAXRSBindingFactory(Bus b) {
@@ -69,6 +78,16 @@ public class JAXRSBindingFactory extends AbstractBaseBindingFactory {
         BindingInfo info = new BindingInfo(null, JAXRSBindingFactory.JAXRS_BINDING_ID);
         info.setName(new QName(JAXRSBindingFactory.JAXRS_BINDING_ID, "binding"));
         return info;
+    }
+    
+    public void addListener(Destination d, Endpoint e) {
+        synchronized (d) {
+            if (d.getMessageObserver() != null) {
+                throw new ServiceConstructionException(new Message("ALREADY_RUNNING", LOG,
+                                                                   e.getEndpointInfo().getAddress()));
+            }
+            super.addListener(d, e);
+        }
     }
 
 
