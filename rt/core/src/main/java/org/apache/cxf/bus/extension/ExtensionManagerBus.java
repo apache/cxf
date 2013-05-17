@@ -19,18 +19,30 @@
 package org.apache.cxf.bus.extension;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.managers.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.managers.ConduitInitiatorManagerImpl;
 import org.apache.cxf.bus.managers.DestinationFactoryManagerImpl;
+import org.apache.cxf.buslifecycle.BusCreationListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.NullConfigurer;
+import org.apache.cxf.feature.Feature;
+import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ObjectTypeResolver;
 import org.apache.cxf.resource.PropertiesResolver;
@@ -46,16 +58,52 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  * to load it doesn't allow extensive configuration and customization like
  * the Spring bus does.
  */
-public class ExtensionManagerBus extends CXFBusImpl {
-    
+public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implements Bus {
     public static final String BUS_PROPERTY_NAME = "bus";
+    static final boolean FORCE_LOGGING;
+    static {
+        boolean b = false;
+        try {
+            b = Boolean.getBoolean("org.apache.cxf.logging.enabled");
+            //treat these all the same
+            b |= Boolean.getBoolean("com.sun.xml.ws.transport.local.LocalTransportPipe.dump");
+            b |= Boolean.getBoolean("com.sun.xml.ws.util.pipe.StandaloneTubeAssembler.dump");
+            b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump");
+            b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.HttpAdapter.dump");
+        } catch (Throwable t) {
+            //ignore
+        }
+        FORCE_LOGGING = b;
+    }
     private static final String BUS_ID_PROPERTY_NAME = "org.apache.cxf.bus.id";
+    
+    protected final Map<Class<?>, Object> extensions;
+    protected final Set<Class<?>> missingExtensions;
+    protected String id;
+    private BusState state;      
+    private final Collection<Feature> features = new CopyOnWriteArrayList<Feature>();
+    private final Map<String, Object> properties = new ConcurrentHashMap<String, Object>(16, 0.75f, 4);
+    
+    
     private final ExtensionManagerImpl extensionManager;
     
-    public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties,
+    public ExtensionManagerBus(Map<Class<?>, Object> extensions, Map<String, Object> properties,
           ClassLoader extensionClassLoader) {
-        super(e);
-
+        if (extensions == null) {
+            extensions = new ConcurrentHashMap<Class<?>, Object>(16, 0.75f, 4);
+        } else {
+            extensions = new ConcurrentHashMap<Class<?>, Object>(extensions);
+        }
+        this.extensions = extensions;
+        this.missingExtensions = new CopyOnWriteArraySet<Class<?>>();
+        
+        
+        state = BusState.INITIAL;
+        
+        CXFBusFactory.possiblySetDefaultBus(this);
+        if (FORCE_LOGGING) {
+            features.add(new LoggingFeature());
+        }        
         if (null == properties) {
             properties = new HashMap<String, Object>();
         }
@@ -66,7 +114,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
             extensions.put(Configurer.class, configurer);
         }
  
-        setId(getBusId(properties));
+        id = getBusId(properties);
         
         ResourceManager resourceManager = new DefaultResourceManager();
         
@@ -124,28 +172,76 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         extensionManager.activateAllByType(ResourceResolver.class);
         
-        
-        this.setExtension(extensionManager, ExtensionManager.class);
-        
+        extensions.put(ExtensionManager.class, extensionManager);        
     }
     
     public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
        this(e, properties, Thread.currentThread().getContextClassLoader());
     }
-
+    public ExtensionManagerBus(Map<Class<?>, Object> e) {
+        this(e, null, Thread.currentThread().getContextClassLoader());
+    }
     public ExtensionManagerBus() {
         this(null, null, Thread.currentThread().getContextClassLoader());
     }
-    @Override
-    public void doInitializeInternal() {
-        extensionManager.initialize();
-        super.doInitializeInternal();
+    
+    
+    protected final void setState(BusState state) {
+        this.state = state;
     }
-    protected void destroyBeans() {
-        extensionManager.destroyBeans();
+    
+    public void setId(String i) {
+        id = i;
     }
 
-    protected synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
+    public final <T> T getExtension(Class<T> extensionType) {
+        Object obj = extensions.get(extensionType);
+        if (obj == null) {
+            if (missingExtensions.contains(extensionType)) {
+                //already know we cannot find it
+                return null;
+            }
+            ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+            if (loc == null) {
+                loc = createConfiguredBeanLocator();
+            }
+            if (loc != null) {
+                //force loading
+                Collection<?> objs = loc.getBeansOfType(extensionType);
+                if (objs != null) {
+                    for (Object o : objs) {
+                        extensions.put(extensionType, o);
+                    }
+                }
+                obj = extensions.get(extensionType);
+            }
+        }
+        if (null != obj) {
+            return extensionType.cast(obj);
+        } else {
+            //record that it couldn't be found to avoid expensive searches again in the future
+            missingExtensions.add(extensionType);
+        }
+        return null;
+    }
+    
+    public boolean hasExtensionByName(String name) {
+        for (Class<?> c : extensions.keySet()) {
+            if (name.equals(c.getName())) {
+                return true;
+            }
+        }
+        ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+        if (loc == null) {
+            loc = createConfiguredBeanLocator();
+        }
+        if (loc != null) {
+            return loc.hasBeanOfName(name);
+        }
+        return false;
+    }
+    
+    protected final synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
         ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
         if (loc == null) {
             loc = extensionManager; 
@@ -154,7 +250,137 @@ public class ExtensionManagerBus extends CXFBusImpl {
         return loc;
     }
 
-    private String getBusId(Map<String, Object> properties) {
+    public final <T> void setExtension(T extension, Class<T> extensionType) {
+        if (extension == null) {
+            extensions.remove(extensionType);
+            missingExtensions.add(extensionType);
+        } else {
+            extensions.put(extensionType, extension);
+            missingExtensions.remove(extensionType);
+        }
+    }
+
+    public String getId() {        
+        return null == id ? DEFAULT_BUS_ID + Integer.toString(Math.abs(this.hashCode())) : id;
+    }
+
+    public void initialize() {
+        setState(BusState.INITIALIZING);
+        
+        Collection<? extends BusCreationListener> ls = getExtension(ConfiguredBeanLocator.class)
+            .getBeansOfType(BusCreationListener.class);
+        for (BusCreationListener l : ls) {
+            l.busCreated(this);
+        }
+        
+        doInitializeInternal();
+        
+        BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
+        if (null != lifeCycleManager) {
+            lifeCycleManager.initComplete();
+        }    
+        setState(BusState.RUNNING);
+    }
+
+    protected void doInitializeInternal() {
+        extensionManager.initialize();
+        initializeFeatures();
+    }
+
+    protected void loadAdditionalFeatures() {
+        
+    }
+    
+    protected void initializeFeatures() {
+        loadAdditionalFeatures();
+        if (features != null) {
+            for (Feature f : features) {
+                f.initialize(this);
+            }
+        }
+    }
+
+    public void shutdown() {
+        shutdown(true);
+    }
+
+    protected void destroyBeans() {
+        extensionManager.destroyBeans();
+    }
+    
+    public void shutdown(boolean wait) {
+        if (state == BusState.SHUTTING_DOWN) {
+            return;
+        }
+        BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
+        if (null != lifeCycleManager) {
+            lifeCycleManager.preShutdown();
+        }
+        synchronized (this) {
+            state = BusState.SHUTTING_DOWN;
+        }
+        destroyBeans();
+        synchronized (this) {
+            state = BusState.SHUTDOWN;
+            notifyAll();
+        }
+        if (null != lifeCycleManager) {
+            lifeCycleManager.postShutdown();
+        }
+
+        if (BusFactory.getDefaultBus(false) == this) {
+            BusFactory.setDefaultBus(null);
+        }
+        BusFactory.clearDefaultBusForAnyThread(this);
+    }
+
+    public BusState getState() {
+        return state;
+    }
+
+    public Collection<Feature> getFeatures() {
+        return features;
+    }
+
+    public synchronized void setFeatures(Collection<? extends Feature> features) {
+        this.features.clear();
+        this.features.addAll(features);
+        if (FORCE_LOGGING) {
+            this.features.add(new LoggingFeature());
+        }
+        if (state == BusState.RUNNING) {
+            initializeFeatures();
+        }
+    }
+    
+    public interface ExtensionFinder {
+        <T> T findExtension(Class<T> cls);
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> map) {
+        properties.clear();
+        properties.putAll(map);
+    }
+
+    public Object getProperty(String s) {
+        return properties.get(s);
+    }
+
+    public void setProperty(String s, Object o) {
+        if (o == null) {
+            properties.remove(s);
+        } else {
+            properties.put(s, o);
+        }
+    }
+    
+    
+
+    private static String getBusId(Map<String, Object> properties) {
 
         String busId = null;
 
