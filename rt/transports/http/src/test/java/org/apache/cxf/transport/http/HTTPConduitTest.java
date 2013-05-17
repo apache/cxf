@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
@@ -87,7 +87,7 @@ public class HTTPConduitTest extends Assert {
      */
     @Test
     public void testGetTarget() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
@@ -123,7 +123,7 @@ public class HTTPConduitTest extends Assert {
      */
     @Test
     public void testConduitOutputStream() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
@@ -140,7 +140,7 @@ public class HTTPConduitTest extends Assert {
 
     @Test
     public void testAuthPolicyFromEndpointInfo() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         AuthorizationPolicy ap = new AuthorizationPolicy();
         ap.setPassword("password");
@@ -173,7 +173,7 @@ public class HTTPConduitTest extends Assert {
      */
     @Test
     public void testAuthPolicyPrecedence() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);

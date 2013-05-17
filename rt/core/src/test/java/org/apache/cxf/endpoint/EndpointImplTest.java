@@ -20,7 +20,7 @@
 package org.apache.cxf.endpoint;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -35,7 +35,7 @@ public class EndpointImplTest extends Assert {
     
     @Test
     public void testEqualsAndHashCode() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         Service svc = new ServiceImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");

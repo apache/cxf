@@ -150,4 +150,19 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
         return null;
     }
 
+    public void setId(String i) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setFeatures(Collection<? extends Feature> features) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

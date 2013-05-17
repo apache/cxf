@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
@@ -342,7 +342,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             
         }
 
-        CXFBusImpl bus = new CXFBusImpl();
+        ExtensionManagerBus bus = new ExtensionManagerBus();
         
         control.replay();
         

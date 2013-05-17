@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -75,7 +75,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
      */
     @Test
     public void testConnectionURL() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
         HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
@@ -98,7 +98,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
      */
     @Test
     public void testConnectionURLOverride() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.null/bar/foo");
         HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);
@@ -133,7 +133,7 @@ public class HTTPConduitURLConnectionTest extends Assert {
     }
     
     private Object doTestTLSServerParameters() throws Exception {
-        Bus bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("https://secure.nowhere.null/" + "bar/foo");
         HTTPConduit conduit = new URLConnectionHTTPConduit(bus, ei, null);

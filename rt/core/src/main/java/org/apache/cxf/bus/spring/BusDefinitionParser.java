@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
@@ -155,7 +154,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     public static class BusConfig extends AbstractBasicInterceptorProvider
         implements ApplicationContextAware {
         
-        CXFBusImpl bus;
+        Bus bus;
         String busName;
         String id;
         Collection<Feature> features;
@@ -169,41 +168,36 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             if (bus == bb) {
                 return;
             }
-            CXFBusImpl b = (CXFBusImpl)bb;
+            bus = bb;
             if (properties != null) {
-                b.setProperties(properties);
+                bus.setProperties(properties);
                 properties = null;
             }
             if (!getInInterceptors().isEmpty()) {
-                b.getInInterceptors().addAll(getInInterceptors());
+                bus.getInInterceptors().addAll(getInInterceptors());
             }
             if (!getOutInterceptors().isEmpty()) {
-                b.getOutInterceptors().addAll(getOutInterceptors());
+                bus.getOutInterceptors().addAll(getOutInterceptors());
             }
             if (!getInFaultInterceptors().isEmpty()) {
-                b.getInFaultInterceptors().addAll(getInFaultInterceptors());
+                bus.getInFaultInterceptors().addAll(getInFaultInterceptors());
             }
             if (!getOutFaultInterceptors().isEmpty()) {
-                b.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
+                bus.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
             }
             if (!StringUtils.isEmpty(id)) {
-                b.setId(id);
+                bus.setId(id);
             }
             if (features != null) {
-                b.setFeatures(features);
+                bus.setFeatures(features);
                 features = null;
             }
-            bus = b;
         }
 
         public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
             if (bus != null) {
                 return;
-            }
-            /*
-            bus = (CXFBusImpl)BusWiringBeanFactoryPostProcessor
-                    .addBus(applicationContext, busName);
-                    */                
+            }             
         }
         
         public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
@@ -260,7 +254,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
 
         public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
             if (bus != null) {
-                bus.setOutFaultInterceptors(interceptors);
+                bus.getOutFaultInterceptors().addAll(interceptors);
             } else {
                 super.setOutFaultInterceptors(interceptors);
             }

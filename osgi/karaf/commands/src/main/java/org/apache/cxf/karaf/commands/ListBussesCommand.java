@@ -22,7 +22,6 @@ package org.apache.cxf.karaf.commands;
 import java.util.List;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
@@ -47,10 +46,7 @@ public class ListBussesCommand extends OsgiCommandSupport {
         System.out.println(String.format(headerFormat, "Name", "State"));
 
         for (Bus bus : busses) {
-            String state = "";
-            if (bus instanceof CXFBusImpl) {
-                state = ((CXFBusImpl)bus).getState().toString();
-            }
+            String state = bus.getState().toString();
             System.out.println(String.format(outputFormat, bus.getId(), state));
         }
         return null;

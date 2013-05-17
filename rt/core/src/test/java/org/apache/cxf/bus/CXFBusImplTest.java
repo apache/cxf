@@ -43,7 +43,7 @@ public class CXFBusImplTest extends Assert {
     @Test
     public void testConstructionWithoutExtensions() throws BusException {
         
-        CXFBusImpl bus = new ExtensionManagerBus();
+        Bus bus = new ExtensionManagerBus();
         assertNotNull(bus.getExtension(BindingFactoryManager.class));
         assertNotNull(bus.getExtension(ConduitInitiatorManager.class));   
         assertNotNull(bus.getExtension(DestinationFactoryManager.class));
@@ -73,7 +73,7 @@ public class CXFBusImplTest extends Assert {
         extensions.put(InstrumentationManager.class, instrumentationManager);
         extensions.put(PhaseManager.class, phaseManager);
         
-        CXFBusImpl bus = new CXFBusImpl(extensions);
+        Bus bus = new ExtensionManagerBus(extensions);
         
         assertSame(bindingFactoryManager, bus.getExtension(BindingFactoryManager.class));
         assertSame(wsdlManager, bus.getExtension(WSDLManager.class));
@@ -84,7 +84,7 @@ public class CXFBusImplTest extends Assert {
 
     @Test
     public void testExtensions() {
-        CXFBusImpl bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         String extension = "CXF";
         bus.setExtension(extension, String.class);
         assertSame(extension, bus.getExtension(String.class));
@@ -92,7 +92,7 @@ public class CXFBusImplTest extends Assert {
     
     @Test
     public void testBusID() {
-        CXFBusImpl bus = new CXFBusImpl();
+        Bus bus = new ExtensionManagerBus();
         String id = bus.getId();
         assertEquals("The bus id should be cxf", id, Bus.DEFAULT_BUS_ID + Math.abs(bus.hashCode()));
         bus.setId("test");
@@ -101,7 +101,7 @@ public class CXFBusImplTest extends Assert {
     
     @Test
     public void testShutdownWithBusLifecycle() {
-        final CXFBusImpl bus = new ExtensionManagerBus();
+        final Bus bus = new ExtensionManagerBus();
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
         BusLifeCycleListener listener = EasyMock.createMock(BusLifeCycleListener.class);
         EasyMock.reset(listener);

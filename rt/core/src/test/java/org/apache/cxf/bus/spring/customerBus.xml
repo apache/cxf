@@ -24,9 +24,6 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
-  <bean id="cxf1" class="org.apache.cxf.bus.CXFBusImpl"/>
-   
-  <bean id="cxf2" class="org.apache.cxf.bus.CXFBusImpl"/>
 
    <cxf:bus bus="cxf1">
         <cxf:outInterceptors>

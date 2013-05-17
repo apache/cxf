@@ -40,7 +40,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -224,7 +224,7 @@ public class JettyHTTPDestinationTest extends Assert {
             }
         };
         transportFactory = new HTTPTransportFactory();
-        transportFactory.setBus(new CXFBusImpl());
+        transportFactory.setBus(new ExtensionManagerBus());
         transportFactory.getBus().setExtension(
             factory, JettyHTTPServerEngineFactory.class);
         
@@ -280,7 +280,7 @@ public class JettyHTTPDestinationTest extends Assert {
 
     @Test
     public void testDoService() throws Exception {
-        Bus defaultBus = new CXFBusImpl();
+        Bus defaultBus = new ExtensionManagerBus();
         assertSame("Default thread bus has not been set",
                    defaultBus, BusFactory.getThreadDefaultBus()); 
         destination = setUpDestination(false, false);
@@ -431,7 +431,7 @@ public class JettyHTTPDestinationTest extends Assert {
         throws Exception {
         policy = new HTTPServerPolicy();
         address = getEPR("bar/foo");
-        bus = new CXFBusImpl();
+        bus = new ExtensionManagerBus();
         
         transportFactory = new HTTPTransportFactory();
         transportFactory.setBus(bus);
@@ -566,8 +566,9 @@ public class JettyHTTPDestinationTest extends Assert {
         };
         
         if (!mockedBus) {
-            bus = new CXFBusImpl();
+            bus = new ExtensionManagerBus();
             bus.setExtension(mgr, ConduitInitiatorManager.class);
+            bus.setExtension(null, QueryHandlerRegistry.class);
         } else {
             bus = EasyMock.createMock(Bus.class);
             bus.getExtension(EndpointResolverRegistry.class);

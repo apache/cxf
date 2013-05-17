@@ -45,16 +45,18 @@ public interface Bus extends InterceptorProvider {
     boolean hasExtensionByName(String name);
     
     String getId();
+    void setId(String i);
     
     void shutdown(boolean wait);
     
     void setProperty(String s, Object o);
-    
     Object getProperty(String s);
-    
+    void setProperties(Map<String, Object> properties);
     Map<String, Object> getProperties();    
     
     Collection<Feature> getFeatures();
+    void setFeatures(Collection<? extends Feature> features);
     
     BusState getState();
+
 }

@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
@@ -56,7 +55,7 @@ public class BusDefinitionParserTest extends Assert {
         }
         assertTrue("could not find logging interceptor.", found);
    
-        Collection<Feature> features = ((CXFBusImpl)bus).getFeatures();
+        Collection<Feature> features = bus.getFeatures();
         TestFeature tf = null;
         for (Feature f : features) {
             if (f instanceof TestFeature) {
