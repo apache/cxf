@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
@@ -92,14 +93,19 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                                                            defaultPrefix));
                 writer.writeEndElement();
 
-                if (fault.getSubCode() != null) {
-                    writer.writeStartElement(defaultPrefix, "Subcode", ns);
-                    writer.writeStartElement(defaultPrefix, "Value", ns);
-                    writer.writeCharacters(fault.getSubCodeString(getFaultCodePrefix(writer, 
-                                                                                     fault.getSubCode()), 
-                                                                  defaultPrefix));                
-                    writer.writeEndElement();
-                    writer.writeEndElement();
+                if (fault.getSubCodes() != null) {
+                    int fscCount = 0;
+                    for (QName fsc : fault.getSubCodes()) {
+                        writer.writeStartElement(defaultPrefix, "Subcode", ns);
+                        writer.writeStartElement(defaultPrefix, "Value", ns);
+                        writer.writeCharacters(getCodeString(getFaultCodePrefix(writer, fsc), 
+                                                             defaultPrefix, fsc));
+                        writer.writeEndElement();
+                        fscCount++;
+                    }
+                    while (fscCount-- > 0) {
+                        writer.writeEndElement();
+                    }
                 }
                 writer.writeEndElement();
 
@@ -150,6 +156,21 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 return "en";
             }
             return code;
+        }
+
+        //REVISIT either make SoapFault's this method public or put this method into a soap fault utility class
+        private static String getCodeString(String prefix, String defaultPrefix, QName code) {
+            String codePrefix = null;
+            if (StringUtils.isEmpty(prefix)) {
+                codePrefix = code.getPrefix();
+                if (StringUtils.isEmpty(codePrefix)) {
+                    codePrefix = defaultPrefix;
+                }
+            } else {
+                codePrefix = prefix;
+            }
+            
+            return codePrefix + ":" + code.getLocalPart();        
         }
     }
 }

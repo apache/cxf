@@ -142,8 +142,65 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         assertNotNull(fault2);
         assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
         assertEquals(fault.getMessage(), fault2.getMessage());        
+        assertEquals(fault.getSubCode(), fault2.getSubCode());
     }
     
+    @Test
+    public void testSoap12WithMultipleSubCodesOut() throws Exception {
+        String faultString = "Hadrian caused this Fault!";
+        SoapFault fault = new SoapFault(faultString, Soap12.getInstance().getSender());
+        
+        fault.appendSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode"));
+        fault.appendSubCode(new QName("http://cxf.apache.org/soap/fault2", "invalidsoap2", "cxffaultcode2"));
+
+        SoapMessage m = new SoapMessage(new MessageImpl());
+        m.setVersion(Soap12.getInstance());
+        
+        m.setContent(Exception.class, fault);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+        writer.writeStartDocument();
+        writer.writeStartElement("Body");
+
+        m.setContent(XMLStreamWriter.class, writer);
+
+        Soap12FaultOutInterceptorInternal.INSTANCE.handleMessage(m);
+
+        writer.writeEndElement();
+        writer.writeEndDocument();
+        writer.close();
+
+        Document faultDoc = DOMUtils.readXml(new ByteArrayInputStream(out.toByteArray()));
+        
+        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
+                    faultDoc);
+        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/"
+                    + "soap12env:Value[text()='ns2:invalidsoap']", 
+                    faultDoc);
+        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/soap12env:Subcode/"
+                    + "soap12env:Value[text()='ns2:invalidsoap2']", 
+                    faultDoc);
+        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']", 
+                    faultDoc);
+        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[text()='" + faultString + "']", 
+                    faultDoc);
+
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(out.toByteArray()));
+        m.setContent(XMLStreamReader.class, reader);
+
+        reader.nextTag();
+
+        Soap12FaultInInterceptor inInterceptor = new Soap12FaultInInterceptor();
+        inInterceptor.handleMessage(m);
+
+        SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
+        assertNotNull(fault2);
+        assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
+        assertEquals(fault.getMessage(), fault2.getMessage());        
+        assertEquals(fault.getSubCodes(), fault2.getSubCodes());
+    }
+
     @Test
     public void testFaultToSoapFault() throws Exception {
         Exception ex = new Exception();
