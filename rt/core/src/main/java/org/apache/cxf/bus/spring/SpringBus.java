@@ -19,7 +19,6 @@
 
 package org.apache.cxf.bus.spring;
 
-import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;

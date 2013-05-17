@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.bus.managers.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.managers.ConduitInitiatorManagerImpl;

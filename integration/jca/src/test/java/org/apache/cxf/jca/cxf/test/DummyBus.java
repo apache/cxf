@@ -146,4 +146,8 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
         return null;
     }
 
+    public BusState getState() {
+        return null;
+    }
+
 }

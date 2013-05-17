@@ -100,52 +100,6 @@ public class CXFBusImplTest extends Assert {
     }
     
     @Test
-    public void testRun() {
-        final CXFBusImpl bus = new CXFBusImpl();
-        Thread t = new Thread() {
-            public void run() {
-                bus.run();
-            }
-        };
-        t.start();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            // ignore;
-        }
-        try {
-            t.join(400);
-        } catch (InterruptedException ex) {
-            // ignore
-        }
-        assertEquals(BusState.RUNNING, bus.getState());
-    }
-    
-    @Test
-    public void testShutdown() {
-        final CXFBusImpl bus = new CXFBusImpl();
-        Thread t = new Thread() {
-            public void run() {
-                bus.run();
-            }
-        };
-        t.start();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            // ignore;
-        }
-        bus.shutdown(true);
-        try {
-            t.join();
-        } catch (InterruptedException ex) {
-            // ignore
-        }
-        assertEquals(BusState.SHUTDOWN, bus.getState());
-        
-    }
-    
-    @Test
     public void testShutdownWithBusLifecycle() {
         final CXFBusImpl bus = new ExtensionManagerBus();
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);

@@ -178,20 +178,6 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         return null == id ? DEFAULT_BUS_ID + Integer.toString(Math.abs(this.hashCode())) : id;
     }
 
-    public void run() {
-        synchronized (this) {
-            state = BusState.RUNNING;
-            while (state == BusState.RUNNING) {
-
-                try {
-                    wait();
-                } catch (InterruptedException ex) {
-                    // ignore;
-                }
-            }
-        }
-    }
-
     public void initialize() {
         setState(BusState.INITIALIZING);
         
