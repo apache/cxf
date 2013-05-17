@@ -125,12 +125,12 @@
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http/${project.version}</bundle>
     </feature>
     <feature name="cxf-http-jetty" version="${project.version}" resolver='(obr)'>
-        <feature version="[2,3)">cxf-http</feature>
+        <feature version="[3,4)">cxf-http</feature>
         <feature version="[7,9)">jetty</feature>
         <bundle start-level='40'>mvn:org.apache.cxf/cxf-rt-transports-http-jetty/${project.version}</bundle>
     </feature>
     <feature name="cxf-http-async" version="${project.version}" resolver='(obr)'>
-        <feature version="[2,3)">cxf-http</feature>
+        <feature version="[3,4)">cxf-http</feature>
         <bundle start-level='40'> mvn:org.apache.httpcomponents/httpcore-osgi/${cxf.httpcomponents.core.version}</bundle>
         <bundle start-level='40'> mvn:org.apache.httpcomponents/httpclient-osgi/${cxf.httpcomponents.client.version}</bundle>
         <bundle start-level='40'> mvn:org.apache.httpcomponents/httpasyncclient-osgi/${cxf.httpcomponents.asyncclient.version}</bundle>
