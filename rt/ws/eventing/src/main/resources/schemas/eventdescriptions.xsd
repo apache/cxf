@@ -1,0 +1,35 @@
+<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'
+           targetNamespace='http://www.w3.org/2011/03/ws-evd'
+           elementFormDefault='qualified' attributeFormDefault='unqualified'>
+  <xs:element name='EventDescriptions'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='types'>
+          <xs:annotation>
+            <xs:documentation>Data type definitions that are relevant to described notifications.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace='##other' minOccurs='0' maxOccurs='unbounded'/>
+            </xs:sequence>
+            <xs:anyAttribute namespace='##other' processContents='lax'/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='eventType' maxOccurs='unbounded'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace='##other' minOccurs='0' maxOccurs='unbounded'/>
+            </xs:sequence>
+            <xs:attribute name='id' type='xs:ID' use='required'/>
+            <xs:attribute name='element' type='xs:QName' use='optional'/>
+            <xs:attribute name='actionURI' type='xs:anyURI' use='optional'/>
+            <xs:anyAttribute namespace='##other' processContents='lax'/>
+          </xs:complexType>
+        </xs:element>
+        <xs:any namespace='##other' minOccurs='0' maxOccurs='unbounded'/>
+      </xs:sequence>
+      <xs:attribute name='targetNamespace' type='xs:anyURI' use='required'/>
+      <xs:anyAttribute namespace='##other' processContents='lax'/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

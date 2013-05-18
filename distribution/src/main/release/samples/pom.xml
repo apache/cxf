@@ -98,6 +98,7 @@
 
         <module>jax_rs/minimal_osgi</module>
         <module>ws_discovery</module>
+	<module>ws_eventing</module>
 
     </modules>
     <dependencyManagement>
