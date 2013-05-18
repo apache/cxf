@@ -72,18 +72,19 @@ public final class DnUtils {
     
     private static String normalizeAttribute(String val) {
         String[] split;
+        String normalized = val;
         if (null != val) {
             split = val.split("=");
             // normalize the prefix if present
             if (split.length == 2) {
                 String prefix = split[0].toLowerCase().trim();
                 String value = split[1].trim();
-                val = prefix + "=" + value;
+                normalized = prefix + "=" + value;
             } else {
-                val = val.trim();
+                normalized = val.trim();
             }
         }
-        return val;
+        return normalized;
     }
 
     public static class DnAttribute {

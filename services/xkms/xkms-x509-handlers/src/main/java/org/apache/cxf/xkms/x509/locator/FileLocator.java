@@ -46,11 +46,13 @@ import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.x509.parser.LocateRequestParser;
 import org.apache.cxf.xkms.x509.utils.X509Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileLocator implements Locator {
 
     private static final String CN_PREFIX = "cn=";
-    //private static final Logger LOG = LoggerFactory.getLogger(FilePersistenceManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FileLocator.class);
     private final File storageDir;
     private final CertificateFactory certFactory;
 
@@ -116,18 +118,18 @@ public class FileLocator implements Locator {
     private List<X509Certificate> findCertificateBySubjectDn(String subjectDN) {
         List<X509Certificate> result = new ArrayList<X509Certificate>();
         File[] list = getX509Files();
-        //        String searchId = DnUtils.extractMostSignificantAttribute(subjectDN);
         for (File certFile : list) {
             try {
+                if (certFile.isDirectory()) {
+                    continue;
+                }
                 X509Certificate cert = readCertificate(certFile);
-                //                String id = DnUtils.extractMostSignificantAttribute(cert.getSubjectDN().getName());
-                //                if (searchId.equalsIgnoreCase(id)) {
                 if (subjectDN.equalsIgnoreCase(cert.getSubjectDN().getName())
                         || subjectDN.equalsIgnoreCase(cert.getSubjectX500Principal().getName())) {
                     result.add(cert);
                 }
             } catch (Exception e) {
-                throw new RuntimeException("Error reading certificate for " + subjectDN + ": " + e.getMessage(), e);
+                LOG.warn(String.format("Cannot load certificate from file: %s. Error: %s", certFile, e.getMessage()));
             }
 
         }
@@ -139,6 +141,9 @@ public class FileLocator implements Locator {
         File[] list = getX509Files();
         for (File certFile : list) {
             try {
+                if (certFile.isDirectory()) {
+                    continue;
+                }
                 X509Certificate cert = readCertificate(certFile);
                 BigInteger cs = cert.getSerialNumber();
                 BigInteger ss = new BigInteger(serial, 16);
@@ -146,7 +151,7 @@ public class FileLocator implements Locator {
                     result.add(cert);
                 }
             } catch (Exception e) {
-                throw new RuntimeException("Error reading certificate for issuer " + issuer + ": " + e.getMessage(), e);
+                LOG.warn(String.format("Cannot load certificate from file: %s. Error: %s", certFile, e.getMessage()));
             }
 
         }

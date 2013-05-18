@@ -32,19 +32,19 @@ public final class ExceptionMapper {
     public static <T extends ResultType> T toResponse(Exception e, T result) {
         if (e instanceof XKMSException) {
             XKMSException xkmsEx = (XKMSException)e;
-            result = initResultType(xkmsEx.getMessage(), xkmsEx.getResultMajor(), xkmsEx.getResultMinor(), result);
+            initResultType(xkmsEx.getMessage(), xkmsEx.getResultMajor(), xkmsEx.getResultMinor(), result);
         } else if (e instanceof UnsupportedOperationException) {
-            result = initResultType(e.getMessage(),
+            initResultType(e.getMessage(),
                                     ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SENDER,
                                     ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_MESSAGE_NOT_SUPPORTED,
                                     result);
         } else if (e instanceof IllegalArgumentException) {
-            result = initResultType(e.getMessage(),
+            initResultType(e.getMessage(),
                                     ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_SENDER,
                                     ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE,
                                     result);
         } else {
-            result = initResultType(e.getMessage(),
+            initResultType(e.getMessage(),
                                     ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_RECEIVER,
                                     ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE,
                                     result);
@@ -72,7 +72,7 @@ public final class ExceptionMapper {
         return new XKMSException(major, minor, message);
     }
 
-    private static <T extends ResultType> T initResultType(String message, ResultMajorEnum majorCode,
+    private static <T extends ResultType> void initResultType(String message, ResultMajorEnum majorCode,
                                              ResultMinorEnum minorCode, T result) {
         result.setResultMajor((majorCode != null)
             ? majorCode.value() : ResultMajorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_RECEIVER.value());
@@ -83,6 +83,5 @@ public final class ExceptionMapper {
             resultDetails.setDetails(message);
             result.getMessageExtension().add(resultDetails);
         }
-        return result;
     }
 }
