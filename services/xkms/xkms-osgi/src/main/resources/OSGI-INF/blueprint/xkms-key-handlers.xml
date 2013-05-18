@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2008, 2009 SOPERA GmbH. All rights reserved. This program 
+    and the accompanying materials are made available under the terms of the 
+    Eclipse Public License v1.0 which accompanies this distribution, and is available 
+    at http://www.eclipse.org/legal/epl-v10.html Contributors: SOPERA GmbH - 
+    initial API and implementation -->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/blueprint/core"
+	xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:ext="http://www.osgi.org/xmlns/blueprint-ext/v1.1.0"
+	xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+  						http://www.osgi.org/xmlns/blueprint-ext/v1.1.0 https://svn.apache.org/repos/asf/aries/tags/blueprint-0.3.1/blueprint-core/src/main/resources/org/apache/aries/blueprint/ext/blueprint-ext.xsd  
+  						http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.0.0.xsd
+  						http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd
+  						http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
+  	">
+
+   <cm:property-placeholder persistent-id="org.apache.cxf.xkms"/>
+
+   <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
+
+   <bean id="x509LdapLocator" class="org.apache.cxf.xkms.x509.locator.LdapLocator">
+      <argument ref="ldapSearch" />
+      <argument value="${xkms.backend.ldap.rootDN}" />
+   </bean>
+
+    <bean id="ldapRegisterHandler" class="org.apache.cxf.xkms.x509.handlers.LdapRegisterHandler">
+      <argument ref="ldapSearch" />
+      <argument value="${xkms.backend.ldap.rootDN}" />
+   </bean>
+
+   <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.handlers.LDAPSearch">
+      <argument value="${xkms.backend.ldap.url}" />
+      <argument value="${xkms.backend.ldap.user}" />
+      <argument value="${xkms.backend.ldap.pwd}" />
+      <argument value="${xkms.backend.ldap.retry}" />
+   </bean>
+
+   <!-- bean id="x509FileLocator" class="org.apache.cxf.xkms.x509.locator.FileLocator">
+      <argument value="${xkms.backend.file.storageDir}" />
+   </bean>
+
+   <bean id="fileRegisterHandler" class="org.apache.cxf.xkms.x509.handlers.FileRegisterHandler">
+      <argument value="${xkms.filepersistence.storageDir}" />
+   </bean-->
+   
+</blueprint>

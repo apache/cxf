@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RegisterRequest xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+   xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+   Id="I1494ac4351b7de5c174d455b7000e18f"
+   Service="http://www.example.org/XKMS"
+   xmlns="http://www.w3.org/2002/03/xkms#">
+  <RespondWith>http://www.w3.org/2002/03/xkms#X509Cert</RespondWith>
+  <RespondWith>http://www.w3.org/2002/03/xkms#X509Chain</RespondWith>
+  <PrototypeKeyBinding Id="I269e655567dbae568591c0a06957529e">
+    <ds:KeyInfo>
+      <ds:KeyValue>
+        <ds:RSAKeyValue>
+          <ds:Modulus>
+            0nIsmR+aVW2egl5MIfOKy4HuMKkk9AZ/IQuDLVPlhzOfgngjVQCjr8uvmnqtNu8
+            HBupui8LgGthO6U9D0CNT5mbmhIAErRADUMIAFsi7LzBarUvNWTqYNEJmcHsAUZ
+            drdcDrkNnG7SzbuJx+GDNiHKVDQggPBLc1XagW20RMvok=
+          </ds:Modulus>
+          <ds:Exponent>AQAB</ds:Exponent>
+        </ds:RSAKeyValue>
+      </ds:KeyValue>
+    </ds:KeyInfo>
+    <KeyUsage>http://www.w3.org/2002/03/xkms#Signature</KeyUsage>
+    <KeyUsage>http://www.w3.org/2002/03/xkms#Encryption</KeyUsage>
+    <KeyUsage>http://www.w3.org/2002/03/xkms#Exchange</KeyUsage>
+    <UseKeyWith Application="urn:ietf:rfc:2459"
+         Identifier='C="US" O="Alice Corp" CN="Alice Aardvark"' />
+    <UseKeyWith Application="urn:ietf:rfc:2633"
+         Identifier="alice@example.com" />
+    <UseKeyWith Application="http://ca.example.com/cps/20030401/class3"
+         Identifier="alice@example.com" />
+    <RevocationCodeIdentifier>
+      5AEAai06hFJEkuqyDyqNh8k/u3M=
+    </RevocationCodeIdentifier>
+  </PrototypeKeyBinding>
+  <Authentication>
+    <KeyBindingAuthentication>
+      <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+          <CanonicalizationMethod 
+                  Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+          <SignatureMethod 
+                  Algorithm="http://www.w3.org/2000/09/xmldsig#hmac-sha1" />
+          <Reference URI="#I269e655567dbae568591c0a06957529e">
+            <Transforms>
+              <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+            </Transforms>
+            <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+            <DigestValue>WCbpkifxJ1zIJ+V6/knZgxRhR34=</DigestValue>
+          </Reference>
+        </SignedInfo>
+        <SignatureValue>iJSKM+98hj5ae+btC2WjwBYP+/k=</SignatureValue>
+      </Signature>
+    </KeyBindingAuthentication>
+  </Authentication>
+  <ProofOfPossession>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <SignedInfo>
+        <CanonicalizationMethod 
+                Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+        <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+        <Reference URI="#I269e655567dbae568591c0a06957529e">
+          <Transforms>
+            <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+          </Transforms>
+          <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+          <DigestValue>WCbpkifxJ1zIJ+V6/knZgxRhR34=</DigestValue>
+        </Reference>
+      </SignedInfo>
+      <SignatureValue>
+        DcPw742vN120QNrCjCKw0jiCX3pUvbMeRkYjktZkn4nbgo1b7leXU0sJgXM2CY/
+        oQugaRsgz18+qUzM0UX+jr1t1wtCMci5fjzVKZB63oZyKZ9+CJLcBCbirsgJAId
+        +Pq9w4WiwKDf2AytsdXHlN5V1byQIkpfR1CypvBzQa1b4=
+      </SignatureValue>
+    </Signature>
+  </ProofOfPossession>
+</RegisterRequest> 

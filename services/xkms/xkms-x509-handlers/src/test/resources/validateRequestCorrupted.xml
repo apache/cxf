@@ -1,0 +1,11 @@
+<ns2:ValidateRequest xmlns="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:ns2="http://www.w3.org/2002/03/xkms#" xmlns:ns3="http://www.w3.org/2001/04/xmlenc#"
+    Id="CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS">
+    <ns2:QueryKeyBinding>
+        <KeyInfo>
+            <X509Data>
+                <X509Certificate>XXX</X509Certificate>
+            </X509Data>
+        </KeyInfo>
+    </ns2:QueryKeyBinding>
+</ns2:ValidateRequest>

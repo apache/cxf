@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<jaxb:bindings version="2.1"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+  xmlns:wsa="http://www.w3.org/2005/08/addressing"
+  xmlns:annox="http://annox.dev.java.net"
+  jaxb:extensionBindingPrefixes="xjc">
+
+    <jaxb:globalBindings
+        typesafeEnumBase="xs:anyURI"
+        typesafeEnumMemberName="generateError"/> 
+
+    <jaxb:bindings schemaLocation="xmldsig-core-schema.xsd" node="/xs:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.apache.cxf.xkms.model.xmldsig"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="xenc-schema.xsd" node="/xs:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.apache.cxf.xkms.model.xmlenc"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="xkms.xsd" node="/xs:schema">
+        <jaxb:schemaBindings>
+            <jaxb:package name="org.apache.cxf.xkms.model.xkms"/>
+       </jaxb:schemaBindings>
+       <!--jaxb:bindings node="xs:complexType[@name='MessageExtensionAbstractType']">
+            <annox:annotate target="class">
+                <annox:annotate annox:class="javax.xml.bind.annotation.XmlSeeAlso" value="org.apache.cxf.xkms.model.extensions.ResultDetails.class" />
+            </annox:annotate>           
+       </jaxb:bindings-->
+    </jaxb:bindings>
+
+</jaxb:bindings>
