@@ -17,11 +17,10 @@
  * under the License.
  */
 
-package org.apache.cxf.ws.eventing.base.aux;
+package org.apache.cxf.ws.eventing.base;
 
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManager;
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManagerImpl;
-import org.apache.cxf.ws.eventing.base.SimpleEventingIntegrationTest;
 
 public final class SingletonSubscriptionManagerContainer {
 

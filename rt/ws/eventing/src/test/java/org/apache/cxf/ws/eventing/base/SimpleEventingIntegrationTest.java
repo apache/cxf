@@ -33,7 +33,6 @@ import org.apache.cxf.ws.eventing.backend.database.SubscriptionTicket;
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManagerInterfaceForNotificators;
 import org.apache.cxf.ws.eventing.backend.notification.EventSinkInterfaceNotificatorService;
 import org.apache.cxf.ws.eventing.backend.notification.NotificatorService;
-import org.apache.cxf.ws.eventing.base.aux.SingletonSubscriptionManagerContainer;
 import org.apache.cxf.ws.eventing.base.services.TestingEventSource;
 import org.apache.cxf.ws.eventing.base.services.TestingSubscriptionManager;
 import org.apache.cxf.ws.eventing.eventsource.EventSourceEndpoint;

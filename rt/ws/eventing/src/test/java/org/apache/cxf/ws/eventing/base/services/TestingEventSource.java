@@ -22,7 +22,7 @@ package org.apache.cxf.ws.eventing.base.services;
 import javax.jws.WebService;
 
 import org.apache.cxf.ws.eventing.backend.manager.SubscriptionManagerInterfaceForEventSources;
-import org.apache.cxf.ws.eventing.base.aux.SingletonSubscriptionManagerContainer;
+import org.apache.cxf.ws.eventing.base.SingletonSubscriptionManagerContainer;
 import org.apache.cxf.ws.eventing.eventsource.AbstractEventSource;
 
 /**
