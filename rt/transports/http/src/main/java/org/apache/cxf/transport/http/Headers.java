@@ -28,10 +28,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -55,11 +57,29 @@ public class Headers {
      *  is used to get the response.
      */
     public static final String KEY_HTTP_CONNECTION = "http.connection";
-    public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
+    /**
+     * Each header value is added as a separate HTTP header, example, given A header with 'a' and 'b'
+     * values, two A headers will be added as opposed to a single A header with the "a,b" value. 
+     */
     public static final String ADD_HEADERS_PROPERTY = "org.apache.cxf.http.add-headers";             
+       
+    public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
     public static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
+    public static final String HTTP_HEADERS_LINK = "Link";
     
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
+    
+    /**
+     * Known HTTP headers whose values have to be represented as individual HTTP headers
+     */
+    private static final Set<String> HTTP_HEADERS_SINGLE_VALUE_ONLY;
+    
+    static {
+        HTTP_HEADERS_SINGLE_VALUE_ONLY = new HashSet<String>();
+        HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_SETCOOKIE);
+        HTTP_HEADERS_SINGLE_VALUE_ONLY.add(HTTP_HEADERS_LINK);
+    }
+    
     private final Message message;
     private final Map<String, List<String>> headers;
 
@@ -412,18 +432,15 @@ public class Headers {
             String header = (String)iter.next();
             List<?> headerList = headers.get(header);
             
-            if (addHeaders || HTTP_HEADERS_SETCOOKIE.equals(header)) {
+            if (addHeaders || HTTP_HEADERS_SINGLE_VALUE_ONLY.contains(header)) {
                 for (int i = 0; i < headerList.size(); i++) {
-                    response.addHeader(header, headerList.get(i).toString());
+                    response.addHeader(header, headerObjectToString(headerList.get(i)));
                 }
             } else {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < headerList.size(); i++) {
-                    Object headerValue = headerList.get(i);
-                    if (headerValue instanceof Date) {
-                        headerValue = toHttpDate((Date)headerValue);
-                    }
-                    sb.append(headerValue.toString());
+                    sb.append(headerObjectToString(headerList.get(i)));
+                    
                     if (i + 1 < headerList.size()) {
                         sb.append(',');
                     }
@@ -432,6 +449,28 @@ public class Headers {
             }
 
             
+        }
+    }
+    
+    private String headerObjectToString(Object headerObject) {
+        if (headerObject.getClass() == String.class) {
+            // Most likely 
+            return headerObject.toString();    
+        } else {
+            // We may consider introducing CXF HeaderDelegate interface 
+            // so that the below code may be pushed back to the JAX-RS 
+            // front-end where non String header objects are more likely 
+            // to be set. Though the below code may be generally useful
+            
+            String headerString;
+            if (headerObject instanceof Date) {
+                headerString = toHttpDate((Date)headerObject);
+            } else if (headerObject instanceof Locale) {
+                headerString = toHttpLanguage((Locale)headerObject);
+            } else {
+                headerString = headerObject.toString();
+            }
+            return headerString;
         }
     }
     
@@ -461,5 +500,15 @@ public class Headers {
     public static String toHttpDate(Date date) {
         SimpleDateFormat format = getHttpDateFormat();
         return format.format(date);
+    }
+    
+    public static String toHttpLanguage(Locale locale) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(locale.getLanguage());
+        if (locale.getCountry() != null) {
+            // Locale.toString() will add "_" instead, '-' is typically expected
+            sb.append('-').append(locale.getCountry());
+        }
+        return sb.toString();
     }
 }
