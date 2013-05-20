@@ -455,7 +455,7 @@ public abstract class AbstractClient implements Client {
         try {
             Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
             return (WebApplicationException)ctr.newInstance(r);
-        } catch (Exception ex2) {
+        } catch (Throwable ex2) {
             return new WebApplicationException(ex2, r);
         }
     }
