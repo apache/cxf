@@ -106,6 +106,10 @@ public class MultipartStore {
         if (!bookXsd.equals(bookXsd2)) {
             throw new RuntimeException("Wrong attachinfo property");
         }
+        String bookXsdRef = IOUtils.readStringFromStream(type.getAttachInfoRef().getInputStream());
+        if (!bookXsdRef.equals(bookXsd2)) {
+            throw new RuntimeException("Wrong attachinforef property");
+        }
         if (!Boolean.getBoolean("java.awt.headless") && type.getImage() == null) {
             throw new RuntimeException("Wrong image property");
         }
@@ -118,7 +122,7 @@ public class MultipartStore {
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/book.xsd");
         byte[] data = IOUtils.readBytesFromStream(is);
         xop.setAttachinfo(new DataHandler(new ByteArrayDataSource(data, "application/octet-stream")));
-        
+        xop.setAttachInfoRef(new DataHandler(new ByteArrayDataSource(data, "application/octet-stream")));
         xop.setAttachinfo2(bookXsd.getBytes());
      
         xop.setImage(ImageIO.read(getClass().getResource(

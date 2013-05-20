@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.awt.Image;
 
 import javax.activation.DataHandler;
+import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,11 +33,13 @@ import javax.xml.bind.annotation.XmlType;
         "name",
         "attachinfo",
         "attachinfo2",
+        "attachInfoRef",
         "image" })
 public class XopType {
 
     private String name;
     private DataHandler attachinfo;
+    private DataHandler attachInfoRef;
     private byte[] attachinfo2;
     private Image image;
 
@@ -79,6 +82,17 @@ public class XopType {
 
     public Image getImage() {
         return image;
+    }
+
+    @XmlAttachmentRef
+    @XmlElement(required = true)
+    @XmlMimeType("application/octet-stream")
+    public DataHandler getAttachInfoRef() {
+        return attachInfoRef;
+    }
+
+    public void setAttachInfoRef(DataHandler attachInfoRef) {
+        this.attachInfoRef = attachInfoRef;
     }
 
 }
