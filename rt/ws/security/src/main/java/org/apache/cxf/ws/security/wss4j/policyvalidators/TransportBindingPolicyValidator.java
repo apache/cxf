@@ -30,7 +30,6 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -87,9 +86,8 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             
             // Check the Layout
             Layout layout = binding.getLayout();
-            boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTsFirst;
-            boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTsLast;
-            if (!validateLayout(timestampFirst, timestampLast, results)) {
+            LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator(results, signedResults);
+            if (!layoutValidator.validatePolicy(layout)) {
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, layout, error);
                 ai.setNotAsserted(error);
