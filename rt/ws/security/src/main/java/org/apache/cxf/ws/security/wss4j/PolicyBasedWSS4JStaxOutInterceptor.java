@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -44,19 +43,14 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.cxf.ws.security.wss4j.policyhandlers.StaxTransportBindingHandler;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
-import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
-import org.apache.wss4j.policy.model.AbstractBinding;
-import org.apache.wss4j.policy.model.UsernameToken;
-import org.apache.wss4j.policy.model.UsernameToken.PasswordType;
 
 /**
  * 
@@ -332,13 +326,6 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         return signCrypto;
     }
     
-    private void configureActions(
-        AssertionInfoMap aim, SoapMessage message
-    ) throws WSSecurityException {
-        configureUsernameToken(aim, message);
-        configureTimestamp(aim, message);
-    }
-    
     @Override
     protected void configureProperties(SoapMessage msg) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
@@ -346,110 +333,13 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         checkSymmetricBinding(aim, msg);
         checkTransportBinding(aim, msg);
         
-        configureActions(aim, msg);
+        Collection<AssertionInfo> ais = 
+            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
+        if (!ais.isEmpty()) {
+            new StaxTransportBindingHandler(getProperties(), msg).handleBinding();
+        }
         
         super.configureProperties(msg);
     }
     
-    private void configureUsernameToken(
-        AssertionInfoMap aim, SoapMessage message
-    ) throws WSSecurityException {
-        Map<String, Object> config = getProperties();
-                                  
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
-        if (ais != null && ais.size() > 0) {
-            UsernameToken usernameToken = (UsernameToken)ais.iterator().next().getAssertion();
-            IncludeTokenType includeToken = usernameToken.getIncludeTokenType();
-            if (!isTokenRequired(includeToken, message)) {
-                return;
-            }
-            
-            // Action
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, 
-                           action + " " + ConfigurationConstants.USERNAME_TOKEN);
-            } else {
-                config.put(ConfigurationConstants.ACTION, 
-                           ConfigurationConstants.USERNAME_TOKEN);
-            }
-
-            // Password Type
-            PasswordType passwordType = usernameToken.getPasswordType();
-            if (passwordType == PasswordType.HashPassword) {
-                config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-            } else if (passwordType == PasswordType.NoPassword) {
-                config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
-            } else {
-                config.put(ConfigurationConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-            }
-            
-            // Nonce + Created
-            if (usernameToken.isNonce()) {
-                config.put(ConfigurationConstants.ADD_USERNAMETOKEN_NONCE, "true");
-            }
-            if (usernameToken.isCreated()) {
-                config.put(ConfigurationConstants.ADD_USERNAMETOKEN_CREATED, "true");
-            }
-        }
-    }
-    
-    private void configureTimestamp(
-        AssertionInfoMap aim, SoapMessage message
-    ) throws WSSecurityException {
-        Map<String, Object> config = getProperties();
-        
-        AbstractBinding binding = getBinding(aim);
-        if (binding != null && binding.isIncludeTimestamp()) {
-            // Action
-            if (config.containsKey(ConfigurationConstants.ACTION)) {
-                String action = (String)config.get(ConfigurationConstants.ACTION);
-                config.put(ConfigurationConstants.ACTION, 
-                           action + " " + ConfigurationConstants.TIMESTAMP);
-            } else {
-                config.put(ConfigurationConstants.ACTION, 
-                           ConfigurationConstants.TIMESTAMP);
-            }
-        }
-    }
-
-    private AbstractBinding getBinding(
-        AssertionInfoMap aim
-    ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = 
-            getAllAssertionsByLocalname(aim, SPConstants.TRANSPORT_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        ais = getAllAssertionsByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
-        if (ais != null && ais.size() > 0) {
-            return (AbstractBinding)ais.iterator().next().getAssertion();
-        }
-        
-        return null;
-    }
-    
-    private boolean isTokenRequired(IncludeTokenType includeToken, SoapMessage soapMessage) {
-        if (includeToken == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-            return false;
-        } else if (includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS) {
-            return true;
-        } else {
-            boolean initiator = MessageUtils.isRequestor(soapMessage);
-            if (initiator && (includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
-                || includeToken == IncludeTokenType.INCLUDE_TOKEN_ONCE)) {
-                return true;
-            } else if (!initiator && includeToken == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
-                return true;
-            }
-            return false;
-        }
-    }
 }
