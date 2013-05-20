@@ -147,36 +147,6 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
     }
     
     /**
-     * Validate the layout assertion. It just checks the LaxTsFirst and LaxTsLast properties
-     */
-    protected boolean validateLayout(
-        boolean laxTimestampFirst,
-        boolean laxTimestampLast,
-        List<WSSecurityEngineResult> results
-    ) {
-        if (laxTimestampFirst) {
-            if (results.isEmpty()) {
-                return false;
-            }
-            Integer firstAction = (Integer)results.get(results.size() - 1).get(WSSecurityEngineResult.TAG_ACTION);
-            if (firstAction.intValue() != WSConstants.TS) {
-                return false;
-            }
-        } else if (laxTimestampLast) {
-            if (results.isEmpty()) {
-                return false;
-            }
-            Integer lastAction = 
-                (Integer)results.get(0).get(WSSecurityEngineResult.TAG_ACTION);
-            if (lastAction.intValue() != WSConstants.TS) {
-                return false;
-            }
-        }
-        return true;
-        
-    }
-    
-    /**
      * Check various properties set in the policy of the binding
      */
     protected boolean checkProperties(
@@ -204,9 +174,8 @@ public abstract class AbstractBindingPolicyValidator implements BindingPolicyVal
         
         // Check the Layout
         Layout layout = binding.getLayout();
-        boolean timestampFirst = layout.getValue() == SPConstants.Layout.LaxTsFirst;
-        boolean timestampLast = layout.getValue() == SPConstants.Layout.LaxTsLast;
-        if (!validateLayout(timestampFirst, timestampLast, results)) {
+        LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator(results, signedResults);
+        if (!layoutValidator.validatePolicy(layout)) {
             String error = "Layout does not match the requirements";
             notAssertPolicy(aim, layout, error);
             ai.setNotAsserted(error);

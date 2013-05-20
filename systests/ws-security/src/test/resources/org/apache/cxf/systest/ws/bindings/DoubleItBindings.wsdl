@@ -122,6 +122,12 @@
         <wsdl:port name="DoubleItSignatureConfirmationPort2" binding="tns:DoubleItStandardBinding">
             <soap:address location="http://localhost:9010/DoubleItSignatureConfirmation2" />
         </wsdl:port>
+        <wsdl:port name="DoubleItStrictPort" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItStrict" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItStrictPort2" binding="tns:DoubleItStandardBinding">
+            <soap:address location="http://localhost:9010/DoubleItStrict2" />
+        </wsdl:port>
     </wsdl:service>
     
     <wsp:Policy wsu:Id="SignBodyChildPolicy">

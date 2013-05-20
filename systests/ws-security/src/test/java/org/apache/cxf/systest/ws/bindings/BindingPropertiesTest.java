@@ -314,6 +314,42 @@ public class BindingPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testStrict() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BindingPropertiesTest.class.getResource("client/client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BindingPropertiesTest.class.getResource("DoubleItBindings.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+       
+        // Successful invocation
+        QName portQName = new QName(NAMESPACE, "DoubleItStrictPort");
+        DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        port.doubleIt(25);
+        
+        // This should fail, as the client is sending the timestamp last
+        portQName = new QName(NAMESPACE, "DoubleItStrictPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+        
+        try {
+            port.doubleIt(25);
+            fail("Failure expected on sending the timestamp last");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            String error = "Layout does not match the requirements";
+            assertTrue(ex.getMessage().contains(error));
+        }
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+    
     // TODO
     @org.junit.Test
     @org.junit.Ignore
