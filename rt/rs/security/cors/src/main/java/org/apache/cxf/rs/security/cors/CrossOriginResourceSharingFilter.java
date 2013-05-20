@@ -64,7 +64,7 @@ import org.apache.cxf.service.Service;
  */
 public class CrossOriginResourceSharingFilter implements RequestHandler, ResponseHandler {
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
-    private static final Pattern FIELD_COMMA_PATTERN = Pattern.compile(",\\w*");
+    private static final Pattern FIELD_COMMA_PATTERN = Pattern.compile(",");
     
     private static final String PREFLIGHT_PASSED = "preflight_passed";
     private static final String PREFLIGHT_FAILED = "preflight_failed";
