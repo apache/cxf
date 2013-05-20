@@ -51,6 +51,7 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
@@ -390,6 +391,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         bean.setProperties(Collections.singletonMap(org.apache.cxf.message.Message.MTOM_ENABLED, 
                                                     (Object)"true"));
         WebClient client = bean.createWebClient();
+        WebClient.getConfig(client).getInInterceptors().add(new LoggingInInterceptor());
+        WebClient.getConfig(client).getOutInterceptors().add(new LoggingOutInterceptor());
         WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart", 
             "true");
         client.type("multipart/related").accept("multipart/related");
@@ -400,6 +403,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/book.xsd");
         byte[] data = IOUtils.readBytesFromStream(is);
         xop.setAttachinfo(new DataHandler(new ByteArrayDataSource(data, "application/octet-stream")));
+        xop.setAttachInfoRef(new DataHandler(new ByteArrayDataSource(data, "application/octet-stream")));
         
         String bookXsd = IOUtils.readStringFromStream(getClass().getResourceAsStream(
             "/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
@@ -413,6 +417,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
                 "/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
         String bookXsd2 = IOUtils.readStringFromStream(xop2.getAttachinfo().getInputStream());        
         assertEquals(bookXsdOriginal, bookXsd2);
+        String bookXsdRef = IOUtils.readStringFromStream(xop2.getAttachInfoRef().getInputStream());        
+        assertEquals(bookXsdOriginal, bookXsdRef);
         
         String ctString = 
             client.getResponse().getMetadata().getFirst("Content-Type").toString();
