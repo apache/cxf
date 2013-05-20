@@ -36,7 +36,6 @@ import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.Layout;
-import org.apache.wss4j.policy.model.Layout.LayoutType;
 import org.apache.wss4j.policy.model.TransportBinding;
 
 /**
@@ -115,10 +114,8 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             
             // Check the Layout
             Layout layout = binding.getLayout();
-            LayoutType layoutType = layout.getLayoutType();
-            boolean timestampFirst = layoutType == LayoutType.LaxTsFirst;
-            boolean timestampLast = layoutType == LayoutType.LaxTsLast;
-            if (!validateLayout(timestampFirst, timestampLast, results)) {
+            LayoutPolicyValidator layoutValidator = new LayoutPolicyValidator(results, signedResults);
+            if (!layoutValidator.validatePolicy(layout)) {
                 String error = "Layout does not match the requirements";
                 notAssertPolicy(aim, binding.getLayout(), error);
                 ai.setNotAsserted(error);
