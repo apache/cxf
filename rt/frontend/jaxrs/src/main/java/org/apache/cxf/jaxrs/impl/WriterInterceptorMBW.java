@@ -31,6 +31,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -59,6 +60,9 @@ public class WriterInterceptorMBW implements WriterInterceptor {
         Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
         MediaType mt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
         m.put(Message.CONTENT_TYPE, mtObject.toString());
+        
+        HttpUtils.convertHeaderValuesToStringIfNeeded(headers);
+        
         writer.writeTo(c.getEntity(), 
                        c.getType(), 
                        c.getGenericType(), 

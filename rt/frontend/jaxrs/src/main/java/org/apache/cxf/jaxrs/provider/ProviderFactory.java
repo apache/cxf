@@ -99,7 +99,7 @@ public abstract class ProviderFactory {
     private List<ProviderInfo<ContextProvider<?>>> contextProviders = 
         new ArrayList<ProviderInfo<ContextProvider<?>>>(1);
     
-    private ParamConverterProvider newParamConverter;
+    private List<ParamConverterProvider> newParamConverters;
     
     // List of injected providers
     private Collection<ProviderInfo<?>> injectedProviders = 
@@ -251,12 +251,15 @@ public abstract class ProviderFactory {
     
     public <T> ParamConverter<T> createParameterHandler(Class<T> paramType) {
         
-        if (newParamConverter != null) {
-            return newParamConverter.getConverter(paramType, null, null);
-        } else {
-            return null;
-        }
-        
+        if (newParamConverters != null) {
+            for (ParamConverterProvider newParamConverter : newParamConverters) {
+                ParamConverter<T> converter = newParamConverter.getConverter(paramType, null, null);
+                if (converter != null) {
+                    return converter;
+                }
+            }
+        } 
+        return null;
     }
     
     protected <T> void handleMapper(List<T> candidates, 
@@ -509,7 +512,10 @@ public abstract class ProviderFactory {
             if (ParamConverterProvider.class.isAssignableFrom(providerCls)) {
                 //TODO: review the possibility of ParamConverterProvider needing to have Contexts injected
                 Object converter = provider.getProvider();
-                newParamConverter = (ParamConverterProvider)converter;
+                if (newParamConverters == null) {
+                    newParamConverters = new LinkedList<ParamConverterProvider>();
+                }
+                newParamConverters.add((ParamConverterProvider)converter);
             }
         }
         sortReaders();

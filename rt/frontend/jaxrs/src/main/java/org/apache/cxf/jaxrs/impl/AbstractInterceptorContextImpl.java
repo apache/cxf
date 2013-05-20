@@ -51,6 +51,9 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
     }
 
     public void setAnnotations(Annotation[] annotations) {
+        if (annotations == null) {
+            throw new NullPointerException();
+        }
         anns = annotations;
 
     }

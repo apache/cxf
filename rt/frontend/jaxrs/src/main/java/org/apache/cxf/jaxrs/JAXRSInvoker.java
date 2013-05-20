@@ -22,7 +22,6 @@ package org.apache.cxf.jaxrs;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -48,11 +47,7 @@ import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
-import org.apache.cxf.jaxrs.model.Parameter;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -160,8 +155,6 @@ public class JAXRSInvoker extends AbstractInvoker {
         boolean wasSuspended = exchange.remove(REQUEST_WAS_SUSPENDED) != null;
         
         if (!wasSuspended) {
-            
-            pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), inMessage);
             
             final boolean contextsAvailable = cri.contextsAvailable();
             final boolean paramsAvailable = cri.paramsAvailable();
@@ -419,32 +412,5 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
-    private void pushOntoStack(OperationResourceInfo ori, Class<?> realClass, Message msg) {
-        OperationResourceInfoStack stack = msg.get(OperationResourceInfoStack.class);
-        if (stack == null) {
-            stack = new OperationResourceInfoStack();
-            msg.put(OperationResourceInfoStack.class, stack);
-        }
-        
-        
-        @SuppressWarnings("unchecked")
-        MultivaluedMap<String, String> params = 
-            (MultivaluedMap<String, String>)msg.get(URITemplate.TEMPLATE_PARAMETERS);
-        List<String> values = null;
-        if (params == null || params.size() == 1) {
-            values = Collections.emptyList();
-        } else {
-            values = new ArrayList<String>(params.size() - 1);
-            for (Parameter pm : ori.getParameters()) {
-                if (pm.getType() == ParameterType.PATH) {
-                    List<String> paramValues = params.get(pm.getName());
-                    if (paramValues != null) {
-                        values.addAll(paramValues);
-                    }
-                    
-                }
-            }
-        }
-        stack.push(new MethodInvocationInfo(ori, realClass, values));
-    }
+    
 }

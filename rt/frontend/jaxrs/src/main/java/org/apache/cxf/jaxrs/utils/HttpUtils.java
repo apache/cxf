@@ -42,6 +42,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -49,6 +51,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
+import org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -66,8 +69,8 @@ public final class HttpUtils {
     private static final String REQUEST_PATH_TO_MATCH_SLASH = "path_to_match_slash";
     
     private static final String HTTP_SCHEME = "http";
+    private static final String LOCAL_HOST_IP_ADDRESS = "127.0.0.1";
     private static final String ANY_IP_ADDRESS = "0.0.0.0";
-    private static final String ANY_IP_ADDRESS_START = "://0.0.0.0";
     private static final int DEFAULT_HTTP_PORT = 80;
         
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
@@ -194,6 +197,28 @@ public final class HttpUtils {
         return Headers.toHttpDate(date);
     }
     
+    public static void convertHeaderValuesToStringIfNeeded(Map<String, List<Object>> headers) {
+        // In theory there could be custom RuntimeDelegates with custom header handlers
+        RuntimeDelegate rd = RuntimeDelegate.getInstance();
+        if (rd instanceof RuntimeDelegateImpl || rd == null) {
+            return;
+        }
+        for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
+            List<Object> values = entry.getValue();
+            if (!values.isEmpty()) {
+                @SuppressWarnings("unchecked")
+                HeaderDelegate<Object> hd = 
+                    (HeaderDelegate<Object>)rd.createHeaderDelegate(values.get(0).getClass());
+                if (hd != null) {
+                    for (int i = 0; i < values.size(); i++) {
+                        values.set(i, hd.toString(values.get(i)));
+                    }
+                }
+            }
+        }
+        
+    }
+    
     public static Date getHttpDate(String value) {
         if (value == null) {
             return null;
@@ -275,13 +300,20 @@ public final class HttpUtils {
         HttpServletRequest request = 
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
         boolean absolute = u.isAbsolute();
-        if (request != null && (!absolute || u.toString().contains(ANY_IP_ADDRESS_START))) {
+        if (request != null && (!absolute || isLocalHostOrAnyIpAddress(u))) {
             String serverAndPort = request.getServerName();
             boolean localAddressUsed = false;
-            if (absolute && ANY_IP_ADDRESS.equals(serverAndPort)) {
-                serverAndPort = request.getLocalAddr();
-                localAddressUsed = true;
+            if (absolute) {
+                if (ANY_IP_ADDRESS.equals(serverAndPort)) {
+                    serverAndPort = request.getLocalAddr();
+                    localAddressUsed = true;
+                }
+                if (LOCAL_HOST_IP_ADDRESS.equals(serverAndPort)) {
+                    serverAndPort = "localhost";
+                    localAddressUsed = true;
+                }
             }
+            
                 
             int port = localAddressUsed ? request.getLocalPort() : request.getServerPort();
             if (port != DEFAULT_HTTP_PORT) {
@@ -292,12 +324,18 @@ public final class HttpUtils {
                 u = URI.create(base + u.toString());
             } else {
                 int originalPort = u.getPort();
-                String replaceValue = originalPort == -1 ? ANY_IP_ADDRESS
-                    : ANY_IP_ADDRESS + ":" + originalPort;
+                String hostValue = u.getHost().equals(ANY_IP_ADDRESS) 
+                    ? ANY_IP_ADDRESS : LOCAL_HOST_IP_ADDRESS;
+                String replaceValue = originalPort == -1 ? hostValue : hostValue + ":" + originalPort;
                 u = URI.create(u.toString().replace(replaceValue, serverAndPort));
             }
         }
         return u;
+    }
+    
+    private static boolean isLocalHostOrAnyIpAddress(URI u) {
+        String host = u.getHost();
+        return host != null && (LOCAL_HOST_IP_ADDRESS.equals(host)) || ANY_IP_ADDRESS.equals(host);
     }
     
     public static void resetRequestURI(Message m, String requestURI) {

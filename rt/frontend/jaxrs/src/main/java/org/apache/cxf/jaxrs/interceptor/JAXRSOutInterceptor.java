@@ -221,6 +221,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, "0");
             responseHeaders.remove(HttpHeaders.CONTENT_TYPE);
             message.remove(Message.CONTENT_TYPE);
+            HttpUtils.convertHeaderValuesToStringIfNeeded(responseHeaders);
             return;
         }
         

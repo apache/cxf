@@ -175,22 +175,29 @@ public class UriInfoImpl implements UriInfo {
         if (stack != null) {
             List<String> objects = new ArrayList<String>();
             List<String> uris = new LinkedList<String>();
-            StringBuilder sum = new StringBuilder("");
+            StringBuilder sumPath = new StringBuilder("");
             for (MethodInvocationInfo invocation : stack) {
+                List<String> templateObjects = invocation.getTemplateValues();                
                 OperationResourceInfo ori = invocation.getMethodInfo();
                 URITemplate[] paths = {
                     ori.getClassResourceInfo().getURITemplate(),
                     ori.getURITemplate()
                 };
+                if (paths[0] != null) {
+                    int count = paths[0].getVariables().size();
+                    List<String> rootObjects = new ArrayList<String>(count);
+                    for (int i = 0; i < count && i < templateObjects.size(); i++) {
+                        rootObjects.add(templateObjects.get(i));    
+                    }
+                    uris.add(0, createMatchedPath(paths[0].getValue(), rootObjects, decode));
+                }
                 for (URITemplate t : paths) {
                     if (t != null) {
-                        String v = t.getValue();
-                        sum.append("/" + (decode ? HttpUtils.pathDecode(v) : v));
+                        sumPath.append("/").append(t.getValue());
                     }
                 }
-                UriBuilder ub = UriBuilder.fromPath(sum.toString());
-                objects.addAll(invocation.getTemplateValues());
-                uris.add(0, ub.build(objects.toArray()).normalize().getRawPath());
+                objects.addAll(templateObjects);
+                uris.add(0, createMatchedPath(sumPath.toString(), objects, decode));
             }
             return uris;
         }
@@ -198,6 +205,10 @@ public class UriInfoImpl implements UriInfo {
         return Collections.emptyList();
     }
 
+    private static String createMatchedPath(String uri, List<? extends Object> vars, boolean decode) {
+        String uriPath = UriBuilder.fromPath(uri).buildFromEncoded(vars.toArray()).getRawPath();
+        return decode ? HttpUtils.pathDecode(uriPath) : uriPath;
+    }
     private String doGetPath(boolean decode, boolean addSlash) {
         String path = HttpUtils.getPathToMatch(message, addSlash);
         return decode ? HttpUtils.pathDecode(path) : path;

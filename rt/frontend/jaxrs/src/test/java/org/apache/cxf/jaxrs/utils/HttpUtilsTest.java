@@ -191,6 +191,14 @@ public class HttpUtilsTest extends Assert {
     
     @Test
     public void testReplaceAnyIPAddressWithPort() {
+        doTestReplaceAnyIPAddressWithPort(true);
+    }
+    @Test
+    public void testReplaceLHostIPAddressWithPort() {
+        doTestReplaceAnyIPAddressWithPort(false);
+    }
+    
+    private void doTestReplaceAnyIPAddressWithPort(boolean anyIp) {
         Message m = new MessageImpl();
         HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, req);
@@ -201,7 +209,8 @@ public class HttpUtilsTest extends Assert {
         req.getServerPort();
         EasyMock.expectLastCall().andReturn(8080);
         EasyMock.replay(req);
-        URI u = HttpUtils.toAbsoluteUri(URI.create("http://0.0.0.0:8080/bar/foo"), m);
+        String host = anyIp ? "0.0.0.0" : "127.0.0.1";
+        URI u = HttpUtils.toAbsoluteUri(URI.create("http://" + host + ":8080/bar/foo"), m);
         assertEquals("http://localhost:8080/bar/foo", u.toString());
     }
     

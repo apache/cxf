@@ -135,8 +135,10 @@ import org.apache.cxf.jaxrs.model.BeanParamInfo;
 import org.apache.cxf.jaxrs.model.BeanResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfoComparator;
+import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoComparator;
+import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -251,7 +253,7 @@ public final class JAXRSUtils {
     public static List<MediaType> getMediaTypes(String[] values) {
         List<MediaType> supportedMimeTypes = new ArrayList<MediaType>(values.length);
         for (int i = 0; i < values.length; i++) {
-            supportedMimeTypes.add(toMediaType(values[i]));    
+            supportedMimeTypes.addAll(parseMediaTypes(values[i]));    
         }
         return supportedMimeTypes;
     }
@@ -497,6 +499,7 @@ public final class JAXRSUtils {
                                                                                   MEDIA_TYPE_Q_PARAM, 
                                                                                   MEDIA_TYPE_QS_PARAM));
             }
+            pushOntoStack(ori, matchedValues, message);
             return ori;
         }
         
@@ -1375,6 +1378,7 @@ public final class JAXRSUtils {
                     httpHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
                 }
             }
+            HttpUtils.convertHeaderValuesToStringIfNeeded(httpHeaders);
             writer.writeTo(entity, type, genericType, annotations, mediaType,
                            httpHeaders, 
                            entityStream);
@@ -1807,5 +1811,34 @@ public final class JAXRSUtils {
     
     public static ClassResourceInfo getRootResource(Message m) {
         return (ClassResourceInfo)m.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+    }
+    
+    public static void pushOntoStack(OperationResourceInfo ori,
+                                     MultivaluedMap<String, String> params,
+                                     Message msg) {
+        OperationResourceInfoStack stack = msg.get(OperationResourceInfoStack.class);
+        if (stack == null) {
+            stack = new OperationResourceInfoStack();
+            msg.put(OperationResourceInfoStack.class, stack);
+        }
+        
+        
+        List<String> values = null;
+        if (params.size() <= 1) {
+            values = Collections.emptyList();
+        } else {
+            values = new ArrayList<String>(params.size() - 1);
+            for (Parameter pm : ori.getParameters()) {
+                if (pm.getType() == ParameterType.PATH) {
+                    List<String> paramValues = params.get(pm.getName());
+                    if (paramValues != null) {
+                        values.addAll(paramValues);
+                    }
+                    
+                }
+            }
+        }
+        Class<?> realClass = ori.getClassResourceInfo().getServiceClass();
+        stack.push(new MethodInvocationInfo(ori, realClass, values));
     }
 }

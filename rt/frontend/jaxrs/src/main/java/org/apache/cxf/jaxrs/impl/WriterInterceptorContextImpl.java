@@ -79,7 +79,11 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
             return;
         }
         WriterInterceptor next = writers.remove(0);
-        next.aroundWriteTo(this);
+        try {
+            next.aroundWriteTo(this);
+        } catch (IOException ex) {
+            throw ex;
+        }
     }
 
     @Override

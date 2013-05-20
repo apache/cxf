@@ -366,6 +366,27 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testGetMediaTypes() {
+        List<MediaType> types = JAXRSUtils.getMediaTypes(new String[]{"text/xml"});
+        assertEquals(1, types.size());
+        assertEquals(MediaType.TEXT_XML_TYPE, types.get(0));
+    }
+    @Test
+    public void testGetMediaTypes2() {
+        List<MediaType> types = JAXRSUtils.getMediaTypes(new String[]{"text/xml", "text/plain"});
+        assertEquals(2, types.size());
+        assertEquals(MediaType.TEXT_XML_TYPE, types.get(0));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, types.get(1));
+    }
+    @Test
+    public void testGetMediaTypes3() {
+        List<MediaType> types = JAXRSUtils.getMediaTypes(new String[]{"text/xml, text/plain"});
+        assertEquals(2, types.size());
+        assertEquals(MediaType.TEXT_XML_TYPE, types.get(0));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, types.get(1));
+    }
+    
+    @Test
     public void testFindTargetResourceClassWithTemplates() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStoreTemplates.class);
@@ -446,12 +467,12 @@ public class JAXRSUtilsTest extends Assert {
         String contentTypes = "*/*";
         
         OperationResourceInfo ori = findTargetResourceClass(resources,
-               null, "/bookstore/books/123", "GET", new MetadataMap<String, String>(), contentTypes,
+               createMessage2(), "/bookstore/books/123", "GET", new MetadataMap<String, String>(), contentTypes,
                getTypes("*/*"));       
         assertNotNull(ori);
         assertEquals("getBook", ori.getMethodToInvoke().getName());
         
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, createMessage2(), 
             "/bookstore/books/123/true/chapter/1", "GET", new MetadataMap<String, String>(), contentTypes,
             getTypes("*/*"));       
         assertNotNull(ori);
