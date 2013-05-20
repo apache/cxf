@@ -25,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -836,6 +837,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = 
             WebClient.create("http://localhost:" 
                              + PORT + "/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123");
+        WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
         Response response = wc.options();
         List<Object> values = response.getMetadata().get("Allow");
         assertNotNull(values);
@@ -852,8 +854,25 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = 
             WebClient.create("http://localhost:" 
                              + PORT + "/bookstore/options");
+        WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
         Response response = wc.options();
         List<Object> values = response.getMetadata().get("Allow");
+        assertNotNull(values);
+        assertTrue(values.contains("POST") && values.contains("GET")
+                   && values.contains("DELETE") && values.contains("PUT"));
+        assertEquals(0, ((InputStream)response.getEntity()).available());
+        List<Object> date = response.getMetadata().get("Date");
+        assertNotNull(date);
+        assertEquals(1, date.size());
+    }
+    
+    @Test
+    public void testExplicitOptionsNoSplitByDefault() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:" 
+                             + PORT + "/bookstore/options");
+        Response response = wc.options();
+        List<String> values = Arrays.asList(response.getHeaderString("Allow").split(","));
         assertNotNull(values);
         assertTrue(values.contains("POST") && values.contains("GET")
                    && values.contains("DELETE") && values.contains("PUT"));
@@ -868,6 +887,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = 
             WebClient.create("http://localhost:" 
                              + PORT + "/bookstore/booksubresource/123");
+        WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
         Response response = wc.options();
         List<Object> values = response.getMetadata().get("Allow");
         assertNotNull(values);
@@ -2035,7 +2055,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testUriInfoMatchedUrisDecode() throws Exception {
         String expected = "[/bookstore/booksubresource/123/chapters/sub/1/matched!uris, "
                           + "/bookstore/booksubresource/123/chapters/sub/1/, "
-                          + "/bookstore/booksubresource/123/]";
+                          + "/bookstore/booksubresource/123/, "
+                          + "/bookstore]";
         getAndCompare("http://localhost:" + PORT + "/bookstore/"
                       + "booksubresource/123/chapters/sub/1/matched%21uris?decode=true", 
                       expected, "text/plain", "text/plain", 200);
@@ -2046,7 +2067,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         //note '%21' instead of '!'
         String expected = "[/bookstore/booksubresource/123/chapters/sub/1/matched%21uris, "
             + "/bookstore/booksubresource/123/chapters/sub/1/, "
-            + "/bookstore/booksubresource/123/]";
+            + "/bookstore/booksubresource/123/, "
+            + "/bookstore]";
         getAndCompare("http://localhost:" + PORT + "/bookstore/"
                       + "booksubresource/123/chapters/sub/1/matched%21uris?decode=false", 
                       expected,
@@ -2058,7 +2080,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/quotedheaders";
-        Response r = WebClient.create(endpointAddress).get();
+        WebClient wc = WebClient.create(endpointAddress);
+        WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
+        Response r = wc.get();
 
         List<Object> header1 = r.getMetadata().get("SomeHeader1");
         assertEquals(1, header1.size());
@@ -2095,13 +2119,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         // technically speaking, for these test cases, the client should return an error
         // however, servers do send bad data from time to time so we try to be forgiving
         for (int i = 0; i < 3; i++) {
-            Response r = WebClient.create(endpointAddress).query("type", Integer.toString(i)).get();
+            WebClient wc = WebClient.create(endpointAddress);
+            WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
+            Response r = wc.query("type", Integer.toString(i)).get();
             assertEquals(responses[i], r.getMetadata().get("SomeHeader" + i).get(0));
         }
 
         // this test currently returns the WRONG result per RFC2616, however it is correct
         // per the discussion in CXF-3518
-        Response r3 = WebClient.create(endpointAddress).query("type", "3").get();
+        WebClient wc = WebClient.create(endpointAddress);
+        WebClient.getConfig(wc).getRequestContext().put("org.apache.cxf.http.header.split", true);
+        Response r3 = wc.query("type", "3").get();
         List<Object> r3values = r3.getMetadata().get("SomeHeader3");
         assertEquals(4, r3values.size());
         assertEquals("some text", r3values.get(0));
