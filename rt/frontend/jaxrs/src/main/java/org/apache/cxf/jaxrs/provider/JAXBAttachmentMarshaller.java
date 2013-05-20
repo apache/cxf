@@ -20,10 +20,12 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 
+import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.message.Attachment;
 
@@ -70,7 +72,11 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
 
     @Override
     public String addSwaRefAttachment(DataHandler handler) {
-        throw new UnsupportedOperationException();
+        String id = UUID.randomUUID() + "@apache.org";
+        AttachmentImpl att = new AttachmentImpl(id, handler);
+        att.setXOP(false);
+        atts.add(att);
+        return id;
     }
 
     @Override
