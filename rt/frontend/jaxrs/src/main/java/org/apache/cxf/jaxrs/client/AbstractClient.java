@@ -102,6 +102,8 @@ public abstract class AbstractClient implements Client, Retryable {
     
     private static final String HTTP_SCHEME = "http";
     private static final String PROXY_PROPERTY = "jaxrs.proxy";
+    private static final String HEADER_SPLIT_PROPERTY =
+        "org.apache.cxf.http.header.split";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractClient.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractClient.class);
     
@@ -362,9 +364,11 @@ public abstract class AbstractClient implements Client, Retryable {
             return currentResponseBuilder;
         }
                 
-        @SuppressWarnings("unchecked")
         Map<String, List<String>> protocolHeaders = 
-            (Map<String, List<String>>)responseMessage.get(Message.PROTOCOL_HEADERS);
+            CastUtils.cast((Map<?, ?>)responseMessage.get(Message.PROTOCOL_HEADERS));
+        
+        boolean splitHeaders = 
+            MessageUtils.isTrue(outMessage.getContextualProperty(HEADER_SPLIT_PROPERTY));
                 
         for (Map.Entry<String, List<String>> entry : protocolHeaders.entrySet()) {
             if (null == entry.getKey()) {
@@ -376,24 +380,28 @@ public abstract class AbstractClient implements Client, Retryable {
                     continue;                    
                 }
                 for (String val : entry.getValue()) {
-                    String[] values;
-                    if (val == null || val.length() == 0) {
-                        values = new String[]{""};
-                    } else if (val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"') {
-                        // if the value starts with a quote and ends with a quote, we do a best
-                        // effort attempt to determine what the individual values are.
-                        values = parseQuotedHeaderValue(val);
-                    } else {
-                        boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
-                            && val.toUpperCase().contains(HttpHeaders.EXPIRES.toUpperCase()));
-                        values = splitPossible ? val.split(",") : new String[]{val};
-                    }
-                    for (String s : values) {
-                        String theValue = s.trim();
-                        if (theValue.length() > 0) {
-                            currentResponseBuilder.header(entry.getKey(), theValue);
+                    if (splitHeaders) {
+                        String[] values;
+                        if (val == null || val.length() == 0) {
+                            values = new String[]{""};
+                        } else if (val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"') {
+                            // if the value starts with a quote and ends with a quote, we do a best
+                            // effort attempt to determine what the individual values are.
+                            values = parseQuotedHeaderValue(val);
+                        } else {
+                            boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
+                                && val.toUpperCase().contains(HttpHeaders.EXPIRES.toUpperCase()));
+                            values = splitPossible ? val.split(",") : new String[]{val};
                         }
-                    }
+                        for (String s : values) {
+                            String theValue = s.trim();
+                            if (theValue.length() > 0) {
+                                currentResponseBuilder.header(entry.getKey(), theValue);
+                            }
+                        }
+                    } else {
+                        currentResponseBuilder.header(entry.getKey(), val);
+                    } 
                 }
             }
         }
