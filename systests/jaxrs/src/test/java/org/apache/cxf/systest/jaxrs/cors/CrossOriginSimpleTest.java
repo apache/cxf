@@ -151,7 +151,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void preflightPostClassAnnotation() throws ClientProtocolException, IOException {
+    public void preflightPostClassAnnotationFail() throws ClientProtocolException, IOException {
         HttpClient httpclient = new DefaultHttpClient();
         HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
         httpoptions.addHeader("Origin", "http://in.org");
@@ -161,6 +161,67 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1");
         HttpResponse response = httpclient.execute(httpoptions);
         assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN).length);
+        assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS).length);
+        assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS).length);
+    }
+    
+    @Test
+    public void preflightPostClassAnnotationFail2() throws ClientProtocolException, IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
+        httpoptions.addHeader("Origin", "http://area51.mil:31415");
+        httpoptions.addHeader("Content-Type", "application/json");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "POST");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-3");
+        HttpResponse response = httpclient.execute(httpoptions);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN).length);
+        assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS).length);
+        assertEquals(0, response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS).length);
+    }
+    
+    @Test
+    public void preflightPostClassAnnotationPass() throws ClientProtocolException, IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
+        httpoptions.addHeader("Origin", "http://area51.mil:31415");
+        httpoptions.addHeader("Content-Type", "application/json");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "POST");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1");
+        HttpResponse response = httpclient.execute(httpoptions);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        Header[] origin = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN);
+        assertEquals(1, origin.length);
+        assertEquals("http://area51.mil:31415", origin[0].getValue());
+        Header[] method = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS);
+        assertEquals(1, method.length);
+        assertEquals("POST", method[0].getValue());
+        Header[] requestHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS);
+        assertEquals(1, requestHeaders.length);
+        assertEquals("X-custom-1", requestHeaders[0].getValue());
+    }
+    
+    @Test
+    public void preflightPostClassAnnotationPass2() throws ClientProtocolException, IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpOptions httpoptions = new HttpOptions("http://localhost:" + PORT + "/antest/unannotatedPost");
+        httpoptions.addHeader("Origin", "http://area51.mil:31415");
+        httpoptions.addHeader("Content-Type", "application/json");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_METHOD, "POST");
+        httpoptions.addHeader(CorsHeaderConstants.HEADER_AC_REQUEST_HEADERS, "X-custom-1, X-custom-2");
+        HttpResponse response = httpclient.execute(httpoptions);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        Header[] origin = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN);
+        assertEquals(1, origin.length);
+        assertEquals("http://area51.mil:31415", origin[0].getValue());
+        Header[] method = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS);
+        assertEquals(1, method.length);
+        assertEquals("POST", method[0].getValue());
+        Header[] requestHeaders = response.getHeaders(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS);
+        assertEquals(1, requestHeaders.length);
+        assertTrue(requestHeaders[0].getValue().contains("X-custom-1"));
+        assertTrue(requestHeaders[0].getValue().contains("X-custom-2"));
     }
     
     @Test
