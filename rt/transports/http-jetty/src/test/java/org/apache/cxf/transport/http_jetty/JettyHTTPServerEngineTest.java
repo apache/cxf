@@ -99,7 +99,7 @@ public class JettyHTTPServerEngineTest extends Assert {
             "Engine references for the same port should point to the same instance",
             engine == factory.retrieveJettyHTTPServerEngine(PORT1));
 
-        JettyHTTPServerEngineFactory.destroyForPort(1234);
+        JettyHTTPServerEngineFactory.destroyForPort(PORT1);
     }
 
     @Test
