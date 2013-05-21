@@ -354,7 +354,8 @@ public class ProviderFactoryTest extends Assert {
         RuntimeExceptionMapper2 exMapper2 = new RuntimeExceptionMapper2(); 
         pf.registerUserProvider(exMapper2);
         assertSame(exMapper1, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
-        assertSame(exMapper2, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
+        Object webExMapper = pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
+        assertSame(exMapper2, webExMapper);
     }
     
     @Test
@@ -436,6 +437,30 @@ public class ProviderFactoryTest extends Assert {
             .createMessageBodyWriter(File.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE, 
                                      new MessageImpl());
         assertTrue(BinaryDataProvider.class == writer.getClass());
+    }
+    
+    @Test
+    public void testGetComplexProvider() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new ComplexMessageBodyReader());
+        Message m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        m.setExchange(ex);
+        m.put(ProviderFactory.IGNORE_TYPE_VARIABLES, true);
+        MessageBodyReader<Book> reader =
+            pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, 
+                                       m);
+        assertTrue(ComplexMessageBodyReader.class == reader.getClass());
+    }
+    
+    @Test
+    public void testGetComplexProvider2() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        pf.registerUserProvider(new ComplexMessageBodyReader());
+        MessageBodyReader<Book> reader =
+            pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, 
+                                       new MessageImpl());
+        assertTrue(ComplexMessageBodyReader.class == reader.getClass());
     }
     
     private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType) 
@@ -882,4 +907,44 @@ public class ProviderFactoryTest extends Assert {
         
     }
         
+    private static class ComplexMessageBodyReader extends ProviderBase<AClass> {
+    }
+    private abstract static class ProviderBase<A> implements
+        MessageBodyReader<Object>, MessageBodyWriter<Object> {
+        @Override
+        public boolean isReadable(Class<?> cls, Type arg1, Annotation[] arg2, MediaType arg3) {
+            return true;
+        }
+
+        @Override
+        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                               MultivaluedMap<String, String> arg4, InputStream arg5) throws IOException,
+            WebApplicationException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public long getSize(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void writeTo(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4,
+                            MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
+            WebApplicationException {
+            // TODO Auto-generated method stub
+            
+        }      
+    }
+    public static class AClass {
+    }
+    
 }
