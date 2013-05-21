@@ -85,13 +85,13 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     private boolean configFinalized;
      
     /**
-     * Constructor, using Jetty server engine.
-     * 
-     * @param b the associated Bus
-     * @param ci the associated conduit initiator
-     * @param endpointInfo the endpoint info of the destination
-     * @param serverEngineFactory 
-     * @throws IOException
+     * Constructor
+     *
+     * @param b  the associated Bus
+     * @param registry the associated destinationRegistry
+     * @param ei the endpoint info of the destination
+     * @param serverEngineFactory the serverEngineFactory which could be used to create ServerEngine
+     * @throws java.io.IOException
      */
     public JettyHTTPDestination(
             Bus bus,
@@ -99,7 +99,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             EndpointInfo ei, 
             JettyHTTPServerEngineFactory serverEngineFactory
     ) throws IOException {
-        //Add the defualt port if the address is missing it
+        //Add the default port if the address is missing it
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
         nurl = new URL(endpointInfo.getAddress());
