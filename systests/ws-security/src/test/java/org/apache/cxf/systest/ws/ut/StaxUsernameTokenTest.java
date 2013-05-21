@@ -175,9 +175,7 @@ public class StaxUsernameTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    // TODO See WSS-443
     @org.junit.Test
-    @org.junit.Ignore
     public void testSignedEncrypted() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
