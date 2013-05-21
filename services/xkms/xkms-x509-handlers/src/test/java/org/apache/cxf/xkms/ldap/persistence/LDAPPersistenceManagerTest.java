@@ -29,10 +29,12 @@ import javax.naming.directory.Attributes;
 
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
-import org.apache.cxf.xkms.x509.handlers.LDAPSearch;
 import org.apache.cxf.xkms.x509.handlers.LdapRegisterHandler;
+import org.apache.cxf.xkms.x509.handlers.LdapSchemaConfig;
+import org.apache.cxf.xkms.x509.handlers.LdapSearch;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,14 +44,15 @@ public class LDAPPersistenceManagerTest {
     private static final String EXPECTED_SERVICE_URI = "http://myservice.apache.org/MyServiceName";
     private static final String EXPECTED_DN_FOR_SERVICE =
             "cn=http:\\/\\/myservice.apache.org\\/MyServiceName,ou=services";
+    private static final LdapSchemaConfig LDAP_CERT_CONFIG = new LdapSchemaConfig();
 
     @Test
     public void testSaveUserCert() throws Exception {
         IMocksControl c = EasyMock.createControl();
-        LDAPSearch ldapSearch = c.createMock(LDAPSearch.class);
+        LdapSearch ldapSearch = c.createMock(LdapSearch.class);
         ldapSearch.bind(EasyMock.eq(EXPECTED_SUBJECT_DN + "," + ROOT_DN), EasyMock.anyObject(Attributes.class));
         EasyMock.expectLastCall().once();
-        LdapRegisterHandler persistenceManager = new LdapRegisterHandler(ldapSearch, ROOT_DN);
+        LdapRegisterHandler persistenceManager = new LdapRegisterHandler(ldapSearch, LDAP_CERT_CONFIG, ROOT_DN);
         X509Certificate cert = getTestCert();
 
         c.replay();
@@ -63,10 +66,10 @@ public class LDAPPersistenceManagerTest {
     @Test
     public void testSaveServiceCert() throws Exception {
         IMocksControl c = EasyMock.createControl();
-        LDAPSearch ldapSearch = c.createMock(LDAPSearch.class);
+        LdapSearch ldapSearch = c.createMock(LdapSearch.class);
         ldapSearch.bind(EasyMock.eq(EXPECTED_DN_FOR_SERVICE + "," + ROOT_DN), EasyMock.anyObject(Attributes.class));
         EasyMock.expectLastCall().once();
-        LdapRegisterHandler persistenceManager = new LdapRegisterHandler(ldapSearch, ROOT_DN);
+        LdapRegisterHandler persistenceManager = new LdapRegisterHandler(ldapSearch, LDAP_CERT_CONFIG, ROOT_DN);
         X509Certificate cert = getTestCert();
 
         c.replay();

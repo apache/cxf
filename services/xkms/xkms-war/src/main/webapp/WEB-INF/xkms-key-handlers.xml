@@ -24,21 +24,35 @@
    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
 
 <!--
+   <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.handlers.LdapSchemaConfig">
+      <property name="certObjectClass" value="inetOrgPerson" />
+      <property name="attrUID" value="uid" />
+      <property name="attrIssuerID" value="manager" />
+      <property name="attrSerialNumber" value="employeeNumber" />
+      <property name="attrCrtBinary" value="userCertificate;binary" />
+      <property name="constAttrNamesCSV" value="sn" />
+      <property name="constAttrValuesCSV" value="X509 certificate" />
+      <property name="serviceCertRDNTemplate" value="cn=%s,ou=services" />
+      <property name="serviceCertUIDTemplate" value="cn=%s" />
+   </bean>
+
    <bean id="x509LdapLocator" class="org.apache.cxf.xkms.x509.locator.LdapLocator">
       <constructor-arg ref="ldapSearch" />
-      <constructor-arg value="${xkms.backend.ldap.rootDN}" />
+      <constructor-arg ref="ldapSchemaConfig" />
+      <constructor-arg value="dc=example,dc=com" />
    </bean>
 
     <bean id="ldapRegisterHandler" class="org.apache.cxf.xkms.x509.handlers.LdapRegisterHandler">
       <constructor-arg ref="ldapSearch" />
-      <constructor-arg value="${xkms.backend.ldap.rootDN}" />
+      <constructor-arg ref="ldapSchemaConfig" />
+      <constructor-arg value="dc=example,dc=com" />
    </bean>
 
-   <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.handlers.LDAPSearch">
-      <constructor-arg value="${xkms.backend.ldap.url}" />
-      <constructor-arg value="${xkms.backend.ldap.user}" />
-      <constructor-arg value="${xkms.backend.ldap.pwd}" />
-      <constructor-arg value="${xkms.backend.ldap.retry}" />
+   <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.handlers.LdapSearch">
+      <constructor-arg value="ldap://localhost:2389" />
+      <constructor-arg value="cn=Directory Manager" />
+      <constructor-arg value="test" />
+      <constructor-arg value="2" />
    </bean>
 -->
 

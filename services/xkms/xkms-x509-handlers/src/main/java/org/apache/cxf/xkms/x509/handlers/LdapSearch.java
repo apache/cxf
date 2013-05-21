@@ -37,9 +37,9 @@ import org.apache.cxf.xkms.exception.XKMSException;
 import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
 import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 
-public class LDAPSearch {
+public class LdapSearch {
     private static final String SECURITY_AUTHENTICATION = "simple";
-    private static final Logger LOG = LogUtils.getL7dLogger(LDAPSearch.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(LdapSearch.class);
     
     private String ldapuri;
     private String bindDN;
@@ -48,7 +48,7 @@ public class LDAPSearch {
     
     private InitialDirContext dirContext;
 
-    public LDAPSearch(String ldapuri, String bindDN, String bindPassword, int numRetries) {
+    public LdapSearch(String ldapuri, String bindDN, String bindPassword, int numRetries) {
         this.ldapuri = ldapuri;
         this.bindDN = bindDN;
         this.bindPassword = bindPassword;

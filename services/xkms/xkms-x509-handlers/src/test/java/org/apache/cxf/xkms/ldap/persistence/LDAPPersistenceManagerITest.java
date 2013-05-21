@@ -31,8 +31,9 @@ import javax.naming.NamingException;
 
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
-import org.apache.cxf.xkms.x509.handlers.LDAPSearch;
 import org.apache.cxf.xkms.x509.handlers.LdapRegisterHandler;
+import org.apache.cxf.xkms.x509.handlers.LdapSchemaConfig;
+import org.apache.cxf.xkms.x509.handlers.LdapSearch;
 import org.apache.cxf.xkms.x509.locator.LdapLocator;
 
 import org.junit.Assert;
@@ -44,6 +45,7 @@ import org.junit.Test;
  */
 public class LDAPPersistenceManagerITest {
     private static final String EXPECTED_SUBJECT_DN = "CN=www.issuer.com, L=CGN, ST=NRW, C=DE, O=Issuer";
+    private static final LdapSchemaConfig LDAP_CERT_CONFIG = new LdapSchemaConfig();
 
     @Test
     @Ignore
@@ -82,9 +84,11 @@ public class LDAPPersistenceManagerITest {
     @Test
     @Ignore
     public void testSave() throws Exception {
-        LDAPSearch ldapSearch = new LDAPSearch("ldap://localhost:2389", "cn=Directory Manager", "test", 2);
+        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:2389", "cn=Directory Manager", "test", 2);
         LdapLocator locator = createLdapLocator();
-        LdapRegisterHandler persistenceManager = new LdapRegisterHandler(ldapSearch, "dc=example,dc=com");
+        LdapRegisterHandler persistenceManager = new LdapRegisterHandler(ldapSearch,
+                                                                         LDAP_CERT_CONFIG,
+                                                                         "dc=example,dc=com");
         File certFile = new File("src/test/java/cert1.cer");
         Assert.assertTrue(certFile.exists());
         FileInputStream fis = new FileInputStream(certFile);
@@ -99,8 +103,8 @@ public class LDAPPersistenceManagerITest {
     }
 
     private LdapLocator createLdapLocator() throws CertificateException {
-        LDAPSearch ldapSearch = new LDAPSearch("ldap://localhost:2389", "cn=Directory Manager", "test", 2);
-        return new LdapLocator(ldapSearch, "dc=example,dc=com");
+        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:2389", "cn=Directory Manager", "test", 2);
+        return new LdapLocator(ldapSearch, LDAP_CERT_CONFIG, "dc=example,dc=com");
     }
 
     private void testFindBySubjectDnInternal(LdapLocator persistenceManager) {

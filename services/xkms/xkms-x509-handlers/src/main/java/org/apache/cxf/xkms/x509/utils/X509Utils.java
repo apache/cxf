@@ -31,11 +31,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
 import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
@@ -167,5 +169,26 @@ public final class X509Utils {
             throw new IllegalArgumentException(elementClass.getName() + " must be set");
         }
     }
+
+    public static String getSubjectDN(String application, String id, String serviceDNTemplate) {
+        if (application.equalsIgnoreCase(Applications.SERVICE_SOAP.getUri())) {
+            return String.format(serviceDNTemplate, id);
+        } else {
+            return id;
+        }
+    }
+
+    public static String getDN(String applicationUri, String identifier, String serviceDNTemplate, String rootDN) {
+        String dn = identifier;
+        if (Applications.SERVICE_SOAP.getUri().equals(applicationUri)) {
+            String escapedIdentifier = identifier.replaceAll("\\/", Matcher.quoteReplacement("\\/"));
+            dn = String.format(serviceDNTemplate, escapedIdentifier);
+        }
+        if ((rootDN != null) && !(rootDN.isEmpty())) {
+            dn = dn + "," + rootDN;
+        }
+        return dn;
+    }
+
 
 }

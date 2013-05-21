@@ -35,13 +35,13 @@
       </property>
       <property name="locators">
          <list>
-            <!-- ref bean="x509LdapLocator" /-->
+            <!--ref bean="x509LdapLocator" /-->
             <ref bean="x509FileLocator" />
          </list>
       </property>
       <property name="keyRegisterHandlers">
          <list>
-            <!-- ref bean="ldapRegisterHandler" /-->
+            <!--ref bean="ldapRegisterHandler" /-->
             <ref bean="fileRegisterHandler" />
          </list>
       </property>

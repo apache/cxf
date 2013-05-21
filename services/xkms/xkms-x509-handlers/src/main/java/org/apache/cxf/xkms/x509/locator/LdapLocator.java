@@ -27,47 +27,45 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.xkms.exception.XKMSArgumentNotMatchException;
 import org.apache.cxf.xkms.exception.XKMSCertificateException;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.Locator;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
-import org.apache.cxf.xkms.x509.handlers.LDAPSearch;
+import org.apache.cxf.xkms.x509.handlers.LdapSchemaConfig;
+import org.apache.cxf.xkms.x509.handlers.LdapSearch;
 import org.apache.cxf.xkms.x509.parser.LocateRequestParser;
 import org.apache.cxf.xkms.x509.utils.X509Utils;
 
 public class LdapLocator implements Locator {
 
-    private static final String OU_SERVICES = "ou=services";
-    private static final String CN_PREFIX = "cn=";
-    private static final String ATTR_UID_NAME = "uid";
-    private static final String ATTR_ISSUER_IDENTIFIER = "manager";
-    private static final String ATTR_SERIAL_NUMBER = "employeeNumber";
-    private static final String ATTR_USER_CERTIFICATE_BINARY = "userCertificate;binary";
-    private static final String FILTER_UID = "(" + ATTR_UID_NAME + "=%s)";
-    private static final String FILTER_ISSUER_SERIAL = "(&(" + ATTR_ISSUER_IDENTIFIER + "=%s)(" + ATTR_SERIAL_NUMBER
-            + "=%s))";
     private static final Logger LOG = LogUtils.getL7dLogger(LdapLocator.class);
-    private final LDAPSearch ldapSearch;
+    private final LdapSearch ldapSearch;
     private CertificateFactory certificateFactory;
+    private final LdapSchemaConfig ldapConfig;
+    private final String filterUIDTemplate;
+    private final String filterIssuerSerialTemplate;
     private final String rootDN;
-
-    public LdapLocator(LDAPSearch ldapSearch, String rootDN) {
+    
+    
+    public LdapLocator(LdapSearch ldapSearch, LdapSchemaConfig ldapConfig, String rootDN) {
         this.ldapSearch = ldapSearch;
+        this.ldapConfig = ldapConfig;
         this.rootDN = rootDN;
         try {
             this.certificateFactory = CertificateFactory.getInstance("X.509");
         } catch (CertificateException e) {
             LOG.log(Level.SEVERE, e.getMessage(), e);
         }
+        filterUIDTemplate = "(" + ldapConfig.getAttrUID() + "=%s)";
+        filterIssuerSerialTemplate = "(&(" + ldapConfig.getAttrIssuerID() + "=%s)(" + ldapConfig.getAttrSerialNumber()
+            + "=%s))";
     }
 
     @Override
@@ -121,15 +119,17 @@ public class LdapLocator implements Locator {
     private X509Certificate findByDn(String application, String id) throws CertificateException {
         byte[] content = null;
         try {
-            String dn = getDN(application, id);
+            String dn = X509Utils.getDN(application, id, ldapConfig.getServiceCertRDNTemplate(),
+                                        rootDN);
             content = getCertificateForDn(dn);
         } catch (NamingException e) {
             // Not found
         }
-        // Try to find certificate by search for distinguishedName attribute
+        // Try to find certificate by search for uid attribute
         try {
             if (content == null) {
-                content = getCertificateForDnAttr(getSubjectDN(application, id));
+                String uidAttr = X509Utils.getSubjectDN(application, id, ldapConfig.getServiceCertUIDTemplate());
+                content = getCertificateForUIDAttr(uidAttr);
             }
         } catch (NamingException e) {
             // Not found
@@ -140,7 +140,7 @@ public class LdapLocator implements Locator {
     }
 
     private byte[] getCertificateForDn(String dn) throws NamingException {
-        Attribute attr = ldapSearch.getAttribute(dn, ATTR_USER_CERTIFICATE_BINARY);
+        Attribute attr = ldapSearch.getAttribute(dn, ldapConfig.getAttrCrtBinary());
         return (attr != null)
                 ? (byte[]) attr.get()
                 : null;
@@ -152,8 +152,8 @@ public class LdapLocator implements Locator {
         if ((issuer == null) || (serial == null)) {
             throw new IllegalArgumentException("Issuer and serial applications are expected in request");
         }
-        String filter = String.format(FILTER_ISSUER_SERIAL, issuer, serial);
-        Attribute attr = ldapSearch.findAttribute(rootDN, filter, ATTR_USER_CERTIFICATE_BINARY);
+        String filter = String.format(filterIssuerSerialTemplate, issuer, serial);
+        Attribute attr = ldapSearch.findAttribute(rootDN, filter, ldapConfig.getAttrCrtBinary());
         if ((attr != null) && (attr.get() != null)) {
             return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream((byte[]) attr
                     .get()));
@@ -162,28 +162,9 @@ public class LdapLocator implements Locator {
         }
     }
 
-    private String getDN(String applicationUri, String identifier) {
-        if (Applications.PKIX.getUri().equals(applicationUri)) {
-            return identifier + "," + rootDN;
-        } else if (Applications.SERVICE_SOAP.getUri().equals(applicationUri)) {
-            String escapedIdentifier = identifier.replaceAll("\\/", Matcher.quoteReplacement("\\/"));
-            return CN_PREFIX + escapedIdentifier + "," + OU_SERVICES + "," + rootDN;
-        } else {
-            throw new XKMSArgumentNotMatchException("Unsupported application uri: " + applicationUri);
-        }
-    }
-
-    private String getSubjectDN(String application, String id) {
-        if (application.equalsIgnoreCase(Applications.SERVICE_SOAP.getUri())) {
-            return CN_PREFIX + id;
-        } else {
-            return id;
-        }
-    }
-
-    private byte[] getCertificateForDnAttr(String dn) throws NamingException {
-        String filter = String.format(FILTER_UID, dn);
-        Attribute attr = ldapSearch.findAttribute(rootDN, filter, ATTR_USER_CERTIFICATE_BINARY);
+    private byte[] getCertificateForUIDAttr(String dn) throws NamingException {
+        String filter = String.format(filterUIDTemplate, dn);
+        Attribute attr = ldapSearch.findAttribute(rootDN, filter, ldapConfig.getAttrCrtBinary());
         return (attr != null)
                 ? (byte[]) attr.get()
                 : null;

@@ -26,7 +26,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
 
-import org.apache.cxf.xkms.x509.handlers.LDAPSearch;
+import org.apache.cxf.xkms.x509.handlers.LdapSearch;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class LDAPSearchTest {
     @Test
     @Ignore
     public void testSearch() throws URISyntaxException, NamingException {
-        LDAPSearch ldapSearch = new LDAPSearch("ldap://localhost:2389", "cn=Directory Manager", "test", 2);
+        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:2389", "cn=Directory Manager", "test", 2);
         NamingEnumeration<SearchResult> answer = ldapSearch.searchSubTree("dc=example, dc=com", "(cn=Testuser)");
         while (answer.hasMore()) {
             SearchResult sr = answer.next();
