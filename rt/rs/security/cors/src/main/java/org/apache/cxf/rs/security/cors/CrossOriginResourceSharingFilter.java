@@ -90,19 +90,19 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
     private boolean defaultOptionsMethodsHandlePreflight;
     
     
-    private <T extends Annotation> T  getAnnotation(OperationResourceInfo ori,
+    private <T extends Annotation> T  getAnnotation(Method m,
                                                     Class<T> annClass) {
-        if (ori == null) {
+        if (m == null) {
             return null;
         }
         return ReflectionUtil.getAnnotationForMethodOrContainingClass(
-             ori.getAnnotatedMethod(),  annClass);
+             m,  annClass);
     }
 
     public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
         OperationResourceInfo opResInfo = m.getExchange().get(OperationResourceInfo.class);
-        CrossOriginResourceSharing annotation = 
-            getAnnotation(opResInfo, CrossOriginResourceSharing.class);
+        CrossOriginResourceSharing annotation = opResInfo == null ? null 
+            : getAnnotation(opResInfo.getAnnotatedMethod(), CrossOriginResourceSharing.class);
         
         if ("OPTIONS".equals(m.get(Message.HTTP_REQUEST_METHOD))) {
             return preflightRequest(m, annotation, opResInfo, resourceClass);
@@ -196,8 +196,8 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
          * has one of our annotations on it (or its parent class) indicating 'localPreflight' --
          * or the defaultOptionsMethodsHandlePreflight flag is true.
          */
-        LocalPreflight preflightAnnotation = 
-            getAnnotation(opResInfo, LocalPreflight.class);
+        LocalPreflight preflightAnnotation = opResInfo == null ? null 
+            : getAnnotation(opResInfo.getAnnotatedMethod(), LocalPreflight.class);
         if (preflightAnnotation != null || defaultOptionsMethodsHandlePreflight) { 
             m.put(LOCAL_PREFLIGHT, "true");
             m.put(LOCAL_PREFLIGHT_ORIGIN, origin);
@@ -205,7 +205,7 @@ public class CrossOriginResourceSharingFilter implements RequestHandler, Respons
             return null; // let the resource method take all responsibility.
         }
         
-        CrossOriginResourceSharing ann = method.getAnnotation(CrossOriginResourceSharing.class);
+        CrossOriginResourceSharing ann = getAnnotation(method, CrossOriginResourceSharing.class);
         ann = ann == null ? corsAnn : ann;
         
         /* We aren't required to have any annotation at all. If no annotation,
