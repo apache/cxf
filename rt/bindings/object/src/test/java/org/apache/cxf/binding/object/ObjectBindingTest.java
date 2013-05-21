@@ -122,7 +122,7 @@ public class ObjectBindingTest extends AbstractCXFTest {
 
                 inMsg.getExchange().setInMessage(outMsg);
                 try {
-                    Conduit backChannel = d.getBackChannel(inMsg, null, null);
+                    Conduit backChannel = d.getBackChannel(inMsg);
                     backChannel.prepare(outMsg);
                     backChannel.close(outMsg);
                 } catch (IOException e) {

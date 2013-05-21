@@ -59,7 +59,7 @@ public class CorbaDestinationTest extends Assert {
         assertTrue("EndpointInfo should not be null", e2 != null);
    
         Message m = new MessageImpl();
-        CorbaServerConduit serverConduit = (CorbaServerConduit)destination.getBackChannel(m, m, rtype);
+        CorbaServerConduit serverConduit = (CorbaServerConduit)destination.getBackChannel(m);
         assertNotNull("CorbaServerConduit should not be null", serverConduit);             
     }
    

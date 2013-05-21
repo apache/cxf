@@ -37,7 +37,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.http.Headers;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /*
  * This interceptor will issue 401s
@@ -205,10 +204,8 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
      */
     private Conduit getConduit(Message message) throws IOException {
         Exchange exchange = message.getExchange();
-        EndpointReferenceType target = 
-            exchange.get(EndpointReferenceType.class);
         Conduit conduit =
-            exchange.getDestination().getBackChannel(message, null, target);
+            exchange.getDestination().getBackChannel(message);
         exchange.setConduit(conduit);
         return conduit;
     }

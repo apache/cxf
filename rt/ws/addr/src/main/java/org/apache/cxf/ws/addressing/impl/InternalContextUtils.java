@@ -116,9 +116,7 @@ final class InternalContextUtils {
                 if (reference == null) {
                     reference = ContextUtils.getNoneEndpointReference();
                 }
-                Conduit backChannel = target.getBackChannel(inMessage,
-                                                            partialResponse,
-                                                            reference);
+                Conduit backChannel = target.getBackChannel(inMessage);
                 Exception exception = inMessage.getContent(Exception.class);
                 //Add this to handle two way faultTo
                 //TODO:Look at how to refactor 
@@ -294,8 +292,7 @@ final class InternalContextUtils {
             public EndpointReferenceType getAddress() {
                 return reference;
             }
-            public Conduit getBackChannel(Message inMessage, Message partialResponse,
-                                          EndpointReferenceType address) throws IOException {
+            public Conduit getBackChannel(Message inMessage) throws IOException {
                 Bus bus = inMessage.getExchange().get(Bus.class);
                 //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
                 //we don't wait for a response.

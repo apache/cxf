@@ -98,7 +98,6 @@ public class JettyHTTPDestinationTest extends Assert {
     private Conduit decoupledBackChannel;
     private EndpointInfo endpointInfo;
     private EndpointReferenceType address;
-    private EndpointReferenceType replyTo;
     private JettyHTTPServerEngine engine;
     private HTTPServerPolicy policy;
     private JettyHTTPDestination destination;
@@ -141,7 +140,6 @@ public class JettyHTTPDestinationTest extends Assert {
         transportFactory = null;
         decoupledBackChannel = null;
         address = null;
-        replyTo = null;
         engine = null;
         request = null;
         response = null;
@@ -357,7 +355,7 @@ public class JettyHTTPDestinationTest extends Assert {
         setUpDoService(false);
         destination.doService(request, response);
         setUpInMessage();
-        Conduit backChannel = destination.getBackChannel(inMessage, null, null);
+        Conduit backChannel = destination.getBackChannel(inMessage);
         
         assertNotNull("expected back channel", backChannel);
         assertEquals("unexpected target",
@@ -372,7 +370,7 @@ public class JettyHTTPDestinationTest extends Assert {
         destination.doService(request, response);
         setUpInMessage();
         Conduit backChannel =
-            destination.getBackChannel(inMessage, null, null);
+            destination.getBackChannel(inMessage);
         outMessage = setUpOutMessage();
         backChannel.prepare(outMessage);
         verifyBackChannelSend(backChannel, outMessage, 200);
@@ -385,7 +383,7 @@ public class JettyHTTPDestinationTest extends Assert {
         destination.doService(request, response);
         setUpInMessage();
         Conduit backChannel =
-            destination.getBackChannel(inMessage, null, null);
+            destination.getBackChannel(inMessage);
         outMessage = setUpOutMessage();
         backChannel.prepare(outMessage);
         verifyBackChannelSend(backChannel, outMessage, 500);
@@ -398,7 +396,7 @@ public class JettyHTTPDestinationTest extends Assert {
         destination.doService(request, response);
         setUpInMessage();
         Conduit backChannel =
-            destination.getBackChannel(inMessage, null, null);
+            destination.getBackChannel(inMessage);
         outMessage = setUpOutMessage();
         backChannel.prepare(outMessage);
         verifyBackChannelSend(backChannel, outMessage, 500, true);
@@ -407,7 +405,6 @@ public class JettyHTTPDestinationTest extends Assert {
     @Test
     public void testGetBackChannelSendDecoupled() throws Exception {
         destination = setUpDestination(false, false);
-        replyTo = getEPR(NOWHERE + "response/foo");
         setUpDoService(false, true, true, 202);
         destination.doService(request, response);
         setUpInMessage();
@@ -415,13 +412,13 @@ public class JettyHTTPDestinationTest extends Assert {
         Message partialResponse = setUpOutMessage();
         partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
         Conduit partialBackChannel =
-            destination.getBackChannel(inMessage, partialResponse, replyTo);
+            destination.getBackChannel(inMessage);
         partialBackChannel.prepare(partialResponse);
         verifyBackChannelSend(partialBackChannel, partialResponse, 202);
 
         outMessage = setUpOutMessage();
         Conduit fullBackChannel =
-            destination.getBackChannel(inMessage, null, replyTo);
+            destination.getBackChannel(inMessage);
 
         fullBackChannel.prepare(outMessage);
     }

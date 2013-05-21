@@ -44,7 +44,7 @@ public class MessageReplayObserver implements MessageObserver {
             }
             in.close();
             
-            Conduit backChannel = message.getDestination().getBackChannel(message, null, null);
+            Conduit backChannel = message.getDestination().getBackChannel(message);
 
             backChannel.prepare(message);
 

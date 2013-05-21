@@ -611,8 +611,7 @@ public final class ContextUtils {
             public EndpointReferenceType getAddress() {
                 return reference;
             }
-            public Conduit getBackChannel(Message inMessage, Message partialResponse,
-                                          EndpointReferenceType address) throws IOException {
+            public Conduit getBackChannel(Message inMessage) throws IOException {
                 Bus bus = inMessage.getExchange().get(Bus.class);
                 //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
                 //we don't wait for a response.

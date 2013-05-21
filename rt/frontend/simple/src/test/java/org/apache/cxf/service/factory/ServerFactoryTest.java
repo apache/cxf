@@ -120,9 +120,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
             return null;
         }
 
-        public Conduit getBackChannel(Message inMessage, 
-                                      Message partialResponse, 
-                                      EndpointReferenceType address) throws IOException {
+        public Conduit getBackChannel(Message inMessage) throws IOException {
             // TODO Auto-generated method stub
             return null;
         }

@@ -110,9 +110,7 @@ public class CorbaDestination implements MultiplexDestination {
         return reference;
     }    
 
-    public Conduit getBackChannel(Message inMessage,
-                                  Message partialResponse,
-                                  EndpointReferenceType ref)
+    public Conduit getBackChannel(Message inMessage)
         throws IOException {
         return new CorbaServerConduit(endpointInfo, reference, obj,
                                       orb, orbConfig, typeMap);

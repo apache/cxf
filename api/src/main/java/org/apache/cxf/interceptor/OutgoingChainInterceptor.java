@@ -96,7 +96,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         if (ex.getConduit(message) == null
             && ex.getDestination() != null) {
             try {
-                conduit = ex.getDestination().getBackChannel(ex.getInMessage(), null, null);
+                conduit = ex.getDestination().getBackChannel(ex.getInMessage());
                 ex.put(ConduitSelector.class, 
                        new PreexistingConduitSelector(conduit, ex.get(Endpoint.class)));
             } catch (IOException e) {

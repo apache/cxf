@@ -127,7 +127,7 @@ public class Destination extends AbstractEndpoint {
                 try {
                     message.getInterceptorChain().abort();
                     Conduit conduit = message.getExchange().getDestination()
-                        .getBackChannel(message, null, null);
+                        .getBackChannel(message);
                     if (conduit != null) {
                         //for a one-way, the back channel could be
                         //null if it knows it cannot send anything.

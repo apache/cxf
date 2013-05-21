@@ -41,13 +41,9 @@ public interface Destination extends Observable {
      * compatible Quality of Protection must be asserted on the back-channel.
      * 
      * @param inMessage the current message
-     * @param unused1 - will likely always be null  
-     * @param unused2 - will likely always be null
      * @return a suitable Conduit
      */
-    Conduit getBackChannel(Message inMessage,
-                           Message unused1,
-                           EndpointReferenceType unused2)
+    Conduit getBackChannel(Message inMessage)
         throws IOException;
 
     /**

@@ -102,7 +102,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                                   message.getExchange().getEndpoint().getEndpointInfo())) {
                 
                 try {
-                    Conduit c = message.getExchange().getDestination().getBackChannel(message, null, null);
+                    Conduit c = message.getExchange().getDestination().getBackChannel(message);
                     Message mout = new MessageImpl();
                     mout.setExchange(message.getExchange());
                     message.getExchange().setOutMessage(mout);

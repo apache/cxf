@@ -252,7 +252,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
 
         public void onMessage(Message message) {
             try {
-                Conduit backChannel = message.getDestination().getBackChannel(message, null, null);
+                Conduit backChannel = message.getDestination().getBackChannel(message);
 
                 backChannel.prepare(message);
 

@@ -87,7 +87,7 @@ public class LocalTransportFactoryTest extends Assert {
         public void onMessage(Message message) {
             try {
                 message.getExchange().setInMessage(message);
-                Conduit backChannel = message.getDestination().getBackChannel(message, null, null);
+                Conduit backChannel = message.getDestination().getBackChannel(message);
                 
                 InputStream in = message.getContent(InputStream.class);
                 assertNotNull(in);   

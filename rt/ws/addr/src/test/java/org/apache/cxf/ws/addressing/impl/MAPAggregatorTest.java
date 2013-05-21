@@ -781,9 +781,7 @@ public class MAPAggregatorTest extends Assert {
         Destination target = control.createMock(Destination.class);
         setUpMessageDestination(message, target);
         Conduit backChannel = control.createMock(Conduit.class);
-        target.getBackChannel(EasyMock.eq(message),
-                              EasyMock.isA(Message.class),
-                              EasyMock.isA(EndpointReferenceType.class));
+        target.getBackChannel(EasyMock.eq(message));
         EasyMock.expectLastCall().andReturn(backChannel);
         // REVISIT test interceptor chain setup & send
     }

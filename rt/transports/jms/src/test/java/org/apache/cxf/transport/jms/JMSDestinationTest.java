@@ -437,7 +437,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 // setup the message for
                 Conduit backConduit;
                 try {
-                    backConduit = destination.getBackChannel(m, null, null);
+                    backConduit = destination.getBackChannel(m);
                     // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
                     sendoutMessage(backConduit, replyMessage, true);
@@ -501,7 +501,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
                 // setup the message for
                 Conduit backConduit;
                 try {
-                    backConduit = destination.getBackChannel(m, null, null);
+                    backConduit = destination.getBackChannel(m);
                     // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
                     // copy the message encoding

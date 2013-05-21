@@ -236,7 +236,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
                     ExchangeImpl ex = new ExchangeImpl();
                     ex.setInMessage(message);
 
-                    Conduit backChannel = message.getDestination().getBackChannel(message, null, null);
+                    Conduit backChannel = message.getDestination().getBackChannel(message);
 
                     MessageImpl res = new MessageImpl();
                     res.put(Message.CONTENT_TYPE, "text/xml");
