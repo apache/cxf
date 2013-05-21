@@ -77,6 +77,7 @@ public abstract class ProviderFactory {
     protected static final String DEFAULT_FILTER_NAME_BINDING = "org.apache.cxf.filter.binding";
     protected static final String SERVER_FACTORY_NAME = "org.apache.cxf.jaxrs.provider.ServerProviderFactory";
     protected static final String CLIENT_FACTORY_NAME = "org.apache.cxf.jaxrs.client.ClientProviderFactory";
+    protected static final String IGNORE_TYPE_VARIABLES = "org.apache.cxf.jaxrs.providers.ignore.typevars";
     
     private static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
     private static final Logger LOG = LogUtils.getL7dLogger(ProviderFactory.class);
@@ -270,7 +271,12 @@ public abstract class ProviderFactory {
                                      boolean injectContext) {
         
         Class<?> mapperClass =  ClassHelper.getRealClass(em.getProvider());
-        Type[] types = getGenericInterfaces(mapperClass);
+        Type[] types = null;
+        if (m != null && MessageUtils.isTrue(m.getContextualProperty(IGNORE_TYPE_VARIABLES))) {
+            types = new Type[]{mapperClass};
+        } else {
+            types = getGenericInterfaces(mapperClass, expectedType);
+        }
         for (Type t : types) {
             if (t instanceof ParameterizedType) {
                 ParameterizedType pt = (ParameterizedType)t;
@@ -309,7 +315,7 @@ public abstract class ProviderFactory {
                         return;
                     }
                 }
-            } else if (t instanceof Class && ((Class<?>)t).isAssignableFrom(providerClass)) {
+            } else if (t instanceof Class && providerClass.isAssignableFrom((Class<?>)t)) {
                 if (injectContext) {
                     injectContextValues(em, m);
                 }
@@ -901,9 +907,15 @@ public abstract class ProviderFactory {
     
     public static class ClassComparator implements 
         Comparator<Object> {
+        private Class<?> expectedCls;
+        public ClassComparator() {
+        }
+        public ClassComparator(Class<?> expectedCls) {
+            this.expectedCls = expectedCls;
+        }
     
         public int compare(Object em1, Object em2) {
-            return compareClasses(em1, em2);
+            return compareClasses(expectedCls, em1, em2);
         }
     }
     
@@ -916,13 +928,15 @@ public abstract class ProviderFactory {
         
         return (ProviderFactory)e.get(name);
     }
-    
     protected static int compareClasses(Object o1, Object o2) {
+        return compareClasses(null, o1, o2);
+    }
+    protected static int compareClasses(Class<?> expectedCls, Object o1, Object o2) {
         Class<?> cl1 = ClassHelper.getRealClass(o1); 
         Class<?> cl2 = ClassHelper.getRealClass(o2);
         
-        Type[] types1 = getGenericInterfaces(cl1);
-        Type[] types2 = getGenericInterfaces(cl2);
+        Type[] types1 = getGenericInterfaces(cl1, expectedCls);
+        Type[] types2 = getGenericInterfaces(cl2, expectedCls);
         
         if (types1.length == 0 && types2.length > 0) {
             return 1;
@@ -942,19 +956,22 @@ public abstract class ProviderFactory {
         return -1;
     }
     
-    private static Type[] getGenericInterfaces(Class<?> cls) {
+    private static Type[] getGenericInterfaces(Class<?> cls, Class<?> expectedClass) {
         if (Object.class == cls) {
             return new Type[]{};
         }
-        Type genericSuperCls = cls.getGenericSuperclass();
-        if (genericSuperCls instanceof ParameterizedType) {
-            return new Type[]{genericSuperCls};
+        if (expectedClass != null) {
+            Type genericSuperType = cls.getGenericSuperclass();
+            if (genericSuperType instanceof ParameterizedType       
+                && expectedClass == InjectionUtils.getActualType(genericSuperType)) {
+                return new Type[]{genericSuperType};
+            }
         }
         Type[] types = cls.getGenericInterfaces();
         if (types.length > 0) {
             return types;
         }
-        return getGenericInterfaces(cls.getSuperclass());
+        return getGenericInterfaces(cls.getSuperclass(), expectedClass);
     }
     
     protected static class BindingPriorityComparator extends AbstactBindingPriorityComparator {

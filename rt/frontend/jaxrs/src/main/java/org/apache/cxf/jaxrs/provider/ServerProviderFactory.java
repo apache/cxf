@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.provider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -184,7 +183,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (candidates.size() == 0) {
             return null;
         }
-        Collections.sort(candidates, new ExceptionMapperComparator());
+        Collections.sort(candidates, new ClassComparator(exceptionType));
         return (ExceptionMapper<T>) candidates.get(0);
     }
     
@@ -595,13 +594,5 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
     }
     
-    private static class ExceptionMapperComparator implements 
-        Comparator<ExceptionMapper<? extends Throwable>> {
     
-        public int compare(ExceptionMapper<? extends Throwable> em1, 
-                           ExceptionMapper<? extends Throwable> em2) {
-            return compareClasses(em1, em2);
-        }
-        
-    }
 }

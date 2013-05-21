@@ -118,7 +118,7 @@ public final class ClientProviderFactory extends ProviderFactory {
         if (candidates.size() == 0) {
             return null;
         }
-        Collections.sort(candidates, new ProviderFactory.ClassComparator());
+        Collections.sort(candidates, new ProviderFactory.ClassComparator(paramType));
         return (ResponseExceptionMapper<T>) candidates.get(0);
     }
     
