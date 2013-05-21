@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2008, 2009 SOPERA GmbH. All rights reserved. This program 
-    and the accompanying materials are made available under the terms of the 
-    Eclipse Public License v1.0 which accompanies this distribution, and is available 
-    at http://www.eclipse.org/legal/epl-v10.html Contributors: SOPERA GmbH - 
-    initial API and implementation -->
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:test="http://apache.org/hello_world_soap_http"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="
         http://cxf.apache.org/core
@@ -21,47 +31,51 @@
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-   <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
+    <bean id="dateValidator" class="org.apache.cxf.xkms.x509.validator.DateValidator" />
 
-<!--
-   <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.handlers.LdapSchemaConfig">
-      <property name="certObjectClass" value="inetOrgPerson" />
-      <property name="attrUID" value="uid" />
-      <property name="attrIssuerID" value="manager" />
-      <property name="attrSerialNumber" value="employeeNumber" />
-      <property name="attrCrtBinary" value="userCertificate;binary" />
-      <property name="constAttrNamesCSV" value="sn" />
-      <property name="constAttrValuesCSV" value="X509 certificate" />
-      <property name="serviceCertRDNTemplate" value="cn=%s,ou=services" />
-      <property name="serviceCertUIDTemplate" value="cn=%s" />
-   </bean>
+<!-- LDAP based implementation -->
 
-   <bean id="x509LdapLocator" class="org.apache.cxf.xkms.x509.locator.LdapLocator">
-      <constructor-arg ref="ldapSearch" />
-      <constructor-arg ref="ldapSchemaConfig" />
-      <constructor-arg value="dc=example,dc=com" />
-   </bean>
+    <bean id="ldapSchemaConfig" class="org.apache.cxf.xkms.x509.handlers.LdapSchemaConfig">
+        <property name="certObjectClass" value="inetOrgPerson" />
+        <property name="attrUID" value="uid" />
+        <property name="attrIssuerID" value="manager" />
+        <property name="attrSerialNumber" value="employeeNumber" />
+        <property name="attrCrtBinary" value="userCertificate;binary" />
+        <property name="constAttrNamesCSV" value="sn" />
+        <property name="constAttrValuesCSV" value="X509 certificate" />
+        <property name="serviceCertRDNTemplate" value="cn=%s,ou=services" />
+        <property name="serviceCertUIDTemplate" value="cn=%s" />
+    </bean>
 
-    <bean id="ldapRegisterHandler" class="org.apache.cxf.xkms.x509.handlers.LdapRegisterHandler">
-      <constructor-arg ref="ldapSearch" />
-      <constructor-arg ref="ldapSchemaConfig" />
-      <constructor-arg value="dc=example,dc=com" />
-   </bean>
+    <bean id="x509LdapLocator" class="org.apache.cxf.xkms.x509.locator.LdapLocator">
+        <constructor-arg ref="ldapSearch" />
+        <constructor-arg ref="ldapSchemaConfig" />
+        <constructor-arg value="dc=example,dc=com" />
+    </bean>
 
-   <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.handlers.LdapSearch">
-      <constructor-arg value="ldap://localhost:2389" />
-      <constructor-arg value="cn=Directory Manager" />
-      <constructor-arg value="test" />
-      <constructor-arg value="2" />
-   </bean>
--->
+    <bean id="ldapRegisterHandler"
+        class="org.apache.cxf.xkms.x509.handlers.LdapRegisterHandler">
+        <constructor-arg ref="ldapSearch" />
+        <constructor-arg ref="ldapSchemaConfig" />
+        <constructor-arg value="dc=example,dc=com" />
+    </bean>
 
-   <bean id="x509FileLocator" class="org.apache.cxf.xkms.x509.locator.FileLocator">
-      <constructor-arg value="../conf/certs" />
-   </bean>
+    <bean id="ldapSearch" class="org.apache.cxf.xkms.x509.handlers.LdapSearch">
+        <constructor-arg value="ldap://localhost:2389" />
+        <constructor-arg value="cn=Directory Manager" />
+        <constructor-arg value="test" />
+        <constructor-arg value="2" />
+    </bean>
 
-   <bean id="fileRegisterHandler" class="org.apache.cxf.xkms.x509.handlers.FileRegisterHandler">
-      <constructor-arg value="../conf/certs" />
-   </bean>
-   
+<!-- File based implementation -->
+ 
+    <bean id="x509FileLocator" class="org.apache.cxf.xkms.x509.locator.FileLocator">
+        <constructor-arg value="../conf/certs" />
+    </bean>
+
+    <bean id="fileRegisterHandler"
+        class="org.apache.cxf.xkms.x509.handlers.FileRegisterHandler">
+        <constructor-arg value="../conf/certs" />
+    </bean>
+
 </beans>

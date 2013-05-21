@@ -16,12 +16,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<beans 
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
-    xmlns:test="http://apache.org/hello_world_soap_http"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:test="http://apache.org/hello_world_soap_http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="
         http://cxf.apache.org/core
@@ -32,13 +29,13 @@
         http://cxf.apache.org/schemas/jaxws.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-2.0.xsd">
-    <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    <import resource="xkms-endpoint.xml"/>  
-    <import resource="xkms-key-handlers.xml"/>   
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="xkms-endpoint.xml" />
+    <import resource="xkms-key-handlers.xml" />
 
     <cxf:bus>
         <cxf:features>
-            <cxf:logging/>
+            <cxf:logging />
         </cxf:features>
     </cxf:bus>
 
