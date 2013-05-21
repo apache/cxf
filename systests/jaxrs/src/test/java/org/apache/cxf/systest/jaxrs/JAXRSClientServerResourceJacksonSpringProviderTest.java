@@ -25,6 +25,8 @@ import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Collections;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -66,7 +68,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         String endpointAddress =
             "http://localhost:" + PORT + "/webapp/bookstore/collections"; 
         WebClient wc = WebClient.create(endpointAddress,
-            Collections.singletonList(new org.codehaus.jackson.jaxrs.JacksonJsonProvider()));
+            Collections.singletonList(new JacksonJsonProvider()));
         wc.accept("application/json");
         Collection<? extends Book> collection = wc.getCollection(Book.class);
         assertEquals(1, collection.size());

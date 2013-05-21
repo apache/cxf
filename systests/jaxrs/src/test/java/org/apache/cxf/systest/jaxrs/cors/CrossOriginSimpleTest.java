@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
@@ -68,7 +70,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
     @Before
     public void before() {
         List<Object> providers = new ArrayList<Object>();
-        providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+        providers.add(new JacksonJsonProvider());
         configClient = WebClient.create("http://localhost:" + PORT + "/config", providers);
     }
 
