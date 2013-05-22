@@ -37,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.wsdl.extensions.soap.SOAPBinding;
+import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -252,12 +253,22 @@ public class ClientImpl
             for (ServiceInfo svcfo : svc.getServiceInfos()) {
                 for (EndpointInfo e : svcfo.getEndpoints()) {
                     BindingInfo bfo = e.getBinding();
-
-                    if (bfo.getBindingId().equals("http://schemas.xmlsoap.org/wsdl/soap/")) {
+                    String bid = bfo.getBindingId();
+                    if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)) {
                         for (Object o : bfo.getExtensors().get()) {
                             if (o instanceof SOAPBinding) {
                                 SOAPBinding soapB = (SOAPBinding)o;
-                                if (soapB.getTransportURI().equals("http://schemas.xmlsoap.org/soap/http")) {
+                                if ("http://schemas.xmlsoap.org/soap/http".equals(soapB.getTransportURI())) {
+                                    epfo = e;
+                                    break;
+                                }
+                            }
+                        }
+                    } else if ("http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
+                        for (Object o : bfo.getExtensors().get()) {
+                            if (o instanceof SOAP12Binding) {
+                                SOAP12Binding soapB = (SOAP12Binding)o;
+                                if ("http://schemas.xmlsoap.org/soap/http".equals(soapB.getTransportURI())) {
                                     epfo = e;
                                     break;
                                 }
