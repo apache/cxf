@@ -35,6 +35,12 @@
                 <include>licenses/*.*</include>
                 <include>lib/*</include>
                 <include>release_notes.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>..</directory>
+            <outputDirectory>apache-cxf-${cxf.version}</outputDirectory>
+            <includes>
                 <include>README</include>
             </includes>
         </fileSet>
