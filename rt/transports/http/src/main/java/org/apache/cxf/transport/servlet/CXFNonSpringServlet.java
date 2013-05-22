@@ -80,6 +80,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         }
 
         this.controller = createServletController(sc);
+        finalizeServletInit(sc);
     }
 
     private static DestinationRegistry getDestinationRegistryFromBus(Bus bus) {

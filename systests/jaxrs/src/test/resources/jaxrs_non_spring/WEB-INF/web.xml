@@ -52,7 +52,12 @@
 		           org.apache.cxf.jaxrs.provider.JAXBElementProvider
 		      </param-value>    
 		</init-param>
-		
+		<init-param>
+		      <param-name>static-resources-list</param-name>
+		      <param-value>
+		           /staticmodel.xml
+		      </param-value>    
+		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
     
