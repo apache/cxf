@@ -107,7 +107,6 @@ public class HttpConduitBeanDefinitionParser
      * a TLSClientParametersConfig object initialized with the JAXB
      * generated type unmarshalled from the selected node.
      */
-    @SuppressWarnings("deprecation")
     public void mapTLSClientParameters(Element e, BeanDefinitionBuilder bean) {
         BeanDefinitionBuilder paramsbean 
             = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.TLSClientParametersTypeInternal.class);
@@ -176,7 +175,7 @@ public class HttpConduitBeanDefinitionParser
         BeanDefinitionBuilder jaxbbean 
             = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.class);
         jaxbbean.getRawBeanDefinition().setFactoryMethodName("createTLSClientParametersFromType");
-        jaxbbean.addConstructorArg(paramsbean.getBeanDefinition());
+        jaxbbean.addConstructorArgValue(paramsbean.getBeanDefinition());
         bean.addPropertyValue("tlsClientParameters", jaxbbean.getBeanDefinition());
     }
     

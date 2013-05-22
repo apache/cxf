@@ -329,7 +329,6 @@ public abstract class AbstractBeanDefinitionParser
         return context;
     }
 
-    @SuppressWarnings("deprecation")
     protected void mapElementToJaxbProperty(Element data, 
                                             BeanDefinitionBuilder bean, 
                                             String propertyName, 
@@ -345,9 +344,9 @@ public abstract class AbstractBeanDefinitionParser
                 BeanDefinitionBuilder jaxbbean 
                     = BeanDefinitionBuilder.rootBeanDefinition(JAXBBeanFactory.class);
                 jaxbbean.getRawBeanDefinition().setFactoryMethodName("createJAXBBean");
-                jaxbbean.addConstructorArg(getContext(c));
-                jaxbbean.addConstructorArg(writer.toString());
-                jaxbbean.addConstructorArg(c);
+                jaxbbean.addConstructorArgValue(getContext(c));
+                jaxbbean.addConstructorArgValue(writer.toString());
+                jaxbbean.addConstructorArgValue(c);
                 bean.addPropertyValue(propertyName, jaxbbean.getBeanDefinition());
             } catch (Exception ex) {
                 Unmarshaller u = getContext(c).createUnmarshaller();
@@ -391,7 +390,7 @@ public abstract class AbstractBeanDefinitionParser
                                                       Object ... args) {
         return mapElementToJaxbBean(data, cls, factory, cls, method, args);
     }    
-    @SuppressWarnings("deprecation")
+
     public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
                                                        Class<?> cls,
                                                       Class<?> factory,
@@ -415,11 +414,11 @@ public abstract class AbstractBeanDefinitionParser
             jaxbbean.getRawBeanDefinition().setFactoryBeanName(factory.getName());
         }
         jaxbbean.getRawBeanDefinition().setFactoryMethodName(method);
-        jaxbbean.addConstructorArg(writer.toString());
-        jaxbbean.addConstructorArg(getContext(jaxbClass));
+        jaxbbean.addConstructorArgValue(writer.toString());
+        jaxbbean.addConstructorArgValue(getContext(jaxbClass));
         if (args != null) {
             for (Object o : args) {
-                jaxbbean.addConstructorArg(o);
+                jaxbbean.addConstructorArgValue(o);
             }                
         }
         return jaxbbean.getBeanDefinition();
@@ -505,9 +504,8 @@ public abstract class AbstractBeanDefinitionParser
         if (null == id || "".equals(id)) {
             String names = elem.getAttribute(BeanConstants.NAME_ATTR);
             if (null != names) {
-                @SuppressWarnings("deprecation")
                 StringTokenizer st = 
-                    new StringTokenizer(names, BeanDefinitionParserDelegate.BEAN_NAME_DELIMITERS);
+                    new StringTokenizer(names, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
                 if (st.countTokens() > 0) {
                     id = st.nextToken();
                 }

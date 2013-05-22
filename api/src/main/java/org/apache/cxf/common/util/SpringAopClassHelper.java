@@ -23,6 +23,7 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.util.ClassUtils;
 
 /**
  * 
@@ -33,9 +34,8 @@ class SpringAopClassHelper extends ClassHelper {
         Class.forName("org.springframework.aop.framework.Advised");
     }
     
-    @SuppressWarnings("deprecation")
     protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
-        if (AopUtils.isCglibProxyClass(cls)) {
+        if (ClassUtils.isCglibProxyClass(cls)) {
             return getRealClassFromClassInternal(cls.getSuperclass());
         }
         return cls;
@@ -55,7 +55,6 @@ class SpringAopClassHelper extends ClassHelper {
         return o;
     }
 
-    @SuppressWarnings("deprecation")
     protected Class<?> getRealClassInternal(Object o) {
         if (AopUtils.isAopProxy(o) && (o instanceof Advised)) {
             Advised advised = (Advised)o;
@@ -84,7 +83,7 @@ class SpringAopClassHelper extends ClassHelper {
                 // ignore
             }
             
-        } else if (AopUtils.isCglibProxyClass(o.getClass())) {
+        } else if (ClassUtils.isCglibProxyClass(o.getClass())) {
             return getRealClassFromClassInternal(AopUtils.getTargetClass(o));
         }
         return o.getClass();

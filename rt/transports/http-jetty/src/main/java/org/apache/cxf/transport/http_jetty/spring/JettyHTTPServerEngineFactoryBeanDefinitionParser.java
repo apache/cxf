@@ -65,7 +65,6 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
     }
     
 
-    @SuppressWarnings("deprecation")
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         //bean.setAbstract(true);        
@@ -85,11 +84,11 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
                 bean.addConstructorArgReference(bus);
             }
 
-            bean.addConstructorArg(mapElementToJaxbBean(element,
+            bean.addConstructorArgValue(mapElementToJaxbBean(element,
                                                         TLSServerParametersIdentifiedType.class,
                                                         JettySpringTypesFactory.class,
                                                         "createTLSServerParametersMap"));
-            bean.addConstructorArg(mapElementToJaxbBean(element,
+            bean.addConstructorArgValue(mapElementToJaxbBean(element,
                                                         ThreadingParametersIdentifiedType.class,
                                                         JettySpringTypesFactory.class,
                                 "createThreadingParametersMap"));

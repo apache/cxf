@@ -46,7 +46,6 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
         return null;
     }
     
-    @SuppressWarnings("deprecation")
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         Class<?> factoryClass = getFactoryClass();
@@ -132,8 +131,9 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
         } else {
             String factoryId = id + getFactoryIdSuffix();
             ctx.getRegistry().registerBeanDefinition(factoryId, factoryBean.getBeanDefinition());
-            bean.getBeanDefinition().setAttribute("id", id);
-            bean.setFactoryBean(factoryId, "create");
+            bean.getRawBeanDefinition().setAttribute("id", id);
+            bean.getRawBeanDefinition().setFactoryBeanName(factoryId);
+            bean.getRawBeanDefinition().setFactoryMethodName("create");
         }
         if (getDestroyMethod() != null) {
             bean.setDestroyMethodName(getDestroyMethod());
