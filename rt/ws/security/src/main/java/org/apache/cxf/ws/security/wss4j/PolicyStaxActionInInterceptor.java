@@ -27,7 +27,6 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.wss4j.policy.SP11Constants;
@@ -39,8 +38,7 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**
- * This interceptor handles parsing the StaX WS-Security results (events) + marks the 
- * corresponding CXF AssertionInfos as asserted accordingly. WSS4J 2.0 (StAX) takes care of all
+ * This interceptor marks the CXF AssertionInfos as asserted. WSS4J 2.0 (StAX) takes care of all
  * policy validation, so we are just asserting the appropriate AssertionInfo objects in CXF to 
  * make sure that policy validation passes.
  */
@@ -71,80 +69,62 @@ public class PolicyStaxActionInInterceptor extends AbstractPhaseInterceptor<Soap
         AssertionInfoMap aim, List<SecurityEvent> incomingSecurityEventList,
         SoapMessage soapMessage
     ) {
-        TLSSessionInfo tlsInfo = soapMessage.get(TLSSessionInfo.class);
-        if (tlsInfo != null) {
-            assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
-            assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
-            assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
-            assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
-            assertAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-        } else {
-            for (SecurityEvent event : incomingSecurityEventList) {
-                if (WSSecurityEventConstants.SignedPart == event.getSecurityEventType()) {
-                    assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
-                } else if (WSSecurityEventConstants.SignedElement == event.getSecurityEventType()) {
-                    assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
-                } else if (WSSecurityEventConstants.EncryptedPart == event.getSecurityEventType()) {
-                    assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
-                } else if (WSSecurityEventConstants.EncryptedElement == event.getSecurityEventType()) {
-                    assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
-                } else if (WSSecurityEventConstants.ContentEncrypted == event.getSecurityEventType()) {
-                    assertAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
-                }
-            }
-        }
-        
-        for (SecurityEvent event : incomingSecurityEventList) {
-            if (WSSecurityEventConstants.RequiredPart == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.REQUIRED_PARTS);
-            } else if (WSSecurityEventConstants.RequiredElement == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.REQUIRED_ELEMENTS);
-            } 
-        }
+        assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_PARTS);
+        assertAllAssertionsByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
+        assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
+        assertAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
+        assertAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
+
+        assertAllAssertionsByLocalname(aim, SPConstants.REQUIRED_PARTS);
+        assertAllAssertionsByLocalname(aim, SPConstants.REQUIRED_ELEMENTS);
     }
-    
+
     private void verifyTokens(
         AssertionInfoMap aim, List<SecurityEvent> incomingSecurityEventList
     ) {
+        // UsernameToken
+        assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
+        assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN10);
+        assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN11);
+        assertAllAssertionsByLocalname(aim, SPConstants.HASH_PASSWORD);
+        assertAllAssertionsByLocalname(aim, SPConstants.NO_PASSWORD);
+        Collection<AssertionInfo> sp13Ais = aim.get(SP13Constants.NONCE);
+        if (sp13Ais != null) {
+            for (AssertionInfo ai : sp13Ais) {
+                ai.setAsserted(true);
+            }
+        }
+        sp13Ais = aim.get(SP13Constants.CREATED);
+        if (sp13Ais != null) {
+            for (AssertionInfo ai : sp13Ais) {
+                ai.setAsserted(true);
+            }
+        }
+        
+        // X509
+        assertAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKCS7_TOKEN10);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKCS7_TOKEN11);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V1_TOKEN10);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V1_TOKEN11);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V3_TOKEN10);
+        assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V3_TOKEN11);
+        
+        // SAML
+        assertAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
+        assertAllAssertionsByLocalname(aim, "WssSamlV11Token10");
+        assertAllAssertionsByLocalname(aim, "WssSamlV11Token11");
+        assertAllAssertionsByLocalname(aim, "WssSamlV20Token11");
+        
+        // SCT
+        assertAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
+        assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE);
+        
         for (SecurityEvent event : incomingSecurityEventList) {
             if (WSSecurityEventConstants.Timestamp == event.getSecurityEventType()) {
                 assertAllAssertionsByLocalname(aim, "Timestamp");
-            } else if (WSSecurityEventConstants.UsernameToken == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN);
-                assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN10);
-                assertAllAssertionsByLocalname(aim, SPConstants.USERNAME_TOKEN11);
-                assertAllAssertionsByLocalname(aim, SPConstants.HASH_PASSWORD);
-                assertAllAssertionsByLocalname(aim, SPConstants.NO_PASSWORD);
-                Collection<AssertionInfo> sp13Ais = aim.get(SP13Constants.NONCE);
-                if (sp13Ais != null) {
-                    for (AssertionInfo ai : sp13Ais) {
-                        ai.setAsserted(true);
-                    }
-                }
-                sp13Ais = aim.get(SP13Constants.CREATED);
-                if (sp13Ais != null) {
-                    for (AssertionInfo ai : sp13Ais) {
-                        ai.setAsserted(true);
-                    }
-                }
-            } else if (WSSecurityEventConstants.X509Token == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.X509_TOKEN);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKCS7_TOKEN10);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKCS7_TOKEN11);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN10);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_PKI_PATH_V1_TOKEN11);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V1_TOKEN10);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V1_TOKEN11);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V3_TOKEN10);
-                assertAllAssertionsByLocalname(aim, SPConstants.WSS_X509_V3_TOKEN11);
-            } else if (WSSecurityEventConstants.SamlToken == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
-                assertAllAssertionsByLocalname(aim, "WssSamlV11Token10");
-                assertAllAssertionsByLocalname(aim, "WssSamlV11Token11");
-                assertAllAssertionsByLocalname(aim, "WssSamlV20Token11");
-            } else if (WSSecurityEventConstants.SecurityContextToken == event.getSecurityEventType()) {
-                assertAllAssertionsByLocalname(aim, SPConstants.SECURITY_CONTEXT_TOKEN);
-                assertAllAssertionsByLocalname(aim, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE);
             }
         }
         

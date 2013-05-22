@@ -43,6 +43,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.BindingInfo;
@@ -64,6 +65,10 @@ import org.apache.wss4j.policy.stax.OperationPolicy;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyInputProcessor;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
+import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 
@@ -199,6 +204,24 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             return;
         }
         
+        // Add a HttpsSecurityEvent so the policy verification code knows TLS is in use
+        if (isRequestor(message)) {
+            List<SecurityEvent> securityEvents = getSecurityEventList(message);
+            
+            HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
+            httpsTokenSecurityEvent.setAuthenticationType(
+                HttpsTokenSecurityEvent.AuthenticationType.HttpsNoAuthentication
+            );
+            HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl();
+            try {
+                httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+            } catch (XMLSecurityException e) {
+                LOG.fine(e.getMessage());
+            }
+            httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
+            securityEvents.add(httpsTokenSecurityEvent);
+        }
+        
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
         if (s == null) {
             s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
@@ -228,6 +251,18 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             message.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "RefId-" + signCrypto.hashCode());
             message.put("RefId-" + signCrypto.hashCode(), (Crypto)signCrypto);
         }
+    }
+    
+    private List<SecurityEvent> getSecurityEventList(Message message) {
+        @SuppressWarnings("unchecked")
+        List<SecurityEvent> securityEvents = 
+            (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".out");
+        if (securityEvents == null) {
+            securityEvents = new ArrayList<SecurityEvent>();
+            message.getExchange().put(SecurityEvent.class.getName() + ".out", securityEvents);
+        }
+        
+        return securityEvents;
     }
     
     private void checkSymmetricBinding(
@@ -382,9 +417,11 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
             EffectivePolicy policy = 
                 (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-serve-request");
             //PolicyEngineImpl.POLICY_INFO_REQUEST_SERVER);
+            String localName = operationName.getLocalPart();
             if (MessageUtils.isRequestor(msg)) {
                 policy = 
                     (EffectivePolicy)bindingOperationInfo.getProperty("policy-engine-info-client-response");
+                localName = bindingOperationInfo.getOutput().getMessageInfo().getName().getLocalPart();
             }
             SoapOperationInfo soapOperationInfo = bindingOperationInfo.getExtensor(SoapOperationInfo.class);
 
@@ -397,10 +434,10 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
                 //most probably throw an exception:
                 throw new IllegalArgumentException("BindingInfo is not an instance of SoapBindingInfo");
             }
-
+            
             //todo: I think its a bug that we handover only the localPart of the operation. 
             // Needs to be fixed in ws-security-policy-stax
-            OperationPolicy operationPolicy = new OperationPolicy(operationName.getLocalPart());
+            OperationPolicy operationPolicy = new OperationPolicy(localName);
             operationPolicy.setPolicy(policy.getPolicy());
             operationPolicy.setOperationAction(soapOperationInfo.getAction());
             operationPolicy.setSoapMessageVersionNamespace(soapNS);
@@ -410,7 +447,7 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
         
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<SecurityEvent>();
         // TODO Soap Action
-        PolicyEnforcer securityEventListener = new PolicyEnforcer(operationPolicies, "") {
+        PolicyEnforcer securityEventListener = new PolicyEnforcer(operationPolicies, "", isRequestor(msg)) {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
                 incomingSecurityEventList.add(securityEvent);

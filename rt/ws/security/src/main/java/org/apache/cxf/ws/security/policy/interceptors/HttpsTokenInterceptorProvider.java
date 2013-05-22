@@ -207,6 +207,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }
+                    
                     NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_DIGEST_AUTHENTICATION);
                     NegotiationUtils.assertPolicy(aim, SPConstants.HTTP_BASIC_AUTHENTICATION);
                     NegotiationUtils.assertPolicy(aim, SPConstants.REQUIRE_CLIENT_CERTIFICATE);
@@ -219,14 +220,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
             Collection<AssertionInfo> ais, 
             Message message
         ) throws XMLSecurityException {
-            @SuppressWarnings("unchecked")
-            List<SecurityEvent> securityEvents = 
-                (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".out");
-            if (securityEvents == null) {
-                securityEvents = new ArrayList<SecurityEvent>();
-                message.getExchange().put(SecurityEvent.class.getName() + ".out", securityEvents);
-            }
-            
+            List<SecurityEvent> securityEvents = getSecurityEventList(message);
             AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
             
             for (AssertionInfo ai : ais) {
@@ -307,6 +301,18 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                     securityEvents.add(httpsTokenSecurityEvent);
                 }
             }
+        }
+        
+        private List<SecurityEvent> getSecurityEventList(Message message) {
+            @SuppressWarnings("unchecked")
+            List<SecurityEvent> securityEvents = 
+                (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".out");
+            if (securityEvents == null) {
+                securityEvents = new ArrayList<SecurityEvent>();
+                message.getExchange().put(SecurityEvent.class.getName() + ".out", securityEvents);
+            }
+            
+            return securityEvents;
         }
         
         private SecurityContext createSecurityContext(final Principal p) {
