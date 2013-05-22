@@ -189,7 +189,7 @@ public class SoapFault extends Fault {
      * 
      * @param subCode The SubCode element as detailed by the SOAP 1.2 spec. 
      */
-    public void appendSubCode(QName subCode) {
+    public void addSubCode(QName subCode) {
         if (subCodes == null) {
             subCodes = new LinkedList<QName>();
         }
