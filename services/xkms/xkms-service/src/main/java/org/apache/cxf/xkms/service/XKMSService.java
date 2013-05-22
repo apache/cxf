@@ -21,7 +21,6 @@ package org.apache.cxf.xkms.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -241,7 +240,7 @@ public class XKMSService implements XKMSPortType {
     // TODO refactoring into factory class?
     public static KeyBindingType createKeyBinding(ValidateResultType result) {
         KeyBindingType binding = new KeyBindingType();
-        binding.setId(UUID.randomUUID().toString());
+        binding.setId(XKMSResponseFactory.generateUniqueID());
         result.getKeyBinding().add(binding);
 
         StatusType status = new StatusType();

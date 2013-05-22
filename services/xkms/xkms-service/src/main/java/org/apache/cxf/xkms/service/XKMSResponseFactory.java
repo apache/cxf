@@ -103,7 +103,7 @@ public final class XKMSResponseFactory {
      * @return Returns generated random UUID
      */
     public static String generateUniqueID() {
-        return UUID.randomUUID().toString();
+        return "I" + UUID.randomUUID().getMostSignificantBits();
     }
 
 }
