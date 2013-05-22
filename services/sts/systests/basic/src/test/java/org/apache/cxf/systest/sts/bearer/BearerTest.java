@@ -165,6 +165,31 @@ public class BearerTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
+    @org.junit.Test
+    public void testSAML2BearerNoBinding() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = BearerTest.class.getResource("cxf-client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = BearerTest.class.getResource("DoubleIt.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2BearerPort2");
+        DoubleItPortType transportSaml2Port = 
+            service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(transportSaml2Port, PORT);
+        if (standalone) {
+            TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, STSPORT);
+        }
+        
+        doubleIt(transportSaml2Port, 45);
+        
+        ((java.io.Closeable)transportSaml2Port).close();
+        bus.shutdown(true);
+    }
     
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);

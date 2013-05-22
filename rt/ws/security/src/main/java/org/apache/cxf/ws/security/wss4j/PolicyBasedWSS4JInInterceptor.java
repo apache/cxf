@@ -241,14 +241,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return action;
     }
     
-    private String checkTransportBinding(
+    private String checkDefaultBinding(
         AssertionInfoMap aim, String action, SoapMessage message
     ) throws WSSecurityException {
-        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
-        if (ais == null || ais.isEmpty()) {
-            return action;
-        }
-        
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
         Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_CRYPTO);
@@ -518,7 +513,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             handleWSS11(aim, message);
             action = checkAsymmetricBinding(aim, action, message);
             action = checkSymmetricBinding(aim, action, message);
-            action = checkTransportBinding(aim, action, message);
+            Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+            if ("".equals(action) || (ais != null && !ais.isEmpty())) {
+                action = checkDefaultBinding(aim, action, message);
+            }
             checkUsernameToken(aim, message);
             
             // stuff we can default to asserted and un-assert if a condition isn't met
