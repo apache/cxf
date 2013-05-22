@@ -44,6 +44,20 @@
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
+	<wsdl:binding name="DoubleItTransportSAML2BearerBinding2" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItBindingTransportSAML2BearerNoBindingPolicy" />
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
 
 	<wsdl:service name="DoubleItService">
 		<wsdl:port name="DoubleItTransportSAML2BearerPort" 
@@ -51,6 +65,11 @@
 			<soap:address
 				location="https://localhost:8081/doubleit/services/doubleittransportsaml2bearer" />
 		</wsdl:port>
+		<wsdl:port name="DoubleItTransportSAML2BearerPort2" 
+                   binding="tns:DoubleItTransportSAML2BearerBinding2">
+            <soap:address
+                location="https://localhost:8081/doubleit/services/doubleittransportsaml2bearer2" />
+        </wsdl:port>
 	</wsdl:service>
 	
 	<wsp:Policy wsu:Id="DoubleItBindingTransportSAML2BearerPolicy">
@@ -128,6 +147,59 @@
 			</wsp:All>
 		</wsp:ExactlyOne>
 	</wsp:Policy>
+	
+	<wsp:Policy wsu:Id="DoubleItBindingTransportSAML2BearerNoBindingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsam:Addressing wsp:Optional="false">
+                    <wsp:Policy />
+                </wsam:Addressing>
+                <sp:SignedSupportingTokens
+                    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+                    <wsp:Policy>
+                        <sp:IssuedToken
+                            sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                            <sp:RequestSecurityTokenTemplate>
+                                <t:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0</t:TokenType>
+                                <t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer</t:KeyType>
+                            </sp:RequestSecurityTokenTemplate>
+                            <wsp:Policy>
+                                <sp:RequireInternalReference />
+                            </wsp:Policy>
+                            <sp:Issuer>
+                                <wsaw:Address>http://localhost:8080/SecurityTokenService/UT
+                                </wsaw:Address>
+                                <wsaw:Metadata>
+                                    <wsx:Metadata>
+                                        <wsx:MetadataSection>
+                                            <wsx:MetadataReference>
+                                                <wsaw:Address>http://localhost:8080/SecurityTokenService/UT/mex
+                                                </wsaw:Address>
+                                            </wsx:MetadataReference>
+                                        </wsx:MetadataSection>
+                                    </wsx:Metadata>
+                                </wsaw:Metadata>
+                            </sp:Issuer>
+                        </sp:IssuedToken>
+                    </wsp:Policy>
+                </sp:SignedSupportingTokens>
+                <sp:Wss11>
+                    <wsp:Policy>
+                        <sp:MustSupportRefIssuerSerial />
+                        <sp:MustSupportRefThumbprint />
+                        <sp:MustSupportRefEncryptedKey />
+                    </wsp:Policy>
+                </sp:Wss11>
+                <sp:Trust13>
+                    <wsp:Policy>
+                        <sp:MustSupportIssuedTokens />
+                        <sp:RequireClientEntropy />
+                        <sp:RequireServerEntropy />
+                    </wsp:Policy>
+                </sp:Trust13>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
 	
 	<wsp:Policy wsu:Id="DoubleItBinding_DoubleIt_Input_Policy">
 		<wsp:ExactlyOne>
