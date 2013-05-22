@@ -61,6 +61,16 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     }
     
     @Test
+    public void testGetStaticResource() throws Exception {
+        String address = "http://localhost:" + PORT + "/singleton/staticmodel.xml";
+        WebClient wc = WebClient.create(address);
+        String response = wc.get(String.class);
+        assertTrue(response.startsWith("<model"));
+        assertEquals("application/xml+model", wc.getResponse().getMetadata().getFirst("Content-Type"));
+        
+    }
+    
+    @Test
     public void testGetBook123UserModel() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/usermodel/bookstore/books/123",
                                "resources/expected_get_book123.txt",
