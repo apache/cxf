@@ -69,7 +69,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     
     private static final String STATIC_RESOURCES_PARAMETER = "static-resources-list";
     private static final String STATIC_WELCOME_FILE_PARAMETER = "static-welcome-file";
-    private static final String STATIC_RESOURCES_MAP_RESOURCE = "/WEB-INF/cxfServletStaticResourcesMap.txt";    
+    private static final String STATIC_RESOURCES_MAP_RESOURCE = "/cxfServletStaticResourcesMap.txt";    
     
     private static final String REDIRECTS_PARAMETER = "redirects-list";
     private static final String REDIRECT_SERVLET_NAME_PARAMETER = "redirect-servlet-name";
