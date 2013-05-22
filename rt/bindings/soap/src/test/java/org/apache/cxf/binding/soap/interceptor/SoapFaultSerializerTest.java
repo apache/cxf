@@ -150,8 +150,8 @@ public class SoapFaultSerializerTest extends AbstractCXFTest {
         String faultString = "Hadrian caused this Fault!";
         SoapFault fault = new SoapFault(faultString, Soap12.getInstance().getSender());
         
-        fault.appendSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode"));
-        fault.appendSubCode(new QName("http://cxf.apache.org/soap/fault2", "invalidsoap2", "cxffaultcode2"));
+        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode"));
+        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault2", "invalidsoap2", "cxffaultcode2"));
 
         SoapMessage m = new SoapMessage(new MessageImpl());
         m.setVersion(Soap12.getInstance());

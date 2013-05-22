@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.interceptors;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -37,6 +38,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataWriter;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.message.FaultMode;
@@ -88,16 +90,10 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         try {
             if (f.getCause().getClass().equals(SOAPFaultException.class)) {
                 SOAPFaultException sf = (SOAPFaultException) (f.getCause());
-                if (sf.getFault().getFaultSubcodes().hasNext()
-                        && f.getClass().equals(SoapFault.class)) {
-                    String subcode = sf.getFault().getFaultSubcodes().next()
-                           .toString();
-                    String nameSpace = subcode.substring(
-                           subcode.indexOf("{") + 1, subcode.indexOf("}"));
-                    String localPart = subcode
-                           .substring(subcode.indexOf("}") + 1);
-                    QName subcodeQName = new QName(nameSpace, localPart);
-                    ((SoapFault) f).setSubCode(subcodeQName);
+                if (f instanceof SoapFault) {
+                    for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
+                        ((SoapFault) f).addSubCode(it.next());    
+                    }
                 }
                 if (sf.getFault().getFaultReasonLocales().hasNext()) {
                     Locale lang = (Locale) sf.getFault()
