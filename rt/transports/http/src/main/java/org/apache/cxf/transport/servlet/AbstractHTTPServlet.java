@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
@@ -40,8 +43,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 
@@ -49,7 +57,8 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public abstract class AbstractHTTPServlet extends HttpServlet {
     
     private static final long serialVersionUID = -8357252743467075117L;
-
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPServlet.class);
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractHTTPServlet.class);
     /**
      * List of well-known HTTP 1.1 verbs, with POST and GET being the most used verbs at the top 
      */
@@ -58,6 +67,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     
     private static final String STATIC_RESOURCES_PARAMETER = "static-resources-list";
     private static final String STATIC_WELCOME_FILE_PARAMETER = "static-welcome-file";
+    private static final String STATIC_RESOURCES_MAP_RESOURCE = "/WEB-INF/cxfServletStaticResourcesMap.txt";    
     
     private static final String REDIRECTS_PARAMETER = "redirects-list";
     private static final String REDIRECT_SERVLET_NAME_PARAMETER = "redirect-servlet-name";
@@ -65,16 +75,16 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     private static final String REDIRECT_ATTRIBUTES_PARAMETER = "redirect-attributes";
     private static final String REDIRECT_QUERY_CHECK_PARAMETER = "redirect-query-check";
     
-    private static final Map<String, String> STATIC_CONTENT_TYPES;
+    private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
     
     static {
-        STATIC_CONTENT_TYPES = new HashMap<String, String>();
-        STATIC_CONTENT_TYPES.put("html", "text/html");
-        STATIC_CONTENT_TYPES.put("txt", "text/plain");
-        STATIC_CONTENT_TYPES.put("css", "text/css");
-        STATIC_CONTENT_TYPES.put("pdf", "application/pdf");
-        STATIC_CONTENT_TYPES.put("xsd", "application/xml");
-        // TODO : add more types if needed
+        DEFAULT_STATIC_CONTENT_TYPES = new HashMap<String, String>();
+        DEFAULT_STATIC_CONTENT_TYPES.put("html", "text/html");
+        DEFAULT_STATIC_CONTENT_TYPES.put("txt", "text/plain");
+        DEFAULT_STATIC_CONTENT_TYPES.put("css", "text/css");
+        DEFAULT_STATIC_CONTENT_TYPES.put("pdf", "application/pdf");
+        DEFAULT_STATIC_CONTENT_TYPES.put("xsd", "application/xml");
+        DEFAULT_STATIC_CONTENT_TYPES.put("js", "application/javascript");
     }
     
     private List<Pattern> staticResourcesList;
@@ -83,6 +93,8 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     private String dispatcherServletPath;
     private String dispatcherServletName;
     private Map<String, String> redirectAttributes;
+    private Map<String, String> staticContentTypes = 
+        new HashMap<String, String>(DEFAULT_STATIC_CONTENT_TYPES);
     private boolean redirectQueryCheck;
     
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -97,10 +109,39 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
         
         redirectAttributes = parseMapSequence(servletConfig.getInitParameter(REDIRECT_ATTRIBUTES_PARAMETER));
-            
-        
     }
     
+    protected void finalizeServletInit(ServletConfig servletConfig) {
+        InputStream is = getResourceAsStream("/WEB-INF" + STATIC_RESOURCES_MAP_RESOURCE);
+        if (is == null) {
+            is = getResourceAsStream(STATIC_RESOURCES_MAP_RESOURCE);
+        }
+        if (is != null) {
+            try {
+                Properties props = new Properties();
+                props.load(is);
+                for (String name : props.stringPropertyNames()) {
+                    staticContentTypes.put(name, props.getProperty(name));
+                }
+            } catch (IOException ex) {
+                String message = new org.apache.cxf.common.i18n.Message("STATIC_RESOURCES_MAP_LOAD_FAILURE",
+                                                                        BUNDLE).toString();
+                LOG.warning(message);
+            }    
+        }    
+    }
+    
+    protected InputStream getResourceAsStream(String path) {
+        
+        InputStream is = ClassLoaderUtils.getResourceAsStream(path, AbstractHTTPServlet.class);
+        if (is == null && getBus() != null) {
+            ResourceManager rm = getBus().getExtension(ResourceManager.class);
+            if (rm != null) {
+                is = rm.resolveResource(path, InputStream.class);
+            }
+        }
+        return is;
+    }
     protected static List<Pattern> parseListSequence(String values) {
         if (values != null) {
             List<Pattern> list = new LinkedList<Pattern>();
@@ -244,17 +285,19 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         return false;
     }
     
+    protected abstract Bus getBus();
+    
     protected void serveStaticContent(HttpServletRequest request, 
                                       HttpServletResponse response,
                                       String pathInfo) throws ServletException {
-        InputStream is = super.getServletContext().getResourceAsStream(pathInfo);
+        InputStream is = getResourceAsStream(pathInfo);
         if (is == null) {
             throw new ServletException("Static resource " + pathInfo + " is not available");
         }
         try {
             int ind = pathInfo.lastIndexOf(".");
             if (ind != -1 && ind < pathInfo.length()) {
-                String type = STATIC_CONTENT_TYPES.get(pathInfo.substring(ind + 1));
+                String type = getStaticResourceContentType(pathInfo.substring(ind + 1));
                 if (type != null) {
                     response.setContentType(type);
                 }
@@ -268,6 +311,10 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
                                        + " can not be written to the output stream");
         }
         
+    }
+    
+    protected String getStaticResourceContentType(String extension) {
+        return staticContentTypes.get(extension);
     }
     
     protected void redirect(HttpServletRequest request, HttpServletResponse response, String pathInfo) 
