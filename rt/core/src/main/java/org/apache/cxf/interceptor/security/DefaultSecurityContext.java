@@ -48,6 +48,9 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     public DefaultSecurityContext(Principal p, Subject subject) {
         this.p = p;
         this.subject = subject;
+        if (p == null) {
+            this.p = findPrincipal(subject);
+        }
     }
     
     private static Principal findPrincipal(Subject subject) {
